@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
+    <suppress>
+        <notes>Suppress spring-boot-starter-data-jpa being matched as spring-data-jpa</notes>
+        <gav regex="true">^org\.springframework\.boot:spring-boot-starter-data-jpa:.*$</gav>
+        <cpe>cpe:/a:pivotal_software:spring_data_jpa</cpe>
+    </suppress>
+    <suppress>
+        <notes>Does not apply as tomcat is not installed as a service</notes>
+        <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed.*:.*$</gav>
+        <cve>CVE-2016-6325</cve>
+    </suppress>
+    <suppress>
+        <notes>Ignoring logback-core warning and this is not an error</notes>
+        <gav regex="true">^ch\.qos\.logback:logback-classic:.*$</gav>
+        <cpe>cpe:/a:logback:logback</cpe>
+    </suppress>
+    <suppress>
+        <notes>Ignoring warning</notes>
+        <gav regex="true">^ch\.qos\.logback:logback-core:.*$</gav>
+        <cpe>cpe:/a:logback:logback</cpe>
+    </suppress>
+    <suppress>
+        <notes>Will be fixed once java-logging project update logback-core dependency version to 1.2.0</notes>
+        <gav regex="true">^ch\.qos\.logback:logback-core:.*$</gav>
+        <cve>CVE-2017-5929</cve>
+    </suppress>
+    <suppress>
+        <notes>Warning ignored</notes>
+        <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes>Ignored warning. This will be fixed in future versions of spring-boot-starter-web dependency</notes>
+        <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-websocket:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes>This is part of spring boot starter, can be ignored</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:.*$</gav>
+        <cpe>cpe:/a:fasterxml:jackson</cpe>
+    </suppress>
+
+    <suppress>
+        <notes>This is part of spring boot starter, can be ignored</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.core:.*$</gav>
+        <cve>CVE-2016-7051</cve>
+    </suppress>
+
+    <suppress>
+        <notes>This is part of spring boot starter, can be ignored</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.datatype:.*$</gav>
+        <cpe>cpe:/a:fasterxml:jackson</cpe>
+    </suppress>
+    <suppress>
+        <notes>This is part of spring boot starter, can be ignored</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.datatype:.*$</gav>
+        <cve>CVE-2016-7051</cve>
+    </suppress>
+    <suppress>
+        <notes>This is part of spring boot starter, can be ignored</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.module:.*$</gav>
+        <cpe>cpe:/a:fasterxml:jackson</cpe>
+    </suppress>
+    <suppress>
+        <notes>This is part of spring boot starter, can be ignored</notes>
+        <gav regex="true">^com\.fasterxml\.jackson\.module:.*$</gav>
+        <cve>CVE-2016-7051</cve>
+    </suppress>
+</suppressions>
