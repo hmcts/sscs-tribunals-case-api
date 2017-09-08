@@ -10,3 +10,7 @@
 # Maven
 log/
 target/
+
+# Gradle
+.gradle
+build

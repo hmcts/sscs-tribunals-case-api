@@ -1,6 +1,5 @@
 package uk.gov.hmcts.sscs;
 
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
