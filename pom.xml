@@ -33,6 +33,7 @@
         <jacoco-maven-plugin.version>0.7.9</jacoco-maven-plugin.version>
         <javax.ws.rs-api.version>2.0.1</javax.ws.rs-api.version>
         <logback.encoder.version>4.9</logback.encoder.version>
+        <token.generator.version>0.0.1-SNAPSHOT</token.generator.version>
     </properties>
 
     <parent>
@@ -118,6 +119,12 @@
             <groupId>uk.gov.hmcts.reform</groupId>
             <artifactId>java-logging</artifactId>
             <version>${json.logging.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>uk.gov.hmcts.auth.provider.service</groupId>
+            <artifactId>service-token-generator-spring</artifactId>
+            <version>${token.generator.version}</version>
         </dependency>
      </dependencies>
 
