@@ -44,5 +44,7 @@ repositories {
 dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+  compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 }
