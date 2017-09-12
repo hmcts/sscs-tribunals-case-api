@@ -2,7 +2,7 @@ FROM openjdk:8-alpine
 
 RUN mkdir -p /opt/sscs/tribunals-case-api
 
-COPY target/tribunals-case-api*.jar /opt/sscs/tribunals-case-api/app.jar
+COPY build/libs/tribunals-case-api*.jar /opt/sscs/tribunals-case-api/app.jar
 
 ENV JAVA_OPTS=""
 

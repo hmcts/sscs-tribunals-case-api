@@ -12,7 +12,7 @@ services:
 
     depends_on:
       service-auth-provider-api:
-        condition: service_healthy
+        condition: service_started
     links:
       - service-auth-provider-api
 
