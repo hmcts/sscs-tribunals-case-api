@@ -47,7 +47,7 @@ node {
     }
     stage('Smoke Test -Dev') {
         sleep(208)
-        SMOKETEST_URL = "http://sscs-tribunals-api"+deployEnvironment+".${computeCluster}-dev.p.azurewebsites.net/health"
+        SMOKETEST_URL = "http://sscs-tribunals-api-"+deployEnvironment+".${computeCluster}-dev.p.azurewebsites.net/health"
         sh "curl -vf $SMOKETEST_URL"
     }
 }
