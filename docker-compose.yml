@@ -6,10 +6,9 @@ services:
       context: .
     image: docker.artifactory.reform.hmcts.net/sscs/tribunals-case-api
     environment:
-      - AUTH_PROVIDER_SERVICE_CLIENT_KEY=JdLxxbOOnulDBbOb
+      - AUTH_PROVIDER_SERVICE_CLIENT_KEY=AAAAAAAAAAAAAAAA
       - AUTH_PROVIDER_SERVICE_API=http://provider:8080
       - CCD_SERVICE_API=http://localhost:4451/citizens/%s/jurisdictions/SSCS/case-types/GrantOfRepresentation
-
     depends_on:
       service-auth-provider-api:
         condition: service_started
@@ -19,6 +18,8 @@ services:
   service-auth-provider-api:
     image: docker.artifactory.reform.hmcts.net/auth/service-auth-provider-api:47e18b53aad48ae8124744041988565e07dfed50
     environment:
-      - auth.provider.service.server.jwtKey=wThK0f0/lh3FlxFcL4xUWDMI5C1J9KyQBgXV4wseh1e5J1uYJIjvTvArHxQDrYoHJ23xFxjHkOnvNbR5dXRoxA==
-      - auth.provider.service.server.microserviceKeys.sscs=JdLxxbOOnulDBbOb
+      - auth.provider.service.server.jwtKey=this-is-a-test-jwt-key
+      - auth.provider.service.server.microserviceKeys.sscs=AAAAAAAAAAAAAAAA
       - auth.provider.service.testing-support.enabled=true
+    ports:
+      - 8080:8080
