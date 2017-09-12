@@ -50,8 +50,8 @@ dependencies {
 }
 
 jar {
+  baseName 'tribunals-case-api'
   manifest {
-
     attributes 'Implementation-Title': project.name,
             'Implementation-Version': project.version
   }
