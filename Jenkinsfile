@@ -16,8 +16,6 @@ def javaDeployer = new WebAppDeploy(this, product, "api")
 def computeCluster = "core-compute-sample"
 
 node {
-    deployEnvironment =  (deployEnvironment in ['dev', 'test'])
-                                ? deployEnvironment : error ("${deployEnvironment} is not one of reforms deployment environments")
 
     stage('Checkout') {
         deleteDir()
@@ -42,12 +40,26 @@ node {
     }
 
     stage('Deploy - Dev') {
-        javaDeployer.deployJavaWebApp(deployEnvironment,"${computeCluster}-dev", 'build/libs/tribunals-case-api-1.0.0.jar',
+       deployEnvironment = 'dev';
+        javaDeployer.deployJavaWebApp(deployEnvironment,"${computeCluster}-${deployEnvironment}", 'build/libs/tribunals-case-api-1.0.0.jar',
                 'src/main/resources/application_env.yml', 'web.config')
     }
     stage('Smoke Test -Dev') {
+        deployEnvironment = 'dev';
         sleep(208)
-        SMOKETEST_URL = "http://sscs-tribunals-api-"+deployEnvironment+".${computeCluster}-dev.p.azurewebsites.net/health"
+        SMOKETEST_URL = "http://sscs-tribunals-api-"+deployEnvironment+".${computeCluster}-${deployEnvironment}.p.azurewebsites.net/health"
         sh "curl -vf $SMOKETEST_URL"
     }
+
+        stage('Deploy - Prod') {
+           deployEnvironment = 'prod';
+            javaDeployer.deployJavaWebApp(deployEnvironment,"${computeCluster}-${deployEnvironment}", 'build/libs/tribunals-case-api-1.0.0.jar',
+                    'src/main/resources/application_env.yml', 'web.config')
+        }
+        stage('Smoke Test -Prod') {
+            deployEnvironment = 'prod';
+            sleep(208)
+            SMOKETEST_URL = "http://sscs-tribunals-api-"+deployEnvironment+".${computeCluster}-${deployEnvironment}.p.azurewebsites.net/health"
+            sh "curl -vf $SMOKETEST_URL"
+        }
 }
