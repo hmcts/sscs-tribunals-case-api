@@ -9,7 +9,7 @@ plugins {
 }
 
 group = 'uk.gov.hmcts.sscs'
-version = '0.0.1'
+version = '1.0.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -47,4 +47,19 @@ dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
 
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+}
+
+jar {
+  manifest {
+
+    attributes 'Implementation-Title': project.name,
+            'Implementation-Version': project.version
+  }
+}
+
+
+task printVersion {
+  doLast {
+    print project.version
+  }
 }

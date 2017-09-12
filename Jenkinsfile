@@ -42,7 +42,7 @@ node {
     }
 
     stage('Deploy - Dev') {
-        javaDeployer.deployJavaWebApp(deployEnvironment,"${computeCluster}-dev", 'build/libs/tribunals-case-api-0.0.1.jar',
+        javaDeployer.deployJavaWebApp(deployEnvironment,"${computeCluster}-dev", 'build/libs/tribunals-case-api-1.0.0.jar',
                 'src/main/resources/application_env.yml', 'web.config')
     }
     stage('Smoke Test -Dev') {
