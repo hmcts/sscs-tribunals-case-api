@@ -51,15 +51,4 @@ node {
         sh "curl -vf $SMOKETEST_URL"
     }
 
-        stage('Deploy - Prod') {
-           deployEnvironment = 'prod';
-            javaDeployer.deployJavaWebApp(deployEnvironment,"${computeCluster}-${deployEnvironment}", 'build/libs/tribunals-case-api-1.0.0.jar',
-                    'src/main/resources/application_env.yml', 'web.config')
-        }
-        stage('Smoke Test -Prod') {
-            deployEnvironment = 'prod';
-            sleep(208)
-            SMOKETEST_URL = "http://sscs-tribunals-api-"+deployEnvironment+".${computeCluster}-${deployEnvironment}.p.azurewebsites.net/health"
-            sh "curl -vf $SMOKETEST_URL"
-        }
 }
