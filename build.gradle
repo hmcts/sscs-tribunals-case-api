@@ -1,11 +1,11 @@
 plugins {
-  id 'checkstyle'
-  id 'org.sonarqube' version '2.5'
-  id 'jacoco'
-  id 'io.spring.dependency-management' version '1.0.3.RELEASE'
-  id 'org.springframework.boot' version '1.5.6.RELEASE'
-  id 'org.owasp.dependencycheck' version '1.4.5.1'
-  id 'com.github.ben-manes.versions' version '0.15.0'
+    id 'checkstyle'
+    id 'org.sonarqube' version '2.5'
+    id 'jacoco'
+    id 'io.spring.dependency-management' version '1.0.3.RELEASE'
+    id 'org.springframework.boot' version '1.5.6.RELEASE'
+    id 'org.owasp.dependencycheck' version '1.4.5.1'
+    id 'com.github.ben-manes.versions' version '0.15.0'
 }
 
 group = 'uk.gov.hmcts.sscs'
@@ -19,47 +19,52 @@ checkstyle.configFile = new File(rootDir, "checkstyle.xml")
 
 // make build fail on Checkstyle issues (https://github.com/gradle/gradle/issues/881)
 tasks.withType(Checkstyle).each { checkstyleTask ->
-  checkstyleTask.doLast {
-    reports.all { report ->
-      def outputFile = report.destination
-      if (outputFile.exists() && outputFile.text.contains("<error ")) {
-        throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
-      }
+    checkstyleTask.doLast {
+        reports.all { report ->
+            def outputFile = report.destination
+            if (outputFile.exists() && outputFile.text.contains("<error ")) {
+                throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
+            }
+        }
     }
-  }
 }
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
-  // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-  // range of 0-10 fails the build, anything greater and it doesn't fail the build
-  failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
-  suppressionFile = 'dependency-check-suppressions.xml'
+    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
+    // range of 0-10 fails the build, anything greater and it doesn't fail the build
+    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
+    suppressionFile = 'dependency-check-suppressions.xml'
 }
 
 repositories {
-  jcenter()
+    jcenter()
 }
 
 dependencies {
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-  compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
 
-  testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
+    compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 }
 
 jar {
-  baseName 'tribunals-case-api'
-  manifest {
-    attributes 'Implementation-Title': project.name,
-            'Implementation-Version': project.version
-  }
+    baseName 'tribunals-case-api'
+    manifest {
+        attributes 'Implementation-Title': project.name,
+                'Implementation-Version': project.version
+    }
 }
 
 
 task printVersion {
-  doLast {
-    print project.version
-  }
+    doLast {
+        print project.version
+    }
 }
