@@ -19,7 +19,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.sscs.TribunalsCaseApiApplication;
-import uk.gov.hmcts.sscs.tribunals.service.CoreCaseService;
+import uk.gov.hmcts.sscs.tribunals.service.CcdService;
 
 
 
@@ -54,7 +54,7 @@ public class AppealsControllerTest {
 
 
     @Mock
-    private CoreCaseService coreCaseService;
+    private CcdService ccdService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -63,14 +63,14 @@ public class AppealsControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        appealsController = new AppealsController(coreCaseService);
+        appealsController = new AppealsController(ccdService);
         this.mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
 
     @Test
     public void shouldCreateNewAppeals() throws Exception {
-        doNothing().when(coreCaseService).storeAppeals(appealJson);
+        doNothing().when(ccdService).saveCase(appealJson);
 
         this.mockMvc.perform(post("/appeals").content(appealJson).contentType(contentType))
                 .andExpect(status().isCreated());

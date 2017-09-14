@@ -11,22 +11,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.sscs.tribunals.service.CoreCaseService;
+import uk.gov.hmcts.sscs.tribunals.service.CcdService;
 
 
 @RestController
 public class AppealsController {
 
-    private CoreCaseService coreCaseService;
+    private CcdService ccdService;
 
     @Autowired
-    public AppealsController(CoreCaseService coreCaseService) {
-        this.coreCaseService = coreCaseService;
+    public AppealsController(CcdService ccdService) {
+        this.ccdService = ccdService;
     }
 
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createApppeals(@RequestBody String appealsJson) throws IOException {
-        coreCaseService.storeAppeals(appealsJson);
+        ccdService.saveCase(appealsJson);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
