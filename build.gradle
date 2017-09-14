@@ -39,13 +39,15 @@ dependencyCheck {
 
 repositories {
   jcenter()
+  mavenCentral()
 }
 
 dependencies {
   compile group: 'org.springframework.boot', name: 'spring-boot-starter'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
   compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
-
+  compile group: 'org.projectlombok', name: 'lombok'
+  compile group: 'com.google.guava', name: 'guava', version: '18.0'
   testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 }
 
@@ -62,4 +64,8 @@ task printVersion {
   doLast {
     print project.version
   }
+}
+
+task getHomeDir << {
+  println gradle.gradleHomeDir
 }
