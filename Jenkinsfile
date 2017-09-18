@@ -47,8 +47,6 @@ node {
 
         javaDeployer.deployJavaWebApp(deployEnvironment, 'build/libs/tribunals-case-api-1.0.0.jar', 'web.config')
 
-        sleep(200)
-
         javaDeployer.healthCheck('dev')
     }
 
@@ -60,8 +58,6 @@ node {
         unstash product
 
         javaDeployer.deployJavaWebApp(deployEnvironment, 'build/libs/tribunals-case-api-1.0.0.jar', 'web.config')
-
-        sleep(200)
 
         javaDeployer.healthCheck('dev')
     }
