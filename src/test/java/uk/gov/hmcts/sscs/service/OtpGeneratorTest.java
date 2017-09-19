@@ -9,7 +9,7 @@ public class OtpGeneratorTest {
 
     @Test
     public void shouldGenerate6DigitOtp() throws Exception {
-        String key = "AAAAAAAAAAAAAAAA";
+        String key = "KWCNVXMFJ6PIZIDX";
         String otp = otpGenerator.issueOneTimePassword(key);
         assertEquals(6,otp.length());
     }
