@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.tribunals.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.ResponseEntity.status;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 import java.io.IOException;
@@ -11,7 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.sscs.tribunals.service.CcdService;
+import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.service.CcdService;
 
 
 @RestController
@@ -25,9 +27,10 @@ public class AppealsController {
     }
 
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createApppeals(@RequestBody String appealsJson) throws IOException {
-        ccdService.saveCase(appealsJson);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<?> createApppeals(@RequestBody String appealsJson)
+            throws IOException, CcdException {
+        HttpStatus status = ccdService.saveCase(appealsJson);
+        return status(status).build();
     }
 
 }

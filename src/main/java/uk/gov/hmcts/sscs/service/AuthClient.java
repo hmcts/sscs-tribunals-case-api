@@ -13,43 +13,45 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.sscs.exception.AuthException;
 
 @Service
 public class AuthClient {
     private static final Logger LOG = getLogger(AuthClient.class);
 
-    private String vaultSecret;
+    private String idamKey;
     private OtpGenerator otpGenerator;
     private String authApiUrl;
     private RestTemplate restTemplate;
 
     @Autowired
-    AuthClient(@Value("${auth.micro.service.key}") String vaultSecret,
+    AuthClient(@Value("${sscs.idam.key}") String idamKey,
                @Value("${auth.provider.service.api}") String authApiUrl,
                OtpGenerator otpGenerator, RestTemplate restTemplate) {
-        this.vaultSecret = vaultSecret;
+        this.idamKey = idamKey;
         this.otpGenerator = otpGenerator;
         this.authApiUrl = authApiUrl;
         this.restTemplate = restTemplate;
     }
 
-    /**
-     * Sends the request to auth api.
-     * @param path path of the api
-     * @param httpMethod http method to be invoked on auth api
-     * @param requestBody request body
-     * @return Response string
-     */
-    public String sendRequest(String path, HttpMethod httpMethod, String requestBody) {
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(HttpStatus.OK);
+    public String sendRequest(String path, HttpMethod httpMethod, String requestBody)
+            throws AuthException {
         try {
-            String otp = otpGenerator.issueOneTimePassword(vaultSecret);
+            String otp = otpGenerator.issueOneTimePassword(idamKey);
             String authUrl = authApiUrl + path + "?microservice=sscs&oneTimePassword=" + otp;
             HttpEntity requestEntity = new HttpEntity(requestBody);
-            responseEntity = restTemplate.exchange(authUrl,httpMethod,requestEntity,String.class);
+            ResponseEntity<String> responseEntity =
+                    restTemplate.exchange(authUrl,httpMethod,requestEntity,String.class);
+            return responseEntity.getBody();
         } catch (InvalidKeyException | NoSuchAlgorithmException e) {
+            LOG.error("Authentication error in auth client: ", e);
+            throw new AuthException("Authorization error in auth client "
+                    +
+                    "while generating service key: " + e.getMessage());
+        } catch (Exception e) {
             LOG.error("Error in auth client: ", e);
+            throw new AuthException("Error while generating service key: "
+                    + e.getMessage());
         }
-        return responseEntity.getBody();
     }
 }

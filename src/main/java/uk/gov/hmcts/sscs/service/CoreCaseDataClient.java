@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.service;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
+import java.util.Map;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-
+import uk.gov.hmcts.sscs.exception.CcdException;
 
 @Service
 public class CoreCaseDataClient {
@@ -27,33 +28,44 @@ public class CoreCaseDataClient {
         this.restTemplate = restTemplate;
     }
 
-    /**
-     * Sends request to core case data api.
-     * @param userToken User token to send in request headers to core case data api
-     * @param serviceToken Service token to send in request header to core case data api
-     * @param path request path
-     * @param httpMethod request method
-     * @param requestBody request body
-     * @return Response string
-     */
-    public ResponseEntity<String> sendRequest(String userToken,
+    public ResponseEntity<Object> sendRequest(String userToken,
                                       String serviceToken,
                                       String path,
                                       HttpMethod httpMethod,
-                                      String requestBody) {
+                                              Map<String,Object> requestBody) throws CcdException {
         try {
             MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-            headers.add("Authorization", "Bearer " + userToken);
+            headers.add("Authorization", userToken);
             headers.add("ServiceAuthorization", serviceToken);
             headers.add("Content-Type", "application/json");
             HttpEntity requestEntity = new HttpEntity(requestBody, headers);
             String url = ccdApiUrl + path;
-            ResponseEntity<String> responseEntity =
-                restTemplate.exchange(url,httpMethod,requestEntity,String.class);
+            ResponseEntity<Object> responseEntity =
+                restTemplate.exchange(url,httpMethod,requestEntity,Object.class);
             return responseEntity;
         } catch (Exception ex) {
             LOG.error("Error while sending request to CCD api: ", ex);
-            return null;
+            throw new CcdException("Error while sending request to CCD api: " + ex.getMessage());
+        }
+    }
+
+    public ResponseEntity<Object> post(String userToken,
+                                              String serviceToken,
+                                              String path,
+                                              Map<String,Object> requestBody) throws CcdException {
+        try {
+            MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+            headers.add("Authorization", userToken);
+            headers.add("ServiceAuthorization", serviceToken);
+            headers.add("Content-Type", "application/json");
+            HttpEntity requestEntity = new HttpEntity(requestBody, headers);
+            String url = ccdApiUrl + path;
+            ResponseEntity<Object> responseEntity =
+                    restTemplate.postForEntity(url,requestEntity,Object.class);
+            return responseEntity;
+        } catch (Exception ex) {
+            LOG.error("Error while sending request to CCD api: ", ex);
+            throw new CcdException("Error while POSTing new case to CCD api: " + ex.getMessage());
         }
     }
 }

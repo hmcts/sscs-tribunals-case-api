@@ -1,6 +1,6 @@
 package uk.gov.hmcts.sscs.tribunals.controller;
 
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -13,13 +13,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.sscs.TribunalsCaseApiApplication;
-import uk.gov.hmcts.sscs.tribunals.service.CcdService;
+import uk.gov.hmcts.sscs.service.CcdService;
 
 
 
@@ -27,7 +30,6 @@ import uk.gov.hmcts.sscs.tribunals.service.CcdService;
 @SpringBootTest(classes = TribunalsCaseApiApplication.class)
 @WebAppConfiguration
 public class AppealsControllerTest {
-
 
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
@@ -52,8 +54,7 @@ public class AppealsControllerTest {
 
     private MockMvc mockMvc;
 
-
-    @Mock
+    @MockBean
     private CcdService ccdService;
 
     @Autowired
@@ -64,13 +65,13 @@ public class AppealsControllerTest {
     @Before
     public void setUp() throws Exception {
         appealsController = new AppealsController(ccdService);
-        this.mockMvc = webAppContextSetup(webApplicationContext).build();
+        mockMvc = webAppContextSetup(webApplicationContext).build();
     }
-
 
     @Test
     public void shouldCreateNewAppeals() throws Exception {
-        doNothing().when(ccdService).saveCase(appealJson);
+        when(ccdService.saveCase(appealJson))
+                .thenReturn(HttpStatus.CREATED);
 
         this.mockMvc.perform(post("/appeals").content(appealJson).contentType(contentType))
                 .andExpect(status().isCreated());
