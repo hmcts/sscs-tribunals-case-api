@@ -9,7 +9,6 @@ import java.time.Clock;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,7 +56,6 @@ public class OtpGenerator implements TotpAuthenticator {
         return issueOneTimePassword(base32Key, time - TIME_STEP).equals(token);
     }
 
-    @SneakyThrows
     private byte[] calculateHash(long value, byte[] key)
             throws InvalidKeyException, NoSuchAlgorithmException {
         SecretKeySpec signKey = new SecretKeySpec(key, "HmacSHA1");

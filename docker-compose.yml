@@ -7,8 +7,9 @@ services:
     image: docker.artifactory.reform.hmcts.net/sscs/tribunals-case-api
     environment:
       - AUTH_PROVIDER_SERVICE_CLIENT_KEY=AAAAAAAAAAAAAAAA
-      - AUTH_PROVIDER_SERVICE_API=http://provider:8080
-      - CCD_SERVICE_API=http://localhost:4451/citizens/%s/jurisdictions/SSCS/case-types/GrantOfRepresentation
+      - AUTH_SERVICE_JWT_KEY=this-is-a-test-jwt-key
+      - AUTH_PROVIDER_SERVICE_API=http://provider:8080/
+      - CCD_SERVICE_API=http://localhost:4451/
     depends_on:
       service-auth-provider-api:
         condition: service_started
