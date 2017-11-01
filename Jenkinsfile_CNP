@@ -10,7 +10,8 @@ def type = "java"
 
 def product = "sscs"
 
-def app = "tribunals-case-api"
+def app = "tribunals-api"
 
 withPipeline(type, product, app) {
 }
+
