@@ -8,7 +8,9 @@ public class Mrn {
 
     private String missingReason;
 
-    private ZonedDateTime date;
+    private ZonedDateTime dateOfDecision;
+
+    private String mrnLocation;
 
     public Mrn() {
     }
@@ -29,20 +31,25 @@ public class Mrn {
         this.missingReason = missingReason;
     }
 
-    public ZonedDateTime getDate() {
-        return date;
+    public ZonedDateTime getDateOfDecision() {
+        return dateOfDecision;
     }
 
-    public void setDate(ZonedDateTime date) {
-        this.date = date;
+    public void setDateOfDecision(ZonedDateTime date) {
+        this.dateOfDecision = dateOfDecision;
     }
+
+    public String getMrnLocation() { return mrnLocation; }
+
+    public void setMrnLocation(String mrnLocation) { this.mrnLocation = mrnLocation; }
 
     @Override
     public String toString() {
         return "Mrn{"
                 +       "lateReason='" + lateReason + '\''
                 +       ", missingReason='" + missingReason + '\''
-                +       ", date=" + date
+                +       ", dateOfDecision=" + dateOfDecision + '\''
+                +       ", mrnLocation='" + mrnLocation
                 +       '}';
     }
 }
