@@ -1,24 +1,21 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import uk.gov.hmcts.sscs.service.xml.CustomDateTimeXmlAdapter;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.time.ZonedDateTime;
 
 public class Appeal {
 
-    private String type;
-
-    private Mrn mrn;
-
-    private ZonedDateTime dlReceivedDate;
-
-    private String appealFormat;
-
-    private String receiptFormat;
+    private String caseCode;
 
     private String originatingOffice;
 
-    private ZonedDateTime dateAppealMade;
+    private ZonedDateTime dateOfDecision;
 
-    private String requestingParty;
+    private ZonedDateTime dateAppealMade;
 
     private Boolean ftaReconsiderationEnclosed;
 
@@ -26,58 +23,70 @@ public class Appeal {
 
     private Boolean isFurtherEvidenceRequired;
 
-    private ZonedDateTime notificationDate;
+    public Appeal(String caseCode, String originatingOffice, ZonedDateTime dateOfDecision, ZonedDateTime dateAppealMade, Boolean ftaReconsiderationEnclosed, Boolean isAdmissable, Boolean isFurtherEvidenceRequired) {
+        this.caseCode = caseCode;
+        this.dateOfDecision = dateOfDecision;
+        this.originatingOffice = originatingOffice;
+        this.dateAppealMade = dateAppealMade;
+        this.ftaReconsiderationEnclosed = ftaReconsiderationEnclosed;
+        this.isAdmissable = isAdmissable;
+        this.isFurtherEvidenceRequired = isFurtherEvidenceRequired;
+    }
 
-    public String getType() { return type; }
+    @XmlTransient
+    public String getCaseCode() { return caseCode; }
 
-    public void setType(String type) { this.type = type; }
+    @XmlElement(name = "caseCode", required = true)
+    public String getCaseCodeWithSuffix() { return caseCode + "DD"; }
 
-    public Mrn getMrn() { return mrn; }
+    public void setCaseCode(String caseCode) { this.caseCode = caseCode; }
 
-    public void setMrn(Mrn mrn) { this.mrn = mrn; }
-
-    public ZonedDateTime getDlReceivedDate() { return dlReceivedDate; }
-
-    public void setDlReceivedDate(ZonedDateTime dlReceivedDate) { this.dlReceivedDate = dlReceivedDate; }
-
-    public String getAppealFormat() { return appealFormat; }
-
-    public void setAppealFormat(String appealFormat) { this.appealFormat = appealFormat; }
-
-    public String getReceiptFormat() { return receiptFormat; }
-
-    public void setReceiptFormat(String receiptFormat) { this.receiptFormat = receiptFormat; }
-
+    @XmlElement
     public String getOriginatingOffice() { return originatingOffice; }
 
     public void setOriginatingOffice(String originatingOffice) { this.originatingOffice = originatingOffice; }
 
+    @XmlElement(name = "dateOfDecision", required = true)
+    @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
+    public ZonedDateTime getDateOfDecision() {
+        return dateOfDecision;
+    }
+
+    public void setDateOfDecision(ZonedDateTime dateOfDecision) {
+        this.dateOfDecision = dateOfDecision;
+    }
+
+    @XmlElement(name = "dateAppealMade", required = true)
+    @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
     public ZonedDateTime getDateAppealMade() { return dateAppealMade; }
 
     public void setDateAppealMade(ZonedDateTime dateAppealMade) { this.dateAppealMade = dateAppealMade; }
 
-    public String getRequestingParty() { return requestingParty; }
-
-    public void setRequestingParty(String requestingParty) { this.requestingParty = requestingParty; }
-
+    @XmlElement
     public Boolean getFtaReconsiderationEnclosed() { return ftaReconsiderationEnclosed; }
 
     public void setFtaReconsiderationEnclosed(Boolean ftaReconsiderationEnclosed) { this.ftaReconsiderationEnclosed = ftaReconsiderationEnclosed; }
 
-    public Boolean getAdmissable() { return isAdmissable; }
+    @XmlElement
+    public Boolean isAdmissable() { return isAdmissable; }
 
-    public void setAdmissable(Boolean admissable) { isAdmissable = admissable; }
+    public void setAdmissable(Boolean isAdmissable) { this.isAdmissable = isAdmissable; }
 
-    public Boolean getFurtherEvidenceRequired() { return isFurtherEvidenceRequired; }
+    @XmlElement
+    public Boolean isFurtherEvidenceRequired() { return isFurtherEvidenceRequired; }
 
-    public void setFurtherEvidenceRequired(Boolean furtherEvidenceRequired) { isFurtherEvidenceRequired = furtherEvidenceRequired; }
-
-    public ZonedDateTime getNotificationDate() { return notificationDate; }
-
-    public void setNotificationDate(ZonedDateTime notificationDate) { this.notificationDate = notificationDate; }
+    public void setFurtherEvidenceRequired(Boolean isFurtherEvidenceRequired) { this.isFurtherEvidenceRequired = isFurtherEvidenceRequired; }
 
     @Override
     public String toString() {
-        return "Appeal{" + " type='" + type + '\'' + ", mrn=" + mrn + ", dlReceivedDate=" + dlReceivedDate + ", appealFormat='" + appealFormat + '\'' + ", receiptFormat='" + receiptFormat + '\'' + ", originatingOffice='" + originatingOffice + '\'' + ", dateAppealMade=" + dateAppealMade + ", requestingParty='" + requestingParty + '\'' + ", ftaReconsiderationEnclosed=" + ftaReconsiderationEnclosed + ", isAdmissable=" + isAdmissable + ", isFurtherEvidenceRequired=" + isFurtherEvidenceRequired + ", notificationDate=" + notificationDate + '}';
+        return "Appeal{"
+                + " caseCode='" + caseCode + '\''
+                + ", dateOfDecision=" + dateOfDecision
+                + ", originatingOffice='" + originatingOffice + '\''
+                + ", dateAppealMade=" + dateAppealMade
+                + ", ftaReconsiderationEnclosed=" + ftaReconsiderationEnclosed
+                + ", isAdmissable=" + isAdmissable
+                + ", isFurtherEvidenceRequired=" + isFurtherEvidenceRequired
+                + '}';
     }
 }

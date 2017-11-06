@@ -1,5 +1,8 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 
@@ -13,9 +16,7 @@ public class Hearing {
 
     private ZonedDateTime date;
 
-    private HearingType hearingType;
-
-    private Boolean isOralHearingRequired;
+    private TribunalType tribunalType;
 
     private Boolean isLanguageInterpreterRequired;
 
@@ -29,56 +30,74 @@ public class Hearing {
 
     private ExcludeDates[] excludeDates;
 
+    public Hearing(TribunalType tribunalType, Boolean isLanguageInterpreterRequired, Boolean isSignLanguageRequired, Boolean isHearingLoopRequired, Boolean hasDisabilityNeeds, String additionalInformation, ExcludeDates[] excludeDates) {
+        this.tribunalType = tribunalType;
+        this.isLanguageInterpreterRequired = isLanguageInterpreterRequired;
+        this.isSignLanguageRequired = isSignLanguageRequired;
+        this.isHearingLoopRequired = isHearingLoopRequired;
+        this.hasDisabilityNeeds = hasDisabilityNeeds;
+        this.additionalInformation = additionalInformation;
+        this.excludeDates = excludeDates;
+    }
+
+    @XmlTransient
     public ZonedDateTime getTime() { return time; }
 
     public void setTime(ZonedDateTime time) { this.time = time; }
 
+    @XmlTransient
     public String getJudge() { return judge; }
 
     public void setJudge(String judge) { this.judge = judge; }
 
+    @XmlTransient
     public String getVenue() { return venue; }
 
     public void setVenue(String venue) { this.venue = venue; }
 
+    @XmlTransient
     public ZonedDateTime getDate() { return date; }
 
     public void setDate(ZonedDateTime date) { this.date = date; }
 
-    public Boolean getOralHearingRequired() { return isOralHearingRequired; }
+    @XmlElement
+    public TribunalType getTribunalType() { return tribunalType; }
 
-    public void setOralHearingRequired(Boolean oralHearingRequired) { isOralHearingRequired = oralHearingRequired; }
+    public void setTribunalType(TribunalType tribunalType) { this.tribunalType = tribunalType; }
 
-    public HearingType getHearingType() { return hearingType; }
+    @XmlElement
+    public Boolean isLanguageInterpreterRequired() { return isLanguageInterpreterRequired; }
 
-    public void setHearingType(HearingType hearingType) { this.hearingType = hearingType; }
+    public void setLanguageInterpreterRequired(Boolean isLanguageInterpreterRequired) { this.isLanguageInterpreterRequired = isLanguageInterpreterRequired; }
 
-    public Boolean getLanguageInterpreterRequired() { return isLanguageInterpreterRequired; }
+    @XmlElement
+    public Boolean isSignLanguageRequired() { return isSignLanguageRequired; }
 
-    public void setLanguageInterpreterRequired(Boolean languageInterpreterRequired) { isLanguageInterpreterRequired = languageInterpreterRequired; }
+    public void setSignLanguageRequired(Boolean isSignLanguageRequired) { this.isSignLanguageRequired = isSignLanguageRequired; }
 
-    public Boolean getSignLanguageRequired() { return isSignLanguageRequired; }
+    @XmlElement
+    public Boolean isHearingLoopRequired() { return isHearingLoopRequired; }
 
-    public void setSignLanguageRequired(Boolean signLanguageRequired) { isSignLanguageRequired = signLanguageRequired; }
+    public void setHearingLoopRequired(Boolean isHearingLoopRequired) { this.isHearingLoopRequired = isHearingLoopRequired; }
 
-    public Boolean getHearingLoopRequired() { return isHearingLoopRequired; }
-
-    public void setHearingLoopRequired(Boolean hearingLoopRequired) { isHearingLoopRequired = hearingLoopRequired; }
-
+    @XmlElement
     public Boolean getHasDisabilityNeeds() { return hasDisabilityNeeds; }
 
     public void setHasDisabilityNeeds(Boolean hasDisabilityNeeds) { this.hasDisabilityNeeds = hasDisabilityNeeds; }
 
+    @XmlElement
     public String getAdditionalInformation() { return additionalInformation; }
 
     public void setAdditionalInformation(String additionalInformation) { this.additionalInformation = additionalInformation; }
 
+    @XmlElementWrapper(name="excludeDates")
+    @XmlElement(name="exclude", type=ExcludeDates.class)
     public ExcludeDates[] getExcludeDates() { return excludeDates; }
 
     public void setExcludeDates(ExcludeDates[] excludeDates) { this.excludeDates = excludeDates; }
 
     @Override
     public String toString() {
-        return "Hearing{" + " time=" + time + ", judge='" + judge + '\'' + ", venue='" + venue + '\'' + ", date=" + date + ", hearingType=" + hearingType + ", isLanguageInterpreterRequired=" + isLanguageInterpreterRequired + ", isSignLanguageRequired=" + isSignLanguageRequired + ", isHearingLoopRequired=" + isHearingLoopRequired + ", hasDisabilityNeeds=" + hasDisabilityNeeds + ", additionalInformation='" + additionalInformation + '\'' + ", excludeDates=" + Arrays.toString(excludeDates) + '}';
+        return "Hearing{" + " time=" + time + ", judge='" + judge + '\'' + ", venue='" + venue + '\'' + ", date=" + date + ", tribunalType=" + tribunalType + ", isLanguageInterpreterRequired=" + isLanguageInterpreterRequired + ", isSignLanguageRequired=" + isSignLanguageRequired + ", isHearingLoopRequired=" + isHearingLoopRequired + ", hasDisabilityNeeds=" + hasDisabilityNeeds + ", additionalInformation='" + additionalInformation + '\'' + ", excludeDates=" + Arrays.toString(excludeDates) + '}';
     }
 }
