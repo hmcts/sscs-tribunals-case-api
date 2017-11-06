@@ -26,7 +26,6 @@ public class Name {
         this.initial = first.substring(0,1);
     }
 
-    @XmlElement
     public String getTitle() {
         return title;
     }
@@ -44,7 +43,6 @@ public class Name {
         this.first = first;
     }
 
-    @XmlElement
     public String getSurname() {
         return surname;
     }

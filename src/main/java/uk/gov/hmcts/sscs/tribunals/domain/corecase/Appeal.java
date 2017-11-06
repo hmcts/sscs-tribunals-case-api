@@ -41,12 +41,10 @@ public class Appeal {
 
     public void setCaseCode(String caseCode) { this.caseCode = caseCode; }
 
-    @XmlElement
     public String getOriginatingOffice() { return originatingOffice; }
 
     public void setOriginatingOffice(String originatingOffice) { this.originatingOffice = originatingOffice; }
 
-    @XmlElement(name = "dateOfDecision", required = true)
     @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
     public ZonedDateTime getDateOfDecision() {
         return dateOfDecision;
@@ -56,23 +54,19 @@ public class Appeal {
         this.dateOfDecision = dateOfDecision;
     }
 
-    @XmlElement(name = "dateAppealMade", required = true)
     @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
     public ZonedDateTime getDateAppealMade() { return dateAppealMade; }
 
     public void setDateAppealMade(ZonedDateTime dateAppealMade) { this.dateAppealMade = dateAppealMade; }
 
-    @XmlElement
     public Boolean getFtaReconsiderationEnclosed() { return ftaReconsiderationEnclosed; }
 
     public void setFtaReconsiderationEnclosed(Boolean ftaReconsiderationEnclosed) { this.ftaReconsiderationEnclosed = ftaReconsiderationEnclosed; }
 
-    @XmlElement
     public Boolean isAdmissable() { return isAdmissable; }
 
     public void setAdmissable(Boolean isAdmissable) { this.isAdmissable = isAdmissable; }
 
-    @XmlElement
     public Boolean isFurtherEvidenceRequired() { return isFurtherEvidenceRequired; }
 
     public void setFurtherEvidenceRequired(Boolean isFurtherEvidenceRequired) { this.isFurtherEvidenceRequired = isFurtherEvidenceRequired; }

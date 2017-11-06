@@ -1,8 +1,6 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement
@@ -10,8 +8,6 @@ import javax.xml.bind.annotation.XmlType;
 public class Appellant extends Person {
 
     private String nino;
-
-    private Notifications notifications;
 
     private String adminGroup;
 
@@ -26,17 +22,10 @@ public class Appellant extends Person {
         this.adminGroup = adminGroup;
     }
 
-    @XmlElement
     public String getNino() { return nino; }
 
     public void setNino(String nino) { this.nino = nino; }
 
-    @XmlTransient
-    public Notifications getNotifications() { return notifications; }
-
-    public void setNotifications(Notifications notifications) { this.notifications = notifications; }
-
-    @XmlElement
     public String getAdminGroup() { return adminGroup; }
 
     public void setAdminGroup(String adminGroup) { this.adminGroup = adminGroup; }
@@ -45,7 +34,6 @@ public class Appellant extends Person {
     public String toString() {
         return "Appellant{"
                 + " nino='" + nino + '\''
-                + ", notifications=" + notifications
                 + ", adminGroup='" + adminGroup + '\''
                 + ", name=" + name
                 + ", address=" + address
