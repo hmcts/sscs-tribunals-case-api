@@ -1,147 +1,44 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
-import java.util.Arrays;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-public class Appellant {
+@XmlRootElement
+@XmlType(propOrder = {"nino", "adminGroup"})
+public class Appellant extends Person {
 
-    private Identity identity;
+    private String nino;
 
-    private Supporter supporter;
+    private String adminGroup;
 
-    private Notifications notifications;
+    public Appellant() { }
 
-    private AppealReasons[] appealReasons;
-
-    private Address address;
-
-    private HearingOptions hearingOptions;
-
-    private Name name;
-
-    private String gpConsent;
-
-    private HearingType hearingType;
-
-    private String isAppointee;
-
-    private Contact contact;
-
-    private Representative representative;
-
-    public Appellant() {
-    }
-
-    public Identity getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(Identity identity) {
-        this.identity = identity;
-    }
-
-    public Supporter getSupporter() {
-        return supporter;
-    }
-
-    public void setSupporter(Supporter supporter) {
-        this.supporter = supporter;
-    }
-
-    public Notifications getNotifications() {
-        return notifications;
-    }
-
-    public void setNotifications(Notifications notifications) {
-        this.notifications = notifications;
-    }
-
-    public AppealReasons[] getAppealReasons() {
-        return appealReasons;
-    }
-
-    public void setAppealReasons(AppealReasons[] appealReasons) {
-        this.appealReasons = appealReasons;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
-        this.address = address;
-    }
-
-    public HearingOptions getHearingOptions() {
-        return hearingOptions;
-    }
-
-    public void setHearingOptions(HearingOptions hearingOptions) {
-        this.hearingOptions = hearingOptions;
-    }
-
-    public Name getName() {
-        return name;
-    }
-
-    public void setName(Name name) {
+    public Appellant(Name name, Address address, String phone, String email, String nino, String adminGroup) {
         this.name = name;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+        this.nino = nino;
+        this.adminGroup = adminGroup;
     }
 
-    public String getGpConsent() {
-        return gpConsent;
-    }
+    public String getNino() { return nino; }
 
-    public void setGpConsent(String gpConsent) {
-        this.gpConsent = gpConsent;
-    }
+    public void setNino(String nino) { this.nino = nino; }
 
-    public HearingType getHearingType() {
-        return hearingType;
-    }
+    public String getAdminGroup() { return adminGroup; }
 
-    public void setHearingType(HearingType hearingType) {
-        this.hearingType = hearingType;
-    }
-
-    public String getIsAppointee() {
-        return isAppointee;
-    }
-
-    public void setIsAppointee(String isAppointee) {
-        this.isAppointee = isAppointee;
-    }
-
-    public Contact getContact() {
-        return contact;
-    }
-
-    public void setContact(Contact contact) {
-        this.contact = contact;
-    }
-
-    public Representative getRepresentative() {
-        return representative;
-    }
-
-    public void setRepresentative(Representative representative) {
-        this.representative = representative;
-    }
+    public void setAdminGroup(String adminGroup) { this.adminGroup = adminGroup; }
 
     @Override
     public String toString() {
         return "Appellant{"
-                +  "identity=" + identity
-                +  ", supporter=" + supporter
-                +  ", notifications=" + notifications
-                +  ", appealReasons=" + Arrays.toString(appealReasons)
-                +  ", address=" + address
-                +  ", hearingOptions=" + hearingOptions
-                +  ", name=" + name
-                +  ", gpConsent='" + gpConsent + '\''
-                +  ", hearingType='" + hearingType + '\''
-                +  ", isAppointee='" + isAppointee + '\''
-                +  ", contact=" + contact
-                +  ", representative=" + representative
+                + " nino='" + nino + '\''
+                + ", adminGroup='" + adminGroup + '\''
+                + ", name=" + name
+                + ", address=" + address
+                + ", phone='" + phone + '\''
+                + ", email='" + email + '\''
                 + '}';
     }
 }

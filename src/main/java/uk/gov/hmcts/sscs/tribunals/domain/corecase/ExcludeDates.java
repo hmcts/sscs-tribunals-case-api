@@ -1,12 +1,17 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType(propOrder = {"start", "end"})
 public class ExcludeDates {
 
     private String start;
 
     private String end;
 
-    public ExcludeDates() {
+    public ExcludeDates(String start, String end) {
+        this.start = start;
+        this.end = end;
     }
 
     public String getStart() {

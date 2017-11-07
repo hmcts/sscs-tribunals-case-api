@@ -1,59 +1,75 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
-import java.time.ZonedDateTime;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.Arrays;
 
 public class Hearing {
 
-    private ZonedDateTime time;
+    private TribunalType tribunalType;
 
-    private String judge;
+    private Boolean isLanguageInterpreterRequired;
 
-    private String venue;
+    private Boolean isSignLanguageRequired;
 
-    private ZonedDateTime date;
+    private Boolean isHearingLoopRequired;
 
-    public Hearing() {
+    private Boolean hasDisabilityNeeds;
+
+    private String additionalInformation;
+
+    private ExcludeDates[] excludeDates;
+
+    public Hearing(TribunalType tribunalType, Boolean isLanguageInterpreterRequired, Boolean isSignLanguageRequired, Boolean isHearingLoopRequired, Boolean hasDisabilityNeeds, String additionalInformation, ExcludeDates[] excludeDates) {
+        this.tribunalType = tribunalType;
+        this.isLanguageInterpreterRequired = isLanguageInterpreterRequired;
+        this.isSignLanguageRequired = isSignLanguageRequired;
+        this.isHearingLoopRequired = isHearingLoopRequired;
+        this.hasDisabilityNeeds = hasDisabilityNeeds;
+        this.additionalInformation = additionalInformation;
+        this.excludeDates = excludeDates;
     }
 
-    public ZonedDateTime getTime() {
-        return time;
-    }
+    public TribunalType getTribunalType() { return tribunalType; }
 
-    public void setTime(ZonedDateTime time) {
-        this.time = time;
-    }
+    public void setTribunalType(TribunalType tribunalType) { this.tribunalType = tribunalType; }
 
-    public String getJudge() {
-        return judge;
-    }
+    public Boolean isLanguageInterpreterRequired() { return isLanguageInterpreterRequired; }
 
-    public void setJudge(String judge) {
-        this.judge = judge;
-    }
+    public void setLanguageInterpreterRequired(Boolean isLanguageInterpreterRequired) { this.isLanguageInterpreterRequired = isLanguageInterpreterRequired; }
 
-    public String getVenue() {
-        return venue;
-    }
+    public Boolean isSignLanguageRequired() { return isSignLanguageRequired; }
 
-    public void setVenue(String venue) {
-        this.venue = venue;
-    }
+    public void setSignLanguageRequired(Boolean isSignLanguageRequired) { this.isSignLanguageRequired = isSignLanguageRequired; }
 
-    public ZonedDateTime getDate() {
-        return date;
-    }
+    public Boolean isHearingLoopRequired() { return isHearingLoopRequired; }
 
-    public void setDate(ZonedDateTime date) {
-        this.date = date;
-    }
+    public void setHearingLoopRequired(Boolean isHearingLoopRequired) { this.isHearingLoopRequired = isHearingLoopRequired; }
+
+    public Boolean getHasDisabilityNeeds() { return hasDisabilityNeeds; }
+
+    public void setHasDisabilityNeeds(Boolean hasDisabilityNeeds) { this.hasDisabilityNeeds = hasDisabilityNeeds; }
+
+    public String getAdditionalInformation() { return additionalInformation; }
+
+    public void setAdditionalInformation(String additionalInformation) { this.additionalInformation = additionalInformation; }
+
+    @XmlElementWrapper(name="excludeDates")
+    @XmlElement(name="exclude", type=ExcludeDates.class)
+    public ExcludeDates[] getExcludeDates() { return excludeDates; }
+
+    public void setExcludeDates(ExcludeDates[] excludeDates) { this.excludeDates = excludeDates; }
 
     @Override
     public String toString() {
         return "Hearing{"
-                +     "time='" + time + '\''
-                +     ", judge='" + judge + '\''
-                +    ", venue='" + venue + '\''
-                +   ", date='" + date + '\''
-                +   '}';
+                + " tribunalType=" + tribunalType
+                + ", isLanguageInterpreterRequired=" + isLanguageInterpreterRequired
+                + ", isSignLanguageRequired=" + isSignLanguageRequired
+                + ", isHearingLoopRequired=" + isHearingLoopRequired
+                + ", hasDisabilityNeeds=" + hasDisabilityNeeds
+                + ", additionalInformation='" + additionalInformation + '\''
+                + ", excludeDates=" + Arrays.toString(excludeDates)
+                + '}';
     }
 }
