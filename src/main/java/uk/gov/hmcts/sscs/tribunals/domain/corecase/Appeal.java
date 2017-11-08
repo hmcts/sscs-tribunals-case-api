@@ -17,20 +17,11 @@ public class Appeal {
 
     private ZonedDateTime dateAppealMade;
 
-    private Boolean ftaReconsiderationEnclosed;
-
-    private Boolean isAdmissable;
-
-    private Boolean isFurtherEvidenceRequired;
-
-    public Appeal(String caseCode, String originatingOffice, ZonedDateTime dateOfDecision, ZonedDateTime dateAppealMade, Boolean ftaReconsiderationEnclosed, Boolean isAdmissable, Boolean isFurtherEvidenceRequired) {
+    public Appeal(String caseCode, String originatingOffice, ZonedDateTime dateOfDecision, ZonedDateTime dateAppealMade) {
         this.caseCode = caseCode;
-        this.dateOfDecision = dateOfDecision;
         this.originatingOffice = originatingOffice;
+        this.dateOfDecision = dateOfDecision;
         this.dateAppealMade = dateAppealMade;
-        this.ftaReconsiderationEnclosed = ftaReconsiderationEnclosed;
-        this.isAdmissable = isAdmissable;
-        this.isFurtherEvidenceRequired = isFurtherEvidenceRequired;
     }
 
     @XmlTransient
@@ -59,18 +50,6 @@ public class Appeal {
 
     public void setDateAppealMade(ZonedDateTime dateAppealMade) { this.dateAppealMade = dateAppealMade; }
 
-    public Boolean getFtaReconsiderationEnclosed() { return ftaReconsiderationEnclosed; }
-
-    public void setFtaReconsiderationEnclosed(Boolean ftaReconsiderationEnclosed) { this.ftaReconsiderationEnclosed = ftaReconsiderationEnclosed; }
-
-    public Boolean isAdmissable() { return isAdmissable; }
-
-    public void setAdmissable(Boolean isAdmissable) { this.isAdmissable = isAdmissable; }
-
-    public Boolean isFurtherEvidenceRequired() { return isFurtherEvidenceRequired; }
-
-    public void setFurtherEvidenceRequired(Boolean isFurtherEvidenceRequired) { this.isFurtherEvidenceRequired = isFurtherEvidenceRequired; }
-
     @Override
     public String toString() {
         return "Appeal{"
@@ -78,9 +57,6 @@ public class Appeal {
                 + ", dateOfDecision=" + dateOfDecision
                 + ", originatingOffice='" + originatingOffice + '\''
                 + ", dateAppealMade=" + dateAppealMade
-                + ", ftaReconsiderationEnclosed=" + ftaReconsiderationEnclosed
-                + ", isAdmissable=" + isAdmissable
-                + ", isFurtherEvidenceRequired=" + isFurtherEvidenceRequired
                 + '}';
     }
 }

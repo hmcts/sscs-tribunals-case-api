@@ -2,72 +2,122 @@ package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.Arrays;
 
 public class Hearing {
 
     private TribunalType tribunalType;
 
-    private Boolean isLanguageInterpreterRequired;
+    private String languageInterpreterRequired;
 
-    private Boolean isSignLanguageRequired;
+    private String signLanguageRequired;
 
-    private Boolean isHearingLoopRequired;
+    private String hearingLoopRequired;
 
-    private Boolean hasDisabilityNeeds;
+    private String hasDisabilityNeeds;
 
     private String additionalInformation;
 
     private ExcludeDates[] excludeDates;
 
-    public Hearing(TribunalType tribunalType, Boolean isLanguageInterpreterRequired, Boolean isSignLanguageRequired, Boolean isHearingLoopRequired, Boolean hasDisabilityNeeds, String additionalInformation, ExcludeDates[] excludeDates) {
+    public Hearing() {
+    }
+
+    public Hearing(TribunalType tribunalType, String languageInterpreterRequired, String signLanguageRequired, String hearingLoopRequired, String hasDisabilityNeeds, String additionalInformation, ExcludeDates[] excludeDates) {
         this.tribunalType = tribunalType;
-        this.isLanguageInterpreterRequired = isLanguageInterpreterRequired;
-        this.isSignLanguageRequired = isSignLanguageRequired;
-        this.isHearingLoopRequired = isHearingLoopRequired;
+        this.languageInterpreterRequired = languageInterpreterRequired;
+        this.signLanguageRequired = signLanguageRequired;
+        this.hearingLoopRequired = hearingLoopRequired;
         this.hasDisabilityNeeds = hasDisabilityNeeds;
         this.additionalInformation = additionalInformation;
         this.excludeDates = excludeDates;
     }
 
-    public TribunalType getTribunalType() { return tribunalType; }
+    public TribunalType getTribunalType() {
+        return tribunalType;
+    }
 
-    public void setTribunalType(TribunalType tribunalType) { this.tribunalType = tribunalType; }
+    public void setTribunalType(TribunalType tribunalType) {
+        this.tribunalType = tribunalType;
+    }
 
-    public Boolean isLanguageInterpreterRequired() { return isLanguageInterpreterRequired; }
+    @XmlTransient
+    public String getLanguageInterpreterRequired() {
+        return languageInterpreterRequired;
+    }
 
-    public void setLanguageInterpreterRequired(Boolean isLanguageInterpreterRequired) { this.isLanguageInterpreterRequired = isLanguageInterpreterRequired; }
+    @XmlElement(name = "languageInterpreterRequired", required = true)
+    public String getLanguageInterpreterRequiredForXML() {
+        return (languageInterpreterRequired == "Yes") ? "Yes, Language Interpreter required" : "No";
+    }
 
-    public Boolean isSignLanguageRequired() { return isSignLanguageRequired; }
+    public void setLanguageInterpreterRequired(Boolean isLanguageInterpreterRequired) {
+        this.languageInterpreterRequired = languageInterpreterRequired;
+    }
 
-    public void setSignLanguageRequired(Boolean isSignLanguageRequired) { this.isSignLanguageRequired = isSignLanguageRequired; }
+    @XmlTransient
+    public String getSignLanguageRequired() {
+        return signLanguageRequired;
+    }
 
-    public Boolean isHearingLoopRequired() { return isHearingLoopRequired; }
+    @XmlElement(name = "signLanguageRequired", required = true)
+    public String getSignLanguageRequiredForXML() {
+        return (signLanguageRequired == "Yes") ? "Yes, Sign Language Interpreter required" : "No";
+    }
 
-    public void setHearingLoopRequired(Boolean isHearingLoopRequired) { this.isHearingLoopRequired = isHearingLoopRequired; }
+    public void setSignLanguageRequired(String signLanguageRequired) {
+        this.signLanguageRequired = signLanguageRequired;
+    }
 
-    public Boolean getHasDisabilityNeeds() { return hasDisabilityNeeds; }
+    @XmlTransient
+    public String getHearingLoopRequired() {
+        return hearingLoopRequired;
+    }
 
-    public void setHasDisabilityNeeds(Boolean hasDisabilityNeeds) { this.hasDisabilityNeeds = hasDisabilityNeeds; }
+    @XmlElement(name = "hearingLoopRequired", required = true)
+    public String getHearingLoopRequiredForXML() {
+        return (hearingLoopRequired == "Yes") ? "Yes, A hearing loop is required" : "No";
+    }
 
-    public String getAdditionalInformation() { return additionalInformation; }
+    public void setHearingLoopRequired(String hearingLoopRequired) {
+        this.hearingLoopRequired = hearingLoopRequired;
+    }
 
-    public void setAdditionalInformation(String additionalInformation) { this.additionalInformation = additionalInformation; }
+    public String getHasDisabilityNeeds() {
+        return hasDisabilityNeeds;
+    }
+
+    public void setHasDisabilityNeeds(String hasDisabilityNeeds) {
+        this.hasDisabilityNeeds = hasDisabilityNeeds;
+    }
+
+    public String getAdditionalInformation() {
+        return additionalInformation;
+    }
+
+    public void setAdditionalInformation(String additionalInformation) {
+        this.additionalInformation = additionalInformation;
+    }
 
     @XmlElementWrapper(name="excludeDates")
     @XmlElement(name="exclude", type=ExcludeDates.class)
-    public ExcludeDates[] getExcludeDates() { return excludeDates; }
+    public ExcludeDates[] getExcludeDates() {
+        return excludeDates;
+    }
 
-    public void setExcludeDates(ExcludeDates[] excludeDates) { this.excludeDates = excludeDates; }
+    public void setExcludeDates(ExcludeDates[] excludeDates) {
+        this.excludeDates = excludeDates;
+    }
 
     @Override
     public String toString() {
         return "Hearing{"
                 + " tribunalType=" + tribunalType
-                + ", isLanguageInterpreterRequired=" + isLanguageInterpreterRequired
-                + ", isSignLanguageRequired=" + isSignLanguageRequired
-                + ", isHearingLoopRequired=" + isHearingLoopRequired
-                + ", hasDisabilityNeeds=" + hasDisabilityNeeds
+                + ", languageInterpreterRequired='" + languageInterpreterRequired + '\''
+                + ", signLanguageRequired='" + signLanguageRequired + '\''
+                + ", hearingLoopRequired='" + hearingLoopRequired + '\''
+                + ", hasDisabilityNeeds='" + hasDisabilityNeeds + '\''
                 + ", additionalInformation='" + additionalInformation + '\''
                 + ", excludeDates=" + Arrays.toString(excludeDates)
                 + '}';
