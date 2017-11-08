@@ -55,7 +55,7 @@ public class Hearing {
         return (languageInterpreterRequired == "Yes") ? "Yes, Language Interpreter required" : "No";
     }
 
-    public void setLanguageInterpreterRequired(Boolean isLanguageInterpreterRequired) {
+    public void setLanguageInterpreterRequired(String languageInterpreterRequired) {
         this.languageInterpreterRequired = languageInterpreterRequired;
     }
 
