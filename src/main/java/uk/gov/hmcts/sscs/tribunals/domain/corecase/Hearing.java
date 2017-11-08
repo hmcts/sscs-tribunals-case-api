@@ -1,9 +1,9 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import java.util.Arrays;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.Arrays;
 
 public class Hearing {
 
@@ -24,7 +24,10 @@ public class Hearing {
     public Hearing() {
     }
 
-    public Hearing(TribunalType tribunalType, String languageInterpreterRequired, String signLanguageRequired, String hearingLoopRequired, String hasDisabilityNeeds, String additionalInformation, ExcludeDates[] excludeDates) {
+    public Hearing(TribunalType tribunalType, String languageInterpreterRequired,
+                   String signLanguageRequired, String hearingLoopRequired,
+                   String hasDisabilityNeeds, String additionalInformation,
+                   ExcludeDates[] excludeDates) {
         this.tribunalType = tribunalType;
         this.languageInterpreterRequired = languageInterpreterRequired;
         this.signLanguageRequired = signLanguageRequired;
@@ -48,7 +51,7 @@ public class Hearing {
     }
 
     @XmlElement(name = "languageInterpreterRequired", required = true)
-    public String getLanguageInterpreterRequiredForXML() {
+    public String getLanguageInterpreterRequiredForXml() {
         return (languageInterpreterRequired == "Yes") ? "Yes, Language Interpreter required" : "No";
     }
 
@@ -62,7 +65,7 @@ public class Hearing {
     }
 
     @XmlElement(name = "signLanguageRequired", required = true)
-    public String getSignLanguageRequiredForXML() {
+    public String getSignLanguageRequiredForXml() {
         return (signLanguageRequired == "Yes") ? "Yes, Sign Language Interpreter required" : "No";
     }
 
@@ -76,7 +79,7 @@ public class Hearing {
     }
 
     @XmlElement(name = "hearingLoopRequired", required = true)
-    public String getHearingLoopRequiredForXML() {
+    public String getHearingLoopRequiredForXml() {
         return (hearingLoopRequired == "Yes") ? "Yes, A hearing loop is required" : "No";
     }
 
@@ -100,8 +103,8 @@ public class Hearing {
         this.additionalInformation = additionalInformation;
     }
 
-    @XmlElementWrapper(name="excludeDates")
-    @XmlElement(name="exclude", type=ExcludeDates.class)
+    @XmlElementWrapper(name = "excludeDates")
+    @XmlElement(name = "exclude", type = ExcludeDates.class)
     public ExcludeDates[] getExcludeDates() {
         return excludeDates;
     }

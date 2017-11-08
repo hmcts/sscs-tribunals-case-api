@@ -1,11 +1,12 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
-import uk.gov.hmcts.sscs.service.xml.CustomDateTimeXmlAdapter;
+import java.time.ZonedDateTime;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.time.ZonedDateTime;
+
+import uk.gov.hmcts.sscs.service.xml.CustomDateTimeXmlAdapter;
 
 public class Appeal {
 
@@ -17,7 +18,8 @@ public class Appeal {
 
     private ZonedDateTime dateAppealMade;
 
-    public Appeal(String caseCode, String originatingOffice, ZonedDateTime dateOfDecision, ZonedDateTime dateAppealMade) {
+    public Appeal(String caseCode, String originatingOffice, ZonedDateTime dateOfDecision,
+                  ZonedDateTime dateAppealMade) {
         this.caseCode = caseCode;
         this.originatingOffice = originatingOffice;
         this.dateOfDecision = dateOfDecision;
@@ -25,16 +27,26 @@ public class Appeal {
     }
 
     @XmlTransient
-    public String getCaseCode() { return caseCode; }
+    public String getCaseCode() {
+        return caseCode;
+    }
 
     @XmlElement(name = "caseCode", required = true)
-    public String getCaseCodeWithSuffix() { return caseCode + "DD"; }
+    public String getCaseCodeWithSuffix() {
+        return caseCode + "DD";
+    }
 
-    public void setCaseCode(String caseCode) { this.caseCode = caseCode; }
+    public void setCaseCode(String caseCode) {
+        this.caseCode = caseCode;
+    }
 
-    public String getOriginatingOffice() { return originatingOffice; }
+    public String getOriginatingOffice() {
+        return originatingOffice;
+    }
 
-    public void setOriginatingOffice(String originatingOffice) { this.originatingOffice = originatingOffice; }
+    public void setOriginatingOffice(String originatingOffice) {
+        this.originatingOffice = originatingOffice;
+    }
 
     @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
     public ZonedDateTime getDateOfDecision() {
@@ -46,9 +58,13 @@ public class Appeal {
     }
 
     @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
-    public ZonedDateTime getDateAppealMade() { return dateAppealMade; }
+    public ZonedDateTime getDateAppealMade() {
+        return dateAppealMade;
+    }
 
-    public void setDateAppealMade(ZonedDateTime dateAppealMade) { this.dateAppealMade = dateAppealMade; }
+    public void setDateAppealMade(ZonedDateTime dateAppealMade) {
+        this.dateAppealMade = dateAppealMade;
+    }
 
     @Override
     public String toString() {

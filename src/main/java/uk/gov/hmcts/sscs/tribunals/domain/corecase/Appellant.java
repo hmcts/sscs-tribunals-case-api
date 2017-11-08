@@ -13,7 +13,8 @@ public class Appellant extends Person {
 
     public Appellant() { }
 
-    public Appellant(Name name, Address address, String phone, String email, String nino, String adminGroup) {
+    public Appellant(Name name, Address address, String phone, String email, String nino,
+                     String adminGroup) {
         this.name = name;
         this.address = address;
         this.phone = phone;
@@ -22,13 +23,21 @@ public class Appellant extends Person {
         this.adminGroup = adminGroup;
     }
 
-    public String getNino() { return nino; }
+    public String getNino() {
+        return nino;
+    }
 
-    public void setNino(String nino) { this.nino = nino; }
+    public void setNino(String nino) {
+        this.nino = nino;
+    }
 
-    public String getAdminGroup() { return adminGroup; }
+    public String getAdminGroup() {
+        return adminGroup;
+    }
 
-    public void setAdminGroup(String adminGroup) { this.adminGroup = adminGroup; }
+    public void setAdminGroup(String adminGroup) {
+        this.adminGroup = adminGroup;
+    }
 
     @Override
     public String toString() {

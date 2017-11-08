@@ -1,24 +1,32 @@
 package uk.gov.hmcts.sscs.service.xml;
 
-import org.junit.Test;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
+import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
 
 public class XmlUtilTest {
 
-    private CCDCase setupCCDCase() {
-        Appeal appeal = new Appeal("001","Birmingham2 SSO", ZonedDateTime.now(), ZonedDateTime.now(),false, true, false);
-        Appellant appellant = new Appellant(createName(), createAddress(), "01234 984585", "test@email.com", "JT123456F", "Bedford");
-        Appointee appointee = new Appointee(createName(), createAddress(), "01987 232323", "my@email.com");
-        Representative representative = new Representative(createName(), createAddress(), "01576 765456", "rep@email.com", "Computer Towers Ltd.")   ;
-        Hearing hearing = new Hearing(TribunalType.PAPER, true, true, true, false, "Additional information", new ExcludeDates[]{new ExcludeDates("November 5th", "November 12th")});
+    private CcdCase setupCcdCase() {
+        Appeal appeal = new Appeal(
+                "001","Birmingham2 SSO", ZonedDateTime.now(), ZonedDateTime.now());
+        Appellant appellant = new Appellant(
+                createName(), createAddress(), "01234 984585", "test@email.com",
+                "JT123456F", "Bedford");
+        Appointee appointee = new Appointee(
+                createName(), createAddress(), "01987 232323", "my@email.com");
+        Representative representative = new Representative(
+                createName(), createAddress(), "01576 765456", "rep@email.com",
+                "Computer Towers Ltd.")   ;
+        Hearing hearing = new Hearing(TribunalType.PAPER, "Yes", "Yes",
+                "Yes", "No", "Additional information",
+                new ExcludeDates[]{new ExcludeDates("November 5th", "November 12th")});
 
-        return new CCDCase(appeal, appellant, appointee, representative, hearing);
+        return new CcdCase(appeal, appellant, appointee, representative, hearing);
     }
 
     private Name createName() {
@@ -31,7 +39,7 @@ public class XmlUtilTest {
 
     @Test
     public void getCaseAsXml() {
-        CCDCase ccdCase = setupCCDCase();
+        CcdCase ccdCase = setupCcdCase();
 
         XmlUtil xmlUtil = new XmlUtil();
         String xml = xmlUtil.convertToXml(ccdCase, ccdCase.getClass());
@@ -46,22 +54,12 @@ public class XmlUtilTest {
         assertThat(actual, is(ccdCase.getAppeal().getOriginatingOffice()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/dateOfDecision");
-        assertThat(actual.toString(), is(ccdCase.getAppeal().getDateOfDecision().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()));
+        assertThat(actual.toString(), is(ccdCase.getAppeal().getDateOfDecision().format(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/dateAppealMade");
-        assertThat(actual.toString(), is(ccdCase.getAppeal().getDateAppealMade().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()));
-
-        actual = xmlUtil.extractValue(xml, xpathExpression + "/ftaReconsiderationEnclosed");
-        assertThat(actual, is(ccdCase.getAppeal().getFtaReconsiderationEnclosed().toString()));
-
-        actual = xmlUtil.extractValue(xml, xpathExpression + "/ftaReconsiderationEnclosed");
-        assertThat(actual, is(ccdCase.getAppeal().getFtaReconsiderationEnclosed().toString()));
-
-        actual = xmlUtil.extractValue(xml, xpathExpression + "/admissable");
-        assertThat(actual, is(ccdCase.getAppeal().isAdmissable().toString()));
-
-        actual = xmlUtil.extractValue(xml, xpathExpression + "/furtherEvidenceRequired");
-        assertThat(actual, is(ccdCase.getAppeal().isFurtherEvidenceRequired().toString()));
+        assertThat(actual.toString(), is(ccdCase.getAppeal().getDateAppealMade().format(
+                DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()));
 
         //appellant
         xpathExpression = "/ccdCase/appellant/name";
@@ -176,16 +174,16 @@ public class XmlUtilTest {
         assertThat(actual, is(ccdCase.getHearing().getTribunalType().toString()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/languageInterpreterRequired");
-        assertThat(actual, is(ccdCase.getHearing().isLanguageInterpreterRequired().toString()));
+        assertThat(actual, is(ccdCase.getHearing().getLanguageInterpreterRequiredForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/signLanguageRequired");
-        assertThat(actual, is(ccdCase.getHearing().isSignLanguageRequired().toString()));
+        assertThat(actual, is(ccdCase.getHearing().getSignLanguageRequiredForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/hearingLoopRequired");
-        assertThat(actual, is(ccdCase.getHearing().isHearingLoopRequired().toString()));
+        assertThat(actual, is(ccdCase.getHearing().getHearingLoopRequiredForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/hasDisabilityNeeds");
-        assertThat(actual, is(ccdCase.getHearing().getHasDisabilityNeeds().toString()));
+        assertThat(actual, is(ccdCase.getHearing().getHasDisabilityNeeds()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/additionalInformation");
         assertThat(actual, is(ccdCase.getHearing().getAdditionalInformation()));
@@ -200,9 +198,11 @@ public class XmlUtilTest {
     @Test
     public void excludeMultipleDates() {
 
-        Hearing hearing = new Hearing(null, null, null, null, null, null, new ExcludeDates[]{new ExcludeDates("November 5th", "November 12th"), new ExcludeDates("December 1st", "December 2nd")});
+        Hearing hearing = new Hearing(null, null, null, null, null, null, new ExcludeDates[]{
+            new ExcludeDates("November 5th", "November 12th"),
+            new ExcludeDates("December 1st", "December 2nd")});
 
-        CCDCase ccdCase = new CCDCase(null, null, null, null, hearing);
+        CcdCase ccdCase = new CcdCase(null, null, null, null, hearing);
         XmlUtil xmlUtil = new XmlUtil();
         String xpathExpression = "/ccdCase/hearing/excludeDates";
 

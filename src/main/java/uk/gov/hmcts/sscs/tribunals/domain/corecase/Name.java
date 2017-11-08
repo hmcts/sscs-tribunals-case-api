@@ -52,7 +52,9 @@ public class Name {
     }
 
     @XmlElement
-    public String getInitial() { return initial; }
+    public String getInitial() {
+        return initial;
+    }
 
     @Override
     public String toString() {

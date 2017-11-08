@@ -14,7 +14,8 @@ public enum Benefit {
 
     private final String code;
     private final String description;
-    private static final Map<String, String> mMap = Collections.unmodifiableMap(initializeMapping());
+    private static final Map<String, String> mMap =
+            Collections.unmodifiableMap(initializeMapping());
 
     Benefit(String code, String description) {
         this.code = code;
@@ -41,10 +42,10 @@ public enum Benefit {
     }
 
     private static Map<String, String> initializeMapping() {
-        Map<String, String> mMap = new HashMap<>();
+        Map<String, String> m = new HashMap<>();
         for (Benefit s : Benefit.values()) {
-            mMap.put(s.code, s.description);
+            m.put(s.code, s.description);
         }
-        return mMap;
+        return m;
     }
 }
