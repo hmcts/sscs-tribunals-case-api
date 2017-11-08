@@ -6,9 +6,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * {@code XmlAdapter} mapping JSR-310 {@code ZonedDateTime} to ISO-8601 string
- * <p>
- * String format details: dd/MM/yyyy
+ * {@code XmlAdapter} mapping JSR-310 {@code ZonedDateTime} to ISO-8601 string.
+ *
+ * <p>String format details: dd/MM/yyyy
  *
  * @see javax.xml.bind.annotation.adapters.XmlAdapter
  * @see java.time.ZonedDateTime

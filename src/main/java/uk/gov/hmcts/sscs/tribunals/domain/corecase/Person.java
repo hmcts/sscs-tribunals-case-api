@@ -10,19 +10,35 @@ abstract class Person {
 
     protected String email;
 
-    public Name getName() { return name; }
+    public Name getName() {
+        return name;
+    }
 
-    public void setName(Name name) { this.name = name; }
+    public void setName(Name name) {
+        this.name = name;
+    }
 
-    public Address getAddress() { return address; }
+    public Address getAddress() {
+        return address;
+    }
 
-    public void setAddress(Address address) { this.address = address; }
+    public void setAddress(Address address) {
+        this.address = address;
+    }
 
-    public String getPhone() { return phone; }
+    public String getPhone() {
+        return phone;
+    }
 
-    public void setPhone(String phone) { this.phone = phone; }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
-    public String getEmail() { return email; }
+    public String getEmail() {
+        return email;
+    }
 
-    public void setEmail(String email) { this.email = email; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }
