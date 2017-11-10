@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -76,5 +77,26 @@ public class Address {
                 + ", county='" + county + '\''
                 + ", postcode='" + postcode + '\''
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Address)) {
+            return false;
+        }
+        Address address = (Address) o;
+        return Objects.equals(line1, address.line1)
+                && Objects.equals(line2, address.line2)
+                && Objects.equals(town, address.town)
+                && Objects.equals(county, address.county)
+                && Objects.equals(postcode, address.postcode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line1, line2, town, county, postcode);
     }
 }

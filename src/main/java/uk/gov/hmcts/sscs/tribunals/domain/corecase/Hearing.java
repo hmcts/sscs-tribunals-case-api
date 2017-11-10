@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
 import java.util.Arrays;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
@@ -124,5 +125,29 @@ public class Hearing {
                 + ", additionalInformation='" + additionalInformation + '\''
                 + ", excludeDates=" + Arrays.toString(excludeDates)
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Hearing)) {
+            return false;
+        }
+        Hearing hearing = (Hearing) o;
+        return tribunalType == hearing.tribunalType
+                && Objects.equals(languageInterpreterRequired, hearing.languageInterpreterRequired)
+                && Objects.equals(signLanguageRequired, hearing.signLanguageRequired)
+                && Objects.equals(hearingLoopRequired, hearing.hearingLoopRequired)
+                && Objects.equals(hasDisabilityNeeds, hearing.hasDisabilityNeeds)
+                && Objects.equals(additionalInformation, hearing.additionalInformation)
+                && Arrays.equals(excludeDates, hearing.excludeDates);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tribunalType, languageInterpreterRequired, signLanguageRequired,
+                hearingLoopRequired, hasDisabilityNeeds, additionalInformation, excludeDates);
     }
 }

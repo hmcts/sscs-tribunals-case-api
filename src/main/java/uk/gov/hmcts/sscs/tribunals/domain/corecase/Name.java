@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -23,7 +24,7 @@ public class Name {
         this.title = title;
         this.first = first;
         this.surname = surname;
-        this.initial = first.substring(0,1);
+        generateInitial();
     }
 
     public String getTitle() {
@@ -41,6 +42,7 @@ public class Name {
 
     public void setFirst(String first) {
         this.first = first;
+        generateInitial();
     }
 
     public String getSurname() {
@@ -56,6 +58,12 @@ public class Name {
         return initial;
     }
 
+    public void generateInitial() {
+        if (first != null) {
+            initial = first.substring(0, 1);
+        }
+    }
+
     @Override
     public String toString() {
         return "Name{"
@@ -64,5 +72,25 @@ public class Name {
                 + ", surname='" + surname + '\''
                 + ", initial='" + initial + '\''
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Name)) {
+            return false;
+        }
+        Name name = (Name) o;
+        return Objects.equals(title, name.title)
+                && Objects.equals(first, name.first)
+                && Objects.equals(surname, name.surname)
+                && Objects.equals(initial, name.initial);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, first, surname, initial);
     }
 }

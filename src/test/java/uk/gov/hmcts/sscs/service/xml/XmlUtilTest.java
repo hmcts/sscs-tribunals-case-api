@@ -3,17 +3,18 @@ package uk.gov.hmcts.sscs.service.xml;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.Test;
+
 import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
 
 public class XmlUtilTest {
 
     private CcdCase setupCcdCase() {
         Appeal appeal = new Appeal(
-                "001","Birmingham2 SSO", ZonedDateTime.now(), ZonedDateTime.now());
+                Benefit.UNIVERSAL_CREDIT, "Birmingham2 SSO", LocalDate.now(), LocalDate.now());
         Appellant appellant = new Appellant(
                 createName(), createAddress(), "01234 984585", "test@email.com",
                 "JT123456F", "Bedford");
@@ -48,7 +49,7 @@ public class XmlUtilTest {
         String xpathExpression = "/ccdCase/appeal";
 
         String actual = xmlUtil.extractValue(xml, xpathExpression + "/caseCode");
-        assertThat(actual, is(ccdCase.getAppeal().getCaseCodeWithSuffix()));
+        assertThat(actual, is(ccdCase.getAppeal().getBenefitAsCaseCode()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/originatingOffice");
         assertThat(actual, is(ccdCase.getAppeal().getOriginatingOffice()));

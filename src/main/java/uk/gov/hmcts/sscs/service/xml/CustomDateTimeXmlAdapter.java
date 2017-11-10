@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.service.xml;
 
 import com.migesok.jaxb.adapter.javatime.TemporalAccessorXmlAdapter;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -13,8 +14,8 @@ import java.time.format.DateTimeFormatter;
  * @see javax.xml.bind.annotation.adapters.XmlAdapter
  * @see java.time.ZonedDateTime
  */
-public class CustomDateTimeXmlAdapter extends TemporalAccessorXmlAdapter<ZonedDateTime> {
+public class CustomDateTimeXmlAdapter extends TemporalAccessorXmlAdapter<LocalDate> {
     public CustomDateTimeXmlAdapter() {
-        super(DateTimeFormatter.ofPattern("dd/MM/yyyy"), ZonedDateTime::from);
+        super(DateTimeFormatter.ofPattern("dd/MM/yyyy"), LocalDate::from);
     }
 }
