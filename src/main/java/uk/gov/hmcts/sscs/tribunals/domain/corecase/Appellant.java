@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -49,5 +50,27 @@ public class Appellant extends Person {
                 + ", phone='" + phone + '\''
                 + ", email='" + email + '\''
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Appellant)) {
+            return false;
+        }
+        Appellant appellant = (Appellant) o;
+        return Objects.equals(nino, appellant.nino)
+                && Objects.equals(adminGroup, appellant.adminGroup)
+                && Objects.equals(name, appellant.name)
+                && Objects.equals(address, appellant.address)
+                && Objects.equals(phone, appellant.phone)
+                && Objects.equals(email, appellant.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nino, adminGroup, name, address, phone, email);
     }
 }

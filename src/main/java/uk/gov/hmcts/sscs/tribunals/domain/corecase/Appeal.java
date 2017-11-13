@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -10,34 +11,38 @@ import uk.gov.hmcts.sscs.service.xml.CustomDateTimeXmlAdapter;
 
 public class Appeal {
 
-    private String caseCode;
+    private Benefit benefit;
 
     private String originatingOffice;
 
-    private ZonedDateTime dateOfDecision;
+    private LocalDate dateOfDecision;
 
-    private ZonedDateTime dateAppealMade;
+    private LocalDate dateAppealMade;
 
-    public Appeal(String caseCode, String originatingOffice, ZonedDateTime dateOfDecision,
-                  ZonedDateTime dateAppealMade) {
-        this.caseCode = caseCode;
+    public Appeal(Benefit benefit, String originatingOffice, LocalDate dateOfDecision,
+                  LocalDate dateAppealMade) {
+        this.benefit = benefit;
         this.originatingOffice = originatingOffice;
         this.dateOfDecision = dateOfDecision;
         this.dateAppealMade = dateAppealMade;
     }
 
+    public Appeal() {
+
+    }
+
     @XmlTransient
-    public String getCaseCode() {
-        return caseCode;
+    public Benefit getBenefit() {
+        return benefit;
     }
 
     @XmlElement(name = "caseCode", required = true)
-    public String getCaseCodeWithSuffix() {
-        return caseCode + "DD";
+    public String getBenefitAsCaseCode() {
+        return benefit.getCode() + "DD";
     }
 
-    public void setCaseCode(String caseCode) {
-        this.caseCode = caseCode;
+    public void setBenefit(Benefit benefit) {
+        this.benefit = benefit;
     }
 
     public String getOriginatingOffice() {
@@ -49,30 +54,50 @@ public class Appeal {
     }
 
     @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
-    public ZonedDateTime getDateOfDecision() {
+    public LocalDate getDateOfDecision() {
         return dateOfDecision;
     }
 
-    public void setDateOfDecision(ZonedDateTime dateOfDecision) {
+    public void setDateOfDecision(LocalDate dateOfDecision) {
         this.dateOfDecision = dateOfDecision;
     }
 
     @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
-    public ZonedDateTime getDateAppealMade() {
+    public LocalDate getDateAppealMade() {
         return dateAppealMade;
     }
 
-    public void setDateAppealMade(ZonedDateTime dateAppealMade) {
+    public void setDateAppealMade(LocalDate dateAppealMade) {
         this.dateAppealMade = dateAppealMade;
     }
 
     @Override
     public String toString() {
         return "Appeal{"
-                + " caseCode='" + caseCode + '\''
+                + " benefit='" + benefit + '\''
                 + ", dateOfDecision=" + dateOfDecision
                 + ", originatingOffice='" + originatingOffice + '\''
                 + ", dateAppealMade=" + dateAppealMade
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Appeal)) {
+            return false;
+        }
+        Appeal appeal = (Appeal) o;
+        return Objects.equals(benefit, appeal.benefit)
+                && Objects.equals(originatingOffice, appeal.originatingOffice)
+                && Objects.equals(dateOfDecision, appeal.dateOfDecision)
+                && Objects.equals(dateAppealMade, appeal.dateAppealMade);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(benefit, originatingOffice, dateOfDecision, dateAppealMade);
     }
 }
