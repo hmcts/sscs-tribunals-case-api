@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlElement;
@@ -22,6 +23,10 @@ public class Hearing {
 
     private ExcludeDates[] excludeDates;
 
+    private Address address;
+
+    private ZonedDateTime dateTime;
+
     public Hearing() {
     }
 
@@ -36,6 +41,11 @@ public class Hearing {
         this.hasDisabilityNeeds = hasDisabilityNeeds;
         this.additionalInformation = additionalInformation;
         this.excludeDates = excludeDates;
+    }
+
+    public Hearing(Address address, ZonedDateTime dateTime) {
+        this.address = address;
+        this.dateTime = dateTime;
     }
 
     public TribunalType getTribunalType() {
@@ -114,6 +124,24 @@ public class Hearing {
         this.excludeDates = excludeDates;
     }
 
+    @XmlTransient
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    @XmlTransient
+    public ZonedDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(ZonedDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
     @Override
     public String toString() {
         return "Hearing{"
@@ -124,6 +152,8 @@ public class Hearing {
                 + ", hasDisabilityNeeds='" + hasDisabilityNeeds + '\''
                 + ", additionalInformation='" + additionalInformation + '\''
                 + ", excludeDates=" + Arrays.toString(excludeDates)
+                + ", address=" + address
+                + ", dateTime=" + dateTime
                 + '}';
     }
 
@@ -132,7 +162,7 @@ public class Hearing {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Hearing)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         Hearing hearing = (Hearing) o;
@@ -142,12 +172,15 @@ public class Hearing {
                 && Objects.equals(hearingLoopRequired, hearing.hearingLoopRequired)
                 && Objects.equals(hasDisabilityNeeds, hearing.hasDisabilityNeeds)
                 && Objects.equals(additionalInformation, hearing.additionalInformation)
-                && Arrays.equals(excludeDates, hearing.excludeDates);
+                && Arrays.equals(excludeDates, hearing.excludeDates)
+                && Objects.equals(address, hearing.address)
+                && Objects.equals(dateTime, hearing.dateTime);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(tribunalType, languageInterpreterRequired, signLanguageRequired,
-                hearingLoopRequired, hasDisabilityNeeds, additionalInformation, excludeDates);
+                hearingLoopRequired, hasDisabilityNeeds, additionalInformation, excludeDates,
+                address, dateTime);
     }
 }

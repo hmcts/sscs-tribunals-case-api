@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement
@@ -18,6 +19,8 @@ public class Address {
 
     private String postcode;
 
+    private String googleMapUrl;
+
     public Address() { }
 
     public Address(String line1, String line2, String town, String county, String postcode) {
@@ -26,6 +29,16 @@ public class Address {
         this.town = town;
         this.county = county;
         this.postcode = postcode;
+    }
+
+    public Address(String line1, String line2, String town, String county, String postcode,
+                   String googleMapUrl) {
+        this.line1 = line1;
+        this.line2 = line2;
+        this.town = town;
+        this.county = county;
+        this.postcode = postcode;
+        this.googleMapUrl = googleMapUrl;
     }
 
     public String getLine1() {
@@ -68,6 +81,15 @@ public class Address {
         this.postcode = postcode;
     }
 
+    @XmlTransient
+    public String getGoogleMapUrl() {
+        return googleMapUrl;
+    }
+
+    public void setGoogleMapUrl(String googleMapUrl) {
+        this.googleMapUrl = googleMapUrl;
+    }
+
     @Override
     public String toString() {
         return "Address{"
@@ -76,6 +98,7 @@ public class Address {
                 + ", town='" + town + '\''
                 + ", county='" + county + '\''
                 + ", postcode='" + postcode + '\''
+                + ", googleMapUrl='" + googleMapUrl + '\''
                 + '}';
     }
 
@@ -92,11 +115,12 @@ public class Address {
                 && Objects.equals(line2, address.line2)
                 && Objects.equals(town, address.town)
                 && Objects.equals(county, address.county)
-                && Objects.equals(postcode, address.postcode);
+                && Objects.equals(postcode, address.postcode)
+                && Objects.equals(googleMapUrl, address.googleMapUrl);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(line1, line2, town, county, postcode);
+        return Objects.hash(line1, line2, town, county, postcode, googleMapUrl);
     }
 }

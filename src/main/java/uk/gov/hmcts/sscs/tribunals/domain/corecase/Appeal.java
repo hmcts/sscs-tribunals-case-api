@@ -19,6 +19,8 @@ public class Appeal {
 
     private LocalDate dateAppealMade;
 
+    private String appealNumber;
+
     public Appeal(Benefit benefit, String originatingOffice, LocalDate dateOfDecision,
                   LocalDate dateAppealMade) {
         this.benefit = benefit;
@@ -71,13 +73,23 @@ public class Appeal {
         this.dateAppealMade = dateAppealMade;
     }
 
+    @XmlTransient
+    public String getAppealNumber() {
+        return appealNumber;
+    }
+
+    public void setAppealNumber(String appealNumber) {
+        this.appealNumber = appealNumber;
+    }
+
     @Override
     public String toString() {
         return "Appeal{"
-                + " benefit='" + benefit + '\''
-                + ", dateOfDecision=" + dateOfDecision
+                + " benefit=" + benefit
                 + ", originatingOffice='" + originatingOffice + '\''
+                + ", dateOfDecision=" + dateOfDecision
                 + ", dateAppealMade=" + dateAppealMade
+                + ", appealNumber='" + appealNumber + '\''
                 + '}';
     }
 
@@ -86,18 +98,19 @@ public class Appeal {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Appeal)) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         Appeal appeal = (Appeal) o;
-        return Objects.equals(benefit, appeal.benefit)
+        return benefit == appeal.benefit
                 && Objects.equals(originatingOffice, appeal.originatingOffice)
                 && Objects.equals(dateOfDecision, appeal.dateOfDecision)
-                && Objects.equals(dateAppealMade, appeal.dateAppealMade);
+                && Objects.equals(dateAppealMade, appeal.dateAppealMade)
+                && Objects.equals(appealNumber, appeal.appealNumber);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(benefit, originatingOffice, dateOfDecision, dateAppealMade);
+        return Objects.hash(benefit, originatingOffice, dateOfDecision, dateAppealMade, appealNumber);
     }
 }
