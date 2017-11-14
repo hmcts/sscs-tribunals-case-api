@@ -64,6 +64,11 @@ public class Name {
         }
     }
 
+    @XmlTransient
+    public String getFullName() {
+        return title + " " + initial + " " + surname;
+    }
+
     @Override
     public String toString() {
         return "Name{"
