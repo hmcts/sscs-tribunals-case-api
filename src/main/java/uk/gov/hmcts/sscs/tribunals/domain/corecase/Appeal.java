@@ -111,6 +111,7 @@ public class Appeal {
 
     @Override
     public int hashCode() {
-        return Objects.hash(benefit, originatingOffice, dateOfDecision, dateAppealMade, appealNumber);
+        return Objects.hash(benefit, originatingOffice, dateOfDecision, dateAppealMade,
+                appealNumber);
     }
 }

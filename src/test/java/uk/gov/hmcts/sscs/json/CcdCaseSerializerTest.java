@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service.json;
+package uk.gov.hmcts.sscs.json;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -6,6 +6,7 @@ import java.util.Arrays;
 import org.json.JSONException;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
+import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
 import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
 
 public class CcdCaseSerializerTest {
@@ -27,8 +28,7 @@ public class CcdCaseSerializerTest {
 
         caseReference = "SC777/77/77777";
 
-        Address hearingAddress = new Address("Chester Magistrate's Court", "Grosvenor Street",
-                "Chester", "Chestershire", "CH1 2XA", "https://googleURL.com");
+        Address hearingAddress = CcdCaseBuilder.address(true);
 
         Hearing hearingEvent = new Hearing(hearingAddress, ZonedDateTime.now());
 
