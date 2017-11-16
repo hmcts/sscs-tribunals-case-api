@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service.json;
+package uk.gov.hmcts.sscs.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;

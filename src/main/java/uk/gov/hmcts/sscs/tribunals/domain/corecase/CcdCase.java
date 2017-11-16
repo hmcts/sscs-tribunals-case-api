@@ -2,14 +2,13 @@ package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import uk.gov.hmcts.sscs.service.json.CcdCaseDeserializer;
+import uk.gov.hmcts.sscs.json.CcdCaseDeserializer;
 
 @XmlRootElement
 @XmlType(propOrder = {"appeal", "appellant", "appointee", "representative", "hearing"})
