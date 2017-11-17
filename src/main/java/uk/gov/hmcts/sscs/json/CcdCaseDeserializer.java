@@ -32,16 +32,16 @@ public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
         ObjectCodec oc = jp.getCodec();
         JsonNode node = oc.readTree(jp);
 
-        ccdCase.setAppeal(buildAppeal(node));
-        ccdCase.setAppellant(buildAppellant(node));
-        ccdCase.setAppointee(buildAppointee(node));
-        ccdCase.setRepresentative(buildRepresentative(node));
-        ccdCase.setHearing(buildHearing(node));
+        ccdCase.setAppeal(deserializeAppeal(node));
+        ccdCase.setAppellant(deserializeAppellant(node));
+        ccdCase.setAppointee(deserializeAppointee(node));
+        ccdCase.setRepresentative(deserializeRepresentative(node));
+        ccdCase.setHearing(deserializeHearing(node));
 
         return ccdCase;
     }
 
-    public Appeal buildAppeal(JsonNode node) {
+    public Appeal deserializeAppeal(JsonNode node) {
         Appeal appeal = new Appeal();
 
         appeal.setBenefit(node.has("BenefitType_benefitType")
@@ -73,7 +73,7 @@ public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
         return LocalDate.parse(date.toString(), formatter);
     }
 
-    public Appellant buildAppellant(JsonNode node) {
+    public Appellant deserializeAppellant(JsonNode node) {
         Name name = new Name();
 
         name.setTitle(node.has("AppellantName_title")
@@ -110,7 +110,7 @@ public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
         return appellant;
     }
 
-    public Appointee buildAppointee(JsonNode node) {
+    public Appointee deserializeAppointee(JsonNode node) {
         Name name = new Name();
 
         //TODO: Lots of assumptions here
@@ -146,7 +146,7 @@ public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
         return appointee;
     }
 
-    public Representative buildRepresentative(JsonNode node) {
+    public Representative deserializeRepresentative(JsonNode node) {
 
         Name name = new Name();
 
@@ -186,7 +186,7 @@ public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
         return representative;
     }
 
-    public Hearing buildHearing(JsonNode node) {
+    public Hearing deserializeHearing(JsonNode node) {
         Hearing hearing = new Hearing();
         // TODO: Lots of assumptions here
 

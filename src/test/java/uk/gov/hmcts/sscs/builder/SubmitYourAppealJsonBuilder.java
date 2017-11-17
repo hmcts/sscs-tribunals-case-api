@@ -10,7 +10,6 @@ public class SubmitYourAppealJsonBuilder {
     public static JSONObject convertAppeal(Appeal appeal) {
         return new JSONObject(new HashMap<String, Object>() {{
                 put("BenefitType_benefitType", appeal.getBenefit().getType());
-                put("BenefitType_benefitType", appeal.getBenefit().getType());
                 put("MRNDate_day", appeal.getDateOfDecision().getDayOfMonth());
                 put("MRNDate_month",  appeal.getDateOfDecision().getMonthValue());
                 put("MRNDate_year",  appeal.getDateOfDecision().getYear());
@@ -70,7 +69,7 @@ public class SubmitYourAppealJsonBuilder {
 
     public static JSONObject convertHearing(Hearing hearing) {
         return new JSONObject(new HashMap<String, Object>() {{
-                put("tribunal_type", hearing.getTribunalType().getKey());
+                put("tribunal_type", hearing.getTribunalType().toString());
                 put("hearing_interpreter_required", hearing.getLanguageInterpreterRequired());
                 put("sign_interpreter_required", hearing.getSignLanguageRequired());
                 put("hearing_loop_required", hearing.getHearingLoopRequired());

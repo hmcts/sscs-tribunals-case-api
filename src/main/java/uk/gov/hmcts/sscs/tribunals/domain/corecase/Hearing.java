@@ -48,8 +48,18 @@ public class Hearing {
         this.dateTime = dateTime;
     }
 
+    @XmlTransient
     public TribunalType getTribunalType() {
         return tribunalType;
+    }
+
+    @XmlElement(name = "tribunalType", required = true)
+    public String getTribunalTypeText() {
+        if (tribunalType != null) {
+            return tribunalType.toString();
+        } else {
+            return null;
+        }
     }
 
     public void setTribunalType(TribunalType tribunalType) {

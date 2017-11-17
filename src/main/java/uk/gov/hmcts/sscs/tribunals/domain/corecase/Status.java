@@ -1,20 +1,15 @@
 package uk.gov.hmcts.sscs.tribunals.domain.corecase;
 
+import com.google.common.base.CaseFormat;
+
 public enum Status {
 
-    ADJOURNED("adjourned"), APPEAL_RECEIVED("appealReceived"), CLOSED("closed"),
-    DORMANT("dormant"), DWP_RESPOND("dwpRespond"), DWP_RESPOND_OVERDUE("dwpRespondOverdue"),
-    EVIDENCE_RECEIVED("evidenceReceived"), HEARING("hearing"), HEARING_BOOKED("hearingBooked"),
-    LAPSED_REVISED("lapsedRevised"), NEW_HEARING_BOOKED("newHearingBooked"),
-    PAST_HEARING_BOOKED("pastHearingBooked"), POSTPONED("postponed"), WITHDRAWN("withdrawn");
+    ADJOURNED, APPEAL_RECEIVED, CLOSED, DORMANT, DWP_RESPOND, DWP_RESPOND_OVERDUE,
+    EVIDENCE_RECEIVED, HEARING, HEARING_BOOKED, LAPSED_REVISED, NEW_HEARING_BOOKED,
+    PAST_HEARING_BOOKED, POSTPONED, WITHDRAWN;
 
-    private String key;
-
-    Status(String key) {
-        this.key = key;
-    }
 
     public String getContentKey() {
-        return "status." + key;
+        return "status." + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
     }
 }

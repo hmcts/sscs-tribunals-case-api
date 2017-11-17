@@ -8,39 +8,14 @@ import java.time.format.DateTimeFormatter;
 
 import org.junit.Test;
 
+import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
 import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
 
 public class XmlUtilTest {
 
-    private CcdCase setupCcdCase() {
-        Appeal appeal = new Appeal(
-                Benefit.UNIVERSAL_CREDIT, "Birmingham2 SSO", LocalDate.now(), LocalDate.now());
-        Appellant appellant = new Appellant(
-                createName(), createAddress(), "01234 984585", "test@email.com",
-                "JT123456F", "Bedford");
-        Appointee appointee = new Appointee(
-                createName(), createAddress(), "01987 232323", "my@email.com");
-        Representative representative = new Representative(
-                createName(), createAddress(), "01576 765456", "rep@email.com",
-                "Computer Towers Ltd.")   ;
-        Hearing hearing = new Hearing(TribunalType.PAPER, "Yes", "Yes",
-                "Yes", "No", "Additional information",
-                new ExcludeDates[]{new ExcludeDates("November 5th", "November 12th")});
-
-        return new CcdCase(appeal, appellant, appointee, representative, hearing);
-    }
-
-    private Name createName() {
-        return new Name("Mr", "Joe", "Bloggs");
-    }
-
-    private Address createAddress() {
-        return new Address("My Road", "End of the path", "Applebury", "Surrey", "GU12 5JT");
-    }
-
     @Test
     public void getCaseAsXml() {
-        CcdCase ccdCase = setupCcdCase();
+        CcdCase ccdCase = CcdCaseBuilder.ccdCase();
 
         XmlUtil xmlUtil = new XmlUtil();
         String xml = xmlUtil.convertToXml(ccdCase, ccdCase.getClass());
@@ -61,6 +36,9 @@ public class XmlUtilTest {
         actual = xmlUtil.extractValue(xml, xpathExpression + "/dateAppealMade");
         assertThat(actual.toString(), is(ccdCase.getAppeal().getDateAppealMade().format(
                 DateTimeFormatter.ofPattern("dd/MM/yyyy")).toString()));
+
+        actual =  xmlUtil.extractValue(xml, xpathExpression + "/outOfTime");
+        assertThat(actual, is(ccdCase.getAppeal().getOutOfTime()));
 
         //appellant
         xpathExpression = "/ccdCase/appellant/name";
@@ -172,7 +150,7 @@ public class XmlUtilTest {
         xpathExpression = "/ccdCase/hearing";
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/tribunalType");
-        assertThat(actual, is(ccdCase.getHearing().getTribunalType().toString()));
+        assertThat(actual, is(ccdCase.getHearing().getTribunalTypeText()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/languageInterpreterRequired");
         assertThat(actual, is(ccdCase.getHearing().getLanguageInterpreterRequiredForXml()));
