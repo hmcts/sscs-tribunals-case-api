@@ -10,6 +10,6 @@ public enum Status {
 
 
     public String getContentKey() {
-        return "status." + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
+        return "status." + CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
     }
 }
