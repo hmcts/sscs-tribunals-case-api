@@ -38,8 +38,8 @@ dependencyCheck {
 }
 
 repositories {
-  jcenter()
-  mavenCentral()
+    jcenter()
+    mavenCentral()
 }
 
 dependencies {
@@ -69,6 +69,12 @@ jar {
     }
 }
 
+sonarqube {
+    properties {
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/tribunals/domain/corecase/*"
+    }
+}
+
 
 task printVersion {
     doLast {
@@ -77,5 +83,5 @@ task printVersion {
 }
 
 task getHomeDir << {
-  println gradle.gradleHomeDir
+    println gradle.gradleHomeDir
 }
