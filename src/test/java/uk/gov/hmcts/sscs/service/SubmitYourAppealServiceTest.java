@@ -19,9 +19,6 @@ import uk.gov.hmcts.sscs.json.CcdCaseDeserializer;
 public class SubmitYourAppealServiceTest {
 
     @Mock
-    private CcdCaseDeserializer ccdCaseDeserializer;
-
-    @Mock
     private EmailService emailService;
 
     private SubmitYourAppealEmail email = new SubmitYourAppealEmail("from@hmcts.net",
@@ -31,7 +28,7 @@ public class SubmitYourAppealServiceTest {
 
     @Before
     public void setUp() {
-        service = new SubmitYourAppealService(ccdCaseDeserializer, emailService, email);
+        service = new SubmitYourAppealService(emailService, email);
     }
 
     @Test
