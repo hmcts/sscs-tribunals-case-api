@@ -9,10 +9,15 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.sscs.tribunals.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.tribunals.domain.corecase.Event;
 
+
 class CcdCaseSerializer extends StdSerializer<CcdCase> {
+
+    private static final Logger log = LoggerFactory.getLogger(CcdCaseSerializer.class);
 
     private ObjectMapper mapper;
 
@@ -32,7 +37,7 @@ class CcdCaseSerializer extends StdSerializer<CcdCase> {
         try {
             json = mapper.writeValueAsString(ccdCase);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            log.error("JsonProcessingException : ", e);
         }
         return json;
     }
@@ -69,7 +74,7 @@ class CcdCaseSerializer extends StdSerializer<CcdCase> {
 
     public JsonGenerator generateEventJson(JsonGenerator jgen, List<Event> events)
             throws IOException {
-        if (events.size() == 0) {
+        if (events.isEmpty()) {
             return jgen;
         }
 

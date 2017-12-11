@@ -4,23 +4,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
-import uk.gov.hmcts.sscs.json.CcdCaseDeserializer;
 import uk.gov.hmcts.sscs.tribunals.domain.corecase.CcdCase;
+
 
 @Service
 public class SubmitYourAppealService {
 
-    private final CcdCaseDeserializer ccdCaseDeserializer;
+    private static final Logger log = LoggerFactory.getLogger(SubmitYourAppealService.class);
+
     private final EmailService emailService;
     private final SubmitYourAppealEmail email;
 
     @Autowired
-    public SubmitYourAppealService(CcdCaseDeserializer ccdCaseDeserializer,
-                                   EmailService emailService, SubmitYourAppealEmail email) {
-        this.ccdCaseDeserializer = ccdCaseDeserializer;
+    public SubmitYourAppealService(EmailService emailService, SubmitYourAppealEmail email) {
         this.emailService = emailService;
         this.email = email;
     }
@@ -36,9 +37,9 @@ public class SubmitYourAppealService {
         try {
             JSONObject json = new JSONObject(appeal);
             ObjectMapper mapper = new ObjectMapper();
-            CcdCase ccd = mapper.readValue(json.toString(), CcdCase.class);
+            mapper.readValue(json.toString(), CcdCase.class);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Json to CCD object exception", e);
         }
     }
 }
