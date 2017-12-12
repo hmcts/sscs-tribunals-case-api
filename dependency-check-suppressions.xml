@@ -67,4 +67,39 @@
         <gav regex="true">^com\.fasterxml\.jackson\.module:.*$</gav>
         <cve>CVE-2016-7051</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-8.5.23.jar
+   ]]></notes>
+        <sha1>79261793a47f507890ee08f749b9d81774e4f7f0</sha1>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-el-8.5.23.jar
+   ]]></notes>
+        <sha1>98d979cde444dffa6d434c8377d0123b2dfa614c</sha1>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-8.5.23.jar
+   ]]></notes>
+        <sha1>52f07abcae10dc7e1764304b0877def175c2c833</sha1>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-annotations-api-8.5.23.jar
+   ]]></notes>
+        <sha1>aaf17df9fe0240e9e9d5375d24d5f177174b73d9</sha1>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-boot-starter-mail-1.5.9.RELEASE.jar
+   ]]></notes>
+        <gav regex="true">^org\.springframework\.boot:spring-boot-starter-mail:.*$</gav>
+        <cpe>cpe:/a:mail_project:mail</cpe>
+    </suppress>
 </suppressions>
