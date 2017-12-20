@@ -3,13 +3,14 @@ package uk.gov.hmcts.sscs.service.xml;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.Test;
 
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.ExcludeDates;
+import uk.gov.hmcts.sscs.domain.corecase.Hearing;
 
 public class XmlUtilTest {
 
@@ -162,7 +163,7 @@ public class XmlUtilTest {
         assertThat(actual, is(ccdCase.getHearing().getHearingLoopRequiredForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/hasDisabilityNeeds");
-        assertThat(actual, is(ccdCase.getHearing().getHasDisabilityNeeds()));
+        assertThat(actual, is(ccdCase.getHearing().getHasDisabilityNeedsForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/additionalInformation");
         assertThat(actual, is(ccdCase.getHearing().getAdditionalInformation()));

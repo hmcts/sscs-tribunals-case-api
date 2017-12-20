@@ -2,7 +2,7 @@ package uk.gov.hmcts.sscs.builder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class CcdCaseBuilder {
 
@@ -32,7 +32,7 @@ public class CcdCaseBuilder {
     }
 
     public static Hearing hearing() {
-        return new Hearing(TribunalType.PAPER, "Yes", "Yes", "No", "No",
+        return new Hearing(TribunalType.PAPER, true, true, false, false,
         "Additional info", new ExcludeDates[]{new ExcludeDates("November 5th", "November 12th")});
     }
 

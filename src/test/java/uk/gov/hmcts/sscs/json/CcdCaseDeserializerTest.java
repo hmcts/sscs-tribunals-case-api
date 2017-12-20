@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
@@ -16,7 +15,7 @@ import org.junit.Test;
 
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
 import uk.gov.hmcts.sscs.builder.SubmitYourAppealJsonBuilder;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class CcdCaseDeserializerTest {
 

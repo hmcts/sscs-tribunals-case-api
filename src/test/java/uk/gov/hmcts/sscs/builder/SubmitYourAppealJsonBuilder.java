@@ -3,7 +3,7 @@ package uk.gov.hmcts.sscs.builder;
 import java.util.HashMap;
 import java.util.Iterator;
 import org.json.simple.JSONObject;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class SubmitYourAppealJsonBuilder {
 
