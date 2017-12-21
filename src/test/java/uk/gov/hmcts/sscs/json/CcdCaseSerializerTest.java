@@ -7,7 +7,7 @@ import org.json.JSONException;
 import org.junit.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class CcdCaseSerializerTest {
 

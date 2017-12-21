@@ -8,8 +8,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.corecase.*;
 
 //@SuppressWarnings("serial")
 public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
@@ -194,15 +193,15 @@ public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
                 ? TribunalType.getTribunalByKey(node.get("tribunal_type").asText()) : null);
 
         hearing.setLanguageInterpreterRequired(node.has("hearing_interpreter_required")
-                ? node.get("hearing_interpreter_required").asText() : "No");
+            && node.get("hearing_interpreter_required").asText() == "true");
         hearing.setSignLanguageRequired(node.has("sign_interpreter_required")
-                ? node.get("sign_interpreter_required").asText() : "No");
+            && node.get("sign_interpreter_required").asText() == "true");
         hearing.setHearingLoopRequired(node.has("hearing_loop_required")
-                ? node.get("hearing_loop_required").asText() : "No");
+            && node.get("hearing_loop_required").asText() == "true");
         hearing.setHasDisabilityNeeds(node.has("disabled_access_required")
-                ? node.get("disabled_access_required").asText() : "No");
+            && node.get("disabled_access_required").asText() == "true");
         hearing.setAdditionalInformation(node.has("other_details")
-                ? node.get("other_details").asText() : null);
+            ? node.get("other_details").asText() : null);
 
         // TODO: Add exclude dates when we know what front end looks like
         // hearing.setExcludeDates(values.has("disabled_access_required")

@@ -11,8 +11,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.tribunals.domain.corecase.Event;
+import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.Event;
 
 
 class CcdCaseSerializer extends StdSerializer<CcdCase> {

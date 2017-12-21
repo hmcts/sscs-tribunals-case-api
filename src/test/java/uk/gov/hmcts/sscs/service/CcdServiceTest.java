@@ -25,6 +25,13 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.sscs.domain.corecase.Appellant;
+import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.Name;
+import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
@@ -41,6 +48,15 @@ public class CcdServiceTest {
     @Mock
     private CoreCaseDataClient coreCaseDataClient;
 
+    @Mock
+    private EmailService emailService;
+
+    private SubmitYourAppealEmail email = new SubmitYourAppealEmail("from@hmcts.net",
+            "to@hmcts.net", "Your appeal", "Your appeal has been created");
+
+    @Mock
+    private SubmitYourAppealToCcdCaseTransformer transformer;
+
     @Captor
     private ArgumentCaptor<Map> captor;
 
@@ -48,30 +64,24 @@ public class CcdServiceTest {
 
     private String serviceToken = "service-caseToken";
 
-    @Before
-    public void setUp() {
-        ccdService = new CcdService(coreCaseDataClient, authClient,
-                idamClient, CASE_WORKER_ID);
-    }
+    private String tokenPath;
 
-    @Test
-    public void shouldSendAppealCaseToCcd() throws Exception {
+    private String ccdPath;
+
+
+    @Before
+    public void setUp() throws Exception {
+        ccdService = new CcdService(coreCaseDataClient, authClient,
+                idamClient, CASE_WORKER_ID, emailService, email, transformer);
+
+        tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
+                + "Benefit/event-triggers/appealReceived/token";
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
+
         given(authClient.sendRequest(eq("lease"), eq(HttpMethod.POST),
                 eq(""))).willReturn(serviceToken);
-        Map<String,Object> appeal = new HashMap<>();
-        appeal.put("id","123");
-        appeal.put("jurisdiction","SSCS");
-        appeal.put("state","ResponseRequested");
-        String tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
-                +
-                "Benefit/event-triggers/appealReceived/token";
-        String ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
 
-        String appealsJson = "{\"id\":113,"
-                +
-                "\"jurisdiction\":\"SSCS\","
-                +
-                "\"state\":\"ResponseRequested\"}";
         given(coreCaseDataClient.sendRequest(eq("Bearer " + userToken),eq(serviceToken),
                 eq(tokenPath), eq(HttpMethod.GET), any(Map.class)))
                 .willReturn(new ResponseEntity(newHashMap("token",TOKEN), OK));
@@ -80,15 +90,41 @@ public class CcdServiceTest {
                 .willReturn(new ResponseEntity<>(CREATED));
         given(idamClient.post("testing-support/lease"))
                 .willReturn(userToken);
+    }
 
-        HttpStatus status = ccdService.saveCase(appealsJson);
+    @Test
+    public void shouldSendCaseToCcd() throws Exception {
+        Map<String,Object> appeal = new HashMap<>();
+        appeal.put("id","123");
+        appeal.put("jurisdiction","SSCS");
+        appeal.put("state","ResponseRequested");
+
+        CcdCase ccdCase = new CcdCase();
+        Appellant appellant = new Appellant();
+        appellant.setName(new Name("Mr", "Harry", "Kane"));
+        ccdCase.setAppellant(appellant);
+
+        HttpStatus status = ccdService.saveCase(ccdCase);
         assertEquals(CREATED, status);
         verify(coreCaseDataClient).sendRequest(eq("Bearer " + userToken),eq(serviceToken),
                 eq(tokenPath), eq(HttpMethod.GET), any(Map.class));
         verify(coreCaseDataClient).post(eq("Bearer " + userToken),eq(serviceToken),
-                eq(ccdPath),captor.capture());
-        Map<String,Object> appealMap = new ObjectMapper().readValue(appealsJson, Map.class);
+                eq(ccdPath), captor.capture());
 
-        assertEquals(appealMap, captor.getValue().get("data"));
+        assertEquals(ccdCase, captor.getValue().get("data"));
+    }
+
+
+    @Test
+    public void shouldSendSubmitYourAppealEmail() throws CcdException {
+        SyaCaseWrapper syaCaseWrapper = new SyaCaseWrapper();
+
+        CcdCase ccdCase = new CcdCase();
+
+        given(transformer.convertSyaToCcdCase(syaCaseWrapper)).willReturn(ccdCase);
+
+        ccdService.submitAppeal(syaCaseWrapper);
+
+        verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
     }
 }
