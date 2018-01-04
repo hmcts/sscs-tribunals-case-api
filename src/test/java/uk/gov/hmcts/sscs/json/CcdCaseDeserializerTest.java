@@ -1,18 +1,15 @@
 package uk.gov.hmcts.sscs.json;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
 import uk.gov.hmcts.sscs.builder.SubmitYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.corecase.*;
@@ -45,7 +42,7 @@ public class CcdCaseDeserializerTest {
         appellant = ccdCase.getAppellant();
         appointee = ccdCase.getAppointee();
         representative = ccdCase.getRepresentative();
-        hearing = ccdCase.getHearing();
+        hearing = ccdCase.getHearings().get(0);
 
         allJson = SubmitYourAppealJsonBuilder.buildAllCaseJson(ccdCase);
 
@@ -128,7 +125,7 @@ public class CcdCaseDeserializerTest {
         assertEquals(appointee, result.getAppointee());
         assertEquals(representative, result.getRepresentative());
 
-        Hearing h = result.getHearing();
+        Hearing h = result.getHearings().get(0);
         assertEquals(hearing.getTribunalType(), h.getTribunalType());
         assertEquals(hearing.getLanguageInterpreterRequired(), h.getLanguageInterpreterRequired());
         assertEquals(hearing.getSignLanguageRequired(), h.getSignLanguageRequired());

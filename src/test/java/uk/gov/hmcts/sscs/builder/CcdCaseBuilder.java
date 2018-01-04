@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.builder;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class CcdCaseBuilder {
@@ -37,7 +38,8 @@ public class CcdCaseBuilder {
     }
 
     public static CcdCase ccdCase() {
-        return new CcdCase(appeal(), appellant(), appointee(), representative(), hearing());
+        return new CcdCase(appeal(), appellant(), appointee(), representative(),
+                new ArrayList<Hearing>(){{ add(hearing()); }});
     }
 
     public static LocalDate convertJsonStringIntoDate(String day, String month, String year) {

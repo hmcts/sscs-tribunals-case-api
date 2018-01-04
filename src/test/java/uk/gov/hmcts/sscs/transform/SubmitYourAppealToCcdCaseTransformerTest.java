@@ -169,16 +169,16 @@ public class SubmitYourAppealToCcdCaseTransformerTest {
                 ccdCase.getReasonsForAppealing().getOtherReasons());
 
         //Hearing
-        assertEquals(hearing.getAnythingElse(), ccdCase.getHearing().getAdditionalInformation());
-        assertEquals(true, ccdCase.getHearing().getLanguageInterpreterRequired());
-        assertEquals(true, ccdCase.getHearing().getSignLanguageRequired());
-        assertEquals(true, ccdCase.getHearing().getHearingLoopRequired());
-        assertEquals(true, ccdCase.getHearing().getHasDisabilityNeeds());
+        assertEquals(hearing.getAnythingElse(), ccdCase.getHearings().get(0).getAdditionalInformation());
+        assertEquals(true, ccdCase.getHearings().get(0).getLanguageInterpreterRequired());
+        assertEquals(true, ccdCase.getHearings().get(0).getSignLanguageRequired());
+        assertEquals(true, ccdCase.getHearings().get(0).getHearingLoopRequired());
+        assertEquals(true, ccdCase.getHearings().get(0).getHasDisabilityNeeds());
         assertEquals(hearing.getDatesCantAttend()[0],
-                ccdCase.getHearing().getExcludeDates()[0].getStart());
-        assertEquals(hearing.getScheduleHearing(), ccdCase.getHearing().getScheduleHearing());
-        assertEquals(hearing.getWantsSupport(), ccdCase.getHearing().getWantsSupport());
-        assertEquals(hearing.getWantsToAttend(), ccdCase.getHearing().getWantsToAttend());
+                ccdCase.getHearings().get(0).getExcludeDates()[0].getStart());
+        assertEquals(hearing.getScheduleHearing(), ccdCase.getHearings().get(0).getScheduleHearing());
+        assertEquals(hearing.getWantsSupport(), ccdCase.getHearings().get(0).getWantsSupport());
+        assertEquals(hearing.getWantsToAttend(), ccdCase.getHearings().get(0).getWantsToAttend());
 
         //Representative
         assertEquals(representative.getContactDetails().getAddressLine1(),

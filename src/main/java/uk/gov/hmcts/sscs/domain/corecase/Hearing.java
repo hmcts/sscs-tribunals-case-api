@@ -25,6 +25,8 @@ public class Hearing {
 
     private Address address;
 
+    private String venueName;
+
     private ZonedDateTime dateTime;
 
     private Boolean scheduleHearing;
@@ -194,6 +196,15 @@ public class Hearing {
         this.wantsToAttend = wantsToAttend;
     }
 
+    @XmlTransient
+    public String getVenueName() {
+        return venueName;
+    }
+
+    public void setVenueName(String venueName) {
+        this.venueName = venueName;
+    }
+
     @Override
     public String toString() {
         return "Hearing{"
@@ -209,6 +220,7 @@ public class Hearing {
                 + ", scheduleHearing=" + scheduleHearing
                 + ", wantsSupport=" + wantsSupport
                 + ", wantsToAttend=" + wantsToAttend
+                + ", venueName=" + venueName
                 + '}';
     }
 
@@ -232,13 +244,15 @@ public class Hearing {
                 && Objects.equals(dateTime, hearing.dateTime)
                 && Objects.equals(scheduleHearing, hearing.scheduleHearing)
                 && Objects.equals(wantsSupport, hearing.wantsSupport)
-                && Objects.equals(wantsToAttend, hearing.wantsToAttend);
+                && Objects.equals(wantsToAttend, hearing.wantsToAttend)
+                && Objects.equals(venueName, hearing.venueName);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(tribunalType, languageInterpreterRequired, signLanguageRequired,
                 hearingLoopRequired, hasDisabilityNeeds, additionalInformation, excludeDates,
-                address, dateTime, scheduleHearing, wantsSupport, wantsToAttend);
+                address, dateTime, scheduleHearing, wantsSupport, wantsToAttend, venueName);
     }
+
 }

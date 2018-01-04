@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpMethod.POST;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -13,9 +14,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
 
@@ -106,4 +109,19 @@ public class CcdService {
         }
         return token;
     }
+
+    public ObjectNode generateResponse(String appealNumber, String surname) {
+        //TODO: Check surname is valid for appeal number by checking CCD and update tests
+
+        return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
+                findCcdCaseByAppealNumber(appealNumber));
+    }
+
+    public CcdCase findCcdCaseByAppealNumber(String appealNumber) {
+
+        //TODO: Placeholder, implement this properly as part of future story
+        //TODO: Possibly remove this method and call the new DAO class directly?
+        return new CcdCase();
+    }
+
 }

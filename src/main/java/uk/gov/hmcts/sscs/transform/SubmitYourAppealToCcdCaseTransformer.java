@@ -12,11 +12,15 @@ public class SubmitYourAppealToCcdCaseTransformer {
     public CcdCase convertSyaToCcdCase(SyaCaseWrapper syaCaseWrapper) {
 
         CcdCase ccdCase = new CcdCase();
+        List<Hearing> hearings = new ArrayList<>();
+
         ccdCase.setAppellant(convertAppellant(syaCaseWrapper.getAppellant()));
         ccdCase.setRepresentative(convertRepresentative(syaCaseWrapper.getRepresentative()));
         ccdCase.setReasonsForAppealing(convertReasonsForAppealing(
                 syaCaseWrapper.getReasonsForAppealing()));
-        ccdCase.setHearing(convertHearing(syaCaseWrapper.getHearing()));
+
+        hearings.add(convertHearing(syaCaseWrapper.getHearing()));
+        ccdCase.setHearings(hearings);
         ccdCase.setSmsNotify(convertSmsNotify(syaCaseWrapper.getSmsNotify()));
         ccdCase.setAppeal(convertSyaDataToAppeal(syaCaseWrapper));
         ccdCase.setIsAppointee(syaCaseWrapper.getIsAppointee());
