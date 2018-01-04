@@ -13,7 +13,6 @@ public class TrackYourAppealJsonBuilder {
 
     public static ObjectNode buildTrackYourAppealJson(CcdCase ccdCase) {
 
-        ObjectNode root = JsonNodeFactory.instance.objectNode();
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", ccdCase.getCaseReference());
@@ -28,6 +27,7 @@ public class TrackYourAppealJsonBuilder {
         caseNode.set("latestEvents", buildEventArray(ccdCase.buildLatestEvents()));
         caseNode.set("historicalEvents", buildEventArray(ccdCase.buildHistoricalEvents()));
 
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
         root.set("appeal", caseNode);
 
         return root;
@@ -74,19 +74,23 @@ public class TrackYourAppealJsonBuilder {
                     eventNode.put("evidenceType", json.get("evidence_type").toString());
                 }
                 if (json.has("evidence_provided_by")) {
-                    eventNode.put("evidenceProvidedBy", json.get("evidence_provided_by").toString());
+                    eventNode.put("evidenceProvidedBy",
+                            json.get("evidence_provided_by").toString());
                 }
                 if (json.has("dwpResponseDate")) {
                     eventNode.put("dwpResponseDate", json.get("dwpResponseDate").toString());
                 }
                 if (json.has("hearing_contact_date")) {
-                    eventNode.put("hearingContactDate", json.get("hearing_contact_date").toString());
+                    eventNode.put("hearingContactDate",
+                            json.get("hearing_contact_date").toString());
                 }
                 if (json.has("adjournedLetterReceivedByDate")) {
-                    eventNode.put("adjournedLetterReceivedByDate", json.get("adjournedLetterReceivedByDate").toString());
+                    eventNode.put("adjournedLetterReceivedByDate",
+                            json.get("adjournedLetterReceivedByDate").toString());
                 }
                 if (json.has("decisionLetterReceiveByDate")) {
-                    eventNode.put("decisionLetterReceiveByDate", json.get("decisionLetterReceiveByDate").toString());
+                    eventNode.put("decisionLetterReceiveByDate",
+                            json.get("decisionLetterReceiveByDate").toString());
                 }
             }
 

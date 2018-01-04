@@ -82,7 +82,8 @@ public class AppealsControllerTest {
     public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws IOException {
         //Given
         String appealId = NOT_FOUND_APPEAL_ID;
-        when(ccdService.generateResponse(appealId, null)).thenThrow(new AppealNotFoundException(appealId));
+        when(ccdService.generateResponse(appealId, null)).thenThrow(
+                new AppealNotFoundException(appealId));
 
         //When
         controller.getAppeal(appealId, null);
@@ -103,7 +104,7 @@ public class AppealsControllerTest {
     }
 
     @Test
-    public void testToReturnNotFoundResponseCodeForRootContext(){
+    public void testToReturnNotFoundResponseCodeForRootContext() {
         //When
         ResponseEntity<?> responseEntity = controller.getRootContext();
 
