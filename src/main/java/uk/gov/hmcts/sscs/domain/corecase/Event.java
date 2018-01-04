@@ -2,12 +2,13 @@ package uk.gov.hmcts.sscs.domain.corecase;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
+import javax.xml.bind.annotation.XmlTransient;
 
 public class Event {
 
     private ZonedDateTime date;
     private ZonedDateTime dwpResponseDate;
-    private Status type;
+    private EventType type;
     private String evidenceType;
     private String evidenceProvidedBy;
     private String contentKey;
@@ -16,8 +17,9 @@ public class Event {
     private ZonedDateTime adjournedLetterReceivedByDate;
     private ZonedDateTime adjournedDate;
     private ZonedDateTime hearingContactDate;
+    private String placeholders;
 
-    public Event(ZonedDateTime date, ZonedDateTime dwpResponseDate, Status type,
+    public Event(ZonedDateTime date, ZonedDateTime dwpResponseDate, EventType type,
                  String evidenceType, String contentKey) {
         this.date = date;
         this.dwpResponseDate = dwpResponseDate;
@@ -26,7 +28,7 @@ public class Event {
         this.contentKey = contentKey;
     }
 
-    public Event(ZonedDateTime date, ZonedDateTime dwpResponseDate, Status type,
+    public Event(ZonedDateTime date, ZonedDateTime dwpResponseDate, EventType type,
                  String evidenceType, String evidenceProvidedBy, String contentKey,
                  Hearing hearing, ZonedDateTime decisionLetterReceivedByDate,
                  ZonedDateTime adjournedLetterReceivedByDate, ZonedDateTime adjournedDate,
@@ -42,6 +44,11 @@ public class Event {
         this.adjournedLetterReceivedByDate = adjournedLetterReceivedByDate;
         this.adjournedDate = adjournedDate;
         this.hearingContactDate = hearingContactDate;
+    }
+
+    public Event(ZonedDateTime date, EventType type) {
+        this.date = date;
+        this.type = type;
     }
 
     public ZonedDateTime getDate() {
@@ -60,11 +67,11 @@ public class Event {
         this.dwpResponseDate = dwpResponseDate;
     }
 
-    public Status getType() {
+    public EventType getType() {
         return type;
     }
 
-    public void setType(Status type) {
+    public void setType(EventType type) {
         this.type = type;
     }
 
@@ -132,6 +139,15 @@ public class Event {
         this.hearingContactDate = hearingContactDate;
     }
 
+    @XmlTransient
+    public String getPlaceholders() {
+        return placeholders;
+    }
+
+    public void setPlaceholders(String placeholders) {
+        this.placeholders = placeholders;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -152,13 +168,14 @@ public class Event {
                 && Objects.equals(adjournedLetterReceivedByDate,
                     event.adjournedLetterReceivedByDate)
                 && Objects.equals(adjournedDate, event.adjournedDate)
-                && Objects.equals(hearingContactDate, event.hearingContactDate);
+                && Objects.equals(hearingContactDate, event.hearingContactDate)
+                && Objects.equals(placeholders, event.placeholders);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(date, dwpResponseDate, type, evidenceType, evidenceProvidedBy,
                 contentKey, hearing, decisionLetterReceivedByDate, adjournedLetterReceivedByDate,
-                adjournedDate, hearingContactDate);
+                adjournedDate, hearingContactDate, placeholders);
     }
 }

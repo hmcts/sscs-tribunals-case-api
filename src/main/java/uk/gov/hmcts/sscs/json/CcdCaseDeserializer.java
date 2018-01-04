@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 
 //@SuppressWarnings("serial")
@@ -35,7 +37,10 @@ public class CcdCaseDeserializer extends StdDeserializer<CcdCase> {
         ccdCase.setAppellant(deserializeAppellant(node));
         ccdCase.setAppointee(deserializeAppointee(node));
         ccdCase.setRepresentative(deserializeRepresentative(node));
-        ccdCase.setHearing(deserializeHearing(node));
+
+        List<Hearing> hearings = new ArrayList<>();
+        hearings.add(deserializeHearing(node));
+        ccdCase.setHearings(hearings);
 
         return ccdCase;
     }
