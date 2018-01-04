@@ -10,19 +10,20 @@ import org.junit.Test;
 
 public class BusinessDaysCalculatorServiceTest {
 
-	@Test
-	public void shouldReturnCorrectBusinessDay() {
-		// given
-		LocalDate hearingDate = LocalDate.of(2017,12,22);
-		LocalTime hearingTime = LocalTime.of(9,30,00);
+    @Test
+    public void shouldReturnCorrectBusinessDay() {
+        // given
+        LocalDate hearingDate = LocalDate.of(2017,12,22);
+        LocalTime hearingTime = LocalTime.of(9,30,00);
 
-		// when
-		ZonedDateTime decisionDateTime = BusinessDaysCalculatorService.getBusinessDay(ZonedDateTime.of(hearingDate, hearingTime, ZoneId.of("Europe/London")), 7);
+        // when
+        ZonedDateTime decisionDateTime = BusinessDaysCalculatorService.getBusinessDay(
+                ZonedDateTime.of(hearingDate, hearingTime, ZoneId.of("Europe/London")), 7);
 
-		// then
-		assertEquals(2018, decisionDateTime.getYear());
-		assertEquals(01, decisionDateTime.getMonthValue());
-		assertEquals(02, decisionDateTime.getDayOfMonth());
-		assertEquals(hearingTime, decisionDateTime.toLocalTime());
-	}
+        // then
+        assertEquals(2018, decisionDateTime.getYear());
+        assertEquals(01, decisionDateTime.getMonthValue());
+        assertEquals(02, decisionDateTime.getDayOfMonth());
+        assertEquals(hearingTime, decisionDateTime.toLocalTime());
+    }
 }

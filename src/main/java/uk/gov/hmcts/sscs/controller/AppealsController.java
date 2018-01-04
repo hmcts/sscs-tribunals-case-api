@@ -33,7 +33,8 @@ public class AppealsController {
     @ApiOperation(value = "submitAppeal",
         notes = "Creates an appeal from the SYA case details",
         response = String.class, responseContainer = "Appeal details")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Submitted appeal successfully", response = String.class)})
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Submitted appeal successfully",
+            response = String.class)})
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper)
             throws CcdException {
@@ -46,8 +47,9 @@ public class AppealsController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
     @RequestMapping(value = "/appeals/{appealNumber}/surname/{surname}", method = GET,
             produces = APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> getAppeal(@PathVariable(value = "appealNumber") String appealNumber,
-                                            @PathVariable(value = "surname") String surname) {
+    public ResponseEntity<String> getAppeal(
+            @PathVariable(value = "appealNumber") String appealNumber,
+            @PathVariable(value = "surname") String surname) {
         return ok(ccdService.generateResponse(appealNumber, surname).toString());
     }
 
@@ -56,8 +58,8 @@ public class AppealsController {
             response = String.class, responseContainer = "Tribunals case api")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal api",
             response = String.class)})
-    @RequestMapping(value="/", method = GET)
-    public ResponseEntity<String> getRootContext(){
+    @RequestMapping(value = "/", method = GET)
+    public ResponseEntity<String> getRootContext() {
         return ResponseEntity.notFound().build();
     }
 }

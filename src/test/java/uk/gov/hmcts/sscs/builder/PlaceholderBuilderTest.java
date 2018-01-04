@@ -29,7 +29,8 @@ public class PlaceholderBuilderTest {
 
         try {
             JSONObject json = addEventPlaceHolders(event, new JSONObject(), null);
-            assertThat(json.get(DWP_RESPONSE_DATE_LITERAL), is(now.plusDays(MAX_DWP_RESPONSE_DAYS).format(ISO_INSTANT)));
+            assertThat(json.get(DWP_RESPONSE_DATE_LITERAL),
+                    is(now.plusDays(MAX_DWP_RESPONSE_DAYS).format(ISO_INSTANT)));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
@@ -43,7 +44,9 @@ public class PlaceholderBuilderTest {
 
         try {
             JSONObject json = addEventPlaceHolders(event, new JSONObject(), null);
-            assertThat(json.get(HEARING_CONTACT_DATE_LITERAL), is(now.plusDays(DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT).format(ISO_INSTANT)));
+            assertThat(json.get(HEARING_CONTACT_DATE_LITERAL),
+                    is(now.plusDays(DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT)
+                            .format(ISO_INSTANT)));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
@@ -57,7 +60,9 @@ public class PlaceholderBuilderTest {
 
         try {
             JSONObject json = addEventPlaceHolders(event, new JSONObject(), null);
-            assertThat(json.get(HEARING_CONTACT_DATE_LITERAL), is(now.plusDays(DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT).format(ISO_INSTANT)));
+            assertThat(json.get(HEARING_CONTACT_DATE_LITERAL),
+                    is(now.plusDays(DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT)
+                            .format(ISO_INSTANT)));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
@@ -71,7 +76,8 @@ public class PlaceholderBuilderTest {
 
         try {
             JSONObject json = addEventPlaceHolders(event, new JSONObject(), null);
-            assertThat(json.get(HEARING_CONTACT_DATE_LITERAL), is(now.plusWeeks(HEARING_DATE_CONTACT_WEEKS).format(ISO_INSTANT)));
+            assertThat(json.get(HEARING_CONTACT_DATE_LITERAL),
+                    is(now.plusWeeks(HEARING_DATE_CONTACT_WEEKS).format(ISO_INSTANT)));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
@@ -85,7 +91,8 @@ public class PlaceholderBuilderTest {
 
         try {
             JSONObject json = addEventPlaceHolders(event, new JSONObject(), null);
-            assertThat(json.get("adjournedLetterReceivedByDate"), is(now.plusDays(ADJOURNED_LETTER_RECEIVED_MAX_DAYS).format(ISO_INSTANT)));
+            assertThat(json.get("adjournedLetterReceivedByDate"),
+                    is(now.plusDays(ADJOURNED_LETTER_RECEIVED_MAX_DAYS).format(ISO_INSTANT)));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
@@ -96,11 +103,13 @@ public class PlaceholderBuilderTest {
     public void addHearingPlaceholder() {
         ZonedDateTime now = ZonedDateTime.now();
         Event event = new Event(now, EventType.HEARING);
-        ZonedDateTime decisionDateTime = BusinessDaysCalculatorService.getBusinessDay(now, HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS);
+        ZonedDateTime decisionDateTime = BusinessDaysCalculatorService.getBusinessDay(
+                now, HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS);
 
         try {
             JSONObject json = addEventPlaceHolders(event, new JSONObject(), null);
-            assertThat(json.get(DECISION_LETTER_RECEIVE_BY_DATE), is(decisionDateTime.format(ISO_INSTANT)));
+            assertThat(json.get(DECISION_LETTER_RECEIVE_BY_DATE),
+                    is(decisionDateTime.format(ISO_INSTANT)));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
@@ -111,11 +120,13 @@ public class PlaceholderBuilderTest {
     public void addDormantPlaceholder() {
         ZonedDateTime now = ZonedDateTime.now();
         Event event = new Event(now, EventType.DORMANT);
-        ZonedDateTime decisionDateTime = BusinessDaysCalculatorService.getBusinessDay(now, HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS);
+        ZonedDateTime decisionDateTime = BusinessDaysCalculatorService.getBusinessDay(
+                now, HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS);
 
         try {
             JSONObject json = addEventPlaceHolders(event, new JSONObject(), null);
-            assertThat(json.get(DECISION_LETTER_RECEIVE_BY_DATE), is(decisionDateTime.format(ISO_INSTANT)));
+            assertThat(json.get(DECISION_LETTER_RECEIVE_BY_DATE),
+                    is(decisionDateTime.format(ISO_INSTANT)));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");
@@ -124,10 +135,13 @@ public class PlaceholderBuilderTest {
 
     @Test
     public void addHearingBookedPlaceholderWhenHearingDateAndEventDateAreOnSameDay() {
-        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-12-01T12:00:00.123Z", DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-01T16:00:00.123Z", DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime hearingDateTime = ZonedDateTime.parse(
+                "2017-12-01T12:00:00.123Z", DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime eventDateTime = ZonedDateTime.parse(
+                "2017-12-01T16:00:00.123Z", DateTimeFormatter.ISO_ZONED_DATE_TIME);
 
-        Address address = new Address("The court house", "", "Farndon", "Chester", "CH1 6YT", "http://chester.com");
+        Address address = new Address("The court house", "", "Farndon", "Chester", "CH1 6YT",
+                "http://chester.com");
         Hearing hearing = new Hearing(address, hearingDateTime);
         hearing.setVenueName("Chester court");
 
@@ -153,8 +167,10 @@ public class PlaceholderBuilderTest {
 
     @Test
     public void doNotGenerateHearingBookedPlaceholderWhenHearingTimeAndEventTimeAreNotOnSameDay() {
-        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-12-01T12:00:00.123Z", DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-02T16:00:00.123Z", DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-12-01T12:00:00.123Z",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-02T16:00:00.123Z",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
 
         Hearing hearing = new Hearing(new Address(), hearingDateTime);
 
@@ -169,10 +185,13 @@ public class PlaceholderBuilderTest {
 
     @Test
     public void addHearingBookedPlaceholderWithGmtTime() {
-        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-12-01T12:00:00.123+00:00", DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-01T16:00:00.123+00:00", DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-12-01T12:00:00.123+00:00",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-01T16:00:00.123+00:00",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
 
-        Address address = new Address("Chester court", "The court house", "Farndon", "Chester", "CH1 6YT", "http://chester.com");
+        Address address = new Address("Chester court", "The court house", "Farndon", "Chester",
+                "CH1 6YT", "http://chester.com");
         Hearing hearing = new Hearing(address, hearingDateTime);
 
         List<Hearing> hearings = new ArrayList<>();
@@ -191,10 +210,13 @@ public class PlaceholderBuilderTest {
 
     @Test
     public void addHearingBookedPlaceholderWithBstTime() {
-        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-08-01T12:00:00.123+01:00", DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-08-01T16:00:00.123+01:00", DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-08-01T12:00:00.123+01:00",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-08-01T16:00:00.123+01:00",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
 
-        Address address = new Address("Chester court", "The court house", "Farndon", "Chester", "CH1 6YT", "http://chester.com");
+        Address address = new Address("Chester court", "The court house", "Farndon", "Chester",
+                "CH1 6YT", "http://chester.com");
         Hearing hearing = new Hearing(address, hearingDateTime);
 
         List<Hearing> hearings = new ArrayList<>();

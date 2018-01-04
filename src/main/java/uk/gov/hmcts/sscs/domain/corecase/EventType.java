@@ -32,9 +32,13 @@ public enum EventType {
         this.notifiable = notifiable;
     }
 
-    public int getOrder() { return order; }
+    public int getOrder() {
+        return order;
+    }
 
-    public boolean isStatusEvent() { return order > 0; }
+    public boolean isStatusEvent() {
+        return order > 0;
+    }
 
     public String getContentKey() {
         return "status." + CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, name());
