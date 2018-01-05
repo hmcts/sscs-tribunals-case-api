@@ -72,7 +72,7 @@ public class CcdServiceTest {
     @Before
     public void setUp() throws Exception {
         ccdService = new CcdService(coreCaseDataClient, authClient,
-                idamClient, CASE_WORKER_ID, emailService, email, transformer);
+                idamClient, CASE_WORKER_ID);
 
         tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
                 + "Benefit/event-triggers/appealReceived/token";
@@ -104,7 +104,7 @@ public class CcdServiceTest {
         appellant.setName(new Name("Mr", "Harry", "Kane"));
         ccdCase.setAppellant(appellant);
 
-        HttpStatus status = ccdService.saveCase(ccdCase);
+        HttpStatus status = ccdService.createCase(ccdCase);
         assertEquals(CREATED, status);
         verify(coreCaseDataClient).sendRequest(eq("Bearer " + userToken),eq(serviceToken),
                 eq(tokenPath), eq(HttpMethod.GET), any(Map.class));
@@ -115,16 +115,4 @@ public class CcdServiceTest {
     }
 
 
-    @Test
-    public void shouldSendSubmitYourAppealEmail() throws CcdException {
-        SyaCaseWrapper syaCaseWrapper = new SyaCaseWrapper();
-
-        CcdCase ccdCase = new CcdCase();
-
-        given(transformer.convertSyaToCcdCase(syaCaseWrapper)).willReturn(ccdCase);
-
-        ccdService.submitAppeal(syaCaseWrapper);
-
-        verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
-    }
 }

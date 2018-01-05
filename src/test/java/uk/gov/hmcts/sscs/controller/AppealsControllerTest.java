@@ -22,7 +22,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaAppellant;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.service.CcdService;
+import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TribunalsCaseApiApplication.class)
@@ -38,7 +38,7 @@ public class AppealsControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CcdService ccdService;
+    private TribunalsService tribunalsService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -47,7 +47,7 @@ public class AppealsControllerTest {
 
     @Before
     public void setUp() {
-        appealsController = new AppealsController(ccdService);
+        appealsController = new AppealsController(tribunalsService);
         mockMvc = webAppContextSetup(webApplicationContext).build();
 
         SyaAppellant appellant = new SyaAppellant();
@@ -58,11 +58,11 @@ public class AppealsControllerTest {
 
     @Test
     public void shouldCreateNewAppeals() throws Exception {
-        when(ccdService.submitAppeal(syaCaseWrapper)).thenReturn(HttpStatus.CREATED);
+        when(tribunalsService.submitAppeal(syaCaseWrapper)).thenReturn(HttpStatus.CREATED);
 
         ResponseEntity<?> entity = appealsController.createApppeals(syaCaseWrapper);
 
-        verify(ccdService).submitAppeal(syaCaseWrapper);
+        verify(tribunalsService).submitAppeal(syaCaseWrapper);
 
         assertEquals(HttpStatus.CREATED, entity.getStatusCode());
     }

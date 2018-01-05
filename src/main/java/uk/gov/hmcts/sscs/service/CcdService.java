@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
@@ -29,36 +28,19 @@ public class CcdService {
     private String caseWorkerId;
     private String userToken;
     private String serviceToken;
-    private EmailService emailService;
-    private SubmitYourAppealEmail email;
-    private SubmitYourAppealToCcdCaseTransformer transformer;
+
 
     @Autowired
     CcdService(CoreCaseDataClient coreCaseDataClient, AuthClient authClient,
                IdamClient idamClient,
-               @Value("${ccd.case.worker.id}") String caseWorkerId,
-               EmailService emailService, SubmitYourAppealEmail email,
-               SubmitYourAppealToCcdCaseTransformer transformer) {
+               @Value("${ccd.case.worker.id}") String caseWorkerId) {
         this.coreCaseDataClient = coreCaseDataClient;
         this.authClient = authClient;
         this.idamClient = idamClient;
         this.caseWorkerId = caseWorkerId;
-        this.emailService = emailService;
-        this.email = email;
-        this.transformer = transformer;
     }
 
-    public HttpStatus submitAppeal(SyaCaseWrapper syaCaseWrapper) throws CcdException {
-        CcdCase ccdCase = transformer.convertSyaToCcdCase(syaCaseWrapper);
-
-        emailService.sendEmail(email);
-
-        HttpStatus status = saveCase(ccdCase);
-
-        return status;
-    }
-
-    public HttpStatus saveCase(CcdCase ccdCase) throws CcdException {
+    public HttpStatus createCase(CcdCase ccdCase) throws CcdException {
         ResponseEntity<Object> responseEntity = null;
         try {
             serviceToken = authClient.sendRequest("lease", POST, "");
