@@ -189,7 +189,7 @@ public class CcdCase {
         }
 
         List<Event> latestAppealEvents = latestEvents.stream().sorted((e1, e2)
-                -> e2.getDate().compareTo(e1.getDate())).collect(toList());
+            -> e2.getDate().compareTo(e1.getDate())).collect(toList());
         processExceptions(sortedEvents, latestAppealEvents);
 
         setLatestAppealStatus(latestAppealEvents);
