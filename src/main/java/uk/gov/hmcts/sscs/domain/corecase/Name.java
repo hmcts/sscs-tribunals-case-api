@@ -1,13 +1,7 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement
-@XmlType(propOrder = {"title", "initial", "surname"})
 public class Name {
 
     private String title;
@@ -35,7 +29,6 @@ public class Name {
         this.title = title;
     }
 
-    @XmlTransient
     public String getFirst() {
         return first;
     }
@@ -53,7 +46,6 @@ public class Name {
         this.surname = surname;
     }
 
-    @XmlElement
     public String getInitial() {
         return initial;
     }
@@ -64,7 +56,6 @@ public class Name {
         }
     }
 
-    @XmlTransient
     public String getFullName() {
         return title + " " + initial + " " + surname;
     }
