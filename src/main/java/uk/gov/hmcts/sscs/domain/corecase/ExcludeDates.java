@@ -1,9 +1,7 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlType;
 
-@XmlType(propOrder = {"start", "end"})
 public class ExcludeDates {
 
     private String start;

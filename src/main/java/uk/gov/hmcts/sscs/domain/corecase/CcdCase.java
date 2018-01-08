@@ -1,27 +1,16 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
 import static java.util.stream.Collectors.toList;
-
 import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
-import static uk.gov.hmcts.sscs.model.AppConstants.DORMANT_TO_CLOSED_DURATION_IN_MONTHS;
-import static uk.gov.hmcts.sscs.model.AppConstants.MAX_DWP_RESPONSE_DAYS;
-import static uk.gov.hmcts.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
+import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-
 import uk.gov.hmcts.sscs.json.CcdCaseDeserializer;
 
-@XmlRootElement
-@XmlType(propOrder = {"appeal", "appellant", "appointee", "representative", "hearing"})
 @JsonDeserialize(using = CcdCaseDeserializer.class)
 public class CcdCase {
 
@@ -97,7 +86,6 @@ public class CcdCase {
     }
 
     //TODO: Assume there is one hearing until business decides how to handle multiple for robotics
-    @XmlElement(name = "hearing")
     public Hearing getHearing() {
         if (hearings != null && hearings.size() > 0) {
             return hearings.get(0);
@@ -106,7 +94,6 @@ public class CcdCase {
         }
     }
 
-    @XmlTransient
     public List<Hearing> getHearings() {
         return hearings;
     }
@@ -115,7 +102,6 @@ public class CcdCase {
         this.hearings = hearings;
     }
 
-    @XmlTransient
     public String getCaseReference() {
         return caseReference;
     }
@@ -124,7 +110,6 @@ public class CcdCase {
         this.caseReference = caseReference;
     }
 
-    @XmlTransient
     public EventType getEventType() {
         return eventType;
     }
@@ -133,7 +118,6 @@ public class CcdCase {
         this.eventType = eventType;
     }
 
-    @XmlTransient
     public ReasonsForAppealing getReasonsForAppealing() {
         return reasonsForAppealing;
     }
@@ -142,7 +126,6 @@ public class CcdCase {
         this.reasonsForAppealing = reasonsForAppealing;
     }
 
-    @XmlTransient
     public SmsNotify getSmsNotify() {
         return smsNotify;
     }
@@ -151,7 +134,6 @@ public class CcdCase {
         this.smsNotify = smsNotify;
     }
 
-    @XmlTransient
     public Boolean getIsAppointee() {
         return isAppointee;
     }
@@ -160,7 +142,6 @@ public class CcdCase {
         this.isAppointee = isAppointee;
     }
 
-    @XmlTransient
     public String getBenefitType() {
         return benefitType;
     }
@@ -169,7 +150,6 @@ public class CcdCase {
         this.benefitType = benefitType;
     }
 
-    @XmlTransient
     public String getAppealStatus() {
         return appealStatus;
     }
@@ -178,7 +158,6 @@ public class CcdCase {
         this.appealStatus = appealStatus;
     }
 
-    @XmlTransient
     public List<Event> getEvents() {
         if (events == null) {
             buildEvents();
@@ -249,25 +228,25 @@ public class CcdCase {
 
     private boolean isDwpRespondOverdue(Event currentEvent) {
         return currentEvent.getType() == APPEAL_RECEIVED
-            && ZonedDateTime.now().isAfter(currentEvent.getDate().plusDays(MAX_DWP_RESPONSE_DAYS));
+                && ZonedDateTime.now().isAfter(currentEvent.getDate().plusDays(MAX_DWP_RESPONSE_DAYS));
     }
 
     private boolean isAppealClosed(Event currentEvent) {
         return currentEvent.getType() == DORMANT
-            && ZonedDateTime.now().isAfter(currentEvent.getDate().plusMonths(
-                    DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
+                && ZonedDateTime.now().isAfter(currentEvent.getDate().plusMonths(
+                DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
     }
 
     private boolean isPastHearingBookedDate(Event currentEvent) {
         return currentEvent.getType() == DWP_RESPOND
-            && ZonedDateTime.now().isAfter(currentEvent.getDate().plusWeeks(
-                    PAST_HEARING_BOOKED_IN_WEEKS));
+                && ZonedDateTime.now().isAfter(currentEvent.getDate().plusWeeks(
+                PAST_HEARING_BOOKED_IN_WEEKS));
     }
 
     private boolean isNewHearingBookedEvent(List<Event> sortedEvents) {
         return sortedEvents.size() > 1
-            && sortedEvents.get(0).getType() == HEARING_BOOKED
-            && (sortedEvents.get(1).getType() == POSTPONED
+                && sortedEvents.get(0).getType() == HEARING_BOOKED
+                && (sortedEvents.get(1).getType() == POSTPONED
                 || sortedEvents.get(1).getType() == ADJOURNED);
     }
 
@@ -281,7 +260,7 @@ public class CcdCase {
             historicalEvents.addAll(sortedEvents);
         } else {
             historicalEvents = sortedEvents.stream().skip(buildLatestEvents().size())
-                .collect(toList());
+                    .collect(toList());
         }
         return historicalEvents.stream().sorted((e1,e2) ->
                 e2.getDate().compareTo(e1.getDate())).collect(toList());

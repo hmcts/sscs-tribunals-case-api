@@ -2,12 +2,7 @@ package uk.gov.hmcts.sscs.domain.corecase;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement
-@XmlType(propOrder = {"nino", "adminGroup"})
 public class Appellant extends Person {
 
     private String nino;
@@ -44,7 +39,6 @@ public class Appellant extends Person {
         this.adminGroup = adminGroup;
     }
 
-    @XmlTransient
     public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
