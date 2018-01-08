@@ -3,12 +3,6 @@ package uk.gov.hmcts.sscs.domain.corecase;
 import java.time.LocalDate;
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import uk.gov.hmcts.sscs.service.xml.CustomDateTimeXmlAdapter;
-
 public class Appeal {
 
     private Benefit benefit;
@@ -41,12 +35,10 @@ public class Appeal {
 
     }
 
-    @XmlTransient
     public Benefit getBenefit() {
         return benefit;
     }
 
-    @XmlElement(name = "caseCode", required = true)
     public String getBenefitAsCaseCode() {
         return benefit.getCode() + "DD";
     }
@@ -63,7 +55,6 @@ public class Appeal {
         this.originatingOffice = originatingOffice;
     }
 
-    @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
     public LocalDate getDateOfDecision() {
         return dateOfDecision;
     }
@@ -72,7 +63,6 @@ public class Appeal {
         this.dateOfDecision = dateOfDecision;
     }
 
-    @XmlJavaTypeAdapter(CustomDateTimeXmlAdapter.class)
     public LocalDate getDateAppealMade() {
         return dateAppealMade;
     }
@@ -89,7 +79,6 @@ public class Appeal {
         this.outOfTime = outOfTime;
     }
 
-    @XmlTransient
     public String getAppealNumber() {
         return appealNumber;
     }
@@ -98,7 +87,6 @@ public class Appeal {
         this.appealNumber = appealNumber;
     }
 
-    @XmlTransient
     public String getReasonForBeingLate() {
         return reasonForBeingLate;
     }
@@ -107,7 +95,6 @@ public class Appeal {
         this.reasonForBeingLate = reasonForBeingLate;
     }
 
-    @XmlTransient
     public String getReasonForNoMrn() {
         return reasonForNoMrn;
     }

@@ -2,7 +2,6 @@ package uk.gov.hmcts.sscs.domain.corecase;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlTransient;
 
 public class Event {
 
@@ -139,7 +138,6 @@ public class Event {
         this.hearingContactDate = hearingContactDate;
     }
 
-    @XmlTransient
     public String getPlaceholders() {
         return placeholders;
     }

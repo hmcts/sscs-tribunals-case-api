@@ -8,21 +8,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import org.junit.Test;
 
+import org.w3c.dom.Document;
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.ExcludeDates;
 import uk.gov.hmcts.sscs.domain.corecase.Hearing;
 
-public class XmlUtilTest {
+public class RoboticsXmlUtilTest {
 
     @Test
     public void getCaseAsXml() {
         CcdCase ccdCase = CcdCaseBuilder.ccdCase();
 
-        XmlUtil xmlUtil = new XmlUtil();
-        String xml = xmlUtil.convertToXml(ccdCase, ccdCase.getClass());
+        RoboticsXmlUtil xmlUtil = new RoboticsXmlUtil();
+        Document xml = xmlUtil.convertToXml(ccdCase);
 
-        //appeal
         String xpathExpression = "/ccdCase/appeal";
 
         String actual = xmlUtil.extractValue(xml, xpathExpression + "/caseCode");
@@ -191,10 +191,10 @@ public class XmlUtilTest {
                     }
                 });
 
-        XmlUtil xmlUtil = new XmlUtil();
+        RoboticsXmlUtil xmlUtil = new RoboticsXmlUtil();
         String xpathExpression = "/ccdCase/hearing/excludeDates";
 
-        String xml = xmlUtil.convertToXml(ccdCase, ccdCase.getClass());
+        Document xml = xmlUtil.convertToXml(ccdCase);
 
         String actual = xmlUtil.extractValue(xml, xpathExpression + "/exclude/start");
         assertThat(actual, is(ccdCase.getHearings().get(0).getExcludeDates()[0].getStart()));
