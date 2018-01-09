@@ -53,8 +53,8 @@ class CcdCaseSerializer extends StdSerializer<CcdCase> {
             jgen.writeStringField("caseReference", ccd.getCaseReference());
         }
 
-        if (ccd.getStatus() != null) {
-            jgen.writeStringField("status", ccd.getStatus().name());
+        if (ccd.getEventType() != null) {
+            jgen.writeStringField("status", ccd.getEventType().name());
         }
 
         if (ccd.getAppeal() != null && ccd.getAppeal().getAppealNumber() != null) {

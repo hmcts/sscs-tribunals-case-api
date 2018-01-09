@@ -22,7 +22,7 @@ public class TribunalsServiceTest {
     private TribunalsService tribunalsService;
 
     @Mock
-    private CcdService CcdService;
+    private CcdService ccdService;
 
     @Mock
     private EmailService emailService;
@@ -35,7 +35,7 @@ public class TribunalsServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        tribunalsService = new TribunalsService(CcdService, emailService, email, transformer);
+        tribunalsService = new TribunalsService(ccdService, emailService, email, transformer);
     }
 
     @Test

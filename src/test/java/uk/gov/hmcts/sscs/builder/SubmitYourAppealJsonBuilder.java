@@ -83,7 +83,7 @@ public class SubmitYourAppealJsonBuilder {
         return merge(convertAppeal(ccdCase.getAppeal()), convertAppellant(ccdCase.getAppellant()),
                 convertAppointee(ccdCase.getAppointee()),
                 convertRepresentative(ccdCase.getRepresentative()),
-                convertHearing(ccdCase.getHearing()));
+                convertHearing(ccdCase.getHearings().get(0)));
     }
 
     private static JSONObject merge(JSONObject... jsonObjects) {

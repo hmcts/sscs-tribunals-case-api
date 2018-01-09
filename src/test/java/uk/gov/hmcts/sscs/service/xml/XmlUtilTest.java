@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import org.junit.Test;
 
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
@@ -150,29 +151,30 @@ public class XmlUtilTest {
         //hearing
         xpathExpression = "/ccdCase/hearing";
 
+        //TODO: Assume there is only one hearing until business decides how to handle multiple
         actual = xmlUtil.extractValue(xml, xpathExpression + "/tribunalType");
-        assertThat(actual, is(ccdCase.getHearing().getTribunalTypeText()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getTribunalTypeText()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/languageInterpreterRequired");
-        assertThat(actual, is(ccdCase.getHearing().getLanguageInterpreterRequiredForXml()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getLanguageInterpreterRequiredForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/signLanguageRequired");
-        assertThat(actual, is(ccdCase.getHearing().getSignLanguageRequiredForXml()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getSignLanguageRequiredForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/hearingLoopRequired");
-        assertThat(actual, is(ccdCase.getHearing().getHearingLoopRequiredForXml()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getHearingLoopRequiredForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/hasDisabilityNeeds");
-        assertThat(actual, is(ccdCase.getHearing().getHasDisabilityNeedsForXml()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getHasDisabilityNeedsForXml()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/additionalInformation");
-        assertThat(actual, is(ccdCase.getHearing().getAdditionalInformation()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getAdditionalInformation()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/excludeDates/exclude/start");
-        assertThat(actual, is(ccdCase.getHearing().getExcludeDates()[0].getStart()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getExcludeDates()[0].getStart()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/excludeDates/exclude/end");
-        assertThat(actual, is(ccdCase.getHearing().getExcludeDates()[0].getEnd()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getExcludeDates()[0].getEnd()));
     }
 
     @Test
@@ -182,22 +184,28 @@ public class XmlUtilTest {
             new ExcludeDates("November 5th", "November 12th"),
             new ExcludeDates("December 1st", "December 2nd")});
 
-        CcdCase ccdCase = new CcdCase(null, null, null, null, hearing);
+        CcdCase ccdCase = new CcdCase(null, null, null, null,
+                new ArrayList<Hearing>() {
+                    {
+                        add(hearing);
+                    }
+                });
+
         XmlUtil xmlUtil = new XmlUtil();
         String xpathExpression = "/ccdCase/hearing/excludeDates";
 
         String xml = xmlUtil.convertToXml(ccdCase, ccdCase.getClass());
 
         String actual = xmlUtil.extractValue(xml, xpathExpression + "/exclude/start");
-        assertThat(actual, is(ccdCase.getHearing().getExcludeDates()[0].getStart()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getExcludeDates()[0].getStart()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/exclude/end");
-        assertThat(actual, is(ccdCase.getHearing().getExcludeDates()[0].getEnd()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getExcludeDates()[0].getEnd()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/exclude[2]/start");
-        assertThat(actual, is(ccdCase.getHearing().getExcludeDates()[1].getStart()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getExcludeDates()[1].getStart()));
 
         actual = xmlUtil.extractValue(xml, xpathExpression + "/exclude[2]/end");
-        assertThat(actual, is(ccdCase.getHearing().getExcludeDates()[1].getEnd()));
+        assertThat(actual, is(ccdCase.getHearings().get(0).getExcludeDates()[1].getEnd()));
     }
 }

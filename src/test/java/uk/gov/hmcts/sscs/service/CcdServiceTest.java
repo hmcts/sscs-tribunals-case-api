@@ -6,12 +6,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,12 +22,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
 import uk.gov.hmcts.sscs.domain.corecase.Appellant;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Name;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
 
 @RunWith(MockitoJUnitRunner.class)

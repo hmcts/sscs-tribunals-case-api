@@ -56,6 +56,10 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
 
+    compile group: 'org.json', name: 'json', version: '20140107'
+    compile group: 'net.objectlab.kit', name: 'datecalc-common', version: '1.4.0'
+    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.0'
+
     compile('io.springfox:springfox-swagger2:2.7.0')
     compile('io.springfox:springfox-swagger-ui:2.7.0')
 

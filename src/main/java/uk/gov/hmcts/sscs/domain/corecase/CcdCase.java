@@ -1,14 +1,23 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
+import static java.util.stream.Collectors.toList;
+
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
+import static uk.gov.hmcts.sscs.model.AppConstants.DORMANT_TO_CLOSED_DURATION_IN_MONTHS;
+import static uk.gov.hmcts.sscs.model.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.json.CcdCaseDeserializer;
 
 @XmlRootElement
@@ -20,36 +29,38 @@ public class CcdCase {
     private Appellant appellant;
     private Appointee appointee;
     private Representative representative;
-    private Hearing hearing;
+    private List<Hearing> hearings;
     private String caseReference;
-    private Status status;
+    private EventType eventType;
     private List<Event> events;
     private ReasonsForAppealing reasonsForAppealing;
     private SmsNotify smsNotify;
     private Boolean isAppointee;
+    private String benefitType;
+    private String appealStatus;
 
     public CcdCase() {
     }
 
     public CcdCase(Appeal appeal, Appellant appellant, Appointee appointee,
-                   Representative representative, Hearing hearing) {
+                   Representative representative, List<Hearing> hearings) {
         this.appeal = appeal;
         this.appellant = appellant;
         this.appointee = appointee;
         this.representative = representative;
-        this.hearing = hearing;
+        this.hearings = hearings;
     }
 
     public CcdCase(Appeal appeal, Appellant appellant, Appointee appointee,
-                   Representative representative, Hearing hearing, String caseReference,
-                   Status status, List<Event> events) {
+                   Representative representative, List<Hearing> hearings, String caseReference,
+                   EventType eventType, List<Event> events) {
         this.appeal = appeal;
         this.appellant = appellant;
         this.appointee = appointee;
         this.representative = representative;
-        this.hearing = hearing;
+        this.hearings = hearings;
         this.caseReference = caseReference;
-        this.status = status;
+        this.eventType = eventType;
         this.events = events;
     }
 
@@ -85,12 +96,23 @@ public class CcdCase {
         this.representative = representative;
     }
 
+    //TODO: Assume there is one hearing until business decides how to handle multiple for robotics
+    @XmlElement(name = "hearing")
     public Hearing getHearing() {
-        return hearing;
+        if (hearings != null && hearings.size() > 0) {
+            return hearings.get(0);
+        } else {
+            return null;
+        }
     }
 
-    public void setHearing(Hearing hearing) {
-        this.hearing = hearing;
+    @XmlTransient
+    public List<Hearing> getHearings() {
+        return hearings;
+    }
+
+    public void setHearings(List<Hearing> hearings) {
+        this.hearings = hearings;
     }
 
     @XmlTransient
@@ -103,21 +125,12 @@ public class CcdCase {
     }
 
     @XmlTransient
-    public List<Event> getEvents() {
-        return events;
+    public EventType getEventType() {
+        return eventType;
     }
 
-    public void setEvents(List<Event> events) {
-        this.events = events;
-    }
-
-    @XmlTransient
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setEventType(EventType eventType) {
+        this.eventType = eventType;
     }
 
     @XmlTransient
@@ -147,6 +160,148 @@ public class CcdCase {
         this.isAppointee = isAppointee;
     }
 
+    @XmlTransient
+    public String getBenefitType() {
+        return benefitType;
+    }
+
+    public void setBenefitType(String benefitType) {
+        this.benefitType = benefitType;
+    }
+
+    @XmlTransient
+    public String getAppealStatus() {
+        return appealStatus;
+    }
+
+    public void setAppealStatus(String appealStatus) {
+        this.appealStatus = appealStatus;
+    }
+
+    @XmlTransient
+    public List<Event> getEvents() {
+        if (events == null) {
+            buildEvents();
+        }
+
+        return events;
+    }
+
+    public void buildEvents() {
+        //TODO: Placeholder, build up events in a proper way. Refer to TYA API
+        this.events = new ArrayList<>();
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
+    }
+
+    public List<Event> buildLatestEvents() {
+        List<Event> latestEvents = new ArrayList<>();
+        List<Event> sortedEvents = sortedEvents(getEvents());
+
+        for (Event event: sortedEvents) {
+            if (event.getType().equals(EVIDENCE_RECEIVED)) {
+                latestEvents.add(event);
+            } else {
+                latestEvents.add(event);
+                break;
+            }
+        }
+
+        List<Event> latestAppealEvents = latestEvents.stream().sorted((e1, e2)
+            -> e2.getDate().compareTo(e1.getDate())).collect(toList());
+        processExceptions(sortedEvents, latestAppealEvents);
+
+        setLatestAppealStatus(latestAppealEvents);
+
+        return latestAppealEvents;
+    }
+
+    private void setLatestAppealStatus(List<Event> latestEvents) {
+        if (null != latestEvents && !latestEvents.isEmpty()) {
+            for (int i = 0; i < latestEvents.size(); i++) {
+
+                if (latestEvents.get(i).getType().getOrder() > 0) {
+                    setAppealStatus(latestEvents.get(i).getType().name());
+                    return;
+                }
+            }
+        }
+    }
+
+    private void processExceptions(List<Event> sortedEvents, List<Event> latestAppealEvents) {
+        if (null != sortedEvents && !sortedEvents.isEmpty()) {
+
+            Event currentEvent = sortedEvents.get(0);
+
+            if (isPastHearingBookedDate(currentEvent)) {
+                setLatestAppealEventStatus(latestAppealEvents, PAST_HEARING_BOOKED);
+            } else if (isNewHearingBookedEvent(sortedEvents)) {
+                setLatestAppealEventStatus(latestAppealEvents, NEW_HEARING_BOOKED);
+            } else if (isAppealClosed(currentEvent)) {
+                setLatestAppealEventStatus(latestAppealEvents, CLOSED);
+            } else if (isDwpRespondOverdue(currentEvent)) {
+                setLatestAppealEventStatus(latestAppealEvents, DWP_RESPOND_OVERDUE);
+            }
+        }
+    }
+
+    private boolean isDwpRespondOverdue(Event currentEvent) {
+        return currentEvent.getType() == APPEAL_RECEIVED
+            && ZonedDateTime.now().isAfter(currentEvent.getDate().plusDays(MAX_DWP_RESPONSE_DAYS));
+    }
+
+    private boolean isAppealClosed(Event currentEvent) {
+        return currentEvent.getType() == DORMANT
+            && ZonedDateTime.now().isAfter(currentEvent.getDate().plusMonths(
+                    DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
+    }
+
+    private boolean isPastHearingBookedDate(Event currentEvent) {
+        return currentEvent.getType() == DWP_RESPOND
+            && ZonedDateTime.now().isAfter(currentEvent.getDate().plusWeeks(
+                    PAST_HEARING_BOOKED_IN_WEEKS));
+    }
+
+    private boolean isNewHearingBookedEvent(List<Event> sortedEvents) {
+        return sortedEvents.size() > 1
+            && sortedEvents.get(0).getType() == HEARING_BOOKED
+            && (sortedEvents.get(1).getType() == POSTPONED
+                || sortedEvents.get(1).getType() == ADJOURNED);
+    }
+
+    public List<Event> buildHistoricalEvents() {
+        List<Event> sortedEvents = sortedEvents(getEvents());
+
+        List<Event> historicalEvents = new ArrayList<>();
+
+        if (buildLatestEvents().size() == 1 && buildLatestEvents().get(0).getType()
+                == DWP_RESPOND_OVERDUE) {
+            historicalEvents.addAll(sortedEvents);
+        } else {
+            historicalEvents = sortedEvents.stream().skip(buildLatestEvents().size())
+                .collect(toList());
+        }
+        return historicalEvents.stream().sorted((e1,e2) ->
+                e2.getDate().compareTo(e1.getDate())).collect(toList());
+    }
+
+    private void setLatestAppealEventStatus(List<Event> latestEvents, EventType eventType) {
+
+        for (Event event: latestEvents) {
+            if (event.getType().getOrder() > 0) {
+                event.setType(eventType);
+                break;
+            }
+        }
+    }
+
+    private List<Event> sortedEvents(List<Event> eventsToBeSorted) {
+        return eventsToBeSorted.stream().sorted((e1,e2) ->
+                e2.getDate().compareTo(e1.getDate())).collect(toList());
+    }
+
     @Override
     public String toString() {
         return "CcdCase{"
@@ -154,13 +309,15 @@ public class CcdCase {
                 + ", appellant=" + appellant
                 + ", appointee=" + appointee
                 + ", representative=" + representative
-                + ", hearing=" + hearing
+                + ", hearings=" + hearings
                 + ", caseReference=" + caseReference
-                + ", status=" + status
+                + ", eventType=" + eventType
                 + ", events=" + events
                 + ", reasonsForAppealing=" + reasonsForAppealing
                 + ", smsNotify=" + smsNotify
                 + ", isAppointee=" + isAppointee
+                + ", benefitType=" + benefitType
+                + ", appealStatus=" + appealStatus
                 + '}';
     }
 
@@ -177,19 +334,21 @@ public class CcdCase {
                 && Objects.equals(appellant, ccdCase.appellant)
                 && Objects.equals(appointee, ccdCase.appointee)
                 && Objects.equals(representative, ccdCase.representative)
-                && Objects.equals(hearing, ccdCase.hearing)
+                && Objects.equals(hearings, ccdCase.hearings)
                 && Objects.equals(caseReference, ccdCase.caseReference)
-                && status == ccdCase.status
+                && eventType == ccdCase.eventType
                 && Objects.equals(events, ccdCase.events)
                 && Objects.equals(reasonsForAppealing, ccdCase.reasonsForAppealing)
                 && Objects.equals(smsNotify, ccdCase.smsNotify)
-                && Objects.equals(isAppointee, ccdCase.isAppointee);
+                && Objects.equals(isAppointee, ccdCase.isAppointee)
+                && Objects.equals(benefitType, ccdCase.benefitType)
+                && Objects.equals(appealStatus, ccdCase.appealStatus);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(appeal, appellant, appointee, representative, hearing, caseReference,
-                status, events, reasonsForAppealing, smsNotify, isAppointee);
+        return Objects.hash(appeal, appellant, appointee, representative, hearings, caseReference,
+                eventType, events, reasonsForAppealing, smsNotify, isAppointee, benefitType,
+                appealStatus);
     }
-
 }

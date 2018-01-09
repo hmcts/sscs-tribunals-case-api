@@ -32,12 +32,12 @@ public class CcdCaseSerializerTest {
 
         Hearing hearingEvent = new Hearing(hearingAddress, ZonedDateTime.now());
 
-        event1 = new Event(ZonedDateTime.now(), ZonedDateTime.now(), Status.ADJOURNED, "medical",
-            "The medical company", Status.ADJOURNED.getContentKey(), hearingEvent,
+        event1 = new Event(ZonedDateTime.now(), ZonedDateTime.now(), EventType.ADJOURNED, "medical",
+            "The medical company", EventType.ADJOURNED.getContentKey(), hearingEvent,
             ZonedDateTime.now(), ZonedDateTime.now(), ZonedDateTime.now(), ZonedDateTime.now());
 
         ccdCase = new CcdCase(appeal, appellant, null, null, null, caseReference,
-            Status.APPEAL_RECEIVED, Arrays.asList(event1));
+            EventType.APPEAL_RECEIVED, Arrays.asList(event1));
 
         ccdCaseSerializer = new CcdCaseSerializer(CcdCase.class);
     }
@@ -51,20 +51,21 @@ public class CcdCaseSerializerTest {
         appellant = new Appellant(new Name("Dr", "Kenny", "Rodgers"),
                 null, null, null, null, null);
 
-        event1 = new Event(ZonedDateTime.now(), null, Status.DORMANT, null,
-               null,  Status.DORMANT.getContentKey(), null, ZonedDateTime.now(),null, null, null);
+        event1 = new Event(ZonedDateTime.now(), null, EventType.DORMANT, null,
+               null,  EventType.DORMANT.getContentKey(), null, ZonedDateTime.now(),null,
+                null, null);
 
         ccdCase = new CcdCase(appeal, appellant, null, null, null, caseReference,
-                Status.DORMANT, Arrays.asList(event1));
+                EventType.DORMANT, Arrays.asList(event1));
 
         ccdCaseSerializer = new CcdCaseSerializer(CcdCase.class);
     }
 
     private void buildMultipleEventData() {
-        event1 = new Event(ZonedDateTime.now(), ZonedDateTime.now(), Status.ADJOURNED, "medical",
-                Status.ADJOURNED.getContentKey());
-        event2 = new Event(ZonedDateTime.now(), ZonedDateTime.now(), Status.DWP_RESPOND, null,
-                Status.DWP_RESPOND.getContentKey());
+        event1 = new Event(ZonedDateTime.now(), ZonedDateTime.now(), EventType.ADJOURNED, "medical",
+                EventType.ADJOURNED.getContentKey());
+        event2 = new Event(ZonedDateTime.now(), ZonedDateTime.now(), EventType.DWP_RESPOND, null,
+                EventType.DWP_RESPOND.getContentKey());
 
         ccdCase = new CcdCase(null, null, null, null, null, null, null,
                 Arrays.asList(event1, event2));

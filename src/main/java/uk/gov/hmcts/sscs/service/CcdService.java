@@ -6,6 +6,7 @@ import static org.springframework.http.HttpMethod.POST;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,10 +14,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
 
 @Service
 public class CcdService {
@@ -88,4 +88,12 @@ public class CcdService {
         }
         return token;
     }
+
+    public CcdCase findCcdCaseByAppealNumber(String appealNumber) {
+
+        //TODO: Placeholder, implement this properly as part of future story
+        //TODO: Possibly remove this method and call the new DAO class directly?
+        return new CcdCase();
+    }
+
 }
