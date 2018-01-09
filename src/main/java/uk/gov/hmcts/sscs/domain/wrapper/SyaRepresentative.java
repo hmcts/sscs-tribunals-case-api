@@ -1,11 +1,14 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SyaRepresentative {
 
     private String lastName;
 
     private String organisation;
 
+    @JsonProperty("contactDetails")
     private SyaContactDetails contactDetails;
 
     private String firstName;

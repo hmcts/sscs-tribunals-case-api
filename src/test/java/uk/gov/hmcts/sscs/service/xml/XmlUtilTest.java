@@ -185,7 +185,11 @@ public class XmlUtilTest {
             new ExcludeDates("December 1st", "December 2nd")});
 
         CcdCase ccdCase = new CcdCase(null, null, null, null,
-                new ArrayList<Hearing>(){{ add(hearing); }});
+                new ArrayList<Hearing>() {
+                {
+                    add(hearing);
+                }
+            });
 
         XmlUtil xmlUtil = new XmlUtil();
         String xpathExpression = "/ccdCase/hearing/excludeDates";

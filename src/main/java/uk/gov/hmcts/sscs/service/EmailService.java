@@ -10,6 +10,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.email.Email;
+import uk.gov.hmcts.sscs.email.EmailAttachment;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 
 @Service
@@ -33,6 +34,15 @@ public class EmailService {
             mimeMessageHelper.setTo(email.getTo());
             mimeMessageHelper.setSubject(email.getSubject());
             mimeMessageHelper.setText(email.getMessage());
+
+            if (email.hasAttachments()) {
+                for (EmailAttachment emailAttachment : email.getAttachments()) {
+                    mimeMessageHelper.addAttachment(emailAttachment.getFilename(),
+                            emailAttachment.getData(),
+                            emailAttachment.getContentType());
+                }
+            }
+
             javaMailSender.send(message);
         } catch (MessagingException | MailException e) {
             throw new EmailSendFailedException(e);

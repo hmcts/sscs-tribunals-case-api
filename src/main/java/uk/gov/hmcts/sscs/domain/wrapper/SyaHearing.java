@@ -1,5 +1,7 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Arrays;
 
 public class SyaHearing {
@@ -14,7 +16,8 @@ public class SyaHearing {
 
     private String[] datesCantAttend;
 
-    private String[] arrangements;
+    @JsonProperty("arrangements")
+    private SyaArrangements arrangements;
 
     public SyaHearing() {
         // For JSON
@@ -60,23 +63,23 @@ public class SyaHearing {
         this.datesCantAttend = datesCantAttend;
     }
 
-    public String[] getArrangements() {
+    public SyaArrangements getArrangements() {
         return arrangements;
     }
 
-    public void setArrangements(String[] arrangements) {
+    public void setArrangements(SyaArrangements arrangements) {
         this.arrangements = arrangements;
     }
 
     @Override
     public String toString() {
         return "SyaHearing{"
-                + " scheduleHearing=" + scheduleHearing
+                + "scheduleHearing=" + scheduleHearing
                 + ", anythingElse='" + anythingElse + '\''
                 + ", wantsSupport=" + wantsSupport
                 + ", wantsToAttend=" + wantsToAttend
                 + ", datesCantAttend=" + Arrays.toString(datesCantAttend)
-                + ", arrangements=" + Arrays.toString(arrangements)
+                + ", arrangements=" + arrangements
                 + '}';
     }
 }

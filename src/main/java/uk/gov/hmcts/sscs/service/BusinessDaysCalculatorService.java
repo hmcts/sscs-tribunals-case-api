@@ -13,11 +13,14 @@ public class BusinessDaysCalculatorService {
         //
     }
 
-    public static ZonedDateTime getBusinessDay(ZonedDateTime startDateTime, int numberOfBusinessDays) {
+    public static ZonedDateTime getBusinessDay(ZonedDateTime startDateTime,
+                                               int numberOfBusinessDays) {
         LocalDate startDate = startDateTime.toLocalDate();
-        DateCalculator<LocalDate> dateCalculator = LocalDateKitCalculatorsFactory.forwardCalculator("UK");
+        DateCalculator<LocalDate> dateCalculator = LocalDateKitCalculatorsFactory
+                .forwardCalculator("UK");
         dateCalculator.setStartDate(startDate);
-        LocalDate decisionDate = dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
+        LocalDate decisionDate = dateCalculator.moveByBusinessDays(numberOfBusinessDays)
+                .getCurrentBusinessDate();
         return of(decisionDate, startDateTime.toLocalTime(), startDateTime.getZone());
     }
 }

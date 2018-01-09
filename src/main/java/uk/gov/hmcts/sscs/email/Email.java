@@ -1,11 +1,15 @@
 package uk.gov.hmcts.sscs.email;
 
+import java.util.List;
+
 public class Email {
 
     protected String from;
     protected String to;
     protected String subject;
     protected String message;
+
+    private List<EmailAttachment> attachments;
 
     public String getFrom() {
         return from;
@@ -37,5 +41,17 @@ public class Email {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public List<EmailAttachment> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<EmailAttachment> attachments) {
+        this.attachments = attachments;
+    }
+
+    public boolean hasAttachments() {
+        return this.attachments != null && !this.attachments.isEmpty();
     }
 }

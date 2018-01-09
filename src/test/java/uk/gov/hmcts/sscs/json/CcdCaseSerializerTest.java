@@ -52,7 +52,9 @@ public class CcdCaseSerializerTest {
                 null, null, null, null, null);
 
         event1 = new Event(ZonedDateTime.now(), null, EventType.DORMANT, null,
-               null,  EventType.DORMANT.getContentKey(), null, ZonedDateTime.now(),null, null, null);
+               null,  EventType.DORMANT.getContentKey(),
+                null, ZonedDateTime.now(),null,
+                null, null);
 
         ccdCase = new CcdCase(appeal, appellant, null, null, null, caseReference,
                 EventType.DORMANT, Arrays.asList(event1));

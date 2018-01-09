@@ -12,13 +12,13 @@ public class SubmitYourAppealToCcdCaseTransformer {
     public CcdCase convertSyaToCcdCase(SyaCaseWrapper syaCaseWrapper) {
 
         CcdCase ccdCase = new CcdCase();
-        List<Hearing> hearings = new ArrayList<>();
 
         ccdCase.setAppellant(convertAppellant(syaCaseWrapper.getAppellant()));
         ccdCase.setRepresentative(convertRepresentative(syaCaseWrapper.getRepresentative()));
         ccdCase.setReasonsForAppealing(convertReasonsForAppealing(
                 syaCaseWrapper.getReasonsForAppealing()));
 
+        List<Hearing> hearings = new ArrayList<>();
         hearings.add(convertHearing(syaCaseWrapper.getHearing()));
         ccdCase.setHearings(hearings);
         ccdCase.setSmsNotify(convertSmsNotify(syaCaseWrapper.getSmsNotify()));
@@ -84,14 +84,8 @@ public class SubmitYourAppealToCcdCaseTransformer {
         Hearing hearing = new Hearing();
 
         hearing.setAdditionalInformation(syaHearing.getAnythingElse());
-        hearing.setLanguageInterpreterRequired(isArrangementInSya(syaHearing.getArrangements(),
-                "Language interpreter"));
-        hearing.setSignLanguageRequired(isArrangementInSya(syaHearing.getArrangements(),
-                "Sign language interpreter"));
-        hearing.setHearingLoopRequired(isArrangementInSya(syaHearing.getArrangements(),
-                "Hearing loop"));
-        hearing.setHasDisabilityNeeds(isArrangementInSya(syaHearing.getArrangements(),
-                "Disabled access"));
+
+        // TODO : Hearing arrangements
         hearing.setExcludeDates(convertExcludedDates(syaHearing.getDatesCantAttend()));
         hearing.setScheduleHearing(syaHearing.getScheduleHearing());
         hearing.setWantsSupport(syaHearing.getWantsSupport());
@@ -148,15 +142,6 @@ public class SubmitYourAppealToCcdCaseTransformer {
         return address;
     }
 
-    public Boolean isArrangementInSya(String[] arrangements, String arrangementToFind) {
-        for (String arrangement: arrangements) {
-            if (arrangement.contains(arrangementToFind)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public ExcludeDates[] convertExcludedDates(String[] dates) {
         List<ExcludeDates> excludedDates = new ArrayList();

@@ -84,9 +84,6 @@ public class SubmitYourAppealToCcdCaseTransformerTest {
         hearing.setWantsSupport(true);
         hearing.setWantsToAttend(true);
         hearing.setDatesCantAttend(new String[] {"25/01/1972"});
-        hearing.setArrangements(new String[] {"Language interpreter", "Sign language interpreter",
-            "Hearing loop", "Disabled access"});
-
         return hearing;
     }
 
@@ -169,14 +166,13 @@ public class SubmitYourAppealToCcdCaseTransformerTest {
                 ccdCase.getReasonsForAppealing().getOtherReasons());
 
         //Hearing
-        assertEquals(hearing.getAnythingElse(), ccdCase.getHearings().get(0).getAdditionalInformation());
-        assertEquals(true, ccdCase.getHearings().get(0).getLanguageInterpreterRequired());
-        assertEquals(true, ccdCase.getHearings().get(0).getSignLanguageRequired());
-        assertEquals(true, ccdCase.getHearings().get(0).getHearingLoopRequired());
-        assertEquals(true, ccdCase.getHearings().get(0).getHasDisabilityNeeds());
+        //TODO add assertions for arrangements
+        assertEquals(hearing.getAnythingElse(),
+                ccdCase.getHearings().get(0).getAdditionalInformation());
         assertEquals(hearing.getDatesCantAttend()[0],
                 ccdCase.getHearings().get(0).getExcludeDates()[0].getStart());
-        assertEquals(hearing.getScheduleHearing(), ccdCase.getHearings().get(0).getScheduleHearing());
+        assertEquals(hearing.getScheduleHearing(),
+                ccdCase.getHearings().get(0).getScheduleHearing());
         assertEquals(hearing.getWantsSupport(), ccdCase.getHearings().get(0).getWantsSupport());
         assertEquals(hearing.getWantsToAttend(), ccdCase.getHearings().get(0).getWantsToAttend());
 
@@ -216,21 +212,6 @@ public class SubmitYourAppealToCcdCaseTransformerTest {
         assertEquals(mrn.getReasonForNoMrn(), ccdCase.getAppeal().getReasonForNoMrn());
     }
 
-    @Test
-    public void findArrangementInSya() {
-        Boolean result = transformer.isArrangementInSya(new String[]
-            {"Language interpreter", "Sign language interpreter"}, "Language interpreter");
-
-        assertEquals(true, result);
-    }
-
-    @Test
-    public void doNotFindArrangementInSya() {
-        Boolean result = transformer.isArrangementInSya(new String[]
-            {"Language interpreter", "Sign language interpreter"}, "Unknown");
-
-        assertEquals(false, result);
-    }
 
     @Test
     public void convertExcludedDates() {

@@ -96,7 +96,8 @@ public class CcdCase {
         this.representative = representative;
     }
 
-    //TODO: Assume there is only one hearing until business decides how to handle multiple for robotics
+    //TODO: Assume there is only one hearing until business decides
+    // how to handle multiple for robotics
     @XmlElement(name = "hearing")
     public Hearing getHearing() {
         if (hearings != null && hearings.size() > 0) {
@@ -188,7 +189,7 @@ public class CcdCase {
     }
 
     public void buildEvents() {
-       //TODO: Placeholder, build up events in a proper way. Refer to TYA API
+        //TODO: Placeholder, build up events in a proper way. Refer to TYA API
 
         this.events = new ArrayList<>();
     }
@@ -211,7 +212,7 @@ public class CcdCase {
         }
 
         List<Event> latestAppealEvents = latestEvents.stream().sorted((e1, e2)
-                -> e2.getDate().compareTo(e1.getDate())).collect(toList());
+            -> e2.getDate().compareTo(e1.getDate())).collect(toList());
         processExceptions(sortedEvents, latestAppealEvents);
 
         setLatestAppealStatus(latestAppealEvents);
@@ -220,10 +221,10 @@ public class CcdCase {
     }
 
     private void setLatestAppealStatus(List<Event> latestEvents) {
-        if(null != latestEvents && !latestEvents.isEmpty()) {
-            for(int i = 0; i< latestEvents.size(); i++) {
+        if (null != latestEvents && !latestEvents.isEmpty()) {
+            for (int i = 0; i < latestEvents.size(); i++) {
 
-                if(latestEvents.get(i).getType().getOrder() > 0 ) {
+                if (latestEvents.get(i).getType().getOrder() > 0) {
                     setAppealStatus(latestEvents.get(i).getType().name());
                     return;
                 }
@@ -231,8 +232,8 @@ public class CcdCase {
         }
     }
 
-    private void processExceptions(List<Event> sortedEvents, List<Event> latestAppealEvents ) {
-        if(null != sortedEvents && !sortedEvents.isEmpty()) {
+    private void processExceptions(List<Event> sortedEvents, List<Event> latestAppealEvents) {
+        if (null != sortedEvents && !sortedEvents.isEmpty()) {
 
             Event currentEvent = sortedEvents.get(0);
 
@@ -242,31 +243,35 @@ public class CcdCase {
                 setLatestAppealEventStatus(latestAppealEvents, NEW_HEARING_BOOKED);
             } else if (isAppealClosed(currentEvent)) {
                 setLatestAppealEventStatus(latestAppealEvents, CLOSED);
-            } else if(isDwpRespondOverdue(currentEvent)) {
+            } else if (isDwpRespondOverdue(currentEvent)) {
                 setLatestAppealEventStatus(latestAppealEvents, DWP_RESPOND_OVERDUE);
             }
         }
     }
 
     private boolean isDwpRespondOverdue(Event currentEvent) {
-        return currentEvent.getType() == APPEAL_RECEIVED &&
-                ZonedDateTime.now().isAfter(currentEvent.getDate().plusDays(MAX_DWP_RESPONSE_DAYS));
+        return currentEvent.getType() == APPEAL_RECEIVED
+                && ZonedDateTime.now().isAfter(currentEvent.getDate()
+                .plusDays(MAX_DWP_RESPONSE_DAYS));
     }
 
     private boolean isAppealClosed(Event currentEvent) {
-        return currentEvent.getType() == DORMANT &&
-                ZonedDateTime.now().isAfter(currentEvent.getDate().plusMonths(DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
+        return currentEvent.getType() == DORMANT
+                && ZonedDateTime.now().isAfter(currentEvent.getDate()
+                        .plusMonths(DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
     }
 
     private boolean isPastHearingBookedDate(Event currentEvent) {
-        return currentEvent.getType() == DWP_RESPOND &&
-                ZonedDateTime.now().isAfter(currentEvent.getDate().plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS));
+        return currentEvent.getType() == DWP_RESPOND
+                && ZonedDateTime.now().isAfter(currentEvent.getDate()
+                .plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS));
     }
 
     private boolean isNewHearingBookedEvent(List<Event> sortedEvents) {
-        return sortedEvents.size() > 1 &&
-                sortedEvents.get(0).getType() == HEARING_BOOKED &&
-                (sortedEvents.get(1).getType() == POSTPONED || sortedEvents.get(1).getType() == ADJOURNED);
+        return sortedEvents.size() > 1
+                && sortedEvents.get(0).getType() == HEARING_BOOKED
+                && (sortedEvents.get(1).getType() == POSTPONED
+                || sortedEvents.get(1).getType() == ADJOURNED);
     }
 
     public List<Event> buildHistoricalEvents() {
@@ -274,19 +279,21 @@ public class CcdCase {
 
         List<Event> historicalEvents = new ArrayList<>();
 
-        if (buildLatestEvents().size() == 1 && buildLatestEvents().get(0).getType() == DWP_RESPOND_OVERDUE){
+        if (buildLatestEvents().size() == 1 && buildLatestEvents().get(0).getType()
+                == DWP_RESPOND_OVERDUE) {
             historicalEvents.addAll(sortedEvents);
+        } else {
+            historicalEvents = sortedEvents.stream().skip(buildLatestEvents().size())
+                    .collect(toList());
         }
-        else {
-            historicalEvents = sortedEvents.stream().skip(buildLatestEvents().size()).collect(toList());
-        }
-        return historicalEvents.stream().sorted((e1,e2) -> e2.getDate().compareTo(e1.getDate())).collect(toList());
+        return historicalEvents.stream()
+                .sorted((e1,e2) -> e2.getDate().compareTo(e1.getDate())).collect(toList());
     }
 
     private void setLatestAppealEventStatus(List<Event> latestEvents, EventType eventType) {
 
         for (Event event: latestEvents) {
-            if (event.getType().getOrder() > 0){
+            if (event.getType().getOrder() > 0) {
                 event.setType(eventType);
                 break;
             }
@@ -294,7 +301,8 @@ public class CcdCase {
     }
 
     private List<Event> sortedEvents(List<Event> eventsToBeSorted) {
-        return eventsToBeSorted.stream().sorted((e1,e2) -> e2.getDate().compareTo(e1.getDate())).collect(toList());
+        return eventsToBeSorted.stream().sorted((e1,e2) ->
+                e2.getDate().compareTo(e1.getDate())).collect(toList());
     }
 
     @Override

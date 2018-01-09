@@ -39,7 +39,11 @@ public class CcdCaseBuilder {
 
     public static CcdCase ccdCase() {
         return new CcdCase(appeal(), appellant(), appointee(), representative(),
-                new ArrayList<Hearing>(){{ add(hearing()); }});
+                new ArrayList<Hearing>() {
+                {
+                    add(hearing());
+                }
+            });
     }
 
     public static LocalDate convertJsonStringIntoDate(String day, String month, String year) {
