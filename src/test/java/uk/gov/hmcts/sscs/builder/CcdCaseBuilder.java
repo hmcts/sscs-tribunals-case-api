@@ -39,7 +39,7 @@ public class CcdCaseBuilder {
 
     public static CcdCase ccdCase() {
         return new CcdCase(appeal(), appellant(), appointee(), representative(),
-                new ArrayList<Hearing>() {
+            new ArrayList<Hearing>() {
                 {
                     add(hearing());
                 }

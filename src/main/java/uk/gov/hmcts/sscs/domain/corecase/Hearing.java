@@ -3,9 +3,6 @@ package uk.gov.hmcts.sscs.domain.corecase;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlTransient;
 
 public class Hearing {
 
@@ -56,12 +53,10 @@ public class Hearing {
         this.dateTime = dateTime;
     }
 
-    @XmlTransient
     public TribunalType getTribunalType() {
         return tribunalType;
     }
 
-    @XmlElement(name = "tribunalType", required = true)
     public String getTribunalTypeText() {
         if (tribunalType != null) {
             return tribunalType.toString();
@@ -74,12 +69,10 @@ public class Hearing {
         this.tribunalType = tribunalType;
     }
 
-    @XmlTransient
     public Boolean getLanguageInterpreterRequired() {
         return languageInterpreterRequired;
     }
 
-    @XmlElement(name = "languageInterpreterRequired", required = true)
     public String getLanguageInterpreterRequiredForXml() {
         return languageInterpreterRequired != null && languageInterpreterRequired
                 ? "Yes, Language Interpreter required" : "No";
@@ -89,12 +82,10 @@ public class Hearing {
         this.languageInterpreterRequired = languageInterpreterRequired;
     }
 
-    @XmlTransient
     public Boolean getSignLanguageRequired() {
         return signLanguageRequired;
     }
 
-    @XmlElement(name = "signLanguageRequired", required = true)
     public String getSignLanguageRequiredForXml() {
         return signLanguageRequired != null && signLanguageRequired
                 ? "Yes, Sign Language Interpreter required" : "No";
@@ -104,12 +95,10 @@ public class Hearing {
         this.signLanguageRequired = signLanguageRequired;
     }
 
-    @XmlTransient
     public Boolean getHearingLoopRequired() {
         return hearingLoopRequired;
     }
 
-    @XmlElement(name = "hearingLoopRequired", required = true)
     public String getHearingLoopRequiredForXml() {
         return hearingLoopRequired != null && hearingLoopRequired
                 ? "Yes, A hearing loop is required" : "No";
@@ -119,12 +108,10 @@ public class Hearing {
         this.hearingLoopRequired = hearingLoopRequired;
     }
 
-    @XmlTransient
     public Boolean getHasDisabilityNeeds() {
         return hasDisabilityNeeds;
     }
 
-    @XmlElement(name = "hasDisabilityNeeds", required = true)
     public String getHasDisabilityNeedsForXml() {
         return hasDisabilityNeeds != null && hasDisabilityNeeds ? "Yes" : "No";
     }
@@ -141,8 +128,6 @@ public class Hearing {
         this.additionalInformation = additionalInformation;
     }
 
-    @XmlElementWrapper(name = "excludeDates")
-    @XmlElement(name = "exclude", type = ExcludeDates.class)
     public ExcludeDates[] getExcludeDates() {
         return excludeDates;
     }
@@ -151,7 +136,6 @@ public class Hearing {
         this.excludeDates = excludeDates;
     }
 
-    @XmlTransient
     public Address getAddress() {
         return address;
     }
@@ -160,7 +144,6 @@ public class Hearing {
         this.address = address;
     }
 
-    @XmlTransient
     public ZonedDateTime getDateTime() {
         return dateTime;
     }
@@ -169,7 +152,6 @@ public class Hearing {
         this.dateTime = dateTime;
     }
 
-    @XmlTransient
     public Boolean getScheduleHearing() {
         return scheduleHearing;
     }
@@ -178,7 +160,6 @@ public class Hearing {
         this.scheduleHearing = scheduleHearing;
     }
 
-    @XmlTransient
     public Boolean getWantsSupport() {
         return wantsSupport;
     }
@@ -187,7 +168,6 @@ public class Hearing {
         this.wantsSupport = wantsSupport;
     }
 
-    @XmlTransient
     public Boolean getWantsToAttend() {
         return wantsToAttend;
     }
@@ -196,7 +176,6 @@ public class Hearing {
         this.wantsToAttend = wantsToAttend;
     }
 
-    @XmlTransient
     public String getVenueName() {
         return venueName;
     }

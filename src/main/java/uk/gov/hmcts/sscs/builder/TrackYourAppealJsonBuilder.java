@@ -13,7 +13,6 @@ public class TrackYourAppealJsonBuilder {
 
     public static ObjectNode buildTrackYourAppealJson(CcdCase ccdCase) {
 
-        final ObjectNode root = JsonNodeFactory.instance.objectNode();
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", ccdCase.getCaseReference());
@@ -28,6 +27,7 @@ public class TrackYourAppealJsonBuilder {
         caseNode.set("latestEvents", buildEventArray(ccdCase.buildLatestEvents()));
         caseNode.set("historicalEvents", buildEventArray(ccdCase.buildHistoricalEvents()));
 
+        ObjectNode root = JsonNodeFactory.instance.objectNode();
         root.set("appeal", caseNode);
 
         return root;

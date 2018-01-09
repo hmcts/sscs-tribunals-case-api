@@ -21,6 +21,7 @@ public class SubmitYourAppealToCcdCaseTransformer {
         List<Hearing> hearings = new ArrayList<>();
         hearings.add(convertHearing(syaCaseWrapper.getHearing()));
         ccdCase.setHearings(hearings);
+
         ccdCase.setSmsNotify(convertSmsNotify(syaCaseWrapper.getSmsNotify()));
         ccdCase.setAppeal(convertSyaDataToAppeal(syaCaseWrapper));
         ccdCase.setIsAppointee(syaCaseWrapper.getIsAppointee());
@@ -90,6 +91,14 @@ public class SubmitYourAppealToCcdCaseTransformer {
         hearing.setScheduleHearing(syaHearing.getScheduleHearing());
         hearing.setWantsSupport(syaHearing.getWantsSupport());
         hearing.setWantsToAttend(syaHearing.getWantsToAttend());
+
+        if (null != syaHearing.getArrangements()) {
+            hearing.setHasDisabilityNeeds(syaHearing.getArrangements().getDisabledAccess());
+            hearing.setHearingLoopRequired(syaHearing.getArrangements().getHearingLoop());
+            hearing.setLanguageInterpreterRequired(syaHearing.getArrangements().getLanguageInterpreter());
+            hearing.setSignLanguageRequired(syaHearing.getArrangements().getSignLanguageInterpreter());
+        }
+
 
         return hearing;
     }

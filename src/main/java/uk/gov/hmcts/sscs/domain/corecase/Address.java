@@ -1,12 +1,7 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
 import java.util.Objects;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
 
-@XmlRootElement
-@XmlType(propOrder = {"line1", "line2", "town", "county", "postcode"})
 public class Address {
 
     private String line1;
@@ -81,7 +76,6 @@ public class Address {
         this.postcode = postcode;
     }
 
-    @XmlTransient
     public String getGoogleMapUrl() {
         return googleMapUrl;
     }
