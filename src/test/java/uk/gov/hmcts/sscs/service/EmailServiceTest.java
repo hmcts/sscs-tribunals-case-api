@@ -3,8 +3,11 @@ package uk.gov.hmcts.sscs.service;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +17,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
+
 import uk.gov.hmcts.sscs.email.Email;
+import uk.gov.hmcts.sscs.email.EmailAttachment;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -80,7 +85,13 @@ public class EmailServiceTest {
     public static class SampleEmailData {
 
         static Email getDefault() {
-            return new TestEmail(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_MESSAGE);
+            List<EmailAttachment> emailAttachmentList = new ArrayList<>();
+            EmailAttachment emailAttachment =
+                    EmailAttachment.pdf("hello".getBytes(), "Hello.pdf");
+            emailAttachmentList.add(emailAttachment);
+            TestEmail testEmail = new TestEmail(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_MESSAGE);
+            testEmail.setAttachments(emailAttachmentList);
+            return testEmail;
         }
 
         static Email getWithToNull() {

@@ -85,18 +85,20 @@ public class SubmitYourAppealToCcdCaseTransformer {
         Hearing hearing = new Hearing();
 
         hearing.setAdditionalInformation(syaHearing.getAnythingElse());
-        hearing.setLanguageInterpreterRequired(isArrangementInSya(syaHearing.getArrangements(),
-                "Language interpreter"));
-        hearing.setSignLanguageRequired(isArrangementInSya(syaHearing.getArrangements(),
-                "Sign language interpreter"));
-        hearing.setHearingLoopRequired(isArrangementInSya(syaHearing.getArrangements(),
-                "Hearing loop"));
-        hearing.setHasDisabilityNeeds(isArrangementInSya(syaHearing.getArrangements(),
-                "Disabled access"));
+
+        // TODO : Hearing arrangements
         hearing.setExcludeDates(convertExcludedDates(syaHearing.getDatesCantAttend()));
         hearing.setScheduleHearing(syaHearing.getScheduleHearing());
         hearing.setWantsSupport(syaHearing.getWantsSupport());
         hearing.setWantsToAttend(syaHearing.getWantsToAttend());
+
+        if (null != syaHearing.getArrangements()) {
+            hearing.setHasDisabilityNeeds(syaHearing.getArrangements().getDisabledAccess());
+            hearing.setHearingLoopRequired(syaHearing.getArrangements().getHearingLoop());
+            hearing.setLanguageInterpreterRequired(syaHearing.getArrangements().getLanguageInterpreter());
+            hearing.setSignLanguageRequired(syaHearing.getArrangements().getSignLanguageInterpreter());
+        }
+
 
         return hearing;
     }
@@ -149,15 +151,6 @@ public class SubmitYourAppealToCcdCaseTransformer {
         return address;
     }
 
-    public Boolean isArrangementInSya(String[] arrangements, String arrangementToFind) {
-        for (String arrangement: arrangements) {
-            if (arrangement.contains(arrangementToFind)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public ExcludeDates[] convertExcludedDates(String[] dates) {
         List<ExcludeDates> excludedDates = new ArrayList();

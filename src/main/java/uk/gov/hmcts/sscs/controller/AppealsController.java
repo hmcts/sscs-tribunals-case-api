@@ -10,24 +10,35 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.service.SubmitAppealService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RestController
 public class AppealsController {
 
+    public static final String SYA_CASE_WRAPPER = "SyaCaseWrapper";
+    public static final String UNDERSCORE = "_";
+
+    private SubmitAppealService submitAppealService;
     private TribunalsService tribunalsService;
 
     @Autowired
-    public AppealsController(TribunalsService tribunalsService) {
+    public AppealsController(TribunalsService tribunalsService, SubmitAppealService submitAppealService) {
         this.tribunalsService = tribunalsService;
+        this.submitAppealService = submitAppealService;
     }
 
     @ApiOperation(value = "submitAppeal",
@@ -38,6 +49,14 @@ public class AppealsController {
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper)
             throws CcdException {
+        String appellantLastName = syaCaseWrapper.getAppellant().getLastName();
+        String nino = syaCaseWrapper.getAppellant().getNino();
+
+        String appealUniqueIdentifier = appellantLastName + UNDERSCORE
+                + nino.substring(nino.length() - 3);
+        Map<String,Object> appealData = new HashMap<>();
+        appealData.put(SYA_CASE_WRAPPER, syaCaseWrapper);
+        submitAppealService.submitAppeal(appealData,appealUniqueIdentifier);
         return status(tribunalsService.submitAppeal(syaCaseWrapper)).build();
     }
 

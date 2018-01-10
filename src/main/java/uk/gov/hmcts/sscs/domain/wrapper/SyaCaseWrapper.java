@@ -1,26 +1,36 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class SyaCaseWrapper {
 
+    @JsonProperty("hearing")
     private SyaHearing hearing;
 
+    @JsonProperty("reasonsForAppealing")
     private SyaReasonsForAppealing reasonsForAppealing;
 
+    @JsonProperty("representative")
     private SyaRepresentative representative;
 
     private String benefitType;
 
+    @JsonProperty("smsNotify")
     private SyaSmsNotify smsNotify;
 
+    @JsonProperty("mrn")
     private SyaMrn mrn;
 
     private Boolean isAppointee;
 
+    @JsonProperty("appellant")
     private SyaAppellant appellant;
+
+    @JsonProperty("signAndSubmit")
+    private SyaSignAndSubmit signAndSubmit;
 
 
     public SyaCaseWrapper() {
@@ -91,10 +101,27 @@ public class SyaCaseWrapper {
         this.appellant = syaAppellant;
     }
 
+    public Boolean getAppointee() {
+        return isAppointee;
+    }
+
+    public void setAppointee(Boolean appointee) {
+        isAppointee = appointee;
+    }
+
+    public SyaSignAndSubmit getSignAndSubmit() {
+        return signAndSubmit;
+    }
+
+    public void setSignAndSubmit(SyaSignAndSubmit signAndSubmit) {
+        this.signAndSubmit = signAndSubmit;
+    }
+
+
     @Override
     public String toString() {
         return "SyaCaseWrapper{"
-                + " hearing=" + hearing
+                +  "hearing=" + hearing
                 + ", reasonsForAppealing=" + reasonsForAppealing
                 + ", representative=" + representative
                 + ", benefitType='" + benefitType + '\''
@@ -102,6 +129,7 @@ public class SyaCaseWrapper {
                 + ", mrn=" + mrn
                 + ", isAppointee=" + isAppointee
                 + ", appellant=" + appellant
+                + ", signAndSubmit=" + signAndSubmit
                 + '}';
     }
 }

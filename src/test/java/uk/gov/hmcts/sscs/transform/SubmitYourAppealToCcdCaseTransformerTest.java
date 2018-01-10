@@ -84,8 +84,13 @@ public class SubmitYourAppealToCcdCaseTransformerTest {
         hearing.setWantsSupport(true);
         hearing.setWantsToAttend(true);
         hearing.setDatesCantAttend(new String[] {"25/01/1972"});
-        hearing.setArrangements(new String[] {"Language interpreter", "Sign language interpreter",
-            "Hearing loop", "Disabled access"});
+        SyaArrangements syaArrangements = new SyaArrangements();
+        syaArrangements.setDisabledAccess(true);
+        syaArrangements.setHearingLoop(true);
+        syaArrangements.setLanguageInterpreter(true);
+        syaArrangements.setSignLanguageInterpreter(true);
+
+        hearing.setArrangements(syaArrangements);
 
         return hearing;
     }
@@ -217,22 +222,7 @@ public class SubmitYourAppealToCcdCaseTransformerTest {
         assertEquals(mrn.getReasonForBeingLate(), ccdCase.getAppeal().getReasonForBeingLate());
         assertEquals(mrn.getReasonForNoMrn(), ccdCase.getAppeal().getReasonForNoMrn());
     }
-
-    @Test
-    public void findArrangementInSya() {
-        Boolean result = transformer.isArrangementInSya(new String[]
-            {"Language interpreter", "Sign language interpreter"}, "Language interpreter");
-
-        assertEquals(true, result);
-    }
-
-    @Test
-    public void doNotFindArrangementInSya() {
-        Boolean result = transformer.isArrangementInSya(new String[]
-            {"Language interpreter", "Sign language interpreter"}, "Unknown");
-
-        assertEquals(false, result);
-    }
+    
 
     @Test
     public void convertExcludedDates() {
