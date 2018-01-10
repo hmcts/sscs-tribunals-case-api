@@ -4,9 +4,9 @@ import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.http.HttpMethod.POST;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,13 +14,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
+
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
-import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
 
 @Service
 public class CcdService {
@@ -32,36 +28,19 @@ public class CcdService {
     private String caseWorkerId;
     private String userToken;
     private String serviceToken;
-    private EmailService emailService;
-    private SubmitYourAppealEmail email;
-    private SubmitYourAppealToCcdCaseTransformer transformer;
+
 
     @Autowired
     CcdService(CoreCaseDataClient coreCaseDataClient, AuthClient authClient,
                IdamClient idamClient,
-               @Value("${ccd.case.worker.id}") String caseWorkerId,
-               EmailService emailService, SubmitYourAppealEmail email,
-               SubmitYourAppealToCcdCaseTransformer transformer) {
+               @Value("${ccd.case.worker.id}") String caseWorkerId) {
         this.coreCaseDataClient = coreCaseDataClient;
         this.authClient = authClient;
         this.idamClient = idamClient;
         this.caseWorkerId = caseWorkerId;
-        this.emailService = emailService;
-        this.email = email;
-        this.transformer = transformer;
     }
 
-    public HttpStatus submitAppeal(SyaCaseWrapper syaCaseWrapper) throws CcdException {
-        CcdCase ccdCase = transformer.convertSyaToCcdCase(syaCaseWrapper);
-
-        emailService.sendEmail(email);
-
-        HttpStatus status = saveCase(ccdCase);
-
-        return status;
-    }
-
-    public HttpStatus saveCase(CcdCase ccdCase) throws CcdException {
+    public HttpStatus createCase(CcdCase ccdCase) throws CcdException {
         ResponseEntity<Object> responseEntity = null;
         try {
             serviceToken = authClient.sendRequest("lease", POST, "");
@@ -110,18 +89,21 @@ public class CcdService {
         return token;
     }
 
-    public ObjectNode generateResponse(String appealNumber, String surname) {
-        //TODO: Check surname is valid for appeal number by checking CCD and update tests
+    public CcdCase findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
 
-        return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
-                findCcdCaseByAppealNumber(appealNumber));
-    }
-
-    public CcdCase findCcdCaseByAppealNumber(String appealNumber) {
-
-        //TODO: Placeholder, implement this properly as part of future story
-        //TODO: Possibly remove this method and call the new DAO class directly?
-        return new CcdCase();
+        ResponseEntity<CcdCase> responseEntity = null;
+        try {
+            serviceToken = authClient.sendRequest("lease", POST, "");
+            userToken = "Bearer " + idamClient.post("testing-support/lease");
+            String url = "caseworkers/%s/jurisdictions/SSCS/case-types/Benefit/cases/%s";
+            String ccdPath = format(url, caseWorkerId, appealNumber);
+            responseEntity = coreCaseDataClient
+                    .get(userToken,serviceToken,ccdPath);
+        } catch (Exception ex) {
+            LOG.error("Error while getting case from ccd", ex);
+            throw new CcdException("Error while getting case from ccd" + ex.getMessage());
+        }
+        return responseEntity.getBody();
     }
 
 }

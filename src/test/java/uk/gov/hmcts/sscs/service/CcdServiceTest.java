@@ -6,12 +6,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,12 +22,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.Appellant;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Name;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -72,7 +69,7 @@ public class CcdServiceTest {
     @Before
     public void setUp() throws Exception {
         ccdService = new CcdService(coreCaseDataClient, authClient,
-                idamClient, CASE_WORKER_ID, emailService, email, transformer);
+                idamClient, CASE_WORKER_ID);
 
         tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
                 + "Benefit/event-triggers/appealReceived/token";
@@ -104,7 +101,7 @@ public class CcdServiceTest {
         appellant.setName(new Name("Mr", "Harry", "Kane"));
         ccdCase.setAppellant(appellant);
 
-        HttpStatus status = ccdService.saveCase(ccdCase);
+        HttpStatus status = ccdService.createCase(ccdCase);
         assertEquals(CREATED, status);
         verify(coreCaseDataClient).sendRequest(eq("Bearer " + userToken),eq(serviceToken),
                 eq(tokenPath), eq(HttpMethod.GET), any(Map.class));
@@ -114,17 +111,29 @@ public class CcdServiceTest {
         assertEquals(ccdCase, captor.getValue().get("data"));
     }
 
-
     @Test
-    public void shouldSendSubmitYourAppealEmail() throws CcdException {
-        SyaCaseWrapper syaCaseWrapper = new SyaCaseWrapper();
+    public void shouldGetCaseFromCcd() throws Exception {
 
         CcdCase ccdCase = new CcdCase();
+        Appeal appeal = new Appeal();
+        appeal.setAppealNumber("567");
+        Appellant appellant = new Appellant();
+        appellant.setName(new Name("Mr", "Harry", "Kane"));
+        ccdCase.setAppeal(appeal);
+        ccdCase.setAppellant(appellant);
 
-        given(transformer.convertSyaToCcdCase(syaCaseWrapper)).willReturn(ccdCase);
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
+                eq(ccdPath)))
+                .willReturn(new ResponseEntity<>(ccdCase, OK));
 
-        ccdService.submitAppeal(syaCaseWrapper);
+        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber("567");
 
-        verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),
+                eq(ccdPath));
+
+        assertEquals(ccdCaseRes, ccdCase);
     }
+
+
 }

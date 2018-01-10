@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.junit.Before;
@@ -24,11 +23,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.sscs.service.TribunalsService;
+
 
 
 
@@ -41,7 +42,7 @@ public class AppealsControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private CcdService ccdService;
+    private TribunalsService tribunalsService;
 
     @Mock
     private SubmitAppealService submitAppealService;
@@ -51,7 +52,7 @@ public class AppealsControllerTest {
 
     @Before
     public void setUp() {
-        controller = new AppealsController(ccdService, submitAppealService);
+        controller = new AppealsController(tribunalsService, submitAppealService);
         mockMvc = standaloneSetup(controller).build();
     }
 
@@ -59,7 +60,7 @@ public class AppealsControllerTest {
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
         doNothing().when(submitAppealService).submitAppeal(any(Map.class),any(String.class));
-        when(ccdService.submitAppeal(any(SyaCaseWrapper.class))).thenReturn(HttpStatus.OK);
+        when(tribunalsService.submitAppeal(any(SyaCaseWrapper.class))).thenReturn(HttpStatus.OK);
 
         String json = getSyaCaseWrapperJson();
 
@@ -68,7 +69,6 @@ public class AppealsControllerTest {
                 .content(json))
                 .andExpect(status().isOk());
     }
-
 
     @Test
     public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
@@ -84,11 +84,11 @@ public class AppealsControllerTest {
     }
 
     @Test(expected = AppealNotFoundException.class)
-    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws IOException {
+    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws Exception {
         //Given
         String appealId = NOT_FOUND_APPEAL_ID;
-        when(ccdService.generateResponse(appealId, null))
-                .thenThrow(new AppealNotFoundException(appealId));
+        when(tribunalsService.findAppeal(appealId, null)).thenThrow(
+                new AppealNotFoundException(appealId));
 
         //When
         controller.getAppeal(appealId, null);
@@ -98,7 +98,7 @@ public class AppealsControllerTest {
     public void testToReturnAppealForGivenAppealNumber() throws Exception {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
-        when(ccdService.generateResponse(APPEAL_ID, null)).thenReturn(node);
+        when(tribunalsService.findAppeal(APPEAL_ID, null)).thenReturn(node);
 
         //When
         ResponseEntity<String> receivedAppeal = controller.getAppeal(APPEAL_ID, null);

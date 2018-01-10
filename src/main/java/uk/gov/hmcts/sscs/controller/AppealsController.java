@@ -23,9 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
-
+import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RestController
 public class AppealsController {
@@ -33,12 +32,12 @@ public class AppealsController {
     public static final String SYA_CASE_WRAPPER = "SyaCaseWrapper";
     public static final String UNDERSCORE = "_";
 
-    private CcdService ccdService;
     private SubmitAppealService submitAppealService;
+    private TribunalsService tribunalsService;
 
     @Autowired
-    public AppealsController(CcdService ccdService, SubmitAppealService submitAppealService) {
-        this.ccdService = ccdService;
+    public AppealsController(TribunalsService tribunalsService, SubmitAppealService submitAppealService) {
+        this.tribunalsService = tribunalsService;
         this.submitAppealService = submitAppealService;
     }
 
@@ -58,8 +57,7 @@ public class AppealsController {
         Map<String,Object> appealData = new HashMap<>();
         appealData.put(SYA_CASE_WRAPPER, syaCaseWrapper);
         submitAppealService.submitAppeal(appealData,appealUniqueIdentifier);
-
-        return status(ccdService.submitAppeal(syaCaseWrapper)).build();
+        return status(tribunalsService.submitAppeal(syaCaseWrapper)).build();
     }
 
     @ApiOperation(value = "getAppeal",
@@ -70,8 +68,8 @@ public class AppealsController {
             produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> getAppeal(
             @PathVariable(value = "appealNumber") String appealNumber,
-            @PathVariable(value = "surname") String surname) {
-        return ok(ccdService.generateResponse(appealNumber, surname).toString());
+            @PathVariable(value = "surname") String surname) throws CcdException {
+        return ok(tribunalsService.findAppeal(appealNumber, surname).toString());
     }
 
     @ApiOperation(value = "getRootContext",
