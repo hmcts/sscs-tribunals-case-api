@@ -18,16 +18,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.service.CcdService;
+import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RestController
 public class AppealsController {
 
-    private CcdService ccdService;
+    private TribunalsService tribunalsService;
 
     @Autowired
-    public AppealsController(CcdService ccdService) {
-        this.ccdService = ccdService;
+    public AppealsController(TribunalsService tribunalsService) {
+        this.tribunalsService = tribunalsService;
     }
 
     @ApiOperation(value = "submitAppeal",
@@ -38,7 +38,7 @@ public class AppealsController {
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper)
             throws CcdException {
-        return status(ccdService.submitAppeal(syaCaseWrapper)).build();
+        return status(tribunalsService.submitAppeal(syaCaseWrapper)).build();
     }
 
     @ApiOperation(value = "getAppeal",
@@ -49,8 +49,8 @@ public class AppealsController {
             produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> getAppeal(
             @PathVariable(value = "appealNumber") String appealNumber,
-            @PathVariable(value = "surname") String surname) {
-        return ok(ccdService.generateResponse(appealNumber, surname).toString());
+            @PathVariable(value = "surname") String surname) throws CcdException {
+        return ok(tribunalsService.findAppeal(appealNumber, surname).toString());
     }
 
     @ApiOperation(value = "getRootContext",

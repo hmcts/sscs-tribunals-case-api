@@ -5,12 +5,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,11 +25,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
 import uk.gov.hmcts.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaAppellant;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
-import uk.gov.hmcts.sscs.service.CcdService;
+import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TribunalsCaseApiApplication.class)
@@ -49,7 +51,7 @@ public class AppealsControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private CcdService ccdService;
+    private TribunalsService tribunalsService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;
@@ -58,8 +60,8 @@ public class AppealsControllerTest {
 
     @Before
     public void setUp() {
-        controller = new AppealsController(ccdService);
-        mockMvc = webAppContextSetup(webApplicationContext).build();
+
+        controller = new AppealsController(tribunalsService);
 
         SyaAppellant appellant = new SyaAppellant();
         appellant.setFirstName("Paul");
@@ -69,20 +71,20 @@ public class AppealsControllerTest {
 
     @Test
     public void shouldCreateNewAppeals() throws Exception {
-        when(ccdService.submitAppeal(syaCaseWrapper)).thenReturn(HttpStatus.CREATED);
+        when(tribunalsService.submitAppeal(syaCaseWrapper)).thenReturn(HttpStatus.CREATED);
 
         ResponseEntity<?> entity = controller.createAppeals(syaCaseWrapper);
 
-        verify(ccdService).submitAppeal(syaCaseWrapper);
+        verify(tribunalsService).submitAppeal(syaCaseWrapper);
 
         assertEquals(HttpStatus.CREATED, entity.getStatusCode());
     }
 
     @Test(expected = AppealNotFoundException.class)
-    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws IOException {
+    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws Exception {
         //Given
         String appealId = NOT_FOUND_APPEAL_ID;
-        when(ccdService.generateResponse(appealId, null)).thenThrow(
+        when(tribunalsService.findAppeal(appealId, null)).thenThrow(
                 new AppealNotFoundException(appealId));
 
         //When
@@ -93,7 +95,7 @@ public class AppealsControllerTest {
     public void testToReturnAppealForGivenAppealNumber() throws Exception {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
-        when(ccdService.generateResponse(APPEAL_ID, null)).thenReturn(node);
+        when(tribunalsService.findAppeal(APPEAL_ID, null)).thenReturn(node);
 
         //When
         ResponseEntity<String> receivedAppeal = controller.getAppeal(APPEAL_ID, null);
