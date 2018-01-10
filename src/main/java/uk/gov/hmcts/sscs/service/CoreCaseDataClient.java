@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.exception.CcdException;
 
 @Service
@@ -68,4 +70,21 @@ public class CoreCaseDataClient {
             throw new CcdException("Error while POSTing new case to CCD api: " + ex.getMessage());
         }
     }
+
+    public ResponseEntity<CcdCase> get(String userToken, String serviceToken, String path) throws CcdException {
+        try {
+            MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+            headers.add("Authorization", userToken);
+            headers.add("ServiceAuthorization", serviceToken);
+            headers.add("Content-Type", "application/json");
+            String url = ccdApiUrl + path;
+            System.out.println("####            Header Details    ############\n" + headers.toString());
+            ResponseEntity<CcdCase> responseEntity = restTemplate.getForEntity(url, CcdCase.class);
+            return responseEntity;
+        } catch (Exception ex) {
+            LOG.error("Error while getting a case from CCD api: ", ex);
+            throw new CcdException("Error while getting a case from CCD api: " + ex.getMessage());
+        }
+    }
+
 }

@@ -49,8 +49,8 @@ public class AppealsController {
             produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> getAppeal(
             @PathVariable(value = "appealNumber") String appealNumber,
-            @PathVariable(value = "surname") String surname) {
-        return ok(tribunalsService.generateResponse(appealNumber, surname).toString());
+            @PathVariable(value = "surname") String surname) throws CcdException {
+        return ok(tribunalsService.findAppeal(appealNumber, surname).toString());
     }
 
     @ApiOperation(value = "getRootContext",

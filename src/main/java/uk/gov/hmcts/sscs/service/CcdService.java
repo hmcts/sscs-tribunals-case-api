@@ -89,11 +89,21 @@ public class CcdService {
         return token;
     }
 
-    public CcdCase findCcdCaseByAppealNumber(String appealNumber) {
+    public CcdCase findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
 
-        //TODO: Placeholder, implement this properly as part of future story
-        //TODO: Possibly remove this method and call the new DAO class directly?
-        return new CcdCase();
+        ResponseEntity<CcdCase> responseEntity = null;
+        try {
+            serviceToken = authClient.sendRequest("lease", POST, "");
+            userToken = "Bearer " + idamClient.post("testing-support/lease");
+            String url = "caseworkers/%s/jurisdictions/SSCS/case-types/Benefit/cases/%s";
+            String ccdPath = format(url, caseWorkerId, appealNumber);
+            responseEntity = coreCaseDataClient
+                    .get(userToken,serviceToken,ccdPath);
+        } catch (Exception ex) {
+            LOG.error("Error while getting case from ccd", ex);
+            throw new CcdException("Error while getting case from ccd" + ex.getMessage());
+        }
+        return responseEntity.getBody();
     }
 
 }

@@ -23,6 +23,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.Appellant;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Name;
@@ -108,6 +109,30 @@ public class CcdServiceTest {
                 eq(ccdPath), captor.capture());
 
         assertEquals(ccdCase, captor.getValue().get("data"));
+    }
+
+    @Test
+    public void shouldGetCaseFromCcd() throws Exception {
+
+        CcdCase ccdCase = new CcdCase();
+        Appeal appeal = new Appeal();
+        appeal.setAppealNumber("567");
+        Appellant appellant = new Appellant();
+        appellant.setName(new Name("Mr", "Harry", "Kane"));
+        ccdCase.setAppeal(appeal);
+        ccdCase.setAppellant(appellant);
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
+                eq(ccdPath)))
+                .willReturn(new ResponseEntity<>(ccdCase, OK));
+
+        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber("567");
+
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),
+                eq(ccdPath));
+
+        assertEquals(ccdCaseRes, ccdCase);
     }
 
 

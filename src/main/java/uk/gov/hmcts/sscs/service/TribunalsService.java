@@ -45,12 +45,12 @@ public class TribunalsService {
         return status;
     }
     
-    public ObjectNode generateResponse(String appealNumber, String surname) {
+    public ObjectNode findAppeal(String appealNumber, String surname) throws CcdException {
         //TODO: Check surname is valid for appeal number by checking CCD and update tests
 
         return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
                 ccdService.findCcdCaseByAppealNumber(appealNumber));
-    }    
+    }
 
 
 }

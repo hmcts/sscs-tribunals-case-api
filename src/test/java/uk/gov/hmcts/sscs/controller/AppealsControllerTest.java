@@ -81,10 +81,10 @@ public class AppealsControllerTest {
     }
 
     @Test(expected = AppealNotFoundException.class)
-    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws IOException {
+    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws Exception {
         //Given
         String appealId = NOT_FOUND_APPEAL_ID;
-        when(tribunalsService.generateResponse(appealId, null)).thenThrow(
+        when(tribunalsService.findAppeal(appealId, null)).thenThrow(
                 new AppealNotFoundException(appealId));
 
         //When
@@ -95,7 +95,7 @@ public class AppealsControllerTest {
     public void testToReturnAppealForGivenAppealNumber() throws Exception {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
-        when(tribunalsService.generateResponse(APPEAL_ID, null)).thenReturn(node);
+        when(tribunalsService.findAppeal(APPEAL_ID, null)).thenReturn(node);
 
         //When
         ResponseEntity<String> receivedAppeal = controller.getAppeal(APPEAL_ID, null);
