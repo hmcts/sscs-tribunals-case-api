@@ -78,7 +78,6 @@ public class CoreCaseDataClient {
             headers.add("ServiceAuthorization", serviceToken);
             headers.add("Content-Type", "application/json");
             String url = ccdApiUrl + path;
-            System.out.println("####            Header Details    ############\n" + headers.toString());
             ResponseEntity<CcdCase> responseEntity = restTemplate.getForEntity(url, CcdCase.class);
             return responseEntity;
         } catch (Exception ex) {
