@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.json;
+package uk.gov.hmcts.sscs.transform.serialize;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,9 +9,9 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 
-public class CcdCaseSerializerTest {
+public class TrackYourAppealJsonFromCcdCaseSerializerTest {
 
-    private CcdCaseSerializer ccdCaseSerializer;
+    private TrackYourAppealJsonFromCcdCaseSerializer serializer;
     private Appeal appeal;
     private Appellant appellant;
     private String caseReference;
@@ -39,7 +39,7 @@ public class CcdCaseSerializerTest {
         ccdCase = new CcdCase(appeal, appellant, null, null, null, caseReference,
             EventType.APPEAL_RECEIVED, Arrays.asList(event1));
 
-        ccdCaseSerializer = new CcdCaseSerializer(CcdCase.class);
+        serializer = new TrackYourAppealJsonFromCcdCaseSerializer(CcdCase.class);
     }
 
     private void buildPartialCaseData() {
@@ -58,7 +58,7 @@ public class CcdCaseSerializerTest {
         ccdCase = new CcdCase(appeal, appellant, null, null, null, caseReference,
                 EventType.DORMANT, Arrays.asList(event1));
 
-        ccdCaseSerializer = new CcdCaseSerializer(CcdCase.class);
+        serializer = new TrackYourAppealJsonFromCcdCaseSerializer(CcdCase.class);
     }
 
     private void buildMultipleEventData() {
@@ -70,7 +70,7 @@ public class CcdCaseSerializerTest {
         ccdCase = new CcdCase(null, null, null, null, null, null, null,
                 Arrays.asList(event1, event2));
 
-        ccdCaseSerializer = new CcdCaseSerializer(CcdCase.class);
+        serializer = new TrackYourAppealJsonFromCcdCaseSerializer(CcdCase.class);
     }
 
     @Test
@@ -111,7 +111,7 @@ public class CcdCaseSerializerTest {
                     .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss'Z'")) + "\""
             + "}]}";
 
-        JSONAssert.assertEquals(expected, ccdCaseSerializer.handle(ccdCase), true);
+        JSONAssert.assertEquals(expected, serializer.handle(ccdCase), true);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class CcdCaseSerializerTest {
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss'Z'")) + "\""
             + "}]}";
 
-        JSONAssert.assertEquals(expected, ccdCaseSerializer.handle(ccdCase), true);
+        JSONAssert.assertEquals(expected, serializer.handle(ccdCase), true);
     }
 
     @Test
@@ -159,6 +159,6 @@ public class CcdCaseSerializerTest {
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss'Z'")) + "\""
             + "}]}";
 
-        JSONAssert.assertEquals(expected, ccdCaseSerializer.handle(ccdCase), true);
+        JSONAssert.assertEquals(expected, serializer.handle(ccdCase), true);
     }
 }

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.transform;
+package uk.gov.hmcts.sscs.transform.deserialize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,7 @@ import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.domain.wrapper.*;
 
 @Service
-public class SubmitYourAppealToCcdCaseTransformer {
+public class SubmitYourAppealToCcdCaseDeserializer {
 
     public CcdCase convertSyaToCcdCase(SyaCaseWrapper syaCaseWrapper) {
 
