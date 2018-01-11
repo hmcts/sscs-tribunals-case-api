@@ -88,7 +88,7 @@ jar {
 sonarqube {
     properties {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
-        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/tribunals/domain/corecase/*"
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/corecase/*"
     }
 }
 
