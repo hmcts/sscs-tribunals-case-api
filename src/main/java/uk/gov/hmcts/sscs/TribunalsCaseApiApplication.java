@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.sscs.json.CcdCaseDeserializer;
 
 @SpringBootApplication
 public class TribunalsCaseApiApplication {
@@ -29,11 +28,6 @@ public class TribunalsCaseApiApplication {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
-    }
-
-    @Bean
-    public CcdCaseDeserializer ccdCaseDeserializer() {
-        return new CcdCaseDeserializer();
     }
 
     @Bean

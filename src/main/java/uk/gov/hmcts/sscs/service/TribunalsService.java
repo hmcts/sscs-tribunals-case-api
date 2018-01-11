@@ -14,7 +14,7 @@ import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
+import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
 
 @Service
 public class TribunalsService {
@@ -23,12 +23,12 @@ public class TribunalsService {
     private CcdService ccdService;
     private EmailService emailService;
     private SubmitYourAppealEmail email;
-    private SubmitYourAppealToCcdCaseTransformer transformer;
+    private SubmitYourAppealToCcdCaseDeserializer transformer;
 
     @Autowired
     TribunalsService(CcdService ccdService,
-               EmailService emailService, SubmitYourAppealEmail email,
-               SubmitYourAppealToCcdCaseTransformer transformer) {
+                     EmailService emailService, SubmitYourAppealEmail email,
+                     SubmitYourAppealToCcdCaseDeserializer transformer) {
         this.ccdService = ccdService;
         this.emailService = emailService;
         this.email = email;

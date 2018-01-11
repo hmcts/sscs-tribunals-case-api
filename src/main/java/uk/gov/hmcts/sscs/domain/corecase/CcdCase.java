@@ -4,14 +4,11 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import uk.gov.hmcts.sscs.json.CcdCaseDeserializer;
 
-@JsonDeserialize(using = CcdCaseDeserializer.class)
 public class CcdCase {
 
     private Appeal appeal;

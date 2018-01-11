@@ -42,7 +42,7 @@ public class AppealsController {
     }
 
     @ApiOperation(value = "submitAppeal",
-        notes = "Creates an appeal from the SYA case details",
+        notes = "Creates a case from the SYA details",
         response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Submitted appeal successfully",
             response = String.class)})
