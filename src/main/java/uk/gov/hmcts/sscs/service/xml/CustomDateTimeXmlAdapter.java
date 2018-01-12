@@ -3,7 +3,6 @@ package uk.gov.hmcts.sscs.service.xml;
 import com.migesok.jaxb.adapter.javatime.TemporalAccessorXmlAdapter;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**

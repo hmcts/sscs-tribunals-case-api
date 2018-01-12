@@ -7,7 +7,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPath;
@@ -337,8 +336,6 @@ public class RoboticsXmlUtil {
             // StreamResult result = new StreamResult(new File("C:\\file.xml"));
             // transformer.transform(source, result);
         } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
-        } catch (TransformerException e) {
             e.printStackTrace();
         }
     }

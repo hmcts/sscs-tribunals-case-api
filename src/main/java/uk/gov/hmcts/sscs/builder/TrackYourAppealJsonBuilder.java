@@ -11,6 +11,10 @@ import uk.gov.hmcts.sscs.domain.corecase.Event;
 
 public class TrackYourAppealJsonBuilder {
 
+    private TrackYourAppealJsonBuilder() {
+
+    }
+
     public static ObjectNode buildTrackYourAppealJson(CcdCase ccdCase) {
 
 
