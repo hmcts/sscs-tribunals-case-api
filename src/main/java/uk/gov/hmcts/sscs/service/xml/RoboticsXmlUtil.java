@@ -1,68 +1,51 @@
 package uk.gov.hmcts.sscs.service.xml;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-
-import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 
+import static uk.gov.hmcts.sscs.model.AppConstants.EMAIL;
+import static uk.gov.hmcts.sscs.model.AppConstants.PHONE;
 
 public class RoboticsXmlUtil {
 
-    private static final Logger LOG = getLogger(RoboticsXmlUtil.class);
+    public Document convertToXml(CcdCase ccdCase) throws ParserConfigurationException {
 
-    public Document convertToXml(CcdCase ccdCase) {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
-        try {
-            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+        Element rootElement = doc.createElement("ccdCase");
+        doc.appendChild(rootElement);
 
-            Document doc = docBuilder.newDocument();
-            Element rootElement = doc.createElement("ccdCase");
-            doc.appendChild(rootElement);
-
-            if (ccdCase.getAppeal() != null) {
-                rootElement.appendChild(buildAppealElement(doc, ccdCase.getAppeal()));
-            }
-
-            if (ccdCase.getAppellant() != null) {
-                rootElement.appendChild(buildAppellantElement(doc, ccdCase.getAppellant()));
-            }
-
-            if (ccdCase.getAppointee() != null) {
-                rootElement.appendChild(buildAppointeeElement(doc, ccdCase.getAppointee()));
-            }
-
-            if (ccdCase.getRepresentative() != null) {
-                rootElement.appendChild(buildRepresentativeElement(doc, ccdCase.getRepresentative()));
-            }
-
-            if (ccdCase.getHearing() != null) {
-                rootElement.appendChild(buildHearingElement(doc, ccdCase.getHearing()));
-            }
-
-            createXmlFile(doc);
-
-            return doc;
-
-        } catch (ParserConfigurationException pce) {
-            LOG.error("CcdCase to XML parser exception", pce);
+        if (ccdCase.getAppeal() != null) {
+            rootElement.appendChild(buildAppealElement(doc, ccdCase.getAppeal()));
         }
-        return null;
+
+        if (ccdCase.getAppellant() != null) {
+            rootElement.appendChild(buildAppellantElement(doc, ccdCase.getAppellant()));
+        }
+
+        if (ccdCase.getAppointee() != null) {
+            rootElement.appendChild(buildAppointeeElement(doc, ccdCase.getAppointee()));
+        }
+
+        if (ccdCase.getRepresentative() != null) {
+            rootElement.appendChild(buildRepresentativeElement(doc, ccdCase.getRepresentative()));
+        }
+
+        if (ccdCase.getHearing() != null) {
+            rootElement.appendChild(buildHearingElement(doc, ccdCase.getHearing()));
+        }
+
+        createXmlFileStub(doc);
+
+        return doc;
     }
 
     private Element buildAppealElement(Document doc, Appeal appeal) {
@@ -113,13 +96,13 @@ public class RoboticsXmlUtil {
         }
 
         if (appellant.getEmail() != null) {
-            Element emailElement = doc.createElement("email");
+            Element emailElement = doc.createElement(EMAIL);
             emailElement.appendChild(doc.createTextNode(appellant.getEmail()));
             appellantElement.appendChild(emailElement);
         }
 
         if (appellant.getPhone() != null) {
-            Element phoneElement = doc.createElement("phone");
+            Element phoneElement = doc.createElement(PHONE);
             phoneElement.appendChild(doc.createTextNode(appellant.getPhone()));
             appellantElement.appendChild(phoneElement);
         }
@@ -151,13 +134,13 @@ public class RoboticsXmlUtil {
         }
 
         if (appointee.getEmail() != null) {
-            Element emailElement = doc.createElement("email");
+            Element emailElement = doc.createElement(EMAIL);
             emailElement.appendChild(doc.createTextNode(appointee.getEmail()));
             appointeeElement.appendChild(emailElement);
         }
 
         if (appointee.getPhone() != null) {
-            Element phoneElement = doc.createElement("phone");
+            Element phoneElement = doc.createElement(PHONE);
             phoneElement.appendChild(doc.createTextNode(appointee.getPhone()));
             appointeeElement.appendChild(phoneElement);
         }
@@ -177,13 +160,13 @@ public class RoboticsXmlUtil {
         }
 
         if (representative.getEmail() != null) {
-            Element emailElement = doc.createElement("email");
+            Element emailElement = doc.createElement(EMAIL);
             emailElement.appendChild(doc.createTextNode(representative.getEmail()));
             representativeElement.appendChild(emailElement);
         }
 
         if (representative.getPhone() != null) {
-            Element phoneElement = doc.createElement("phone");
+            Element phoneElement = doc.createElement(PHONE);
             phoneElement.appendChild(doc.createTextNode(representative.getPhone()));
             representativeElement.appendChild(phoneElement);
         }
@@ -206,29 +189,21 @@ public class RoboticsXmlUtil {
             hearingElement.appendChild(additionalInformationElement);
         }
 
-        if (hearing.getHasDisabilityNeedsForXml() != null) {
-            Element hasDisabilityNeedsElement = doc.createElement("hasDisabilityNeeds");
-            hasDisabilityNeedsElement.appendChild(doc.createTextNode(hearing.getHasDisabilityNeedsForXml()));
-            hearingElement.appendChild(hasDisabilityNeedsElement);
-        }
+        Element hasDisabilityNeedsElement = doc.createElement("hasDisabilityNeeds");
+        hasDisabilityNeedsElement.appendChild(doc.createTextNode(hearing.getHasDisabilityNeedsForXml()));
+        hearingElement.appendChild(hasDisabilityNeedsElement);
 
-        if (hearing.getHearingLoopRequiredForXml() != null) {
-            Element hearingLoopRequiredElement = doc.createElement("hearingLoopRequired");
-            hearingLoopRequiredElement.appendChild(doc.createTextNode(hearing.getHearingLoopRequiredForXml()));
-            hearingElement.appendChild(hearingLoopRequiredElement);
-        }
+        Element hearingLoopRequiredElement = doc.createElement("hearingLoopRequired");
+        hearingLoopRequiredElement.appendChild(doc.createTextNode(hearing.getHearingLoopRequiredForXml()));
+        hearingElement.appendChild(hearingLoopRequiredElement);
 
-        if (hearing.getLanguageInterpreterRequiredForXml() != null) {
-            Element languageInterpreterRequiredElement = doc.createElement("languageInterpreterRequired");
-            languageInterpreterRequiredElement.appendChild(doc.createTextNode(hearing.getLanguageInterpreterRequiredForXml()));
-            hearingElement.appendChild(languageInterpreterRequiredElement);
-        }
+        Element languageInterpreterRequiredElement = doc.createElement("languageInterpreterRequired");
+        languageInterpreterRequiredElement.appendChild(doc.createTextNode(hearing.getLanguageInterpreterRequiredForXml()));
+        hearingElement.appendChild(languageInterpreterRequiredElement);
 
-        if (hearing.getSignLanguageRequiredForXml() != null) {
-            Element signLanguageRequiredElement = doc.createElement("signLanguageRequired");
-            signLanguageRequiredElement.appendChild(doc.createTextNode(hearing.getSignLanguageRequiredForXml()));
-            hearingElement.appendChild(signLanguageRequiredElement);
-        }
+        Element signLanguageRequiredElement = doc.createElement("signLanguageRequired");
+        signLanguageRequiredElement.appendChild(doc.createTextNode(hearing.getSignLanguageRequiredForXml()));
+        hearingElement.appendChild(signLanguageRequiredElement);
 
         if (hearing.getTribunalType() != null) {
             Element tribunalTypeElement = doc.createElement("tribunalType");
@@ -331,37 +306,7 @@ public class RoboticsXmlUtil {
         return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
-    public void createXmlFile(Document doc) {
-
-        try {
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-
-            DOMSource source = new DOMSource(doc);
-
-            // TODO: Write this to a real file and send to robotics
-            // StreamResult result = new StreamResult(new File("C:\\file.xml"));
-            // transformer.transform(source, result);
-        } catch (TransformerConfigurationException e) {
-            LOG.error("XML transformation error", e);
-        }
-    }
-
-    public String extractValue(Document doc, String xpathExpression) {
-        String actual;
-        try {
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setNamespaceAware(true);
-            documentBuilderFactory.setIgnoringElementContentWhitespace(true);
-
-            XPathFactory factory = XPathFactory.newInstance();
-            XPath xpath = factory.newXPath();
-
-            actual = xpath.evaluate(xpathExpression, doc, XPathConstants.STRING).toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        return actual;
+    public void createXmlFileStub(Document doc) {
+        //This is a stub - implement when robotics file is ready to send
     }
 }
