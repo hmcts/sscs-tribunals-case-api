@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.sscs.email.Email;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
@@ -39,7 +38,6 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(Map<String, Object> appeal, String appellantUniqueId) {
-        Email email = null;
         try {
             InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
             byte[] template = IOUtils.toByteArray(in);

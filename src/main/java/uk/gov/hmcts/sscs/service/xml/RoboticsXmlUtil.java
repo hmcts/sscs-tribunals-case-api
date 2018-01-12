@@ -1,5 +1,7 @@
 package uk.gov.hmcts.sscs.service.xml;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.xml.parsers.DocumentBuilder;
@@ -12,11 +14,16 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+
+import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 
+
 public class RoboticsXmlUtil {
+
+    private static final Logger LOG = getLogger(RoboticsXmlUtil.class);
 
     public Document convertToXml(CcdCase ccdCase) {
 
@@ -53,7 +60,7 @@ public class RoboticsXmlUtil {
             return doc;
 
         } catch (ParserConfigurationException pce) {
-            pce.printStackTrace();
+            LOG.error("CcdCase to XML parser exception", pce);
         }
         return null;
     }
@@ -336,7 +343,7 @@ public class RoboticsXmlUtil {
             // StreamResult result = new StreamResult(new File("C:\\file.xml"));
             // transformer.transform(source, result);
         } catch (TransformerConfigurationException e) {
-            e.printStackTrace();
+            LOG.error("XML transformation error", e);
         }
     }
 
