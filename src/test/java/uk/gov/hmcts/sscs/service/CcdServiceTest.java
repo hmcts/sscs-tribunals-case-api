@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.Appellant;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
 import uk.gov.hmcts.sscs.domain.corecase.Name;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
@@ -122,10 +123,13 @@ public class CcdServiceTest {
         ccdCase.setAppeal(appeal);
         ccdCase.setAppellant(appellant);
 
+        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
+        ccdCaseResponse.setCaseData(ccdCase);
+
         ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
         given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
                 eq(ccdPath)))
-                .willReturn(new ResponseEntity<>(ccdCase, OK));
+                .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
 
         CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber("567");
 

@@ -10,6 +10,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +22,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -34,6 +37,10 @@ public class CoreCaseDataClientTest {
 
     private CoreCaseDataClient coreCaseDataClient;
 
+    private final String ccdUrl = "https://localhost:4451/caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
+
+    private final String path = "caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
+
     @Before
     public void setUp() {
         coreCaseDataClient = new CoreCaseDataClient("https://localhost:4451/",restTemplate);
@@ -41,14 +48,13 @@ public class CoreCaseDataClientTest {
 
     @Test
     public void shouldCallAuthApiWithGivenRequestParams() throws Exception {
-        String ccdUrl = "https://localhost:4451/caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
-        String responseXml = "{\"id\": 113,\"jurisdiction\": \"SSCS\","
+        String jsonResponse = "{\"id\": 113,\"jurisdiction\": \"SSCS\","
                 +
                 "\"state\": \"ResponseRequested\",\"case_type_id\": \"Benefit\"";
         given(restTemplate.exchange(eq(ccdUrl), eq(GET), any(HttpEntity.class), eq(Object.class)))
-                .willReturn(new ResponseEntity<>(responseXml, OK));
+                .willReturn(new ResponseEntity<>(jsonResponse, OK));
 
-        String path = "caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
+
         Map<String,Object> body = new HashMap<>();
         body.put("data","{\"id\":\"123\"}");
 
@@ -58,7 +64,7 @@ public class CoreCaseDataClientTest {
         verify(restTemplate).exchange(eq(ccdUrl), eq(GET), captor.capture(), eq(Object.class));
         MultiValueMap<String, String> headers = captor.getValue().getHeaders();
 
-        assertEquals(responseXml, responseEntity.getBody());
+        assertEquals(jsonResponse, responseEntity.getBody());
         assertEquals("dfwfwef",headers.getFirst("Authorization"));
         assertEquals("sdsvsdfvs",headers.getFirst("ServiceAuthorization"));
         assertEquals("application/json", headers.getFirst("Content-Type"));
@@ -66,17 +72,29 @@ public class CoreCaseDataClientTest {
 
     @Test(expected = CcdException.class)
     public void shouldHandleException() throws Exception {
-        String ccdUrl = "https://localhost:4451/caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
-        String responseXml = "{\"id\": 113,\"jurisdiction\": \"SSCS\","
-                +
-                "\"state\": \"ResponseRequested\",\"case_type_id\": \"Benefit\"";
         given(restTemplate.exchange(eq(ccdUrl), eq(GET), any(HttpEntity.class), eq(Object.class)))
                 .willThrow(new RuntimeException("Error"));
 
-        String path = "caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
         Map<String,Object> body = new HashMap<>();
         body.put("data","{\"id\":\"123\"}");
 
         coreCaseDataClient.sendRequest("dfwfwef","sdsvsdfvs",path,GET,body);
+    }
+
+    @Test
+    public void shouldCallAuthApiWithGivenRequestParamsForGet() throws Exception {
+        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
+        ccdCaseResponse.setId(113);
+        ccdCaseResponse.setJurisdiction("SSCS");
+
+        given(restTemplate.getForEntity(eq(ccdUrl), eq(CcdCaseResponse.class)))
+                .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
+
+        ResponseEntity<CcdCaseResponse> responseEntity
+                = coreCaseDataClient.get("dfwfwef","sdsvsdfvs",path);
+
+        verify(restTemplate).getForEntity(eq(ccdUrl), eq(CcdCaseResponse.class));
+
+        assertEquals(ccdCaseResponse, responseEntity.getBody());
     }
 }
