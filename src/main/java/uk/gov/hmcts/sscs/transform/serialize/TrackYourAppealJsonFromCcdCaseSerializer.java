@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.json;
+package uk.gov.hmcts.sscs.transform.serialize;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,13 +15,13 @@ import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Event;
 
 
-class CcdCaseSerializer extends StdSerializer<CcdCase> {
+class TrackYourAppealJsonFromCcdCaseSerializer extends StdSerializer<CcdCase> {
 
-    private static final Logger log = LoggerFactory.getLogger(CcdCaseSerializer.class);
+    private static final Logger log = LoggerFactory.getLogger(TrackYourAppealJsonFromCcdCaseSerializer.class);
 
     private ObjectMapper mapper;
 
-    public CcdCaseSerializer(Class<CcdCase> t) {
+    public TrackYourAppealJsonFromCcdCaseSerializer(Class<CcdCase> t) {
         super(t);
 
         mapper = new ObjectMapper();

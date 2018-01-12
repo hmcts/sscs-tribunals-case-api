@@ -6,23 +6,14 @@ import static org.junit.Assert.assertThat;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class TrackYourAppealJsonBuilderTest {
-
-    TrackYourAppealJsonBuilder builder;
-
-    @Before
-    public void setUp() {
-        builder = new TrackYourAppealJsonBuilder();
-    }
 
     @Test
     public void buildJsonFromCcdCase() throws JSONException {
@@ -71,7 +62,7 @@ public class TrackYourAppealJsonBuilderTest {
         ccdCase.buildLatestEvents();
         ccdCase.buildHistoricalEvents();
 
-        ObjectNode result = builder.buildTrackYourAppealJson(ccdCase);
+        ObjectNode result = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(ccdCase);
 
         JsonNode caseNodeResult = result.get("appeal");
 

@@ -4,17 +4,12 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailSendException;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.email.Email;

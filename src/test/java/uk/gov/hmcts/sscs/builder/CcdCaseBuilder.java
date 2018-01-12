@@ -7,6 +7,10 @@ import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class CcdCaseBuilder {
 
+    private CcdCaseBuilder() {
+
+    }
+
     public static Appeal appeal() {
         return new Appeal(Benefit.UNIVERSAL_CREDIT, "Birmingham2 SSO",
                 convertJsonStringIntoDate("2", "9", "2017"),  LocalDate.now(), "Yes", "12345");

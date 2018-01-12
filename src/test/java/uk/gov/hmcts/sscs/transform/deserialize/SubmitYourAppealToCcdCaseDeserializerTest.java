@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.transform;
+package uk.gov.hmcts.sscs.transform.deserialize;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -10,10 +10,11 @@ import org.junit.Test;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.ExcludeDates;
 import uk.gov.hmcts.sscs.domain.wrapper.*;
+import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
 
-public class SubmitYourAppealToCcdCaseTransformerTest {
+public class SubmitYourAppealToCcdCaseDeserializerTest {
 
-    private SubmitYourAppealToCcdCaseTransformer transformer;
+    private SubmitYourAppealToCcdCaseDeserializer transformer;
     private SyaCaseWrapper testData;
     private SyaAppellant appellant;
     private SyaReasonsForAppealing reasonsForAppealing;
@@ -24,7 +25,7 @@ public class SubmitYourAppealToCcdCaseTransformerTest {
 
     @Before
     public void setup() {
-        transformer = new SubmitYourAppealToCcdCaseTransformer();
+        transformer = new SubmitYourAppealToCcdCaseDeserializer();
         testData();
     }
 

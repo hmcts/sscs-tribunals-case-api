@@ -14,7 +14,7 @@ import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.transform.SubmitYourAppealToCcdCaseTransformer;
+import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
@@ -31,7 +31,7 @@ public class TribunalsServiceTest {
             "to@hmcts.net", "Your appeal", "Your appeal has been created");
 
     @Mock
-    private SubmitYourAppealToCcdCaseTransformer transformer;
+    private SubmitYourAppealToCcdCaseDeserializer transformer;
 
     @Before
     public void setUp() throws Exception {

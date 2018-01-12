@@ -7,6 +7,10 @@ import uk.gov.hmcts.sscs.domain.corecase.*;
 
 public class SubmitYourAppealJsonBuilder {
 
+    private SubmitYourAppealJsonBuilder() {
+
+    }
+
     public static JSONObject convertAppeal(Appeal appeal) {
         return new JSONObject(new HashMap<String, Object>() {{
                 put("BenefitType_benefitType", appeal.getBenefit().getType());
