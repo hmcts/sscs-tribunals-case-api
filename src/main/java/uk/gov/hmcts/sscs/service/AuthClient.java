@@ -26,7 +26,7 @@ public class AuthClient {
 
     @Autowired
     AuthClient(@Value("${sscs.idam.key}") String idamKey,
-               @Value("${auth.provider.service.api}") String authApiUrl,
+               @Value("${auth.provider.service.api.url}") String authApiUrl,
                OtpGenerator otpGenerator, RestTemplate restTemplate) {
         this.idamKey = idamKey;
         this.otpGenerator = otpGenerator;

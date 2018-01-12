@@ -24,7 +24,7 @@ public class IdamClient {
 
     @Autowired
     IdamClient(@Value("${idam.user.id}") String userId,
-               @Value("${idam.api}") String idamApiUrl,
+               @Value("${idam.api.url}") String idamApiUrl,
                @Value("${idam.role}") String role,
                RestTemplate restTemplate) {
         this.userId = userId;
