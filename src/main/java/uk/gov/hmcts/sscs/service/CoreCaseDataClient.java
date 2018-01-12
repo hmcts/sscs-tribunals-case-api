@@ -25,7 +25,7 @@ public class CoreCaseDataClient {
     private RestTemplate restTemplate;
 
     @Autowired
-    CoreCaseDataClient(@Value("${ccd.service.api}") String ccdApiUrl, RestTemplate restTemplate) {
+    CoreCaseDataClient(@Value("${ccd.service.api.url}") String ccdApiUrl, RestTemplate restTemplate) {
         this.ccdApiUrl = ccdApiUrl;
         this.restTemplate = restTemplate;
     }
