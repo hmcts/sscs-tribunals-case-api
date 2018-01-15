@@ -40,7 +40,7 @@ public class CoreCaseDataClient {
                                       String serviceToken,
                                       String path,
                                       HttpMethod httpMethod,
-                                              Map<String,Object> requestBody) throws CcdException {
+                                      Map<String,Object> requestBody) throws CcdException {
         try {
             HttpEntity requestEntity = new HttpEntity(requestBody, buildCcdHeader(userToken, serviceToken));
             String url = ccdApiUrl + path;
