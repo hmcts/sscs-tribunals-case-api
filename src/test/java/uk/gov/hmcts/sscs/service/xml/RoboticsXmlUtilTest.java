@@ -1,5 +1,8 @@
 package uk.gov.hmcts.sscs.service.xml;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -12,9 +15,6 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import uk.gov.hmcts.sscs.builder.CcdCaseBuilder;
 import uk.gov.hmcts.sscs.domain.corecase.*;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 public class RoboticsXmlUtilTest {
 
@@ -183,7 +183,7 @@ public class RoboticsXmlUtilTest {
     @Test
     public void ignoreNullExcludeStartDate() throws ParserConfigurationException, XPathExpressionException {
         Hearing hearing = new Hearing(null, null, null, null, null, null, new ExcludeDates[]{
-                new ExcludeDates(null, "November 12th")});
+            new ExcludeDates(null, "November 12th")});
 
         CcdCase ccdCase = new CcdCase(null, null, null, null,
                 new ArrayList<Hearing>() {
@@ -207,7 +207,7 @@ public class RoboticsXmlUtilTest {
     public void ignoreNullExcludeEndDate() throws ParserConfigurationException, XPathExpressionException {
 
         Hearing hearing = new Hearing(null, null, null, null, null, null, new ExcludeDates[]{
-                new ExcludeDates("November 5th", null)});
+            new ExcludeDates("November 5th", null)});
 
         CcdCase ccdCase = new CcdCase(null, null, null, null,
                 new ArrayList<Hearing>() {
@@ -265,7 +265,7 @@ public class RoboticsXmlUtilTest {
 
         Document xml = xmlUtil.convertToXml(ccdCase);
 
-        assertThat(extractValue(xml, "/ccdCase/hearing" ), is(""));
+        assertThat(extractValue(xml, "/ccdCase/hearing"), is(""));
     }
 
     @Test
@@ -290,11 +290,11 @@ public class RoboticsXmlUtilTest {
 
         Document xml = xmlUtil.convertToXml(ccdCase);
 
-        assertThat(extractValue(xml, "/ccdCase/appeal/caseCode" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appeal/dateAppealMade" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appeal/dateOfDecision" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appeal/originatingOffice" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appeal/outOfTime" ), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appeal/caseCode"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appeal/dateAppealMade"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appeal/dateOfDecision"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appeal/originatingOffice"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appeal/outOfTime"), is(""));
     }
 
     @Test
@@ -303,12 +303,12 @@ public class RoboticsXmlUtilTest {
 
         Document xml = xmlUtil.convertToXml(ccdCase);
 
-        assertThat(extractValue(xml, "/ccdCase/appellant/email" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appellant/phone" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appellant/phone" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appellant/phone" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appellant/nino" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appellant/adminGroup" ), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appellant/email"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appellant/phone"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appellant/name"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appellant/phone"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appellant/nino"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appellant/adminGroup"), is(""));
     }
 
     @Test
@@ -317,10 +317,10 @@ public class RoboticsXmlUtilTest {
 
         Document xml = xmlUtil.convertToXml(ccdCase);
 
-        assertThat(extractValue(xml, "/ccdCase/appointee/email" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appointee/phone" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appointee/address" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/appointee/name" ), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appointee/email"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appointee/phone"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appointee/address"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/appointee/name"), is(""));
     }
 
     @Test
@@ -329,11 +329,11 @@ public class RoboticsXmlUtilTest {
 
         Document xml = xmlUtil.convertToXml(ccdCase);
 
-        assertThat(extractValue(xml, "/ccdCase/representative/email" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/phone" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/address" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/name" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/organisation" ), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/email"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/phone"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/address"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/name"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/organisation"), is(""));
     }
 
     @Test
@@ -344,11 +344,11 @@ public class RoboticsXmlUtilTest {
 
         Document xml = xmlUtil.convertToXml(ccdCase);
 
-        assertThat(extractValue(xml, "/ccdCase/representative/address/line1" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/address/line2" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/address/town" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/address/county" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/address/postcode" ), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/address/line1"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/address/line2"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/address/town"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/address/county"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/address/postcode"), is(""));
     }
 
     @Test
@@ -359,9 +359,9 @@ public class RoboticsXmlUtilTest {
 
         Document xml = xmlUtil.convertToXml(ccdCase);
 
-        assertThat(extractValue(xml, "/ccdCase/representative/name/title" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/name/initial" ), is(""));
-        assertThat(extractValue(xml, "/ccdCase/representative/name/surname" ), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/name/title"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/name/initial"), is(""));
+        assertThat(extractValue(xml, "/ccdCase/representative/name/surname"), is(""));
     }
 
     private String extractValue(Document doc, String xpathExpression) throws XPathExpressionException {

@@ -1,5 +1,10 @@
 package uk.gov.hmcts.sscs.builder;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static uk.gov.hmcts.sscs.model.AppConstants.*;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -11,11 +16,6 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.sscs.domain.corecase.*;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
 public class TrackYourAppealJsonBuilderTest {
 

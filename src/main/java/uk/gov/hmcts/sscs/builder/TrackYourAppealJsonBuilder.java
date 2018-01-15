@@ -1,5 +1,7 @@
 package uk.gov.hmcts.sscs.builder;
 
+import static uk.gov.hmcts.sscs.model.AppConstants.*;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,8 +10,6 @@ import java.util.List;
 import org.json.JSONObject;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Event;
-
-import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
 public class TrackYourAppealJsonBuilder {
 

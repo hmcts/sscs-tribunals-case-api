@@ -1,17 +1,11 @@
 package uk.gov.hmcts.sscs.builder;
 
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
-import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.sscs.builder.PlaceholderBuilder.addEventPlaceHolders;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

@@ -18,8 +18,7 @@ import uk.gov.hmcts.sscs.service.BusinessDaysCalculatorService;
 public final class PlaceholderBuilder {
 
     private PlaceholderBuilder() {
-
-	}
+    }
 
     public static JSONObject addEventPlaceHolders(Event event, JSONObject placeholdersMap,
                                                   List<Hearing> hearings) {

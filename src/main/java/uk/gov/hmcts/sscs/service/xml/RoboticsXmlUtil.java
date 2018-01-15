@@ -1,5 +1,8 @@
 package uk.gov.hmcts.sscs.service.xml;
 
+import static uk.gov.hmcts.sscs.model.AppConstants.EMAIL;
+import static uk.gov.hmcts.sscs.model.AppConstants.PHONE;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.xml.parsers.DocumentBuilder;
@@ -8,9 +11,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import uk.gov.hmcts.sscs.domain.corecase.*;
-
-import static uk.gov.hmcts.sscs.model.AppConstants.EMAIL;
-import static uk.gov.hmcts.sscs.model.AppConstants.PHONE;
 
 public class RoboticsXmlUtil {
 
