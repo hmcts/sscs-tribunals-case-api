@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 
 public class CcdCaseResponse {
     
@@ -12,23 +13,23 @@ public class CcdCaseResponse {
     
     @JsonProperty(value = "callback_response_status_code")
     private String callbackResponseStatusCode;
-    
+
     @JsonProperty(value = "case_data")
     private CcdCase caseData;
-    
+
     @JsonProperty(value = "case_type_id")
     private String caseTypeId;
-    
+
     @JsonProperty(value = "created_date")
     private String createdDate;
-    
+
     private int id;
-    
+
     private String jurisdiction;
-    
+
     @JsonProperty(value = "last_modified")
     private String lastModified;
-    
+
     private String state;
 
     public AfterSubmitCallbackResponse getAfterSubmitCallbackResponse() {
@@ -111,4 +112,45 @@ public class CcdCaseResponse {
         this.state = state;
     }
 
+    @Override
+    public String toString() {
+        return "CcdCaseResponse{"
+            + "afterSubmitCallbackResponse=" + afterSubmitCallbackResponse
+            + ", callbackResponseStatus='" + callbackResponseStatus
+            + ", callbackResponseStatusCode='" + callbackResponseStatusCode
+            + ", caseData=" + caseData
+            + ", caseTypeId='" + caseTypeId
+            + ", createdDate='" + createdDate
+            + ", id=" + id
+            + ", jurisdiction='" + jurisdiction
+            + ", lastModified='" + lastModified
+            + ", state='" + state
+            + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CcdCaseResponse)) {
+            return false;
+        }
+        CcdCaseResponse that = (CcdCaseResponse) o;
+        return id == that.id
+            && Objects.equal(afterSubmitCallbackResponse, that.afterSubmitCallbackResponse)
+            && Objects.equal(callbackResponseStatus, that.callbackResponseStatus)
+            && Objects.equal(callbackResponseStatusCode, that.callbackResponseStatusCode)
+            && Objects.equal(caseData, that.caseData)
+            && Objects.equal(caseTypeId, that.caseTypeId)
+            && Objects.equal(createdDate, that.createdDate)
+            && Objects.equal(jurisdiction, that.jurisdiction)
+            && Objects.equal(lastModified, that.lastModified)
+            && Objects.equal(state, that.state);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(afterSubmitCallbackResponse, callbackResponseStatus, callbackResponseStatusCode, caseData, caseTypeId, createdDate, id, jurisdiction, lastModified, state);
+    }
 }
