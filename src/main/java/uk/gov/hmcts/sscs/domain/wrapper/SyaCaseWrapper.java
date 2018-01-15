@@ -101,23 +101,6 @@ public class SyaCaseWrapper {
         this.appellant = syaAppellant;
     }
 
-    public Boolean getAppointee() {
-        return isAppointee;
-    }
-
-    public void setAppointee(Boolean appointee) {
-        isAppointee = appointee;
-    }
-
-    public SyaSignAndSubmit getSignAndSubmit() {
-        return signAndSubmit;
-    }
-
-    public void setSignAndSubmit(SyaSignAndSubmit signAndSubmit) {
-        this.signAndSubmit = signAndSubmit;
-    }
-
-
     @Override
     public String toString() {
         return "SyaCaseWrapper{"

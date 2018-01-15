@@ -84,11 +84,8 @@ public class CcdCase {
 
     //TODO: Assume there is one hearing until business decides how to handle multiple for robotics
     public Hearing getHearing() {
-        if (hearings != null && hearings.size() > 0) {
-            return hearings.get(0);
-        } else {
-            return null;
-        }
+        if (hearings == null || hearings.isEmpty()) return null;
+        return hearings.get(0);
     }
 
     public List<Hearing> getHearings() {
