@@ -86,7 +86,6 @@ public class SubmitYourAppealToCcdCaseDeserializer {
 
         hearing.setAdditionalInformation(syaHearing.getAnythingElse());
 
-        // TODO : Hearing arrangements
         hearing.setExcludeDates(convertExcludedDates(syaHearing.getDatesCantAttend()));
         hearing.setScheduleHearing(syaHearing.getScheduleHearing());
         hearing.setWantsSupport(syaHearing.getWantsSupport());
@@ -118,7 +117,8 @@ public class SubmitYourAppealToCcdCaseDeserializer {
         SyaMrn syaMrn = syaCaseWrapper.getMrn();
 
         appeal.setDateOfDecision(syaMrn.getDate());
-        // TODO: Is this the right field to map to?
+
+        // Is this the right field to map to?
         appeal.setOriginatingOffice(syaMrn.getDwpIssuingOffice());
         appeal.setReasonForBeingLate(syaMrn.getReasonForBeingLate());
         appeal.setReasonForNoMrn(syaMrn.getReasonForNoMrn());
