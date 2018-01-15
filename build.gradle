@@ -98,6 +98,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'pdf-service-client', version: '5.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.4.0'
 
+    compile group: 'org.apache.commons', name: 'commons-text', version: '1.2'
+
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
 }
 
