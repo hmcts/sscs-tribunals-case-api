@@ -242,13 +242,8 @@ public class PlaceholderBuilderTest {
 
     @Test
     public void returnEmptyPlaceholderForHearingBookedEventWithNullHearings() {
-        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-12-01T12:00:00.123+00:00",
-                DateTimeFormatter.ISO_ZONED_DATE_TIME);
         ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-01T16:00:00.123+00:00",
                 DateTimeFormatter.ISO_ZONED_DATE_TIME);
-
-        Address address = new Address("Chester court", "The court house", "Farndon", "Chester",
-                "CH1 6YT", "http://chester.com");
 
         Event event = new Event(eventDateTime, EventType.HEARING_BOOKED);
 

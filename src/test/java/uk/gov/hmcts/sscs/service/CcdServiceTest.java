@@ -123,14 +123,12 @@ public class CcdServiceTest {
         ccdCase.setAppellant(appellant);
 
         ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
-        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
-                eq(ccdPath)))
+        given(coreCaseDataClient.get(eq(ccdPath)))
                 .willReturn(new ResponseEntity<>(ccdCase, OK));
 
         CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber("567");
 
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),
-                eq(ccdPath));
+        verify(coreCaseDataClient).get(eq(ccdPath));
 
         assertEquals(ccdCaseRes, ccdCase);
     }

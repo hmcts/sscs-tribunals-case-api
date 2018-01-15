@@ -47,7 +47,7 @@ public class AppealsController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Submitted appeal successfully",
             response = String.class)})
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper)
+    public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper)
             throws CcdException {
         String appellantLastName = syaCaseWrapper.getAppellant().getLastName();
         String nino = syaCaseWrapper.getAppellant().getNino();
@@ -69,7 +69,7 @@ public class AppealsController {
     public ResponseEntity<String> getAppeal(
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) throws CcdException {
-        return ok(tribunalsService.findAppeal(appealNumber, surname).toString());
+        return ok(tribunalsService.findAppeal(appealNumber).toString());
     }
 
     @ApiOperation(value = "getRootContext",

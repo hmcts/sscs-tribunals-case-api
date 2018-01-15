@@ -63,7 +63,8 @@ public class CcdService {
         event.put("summary","Request to create an appeal case in ccd");
         Map<String,Object> request = new HashMap<>();
         request.put("event", event);
-        //TODO: Implement this properly
+
+        // Implement this properly
         request.put("data", ccdCase);
         request.put("event_token", caseToken());
         request.put("ignore_warning", true);
@@ -97,8 +98,7 @@ public class CcdService {
             userToken = "Bearer " + idamClient.post("testing-support/lease");
             String url = "caseworkers/%s/jurisdictions/SSCS/case-types/Benefit/cases/%s";
             String ccdPath = format(url, caseWorkerId, appealNumber);
-            responseEntity = coreCaseDataClient
-                    .get(userToken,serviceToken,ccdPath);
+            responseEntity = coreCaseDataClient.get(ccdPath);
         } catch (Exception ex) {
             LOG.error("Error while getting case from ccd", ex);
             throw new CcdException("Error while getting case from ccd" + ex.getMessage());

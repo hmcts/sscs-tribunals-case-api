@@ -53,6 +53,14 @@ public class EmailServiceTest {
         verify(javaMailSender).send(mimeMessage);
     }
 
+    @Test
+    public void testSendEmailWithNoAttachments() throws MessagingException {
+        TestEmail testEmail = new TestEmail(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_MESSAGE);
+        doNothing().when(javaMailSender).send(any(MimeMessage.class));
+        emailService.sendEmail(testEmail);
+        verify(javaMailSender).send(mimeMessage);
+    }
+
     @Test(expected = RuntimeException.class)
     public void testSendEmailThrowsMailException() throws MessagingException {
         Email emailData = SampleEmailData.getDefault();
