@@ -37,9 +37,9 @@ public class CoreCaseDataClientTest {
 
     private CoreCaseDataClient coreCaseDataClient;
 
-    private final String ccdUrl = "https://localhost:4451/caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
+    private final String ccdUrl = "https://localhost:4451/caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/1515510597472285";
 
-    private final String path = "caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/113";
+    private final String path = "caseworkers/123/jurisdictions/SSCS/case-types/BENEFIT/cases/1515510597472285";
 
     @Before
     public void setUp() {
@@ -48,7 +48,7 @@ public class CoreCaseDataClientTest {
 
     @Test
     public void shouldCallAuthApiWithGivenRequestParams() throws Exception {
-        String jsonResponse = "{\"id\": 113,\"jurisdiction\": \"SSCS\","
+        String jsonResponse = "{\"id\": 1515510597472285,\"jurisdiction\": \"SSCS\","
                 +
                 "\"state\": \"ResponseRequested\",\"case_type_id\": \"Benefit\"";
         given(restTemplate.exchange(eq(ccdUrl), eq(GET), any(HttpEntity.class), eq(Object.class)))
@@ -84,16 +84,16 @@ public class CoreCaseDataClientTest {
     @Test
     public void shouldCallAuthApiWithGivenRequestParamsForGet() throws Exception {
         CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
-        ccdCaseResponse.setId(113);
+        ccdCaseResponse.setId(1515510597472285L);
         ccdCaseResponse.setJurisdiction("SSCS");
 
-        given(restTemplate.getForEntity(eq(ccdUrl), eq(CcdCaseResponse.class)))
+        given(restTemplate.exchange(eq(ccdUrl), eq(GET), any(HttpEntity.class), eq(CcdCaseResponse.class)))
                 .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
 
         ResponseEntity<CcdCaseResponse> responseEntity
                 = coreCaseDataClient.get("dfwfwef","sdsvsdfvs",path);
 
-        verify(restTemplate).getForEntity(eq(ccdUrl), eq(CcdCaseResponse.class));
+        verify(restTemplate).exchange(eq(ccdUrl), eq(GET), captor.capture(), eq(CcdCaseResponse.class));
 
         assertEquals(ccdCaseResponse, responseEntity.getBody());
     }

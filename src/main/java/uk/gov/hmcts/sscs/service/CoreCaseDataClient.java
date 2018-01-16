@@ -78,9 +78,9 @@ public class CoreCaseDataClient {
             headers.add("Authorization", userToken);
             headers.add("ServiceAuthorization", serviceToken);
             headers.add("Content-Type", "application/json");
+            HttpEntity requestEntity = new HttpEntity(headers);
             String url = ccdApiUrl + path;
-            ResponseEntity<CcdCaseResponse> responseEntity = restTemplate.getForEntity(url, CcdCaseResponse.class);
-            return responseEntity;
+            return restTemplate.exchange(url,HttpMethod.GET,requestEntity,CcdCaseResponse.class);
         } catch (Exception ex) {
             LOG.error("Error while getting a case from CCD api: ", ex);
             throw new CcdException("Error while getting a case from CCD api: " + ex.getMessage());

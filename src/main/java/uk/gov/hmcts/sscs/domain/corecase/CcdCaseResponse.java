@@ -23,7 +23,7 @@ public class CcdCaseResponse {
     @JsonProperty(value = "created_date")
     private String createdDate;
 
-    private int id;
+    private long id;
 
     private String jurisdiction;
 
@@ -80,11 +80,11 @@ public class CcdCaseResponse {
         this.createdDate = createdDate;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
