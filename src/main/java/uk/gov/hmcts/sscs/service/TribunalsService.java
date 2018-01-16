@@ -41,7 +41,7 @@ public class TribunalsService {
         ccdCase.setAppeal(appeal);
         return ccdService.createCase(ccdCase);
     }
-    
+
     public ObjectNode findAppeal(String appealNumber) throws CcdException {
         return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
                 ccdService.findCcdCaseByAppealNumber(appealNumber));

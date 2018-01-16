@@ -1,9 +1,8 @@
 package uk.gov.hmcts.sscs.service;
 
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.Backoff;
@@ -44,8 +43,6 @@ public class EmailService {
             }
 
             javaMailSender.send(message);
-        } catch (MessagingException | MailException e) {
-            throw new EmailSendFailedException(e);
         } catch (Exception e) {
             throw new EmailSendFailedException(e);
         }

@@ -10,10 +10,6 @@ public class SyaArrangements {
 
     private Boolean hearingLoop;
 
-
-    public SyaArrangements() {
-    }
-
     public Boolean getSignLanguageInterpreter() {
         return signLanguageInterpreter;
     }
