@@ -1,10 +1,9 @@
 package uk.gov.hmcts.sscs.service;
 
+import java.security.SecureRandom;
 import org.apache.commons.text.CharacterPredicates;
 import org.apache.commons.text.RandomStringGenerator;
 import org.springframework.stereotype.Component;
-
-import java.security.SecureRandom;
 
 @Component
 public class AppealNumberGenerator {
