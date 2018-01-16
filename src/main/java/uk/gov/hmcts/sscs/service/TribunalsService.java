@@ -33,11 +33,9 @@ public class TribunalsService {
 
         emailService.sendEmail(email);
 
-        HttpStatus status = ccdService.createCase(ccdCase);
-
-        return status;
+        return ccdService.createCase(ccdCase);
     }
-    
+
     public ObjectNode findAppeal(String appealNumber) throws CcdException {
         return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
                 ccdService.findCcdCaseByAppealNumber(appealNumber));
