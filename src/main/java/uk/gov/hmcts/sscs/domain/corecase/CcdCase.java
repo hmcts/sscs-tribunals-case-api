@@ -84,7 +84,9 @@ public class CcdCase {
 
     //TODO: Assume there is one hearing until business decides how to handle multiple for robotics
     public Hearing getHearing() {
-        if (hearings == null || hearings.isEmpty()) return null;
+        if (hearings == null || hearings.isEmpty()) {
+            return null;
+        }
         return hearings.get(0);
     }
 
@@ -160,7 +162,7 @@ public class CcdCase {
         return events;
     }
 
-    public void buildEvents() {
+    private void buildEvents() {
         //TODO: Placeholder, build up events in a proper way. Refer to TYA API
         this.events = new ArrayList<>();
     }
@@ -193,10 +195,10 @@ public class CcdCase {
 
     private void setLatestAppealStatus(List<Event> latestEvents) {
         if (null != latestEvents && !latestEvents.isEmpty()) {
-            for (int i = 0; i < latestEvents.size(); i++) {
+            for (Event latestEvent : latestEvents) {
 
-                if (latestEvents.get(i).getType().getOrder() > 0) {
-                    setAppealStatus(latestEvents.get(i).getType().name());
+                if (latestEvent.getType().getOrder() > 0) {
+                    setAppealStatus(latestEvent.getType().name());
                     return;
                 }
             }
@@ -247,11 +249,11 @@ public class CcdCase {
     public List<Event> buildHistoricalEvents() {
         List<Event> sortedEvents = sortedEvents(getEvents());
 
-        List<Event> historicalEvents = new ArrayList<>();
+        List<Event> historicalEvents;
 
         if (buildLatestEvents().size() == 1 && buildLatestEvents().get(0).getType()
                 == DWP_RESPOND_OVERDUE) {
-            historicalEvents.addAll(sortedEvents);
+            historicalEvents = new ArrayList<>(sortedEvents);
         } else {
             historicalEvents = sortedEvents.stream().skip(buildLatestEvents().size())
                     .collect(toList());

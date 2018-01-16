@@ -6,14 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import uk.gov.hmcts.sscs.domain.corecase.*;
-
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.sscs.domain.corecase.*;
 
 
 class TrackYourAppealJsonFromCcdCaseSerializer extends StdSerializer<CcdCase> {
@@ -66,26 +65,30 @@ class TrackYourAppealJsonFromCcdCaseSerializer extends StdSerializer<CcdCase> {
     }
 
     private void writeCcdAppeal(JsonGenerator jgen, Appeal appeal) throws IOException {
-        if (appeal == null) return;
+        if (appeal == null) {
+            return;
+        }
 
         checkAndWrite(jgen, "appealNumber", appeal.getAppealNumber());
     }
 
     private void writeCcdAppellant(JsonGenerator jgen, Appellant appellant) throws IOException {
-        if (appellant == null) return;
+        if (appellant == null) {
+            return;
+        }
 
         checkAndWrite(jgen, "name", appellant.getName() != null ? appellant.getName().getFullName() : null);
     }
 
     private void generateEventJson(JsonGenerator jgen, List<Event> events)
-            throws IOException {
+        throws IOException {
         if (events.isEmpty()) {
             return;
         }
 
         jgen.writeArrayFieldStart("events");
 
-        for (Event event: events) {
+        for (Event event : events) {
             jgen.writeStartObject();
 
             writeEvent(jgen, event);
@@ -110,13 +113,17 @@ class TrackYourAppealJsonFromCcdCaseSerializer extends StdSerializer<CcdCase> {
     }
 
     private void writeHearing(JsonGenerator jgen, Hearing hearing) throws IOException {
-        if (hearing == null) return;
+        if (hearing == null) {
+            return;
+        }
         checkAndWriteFormat(jgen, "hearingDateTime", hearing.getDateTime());
         writeAddress(jgen, hearing.getAddress());
     }
 
     private void writeAddress(JsonGenerator jgen, Address address) throws IOException {
-        if (address == null) return;
+        if (address == null) {
+            return;
+        }
 
         checkAndWrite(jgen, "addressLine1", address.getLine1());
         checkAndWrite(jgen, "addressLine2", address.getLine2());
@@ -133,11 +140,11 @@ class TrackYourAppealJsonFromCcdCaseSerializer extends StdSerializer<CcdCase> {
         }
     }
 
-    private transient DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss'Z'");
+    private transient DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss'Z'");
 
     private void checkAndWriteFormat(JsonGenerator jgen, String label, ZonedDateTime value) throws IOException {
         if (value != null) {
-            jgen.writeStringField(label, value.format(f));
+            jgen.writeStringField(label, value.format(dateTimeFormatter));
         }
     }
 }
