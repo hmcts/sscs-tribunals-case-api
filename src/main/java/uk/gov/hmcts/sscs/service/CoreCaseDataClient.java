@@ -70,11 +70,7 @@ public class CoreCaseDataClient {
 
     public ResponseEntity<CcdCaseResponse> get(String userToken, String serviceToken, String path) throws CcdException {
         try {
-            MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-            headers.add("Authorization", userToken);
-            headers.add("ServiceAuthorization", serviceToken);
-            headers.add("Content-Type", "application/json");
-            HttpEntity requestEntity = new HttpEntity(headers);
+            HttpEntity requestEntity = new HttpEntity(buildCcdHeader(userToken, serviceToken));
             String url = ccdApiUrl + path;
             return restTemplate.exchange(url,HttpMethod.GET,requestEntity,CcdCaseResponse.class);
         } catch (Exception ex) {
