@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
@@ -7,9 +8,12 @@ import static org.mockito.Mockito.verify;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
@@ -19,6 +23,7 @@ import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserial
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
 
+    public static final String APPEAL_NUMBER = "asfefsdf3223";
     private TribunalsService tribunalsService;
 
     @Mock
@@ -33,9 +38,15 @@ public class TribunalsServiceTest {
     @Mock
     private SubmitYourAppealToCcdCaseDeserializer transformer;
 
+    @Mock
+    private AppealNumberGenerator appealNumberGenerator;
+
+    @Captor
+    private ArgumentCaptor<CcdCase> captor;
+
     @Before
     public void setUp() throws Exception {
-        tribunalsService = new TribunalsService(ccdService, emailService, email, transformer);
+        tribunalsService = new TribunalsService(ccdService, emailService, email, transformer, appealNumberGenerator);
     }
 
     @Test
@@ -43,11 +54,19 @@ public class TribunalsServiceTest {
         SyaCaseWrapper syaCaseWrapper = new SyaCaseWrapper();
 
         CcdCase ccdCase = new CcdCase();
+        Appeal appeal = new Appeal();
+        ccdCase.setAppeal(appeal);
 
         given(transformer.convertSyaToCcdCase(syaCaseWrapper)).willReturn(ccdCase);
+        given(appealNumberGenerator.generate()).willReturn(APPEAL_NUMBER);
 
         tribunalsService.submitAppeal(syaCaseWrapper);
 
         verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
+        verify(ccdService).createCase(captor.capture());
+
+        CcdCase savedCase = captor.getValue();
+
+        assertEquals(APPEAL_NUMBER, savedCase.getAppeal().getAppealNumber());
     }
 }
