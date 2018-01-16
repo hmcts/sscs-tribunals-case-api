@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.service;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +15,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
 
 @Service
@@ -67,10 +68,11 @@ public class CoreCaseDataClient {
         }
     }
 
-    public ResponseEntity<CcdCase> get(String path) throws CcdException {
+    public ResponseEntity<CcdCaseResponse> get(String userToken, String serviceToken, String path) throws CcdException {
         try {
+            HttpEntity requestEntity = new HttpEntity(buildCcdHeader(userToken, serviceToken));
             String url = ccdApiUrl + path;
-            return restTemplate.getForEntity(url, CcdCase.class);
+            return restTemplate.exchange(url,HttpMethod.GET,requestEntity,CcdCaseResponse.class);
         } catch (Exception ex) {
             String errorText = "Error while getting a case from CCD api: ";
             LOG.error(errorText, ex);

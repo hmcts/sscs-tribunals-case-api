@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
 
 @Service
@@ -92,18 +93,18 @@ public class CcdService {
 
     public CcdCase findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
 
-        ResponseEntity<CcdCase> responseEntity = null;
+        ResponseEntity<CcdCaseResponse> responseEntity = null;
         try {
             serviceToken = authClient.sendRequest("lease", POST, "");
             userToken = "Bearer " + idamClient.post("testing-support/lease");
             String url = "caseworkers/%s/jurisdictions/SSCS/case-types/Benefit/cases/%s";
             String ccdPath = format(url, caseWorkerId, appealNumber);
-            responseEntity = coreCaseDataClient.get(ccdPath);
+            responseEntity = coreCaseDataClient.get(userToken, serviceToken, ccdPath);
         } catch (Exception ex) {
             LOG.error("Error while getting case from ccd", ex);
             throw new CcdException("Error while getting case from ccd" + ex.getMessage());
         }
-        return responseEntity.getBody();
+        return responseEntity.getBody().getCaseData();
     }
 
 }
