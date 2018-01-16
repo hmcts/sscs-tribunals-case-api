@@ -1,29 +1,44 @@
 plugins {
+    id 'application'
     id 'checkstyle'
+    id 'pmd'
     id 'org.sonarqube' version '2.5'
     id 'jacoco'
-    id 'io.spring.dependency-management' version '1.0.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.4.RELEASE'
     id 'org.springframework.boot' version '1.5.9.RELEASE'
-    id 'org.owasp.dependencycheck' version '1.4.5.1'
-    id 'com.github.ben-manes.versions' version '0.15.0'
+    id 'org.owasp.dependencycheck' version '3.1.0'
+    id 'com.github.ben-manes.versions' version '0.17.0'
 }
 
-group = 'uk.gov.hmcts.sscs'
+group = 'uk.gov.hmcts.reform'
 version = '1.0.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-checkstyle.toolVersion = '8.2'
-checkstyle.configFile = new File(rootDir, "checkstyle.xml")
+checkstyle {
+    maxWarnings = 0
+    toolVersion = '8.7'
+    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
+    configDir = new File(rootDir, 'config/checkstyle')
+}
 
-// make build fail on Checkstyle issues (https://github.com/gradle/gradle/issues/881)
-tasks.withType(Checkstyle).each { checkstyleTask ->
-    checkstyleTask.doLast {
-        reports.all { report ->
-            def outputFile = report.destination
-            if (outputFile.exists() && outputFile.text.contains("<error ")) {
-                throw new GradleException("There were checkstyle warnings! For more info check $outputFile")
+pmd {
+    toolVersion = "5.8.1"
+    ignoreFailures = true
+    sourceSets = [sourceSets.main, sourceSets.test]
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+}
+
+dependencyUpdates.resolutionStrategy = {
+    componentSelection { rules ->
+        rules.all { ComponentSelection selection ->
+            boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm'].any { qualifier ->
+                selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+            }
+            if (rejected) {
+                selection.reject('Release candidate')
             }
         }
     }
@@ -37,6 +52,8 @@ dependencyCheck {
     suppressionFile = 'dependency-check-suppressions.xml'
 }
 
+def springBootVersion = plugins.getPlugin('org.springframework.boot').class.package.implementationVersion
+
 repositories {
     maven {
         url "https://dl.bintray.com/hmcts/hmcts-maven"
@@ -45,11 +62,16 @@ repositories {
     mavenCentral()
 }
 
+def versions = [
+        springfoxSwagger: '2.7.0'
+]
+
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: springBootVersion
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: springBootVersion
     compile group: 'org.springframework.retry', name: 'spring-retry'
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
     compile group: 'com.google.guava', name: 'guava', version: '18.0'
@@ -70,11 +92,13 @@ dependencies {
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: '1.2.1'
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: '1.4.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: '1.4.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'pdf-service-client', version: '5.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.4.0'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
 }
 
 jar {
@@ -88,17 +112,10 @@ jar {
 sonarqube {
     properties {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
-        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/corecase/*"
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/**," +
+                "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
+                "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +
+                "src/main/java/uk/gov/hmcts/sscs/config/*," +
+                "src/main/java/uk/gov/hmcts/sscs/model/*"
     }
-}
-
-
-task printVersion {
-    doLast {
-        print project.version
-    }
-}
-
-task getHomeDir << {
-    println gradle.gradleHomeDir
 }

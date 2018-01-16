@@ -40,7 +40,7 @@ public class Appeal {
     }
 
     public String getBenefitAsCaseCode() {
-        return benefit.getCode() + "DD";
+        return benefit != null && benefit.getCode() != null ? benefit.getCode() + "DD" : null;
     }
 
     public void setBenefit(Benefit benefit) {

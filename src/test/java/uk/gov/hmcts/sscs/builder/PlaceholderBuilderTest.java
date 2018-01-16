@@ -2,8 +2,7 @@ package uk.gov.hmcts.sscs.builder;
 
 import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.sscs.builder.PlaceholderBuilder.addEventPlaceHolders;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
@@ -227,6 +226,59 @@ public class PlaceholderBuilderTest {
         try {
             JSONObject result = addEventPlaceHolders(event, new JSONObject(), hearings);
             assertThat(result.get(HEARING_DATETIME), is("2017-08-01T12:00:00.123Z"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            fail("Should not have thrown any exception");
+        }
+    }
+
+    @Test
+    public void checkNullPlaceholderReturnsNull() {
+        Event event = new Event(ZonedDateTime.now(), EventType.HEARING_BOOKED);
+
+        JSONObject result = addEventPlaceHolders(event, null, null);
+        assertNull(result);
+    }
+
+    @Test
+    public void returnEmptyPlaceholderForHearingBookedEventWithNullHearings() {
+        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-01T16:00:00.123+00:00",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
+
+        Event event = new Event(eventDateTime, EventType.HEARING_BOOKED);
+
+        JSONObject json = new JSONObject();
+
+        try {
+            JSONObject result = addEventPlaceHolders(event, json, null);
+            assertThat(result, is(json));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            fail("Should not have thrown any exception");
+        }
+    }
+
+    @Test
+    public void returnHearingBookedPlaceholderForHearingBookedEvent() {
+        ZonedDateTime hearingDateTime = ZonedDateTime.parse("2017-12-01T12:00:00.123+00:00",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        ZonedDateTime eventDateTime = ZonedDateTime.parse("2017-12-01T16:00:00.123+00:00",
+                DateTimeFormatter.ISO_ZONED_DATE_TIME);
+
+        Address address = new Address("Chester court", "The court house", "Farndon", "Chester",
+                "CH1 6YT", "http://chester.com");
+        Hearing hearing = new Hearing(address, hearingDateTime);
+
+        List<Hearing> hearings = new ArrayList<>();
+        hearings.add(hearing);
+
+        Event event = new Event(eventDateTime, EventType.HEARING_BOOKED);
+
+        JSONObject json = new JSONObject();
+
+        try {
+            JSONObject result = addEventPlaceHolders(event, json, hearings);
+            assertThat(result.get(HEARING_DATETIME), is("2017-12-01T12:00:00.123Z"));
         } catch (JSONException e) {
             e.printStackTrace();
             fail("Should not have thrown any exception");

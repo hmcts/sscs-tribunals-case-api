@@ -22,11 +22,17 @@ import uk.gov.hmcts.sscs.exception.CcdException;
 public class CoreCaseDataClient {
     private static final Logger LOG = getLogger(CoreCaseDataClient.class);
 
+    private static final String AUTHORIZATION = "Authorization";
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String APPLICATION_JSON = "application/json";
+
+
     private String ccdApiUrl;
     private RestTemplate restTemplate;
 
     @Autowired
-    CoreCaseDataClient(@Value("${ccd.service.api}") String ccdApiUrl, RestTemplate restTemplate) {
+    CoreCaseDataClient(@Value("${ccd.service.api.url}") String ccdApiUrl, RestTemplate restTemplate) {
         this.ccdApiUrl = ccdApiUrl;
         this.restTemplate = restTemplate;
     }
@@ -35,20 +41,15 @@ public class CoreCaseDataClient {
                                       String serviceToken,
                                       String path,
                                       HttpMethod httpMethod,
-                                              Map<String,Object> requestBody) throws CcdException {
+                                      Map<String,Object> requestBody) throws CcdException {
         try {
-            MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-            headers.add("Authorization", userToken);
-            headers.add("ServiceAuthorization", serviceToken);
-            headers.add("Content-Type", "application/json");
-            HttpEntity requestEntity = new HttpEntity(requestBody, headers);
+            HttpEntity requestEntity = new HttpEntity(requestBody, buildCcdHeader(userToken, serviceToken));
             String url = ccdApiUrl + path;
-            ResponseEntity<Object> responseEntity =
-                restTemplate.exchange(url,httpMethod,requestEntity,Object.class);
-            return responseEntity;
+            return restTemplate.exchange(url,httpMethod,requestEntity,Object.class);
         } catch (Exception ex) {
-            LOG.error("Error while sending request to CCD api: ", ex);
-            throw new CcdException("Error while sending request to CCD api: " + ex.getMessage());
+            String errorText = "Error while sending request to CCD api: ";
+            LOG.error(errorText, ex);
+            throw new CcdException(errorText + ex.getMessage());
         }
     }
 
@@ -57,18 +58,13 @@ public class CoreCaseDataClient {
                                               String path,
                                               Map<String,Object> requestBody) throws CcdException {
         try {
-            MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-            headers.add("Authorization", userToken);
-            headers.add("ServiceAuthorization", serviceToken);
-            headers.add("Content-Type", "application/json");
-            HttpEntity requestEntity = new HttpEntity(requestBody, headers);
+            HttpEntity requestEntity = new HttpEntity(requestBody, buildCcdHeader(userToken, serviceToken));
             String url = ccdApiUrl + path;
-            ResponseEntity<Object> responseEntity =
-                    restTemplate.postForEntity(url,requestEntity,Object.class);
-            return responseEntity;
+            return restTemplate.postForEntity(url,requestEntity,Object.class);
         } catch (Exception ex) {
-            LOG.error("Error while sending request to CCD api: ", ex);
-            throw new CcdException("Error while POSTing new case to CCD api: " + ex.getMessage());
+            String errorText = "Error while POSTing new case to CCD api: ";
+            LOG.error(errorText, ex);
+            throw new CcdException(errorText + ex.getMessage());
         }
     }
 
@@ -82,9 +78,19 @@ public class CoreCaseDataClient {
             String url = ccdApiUrl + path;
             return restTemplate.exchange(url,HttpMethod.GET,requestEntity,CcdCaseResponse.class);
         } catch (Exception ex) {
-            LOG.error("Error while getting a case from CCD api: ", ex);
-            throw new CcdException("Error while getting a case from CCD api: " + ex.getMessage());
+            String errorText = "Error while getting a case from CCD api: ";
+            LOG.error(errorText, ex);
+            throw new CcdException(errorText + ex.getMessage());
         }
+    }
+
+    private MultiValueMap<String, String> buildCcdHeader(String userToken, String serviceToken) {
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add(AUTHORIZATION, userToken);
+        headers.add(SERVICE_AUTHORIZATION, serviceToken);
+        headers.add(CONTENT_TYPE, APPLICATION_JSON);
+
+        return headers;
     }
 
 }

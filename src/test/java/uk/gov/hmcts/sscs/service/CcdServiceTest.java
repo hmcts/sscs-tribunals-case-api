@@ -133,8 +133,7 @@ public class CcdServiceTest {
 
         CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber("567");
 
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),
-                eq(ccdPath));
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
 
         assertEquals(ccdCaseRes, ccdCase);
     }

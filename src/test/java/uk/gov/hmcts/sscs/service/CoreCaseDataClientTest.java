@@ -82,7 +82,7 @@ public class CoreCaseDataClientTest {
     }
 
     @Test
-    public void shouldCallAuthApiWithGivenRequestParamsForGet() throws Exception {
+    public void shouldSendGetRequest() throws Exception {
         CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
         ccdCaseResponse.setId(1515510597472285L);
         ccdCaseResponse.setJurisdiction("SSCS");
@@ -97,4 +97,12 @@ public class CoreCaseDataClientTest {
 
         assertEquals(ccdCaseResponse, responseEntity.getBody());
     }
+
+    @Test(expected = CcdException.class)
+    public void shouldHandleExceptionForGetRequest() throws Exception {
+        given(restTemplate.exchange(eq(ccdUrl), eq(GET), any(HttpEntity.class), eq(CcdCaseResponse.class)))
+                .willThrow(new RuntimeException("Error"));
+
+        coreCaseDataClient.get("dfwfwef","sdsvsdfvs",path);
+    }    
 }
