@@ -280,22 +280,22 @@ public class CcdCase {
     }
 
     public Boolean getIsEmailSubscribe() {
-		return isEmailSubscribe;
-	}
+        return isEmailSubscribe;
+    }
 
-	public void setIsEmailSubscribe(Boolean isEmailSubscribe) {
-		this.isEmailSubscribe = isEmailSubscribe;
-	}
+    public void setIsEmailSubscribe(Boolean isEmailSubscribe) {
+        this.isEmailSubscribe = isEmailSubscribe;
+    }
 
-	public Boolean getIsMobileSubscribe() {
-		return isMobileSubscribe;
-	}
+    public Boolean getIsMobileSubscribe() {
+        return isMobileSubscribe;
+    }
 
-	public void setIsMobileSubscribe(Boolean isMobileSubscribe) {
-		this.isMobileSubscribe = isMobileSubscribe;
-	}
+    public void setIsMobileSubscribe(Boolean isMobileSubscribe) {
+        this.isMobileSubscribe = isMobileSubscribe;
+    }
 
-	@Override
+    @Override
     public String toString() {
         return "CcdCase{"
                 + " appeal=" + appeal
