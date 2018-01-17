@@ -24,6 +24,8 @@ public class CcdCase {
     private Boolean isAppointee;
     private String benefitType;
     private String appealStatus;
+    private Boolean isEmailSubscribe;
+    private Boolean isMobileSubscribe;
 
     public CcdCase() {
     }
@@ -277,7 +279,23 @@ public class CcdCase {
                 e2.getDate().compareTo(e1.getDate())).collect(toList());
     }
 
-    @Override
+    public Boolean getIsEmailSubscribe() {
+		return isEmailSubscribe;
+	}
+
+	public void setIsEmailSubscribe(Boolean isEmailSubscribe) {
+		this.isEmailSubscribe = isEmailSubscribe;
+	}
+
+	public Boolean getIsMobileSubscribe() {
+		return isMobileSubscribe;
+	}
+
+	public void setIsMobileSubscribe(Boolean isMobileSubscribe) {
+		this.isMobileSubscribe = isMobileSubscribe;
+	}
+
+	@Override
     public String toString() {
         return "CcdCase{"
                 + " appeal=" + appeal
@@ -293,6 +311,8 @@ public class CcdCase {
                 + ", isAppointee=" + isAppointee
                 + ", benefitType=" + benefitType
                 + ", appealStatus=" + appealStatus
+                + ", isEmailSubscribe=" + isEmailSubscribe
+                + ", isMobileSubscribe=" + isMobileSubscribe
                 + '}';
     }
 
@@ -317,13 +337,15 @@ public class CcdCase {
                 && Objects.equals(smsNotify, ccdCase.smsNotify)
                 && Objects.equals(isAppointee, ccdCase.isAppointee)
                 && Objects.equals(benefitType, ccdCase.benefitType)
-                && Objects.equals(appealStatus, ccdCase.appealStatus);
+                && Objects.equals(appealStatus, ccdCase.appealStatus)
+                && Objects.equals(isEmailSubscribe, ccdCase.isEmailSubscribe)
+                && Objects.equals(isMobileSubscribe, ccdCase.isMobileSubscribe);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(appeal, appellant, appointee, representative, hearings, caseReference,
                 eventType, events, reasonsForAppealing, smsNotify, isAppointee, benefitType,
-                appealStatus);
+                appealStatus, isEmailSubscribe, isMobileSubscribe);
     }
 }

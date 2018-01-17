@@ -46,4 +46,8 @@ public class TribunalsService {
         return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
                 ccdService.findCcdCaseByAppealNumber(appealNumber));
     }
+
+    public String unsubscribe(String appealNumber) throws CcdException {
+        return ccdService.unsubscribe(appealNumber);
+    }
 }
