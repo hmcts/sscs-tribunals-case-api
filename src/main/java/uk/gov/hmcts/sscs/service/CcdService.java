@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
+import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.exception.CcdException;
 
 @Service
@@ -107,13 +108,17 @@ public class CcdService {
         return responseEntity.getBody().getCaseData();
     }
 
-    public String unsubscribe(String appealNumber) throws CcdException {
+    public String unsubscribe(String appealNumber, String reason) throws CcdException {
 
         String benefitType = null;
         try {
+            Subscription subscription = new Subscription();
+            subscription.setEmailSubscribe(Boolean.FALSE);
+            subscription.setMobileSubscribe(Boolean.FALSE);
+            subscription.setReason(reason);
+
             CcdCase ccdCase = findCcdCaseByAppealNumber(appealNumber);
-            ccdCase.setIsEmailSubscribe(Boolean.FALSE);
-            ccdCase.setIsMobileSubscribe(Boolean.FALSE);
+            ccdCase.setSubscription(subscription);
             createCase(ccdCase);
             benefitType = ccdCase.getBenefitType();
         } catch (Exception ex) {

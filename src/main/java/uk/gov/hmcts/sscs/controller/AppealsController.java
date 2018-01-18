@@ -79,9 +79,10 @@ public class AppealsController {
             response = String.class, responseContainer = "Unsubscribed appeal benefit type")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Removed subscription", response = String.class)})
     @ResponseBody
-    @RequestMapping(value = "/appeals/{appealNumber}/subscribe", method = DELETE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> unsubscribe(@PathVariable String appealNumber) throws CcdException {
-        String benefitType = tribunalsService.unsubscribe(appealNumber);
+    @RequestMapping(value = "/appeals/{appealNumber}/subscribe/reason/{reason}", method = DELETE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> unsubscribe(@PathVariable String appealNumber, @PathVariable String reason)
+            throws CcdException {
+        String benefitType = tribunalsService.unsubscribe(appealNumber, reason);
         return ok().body(format("{\"benefitType\":\"%s\"}", benefitType));
     }
 
