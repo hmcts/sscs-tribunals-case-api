@@ -138,5 +138,23 @@ public class CcdServiceTest {
         assertEquals(ccdCaseRes, ccdCase);
     }
 
+    @Test
+    public void shouldUnsubscribeFromCcd() throws Exception {
 
+        CcdCase ccdCase = new CcdCase();
+        ccdCase.setBenefitType("Benefit");
+
+        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
+        ccdCaseResponse.setCaseData(ccdCase);
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+        given(coreCaseDataClient.get(eq("Bearer " + userToken), eq(serviceToken), eq(ccdPath)))
+                .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
+
+        String benefitType = ccdService.unsubscribe("567", "reason");
+
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
+
+        assertEquals(ccdCase.getBenefitType().toLowerCase(), benefitType);
+    }
 }
