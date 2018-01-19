@@ -112,11 +112,7 @@ public class CcdService {
 
         String benefitType = null;
         try {
-            Subscription subscription = new Subscription();
-            subscription.setEmailSubscribe(Boolean.FALSE);
-            subscription.setMobileSubscribe(Boolean.FALSE);
-            subscription.setReason(reason);
-
+            Subscription subscription = new Subscription(Boolean.FALSE, Boolean.FALSE, reason);
             CcdCase ccdCase = findCcdCaseByAppealNumber(appealNumber);
             ccdCase.setSubscription(subscription);
             createCase(ccdCase);

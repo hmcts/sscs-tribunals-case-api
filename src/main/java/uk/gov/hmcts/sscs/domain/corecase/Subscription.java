@@ -11,6 +11,12 @@ public class Subscription {
     public Subscription() {
     }
 
+    public Subscription(Boolean isEmailSubscribe, Boolean isMobileSubscribe, String reason) {
+        this.isEmailSubscribe = isEmailSubscribe;
+        this.isMobileSubscribe = isMobileSubscribe;
+        this.reason = reason;
+    }
+
     public Boolean isEmailSubscribe() {
         return isEmailSubscribe;
     }
