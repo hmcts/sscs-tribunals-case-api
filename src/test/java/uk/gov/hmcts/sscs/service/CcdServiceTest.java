@@ -11,8 +11,6 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -22,14 +20,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import uk.gov.hmcts.sscs.domain.corecase.Appeal;
-import uk.gov.hmcts.sscs.domain.corecase.Appellant;
-import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
-import uk.gov.hmcts.sscs.domain.corecase.Name;
-import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
-import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
+import uk.gov.hmcts.sscs.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
@@ -46,15 +38,6 @@ public class CcdServiceTest {
     @Mock
     private CoreCaseDataClient coreCaseDataClient;
 
-    @Mock
-    private EmailService emailService;
-
-    private SubmitYourAppealEmail email = new SubmitYourAppealEmail("from@hmcts.net",
-            "to@hmcts.net", "Your appeal", "Your appeal has been created");
-
-    @Mock
-    private SubmitYourAppealToCcdCaseDeserializer transformer;
-
     @Captor
     private ArgumentCaptor<Map> captor;
 
@@ -66,16 +49,8 @@ public class CcdServiceTest {
 
     private String ccdPath;
 
-
-    @Before
-    public void setUp() throws Exception {
-        ccdService = new CcdService(coreCaseDataClient, authClient,
-                idamClient, CASE_WORKER_ID);
-
-        tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
-                + "Benefit/event-triggers/appealReceived/token";
-
-        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
+    public void setup() throws Exception {
+        ccdService = new CcdService(coreCaseDataClient, authClient, idamClient, CASE_WORKER_ID);
 
         given(authClient.sendRequest(eq("lease"), eq(HttpMethod.POST),
                 eq(""))).willReturn(serviceToken);
@@ -92,6 +67,13 @@ public class CcdServiceTest {
 
     @Test
     public void shouldSendCaseToCcd() throws Exception {
+        tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
+                + "Benefit/event-triggers/appealReceived/token";
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
+
+        setup();
+
         Map<String,Object> appeal = new HashMap<>();
         appeal.put("id","123");
         appeal.put("jurisdiction","SSCS");
@@ -113,7 +95,34 @@ public class CcdServiceTest {
     }
 
     @Test
+    public void shouldStartEventInCcd() throws Exception {
+        tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
+                + "Benefit/cases/123/event-triggers/hearingReminderNotification/token";
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/123/events";
+
+        setup();
+
+        CcdCase ccdCase = new CcdCase();
+        Appellant appellant = new Appellant();
+        appellant.setName(new Name("Mr", "Harry", "Kane"));
+        ccdCase.setAppellant(appellant);
+
+        ReminderResponse reminder = new ReminderResponse("123", "hearingReminderNotification");
+
+        HttpStatus status = ccdService.createEvent(ccdCase, reminder);
+        assertEquals(CREATED, status);
+        verify(coreCaseDataClient).sendRequest(eq("Bearer " + userToken),eq(serviceToken),
+                eq(tokenPath), eq(HttpMethod.GET), any(Map.class));
+        verify(coreCaseDataClient).post(eq("Bearer " + userToken), eq(serviceToken),
+                eq(ccdPath), captor.capture());
+
+        assertEquals(ccdCase, captor.getValue().get("data"));
+    }
+
+    @Test
     public void shouldGetCaseFromCcd() throws Exception {
+        setup();
 
         CcdCase ccdCase = new CcdCase();
         Appeal appeal = new Appeal();
@@ -140,20 +149,26 @@ public class CcdServiceTest {
 
     @Test
     public void shouldUnsubscribeFromCcd() throws Exception {
+        tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
+                + "Benefit/event-triggers/appealReceived/token";
 
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
+
+        setup();
         CcdCase ccdCase = new CcdCase();
         ccdCase.setBenefitType("Benefit");
 
         CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
         ccdCaseResponse.setCaseData(ccdCase);
 
-        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
-        given(coreCaseDataClient.get(eq("Bearer " + userToken), eq(serviceToken), eq(ccdPath)))
+        String casePath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+
+        given(coreCaseDataClient.get(eq("Bearer " + userToken), eq(serviceToken), eq(casePath)))
                 .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
 
         String benefitType = ccdService.unsubscribe("567", "reason");
 
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(casePath));
 
         assertEquals(ccdCase.getBenefitType().toLowerCase(), benefitType);
     }
