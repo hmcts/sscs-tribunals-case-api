@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.service;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
@@ -68,5 +69,14 @@ public class TribunalsServiceTest {
         CcdCase savedCase = captor.getValue();
 
         assertEquals(APPEAL_NUMBER, savedCase.getAppeal().getAppealNumber());
+    }
+
+    @Test
+    public void shouldUnsubscribe() throws CcdException {
+
+        tribunalsService.unsubscribe(APPEAL_NUMBER, "reason");
+
+        verify(ccdService).unsubscribe(eq(APPEAL_NUMBER), eq("reason"));
+
     }
 }

@@ -3,7 +3,9 @@ package uk.gov.hmcts.sscs.controller;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -117,7 +119,18 @@ public class AppealsControllerTest {
         assertThat(responseEntity.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
 
+    @Test
+    public void unsubscribeForGivenAppealNumber() throws Exception {
+        // Given
+        when(tribunalsService.unsubscribe(APPEAL_ID, "reason")).thenReturn("benefitTypeValue");
 
+        // When
+        ResponseEntity<String> benefitType = controller.unsubscribe(APPEAL_ID, "reason");
+
+        // Then
+        assertThat(benefitType.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(benefitType.getBody(), equalTo("{\"benefitType\":\"benefitTypeValue\"}"));
+    }
 
 
     private String getSyaCaseWrapperJson() {

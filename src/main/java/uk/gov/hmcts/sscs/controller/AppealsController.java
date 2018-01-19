@@ -1,9 +1,11 @@
 package uk.gov.hmcts.sscs.controller;
 
+import static java.lang.String.format;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -19,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
@@ -70,6 +73,17 @@ public class AppealsController {
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) throws CcdException {
         return ok(tribunalsService.findAppeal(appealNumber).toString());
+    }
+
+    @ApiOperation(value = "unsubscribe", notes = "Removes subscription and returns benefit type in the response json",
+            response = String.class, responseContainer = "Unsubscribed appeal benefit type")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Removed subscription", response = String.class)})
+    @ResponseBody
+    @RequestMapping(value = "/appeals/{appealNumber}/subscribe/reason/{reason}", method = DELETE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> unsubscribe(@PathVariable String appealNumber, @PathVariable String reason)
+            throws CcdException {
+        String benefitType = tribunalsService.unsubscribe(appealNumber, reason);
+        return ok().body(format("{\"benefitType\":\"%s\"}", benefitType));
     }
 
     @ApiOperation(value = "getRootContext",

@@ -1,8 +1,20 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
-import static uk.gov.hmcts.sscs.model.AppConstants.*;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.ADJOURNED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.CLOSED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.DORMANT;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.DWP_RESPOND;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.DWP_RESPOND_OVERDUE;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.HEARING_BOOKED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.NEW_HEARING_BOOKED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.PAST_HEARING_BOOKED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.POSTPONED;
+import static uk.gov.hmcts.sscs.model.AppConstants.DORMANT_TO_CLOSED_DURATION_IN_MONTHS;
+import static uk.gov.hmcts.sscs.model.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -24,6 +36,7 @@ public class CcdCase {
     private Boolean isAppointee;
     private String benefitType;
     private String appealStatus;
+    private Subscription subscription;
 
     public CcdCase() {
     }
@@ -277,6 +290,16 @@ public class CcdCase {
                 e2.getDate().compareTo(e1.getDate())).collect(toList());
     }
 
+
+
+    public Subscription getSubscription() {
+        return subscription;
+    }
+
+    public void setSubscription(Subscription subscription) {
+        this.subscription = subscription;
+    }
+
     @Override
     public String toString() {
         return "CcdCase{"
@@ -293,6 +316,7 @@ public class CcdCase {
                 + ", isAppointee=" + isAppointee
                 + ", benefitType=" + benefitType
                 + ", appealStatus=" + appealStatus
+                + ", subscription=" + subscription
                 + '}';
     }
 
@@ -317,13 +341,14 @@ public class CcdCase {
                 && Objects.equals(smsNotify, ccdCase.smsNotify)
                 && Objects.equals(isAppointee, ccdCase.isAppointee)
                 && Objects.equals(benefitType, ccdCase.benefitType)
-                && Objects.equals(appealStatus, ccdCase.appealStatus);
+                && Objects.equals(appealStatus, ccdCase.appealStatus)
+                && Objects.equals(subscription, ccdCase.subscription);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(appeal, appellant, appointee, representative, hearings, caseReference,
                 eventType, events, reasonsForAppealing, smsNotify, isAppointee, benefitType,
-                appealStatus);
+                appealStatus, subscription);
     }
 }
