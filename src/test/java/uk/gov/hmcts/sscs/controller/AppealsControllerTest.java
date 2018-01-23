@@ -3,14 +3,18 @@ package uk.gov.hmcts.sscs.controller;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -26,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 
+import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
@@ -130,6 +135,27 @@ public class AppealsControllerTest {
         // Then
         assertThat(benefitType.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(benefitType.getBody(), equalTo("{\"benefitType\":\"benefitTypeValue\"}"));
+    }
+
+    @Test
+    public void updateSubscriptionForGivenAppealNumber() throws Exception {
+        // Given
+        when(tribunalsService.updateSubscription(eq(APPEAL_ID), any(Subscription.class))).thenReturn("benefitTypeValue");
+
+        Subscription subscription = new Subscription();
+        subscription.setEmailAddress("testuser@gmail.com");
+        subscription.setPhoneNumber("07788996655");
+        subscription.setEmailSubscribe(true);
+        subscription.setMobileSubscribe(true);
+
+        String json = new ObjectMapper().writeValueAsString(subscription);
+
+        // When
+        mockMvc.perform(put("/appeals/" + APPEAL_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{\"benefitType\":\"benefitTypeValue\"}"));
     }
 
 

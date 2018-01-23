@@ -6,6 +6,8 @@ public class Subscription {
 
     private Boolean isEmailSubscribe;
     private Boolean isMobileSubscribe;
+    private String emailAddress;
+    private String phoneNumber;
     private String reason;
 
     public Subscription() {
@@ -31,6 +33,22 @@ public class Subscription {
 
     public void setMobileSubscribe(Boolean isMobileSubscribe) {
         this.isMobileSubscribe = isMobileSubscribe;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getReason() {

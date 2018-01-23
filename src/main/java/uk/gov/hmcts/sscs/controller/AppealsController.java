@@ -5,9 +5,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -24,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
@@ -83,6 +82,17 @@ public class AppealsController {
     public ResponseEntity<String> unsubscribe(@PathVariable String appealNumber, @PathVariable String reason)
             throws CcdException {
         String benefitType = tribunalsService.unsubscribe(appealNumber, reason);
+        return ok().body(format("{\"benefitType\":\"%s\"}", benefitType));
+    }
+
+    @ApiOperation(value = "updateSubscription", notes = "Updates subscription and returns benefit type in the response json",
+            response = String.class, responseContainer = "Updated appeal benefit type")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Removed subscription", response = String.class)})
+    @ResponseBody
+    @RequestMapping(value = "/appeals/{appealNumber}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateSubscription(@PathVariable String appealNumber, @RequestBody Subscription subscription)
+            throws CcdException {
+        String benefitType = tribunalsService.updateSubscription(appealNumber, subscription);
         return ok().body(format("{\"benefitType\":\"%s\"}", benefitType));
     }
 

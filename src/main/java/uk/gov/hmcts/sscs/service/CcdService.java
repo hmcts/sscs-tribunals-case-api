@@ -136,4 +136,18 @@ public class CcdService {
         }
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
+
+    public String updateSubscription(String appealNumber, Subscription subscription) throws CcdException {
+        String benefitType = null;
+        try {
+            CcdCase ccdCase = findCcdCaseByAppealNumber(appealNumber);
+            ccdCase.setSubscription(subscription);
+            createCase(ccdCase);
+            benefitType = ccdCase.getBenefitType();
+        } catch (Exception ex) {
+            LOG.error("Error while updating subscription details in ccd: ", ex);
+            throw new CcdException("Error while updating case in ccd: " + ex.getMessage());
+        }
+        return benefitType != null ? benefitType.toLowerCase() : "";
+    }
 }
