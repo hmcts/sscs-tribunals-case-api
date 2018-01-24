@@ -1,4 +1,6 @@
 #!groovy
+@Library("Infrastructure") _
+
 properties([
   parameters([
     string(name: 'PRODUCT_NAME', defaultValue: 'sscs', description: ''),
@@ -10,8 +12,6 @@ properties([
   [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
   pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
-
-@Library("Infrastructure")
 
 withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
 
