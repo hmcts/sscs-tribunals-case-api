@@ -17,6 +17,12 @@ variable "infrastructure_env" {
   description = "Infrastructure environment to point to"
 }
 
+variable "subscription" {
+  type = "string"
+}
+
+variable "ilbIp"{}
+
 variable "tca_server_port" {
   type    = "string"
   default = "8080"
@@ -79,7 +85,7 @@ variable "appeal_email_message" {
 
 variable "appeal_email_host" {
   type    = "string"
-  default = "localhost"
+  default = "mta.reform.hmcts.net"
 }
 
 variable "appeal_email_port" {
@@ -109,7 +115,7 @@ variable "idam_s2s_auth_microservice" {
 
 variable "idam_s2s_auth_url" {
   type    = "string"
-  default = "http://localhost:8002"
+  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
 }
 
 variable "pdf_api_url" {

@@ -1,9 +1,28 @@
+provider "vault" {
+  //  # It is strongly recommended to configure this provider through the
+  //  # environment variables described above, so that each user can have
+  //  # separate credentials set in the environment.
+  //  #
+  //  # This will default to using $VAULT_ADDR
+  //  # But can be set explicitly
+  address = "https://vault.reform.hmcts.net:6200"
+}
+
+data "vault_generic_secret" "s2s_secret" {
+  path = "secret/test/ccidam/service-auth-provider/api/microservice-keys/cmcClaimStore"
+}
+
+locals {
+  aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+}
+
+
 module "tribunals-case-api" {
-  source   = "git@github.com:contino/moj-module-webapp?ref=0.0.78"
-  product  = "${var.product}-api"
+  source   = "git@github.com:contino/moj-module-webapp?ref=master"
+  product  = "${var.product}-frontend"
   location = "${var.location}"
   env      = "${var.env}"
-  asename  = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  ilbIp    = "${var.ilbIp}"
 
   app_settings = {
     PORT="${var.tca_server_port}"
@@ -27,10 +46,10 @@ module "tribunals-case-api" {
     EMAIL_SMTP_TLS_ENABLED="${var.appeal_email_smtp_tls_enabled}"
     EMAIL_SMTP_SSL_TRUST="${var.appeal_email_smtp_ssl_trust}"
 
-    IDAM_S2S_AUTH_TOTP_SECRET="${var.idam_s2s_auth_totp_secret}"
+    IDAM_S2S_AUTH_TOTP_SECRET="${data.vault_generic_secret.s2s_secret.data["value"]}"
     IDAM_S2S_AUTH_MICROSERVICE="${var.idam_s2s_auth_microservice}"
     IDAM_S2S_AUTH_URL="${var.idam_s2s_auth_url}"
 
-    PDF_API_URL="${var.pdf_api_url}"
+    PDF_API_URL="http://cmc-pdf-service-${var.env}.service.${local.aseName}.internal"
   }
 }
