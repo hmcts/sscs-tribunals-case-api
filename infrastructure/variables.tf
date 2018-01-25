@@ -23,11 +23,6 @@ variable "subscription" {
 
 variable "ilbIp"{}
 
-variable "tca_server_port" {
-  type    = "string"
-  default = "8080"
-}
-
 variable "sscs_idam_key" {
   type    = "string"
   default = "idamkey"

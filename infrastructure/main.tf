@@ -25,8 +25,6 @@ module "tribunals-case-api" {
   ilbIp    = "${var.ilbIp}"
 
   app_settings = {
-    PORT="${var.tca_server_port}"
-
     AUTH_PROVIDER_SERVICE_CLIENT_KEY="${var.sscs_idam_key}"
     AUTH_PROVIDER_SERVICE_API_URL="${var.authprovider_service_api_url}"
 
