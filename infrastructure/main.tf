@@ -12,6 +12,10 @@ data "vault_generic_secret" "s2s_secret" {
   path = "secret/test/ccidam/service-auth-provider/api/microservice-keys/cmcClaimStore"
 }
 
+data "vault_generic_secret" "email_mac_secret" {
+  path = "secret/test/sscs/sscs_email_mac_secret_text"
+}
+
 locals {
   aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 }
@@ -49,5 +53,8 @@ module "tribunals-case-api" {
     IDAM_S2S_AUTH_URL="${var.idam_s2s_auth_url}"
 
     PDF_API_URL="http://cmc-pdf-service-${var.env}.service.${local.aseName}.internal"
+
+    SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"
+
   }
 }
