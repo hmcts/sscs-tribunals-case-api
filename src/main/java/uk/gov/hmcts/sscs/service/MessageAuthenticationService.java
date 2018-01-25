@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException;
@@ -40,7 +41,7 @@ public class MessageAuthenticationService {
     private String macString;
 
     @Autowired
-    public MessageAuthenticationService(String macString) throws InvalidKeyException, NoSuchAlgorithmException {
+    public MessageAuthenticationService(@Value("${subscriptions.mac.secret}") String macString) throws InvalidKeyException, NoSuchAlgorithmException {
         this.macString = macString;
         this.mac = initializeMac();
     }
@@ -80,7 +81,7 @@ public class MessageAuthenticationService {
         }
     }
 
-    private String checkValidEncryptedToken(String encryptedToken) throws Exception {
+    private String checkValidEncryptedToken(String encryptedToken) throws InvalidKeyException, NoSuchAlgorithmException {
         String decrypted = decryptedToken(encryptedToken);
         String[] parts = tokenParts(decrypted);
         String originalMessage = parts[0] + "|" + parts[1];
