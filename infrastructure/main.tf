@@ -19,7 +19,7 @@ locals {
 
 module "tribunals-case-api" {
   source   = "git@github.com:contino/moj-module-webapp?ref=master"
-  product  = "${var.product}-frontend"
+  product  = "${var.product}-api"
   location = "${var.location}"
   env      = "${var.env}"
   ilbIp    = "${var.ilbIp}"
