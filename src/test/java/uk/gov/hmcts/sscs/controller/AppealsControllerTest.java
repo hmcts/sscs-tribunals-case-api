@@ -32,9 +32,6 @@ import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
-
-
-
 @RunWith(MockitoJUnitRunner.class)
 public class AppealsControllerTest {
 
