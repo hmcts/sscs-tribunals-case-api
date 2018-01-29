@@ -62,6 +62,11 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    integrationTestCompile.extendsFrom(testCompile)
+    integrationTestRuntime.extendsFrom(testRuntime)
+}
+
 def versions = [
         springfoxSwagger: '2.7.0'
 ]
@@ -101,6 +106,24 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.2'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.10.19'
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir('src/IntegrationTests/java')
+        }
+        resources {
+            srcDir('src/IntegrationTests/resources')
+        }
+    }
+}
+
+dependencies {
+    integrationTestCompile(sourceSets.test.output)
 }
 
 jar {
