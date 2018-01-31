@@ -132,7 +132,10 @@ public class AppealsControllerTest {
 
     private String getSyaCaseWrapperJson() {
         return  "{\n"
-                + "  \"benefitType\": \"Personal Independence Payment (PIP)\",\n"
+                +   "  \"benefitType\": {\n" +
+                "    \"code\" : \"PIP\",\n" +
+                "    \"description\" : \"Personal Independence Payment\"\n" +
+                "\t},\n"
                 + "  \"postCodeCheck\": \"B14 7SP\",\n"
                 + "  \"mrn\": {\n"
                 + "    \"dwpIssuingOffice\": \"8\",\n"

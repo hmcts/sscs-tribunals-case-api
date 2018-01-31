@@ -38,8 +38,7 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
         testData.setRepresentative(setupRepresentativeData());
         testData.setSmsNotify(setupSmsNotifyData());
         testData.setMrn(setupMrnData());
-
-        testData.setBenefitType("Personal Independence Payment (PIP)");
+        testData.setBenefitType(new SyaBenefitType("Personal Independence Payment","PIP" ));
         testData.setIsAppointee(false);
 
         return testData;
@@ -142,7 +141,9 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
     public void convertWrapper() {
         CcdCase ccdCase = transformer.convertSyaToCcdCase(testData);
 
-        assertEquals(testData.getBenefitType(), ccdCase.getAppeal().getBenefit()
+        assertEquals(testData.getBenefitType().getDescription()
+                + " (" + testData.getBenefitType().getCode() + ")"
+                , ccdCase.getAppeal().getBenefit()
                 .getFullDesciption());
         assertEquals(testData.getIsAppointee(), ccdCase.getIsAppointee());
 

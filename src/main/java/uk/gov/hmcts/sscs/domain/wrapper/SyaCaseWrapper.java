@@ -16,7 +16,8 @@ public class SyaCaseWrapper {
     @JsonProperty("representative")
     private SyaRepresentative representative;
 
-    private String benefitType;
+    @JsonProperty("benefitType")
+    private SyaBenefitType benefitType;
 
     @JsonProperty("smsNotify")
     private SyaSmsNotify smsNotify;
@@ -61,11 +62,11 @@ public class SyaCaseWrapper {
         this.representative = syaRepresentative;
     }
 
-    public String getBenefitType() {
+    public SyaBenefitType getBenefitType() {
         return benefitType;
     }
 
-    public void setBenefitType(String benefitType) {
+    public void setBenefitType(SyaBenefitType benefitType) {
         this.benefitType = benefitType;
     }
 
