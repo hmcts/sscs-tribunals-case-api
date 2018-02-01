@@ -129,7 +129,7 @@ dependencies {
 }
 
 jar {
-    baseName 'tribunals-case-api'
+    archiveName 'tribunals-case-api.jar'
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version
