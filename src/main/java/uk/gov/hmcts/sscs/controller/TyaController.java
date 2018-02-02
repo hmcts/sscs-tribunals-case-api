@@ -1,0 +1,53 @@
+package uk.gov.hmcts.sscs.controller;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import static java.lang.String.format;
+import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import org.springframework.http.ResponseEntity;
+import static org.springframework.http.ResponseEntity.ok;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.service.TribunalsService;
+
+@RestController
+public class TyaController {
+
+    private TribunalsService tribunalsService;
+
+    @Autowired
+    public TyaController(TribunalsService tribunalsService) {
+        this.tribunalsService = tribunalsService;
+    }
+
+    @ApiOperation(value = "getAppeal",
+        notes = "Checks valid appeal number and surname and then returns an appeal details",
+        response = String.class, responseContainer = "Appeal details")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
+    @RequestMapping(value = "/appeals/{appealNumber}/surname/{surname}", method = GET,
+            produces = APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<String> getAppeal(
+            @PathVariable(value = "appealNumber") String appealNumber,
+            @PathVariable(value = "surname") String surname) throws CcdException {
+        return ok(tribunalsService.findAppeal(appealNumber).toString());
+    }
+
+    @ApiOperation(value = "unsubscribe", notes = "Removes subscription and returns benefit type in the response json",
+            response = String.class, responseContainer = "Unsubscribed appeal benefit type")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Removed subscription", response = String.class)})
+    @ResponseBody
+    @RequestMapping(value = "/appeals/{appealNumber}/subscribe/reason/{reason}", method = DELETE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> unsubscribe(@PathVariable String appealNumber, @PathVariable String reason)
+            throws CcdException {
+        String benefitType = tribunalsService.unsubscribe(appealNumber, reason);
+        return ok().body(format("{\"benefitType\":\"%s\"}", benefitType));
+    }
+}
