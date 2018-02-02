@@ -16,6 +16,15 @@ data "vault_generic_secret" "email_mac_secret" {
   path = "secret/test/sscs/sscs_email_mac_secret_text"
 }
 
+data "vault_generic_secret" "sscs_rpc_email_id" {
+  path = "secret/test/sscs/secret/test/sscs/sscs_rpc_email_id"
+}
+
+data "vault_generic_secret" "sscs_tribunals_case_secret" {
+  path = "secret/test/ccidam/service-auth-provider/api/microservice-keys/sscs-tribunals-case"
+}
+
+
 locals {
   aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 }
@@ -29,7 +38,7 @@ module "tribunals-case-api" {
   ilbIp    = "${var.ilbIp}"
 
   app_settings = {
-    AUTH_PROVIDER_SERVICE_CLIENT_KEY="${var.sscs_idam_key}"
+    AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
     AUTH_PROVIDER_SERVICE_API_URL="${var.authprovider_service_api_url}"
 
     IDAM_API_URL="${var.idam_api_url}"
@@ -40,7 +49,7 @@ module "tribunals-case-api" {
     CCD_SERVICE_API_URL="${var.ccd_service_api_url}"
 
     EMAIL_FROM="${var.appeal_email_from}"
-    EMAIL_TO="${var.appeal_email_to}"
+    EMAIL_TO="${data.vault_generic_secret.sscs_rpc_email_id.data["value"]}"
     EMAIL_SUBJECT="${var.appeal_email_subject}"
     EMAIL_MESSAGE="${var.appeal_email_message}"
     EMAIL_SERVER_HOST="${var.appeal_email_host}"

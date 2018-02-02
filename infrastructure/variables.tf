@@ -30,12 +30,12 @@ variable "sscs_idam_key" {
 
 variable "authprovider_service_api_url" {
   type    = "string"
-  default = "http://localhost:4502/"
+  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
 }
 
 variable "idam_api_url" {
   type    = "string"
-  default = "http://localhost:4501/"
+  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
 }
 
 variable "idam_user_id" {
@@ -55,7 +55,7 @@ variable "ccd_case_worker_id" {
 
 variable "ccd_service_api_url" {
   type    = "string"
-  default = "https://case-data-app.dev.ccd.reform.hmcts.net:4451/"
+  default = "https://case-data-app.test.ccd.reform.hmcts.net:4481"
 }
 
 variable "appeal_email_from" {
