@@ -65,7 +65,7 @@ variable "appeal_email_from" {
 
 variable "appeal_email_to" {
   type    = "string"
-  default = "receiver@hmcts.net"
+  default = "sscs@greencroftconsulting.com"
 }
 
 variable "appeal_email_subject" {
