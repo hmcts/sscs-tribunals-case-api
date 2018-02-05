@@ -49,7 +49,7 @@ module "tribunals-case-api" {
     CCD_SERVICE_API_URL="${var.ccd_service_api_url}"
 
     EMAIL_FROM="${var.appeal_email_from}"
-    EMAIL_TO="${data.vault_generic_secret.sscs_rpc_email_id.data["value"]}"
+    EMAIL_TO="${var.appeal_email_to}"
     EMAIL_SUBJECT="${var.appeal_email_subject}"
     EMAIL_MESSAGE="${var.appeal_email_message}"
     EMAIL_SERVER_HOST="${var.appeal_email_host}"
