@@ -8,7 +8,8 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +21,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.controller.SyaController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
@@ -71,9 +71,10 @@ public class SyaEndpointsIT {
     }
 
     @Test
-    public void shouldGeneratePdfAndSend() throws CcdException {
-        assertThat(controller.createAppeals(caseWrapper).getStatusCode(), is(HttpStatus.OK));
-        verify(mailSender, times(2)).send(message);
+    public void shouldGeneratePdfAndSend() {
+        assertThat(controller.createAppeals(caseWrapper).getStatusCode(), is(HttpStatus.CREATED));
+
+        verify(mailSender).send(message);
     }
 
     private byte[] getTemplate() throws IOException {
