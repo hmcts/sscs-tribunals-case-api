@@ -46,7 +46,7 @@ module "tribunals-case-api" {
     IDAM_ROLE="${var.idam_role}"
 
     CCD_CASE_WORKER_ID="${var.ccd_case_worker_id}"
-    CCD_SERVICE_API_URL="${var.ccd_service_api_url}"
+    CCD_SERVICE_API_URL="http://ccd-data-store-api-${var.env}.service.${local.aseName}.internal"
 
     EMAIL_FROM="${var.appeal_email_from}"
     EMAIL_TO="${data.vault_generic_secret.sscs_rpc_email_id.data["value"]}"

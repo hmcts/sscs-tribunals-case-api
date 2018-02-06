@@ -30,12 +30,12 @@ variable "sscs_idam_key" {
 
 variable "authprovider_service_api_url" {
   type    = "string"
-  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
+  default = "http://betaDevBccidamAppLB.reform.hmcts.net:4552"
 }
 
 variable "idam_api_url" {
   type    = "string"
-  default = "http://betaDevBccidamAppLB.reform.hmcts.net"
+  default = "http://betaDevBccidamAppLB.reform.hmcts.net:4551"
 }
 
 variable "idam_user_id" {
@@ -110,7 +110,7 @@ variable "idam_s2s_auth_microservice" {
 
 variable "idam_s2s_auth_url" {
   type    = "string"
-  default = "http://betaDevBccidamS2SLB.reform.hmcts.net"
+  default = "http://betaDevBccidamAppLB.reform.hmcts.net:4552"
 }
 
 variable "pdf_api_url" {
