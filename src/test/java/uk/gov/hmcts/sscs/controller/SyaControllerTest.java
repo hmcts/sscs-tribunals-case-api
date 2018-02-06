@@ -5,9 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.Matchers.any;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,13 +17,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
-import uk.gov.hmcts.sscs.service.TribunalsService;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -32,36 +30,31 @@ public class SyaControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private TribunalsService tribunalsService;
-
-    @Mock
     private SubmitAppealService submitAppealService;
 
 
     @Before
     public void setUp() {
-        SyaController controller = new SyaController(tribunalsService, submitAppealService);
+        SyaController controller = new SyaController(submitAppealService);
         mockMvc = standaloneSetup(controller).build();
     }
 
-
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
-        doNothing().when(submitAppealService).submitAppeal(any(Map.class),any(String.class));
-        when(tribunalsService.submitAppeal(any(SyaCaseWrapper.class))).thenReturn(HttpStatus.OK);
+        doNothing().when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class),any(String.class));
 
         String json = getSyaCaseWrapperJson();
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test
     public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
         doThrow(new PdfGenerationException("malformed html template"))
-                .when(submitAppealService).submitAppeal(any(Map.class),any(String.class));
+                .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class),any(String.class));
         String json = getSyaCaseWrapperJson();
 
         mockMvc.perform(post("/appeals")

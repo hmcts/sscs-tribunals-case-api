@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
-import uk.gov.hmcts.sscs.service.TribunalsService;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,22 +23,19 @@ public class SyaController {
     public static final String UNDERSCORE = "_";
 
     private SubmitAppealService submitAppealService;
-    private TribunalsService tribunalsService;
 
     @Autowired
-    public SyaController(TribunalsService tribunalsService, SubmitAppealService submitAppealService) {
-        this.tribunalsService = tribunalsService;
+    public SyaController(SubmitAppealService submitAppealService) {
         this.submitAppealService = submitAppealService;
     }
 
     @ApiOperation(value = "submitAppeal",
         notes = "Creates a case from the SYA details",
         response = String.class, responseContainer = "Appeal details")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Submitted appeal successfully",
+    @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
             response = String.class)})
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper)
-            throws CcdException {
+    public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         String appellantLastName = syaCaseWrapper.getAppellant().getLastName();
         String nino = syaCaseWrapper.getAppellant().getNino();
 
@@ -48,7 +43,9 @@ public class SyaController {
                 + nino.substring(nino.length() - 3);
         Map<String,Object> appealData = new HashMap<>();
         appealData.put(SYA_CASE_WRAPPER, syaCaseWrapper);
-        submitAppealService.submitAppeal(appealData,appealUniqueIdentifier);
-        return status(tribunalsService.submitAppeal(syaCaseWrapper)).build();
+
+        submitAppealService.submitAppeal(syaCaseWrapper,appealUniqueIdentifier);
+
+        return status(201).build();
     }
 }

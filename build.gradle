@@ -130,6 +130,12 @@ dependencies {
     integrationTestCompile(sourceSets.test.output)
 }
 
+task integrationTest(type: Test) {
+    description = 'Runs the integration tests tests'
+    setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
+    setClasspath(sourceSets.integrationTest.runtimeClasspath)
+}
+
 jar {
     archiveName 'tribunals-case-api.jar'
     manifest {
