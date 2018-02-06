@@ -3,7 +3,6 @@
     "code": "PIP",
     "description": "Personal Independence Payment"
   },
-  "postCodeCheck": "B14 7SP",
   "mrn": {
     "dwpIssuingOffice": "8",
     "date": "01-12-2017"
@@ -26,11 +25,9 @@
     }
   },
   "smsNotify": {
-    "wantsSMSNotifications": true,
     "useSameNumber": true,
     "smsNumber": "07411222222"
   },
-  "hasRepresentative": true,
   "representative": {
     "firstName": "Hermione",
     "lastName": "Granger",
@@ -49,7 +46,6 @@
     "reasons": "Here are my reasons for appealing...",
     "otherReasons": "Nope, not today anyway!"
   },
-  "emailAddress": "harry.potter@wizards.com",
   "hearing": {
     "wantsToAttend": true,
     "wantsSupport": true,
@@ -64,6 +60,5 @@
     "datesCantAttend": [
       "25/01/1972"
     ]
-  },
-  "statementOfTruth": true
+  }
 }

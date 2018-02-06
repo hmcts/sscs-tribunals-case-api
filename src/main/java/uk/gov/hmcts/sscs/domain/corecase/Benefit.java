@@ -9,12 +9,12 @@ public enum Benefit {
     JOB_SEEKERS_ALLOWANCE("Job Seekers Allowance", "Job Seekers Allowance", "073");
 
     private final String type;
-    private final String fullDesciption;
+    private final String fullDescription;
     private final String code;
 
-    Benefit(String type, String fullDesciption, String code) {
+    Benefit(String type, String fullDescription, String code) {
         this.type = type;
-        this.fullDesciption = fullDesciption;
+        this.fullDescription = fullDescription;
         this.code = code;
     }
 
@@ -22,8 +22,8 @@ public enum Benefit {
         return type;
     }
 
-    public String getFullDesciption() {
-        return fullDesciption;
+    public String getFullDescription() {
+        return fullDescription;
     }
 
     public String getCode() {
@@ -44,7 +44,7 @@ public enum Benefit {
     public static Benefit getBenefitByFullDescription(String x) {
         Benefit b = null;
         for (Benefit type : Benefit.values()) {
-            if (type.getFullDesciption().equals(x)) {
+            if (type.getFullDescription().equals(x)) {
                 b = type;
             }
         }

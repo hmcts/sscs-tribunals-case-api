@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
@@ -19,23 +20,33 @@ public class TribunalsService {
     private SubmitYourAppealEmail email;
     private SubmitYourAppealToCcdCaseDeserializer transformer;
     private AppealNumberGenerator appealNumberGenerator;
+    private boolean syaCcdEnabled;
 
     @Autowired
     TribunalsService(CcdService ccdService,
                      EmailService emailService, SubmitYourAppealEmail email,
-                     SubmitYourAppealToCcdCaseDeserializer transformer, AppealNumberGenerator appealNumberGenerator) {
+                     SubmitYourAppealToCcdCaseDeserializer transformer, AppealNumberGenerator appealNumberGenerator,
+                     @Value("${sya.ccd.enabled}") boolean syaCcdEnabled) {
         this.ccdService = ccdService;
         this.emailService = emailService;
         this.email = email;
         this.transformer = transformer;
         this.appealNumberGenerator = appealNumberGenerator;
+        this.syaCcdEnabled = syaCcdEnabled;
     }
 
     public HttpStatus submitAppeal(SyaCaseWrapper syaCaseWrapper) throws CcdException {
         CcdCase ccdCase = transformer.convertSyaToCcdCase(syaCaseWrapper);
-
-        emailService.sendEmail(email);
         String appealNumber = appealNumberGenerator.generate();
+        HttpStatus status = HttpStatus.OK;
+        if (syaCcdEnabled) {
+            status = saveAppeal(ccdCase, appealNumber);
+        }
+        emailService.sendEmail(email);
+        return status;
+    }
+
+    public HttpStatus saveAppeal(CcdCase ccdCase, String appealNumber) throws CcdException {
         Appeal appeal = ccdCase.getAppeal();
         appeal.setAppealNumber(appealNumber);
         ccdCase.setAppeal(appeal);

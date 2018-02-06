@@ -2,15 +2,13 @@ package uk.gov.hmcts.sscs.transform.deserialize;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-
-import java.time.LocalDate;
-import java.time.Month;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.ExcludeDates;
 import uk.gov.hmcts.sscs.domain.wrapper.*;
-import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
+import java.time.LocalDate;
+import java.time.Month;
 
 public class SubmitYourAppealToCcdCaseDeserializerTest {
 
@@ -144,7 +142,7 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
         assertEquals(testData.getBenefitType().getDescription()
                 + " (" + testData.getBenefitType().getCode() + ")"
                 , ccdCase.getAppeal().getBenefit()
-                .getFullDesciption());
+                .getFullDescription());
         assertEquals(testData.getIsAppointee(), ccdCase.getIsAppointee());
 
         //Appellant
@@ -224,7 +222,7 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
         assertEquals(mrn.getReasonForBeingLate(), ccdCase.getAppeal().getReasonForBeingLate());
         assertEquals(mrn.getReasonForNoMrn(), ccdCase.getAppeal().getReasonForNoMrn());
     }
-    
+
 
     @Test
     public void convertExcludedDates() {

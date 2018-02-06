@@ -47,7 +47,7 @@ public class TribunalsServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        tribunalsService = new TribunalsService(ccdService, emailService, email, transformer, appealNumberGenerator);
+        tribunalsService = new TribunalsService(ccdService, emailService, email, transformer, appealNumberGenerator, true);
     }
 
     @Test

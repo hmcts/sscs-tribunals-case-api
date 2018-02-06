@@ -1,15 +1,12 @@
 package uk.gov.hmcts.sscs.service;
 
 import static java.lang.String.format;
-import static org.slf4j.LoggerFactory.getLogger;
-import static org.springframework.http.HttpMethod.POST;
-
-import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.Logger;
+import static org.slf4j.LoggerFactory.getLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import static org.springframework.http.HttpMethod.POST;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +15,8 @@ import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
 import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class CcdService {
@@ -107,7 +106,7 @@ public class CcdService {
 
     public CcdCase findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
 
-        ResponseEntity<CcdCaseResponse> responseEntity = null;
+        ResponseEntity<CcdCaseResponse> responseEntity;
         try {
             serviceToken = authClient.sendRequest("lease", POST, "");
             userToken = "Bearer " + idamClient.post("testing-support/lease");
