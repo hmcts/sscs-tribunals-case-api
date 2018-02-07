@@ -172,4 +172,33 @@ public class CcdServiceTest {
 
         assertEquals(ccdCase.getBenefitType().toLowerCase(), benefitType);
     }
+
+    @Test
+    public void shouldUpdateSubscriptionInCcd() throws Exception {
+        tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
+                + "Benefit/event-triggers/appealReceived/token";
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
+
+        setup();
+        CcdCase ccdCase = new CcdCase();
+        ccdCase.setBenefitType("Benefit");
+
+        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
+        ccdCaseResponse.setCaseData(ccdCase);
+
+        String casePath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+
+        Subscription subscription = new Subscription();
+
+
+        given(coreCaseDataClient.get(eq("Bearer " + userToken), eq(serviceToken), eq(casePath)))
+                .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
+
+        String benefitType = ccdService.updateSubscription("567", subscription);
+
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(casePath));
+
+        assertEquals(ccdCase.getBenefitType().toLowerCase(), benefitType);
+    }
 }

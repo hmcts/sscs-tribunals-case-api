@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
@@ -53,5 +54,9 @@ public class TribunalsService {
 
     public String unsubscribe(String appealNumber, String reason) throws CcdException {
         return ccdService.unsubscribe(appealNumber, reason);
+    }
+
+    public String updateSubscription(String appealNumber, Subscription subscription) throws CcdException {
+        return ccdService.updateSubscription(appealNumber, subscription);
     }
 }

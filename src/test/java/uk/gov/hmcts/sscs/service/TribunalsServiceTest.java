@@ -16,6 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
@@ -77,6 +78,13 @@ public class TribunalsServiceTest {
         tribunalsService.unsubscribe(APPEAL_NUMBER, "reason");
 
         verify(ccdService).unsubscribe(eq(APPEAL_NUMBER), eq("reason"));
+    }
 
+    @Test
+    public void shouldUpdateSubscriptionDetails() throws CcdException {
+        Subscription subscription = new Subscription();
+        tribunalsService.updateSubscription(APPEAL_NUMBER, subscription);
+
+        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(subscription));
     }
 }
