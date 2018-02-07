@@ -1,6 +1,6 @@
 plugins {
     id 'application'
-    id 'checkstyle'
+//    id 'checkstyle'
     id 'pmd'
     id 'org.sonarqube' version '2.5'
     id 'jacoco'
@@ -16,12 +16,12 @@ version = '1.0.0'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-checkstyle {
-    maxWarnings = 0
-    toolVersion = '8.7'
-    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-    configDir = new File(rootDir, 'config/checkstyle')
-}
+//checkstyle {
+//    maxWarnings = 0
+//    toolVersion = '8.7'
+//    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
+//    configDir = new File(rootDir, 'config/checkstyle')
+//}
 
 pmd {
     toolVersion = "5.8.1"
@@ -60,6 +60,11 @@ repositories {
     }
     jcenter()
     mavenCentral()
+}
+
+configurations {
+    integrationTestCompile.extendsFrom(testCompile)
+    integrationTestRuntime.extendsFrom(testRuntime)
 }
 
 def versions = [
@@ -101,10 +106,30 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.2'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'
+
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir('src/IntegrationTests/java')
+        }
+        resources {
+            srcDir('src/IntegrationTests/resources')
+        }
+    }
+}
+
+dependencies {
+    integrationTestCompile(sourceSets.test.output)
 }
 
 jar {
-    baseName 'tribunals-case-api'
+    archiveName 'tribunals-case-api.jar'
     manifest {
         attributes 'Implementation-Title': project.name,
                 'Implementation-Version': project.version

@@ -25,6 +25,8 @@ public class SubmitYourAppealToCcdCaseDeserializer {
         ccdCase.setSmsNotify(convertSmsNotify(syaCaseWrapper.getSmsNotify()));
         ccdCase.setAppeal(convertSyaDataToAppeal(syaCaseWrapper));
         ccdCase.setIsAppointee(syaCaseWrapper.getIsAppointee());
+        ccdCase.setBenefitType(syaCaseWrapper.getBenefitType().getCode());
+        ccdCase.getAppeal().setBenefit(Benefit.getBenefitByType(syaCaseWrapper.getBenefitType().getCode()));
 
         return ccdCase;
     }
@@ -123,7 +125,7 @@ public class SubmitYourAppealToCcdCaseDeserializer {
         appeal.setReasonForBeingLate(syaMrn.getReasonForBeingLate());
         appeal.setReasonForNoMrn(syaMrn.getReasonForNoMrn());
 
-        appeal.setBenefit(Benefit.getBenefitByFullDescription(syaCaseWrapper.getBenefitType()));
+        appeal.setBenefit(Benefit.getBenefitByFullDescription(syaCaseWrapper.getBenefitType().getCode()));
 
         return appeal;
     }
