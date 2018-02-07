@@ -157,3 +157,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/sscs/model/*"
     }
 }
+
+task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
+
+}
