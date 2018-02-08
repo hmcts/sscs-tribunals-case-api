@@ -105,7 +105,7 @@ variable "idam_s2s_auth_totp_secret" {
 
 variable "idam_s2s_auth_microservice" {
   type    = "string"
-  default = "sscsTribunalsCase"
+  default = "cmc"
 }
 
 variable "idam_s2s_auth_url" {

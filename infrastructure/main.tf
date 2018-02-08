@@ -8,6 +8,10 @@ provider "vault" {
   address = "https://vault.reform.hmcts.net:6200"
 }
 
+data "vault_generic_secret" "cmc_s2s_secret" {
+  path = "secret/test/ccidam/service-auth-provider/api/microservice-keys/cmc"
+}
+
 data "vault_generic_secret" "email_mac_secret" {
   path = "secret/test/sscs/sscs_email_mac_secret_text"
 }
@@ -53,7 +57,7 @@ module "tribunals-case-api" {
     EMAIL_SMTP_TLS_ENABLED="${var.appeal_email_smtp_tls_enabled}"
     EMAIL_SMTP_SSL_TRUST="${var.appeal_email_smtp_ssl_trust}"
 
-    IDAM_S2S_AUTH_TOTP_SECRET="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
+    IDAM_S2S_AUTH_TOTP_SECRET="${data.vault_generic_secret.cmc_s2s_secret.data["value"]}"
     IDAM_S2S_AUTH_MICROSERVICE="${var.idam_s2s_auth_microservice}"
     IDAM_S2S_AUTH_URL="${var.idam_s2s_auth_url}"
 
