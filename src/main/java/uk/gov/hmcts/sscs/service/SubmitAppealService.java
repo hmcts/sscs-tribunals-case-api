@@ -23,6 +23,7 @@ public class SubmitAppealService {
     private static final Logger LOG = getLogger(SubmitAppealService.class);
 
     public static final String SYA_CASE_WRAPPER = "SyaCaseWrapper";
+    public static final String ID_FORMAT = "%s_%s";
 
     private String appellantTemplatePath;
     private final PDFServiceClient pdfServiceClient;
@@ -41,7 +42,12 @@ public class SubmitAppealService {
         this.submitYourAppealEmail = submitYourAppealEmail;
     }
 
-    public void submitAppeal(SyaCaseWrapper appeal, String appellantUniqueId) {
+    public void submitAppeal(SyaCaseWrapper appeal) {
+        String appellantLastName = appeal.getAppellant().getLastName();
+        String nino = appeal.getAppellant().getNino();
+
+        String appellantUniqueId = String.format(ID_FORMAT, appellantLastName, nino.substring(nino.length() - 3));
+
         try {
             Map<String, Object> placeholders = Collections.singletonMap(SYA_CASE_WRAPPER, appeal);
             byte[] pdf = pdfServiceClient.generateFromHtml(getTemplate(), placeholders);

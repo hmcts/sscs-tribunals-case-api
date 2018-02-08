@@ -13,14 +13,9 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class SyaController {
-
-    public static final String SYA_CASE_WRAPPER = "SyaCaseWrapper";
-    public static final String UNDERSCORE = "_";
 
     private SubmitAppealService submitAppealService;
 
@@ -36,15 +31,8 @@ public class SyaController {
             response = String.class)})
     @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
-        String appellantLastName = syaCaseWrapper.getAppellant().getLastName();
-        String nino = syaCaseWrapper.getAppellant().getNino();
 
-        String appealUniqueIdentifier = appellantLastName + UNDERSCORE
-                + nino.substring(nino.length() - 3);
-        Map<String,Object> appealData = new HashMap<>();
-        appealData.put(SYA_CASE_WRAPPER, syaCaseWrapper);
-
-        submitAppealService.submitAppeal(syaCaseWrapper,appealUniqueIdentifier);
+        submitAppealService.submitAppeal(syaCaseWrapper);
 
         return status(201).build();
     }
