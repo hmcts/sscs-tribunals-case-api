@@ -63,8 +63,8 @@ repositories {
 }
 
 configurations {
-    integrationTestCompile.extendsFrom(testCompile)
-    integrationTestRuntime.extendsFrom(testRuntime)
+    functionalCompile.extendsFrom(testCompile)
+    functionalRuntime.extendsFrom(testRuntime)
 }
 
 def versions = [
@@ -117,7 +117,7 @@ dependencies {
 }
 
 sourceSets {
-    integrationTest {
+    functional {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
@@ -130,13 +130,13 @@ sourceSets {
 }
 
 dependencies {
-    integrationTestCompile(sourceSets.test.output)
+    functionalCompile(sourceSets.test.output)
 }
 
-task integrationTest(type: Test) {
+task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
     description = 'Runs the integration tests tests'
-    setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
-    setClasspath(sourceSets.integrationTest.runtimeClasspath)
+    setTestClassesDirs(sourceSets.functional.output.classesDirs)
+    setClasspath(sourceSets.functional.runtimeClasspath)
 }
 
 jar {
@@ -159,9 +159,5 @@ sonarqube {
 }
 
 task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
-
-}
-
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
 
 }

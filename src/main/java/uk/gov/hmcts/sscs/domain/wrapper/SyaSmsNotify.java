@@ -2,7 +2,7 @@ package uk.gov.hmcts.sscs.domain.wrapper;
 
 public class SyaSmsNotify {
 
-    private Boolean wantsSmsNotifications;
+    private Boolean wantsSMSNotifications;
 
     private String smsNumber;
 
@@ -13,11 +13,11 @@ public class SyaSmsNotify {
     }
 
     public Boolean isWantsSmsNotifications() {
-        return wantsSmsNotifications;
+        return wantsSMSNotifications;
     }
 
-    public void setWantsSmsNotifications(Boolean wantsSmsNotifications) {
-        this.wantsSmsNotifications = wantsSmsNotifications;
+    public void setWantsSMSNotifications(Boolean wantsSMSNotifications) {
+        this.wantsSMSNotifications = wantsSMSNotifications;
     }
 
     public String getSmsNumber() {
@@ -39,7 +39,7 @@ public class SyaSmsNotify {
     @Override
     public String toString() {
         return "SyaSmsNotify{"
-                + " wantsSmsNotifications=" + wantsSmsNotifications
+                + " wantsSMSNotifications=" + wantsSMSNotifications
                 + ", smsNumber='" + smsNumber + '\''
                 + ", useSameNumber=" + useSameNumber
                 + '}';

@@ -59,7 +59,9 @@
     },
     "scheduleHearing": true,
     "datesCantAttend": [
-      "04-04-2018"
+      "04-04-2018",
+      "05-04-2018",
+      "06-04-2018"
     ]
   },
   "signAndSubmit": {

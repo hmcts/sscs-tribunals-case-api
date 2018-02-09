@@ -5,13 +5,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-public class SyaCaseWrapper {
+public class    SyaCaseWrapper {
 
     @JsonProperty("hearing")
     private SyaHearing hearing;
 
     @JsonProperty("reasonsForAppealing")
     private SyaReasonsForAppealing reasonsForAppealing;
+
+    @JsonProperty("hasRepresentative")
+    private Boolean hasRepresentative;
 
     @JsonProperty("representative")
     private SyaRepresentative representative;
