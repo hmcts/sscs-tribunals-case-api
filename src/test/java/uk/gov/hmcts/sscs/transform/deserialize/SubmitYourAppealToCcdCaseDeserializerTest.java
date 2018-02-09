@@ -117,7 +117,6 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
     public SyaSmsNotify setupSmsNotifyData() {
         smsNotify = new SyaSmsNotify();
 
-        smsNotify.setWantsSmsNotifications(true);
         smsNotify.setSmsNumber("07411222222");
         smsNotify.setUseSameNumber(true);
 
@@ -213,8 +212,6 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
         //SmsNotify
         assertEquals(smsNotify.getSmsNumber(), ccdCase.getSmsNotify().getSmsNumber());
         assertEquals(smsNotify.isUseSameNumber(), ccdCase.getSmsNotify().isUseSameNumber());
-        assertEquals(smsNotify.isWantsSmsNotifications(),
-                ccdCase.getSmsNotify().isWantsSmsNotifications());
 
         //Appeal
         assertEquals(mrn.getDate(), ccdCase.getAppeal().getDateOfDecision());

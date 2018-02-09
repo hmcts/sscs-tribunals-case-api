@@ -33,7 +33,6 @@ public class SyaController {
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
 
         submitAppealService.submitAppeal(syaCaseWrapper);
-
         return status(201).build();
     }
 }
