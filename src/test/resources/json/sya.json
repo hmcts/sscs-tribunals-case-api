@@ -1,18 +1,18 @@
 {
   "benefitType": {
-    "code": "PIP",
-    "description": "Personal Independence Payment"
+    "description": "Personal Independence Payment",
+    "code": "PIP"
   },
   "mrn": {
-    "dwpIssuingOffice": "8",
-    "date": "01-12-2017"
+    "dwpIssuingOffice": "1",
+    "date": "01-02-2018"
   },
   "isAppointee": false,
   "appellant": {
     "title": "Mr",
-    "firstName": "Harry",
-    "lastName": "Potter",
-    "dob": "01-05-1990",
+    "firstName": "Joe",
+    "lastName": "Bloggs",
+    "dob": "26-02-1990",
     "nino": "AB877533C",
     "contactDetails": {
       "addressLine1": "123 Hairy Lane",
@@ -21,44 +21,48 @@
       "county": "Kent",
       "postCode": "TN32 6PL",
       "phoneNumber": "07411222222",
-      "emailAddress": "harry.potter@wizards.com"
+      "emailAddress": "joe@bloggs.com"
     }
   },
   "smsNotify": {
-    "useSameNumber": true,
-    "smsNumber": "07411222222"
+    "wantsSMSNotifications": true,
+    "smsNumber": "07411333333"
   },
+  "hasRepresentative": true,
   "representative": {
-    "firstName": "Hermione",
-    "lastName": "Granger",
-    "organisation": "Harry Potter Entertainments Ltd",
+    "firstName": "Harry",
+    "lastName": "Potter",
+    "organisation": "HP Ltd",
     "contactDetails": {
-      "addressLine1": "991 Harlow Road",
-      "addressLine2": "Off Jam Park",
-      "townCity": "Tunbridge Wells",
-      "county": "Kent",
-      "postCode": "TN32 6PL",
-      "phoneNumber": "07411666666",
-      "emailAddress": "hermione.granger@wizards.com"
+      "addressLine1": "123 Hairy Lane",
+      "addressLine2": "Off Hairy Park",
+      "townCity": "Town",
+      "county": "County",
+      "postCode": "CM14 4LQ",
+      "phoneNumber": "07411999999",
+      "emailAddress": "harry.potter@wizards.com"
     }
   },
   "reasonsForAppealing": {
-    "reasons": "Here are my reasons for appealing...",
-    "otherReasons": "Nope, not today anyway!"
+    "reasons": "My Reason",
+    "otherReasons": "Another reason"
   },
   "hearing": {
     "wantsToAttend": true,
     "wantsSupport": true,
+    "anythingElse": "Yes, this...",
     "arrangements": {
       "languageInterpreter": true,
       "signLanguageInterpreter": true,
       "hearingLoop": true,
-      "disabledAccess": true
+      "disabledAccess": false
     },
-    "anythingElse": "Nothing else today.",
     "scheduleHearing": true,
     "datesCantAttend": [
-      "25/01/1972"
+      "04-04-2018"
     ]
+  },
+  "signAndSubmit": {
+    "signer": "Joe Bloggs"
   }
 }
