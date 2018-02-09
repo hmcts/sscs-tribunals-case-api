@@ -44,7 +44,17 @@
     }
   },
   "reasonsForAppealing": {
-    "reasons": "My Reason",
+    "reasons": [ {
+        "whatYouDisagreeWith": "aaaaaaaaaa",
+        "reasonForAppealing": "aaaaaaaaaa"
+      }, {
+        "whatYouDisagreeWith": "bbbbbbbbbb",
+        "reasonForAppealing": "bbbbbbbbbb"
+      }, {
+        "whatYouDisagreeWith": "cccccccccc",
+        "reasonForAppealing": "cccccccccc"
+      }
+    ],
     "otherReasons": "Another reason"
   },
   "hearing": {
