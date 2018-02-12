@@ -1,0 +1,18 @@
+#!groovy
+properties([
+        [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
+        pipelineTriggers([[$class: 'GitHubPushTrigger']])
+])
+
+@Library("Infrastructure")
+
+def type = "java"
+
+def product = "sscs"
+
+def app = "tribunals-api"
+
+withPipeline(type, product, app) {
+    enableSlackNotifications('#sscs-tech')
+}
+
