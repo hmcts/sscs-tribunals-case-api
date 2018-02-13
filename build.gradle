@@ -150,6 +150,7 @@ jar {
 sonarqube {
     properties {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
+        property "sonar.projectKey", "SSCSTCA"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +
