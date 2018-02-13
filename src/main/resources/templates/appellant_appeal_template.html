@@ -97,7 +97,7 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">Benefit name</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.benefitType }}</dd>
+            <dd class="cya-answer">{{ SyaCaseWrapper.benefitType.description }} ({{ SyaCaseWrapper.benefitType.code }})</dd>
         </div>
         <div>
             <dt class="cya-question">NINO</dt>
@@ -354,7 +354,7 @@
 
         <p>I agree to the terms and conditions of using the ‘Appeal a benefit decision’ service.</p>
 
-        <p><span>Signed: </span>{{SyaCaseWrapper.signAndSubmit.signer}}}</p>
+        <p><span>Signed: </span>{{ SyaCaseWrapper.signAndSubmit.signer }}</p>
 
         <p>SSCS1 - Notice of appeal against a decision of the Department for Work and Pensions (09.13)</p>
 
