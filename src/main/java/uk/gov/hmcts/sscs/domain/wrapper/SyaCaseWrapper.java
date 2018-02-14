@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
-public class    SyaCaseWrapper {
+public class  SyaCaseWrapper {
 
     @JsonProperty("hearing")
     private SyaHearing hearing;

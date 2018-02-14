@@ -1,11 +1,12 @@
 package uk.gov.hmcts.sscs.controller;
 
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
