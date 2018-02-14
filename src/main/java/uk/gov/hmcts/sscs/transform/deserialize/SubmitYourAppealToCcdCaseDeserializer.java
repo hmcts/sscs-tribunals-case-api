@@ -1,10 +1,11 @@
 package uk.gov.hmcts.sscs.transform.deserialize;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.domain.wrapper.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class SubmitYourAppealToCcdCaseDeserializer {

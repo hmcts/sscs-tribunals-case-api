@@ -1,8 +1,11 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class SyaSmsNotify {
 
-    private Boolean wantsSMSNotifications;
+    @JsonProperty("wantsSMSNotifications")
+    private Boolean wantsSmsNotifications;
 
     private String smsNumber;
 
@@ -13,11 +16,11 @@ public class SyaSmsNotify {
     }
 
     public Boolean isWantsSmsNotifications() {
-        return wantsSMSNotifications;
+        return wantsSmsNotifications;
     }
 
-    public void setWantsSMSNotifications(Boolean wantsSMSNotifications) {
-        this.wantsSMSNotifications = wantsSMSNotifications;
+    public void setWantsSmsNotifications(Boolean wantsSmsNotifications) {
+        this.wantsSmsNotifications = wantsSmsNotifications;
     }
 
     public String getSmsNumber() {
@@ -39,7 +42,7 @@ public class SyaSmsNotify {
     @Override
     public String toString() {
         return "SyaSmsNotify{"
-                + " wantsSMSNotifications=" + wantsSMSNotifications
+                + " wantsSMSNotifications=" + wantsSmsNotifications
                 + ", smsNumber='" + smsNumber + '\''
                 + ", useSameNumber=" + useSameNumber
                 + '}';

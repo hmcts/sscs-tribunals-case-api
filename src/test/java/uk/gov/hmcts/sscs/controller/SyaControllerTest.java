@@ -1,28 +1,30 @@
 package uk.gov.hmcts.sscs.controller;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import static org.mockito.Matchers.any;
-import org.mockito.Mock;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.http.MediaType;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.sscs.service.SubmitAppealService;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.sscs.exception.PdfGenerationException;
+import uk.gov.hmcts.sscs.service.SubmitAppealService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SyaControllerTest {

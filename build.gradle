@@ -1,12 +1,12 @@
 plugins {
     id 'application'
-//    id 'checkstyle'
+    id 'checkstyle'
     id 'pmd'
     id 'org.sonarqube' version '2.5'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.4.RELEASE'
     id 'org.springframework.boot' version '1.5.9.RELEASE'
-    id 'org.owasp.dependencycheck' version '3.1.0'
+    id 'org.owasp.dependencycheck' version '1.4.5.1'
     id 'com.github.ben-manes.versions' version '0.17.0'
 }
 
@@ -16,12 +16,12 @@ version = '1.0.0'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-//checkstyle {
-//    maxWarnings = 0
-//    toolVersion = '8.7'
-//    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-//    configDir = new File(rootDir, 'config/checkstyle')
-//}
+checkstyle {
+    maxWarnings = 0
+    toolVersion = '8.7'
+    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
+    configDir = new File(rootDir, 'config/checkstyle')
+}
 
 pmd {
     toolVersion = "5.8.1"

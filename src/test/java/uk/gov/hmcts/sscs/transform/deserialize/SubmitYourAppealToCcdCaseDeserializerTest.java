@@ -2,13 +2,14 @@ package uk.gov.hmcts.sscs.transform.deserialize;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+
+import java.time.LocalDate;
+import java.time.Month;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.ExcludeDates;
 import uk.gov.hmcts.sscs.domain.wrapper.*;
-import java.time.LocalDate;
-import java.time.Month;
 
 public class SubmitYourAppealToCcdCaseDeserializerTest {
 
@@ -36,7 +37,7 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
         testData.setRepresentative(setupRepresentativeData());
         testData.setSmsNotify(setupSmsNotifyData());
         testData.setMrn(setupMrnData());
-        testData.setBenefitType(new SyaBenefitType("Personal Independence Payment","PIP" ));
+        testData.setBenefitType(new SyaBenefitType("Personal Independence Payment","PIP"));
         testData.setIsAppointee(false);
 
         return testData;
@@ -139,8 +140,8 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
         CcdCase ccdCase = transformer.convertSyaToCcdCase(testData);
 
         assertEquals(testData.getBenefitType().getDescription()
-                + " (" + testData.getBenefitType().getCode() + ")"
-                , ccdCase.getAppeal().getBenefit()
+                + " (" + testData.getBenefitType().getCode() + ")",
+                ccdCase.getAppeal().getBenefit()
                 .getFullDescription());
         assertEquals(testData.getIsAppointee(), ccdCase.getIsAppointee());
 
