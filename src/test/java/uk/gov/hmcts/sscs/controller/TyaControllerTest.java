@@ -25,6 +25,7 @@ import uk.gov.hmcts.sscs.service.TribunalsService;
 public class TyaControllerTest {
 
     public static final String APPEAL_ID = "appeal-id";
+    public static final String SURNAME = "surname";
     public static final String NOT_FOUND_APPEAL_ID = "not-found-appeal-id";
 
     @Mock
@@ -37,15 +38,18 @@ public class TyaControllerTest {
         controller = new TyaController(tribunalsService);
     }
 
-    @Test(expected = AppealNotFoundException.class)
-    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws CcdException {
-        //Given
-        String appealId = NOT_FOUND_APPEAL_ID;
-        when(tribunalsService.findAppeal(appealId)).thenThrow(
-            new AppealNotFoundException(appealId));
+    @Test
+    public void shouldReturnOkGivenValidAppealNumberSurnameCombination() throws CcdException {
+        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenReturn(true);
 
-        //When
-        controller.getAppeal(appealId, null);
+        controller.validateSurname(APPEAL_ID, SURNAME);
+    }
+
+    @Test
+    public void shouldReturn404GivenInvalidAppealNumberSurnameCombination() throws CcdException {
+        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenReturn(false);
+
+        controller.validateSurname(APPEAL_ID, SURNAME);
     }
 
     @Test
@@ -55,11 +59,22 @@ public class TyaControllerTest {
         when(tribunalsService.findAppeal(APPEAL_ID)).thenReturn(node);
 
         //When
-        ResponseEntity<String> receivedAppeal = controller.getAppeal(APPEAL_ID, null);
+        ResponseEntity<String> receivedAppeal = controller.getAppeal(APPEAL_ID);
 
         //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+    }
+
+    @Test(expected = AppealNotFoundException.class)
+    public void testToThrowAppealNotFoundExceptionIfAppealNotFound() throws CcdException {
+        //Given
+        String appealId = NOT_FOUND_APPEAL_ID;
+        when(tribunalsService.findAppeal(appealId)).thenThrow(
+            new AppealNotFoundException(appealId));
+
+        //When
+        controller.getAppeal(appealId);
     }
 
 
@@ -86,13 +101,13 @@ public class TyaControllerTest {
         subscription.setPhoneNumber("07788996655");
         subscription.setEmailSubscribe(true);
         subscription.setMobileSubscribe(true);
-        
+
         //When
         ResponseEntity<String> benefitType = controller.updateSubscription(APPEAL_ID, subscription);
 
         // Then
         assertThat(benefitType.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(benefitType.getBody(), equalTo("{\"benefitType\":\"benefitTypeValue\"}"));
-    }    
+    }
 
 }

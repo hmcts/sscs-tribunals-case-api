@@ -1,11 +1,17 @@
 package uk.gov.hmcts.sscs.tya;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
 import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.service.CcdService;
 
@@ -28,6 +36,12 @@ public class TyaEndpointsIt {
     @MockBean
     CcdService ccdService;
 
+    private String expectedAppeal;
+
+    @Before
+    public void setUp() {
+        expectedAppeal = getExpectedAppeal();
+    }
 
     public CcdCase createCase() {
         Appeal appeal = new Appeal();
@@ -50,10 +64,37 @@ public class TyaEndpointsIt {
         CcdCase ccdCase = createCase();
         when(ccdService.findCcdCaseByAppealNumber("1")).thenReturn(ccdCase);
 
-        mockMvc.perform(get("/appeals/1/surname/a"))
+        MvcResult mvcResult = mockMvc.perform(get("/appeals/1"))
             .andExpect(status().isOk())
-            .andExpect(content().string(containsString(expected)));
+            .andReturn();
+        String result = mvcResult.getResponse().getContentAsString();
+        assertThat(result, is(expectedAppeal));
     }
 
-    String expected = "{\"appeal\":{\"caseReference\":\"SC/12345\",\"appealNumber\":\"mj876\",\"status\":\"DWP_RESPOND\",\"benefitType\":\"esa\",\"name\":\"Mr A A\",\"latestEvents\":[],\"historicalEvents\":[]}}";
+    @Test
+    public void shouldValidateSurnameAgainstAppealNumber() throws Exception {
+        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a")).thenReturn(new CcdCase());
+
+        mockMvc.perform(get("/appeals/1/surname/a"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnNotFoundForInvalidSurname() throws Exception {
+        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a")).thenReturn(null);
+
+        mockMvc.perform(get("/appeals/1/surname/a"))
+            .andExpect(status().isNotFound());
+    }
+
+    private String getExpectedAppeal() {
+        String syaCaseJson = "json/appeal.json";
+        URL resource = getClass().getClassLoader().getResource(syaCaseJson);
+        try {
+            String appeal = IOUtils.toString(resource, Charset.defaultCharset());
+            return appeal.replaceAll("\n", "");
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 }

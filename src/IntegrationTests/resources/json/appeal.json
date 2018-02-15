@@ -1,11 +1,1 @@
-{
-  "appeal": {
-    "caseReference": "SC/12345",
-    "appealNumber": "mj876",
-    "status": "DWP_RESPOND",
-    "benefitType": "esa",
-    "name": "Mr A A",
-    "latestEvents": [],
-    "historicalEvents": []
-  }
-}
+{"appeal":{"caseReference":"SC/12345","appealNumber":"mj876","status":"DWP_RESPOND","benefitType":"esa","name":"Mr A A","latestEvents":[],"historicalEvents":[]}}
