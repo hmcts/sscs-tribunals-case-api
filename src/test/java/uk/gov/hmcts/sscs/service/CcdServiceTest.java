@@ -1,7 +1,9 @@
 package uk.gov.hmcts.sscs.service;
 
+import static junit.framework.TestCase.assertNotNull;
 import static org.assertj.core.util.Maps.newHashMap;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -22,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
+import uk.gov.hmcts.sscs.exception.CcdException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
@@ -203,7 +206,56 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldReturnCaseGivenSurnameAndAppealNumber() {
+    public void shouldReturnCaseGivenSurnameAndAppealNumber() throws Exception {
+        setup();
 
+        CcdCase ccdCase = new CcdCase();
+        Appeal appeal = new Appeal();
+        appeal.setAppealNumber("567");
+        Appellant appellant = new Appellant();
+        appellant.setName(new Name("Mr", "Harry", "Kane"));
+        ccdCase.setAppeal(appeal);
+        ccdCase.setAppellant(appellant);
+
+        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
+        ccdCaseResponse.setCaseData(ccdCase);
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
+            eq(ccdPath)))
+            .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
+
+        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumberAndSurname("567", "Kane");
+
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
+
+        assertNotNull(ccdCaseRes);
+    }
+
+    @Test
+    public void shouldReturnNullIfSurnameInvalid() throws Exception {
+        setup();
+
+        CcdCase ccdCase = new CcdCase();
+        Appeal appeal = new Appeal();
+        appeal.setAppealNumber("567");
+        Appellant appellant = new Appellant();
+        appellant.setName(new Name("Mr", "Harry", "Kane"));
+        ccdCase.setAppeal(appeal);
+        ccdCase.setAppellant(appellant);
+
+        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
+        ccdCaseResponse.setCaseData(ccdCase);
+
+        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
+            eq(ccdPath)))
+            .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
+
+        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumberAndSurname("567", "XXX");
+
+        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
+
+        assertNull(ccdCaseRes);
     }
 }
