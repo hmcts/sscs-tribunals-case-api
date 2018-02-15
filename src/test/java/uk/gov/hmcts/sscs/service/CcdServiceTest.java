@@ -24,7 +24,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
-import uk.gov.hmcts.sscs.exception.CcdException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
