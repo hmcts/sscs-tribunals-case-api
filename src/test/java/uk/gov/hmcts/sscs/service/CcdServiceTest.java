@@ -201,4 +201,9 @@ public class CcdServiceTest {
 
         assertEquals(ccdCase.getBenefitType().toLowerCase(), benefitType);
     }
+
+    @Test
+    public void shouldReturnCaseGivenSurnameAndAppealNumber() {
+
+    }
 }

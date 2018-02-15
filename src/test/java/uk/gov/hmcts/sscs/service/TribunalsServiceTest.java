@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.service;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
@@ -20,12 +21,14 @@ import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
 
     public static final String APPEAL_NUMBER = "asfefsdf3223";
+    private static final String SURNAME = "surname";
     private TribunalsService tribunalsService;
 
     @Mock
@@ -47,8 +50,22 @@ public class TribunalsServiceTest {
     private ArgumentCaptor<CcdCase> captor;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         tribunalsService = new TribunalsService(ccdService, emailService, email, transformer, appealNumberGenerator);
+    }
+
+    @Test
+    public void shouldReturnTrueGivenValidAppealNumberAndSurname() throws CcdException {
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME)).willReturn(new CcdCase());
+
+        assertTrue(tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME));
+    }
+
+    @Test(expected = InvalidSurnameException.class)
+    public void shouldThrowExceptionGivenValidationFails() throws CcdException {
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME)).willReturn(null);
+
+        tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
     }
 
     @Test

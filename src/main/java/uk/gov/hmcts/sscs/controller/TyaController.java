@@ -34,15 +34,25 @@ public class TyaController {
         this.tribunalsService = tribunalsService;
     }
 
-    @ApiOperation(value = "getAppeal",
-        notes = "Checks valid appeal number and surname and then returns an appeal details",
+    @ApiOperation(value = "validateSurname",
+        notes = "Checks valid appeal number and surname",
         response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
     @RequestMapping(value = "/appeals/{appealNumber}/surname/{surname}", method = GET,
             produces = APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> getAppeal(
+    public void validateSurname(
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) throws CcdException {
+        tribunalsService.validateSurname(appealNumber, surname);
+    }
+
+    @ApiOperation(value = "getAppeal",
+        notes = "Returns an appeal given the appeal number",
+        response = String.class, responseContainer = "Appeal details")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
+    @RequestMapping(value = "/appeals/{appealNumber}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<String> getAppeal(
+            @PathVariable(value = "appealNumber") String appealNumber) throws CcdException {
         return ok(tribunalsService.findAppeal(appealNumber).toString());
     }
 

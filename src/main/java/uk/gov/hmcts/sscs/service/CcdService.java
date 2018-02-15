@@ -151,4 +151,10 @@ public class CcdService {
         }
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
+
+    public CcdCase findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) throws CcdException {
+        CcdCase ccdCase = findCcdCaseByAppealNumber(appealNumber);
+        return ccdCase.getAppellant().getName().getSurname().equals(surname) ? ccdCase : null;
+
+    }
 }
