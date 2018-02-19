@@ -43,8 +43,7 @@ public class AppealNumberGenerator {
                 .withinRange(MINIMUM_CODE_POINT, MAXIMUM_CODE_POINT)
                 .filteredBy(CharacterPredicates.DIGITS, CharacterPredicates.LETTERS).usingRandom(random::nextInt)
                 .build();
-        String appealNumber = generator.generate(LENGTH);
-        return appealNumber;
+        return generator.generate(LENGTH);
     }
 
 }
