@@ -9,19 +9,19 @@ provider "vault" {
 }
 
 data "vault_generic_secret" "cmc_s2s_secret" {
-  path = "secret/test/ccidam/service-auth-provider/api/microservice-keys/cmc"
+  path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/cmc"
 }
 
 data "vault_generic_secret" "email_mac_secret" {
-  path = "secret/test/sscs/sscs_email_mac_secret_text"
+  path = "secret/${var.infrastructure_env}/sscs/sscs_email_mac_secret_text"
 }
 
 data "vault_generic_secret" "sscs_rpc_email_id" {
-  path = "secret/test/sscs/secret/test/sscs/sscs_rpc_email_id"
+  path = "secret/${var.infrastructure_env}/sscs/secret/${var.infrastructure_env}/sscs/sscs_rpc_email_id"
 }
 
 data "vault_generic_secret" "sscs_tribunals_case_secret" {
-  path = "secret/test/ccidam/service-auth-provider/api/microservice-keys/sscs-tribunals-case"
+  path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/sscs-tribunals-case"
 }
 
 
