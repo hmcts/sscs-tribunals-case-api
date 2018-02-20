@@ -1,8 +1,10 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
+import java.util.List;
+
 public class SyaReasonsForAppealing {
 
-    private String reasons;
+    private List<Reason> reasons;
 
     private String otherReasons;
 
@@ -10,11 +12,11 @@ public class SyaReasonsForAppealing {
         // For Json
     }
 
-    public String getReasons() {
+    public List<Reason> getReasons() {
         return reasons;
     }
 
-    public void setReasons(String reasons) {
+    public void setReasons(List<Reason> reasons) {
         this.reasons = reasons;
     }
 
@@ -33,4 +35,5 @@ public class SyaReasonsForAppealing {
                 + ", otherReasons='" + otherReasons + '\''
                 + '}';
     }
+
 }

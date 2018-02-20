@@ -1,16 +1,19 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
+import java.util.List;
+import uk.gov.hmcts.sscs.domain.wrapper.Reason;
+
 public class ReasonsForAppealing {
 
-    private String reasons;
+    private List<Reason> reasons;
 
     private String otherReasons;
 
-    public String getReasons() {
+    public List<Reason> getReasons() {
         return reasons;
     }
 
-    public void setReasons(String reasons) {
+    public void setReasons(List<Reason> reasons) {
         this.reasons = reasons;
     }
 
