@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.transform.deserialize;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -69,7 +70,10 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
     public SyaReasonsForAppealing setupReasonsForAppealingData() {
         reasonsForAppealing = new SyaReasonsForAppealing();
 
-        reasonsForAppealing.setReasons("Here are my reasons for appealing...");
+        Reason reason = new Reason();
+        reason.setReasonForAppealing("Here are my reasons for appealing...");
+        reason.setWhatYouDisagreeWith("Heres what I disagree with...");
+        reasonsForAppealing.setReasons(newArrayList(reason));
         reasonsForAppealing.setOtherReasons("Nope, not today anyway!");
 
         return reasonsForAppealing;
