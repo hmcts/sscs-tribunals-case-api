@@ -54,7 +54,7 @@ data "vault_generic_secret" "smtp_host" {
   path = "secret/${var.infrastructure_env}/sscs/smtp_host"
 }
 
-data "vault_generic_secret" "appeal_email_host_port" {
+data "vault_generic_secret" "smtp_port" {
   path = "secret/${var.infrastructure_env}/sscs/smtp_port"
 }
 
