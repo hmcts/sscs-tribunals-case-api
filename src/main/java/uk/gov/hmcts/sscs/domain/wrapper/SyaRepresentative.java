@@ -50,6 +50,10 @@ public class SyaRepresentative {
         this.firstName = firstName;
     }
 
+    public String getFullName() {
+        return String.format("%s %s", firstName, lastName);
+    }
+
     @Override
     public String toString() {
         return "SyaRepresentative{"
