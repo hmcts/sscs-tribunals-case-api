@@ -3,7 +3,7 @@ package uk.gov.hmcts.sscs.service;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class AppealNumberGeneratorTest {
     }
 
     @Test
-    public void shouldGenerateAppealNumber() throws CcdException {
+    public void shouldGenerateAppealNumberWhenCcdReturnNullObject() throws CcdException {
 
         given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(null);
 
@@ -40,8 +40,50 @@ public class AppealNumberGeneratorTest {
         assertNotNull(appealNumber);
     }
 
+    @Test
+    public void shouldGenerateAppealNumberWhenCcdReturnEmptyObject() throws CcdException {
+
+        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(new CcdCase());
+
+        String appealNumber = appealNumberGenerator.generate();
+
+        verify(ccdService).findCcdCaseByAppealNumber(anyString());
+
+        assertNotNull(appealNumber);
+    }
+
+    @Test
+    public void shouldGenerateAppealNumberInSecondAttempt() throws Exception {
+
+        Appeal appeal = new Appeal();
+        appeal.setAppealNumber("abcd1efgh2");
+        CcdCase ccdCase = new CcdCase();
+        ccdCase.setAppeal(appeal);
+
+        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(ccdCase, null);
+
+        appealNumberGenerator.generate();
+
+        verify(ccdService, times(2)).findCcdCaseByAppealNumber(anyString());
+    }
+
+    @Test
+    public void shouldGenerateAppealNumberInThirdAttempt() throws Exception {
+
+        Appeal appeal = new Appeal();
+        appeal.setAppealNumber("abcd1efgh2");
+        CcdCase ccdCase = new CcdCase();
+        ccdCase.setAppeal(appeal);
+
+        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(ccdCase, ccdCase, null);
+
+        appealNumberGenerator.generate();
+
+        verify(ccdService, times(3)).findCcdCaseByAppealNumber(anyString());
+    }
+
     @Test(expected = CcdException.class)
-    public void shouldHandleException() throws Exception {
+    public void shouldThrowExceptionTryingThreeAttempts() throws Exception {
 
         Appeal appeal = new Appeal();
         appeal.setAppealNumber("abcd1efgh2");
