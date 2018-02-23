@@ -25,25 +25,21 @@ public class AppealNumberGenerator {
 
     public String generate() throws CcdException {
 
-        String appealNumber = generateAppealNumber();
-        CcdCase ccdCase = ccdService.findCcdCaseByAppealNumber(appealNumber);
-        if (!isDuplicateInCcd(ccdCase)) {
-            return appealNumber;
+        String appealNumber = "";
+        int count = 3;
+        while (count-- > 0 && "".equals(appealNumber)) {
+            appealNumber = generateAppealNumber();
+            CcdCase ccdCase = ccdService.findCcdCaseByAppealNumber(appealNumber);
+            if (isDuplicateInCcd(ccdCase)) {
+                appealNumber = "";
+            }
+            if (count == 0 && "".equals(appealNumber)) {
+                throw new CcdException("AppealNumberGenerator has generated duplicate appeal number against CCD");
+            }
         }
 
-        appealNumber = generateAppealNumber();
-        ccdCase = ccdService.findCcdCaseByAppealNumber(appealNumber);
-        if (!isDuplicateInCcd(ccdCase)) {
-            return appealNumber;
-        }
+        return appealNumber;
 
-        appealNumber = generateAppealNumber();
-        ccdCase = ccdService.findCcdCaseByAppealNumber(appealNumber);
-        if (!isDuplicateInCcd(ccdCase)) {
-            return appealNumber;
-        } else {
-            throw new CcdException("AppealNumberGenerator has generated duplicate appeal number against CCD");
-        }
     }
 
     private boolean isDuplicateInCcd(CcdCase ccdCase) {
