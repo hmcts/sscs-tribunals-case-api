@@ -248,11 +248,16 @@
 
     <h2 class="heading-medium">Reasons for appealing</h2>
     <dl class="govuk-check-your-answers">
-        <div>
-            <dt class="cya-question">What you disagree with and why</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.reasonsForAppealing.reasons }}</dd>
-        </div>
-
+        {% for reason in SyaCaseWrapper.reasonsForAppealing.reasons %}
+            <div>
+                <dt class="cya-question">What you disagree with</dt>
+                <dd class="cya-answer">{{ reason.whatYouDisagreeWith }}</dd>
+            </div>
+            <div>
+                <dt class="cya-question">Why you disagree with it</dt>
+                <dd class="cya-answer">{{ reason.reasonForAppealing }}</dd>
+            </div>
+        {% endfor %}
         <div>
             <dt class="cya-question">Anything else you want to tell the tribunal</dt>
             <dd class="cya-answer">{{ SyaCaseWrapper.reasonsForAppealing.otherReasons | default('Not provided') }}</dd>
