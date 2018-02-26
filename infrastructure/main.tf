@@ -65,11 +65,13 @@ locals {
 
 
 module "tribunals-case-api" {
-  source   = "git@github.com:contino/moj-module-webapp?ref=master"
-  product  = "${var.product}-api"
-  location = "${var.location}"
-  env      = "${var.env}"
-  ilbIp    = "${var.ilbIp}"
+  source       = "git@github.com:contino/moj-module-webapp?ref=master"
+  product      = "${var.product}-api"
+  location     = "${var.location}"
+  env          = "${var.env}"
+  ilbIp        = "${var.ilbIp}"
+  is_frontend  = false
+  subscription = "${var.subscription}"
 
   app_settings = {
     AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
