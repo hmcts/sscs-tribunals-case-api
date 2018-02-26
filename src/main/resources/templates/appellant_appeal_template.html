@@ -314,10 +314,27 @@
         </div>
 
         <div>
-            <dt class="cya-question">Disabled access</dt>
+            <dt class="cya-question">Accessible hearing room</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.disabledAccess == true ? "Yes" : "No" }}, disabled access required
+                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.accessibleHearingRoom == true ? "Yes" : "No" }}, accessible hearing room required
             </dd>
+        </div>
+
+        <div>
+            <dt class="cya-question">Other</dt>
+            <dd class="cya-answer">
+                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.other == true ? "Yes" : "No" }}, other support required
+            </dd>
+        </div>
+
+        <div>
+            <dt class="cya-question">Language interpreter type</dt>
+            <dd class="cya-answer">{{ SyaCaseWrapper.hearing.interpreterLanguageType | default('None') }}</dd>
+        </div>
+
+        <div>
+            <dt class="cya-question">Sign language type</dt>
+            <dd class="cya-answer">{{ SyaCaseWrapper.hearing.signLanguageType | default('None') }}</dd>
         </div>
 
         <div>
