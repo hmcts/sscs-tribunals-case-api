@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.service.CcdService;
+import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -35,6 +36,9 @@ public class TyaEndpointsIt {
 
     @MockBean
     CcdService ccdService;
+
+    @MockBean
+    MessageAuthenticationService macService;
 
     private String expectedAppeal;
 
@@ -85,6 +89,18 @@ public class TyaEndpointsIt {
 
         mockMvc.perform(get("/appeals/1/surname/a"))
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldValidateMacToken() throws Exception {
+        when(macService.validateMacTokenAndReturnBenefitType("abcde12345")).thenReturn("002");
+
+        MvcResult mvcResult = mockMvc.perform(get("/appeals/tokens/abcde12345"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String result = mvcResult.getResponse().getContentAsString();
+        assertThat(result, is("{\"benefitType\":\"002\"}"));
     }
 
     private String getExpectedAppeal() {
