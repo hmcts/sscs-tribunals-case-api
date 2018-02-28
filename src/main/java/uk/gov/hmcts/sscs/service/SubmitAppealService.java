@@ -5,6 +5,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
 
 import java.io.IOException;
+
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
@@ -33,9 +35,9 @@ public class SubmitAppealService {
     private SubmitYourAppealEmail submitYourAppealEmail;
 
     @Autowired
-    public SubmitAppealService(@Value("${appellant.appeal.html.template.path}")
-                                           String appellantTemplatePath,
-                               PDFServiceClient pdfServiceClient, EmailService emailService,
+    public SubmitAppealService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
+                               PDFServiceClient pdfServiceClient,
+                               EmailService emailService,
                                SubmitYourAppealEmail submitYourAppealEmail) {
 
         this.appellantTemplatePath = appellantTemplatePath;
@@ -54,6 +56,7 @@ public class SubmitAppealService {
             Map<String, Object> placeholders = Collections.singletonMap(SYA_CASE_WRAPPER, appeal);
             byte[] pdf = pdfServiceClient.generateFromHtml(getTemplate(), placeholders);
 
+            submitYourAppealEmail.setSubject(appellantUniqueId);
             submitYourAppealEmail.setAttachments(newArrayList(pdf(pdf,appellantUniqueId + ".pdf")));
             emailService.sendEmail(submitYourAppealEmail);
         } catch (EmailSendFailedException ex) {

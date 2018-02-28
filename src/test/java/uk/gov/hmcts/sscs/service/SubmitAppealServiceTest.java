@@ -1,5 +1,7 @@
 package uk.gov.hmcts.sscs.service;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -35,7 +37,6 @@ public class SubmitAppealServiceTest {
     @Mock
     private EmailService emailService;
 
-    @Mock
     private SubmitYourAppealEmail submitYourAppealEmail;
 
     private SubmitAppealService service;
@@ -43,6 +44,8 @@ public class SubmitAppealServiceTest {
     @Before
     public void setUp() {
         mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+        submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
 
         service = new SubmitAppealService(TEMPLATE_PATH,
                 pdfServiceClient, emailService, submitYourAppealEmail);
@@ -57,6 +60,7 @@ public class SubmitAppealServiceTest {
 
         service.submitAppeal(appealData);
 
+        assertThat(submitYourAppealEmail.getSubject(), is("Bloggs_33C"));
         verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
     }
 
