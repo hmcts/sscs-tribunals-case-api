@@ -76,9 +76,6 @@ public class SyaEndpointsIt {
     @Value("${appeal.email.to}")
     private String emailTo;
 
-    @Value("${appeal.email.subject}")
-    private String emailSubject;
-
     private SyaCaseWrapper caseWrapper;
     private MimeMessage message;
 
@@ -105,7 +102,7 @@ public class SyaEndpointsIt {
 
         assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is(emailSubject));
+        assertThat(message.getSubject(), is("Bloggs_33C"));
         assertThat(getPdf(), is(PDF));
 
         verify(mailSender).send(message);
