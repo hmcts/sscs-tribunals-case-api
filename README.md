@@ -1,10 +1,10 @@
-./# SSCS - Tribunals Case API
+# SSCS - Tribunals Case API
 
-##Purpose
+## Purpose
 Tribunals case api is a spring boot based application to create new appeals for the SSCS Appellants
 
 
-###Prerequisites
+### Prerequisites
 
 For versions and complete list of dependencies see build.gradle
 
@@ -12,9 +12,9 @@ For versions and complete list of dependencies see build.gradle
 * Spring Boot
 * Gradle
 
-##Building and deploying the application
+## Building and deploying the application
   
-###Building the application
+### Building the application
 
 To build the project execute the following command:
 
@@ -30,7 +30,7 @@ Run the application by executing:
 ./gradlew bootRun
 ```
 
-###Running in Docker
+### Running in Docker
 Create the image of the application by executing the following command:
 
 ```
@@ -64,7 +64,7 @@ You should get a response similar to this:
 ```
 
 
-###Unit tests
+### Unit tests
 
 To run all unit tests execute the following command:
 
