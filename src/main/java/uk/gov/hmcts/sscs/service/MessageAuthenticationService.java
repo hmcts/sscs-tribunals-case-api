@@ -58,10 +58,10 @@ public class MessageAuthenticationService {
         }
     }
 
-    public String generateToken(String appealNumber)  {
+    public String generateToken(String appealNumber, String benefitType)  {
         try {
             long timestamp = now(of(ZONE_ID)).toInstant().toEpochMilli() / 1000;
-            String originalMessage = format("%s|%d", appealNumber, timestamp);
+            String originalMessage = format("%s|%s|%d", appealNumber, benefitType, timestamp);
             byte[] digest = mac.doFinal(originalMessage.getBytes(CHARSET));
             String macSubString =  printBase64Binary(digest).substring(0,10);
             String macToken = format("%s|%s", originalMessage, macSubString);
@@ -72,19 +72,21 @@ public class MessageAuthenticationService {
         }
     }
 
-    public String decryptMacToken(String encryptedToken) {
+    public String validateMacTokenAndReturnBenefitType(String encryptedToken) {
         try {
-            return checkValidEncryptedToken(encryptedToken);
+            validateMacToken(encryptedToken);
+            return getBenefitType(encryptedToken);
         } catch (Exception ex) {
             LOG.error(ERROR_MESSAGE + encryptedToken, ex);
             throw new InvalidSubscriptionTokenException(ERROR_MESSAGE + encryptedToken);
         }
     }
 
-    private String checkValidEncryptedToken(String encryptedToken) throws InvalidKeyException, NoSuchAlgorithmException {
-        String decrypted = decryptedToken(encryptedToken);
+    private void validateMacToken(String encryptedToken) throws InvalidKeyException,
+            NoSuchAlgorithmException {
+        String decrypted = decryptToken(encryptedToken);
         String[] parts = tokenParts(decrypted);
-        String originalMessage = parts[0] + "|" + parts[1];
+        String originalMessage = parts[0] + "|" + parts[1] + "|" + parts[2];
         mac = initializeMac();
         mac.update(originalMessage.getBytes(CHARSET));
         byte[] digest = mac.doFinal();
@@ -93,14 +95,18 @@ public class MessageAuthenticationService {
         if (!decrypted.equals(macToken)) {
             throw new InvalidSubscriptionTokenException(ERROR_MESSAGE + encryptedToken);
         }
-        return decrypted;
+    }
+
+    private String getBenefitType(String encryptedToken) {
+        String decrypted = decryptToken(encryptedToken);
+        return tokenParts(decrypted)[1];
     }
 
     private String[] tokenParts(String decryptedToken) {
         return decryptedToken.split("\\|");
     }
 
-    private String decryptedToken(String encryptedToken) {
+    public String decryptToken(String encryptedToken) {
         return new String(getDecoder().decode(encryptedToken), CHARSET);
     }
 
