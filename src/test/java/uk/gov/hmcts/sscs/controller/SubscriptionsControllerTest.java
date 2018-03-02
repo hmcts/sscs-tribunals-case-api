@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.controller;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 
 import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException;
+import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,11 +30,37 @@ public class SubscriptionsControllerTest {
     @Mock
     private TribunalsService tribunalsService;
 
+    @Mock
+    private MessageAuthenticationService macService;
+
     private SubscriptionsController controller;
 
     @Before
     public void setUp() {
-        controller = new SubscriptionsController(tribunalsService);
+        controller = new SubscriptionsController(macService, tribunalsService);
+    }
+
+    @Test
+    public void validateMacToken() {
+        // Given
+        when(macService.validateMacTokenAndReturnBenefitType(anyString())).thenReturn("002");
+
+        // When
+        ResponseEntity<String> benefitType = controller.validateMacToken("abcde12345");
+
+        // Then
+        assertThat(benefitType.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(benefitType.getBody(), equalTo("{\"benefitType\":\"002\"}"));
+    }
+
+    @Test(expected = InvalidSubscriptionTokenException.class)
+    public void shouldThrowInvalidSubscriptionTokenException() {
+        // Given
+        when(macService.validateMacTokenAndReturnBenefitType(anyString()))
+            .thenThrow(InvalidSubscriptionTokenException.class);
+
+        // When
+        controller.validateMacToken("abcde12345");
     }
 
     @Test
