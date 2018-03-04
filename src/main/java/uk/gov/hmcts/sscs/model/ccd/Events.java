@@ -1,5 +1,8 @@
 package uk.gov.hmcts.sscs.model.ccd;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Events {
     Event value;
 

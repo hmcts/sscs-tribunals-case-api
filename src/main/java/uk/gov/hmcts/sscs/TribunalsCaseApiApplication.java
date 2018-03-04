@@ -13,7 +13,8 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableFeignClients(basePackages =
         {
-                "uk.gov.hmcts.reform.authorisation"
+                "uk.gov.hmcts.reform.authorisation",
+                "uk.gov.hmcts.sscs.service.idam"
         })
 public class TribunalsCaseApiApplication {
 

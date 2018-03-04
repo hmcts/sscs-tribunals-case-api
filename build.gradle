@@ -8,6 +8,7 @@ plugins {
     id 'org.springframework.boot' version '1.5.9.RELEASE'
     id 'org.owasp.dependencycheck' version '1.4.5.1'
     id 'com.github.ben-manes.versions' version '0.17.0'
+    id 'net.ltgt.apt' version '0.13'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -108,7 +109,10 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'pdf-service-client', version: '5.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.4.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '2.1.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '2.5.0'
+
+    compileOnly 'org.projectlombok:lombok:1.16.20'
+    apt "org.projectlombok:lombok:1.16.20"
 
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
