@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
+import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
@@ -51,8 +52,10 @@ public class CcdServiceTest {
 
     private String ccdPath;
 
+    private ReadCoreCaseDataService readCoreCaseDataService;
+
     public void setup() throws Exception {
-        ccdService = new CcdService(coreCaseDataClient, authClient, idamClient, CASE_WORKER_ID);
+        ccdService = new CcdService(coreCaseDataClient, authClient, idamClient, CASE_WORKER_ID, readCoreCaseDataService);
 
         given(authClient.sendRequest(eq("lease"), eq(HttpMethod.POST),
                 eq(""))).willReturn(serviceToken);

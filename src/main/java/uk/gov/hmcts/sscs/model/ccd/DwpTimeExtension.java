@@ -1,23 +1,20 @@
 package uk.gov.hmcts.sscs.model.ccd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
+import lombok.Value;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Value
+@Builder
 public class DwpTimeExtension {
     private DwpTimeExtensionDetails value;
 
-    public DwpTimeExtensionDetails getValue() {
-        return value;
-    }
-
-    public void setValue(DwpTimeExtensionDetails value) {
+    @JsonCreator
+    public DwpTimeExtension(@JsonProperty("value") DwpTimeExtensionDetails value) {
         this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return "DwpTimeExtension{" +
-                "value=" + value +
-                '}';
     }
 }

@@ -1,8 +1,15 @@
 package uk.gov.hmcts.sscs.model.ccd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
+import lombok.Value;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Value
+@Builder
 public class Appellant {
 
     private Name name;
@@ -10,45 +17,14 @@ public class Appellant {
     private Contact contact;
     private Identity identity;
 
-    public Name getName() {
-        return name;
-    }
-
-    public void setName(Name name) {
+    @JsonCreator
+    public Appellant(@JsonProperty("name") Name name,
+                     @JsonProperty("address") Address address,
+                     @JsonProperty("contact") Contact contact,
+                     @JsonProperty("identity") Identity identity) {
         this.name = name;
-    }
-
-    public Address getAddress() {
-        return address;
-    }
-
-    public void setAddress(Address address) {
         this.address = address;
-    }
-
-    public Contact getContact() {
-        return contact;
-    }
-
-    public void setContact(Contact contact) {
         this.contact = contact;
-    }
-
-    public Identity getIdentity() {
-        return identity;
-    }
-
-    public void setIdentity(Identity identity) {
         this.identity = identity;
-    }
-
-    @Override
-    public String toString() {
-        return "Appellant{" +
-                "name=" + name +
-                ", address=" + address +
-                ", contact=" + contact +
-                ", identity=" + identity +
-                '}';
     }
 }

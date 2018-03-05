@@ -1,33 +1,23 @@
 package uk.gov.hmcts.sscs.model.ccd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
+import lombok.Value;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Value
+@Builder
 public class Doc {
     private String dateReceived;
     private String description;
 
-    public String getDateReceived() {
-        return dateReceived;
-    }
-
-    public void setDateReceived(String dateReceived) {
+    @JsonCreator
+    public Doc(@JsonProperty("dateReceived") String dateReceived,
+               @JsonProperty("description") String description) {
         this.dateReceived = dateReceived;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Override
-    public String toString() {
-        return "Doc{" +
-                "dateReceived='" + dateReceived + '\'' +
-                ", description='" + description + '\'' +
-                '}';
     }
 }

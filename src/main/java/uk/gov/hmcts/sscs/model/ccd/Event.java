@@ -1,43 +1,26 @@
 package uk.gov.hmcts.sscs.model.ccd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
+import lombok.Value;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Value
+@Builder
 public class Event {
     String date;
     String type;
     String description;
 
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
+    @JsonCreator
+    public Event(@JsonProperty("date") String date,
+                 @JsonProperty("type") String type,
+                 @JsonProperty("description") String description) {
         this.date = date;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
         this.type = type;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Override
-    public String toString() {
-        return "Event{" +
-                "date='" + date + '\'' +
-                ", type='" + type + '\'' +
-                ", description='" + description + '\'' +
-                '}';
     }
 }

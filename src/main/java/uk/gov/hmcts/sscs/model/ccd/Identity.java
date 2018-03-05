@@ -1,33 +1,23 @@
 package uk.gov.hmcts.sscs.model.ccd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Builder;
+import lombok.Value;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Value
+@Builder
 public class Identity {
     private String dob;
     private String nino;
 
-    public String getDob() {
-        return dob;
-    }
-
-    public void setDob(String dob) {
+    @JsonCreator
+    public Identity(@JsonProperty("dob") String dob,
+                    @JsonProperty("nino") String nino) {
         this.dob = dob;
-    }
-
-    public String getNino() {
-        return nino;
-    }
-
-    public void setNino(String nino) {
         this.nino = nino;
-    }
-
-    @Override
-    public String toString() {
-        return "Identity{" +
-                "dob='" + dob + '\'' +
-                ", nino='" + nino + '\'' +
-                '}';
     }
 }
