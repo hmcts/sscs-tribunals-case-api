@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.ccd;
+package uk.gov.hmcts.sscs.service.ccd;
 
 import java.util.ArrayList;
 import java.util.Collections;

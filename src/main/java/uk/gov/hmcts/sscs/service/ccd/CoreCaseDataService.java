@@ -9,13 +9,9 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
-import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.sscs.config.properties.CoreCaseDataProperties;
 import uk.gov.hmcts.sscs.config.properties.IdamProperties;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
 import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 

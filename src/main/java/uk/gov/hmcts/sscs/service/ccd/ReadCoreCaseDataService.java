@@ -1,18 +1,14 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.stereotype.Service;
 
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
-import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
@@ -47,6 +43,17 @@ public class ReadCoreCaseDataService {
             eventRequestData.getCaseTypeId(),
             caseId
         );
+    }
+
+    private CaseData printCaseDetailsInJson(Object object) {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            return mapper.convertValue(object, CaseData.class);
+        } catch (Exception e) {
+            throw new ApplicationErrorException("Oops...something went wrong...", e);
+        }
     }
 
 }

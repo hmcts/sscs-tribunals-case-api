@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.ccd;
+package uk.gov.hmcts.sscs.service.ccd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -22,8 +22,6 @@ import uk.gov.hmcts.sscs.config.properties.CoreCaseDataProperties;
 import uk.gov.hmcts.sscs.config.properties.IdamProperties;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
-import uk.gov.hmcts.sscs.service.ccd.CoreCaseDataService;
-import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 
 @RunWith(MockitoJUnitRunner.class)

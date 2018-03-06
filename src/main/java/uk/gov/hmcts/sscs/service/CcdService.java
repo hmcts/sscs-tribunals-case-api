@@ -17,11 +17,10 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
 import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.mapper.CaseDetailsToCcdCaseMapper;
+import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 
 @Service
@@ -35,17 +34,20 @@ public class CcdService {
     private String userToken;
     private String serviceToken;
     private ReadCoreCaseDataService readCoreCaseDataService;
+    private CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper;
 
     @Autowired
     CcdService(CoreCaseDataClient coreCaseDataClient, AuthClient authClient,
                IdamClient idamClient,
                @Value("${ccd.case.worker.id}") String caseWorkerId,
-               ReadCoreCaseDataService readCoreCaseDataService) {
+               ReadCoreCaseDataService readCoreCaseDataService,
+               CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper) {
         this.coreCaseDataClient = coreCaseDataClient;
         this.authClient = authClient;
         this.idamClient = idamClient;
         this.caseWorkerId = caseWorkerId;
         this.readCoreCaseDataService = readCoreCaseDataService;
+        this.caseDetailsToCcdCaseMapper = caseDetailsToCcdCaseMapper;
     }
 
     public HttpStatus createCase(CcdCase ccdCase) throws CcdException {
@@ -118,7 +120,7 @@ public class CcdService {
         CcdCase ccdCase;
         try {
             CaseDetails caseDetails = readCoreCaseDataService.getCcdCase(appealNumber);
-            ccdCase = CaseDetailsToCcdCaseMapper.map(caseDetails);
+            ccdCase = caseDetailsToCcdCaseMapper.map(caseDetails);
         } catch (Exception ex) {
             LOG.error("Error while getting case from ccd", ex);
             throw new CcdException("Error while getting case from ccd" + ex.getMessage());

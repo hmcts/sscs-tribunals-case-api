@@ -132,6 +132,8 @@ sourceSets {
             srcDir('src/IntegrationTests/resources')
         }
     }
+
+
 }
 
 dependencies {
@@ -160,7 +162,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +
                 "src/main/java/uk/gov/hmcts/sscs/config/*," +
-                "src/main/java/uk/gov/hmcts/sscs/model/*"
+                "src/main/java/uk/gov/hmcts/sscs/model/**"
     }
 }
 

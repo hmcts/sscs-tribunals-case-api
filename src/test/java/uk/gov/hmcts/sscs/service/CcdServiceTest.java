@@ -6,8 +6,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -22,14 +24,22 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.domain.corecase.*;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
+import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
-    public static final String CASE_WORKER_ID = "123";
-    public static final String TOKEN = "token123";
+    private static final String CASE_WORKER_ID = "123";
+    private static final String TOKEN = "token123";
+    private static final String CASE_REFERENCE = "SC068/17/00013";
+    private static final String BENEFIT = "benefit";
+    private static  final String SURNAME = "Kane";
+
     private CcdService ccdService;
 
     @Mock
@@ -52,10 +62,15 @@ public class CcdServiceTest {
 
     private String ccdPath;
 
+    @Mock
     private ReadCoreCaseDataService readCoreCaseDataService;
 
+    @Mock
+    private CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper;
+
     public void setup() throws Exception {
-        ccdService = new CcdService(coreCaseDataClient, authClient, idamClient, CASE_WORKER_ID, readCoreCaseDataService);
+        ccdService = new CcdService(coreCaseDataClient, authClient, idamClient, CASE_WORKER_ID,
+                readCoreCaseDataService, caseDetailsToCcdCaseMapper);
 
         given(authClient.sendRequest(eq("lease"), eq(HttpMethod.POST),
                 eq(""))).willReturn(serviceToken);
@@ -128,136 +143,89 @@ public class CcdServiceTest {
     @Test
     public void shouldGetCaseFromCcd() throws Exception {
         setup();
+        mockCaseDetails();
 
-        CcdCase ccdCase = new CcdCase();
-        Appeal appeal = new Appeal();
-        appeal.setAppealNumber("567");
-        Appellant appellant = new Appellant();
-        appellant.setName(new Name("Mr", "Harry", "Kane"));
-        ccdCase.setAppeal(appeal);
-        ccdCase.setAppellant(appellant);
+        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber(anyString());
 
-        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
-        ccdCaseResponse.setCaseData(ccdCase);
+        verify(readCoreCaseDataService).getCcdCase(anyString());
 
-        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
-        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
-                eq(ccdPath)))
-                .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
-
-        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber("567");
-
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
-
-        assertEquals(ccdCaseRes, ccdCase);
+        assertEquals(getCcdCase(), ccdCaseRes);
     }
 
     @Test
     public void shouldUnsubscribeFromCcd() throws Exception {
         tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
                 + "Benefit/event-triggers/appealReceived/token";
-
         ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
 
         setup();
-        CcdCase ccdCase = new CcdCase();
-        ccdCase.setBenefitType("Benefit");
+        mockCaseDetails();
 
-        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
-        ccdCaseResponse.setCaseData(ccdCase);
+        String benefitType = ccdService.unsubscribe(anyString(), "reason");
 
-        String casePath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+        verify(readCoreCaseDataService).getCcdCase(anyString());
 
-        given(coreCaseDataClient.get(eq("Bearer " + userToken), eq(serviceToken), eq(casePath)))
-                .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
-
-        String benefitType = ccdService.unsubscribe("567", "reason");
-
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(casePath));
-
-        assertEquals(ccdCase.getBenefitType().toLowerCase(), benefitType);
+        assertEquals(BENEFIT, benefitType);
     }
 
     @Test
     public void shouldUpdateSubscriptionInCcd() throws Exception {
         tokenPath = "caseworkers/123/jurisdictions/SSCS/case-types/"
                 + "Benefit/event-triggers/appealReceived/token";
-
         ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases";
 
         setup();
-        CcdCase ccdCase = new CcdCase();
-        ccdCase.setBenefitType("Benefit");
+        mockCaseDetails();
 
-        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
-        ccdCaseResponse.setCaseData(ccdCase);
+        String benefitType = ccdService.updateSubscription(anyString(), new Subscription());
 
-        String casePath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
+        verify(readCoreCaseDataService).getCcdCase(anyString());
 
-        Subscription subscription = new Subscription();
-
-
-        given(coreCaseDataClient.get(eq("Bearer " + userToken), eq(serviceToken), eq(casePath)))
-                .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
-
-        String benefitType = ccdService.updateSubscription("567", subscription);
-
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(casePath));
-
-        assertEquals(ccdCase.getBenefitType().toLowerCase(), benefitType);
+        assertEquals(BENEFIT, benefitType);
     }
 
     @Test
     public void shouldReturnCaseGivenSurnameAndAppealNumber() throws Exception {
         setup();
+        mockCaseDetails();
 
-        CcdCase ccdCase = new CcdCase();
-        Appeal appeal = new Appeal();
-        appeal.setAppealNumber("567");
-        Appellant appellant = new Appellant();
-        appellant.setName(new Name("Mr", "Harry", "Kane"));
-        ccdCase.setAppeal(appeal);
-        ccdCase.setAppellant(appellant);
+        CcdCase ccdCase = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), SURNAME);
 
-        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
-        ccdCaseResponse.setCaseData(ccdCase);
+        verify(readCoreCaseDataService).getCcdCase(anyString());
 
-        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
-        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
-            eq(ccdPath)))
-            .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
-
-        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumberAndSurname("567", "Kane");
-
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
-
-        assertNotNull(ccdCaseRes);
+        assertNotNull(ccdCase);
+        assertEquals(SURNAME, ccdCase.getAppellant().getName().getSurname());
     }
 
     @Test
     public void shouldReturnNullIfSurnameInvalid() throws Exception {
         setup();
+        mockCaseDetails();
 
-        CcdCase ccdCase = new CcdCase();
-        Appeal appeal = new Appeal();
-        appeal.setAppealNumber("567");
-        Appellant appellant = new Appellant();
-        appellant.setName(new Name("Mr", "Harry", "Kane"));
-        ccdCase.setAppeal(appeal);
-        ccdCase.setAppellant(appellant);
+        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "XXX");
 
-        CcdCaseResponse ccdCaseResponse = new CcdCaseResponse();
-        ccdCaseResponse.setCaseData(ccdCase);
-
-        ccdPath = "caseworkers/123/jurisdictions/SSCS/case-types/Benefit/cases/567";
-        given(coreCaseDataClient.get(eq("Bearer " + userToken),eq(serviceToken),
-            eq(ccdPath)))
-            .willReturn(new ResponseEntity<>(ccdCaseResponse, OK));
-
-        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumberAndSurname("567", "XXX");
-
-        verify(coreCaseDataClient).get(eq("Bearer " + userToken),eq(serviceToken),eq(ccdPath));
+        verify(readCoreCaseDataService).getCcdCase(anyString());
 
         assertNull(ccdCaseRes);
+    }
+
+    private void mockCaseDetails() {
+        Map<String, Object> caseData = new HashMap<>(1);
+        caseData.put("case-data", CaseDataUtils.buildCaseData());
+        CaseDetails caseDetails = CaseDetails.builder().data(caseData).build();
+        when(readCoreCaseDataService.getCcdCase(anyString())).thenReturn(caseDetails);
+
+        when(caseDetailsToCcdCaseMapper.map(caseDetails)).thenReturn(getCcdCase());
+    }
+
+    private CcdCase getCcdCase() {
+        CcdCase ccdCase = new CcdCase();
+        ccdCase.setCaseReference(CASE_REFERENCE);
+        ccdCase.setBenefitType(BENEFIT);
+
+        Appellant appellant = new Appellant();
+        appellant.setName(new Name("Mr", "Harry", "Kane"));
+        ccdCase.setAppellant(appellant);
+        return ccdCase;
     }
 }
