@@ -1,9 +1,8 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.model.ccd.*;
 
 public final class CaseDataUtils {
@@ -102,5 +101,11 @@ public final class CaseDataUtils {
                 .dwpTimeExtension(dwpTimeExtensionList)
                 .events(Collections.singletonList(events))
                 .build();
+    }
+
+    public static CaseDetails buildCaseDetails() {
+        Map<String, Object> caseData = new HashMap<>(1);
+        caseData.put("case-data", buildCaseData());
+        return CaseDetails.builder().data(caseData).build();
     }
 }

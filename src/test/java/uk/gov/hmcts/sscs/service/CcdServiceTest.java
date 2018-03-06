@@ -5,9 +5,7 @@ import static org.assertj.core.util.Maps.newHashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -15,6 +13,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -26,11 +25,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
-import uk.gov.hmcts.sscs.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.corecase.Appellant;
+import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.domain.corecase.Name;
+import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
-import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
+import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
+import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
@@ -210,9 +212,7 @@ public class CcdServiceTest {
     }
 
     private void mockCaseDetails() {
-        Map<String, Object> caseData = new HashMap<>(1);
-        caseData.put("case-data", CaseDataUtils.buildCaseData());
-        CaseDetails caseDetails = CaseDetails.builder().data(caseData).build();
+        CaseDetails caseDetails = CaseDataUtils.buildCaseDetails();
         when(readCoreCaseDataService.getCcdCase(anyString())).thenReturn(caseDetails);
 
         when(caseDetailsToCcdCaseMapper.map(caseDetails)).thenReturn(getCcdCase());
