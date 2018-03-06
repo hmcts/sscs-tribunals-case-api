@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.config.properties;
+package uk.gov.hmcts.sscs.ccd.properties;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;

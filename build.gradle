@@ -66,6 +66,8 @@ repositories {
 configurations {
     functionalCompile.extendsFrom(testCompile)
     functionalRuntime.extendsFrom(testRuntime)
+    e2eRuntime.extendsFrom(testRuntime)
+    e2eCompile.extendsFrom(testCompile)
 }
 
 def versions = [
@@ -132,12 +134,19 @@ sourceSets {
             srcDir('src/IntegrationTests/resources')
         }
     }
-
+    e2e {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir('src/e2e/java')
+        }
+    }
 
 }
 
 dependencies {
     functionalCompile(sourceSets.test.output)
+    e2eCompile(sourceSets.test.output)
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
@@ -154,10 +163,27 @@ jar {
     }
 }
 
+jacocoTestReport {
+    executionData(test, functional)
+    reports {
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+
+project.tasks['sonarqube'].dependsOn test, functional
+check.dependsOn functional
+checkstyleMain.shouldRunAfter(compileJava)
+test.shouldRunAfter(checkstyleTest)
+functional.shouldRunAfter(checkstyleFunctional)
+functional.shouldRunAfter(test)
+
 sonarqube {
     properties {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
         property "sonar.projectKey", "SSCSTCA"
+        property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/functional.exec"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +

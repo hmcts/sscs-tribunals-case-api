@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.config.properties;
+package uk.gov.hmcts.sscs.ccd.properties;
 
 import lombok.Getter;
 import lombok.Setter;

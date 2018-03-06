@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.ccd;
+package ccd;
 
 import static org.junit.Assert.assertNotNull;
 

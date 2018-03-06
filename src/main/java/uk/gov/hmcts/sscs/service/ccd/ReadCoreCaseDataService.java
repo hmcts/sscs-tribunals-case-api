@@ -1,7 +1,5 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +7,6 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
-import uk.gov.hmcts.sscs.exception.ApplicationErrorException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
 @Service
 @Slf4j
@@ -27,9 +23,8 @@ public class ReadCoreCaseDataService {
         log.info("createCcdCase...");
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
-        CaseDetails caseDetails = get(eventRequestData, serviceAuthorization, caseId);
 
-        return caseDetails;
+        return get(eventRequestData, serviceAuthorization, caseId);
     }
 
     private CaseDetails get(EventRequestData eventRequestData, String serviceAuthorization,
@@ -44,16 +39,4 @@ public class ReadCoreCaseDataService {
             caseId
         );
     }
-
-    private CaseData printCaseDetailsInJson(Object object) {
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            return mapper.convertValue(object, CaseData.class);
-        } catch (Exception e) {
-            throw new ApplicationErrorException("Oops...something went wrong...", e);
-        }
-    }
-
 }
