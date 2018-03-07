@@ -31,11 +31,11 @@ public class AppealNumberGeneratorTest {
     @Test
     public void shouldGenerateAppealNumberWhenCcdReturnNullObject() throws CcdException {
 
-        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(null);
+        given(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).willReturn(null);
 
         String appealNumber = appealNumberGenerator.generate();
 
-        verify(ccdService).findCcdCaseByAppealNumber(anyString());
+        verify(ccdService).findCcdCaseDetailsByAppealNumber(anyString());
 
         assertNotNull(appealNumber);
     }
@@ -43,11 +43,11 @@ public class AppealNumberGeneratorTest {
     @Test
     public void shouldGenerateAppealNumberWhenCcdReturnEmptyObject() throws CcdException {
 
-        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(new CcdCase());
+        given(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).willReturn(new CcdCase());
 
         String appealNumber = appealNumberGenerator.generate();
 
-        verify(ccdService).findCcdCaseByAppealNumber(anyString());
+        verify(ccdService).findCcdCaseDetailsByAppealNumber(anyString());
 
         assertNotNull(appealNumber);
     }
@@ -60,11 +60,11 @@ public class AppealNumberGeneratorTest {
         CcdCase ccdCase = new CcdCase();
         ccdCase.setAppeal(appeal);
 
-        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(ccdCase, null);
+        when(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).thenReturn(ccdCase, null);
 
         appealNumberGenerator.generate();
 
-        verify(ccdService, times(2)).findCcdCaseByAppealNumber(anyString());
+        verify(ccdService, times(2)).findCcdCaseDetailsByAppealNumber(anyString());
     }
 
     @Test
@@ -75,11 +75,11 @@ public class AppealNumberGeneratorTest {
         CcdCase ccdCase = new CcdCase();
         ccdCase.setAppeal(appeal);
 
-        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(ccdCase, ccdCase, null);
+        when(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).thenReturn(ccdCase, ccdCase, null);
 
         appealNumberGenerator.generate();
 
-        verify(ccdService, times(3)).findCcdCaseByAppealNumber(anyString());
+        verify(ccdService, times(3)).findCcdCaseDetailsByAppealNumber(anyString());
     }
 
     @Test(expected = CcdException.class)
@@ -90,7 +90,7 @@ public class AppealNumberGeneratorTest {
         CcdCase ccdCase = new CcdCase();
         ccdCase.setAppeal(appeal);
 
-        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(ccdCase);
+        given(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).willReturn(ccdCase);
 
         appealNumberGenerator.generate();
     }

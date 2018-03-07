@@ -67,7 +67,7 @@ public class ReadCoreCaseDataServiceTest {
         mockIdamProrperties();
 
         //When
-        CaseDetails caseDetails = readCoreCaseDataService.getCcdCase("1520116198612015");
+        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetails("1520116198612015");
 
         //Then
         assertNotNull(caseDetails);

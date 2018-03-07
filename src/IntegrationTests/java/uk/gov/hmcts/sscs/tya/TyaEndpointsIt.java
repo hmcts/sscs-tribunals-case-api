@@ -66,7 +66,7 @@ public class TyaEndpointsIt {
     @Test
     public void shouldReturnAnAppealGivenAnAppealNumber() throws Exception {
         CcdCase ccdCase = createCase();
-        when(ccdService.findCcdCaseByAppealNumber("1")).thenReturn(ccdCase);
+        when(ccdService.findCcdCaseDetailsByAppealNumber("1")).thenReturn(ccdCase);
 
         MvcResult mvcResult = mockMvc.perform(get("/appeals/1"))
             .andExpect(status().isOk())

@@ -50,7 +50,7 @@ public class TribunalsService {
 
     public ObjectNode findAppeal(String appealNumber) throws CcdException {
         return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
-                ccdService.findCcdCaseByAppealNumber(appealNumber));
+                ccdService.findCcdCaseDetailsByAppealNumber(appealNumber));
     }
 
     public String unsubscribe(String appealNumber, String reason) throws CcdException {

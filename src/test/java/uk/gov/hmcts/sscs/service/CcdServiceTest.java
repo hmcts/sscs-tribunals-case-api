@@ -147,9 +147,9 @@ public class CcdServiceTest {
         setup();
         mockCaseDetails();
 
-        CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber(anyString());
+        CcdCase ccdCaseRes = ccdService.findCcdCaseDetailsByAppealNumber(anyString());
 
-        verify(readCoreCaseDataService).getCcdCase(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDetails(anyString());
 
         assertEquals(getCcdCase(), ccdCaseRes);
     }
@@ -165,7 +165,7 @@ public class CcdServiceTest {
 
         String benefitType = ccdService.unsubscribe(anyString(), "reason");
 
-        verify(readCoreCaseDataService).getCcdCase(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDetails(anyString());
 
         assertEquals(BENEFIT, benefitType);
     }
@@ -181,7 +181,7 @@ public class CcdServiceTest {
 
         String benefitType = ccdService.updateSubscription(anyString(), new Subscription());
 
-        verify(readCoreCaseDataService).getCcdCase(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDetails(anyString());
 
         assertEquals(BENEFIT, benefitType);
     }
@@ -193,7 +193,7 @@ public class CcdServiceTest {
 
         CcdCase ccdCase = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), SURNAME);
 
-        verify(readCoreCaseDataService).getCcdCase(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDetails(anyString());
 
         assertNotNull(ccdCase);
         assertEquals(SURNAME, ccdCase.getAppellant().getName().getSurname());
@@ -206,14 +206,14 @@ public class CcdServiceTest {
 
         CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "XXX");
 
-        verify(readCoreCaseDataService).getCcdCase(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDetails(anyString());
 
         assertNull(ccdCaseRes);
     }
 
     private void mockCaseDetails() {
         CaseDetails caseDetails = CaseDataUtils.buildCaseDetails();
-        when(readCoreCaseDataService.getCcdCase(anyString())).thenReturn(caseDetails);
+        when(readCoreCaseDataService.getCcdCaseDetails(anyString())).thenReturn(caseDetails);
 
         when(caseDetailsToCcdCaseMapper.map(caseDetails)).thenReturn(getCcdCase());
     }

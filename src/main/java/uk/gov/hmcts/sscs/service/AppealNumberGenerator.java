@@ -29,7 +29,7 @@ public class AppealNumberGenerator {
         int count = 3;
         while (count-- > 0 && "".equals(appealNumber)) {
             appealNumber = generateAppealNumber();
-            CcdCase ccdCase = ccdService.findCcdCaseByAppealNumber(appealNumber);
+            CcdCase ccdCase = ccdService.findCcdCaseDetailsByAppealNumber(appealNumber);
             if (isDuplicateInCcd(ccdCase)) {
                 appealNumber = "";
             }

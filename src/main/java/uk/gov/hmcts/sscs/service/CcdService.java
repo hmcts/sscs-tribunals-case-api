@@ -20,6 +20,7 @@ import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
 
@@ -115,11 +116,22 @@ public class CcdService {
         return token;
     }
 
-    public CcdCase findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
+    public CaseData findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
+
+        try {
+            return readCoreCaseDataService.getCcdCaseData(appealNumber);
+        } catch (Exception ex) {
+            LOG.error("Error while getting case from ccd", ex);
+            throw new CcdException("Error while getting case from ccd" + ex.getMessage());
+        }
+    }
+
+    @Deprecated
+    public CcdCase findCcdCaseDetailsByAppealNumber(String appealNumber) throws CcdException {
 
         CcdCase ccdCase;
         try {
-            CaseDetails caseDetails = readCoreCaseDataService.getCcdCase(appealNumber);
+            CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetails(appealNumber);
             ccdCase = caseDetailsToCcdCaseMapper.map(caseDetails);
         } catch (Exception ex) {
             LOG.error("Error while getting case from ccd", ex);
@@ -133,7 +145,7 @@ public class CcdService {
         String benefitType = null;
         try {
             Subscription subscription = new Subscription(Boolean.FALSE, Boolean.FALSE, reason);
-            CcdCase ccdCase = findCcdCaseByAppealNumber(appealNumber);
+            CcdCase ccdCase = findCcdCaseDetailsByAppealNumber(appealNumber);
             ccdCase.setSubscription(subscription);
             createCase(ccdCase);
             benefitType = ccdCase.getBenefitType();
@@ -147,7 +159,7 @@ public class CcdService {
     public String updateSubscription(String appealNumber, Subscription subscription) throws CcdException {
         String benefitType = null;
         try {
-            CcdCase ccdCase = findCcdCaseByAppealNumber(appealNumber);
+            CcdCase ccdCase = findCcdCaseDetailsByAppealNumber(appealNumber);
             ccdCase.setSubscription(subscription);
             createCase(ccdCase);
             benefitType = ccdCase.getBenefitType();
@@ -159,7 +171,7 @@ public class CcdService {
     }
 
     public CcdCase findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) throws CcdException {
-        CcdCase ccdCase = findCcdCaseByAppealNumber(appealNumber);
+        CcdCase ccdCase = findCcdCaseDetailsByAppealNumber(appealNumber);
         return ccdCase.getAppellant().getName().getSurname().equals(surname) ? ccdCase : null;
 
     }
