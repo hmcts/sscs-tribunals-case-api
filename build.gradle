@@ -8,6 +8,7 @@ plugins {
     id 'org.springframework.boot' version '1.5.9.RELEASE'
     id 'org.owasp.dependencycheck' version '1.4.5.1'
     id 'com.github.ben-manes.versions' version '0.17.0'
+    id 'net.ltgt.apt' version '0.13'
 }
 
 group = 'uk.gov.hmcts.reform'
@@ -65,6 +66,8 @@ repositories {
 configurations {
     functionalCompile.extendsFrom(testCompile)
     functionalRuntime.extendsFrom(testRuntime)
+    e2eRuntime.extendsFrom(testRuntime)
+    e2eCompile.extendsFrom(testCompile)
 }
 
 def versions = [
@@ -108,7 +111,10 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'pdf-service-client', version: '5.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.4.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '2.1.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '2.5.0'
+
+    compileOnly 'org.projectlombok:lombok:1.16.20'
+    apt "org.projectlombok:lombok:1.16.20"
 
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
@@ -128,10 +134,19 @@ sourceSets {
             srcDir('src/IntegrationTests/resources')
         }
     }
+    e2e {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir('src/e2e/java')
+        }
+    }
+
 }
 
 dependencies {
     functionalCompile(sourceSets.test.output)
+    e2eCompile(sourceSets.test.output)
 }
 
 task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
@@ -148,15 +163,32 @@ jar {
     }
 }
 
+jacocoTestReport {
+    executionData(test, functional)
+    reports {
+        xml.enabled = true
+        csv.enabled = false
+    }
+}
+
+project.tasks['sonarqube'].dependsOn test, functional
+check.dependsOn functional
+checkstyleMain.shouldRunAfter(compileJava)
+test.shouldRunAfter(checkstyleTest)
+functional.shouldRunAfter(checkstyleFunctional)
+functional.shouldRunAfter(test)
+
 sonarqube {
     properties {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
         property "sonar.projectKey", "SSCSTCA"
+        property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
+        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/functional.exec"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +
                 "src/main/java/uk/gov/hmcts/sscs/config/*," +
-                "src/main/java/uk/gov/hmcts/sscs/model/*"
+                "src/main/java/uk/gov/hmcts/sscs/model/**"
     }
 }
 

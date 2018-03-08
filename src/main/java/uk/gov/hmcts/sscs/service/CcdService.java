@@ -14,11 +14,14 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.domain.corecase.CcdCaseResponse;
 import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
+import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
 
 @Service
 public class CcdService {
@@ -30,15 +33,21 @@ public class CcdService {
     private String caseWorkerId;
     private String userToken;
     private String serviceToken;
+    private ReadCoreCaseDataService readCoreCaseDataService;
+    private CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper;
 
     @Autowired
     CcdService(CoreCaseDataClient coreCaseDataClient, AuthClient authClient,
                IdamClient idamClient,
-               @Value("${ccd.case.worker.id}") String caseWorkerId) {
+               @Value("${ccd.case.worker.id}") String caseWorkerId,
+               ReadCoreCaseDataService readCoreCaseDataService,
+               CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper) {
         this.coreCaseDataClient = coreCaseDataClient;
         this.authClient = authClient;
         this.idamClient = idamClient;
         this.caseWorkerId = caseWorkerId;
+        this.readCoreCaseDataService = readCoreCaseDataService;
+        this.caseDetailsToCcdCaseMapper = caseDetailsToCcdCaseMapper;
     }
 
     public HttpStatus createCase(CcdCase ccdCase) throws CcdException {
@@ -108,18 +117,15 @@ public class CcdService {
 
     public CcdCase findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
 
-        ResponseEntity<CcdCaseResponse> responseEntity;
+        CcdCase ccdCase;
         try {
-            serviceToken = authClient.sendRequest("lease", POST, "");
-            userToken = "Bearer " + idamClient.post("testing-support/lease");
-            String url = "caseworkers/%s/jurisdictions/SSCS/case-types/Benefit/cases/%s";
-            String ccdPath = format(url, caseWorkerId, appealNumber);
-            responseEntity = coreCaseDataClient.get(userToken, serviceToken, ccdPath);
+            CaseDetails caseDetails = readCoreCaseDataService.getCcdCase(appealNumber);
+            ccdCase = caseDetailsToCcdCaseMapper.map(caseDetails);
         } catch (Exception ex) {
             LOG.error("Error while getting case from ccd", ex);
             throw new CcdException("Error while getting case from ccd" + ex.getMessage());
         }
-        return responseEntity.getBody().getCaseData();
+        return ccdCase;
     }
 
     public String unsubscribe(String appealNumber, String reason) throws CcdException {
