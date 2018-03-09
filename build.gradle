@@ -105,6 +105,8 @@ dependencies {
 
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '9.5.0'
 
+    compile group: 'com.opencsv', name: 'opencsv', version: '4.1'
+
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-spring', version: '1.6.1'
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-httpcomponents', version: '1.6.1'
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: '1.6.1'

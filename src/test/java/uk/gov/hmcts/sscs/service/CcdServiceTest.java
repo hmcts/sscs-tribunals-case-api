@@ -33,6 +33,7 @@ import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
+import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
@@ -53,6 +54,9 @@ public class CcdServiceTest {
     @Mock
     private CoreCaseDataClient coreCaseDataClient;
 
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+
     @Captor
     private ArgumentCaptor<Map> captor;
 
@@ -72,7 +76,7 @@ public class CcdServiceTest {
 
     public void setup() throws Exception {
         ccdService = new CcdService(coreCaseDataClient, authClient, idamClient, CASE_WORKER_ID,
-                readCoreCaseDataService, caseDetailsToCcdCaseMapper);
+                readCoreCaseDataService, caseDetailsToCcdCaseMapper, regionalProcessingCenterService);
 
         given(authClient.sendRequest(eq("lease"), eq(HttpMethod.POST),
                 eq(""))).willReturn(serviceToken);
@@ -150,6 +154,7 @@ public class CcdServiceTest {
         CcdCase ccdCaseRes = ccdService.findCcdCaseByAppealNumber(anyString());
 
         verify(readCoreCaseDataService).getCcdCase(anyString());
+        verify(regionalProcessingCenterService).getByScReferenceCode(anyString());
 
         assertEquals(getCcdCase(), ccdCaseRes);
     }

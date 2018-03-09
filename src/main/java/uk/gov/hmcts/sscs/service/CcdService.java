@@ -19,9 +19,11 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
+import uk.gov.hmcts.sscs.domain.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.ccd.mapper.CaseDetailsToCcdCaseMapper;
+import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 
 @Service
 public class CcdService {
@@ -35,19 +37,22 @@ public class CcdService {
     private String serviceToken;
     private ReadCoreCaseDataService readCoreCaseDataService;
     private CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper;
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Autowired
     CcdService(CoreCaseDataClient coreCaseDataClient, AuthClient authClient,
                IdamClient idamClient,
                @Value("${ccd.case.worker.id}") String caseWorkerId,
                ReadCoreCaseDataService readCoreCaseDataService,
-               CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper) {
+               CaseDetailsToCcdCaseMapper caseDetailsToCcdCaseMapper,
+               RegionalProcessingCenterService regionalProcessingCenterService) {
         this.coreCaseDataClient = coreCaseDataClient;
         this.authClient = authClient;
         this.idamClient = idamClient;
         this.caseWorkerId = caseWorkerId;
         this.readCoreCaseDataService = readCoreCaseDataService;
         this.caseDetailsToCcdCaseMapper = caseDetailsToCcdCaseMapper;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
     }
 
     public HttpStatus createCase(CcdCase ccdCase) throws CcdException {
@@ -121,6 +126,11 @@ public class CcdService {
         try {
             CaseDetails caseDetails = readCoreCaseDataService.getCcdCase(appealNumber);
             ccdCase = caseDetailsToCcdCaseMapper.map(caseDetails);
+
+            RegionalProcessingCenter regionalProcessingCenter
+                    = regionalProcessingCenterService.getByScReferenceCode(ccdCase.getCaseReference());
+            ccdCase.setRegionalProcessingCenter(regionalProcessingCenter);
+
         } catch (Exception ex) {
             LOG.error("Error while getting case from ccd", ex);
             throw new CcdException("Error while getting case from ccd" + ex.getMessage());

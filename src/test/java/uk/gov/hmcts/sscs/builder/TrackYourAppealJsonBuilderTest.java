@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.builder;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
@@ -16,6 +17,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.sscs.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilderTest {
 
@@ -32,6 +34,7 @@ public class TrackYourAppealJsonBuilderTest {
         ccdCase.setBenefitType("ESA");
         ccdCase.setAppealStatus(EventType.DWP_RESPOND.toString());
         ccdCase.setAppeal(appeal);
+        ccdCase.setRegionalProcessingCenter(populateRegionalProcessingCenter());
     }
 
     @Test
@@ -39,6 +42,7 @@ public class TrackYourAppealJsonBuilderTest {
 
         ccdCase.setAppellant(new Appellant(new Name("Mr", "R", "Smith"),
                 new Address(), "", "", "", ""));
+
 
         String date1 = "2017-12-01T12:00:50.297Z";
 
@@ -88,6 +92,17 @@ public class TrackYourAppealJsonBuilderTest {
                 is("\"" + ccdCase.getAppealStatus().toString() + "\""));
         assertThat(caseNodeResult.get("benefitType").toString(),
                 is("\"" + ccdCase.getBenefitType().toLowerCase() + "\""));
+
+        JsonNode regionalProcessingCenter = caseNodeResult.get("regionalProcessingCenter");
+
+        assertThat(regionalProcessingCenter.get("name").toString(), equalTo("\"BIRMINGHAM\""));
+        assertThat(regionalProcessingCenter.get("addressLines").toString(),
+                equalTo("[\"HM Courts & Tribunals Service\","
+                + "\"Social Security & Child Support Appeals\",\"Administrative Support Centre\",\"PO Box 14620\"]"));
+        assertThat(regionalProcessingCenter.get("city").toString(), equalTo("\"BIRMINGHAM\""));
+        assertThat(regionalProcessingCenter.get("postcode").toString(), equalTo("\"B16 6FR\""));
+        assertThat(regionalProcessingCenter.get("phoneNumber").toString(), equalTo("\"0300 123 1142\""));
+        assertThat(regionalProcessingCenter.get("faxNumber").toString(), equalTo("\"0126 434 7983\""));
 
         //TODO: Placeholder Array needs to be tested by uncommenting the below when creating the Events for CCD. This can only be done when we know what the data will look like.
         //    JsonNode latestEventsResult = caseNodeResult.get("latestEvents").get(0);
@@ -157,6 +172,21 @@ public class TrackYourAppealJsonBuilderTest {
         JsonNode caseNodeResult = result.get(HEARING_DATETIME);
 
         assertNull(caseNodeResult);
+    }
+
+
+    private RegionalProcessingCenter populateRegionalProcessingCenter() {
+        RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
+        regionalProcessingCenter.setName("BIRMINGHAM");
+        regionalProcessingCenter.setAddress1("HM Courts & Tribunals Service");
+        regionalProcessingCenter.setAddress2("Social Security & Child Support Appeals");
+        regionalProcessingCenter.setAddress3("Administrative Support Centre");
+        regionalProcessingCenter.setAddress4("PO Box 14620");
+        regionalProcessingCenter.setCity("BIRMINGHAM");
+        regionalProcessingCenter.setPostcode("B16 6FR");
+        regionalProcessingCenter.setPhoneNumber("0300 123 1142");
+        regionalProcessingCenter.setFaxNumber("0126 434 7983");
+        return regionalProcessingCenter;
     }
 
 }
