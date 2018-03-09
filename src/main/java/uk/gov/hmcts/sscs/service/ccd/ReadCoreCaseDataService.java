@@ -34,7 +34,7 @@ public class ReadCoreCaseDataService {
 
     public CaseData getCcdCaseData(String caseId) {
         log.info("Get CcdCaseData...");
-        return getCaseData(getCcdCaseDetails(caseId));
+        return getCaseData(getCcdCaseDetails(caseId).getData());
     }
 
     private CaseDetails get(EventRequestData eventRequestData, String serviceAuthorization,

@@ -1,6 +1,13 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
-import java.util.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.model.ccd.*;
@@ -104,8 +111,17 @@ public final class CaseDataUtils {
     }
 
     public static CaseDetails buildCaseDetails() {
-        Map<String, Object> caseData = new HashMap<>(1);
-        caseData.put("case-data", buildCaseData());
-        return CaseDetails.builder().data(caseData).build();
+        return CaseDetails.builder().data(buildCaseDataMap()).build();
+    }
+
+    private static Map<String, Object> buildCaseDataMap() {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            String json = mapper.writeValueAsString(buildCaseData());
+            return mapper.readValue(json, new TypeReference<Map<String, Object>>(){});
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -14,7 +14,7 @@ import uk.gov.hmcts.sscs.model.ccd.CaseData;
 public class CaseDetailsToCcdCaseMapper {
 
     public CcdCase map(CaseDetails caseDetails) {
-        CaseData caseData = getCaseData(caseDetails.getData().get("case-data"));
+        CaseData caseData = getCaseData(caseDetails.getData());
 
         CcdCase ccdCase = new CcdCase();
         ccdCase.setCaseReference(caseData.getCaseReference());
@@ -32,7 +32,7 @@ public class CaseDetailsToCcdCaseMapper {
         try {
             return mapper.convertValue(object, CaseData.class);
         } catch (Exception e) {
-            throw new ApplicationErrorException("Error occurred when CaseDetails are mapped into CcdCase", e);
+            throw new ApplicationErrorException("Error occurred when CaseData are mapped into CcdCase", e);
         }
     }
 

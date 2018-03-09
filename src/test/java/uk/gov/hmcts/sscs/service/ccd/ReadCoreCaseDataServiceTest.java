@@ -6,9 +6,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +14,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.ccd.properties.CoreCaseDataProperties;
 import uk.gov.hmcts.sscs.ccd.properties.IdamProperties;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
@@ -67,11 +63,10 @@ public class ReadCoreCaseDataServiceTest {
         mockIdamProrperties();
 
         //When
-        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetails("1520116198612015");
+        CaseData caseData = readCoreCaseDataService.getCcdCaseData("1520116198612015");
 
         //Then
-        assertNotNull(caseDetails);
-        CaseData caseData = (CaseData) caseDetails.getData().get("case-data");
+        assertNotNull(caseData);
         assertEquals("AB 22 55 66 B", caseData.getAppeal().getAppellant().getIdentity().getNino());
     }
 
@@ -90,11 +85,8 @@ public class ReadCoreCaseDataServiceTest {
     }
 
     private void mockCaseDetails() {
-        Map<String, Object> caseData = new HashMap<>(1);
-        caseData.put("case-data", CaseDataUtils.buildCaseData());
-        CaseDetails caseDetails = CaseDetails.builder().data(caseData).build();
         when(coreCaseDataApiMock.readForCaseWorker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString())).thenReturn(caseDetails);
+                anyString())).thenReturn(CaseDataUtils.buildCaseDetails());
     }
 
     private void mockCoreCaseDataProperties() {
