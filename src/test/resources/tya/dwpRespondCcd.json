@@ -1,0 +1,24 @@
+{
+  "caseReference": "SC/12345",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "A",
+        "firstName": "A"
+      }
+    },
+    "benefitType": {
+      "code": "ESA"
+    }
+  },
+  "events": [
+    {
+      "value": {
+        "date": "2017-03-10T13:00:42.233",
+        "type": "responseReceived",
+        "description": "Dwp respond"
+      }
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 {
   "appeal": {
     "caseReference": "SC123/45/00001",
+    "name": "Mr Leah Strickland",
+    "surname": "Strickland",
     "appealNumber": "NotKnownInCCD",
     "benefitType": "pip",
     "status": "APPEAL_RECEIVED",
-    "name": "Mr Leah Strickland",
-    "surname": "Strickland",
     "latestEvents": [
       {
         "date": "2017-03-10T00:00:00Z",

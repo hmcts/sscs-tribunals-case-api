@@ -1,0 +1,33 @@
+{
+  "caseReference": "SC123/45/00001",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "Strickland",
+        "firstName": "Leah",
+        "middleName": "Patricia Riggs"
+      }
+    },
+    "benefitType": {
+      "code": "PIP",
+      "description": "benefit Type"
+    }
+  },
+  "events": [
+    {
+      "value": {
+        "date": "2017-03-10T13:00:42.233",
+        "type": "evidenceReceived",
+        "description": "Evidence received"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-03-08T12:01:47.620",
+        "type": "appealReceived",
+        "description": "Appeal received"
+      }
+    }
+  ]
+}

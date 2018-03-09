@@ -20,7 +20,7 @@ public class ReadCaseFromCcd {
 
     @Test
     public void givenACase_shouldBeSavedAndThenUpdatedIntoCcd() {
-        CaseDetails caseDetails = readCoreCaseDataService.getCcdCase("1520116198612015");
+        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetails("1520116198612015");
         assertNotNull(caseDetails);
     }
 

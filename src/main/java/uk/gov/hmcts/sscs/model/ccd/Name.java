@@ -23,4 +23,8 @@ public class Name {
         this.firstName = firstName;
         this.lastName = lastName;
     }
+
+    public String getFullName() {
+        return title + " " + firstName + " " + lastName;
+    }
 }

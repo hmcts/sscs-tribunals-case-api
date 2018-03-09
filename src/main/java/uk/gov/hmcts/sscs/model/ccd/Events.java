@@ -10,11 +10,16 @@ import lombok.Value;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @Builder
-public class Events {
+public class Events implements Comparable<Events> {
     Event value;
 
     @JsonCreator
     public Events(@JsonProperty("value") Event value) {
         this.value = value;
+    }
+
+    @Override
+    public int compareTo(Events o) {
+        return value.getDate().compareTo(o.getValue().getDate());
     }
 }
