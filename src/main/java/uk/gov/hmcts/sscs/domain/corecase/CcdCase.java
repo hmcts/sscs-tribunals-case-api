@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import uk.gov.hmcts.sscs.domain.tya.RegionalProcessingCenter;
 
 public class CcdCase {
 
@@ -37,6 +38,7 @@ public class CcdCase {
     private String benefitType;
     private String appealStatus;
     private Subscription subscription;
+    private RegionalProcessingCenter regionalProcessingCenter;
 
     public CcdCase() {
     }
@@ -300,23 +302,32 @@ public class CcdCase {
         this.subscription = subscription;
     }
 
+    public RegionalProcessingCenter getRegionalProcessingCenter() {
+        return regionalProcessingCenter;
+    }
+
+    public void setRegionalProcessingCenter(RegionalProcessingCenter regionalProcessingCenter) {
+        this.regionalProcessingCenter = regionalProcessingCenter;
+    }
+
     @Override
     public String toString() {
         return "CcdCase{"
-                + " appeal=" + appeal
+                + "appeal=" + appeal
                 + ", appellant=" + appellant
                 + ", appointee=" + appointee
                 + ", representative=" + representative
                 + ", hearings=" + hearings
-                + ", caseReference=" + caseReference
+                + ", caseReference='" + caseReference + '\''
                 + ", eventType=" + eventType
                 + ", events=" + events
                 + ", reasonsForAppealing=" + reasonsForAppealing
                 + ", smsNotify=" + smsNotify
                 + ", isAppointee=" + isAppointee
-                + ", benefitType=" + benefitType
-                + ", appealStatus=" + appealStatus
+                + ", benefitType='" + benefitType + '\''
+                + ", appealStatus='" + appealStatus + '\''
                 + ", subscription=" + subscription
+                + ", regionalProcessingCenter=" + regionalProcessingCenter
                 + '}';
     }
 

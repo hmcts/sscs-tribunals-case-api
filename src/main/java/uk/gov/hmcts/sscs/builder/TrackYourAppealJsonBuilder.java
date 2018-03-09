@@ -10,6 +10,7 @@ import java.util.List;
 import org.json.JSONObject;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Event;
+import uk.gov.hmcts.sscs.domain.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilder {
 
@@ -33,6 +34,7 @@ public class TrackYourAppealJsonBuilder {
         caseNode.set("historicalEvents", buildEventArray(ccdCase.buildHistoricalEvents()));
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
+        processRpcDetails(ccdCase, caseNode);
         root.set("appeal", caseNode);
 
         return root;
@@ -107,5 +109,32 @@ public class TrackYourAppealJsonBuilder {
         }
 
         return eventNode;
+    }
+
+    private static void processRpcDetails(CcdCase ccdCase, ObjectNode caseNode) {
+        RegionalProcessingCenter regionalProcessingCenter = ccdCase.getRegionalProcessingCenter();
+        if (null != regionalProcessingCenter) {
+            ObjectNode rpcNode = JsonNodeFactory.instance.objectNode();
+
+            rpcNode.put("name", regionalProcessingCenter.getName());
+            rpcNode.set("addressLines", buildRpcAddressArray(regionalProcessingCenter));
+            rpcNode.put("city", regionalProcessingCenter.getCity());
+            rpcNode.put("postcode", regionalProcessingCenter.getPostcode());
+            rpcNode.put("phoneNumber", regionalProcessingCenter.getPhoneNumber());
+            rpcNode.put("faxNumber", regionalProcessingCenter.getFaxNumber());
+
+            caseNode.set("regionalProcessingCenter", rpcNode);
+        }
+    }
+
+    private static ArrayNode buildRpcAddressArray(RegionalProcessingCenter regionalProcessingCenter) {
+        ArrayNode rpcAddressArray = JsonNodeFactory.instance.arrayNode();
+
+        rpcAddressArray.add(regionalProcessingCenter.getAddress1());
+        rpcAddressArray.add(regionalProcessingCenter.getAddress2());
+        rpcAddressArray.add(regionalProcessingCenter.getAddress3());
+        rpcAddressArray.add(regionalProcessingCenter.getAddress4());
+
+        return rpcAddressArray;
     }
 }

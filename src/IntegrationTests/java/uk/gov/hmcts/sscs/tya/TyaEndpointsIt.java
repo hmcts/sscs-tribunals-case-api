@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import uk.gov.hmcts.sscs.domain.corecase.*;
+import uk.gov.hmcts.sscs.domain.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 
@@ -59,6 +60,7 @@ public class TyaEndpointsIt {
         ccdCase.setAppealStatus(EventType.DWP_RESPOND.toString());
         ccdCase.setAppeal(appeal);
         ccdCase.setAppellant(appellant);
+        ccdCase.setRegionalProcessingCenter(populateRegionalProcessingCenter());
 
         return ccdCase;
     }
@@ -112,5 +114,20 @@ public class TyaEndpointsIt {
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+
+    private RegionalProcessingCenter populateRegionalProcessingCenter() {
+        RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
+        regionalProcessingCenter.setName("BIRMINGHAM");
+        regionalProcessingCenter.setAddress1("HM Courts & Tribunals Service");
+        regionalProcessingCenter.setAddress2("Social Security & Child Support Appeals");
+        regionalProcessingCenter.setAddress3("Administrative Support Centre");
+        regionalProcessingCenter.setAddress4("PO Box 14620");
+        regionalProcessingCenter.setCity("BIRMINGHAM");
+        regionalProcessingCenter.setPostcode("B16 6FR");
+        regionalProcessingCenter.setPhoneNumber("0300 123 1142");
+        regionalProcessingCenter.setFaxNumber("0126 434 7983");
+        return regionalProcessingCenter;
     }
 }
