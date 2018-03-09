@@ -1,0 +1,69 @@
+{
+  "SSCS Liverpool": {
+    "name" : "LIVERPOOL",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Prudential Buildings",
+    "address4" : "36 Dale Street",
+    "city" : "LIVERPOOL",
+    "postcode" : "L2 5UZ",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0870 324 0109"
+  },
+  "SSCS Cardiff":{
+    "name" : "CARDIFF",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Eastgate House",
+    "address4" : "Newport Road",
+    "city" : "CARDIFF",
+    "postcode" : "CF24 0AB",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0870 739 4438"
+  },
+  "SSCS Leeds":{
+    "name" : "LEEDS",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "York House",
+    "address4" : "31 York Place",
+    "city" : "LEEDS",
+    "postcode" : "LS1 2ED",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0870 739 4331"
+
+  },
+  "SSCS Sutton":{
+    "name" : "SUTTON",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Copthall House",
+    "address4" : "9 The Pavement, Grove Road",
+    "city" : "SUTTON",
+    "postcode" : "SM1 1DA",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0870 739 4229"
+  },
+  "SSCS Birmingham":{
+    "name" : "BIRMINGHAM",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Administrative Support Centre",
+    "address4" : "PO Box 14620",
+    "city" : "BIRMINGHAM",
+    "postcode" : "B16 6FR",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0126 434 7983"
+  },
+  "SSCS Newcastle":{
+    "name" : "NEWCASTLE",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Manorview House",
+    "address4" : "Kings Manor",
+    "city" : "NEWCASTLE UPON TYNE",
+    "postcode" : "NE1 6PA",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0870 739 5784"
+  }
+}
