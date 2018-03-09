@@ -4,30 +4,37 @@ import com.google.common.base.CaseFormat;
 
 public enum EventType {
 
-    APPEAL_RECEIVED(1, true),
-    DWP_RESPOND(2, true),
-    HEARING_BOOKED(3, true),
-    HEARING(4, false),
-    ADJOURNED(5, true),
-    LAPSED_REVISED(6, true),
-    WITHDRAWN(7, true),
-    POSTPONED(8, true),
-    NEW_HEARING_BOOKED(9, true),
+    APPEAL_RECEIVED("appealReceived", 1, true),
+    DWP_RESPOND("responseReceived", 2, true),
+    HEARING_BOOKED("hearingBooked", 3, true),
+    HEARING("hearing", 4, false),
+    ADJOURNED("hearingAdjourned", 5, true),
+    LAPSED_REVISED("lapsedRevised", 6, true),
+    WITHDRAWN("appealWithdrawn", 7, true),
+    POSTPONED("hearingPostponed", 8, true),
+    NEW_HEARING_BOOKED("", 9, true),
     PAST_HEARING_BOOKED(10, true),
-    DORMANT(11, false),
+    DORMANT("appealDormant", 11, false),
     CLOSED(12, false),
     DWP_RESPOND_OVERDUE(13, true),
-    EVIDENCE_RECEIVED(-1, true),
-    EVIDENCE_REMINDER(-2, true),
+    EVIDENCE_RECEIVED("evidenceReceived", -1, true),
+    EVIDENCE_REMINDER("evidenceRemainder", -2, true),
     SUBSCRIBE_APPELLANT(0, true),
     SUBSCRIBE_SUPPORTER(0, true),
     SUBSCRIBE_APPELLANT_UPDATE_OLD(0, true),
     SUBSCRIBE_APPELLANT_UPDATE_NEW(0, true);
 
+    private String type;
     private final int order;
     private boolean notifiable;
 
     EventType(int order, boolean notifiable) {
+        this.order = order;
+        this.notifiable = notifiable;
+    }
+
+    EventType(String type, int order, boolean notifiable) {
+        this.type = type;
         this.order = order;
         this.notifiable = notifiable;
     }
@@ -46,5 +53,15 @@ public enum EventType {
 
     public boolean isNotifiable() {
         return notifiable;
+    }
+
+    public static EventType getEventTypeByType(String type) {
+        EventType e = null;
+        for (EventType event : EventType.values()) {
+            if (type.equals(event.type)) {
+                e = event;
+            }
+        }
+        return e;
     }
 }

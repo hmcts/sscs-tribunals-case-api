@@ -11,7 +11,7 @@ public class AppConstants {
     public static final String DECISION_LETTER_RECEIVE_BY_DATE = "decisionLetterReceiveByDate";
     public static final String DWP_RESPONSE_DATE_LITERAL = "dwpResponseDate";
     public static final String EMAIL = "email";
-    public static final String EVIDENCE_TYPE = "evidence_type";
+    public static final String EVIDENCE_TYPE = "evidenceType";
     public static final String EVIDENCE_PROVIDED_BY = "evidence_provided_by";
     public static final String GOOGLE_MAP_URL = "google_map_url";
     public static final String HEARING_DATETIME = "hearing_date_time";
