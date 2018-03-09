@@ -52,9 +52,11 @@ public final class CaseDataUtils {
                 .benefitType(benefitType)
                 .hearingOptions(hearingOptions)
                 .build();
-
+        Address venueAddress = Address.builder()
+                .postcode("Aberdeen")
+                .build();
         Venue venue = Venue.builder()
-                .venueTown("Aberdeen")
+                .address(venueAddress)
                 .build();
         HearingDetails hearingDetails = HearingDetails.builder()
                 .venue(venue)

@@ -15,7 +15,7 @@ public class AppConstants {
     public static final String EVIDENCE_PROVIDED_BY = "evidence_provided_by";
     public static final String GOOGLE_MAP_URL = "google_map_url";
     public static final String HEARING_DATETIME = "hearing_date_time";
-    public static final String HEARING_CONTACT_DATE_LITERAL = "hearing_contact_date";
+    public static final String HEARING_CONTACT_DATE_LITERAL = "hearingContactDate";
     public static final String PHONE = "phone";
     public static final String POSTCODE = "postcode";
     public static final String TYPE = "type";

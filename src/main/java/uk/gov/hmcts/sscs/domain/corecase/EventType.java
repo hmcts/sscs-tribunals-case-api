@@ -5,7 +5,7 @@ import com.google.common.base.CaseFormat;
 public enum EventType {
 
     APPEAL_RECEIVED("appealReceived", 1, true),
-    DWP_RESPOND("responseReceived", 2, true),
+    DWP_RESPOND("dwpRespond", 2, true),
     HEARING_BOOKED("hearingBooked", 3, true),
     HEARING("hearing", 4, false),
     ADJOURNED("hearingAdjourned", 5, true),
