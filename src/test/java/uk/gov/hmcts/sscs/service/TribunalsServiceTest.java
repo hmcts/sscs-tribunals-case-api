@@ -14,7 +14,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Subscription;
@@ -22,13 +21,16 @@ import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
+import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
 
     public static final String APPEAL_NUMBER = "asfefsdf3223";
     private static final String SURNAME = "surname";
+    public static final String REF_NUM = "ref-num";
     private TribunalsService tribunalsService;
 
     @Mock
@@ -46,12 +48,16 @@ public class TribunalsServiceTest {
     @Mock
     private AppealNumberGenerator appealNumberGenerator;
 
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+
     @Captor
     private ArgumentCaptor<CcdCase> captor;
 
     @Before
     public void setUp() {
-        tribunalsService = new TribunalsService(ccdService, emailService, email, transformer, appealNumberGenerator);
+        tribunalsService = new TribunalsService(ccdService,
+                emailService, email, transformer, appealNumberGenerator, regionalProcessingCenterService);
     }
 
     @Test
@@ -104,4 +110,5 @@ public class TribunalsServiceTest {
 
         verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(subscription));
     }
+
 }

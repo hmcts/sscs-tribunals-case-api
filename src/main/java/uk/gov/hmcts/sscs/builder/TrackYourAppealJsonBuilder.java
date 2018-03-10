@@ -19,6 +19,7 @@ import uk.gov.hmcts.sscs.domain.corecase.EventType;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.Events;
 import uk.gov.hmcts.sscs.model.ccd.Hearing;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilder {
 
@@ -28,7 +29,8 @@ public class TrackYourAppealJsonBuilder {
 
     }
 
-    public static ObjectNode buildTrackYourAppealJson(CaseData caseData) {
+    public static ObjectNode buildTrackYourAppealJson(CaseData caseData,
+                                                      RegionalProcessingCenter regionalProcessingCenter) {
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -49,6 +51,7 @@ public class TrackYourAppealJsonBuilder {
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
+        processRpcDetails(regionalProcessingCenter, caseNode);
         root.set("appeal", caseNode);
 
         return root;
@@ -160,4 +163,29 @@ public class TrackYourAppealJsonBuilder {
                 + localDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS'Z'"));
     }
 
+    private static void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode) {
+        if (null != regionalProcessingCenter) {
+            ObjectNode rpcNode = JsonNodeFactory.instance.objectNode();
+
+            rpcNode.put("name", regionalProcessingCenter.getName());
+            rpcNode.set("addressLines", buildRpcAddressArray(regionalProcessingCenter));
+            rpcNode.put("city", regionalProcessingCenter.getCity());
+            rpcNode.put("postcode", regionalProcessingCenter.getPostcode());
+            rpcNode.put("phoneNumber", regionalProcessingCenter.getPhoneNumber());
+            rpcNode.put("faxNumber", regionalProcessingCenter.getFaxNumber());
+
+            caseNode.set("regionalProcessingCenter", rpcNode);
+        }
+    }
+
+    private static ArrayNode buildRpcAddressArray(RegionalProcessingCenter regionalProcessingCenter) {
+        ArrayNode rpcAddressArray = JsonNodeFactory.instance.arrayNode();
+
+        rpcAddressArray.add(regionalProcessingCenter.getAddress1());
+        rpcAddressArray.add(regionalProcessingCenter.getAddress2());
+        rpcAddressArray.add(regionalProcessingCenter.getAddress3());
+        rpcAddressArray.add(regionalProcessingCenter.getAddress4());
+
+        return rpcAddressArray;
+    }
 }
