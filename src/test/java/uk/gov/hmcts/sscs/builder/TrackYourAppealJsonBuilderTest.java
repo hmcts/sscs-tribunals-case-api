@@ -12,18 +12,24 @@ import uk.gov.hmcts.sscs.model.ccd.CaseData;
 public class TrackYourAppealJsonBuilderTest {
 
     @Test
-    public void appealReceivedJsonTest() {
+    public void appealReceivedTest() {
         CaseData caseData = APPEAL_RECEIVED_CCD.getDeserializeMessage();
         ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData);
         assertJsonEquals(APPEAL_RECEIVED.getSerializedMessage(), objectNode);
     }
 
     @Test
-    public void dwpRespondJsonTest() {
+    public void dwpRespondTest() {
         CaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
         ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData);
         assertJsonEquals(DWP_RESPOND.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void hearingBookedTest() {
+        CaseData caseData = HEARING_BOOKED_CCD.getDeserializeMessage();
+        ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData);
+        assertJsonEquals(HEARING_BOOKED.getSerializedMessage(), objectNode);
+    }
 }
 

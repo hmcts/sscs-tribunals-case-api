@@ -2,9 +2,9 @@ package uk.gov.hmcts.sscs.model;
 
 public class AppConstants {
 
-    public static final String ADDRESS_LINE_1 = "address_line1";
-    public static final String ADDRESS_LINE_2 = "address_line2";
-    public static final String ADDRESS_LINE_3 = "address_line3";
+    public static final String ADDRESS_LINE_1 = "addressLine1";
+    public static final String ADDRESS_LINE_2 = "addressLine2";
+    public static final String ADDRESS_LINE_3 = "addressLine3";
     public static final String ADJOURNED_LETTER_RECEIVED_BY_DATE = "adjournedLetterReceivedByDate";
     public static final String CONTENT_KEY = "contentKey";
     public static final String DATE = "date";
@@ -12,14 +12,14 @@ public class AppConstants {
     public static final String DWP_RESPONSE_DATE_LITERAL = "dwpResponseDate";
     public static final String EMAIL = "email";
     public static final String EVIDENCE_TYPE = "evidenceType";
-    public static final String EVIDENCE_PROVIDED_BY = "evidence_provided_by";
-    public static final String GOOGLE_MAP_URL = "google_map_url";
-    public static final String HEARING_DATETIME = "hearing_date_time";
+    public static final String EVIDENCE_PROVIDED_BY = "evidenceProvidedBy";
+    public static final String GOOGLE_MAP_URL = "googleMapUrl";
+    public static final String HEARING_DATETIME = "hearingDateTime";
     public static final String HEARING_CONTACT_DATE_LITERAL = "hearingContactDate";
     public static final String PHONE = "phone";
     public static final String POSTCODE = "postcode";
     public static final String TYPE = "type";
-    public static final String VENUE_NAME = "venue_name";
+    public static final String VENUE_NAME = "venueName";
 
     public static final int ADJOURNED_LETTER_RECEIVED_MAX_DAYS = 7;
     public static final int DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT = 42;
