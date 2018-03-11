@@ -12,7 +12,7 @@ public enum EventType {
     LAPSED_REVISED("lapsedRevised", 6, true),
     WITHDRAWN("appealWithdrawn", 7, true),
     POSTPONED("hearingPostponed", 8, true),
-    NEW_HEARING_BOOKED("", 9, true),
+    NEW_HEARING_BOOKED("newHearingBooked", 9, true),
     PAST_HEARING_BOOKED(10, true),
     DORMANT("dormant", 11, false),
     CLOSED(12, false),

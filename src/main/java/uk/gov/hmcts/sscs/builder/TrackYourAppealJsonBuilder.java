@@ -136,6 +136,7 @@ public class TrackYourAppealJsonBuilder {
                         DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT, true));
                 break;
             case HEARING_BOOKED:
+            case NEW_HEARING_BOOKED:
                 Hearing hearing = caseData.getHearings().get(0);
                 eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                 eventNode.put(HEARING_DATETIME,
