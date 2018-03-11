@@ -31,7 +31,9 @@ public enum SerializeJsonMessageManager {
     NEW_HEARING_BOOKED("newHearingBooked.json"),
     NEW_HEARING_BOOKED_CCD("newHearingBookedCcd.json"),
     PAST_HEARING_BOOKED("pastHearingBooked.json"),
-    PAST_HEARING_BOOKED_CCD("pastHearingBookedCcd.json");
+    PAST_HEARING_BOOKED_CCD("pastHearingBookedCcd.json"),
+    DWP_RESPOND_OVERDUE("dwpRespondOverdue.json"),
+    DWP_RESPOND_OVERDUE_CCD("dwpRespondOverdueCcd.json");
 
     private final String serializedMessage;
 

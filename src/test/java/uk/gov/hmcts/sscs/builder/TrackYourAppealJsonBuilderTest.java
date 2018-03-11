@@ -76,6 +76,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(PAST_HEARING_BOOKED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void dwpRespondOverdueTest() {
+        CaseData caseData = DWP_RESPOND_OVERDUE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(DWP_RESPOND_OVERDUE.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
         regionalProcessingCenter.setName("LIVERPOOL");

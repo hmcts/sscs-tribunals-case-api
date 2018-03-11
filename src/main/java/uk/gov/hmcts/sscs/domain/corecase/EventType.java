@@ -16,7 +16,7 @@ public enum EventType {
     PAST_HEARING_BOOKED("pastHearingBooked", 10, true),
     DORMANT("dormant", 11, false),
     CLOSED(12, false),
-    DWP_RESPOND_OVERDUE(13, true),
+    DWP_RESPOND_OVERDUE("dwpRespondOverdue", 13, true),
     EVIDENCE_RECEIVED("evidenceReceived", -1, true),
     EVIDENCE_REMINDER("evidenceRemainder", -2, true),
     SUBSCRIBE_APPELLANT(0, true),

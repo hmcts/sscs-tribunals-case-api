@@ -125,6 +125,7 @@ public class TrackYourAppealJsonBuilder {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED :
+            case DWP_RESPOND_OVERDUE :
                 eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
             case EVIDENCE_RECEIVED :
