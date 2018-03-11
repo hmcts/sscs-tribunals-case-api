@@ -30,14 +30,14 @@
   "events": [
     {
       "value": {
-        "date": "2017-03-02T17:27:50.297",
+        "date": "2017-06-24T17:27:50.297",
         "type": "adjourned",
         "description": "Hearing adjourned"
       }
     },
     {
       "value": {
-        "date": "2017-06-24T14:11:34.013",
+        "date": "2017-03-02T14:11:34.013",
         "type": "hearingBooked",
         "description": "Hearing booked"
       }

@@ -9,9 +9,9 @@
     "latestEvents": [
       {
         "adjournedDate": "",
-        "adjournedLetterReceivedByDate": "2017-03-09T17:27:50.297Z",
-        "hearingContactDate": "2017-04-13T17:27:50.297Z",
-        "date": "2017-03-02T17:27:50.297Z",
+        "adjournedLetterReceivedByDate": "2017-07-01T17:27:50.297Z",
+        "hearingContactDate": "2017-08-05T17:27:50.297Z",
+        "date": "2017-06-24T17:27:50.297Z",
         "type": "ADJOURNED",
         "contentKey": "status.adjourned"
       }
@@ -25,7 +25,7 @@
         "addressLine2": "Chester",
         "addressLine3": null,
         "googleMapUrl": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632",
-        "date": "2017-06-24T14:11:34.013Z",
+        "date": "2017-03-02T14:11:34.013Z",
         "type": "HEARING_BOOKED",
         "contentKey": "status.hearingBooked"
       }
