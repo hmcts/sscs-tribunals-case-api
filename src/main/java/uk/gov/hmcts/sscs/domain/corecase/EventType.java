@@ -11,7 +11,7 @@ public enum EventType {
     ADJOURNED("adjourned", 5, true),
     LAPSED_REVISED("lapsedRevised", 6, true),
     WITHDRAWN("appealWithdrawn", 7, true),
-    POSTPONED("hearingPostponed", 8, true),
+    POSTPONED("postponed", 8, true),
     NEW_HEARING_BOOKED("newHearingBooked", 9, true),
     PAST_HEARING_BOOKED("pastHearingBooked", 10, true),
     DORMANT("dormant", 11, false),

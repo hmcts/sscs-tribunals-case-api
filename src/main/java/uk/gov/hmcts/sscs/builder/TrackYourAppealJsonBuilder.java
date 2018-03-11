@@ -134,6 +134,7 @@ public class TrackYourAppealJsonBuilder {
                 break;
             case DWP_RESPOND :
             case PAST_HEARING_BOOKED :
+            case POSTPONED :
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
                         DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT, true));
                 break;
