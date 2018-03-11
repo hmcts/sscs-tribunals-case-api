@@ -1,0 +1,25 @@
+{
+  "caseReference": "SC333/33/33333",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
+      }
+    },
+    "benefitType": {
+      "code": "PIP",
+      "description": "benefit Type"
+    }
+  },
+  "events": [
+    {
+      "value": {
+        "date": "2017-06-29T12:50:11.437",
+        "type": "dormant",
+        "description": "Dormant"
+      }
+    }
+  ]
+}

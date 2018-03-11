@@ -1,5 +1,7 @@
 package uk.gov.hmcts.sscs.builder;
 
+import static java.time.LocalDateTime.of;
+import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.sscs.domain.corecase.EventType.EVIDENCE_RECEIVED;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
@@ -14,6 +16,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import net.objectlab.kit.datecalc.common.DateCalculator;
+import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
@@ -146,6 +151,10 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
                         HEARING_DATE_CONTACT_WEEKS, false));
                 break;
+            case DORMANT:
+                eventNode.put(DECISION_LETTER_RECEIVE_BY_DATE, getBusinessDay(event,
+                        HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS));
+                break;
             default: break;
         }
     }
@@ -155,14 +164,14 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private static String getUtcDate(Events event) {
-        return formatDateTime(LocalDateTime.parse(event.getValue().getDate()));
+        return formatDateTime(parse(event.getValue().getDate()));
     }
 
     private static String getCalculatedDate(Events event, int days, boolean isDays) {
         if (isDays) {
-            return formatDateTime(LocalDateTime.parse(event.getValue().getDate()).plusDays(days));
+            return formatDateTime(parse(event.getValue().getDate()).plusDays(days));
         } else {
-            return formatDateTime(LocalDateTime.parse(event.getValue().getDate()).plusWeeks(days));
+            return formatDateTime(parse(event.getValue().getDate()).plusWeeks(days));
         }
     }
 
@@ -200,5 +209,14 @@ public class TrackYourAppealJsonBuilder {
         rpcAddressArray.add(regionalProcessingCenter.getAddress4());
 
         return rpcAddressArray;
+    }
+
+    public static String getBusinessDay(Events event, int numberOfBusinessDays) {
+        LocalDateTime localDateTime = parse(event.getValue().getDate());
+        LocalDate startDate = localDateTime.toLocalDate();
+        DateCalculator<LocalDate> dateCalculator = LocalDateKitCalculatorsFactory.forwardCalculator("UK");
+        dateCalculator.setStartDate(startDate);
+        LocalDate decisionDate = dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
+        return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
     }
 }

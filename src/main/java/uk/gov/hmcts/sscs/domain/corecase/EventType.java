@@ -14,7 +14,7 @@ public enum EventType {
     POSTPONED("hearingPostponed", 8, true),
     NEW_HEARING_BOOKED("", 9, true),
     PAST_HEARING_BOOKED(10, true),
-    DORMANT("appealDormant", 11, false),
+    DORMANT("dormant", 11, false),
     CLOSED(12, false),
     DWP_RESPOND_OVERDUE(13, true),
     EVIDENCE_RECEIVED("evidenceReceived", -1, true),
