@@ -55,7 +55,7 @@ public class TrackYourAppealJsonBuilder {
         List<Events> latestEvents = buildLatestEvents(caseData.getEvents());
         caseNode.set("latestEvents", buildEventArray(latestEvents, caseData));
         List<Events> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
-        if (historicalEvents.size() > 0) {
+        if (!historicalEvents.isEmpty()) {
             caseNode.set("historicalEvents", buildEventArray(historicalEvents, caseData));
         }
 
@@ -102,9 +102,8 @@ public class TrackYourAppealJsonBuilder {
 
     private static List<Events> buildHistoricalEvents(List<Events> events, List<Events> latestEvents) {
 
-        List<Events> historicalEvents = events.stream().skip(latestEvents.size()).collect(toList());
+        return events.stream().skip(latestEvents.size()).collect(toList());
 
-        return historicalEvents;
     }
 
     private static String getAppealStatus(List<Events> events) {
