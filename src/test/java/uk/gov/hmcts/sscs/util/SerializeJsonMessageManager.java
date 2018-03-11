@@ -25,7 +25,9 @@ public enum SerializeJsonMessageManager {
     ADJOURNED("adjourned.json"),
     ADJOURNED_CCD("adjournedCcd.json"),
     DORMANT("dormant.json"),
-    DORMANT_CCD("dormantCcd.json");
+    DORMANT_CCD("dormantCcd.json"),
+    HEARING("hearing.json"),
+    HEARING_CCD("hearingCcd.json");
 
     private final String serializedMessage;
 

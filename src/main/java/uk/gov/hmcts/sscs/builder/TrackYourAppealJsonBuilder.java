@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import net.objectlab.kit.datecalc.common.DateCalculator;
@@ -36,6 +38,8 @@ public class TrackYourAppealJsonBuilder {
 
     public static ObjectNode buildTrackYourAppealJson(CaseData caseData,
                                                       RegionalProcessingCenter regionalProcessingCenter) {
+
+        Collections.sort(caseData.getEvents(), Comparator.reverseOrder());
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -151,7 +155,8 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
                         HEARING_DATE_CONTACT_WEEKS, false));
                 break;
-            case DORMANT:
+            case DORMANT :
+            case HEARING :
                 eventNode.put(DECISION_LETTER_RECEIVE_BY_DATE, getBusinessDay(event,
                         HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS));
                 break;

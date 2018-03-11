@@ -52,6 +52,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(DORMANT.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void hearingTest() {
+        CaseData caseData = HEARING_CCD.getDeserializeMessage();
+        ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(HEARING.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
         regionalProcessingCenter.setName("LIVERPOOL");
