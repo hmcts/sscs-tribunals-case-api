@@ -35,7 +35,9 @@ public enum SerializeJsonMessageManager {
     DWP_RESPOND_OVERDUE("dwpRespondOverdue.json"),
     DWP_RESPOND_OVERDUE_CCD("dwpRespondOverdueCcd.json"),
     POSTPONED("postponed.json"),
-    POSTPONED_CCD("postponedCcd.json");
+    POSTPONED_CCD("postponedCcd.json"),
+    WITHDRAWN("withdrawn.json"),
+    WITHDRAWN_CCD("withdrawnCcd.json");
 
     private final String serializedMessage;
 

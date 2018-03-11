@@ -92,6 +92,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(POSTPONED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void withdrawnTest() {
+        CaseData caseData = WITHDRAWN_CCD.getDeserializeMessage();
+        ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(WITHDRAWN.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
         regionalProcessingCenter.setName("LIVERPOOL");
