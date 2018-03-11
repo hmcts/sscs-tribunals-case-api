@@ -37,7 +37,9 @@ public enum SerializeJsonMessageManager {
     POSTPONED("postponed.json"),
     POSTPONED_CCD("postponedCcd.json"),
     WITHDRAWN("withdrawn.json"),
-    WITHDRAWN_CCD("withdrawnCcd.json");
+    WITHDRAWN_CCD("withdrawnCcd.json"),
+    CLOSED("closed.json"),
+    CLOSED_CCD("closedCcd.json");
 
     private final String serializedMessage;
 
