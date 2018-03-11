@@ -21,14 +21,14 @@
         "contentKey": "status.appealReceived"
       }
     ],
-    "regionalProcessingCenter":
-     {"name":"LIVERPOOL",
-       "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
-         "Prudential Buildings","36 Dale Street"],
-       "city":"LIVERPOOL",
-       "postcode":"L2 5UZ",
-       "phoneNumber":"0300 123 1142",
-       "faxNumber":"0870 324 0109"
-     }
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
   }
 }

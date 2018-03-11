@@ -116,15 +116,15 @@ public class TrackYourAppealJsonBuilder {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED :
-                eventNode.put(DWP_RESPONSE_DATE_LITERAL, getDwpResponseDate(event, MAX_DWP_RESPONSE_DAYS));
+                eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
             case EVIDENCE_RECEIVED:
                 eventNode.put(EVIDENCE_TYPE, event.getValue().getDescription());
                 eventNode.put(EVIDENCE_PROVIDED_BY, event.getValue().getDescription());
                 break;
             case DWP_RESPOND:
-                eventNode.put(HEARING_CONTACT_DATE_LITERAL, getDwpResponseDate(event,
-                        DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT));
+                eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
+                        DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT, true));
                 break;
             case HEARING_BOOKED:
                 Hearing hearing = caseData.getHearings().get(0);
@@ -136,6 +136,15 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
                 eventNode.put(ADDRESS_LINE_3, hearing.getValue().getVenue().getAddress().getTown());
                 eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
+                break;
+            case ADJOURNED:
+                eventNode.put(ADJOURNED_DATE, "");
+                eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
+                        HEARING_DATE_CONTACT_WEEKS, false));
+                eventNode.put(ADJOURNED_LETTER_RECEIVED_BY_DATE, getCalculatedDate(event,
+                        ADJOURNED_LETTER_RECEIVED_MAX_DAYS, true));
+                eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
+                        HEARING_DATE_CONTACT_WEEKS, false));
                 break;
             default: break;
         }
@@ -149,8 +158,12 @@ public class TrackYourAppealJsonBuilder {
         return formatDateTime(LocalDateTime.parse(event.getValue().getDate()));
     }
 
-    private static String getDwpResponseDate(Events event, int days) {
-        return formatDateTime(LocalDateTime.parse(event.getValue().getDate()).plusDays(days));
+    private static String getCalculatedDate(Events event, int days, boolean isDays) {
+        if (isDays) {
+            return formatDateTime(LocalDateTime.parse(event.getValue().getDate()).plusDays(days));
+        } else {
+            return formatDateTime(LocalDateTime.parse(event.getValue().getDate()).plusWeeks(days));
+        }
     }
 
     private static String getHearingDateTime(String localDate, String localTime) {

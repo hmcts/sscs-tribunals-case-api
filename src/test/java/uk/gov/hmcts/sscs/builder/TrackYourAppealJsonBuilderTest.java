@@ -36,6 +36,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(HEARING_BOOKED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void adjournedTest() {
+        CaseData caseData = ADJOURNED_CCD.getDeserializeMessage();
+        ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(ADJOURNED.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
         regionalProcessingCenter.setName("LIVERPOOL");

@@ -8,7 +8,7 @@ public enum EventType {
     DWP_RESPOND("dwpRespond", 2, true),
     HEARING_BOOKED("hearingBooked", 3, true),
     HEARING("hearing", 4, false),
-    ADJOURNED("hearingAdjourned", 5, true),
+    ADJOURNED("adjourned", 5, true),
     LAPSED_REVISED("lapsedRevised", 6, true),
     WITHDRAWN("appealWithdrawn", 7, true),
     POSTPONED("hearingPostponed", 8, true),

@@ -36,8 +36,8 @@
         "contentKey": "status.appealReceived"
       }
     ],
-    "regionalProcessingCenter":
-    {"name":"LIVERPOOL",
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
       "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
         "Prudential Buildings","36 Dale Street"],
       "city":"LIVERPOOL",

@@ -5,6 +5,7 @@ public class AppConstants {
     public static final String ADDRESS_LINE_1 = "addressLine1";
     public static final String ADDRESS_LINE_2 = "addressLine2";
     public static final String ADDRESS_LINE_3 = "addressLine3";
+    public static final String ADJOURNED_DATE = "adjournedDate";
     public static final String ADJOURNED_LETTER_RECEIVED_BY_DATE = "adjournedLetterReceivedByDate";
     public static final String CONTENT_KEY = "contentKey";
     public static final String DATE = "date";

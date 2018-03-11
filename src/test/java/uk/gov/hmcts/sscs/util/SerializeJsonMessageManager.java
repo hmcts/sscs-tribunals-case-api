@@ -21,7 +21,9 @@ public enum SerializeJsonMessageManager {
     DWP_RESPOND("dwpRespond.json"),
     DWP_RESPOND_CCD("dwpRespondCcd.json"),
     HEARING_BOOKED("hearingBooked.json"),
-    HEARING_BOOKED_CCD("hearingBookedCcd.json");
+    HEARING_BOOKED_CCD("hearingBookedCcd.json"),
+    ADJOURNED("adjourned.json"),
+    ADJOURNED_CCD("adjournedCcd.json");
 
     private final String serializedMessage;
 
