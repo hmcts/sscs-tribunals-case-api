@@ -127,16 +127,17 @@ public class TrackYourAppealJsonBuilder {
             case APPEAL_RECEIVED :
                 eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
-            case EVIDENCE_RECEIVED:
+            case EVIDENCE_RECEIVED :
                 eventNode.put(EVIDENCE_TYPE, event.getValue().getDescription());
                 eventNode.put(EVIDENCE_PROVIDED_BY, event.getValue().getDescription());
                 break;
-            case DWP_RESPOND:
+            case DWP_RESPOND :
+            case PAST_HEARING_BOOKED :
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
                         DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT, true));
                 break;
-            case HEARING_BOOKED:
-            case NEW_HEARING_BOOKED:
+            case HEARING_BOOKED :
+            case NEW_HEARING_BOOKED :
                 Hearing hearing = caseData.getHearings().get(0);
                 eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                 eventNode.put(HEARING_DATETIME,
@@ -147,7 +148,7 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(ADDRESS_LINE_3, hearing.getValue().getVenue().getAddress().getTown());
                 eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
                 break;
-            case ADJOURNED:
+            case ADJOURNED :
                 eventNode.put(ADJOURNED_DATE, "");
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
                         HEARING_DATE_CONTACT_WEEKS, false));

@@ -13,7 +13,7 @@ public enum EventType {
     WITHDRAWN("appealWithdrawn", 7, true),
     POSTPONED("hearingPostponed", 8, true),
     NEW_HEARING_BOOKED("newHearingBooked", 9, true),
-    PAST_HEARING_BOOKED(10, true),
+    PAST_HEARING_BOOKED("pastHearingBooked", 10, true),
     DORMANT("dormant", 11, false),
     CLOSED(12, false),
     DWP_RESPOND_OVERDUE(13, true),

@@ -1,0 +1,35 @@
+{
+  "appeal": {
+    "caseReference": "SC333/33/33333",
+    "appealNumber": "NotKnownInCCD",
+    "benefitType": "pip",
+    "name": "Mr. C Charlie",
+    "surname": "Charlie",
+    "status": "PAST_HEARING_BOOKED",
+    "latestEvents": [
+      {
+        "hearingContactDate": "2017-08-10T12:50:11.437Z",
+        "date": "2017-06-29T12:50:11.437Z",
+        "type": "PAST_HEARING_BOOKED",
+        "contentKey": "status.pastHearingBooked"
+      }
+    ],
+    "historicalEvents": [
+      {
+        "dwpResponseDate": "2017-04-12T12:01:47.620Z",
+        "date": "2017-03-08T12:01:47.620Z",
+        "type": "APPEAL_RECEIVED",
+        "contentKey": "status.appealReceived"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
+  }
+}
