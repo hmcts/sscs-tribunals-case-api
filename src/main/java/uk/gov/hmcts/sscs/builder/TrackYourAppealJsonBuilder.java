@@ -24,7 +24,7 @@ import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.Events;
+import uk.gov.hmcts.sscs.model.ccd.Event;
 import uk.gov.hmcts.sscs.model.ccd.Hearing;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
@@ -52,9 +52,9 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("surname", caseData.getAppeal().getAppellant().getName().getLastName());
         }
 
-        List<Events> latestEvents = buildLatestEvents(caseData.getEvents());
+        List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
         caseNode.set("latestEvents", buildEventArray(latestEvents, caseData));
-        List<Events> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
+        List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
             caseNode.set("historicalEvents", buildEventArray(historicalEvents, caseData));
         }
@@ -66,11 +66,11 @@ public class TrackYourAppealJsonBuilder {
         return root;
     }
 
-    private static ArrayNode buildEventArray(List<Events> events, CaseData caseData) {
+    private static ArrayNode buildEventArray(List<Event> events, CaseData caseData) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
-        for (Events event: events) {
+        for (Event event: events) {
             ObjectNode eventNode = JsonNodeFactory.instance.objectNode();
 
             eventNode.put(DATE, getUtcDate((event)));
@@ -85,10 +85,10 @@ public class TrackYourAppealJsonBuilder {
         return eventsNode;
     }
 
-    private static List<Events> buildLatestEvents(List<Events> events) {
-        List<Events> latestEvents = new ArrayList<>();
+    private static List<Event> buildLatestEvents(List<Event> events) {
+        List<Event> latestEvents = new ArrayList<>();
 
-        for (Events event: events) {
+        for (Event event: events) {
             if (EVIDENCE_RECEIVED.equals(getEventType(event))) {
                 latestEvents.add(event);
             } else {
@@ -100,17 +100,17 @@ public class TrackYourAppealJsonBuilder {
         return latestEvents;
     }
 
-    private static List<Events> buildHistoricalEvents(List<Events> events, List<Events> latestEvents) {
+    private static List<Event> buildHistoricalEvents(List<Event> events, List<Event> latestEvents) {
 
         return events.stream().skip(latestEvents.size()).collect(toList());
 
     }
 
-    private static String getAppealStatus(List<Events> events) {
+    private static String getAppealStatus(List<Event> events) {
         String appealStatus = "";
 
         if (null != events && !events.isEmpty()) {
-            for (Events event : events) {
+            for (Event event : events) {
                 if (getEventType(event).getOrder() > 0) {
                     appealStatus = getEventType(event).toString();
                     break;
@@ -120,7 +120,7 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private static void buildEventNode(Events event, ObjectNode eventNode, CaseData caseData) {
+    private static void buildEventNode(Event event, ObjectNode eventNode, CaseData caseData) {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED :
@@ -167,15 +167,15 @@ public class TrackYourAppealJsonBuilder {
         }
     }
 
-    private static EventType getEventType(Events event) {
+    private static EventType getEventType(Event event) {
         return EventType.getEventTypeByType(event.getValue().getType());
     }
 
-    private static String getUtcDate(Events event) {
+    private static String getUtcDate(Event event) {
         return formatDateTime(parse(event.getValue().getDate()));
     }
 
-    private static String getCalculatedDate(Events event, int days, boolean isDays) {
+    private static String getCalculatedDate(Event event, int days, boolean isDays) {
         if (isDays) {
             return formatDateTime(parse(event.getValue().getDate()).plusDays(days));
         } else {
@@ -219,7 +219,7 @@ public class TrackYourAppealJsonBuilder {
         return rpcAddressArray;
     }
 
-    public static String getBusinessDay(Events event, int numberOfBusinessDays) {
+    public static String getBusinessDay(Event event, int numberOfBusinessDays) {
         LocalDateTime localDateTime = parse(event.getValue().getDate());
         LocalDate startDate = localDateTime.toLocalDate();
         DateCalculator<LocalDate> dateCalculator = LocalDateKitCalculatorsFactory.forwardCalculator("UK");
