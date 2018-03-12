@@ -20,6 +20,7 @@ import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
@@ -62,7 +63,7 @@ public class TribunalsServiceTest {
 
     @Test
     public void shouldReturnTrueGivenValidAppealNumberAndSurname() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME)).willReturn(new CcdCase());
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME)).willReturn(getCaseData());
 
         assertTrue(tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME));
     }
@@ -109,6 +110,10 @@ public class TribunalsServiceTest {
         tribunalsService.updateSubscription(APPEAL_NUMBER, subscription);
 
         verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(subscription));
+    }
+
+    private CaseData getCaseData() {
+        return CaseData.builder().build();
     }
 
 }

@@ -1,26 +1,15 @@
 package uk.gov.hmcts.sscs.domain.corecase;
 
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.ADJOURNED;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.CLOSED;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.DORMANT;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.DWP_RESPOND;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.DWP_RESPOND_OVERDUE;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.EVIDENCE_RECEIVED;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.HEARING_BOOKED;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.NEW_HEARING_BOOKED;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.PAST_HEARING_BOOKED;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.POSTPONED;
-import static uk.gov.hmcts.sscs.model.AppConstants.DORMANT_TO_CLOSED_DURATION_IN_MONTHS;
-import static uk.gov.hmcts.sscs.model.AppConstants.MAX_DWP_RESPONSE_DAYS;
-import static uk.gov.hmcts.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
+import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Deprecated
 public class CcdCase {
 
     private Appeal appeal;

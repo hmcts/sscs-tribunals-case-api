@@ -74,8 +74,8 @@ public class TribunalsService {
     }
 
     public boolean validateSurname(String appealNumber, String surname) throws CcdException {
-        CcdCase ccdCase = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname);
-        if (ccdCase == null) {
+        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname);
+        if (caseData == null) {
             throw new InvalidSurnameException();
         }
         return true;
