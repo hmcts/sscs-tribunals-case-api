@@ -18,7 +18,7 @@ public class CaseData {
     private List<Hearing> hearings;
     private Evidence evidence;
     private List<DwpTimeExtension> dwpTimeExtension;
-    private List<Events> events;
+    private List<Event> events;
 
     @JsonCreator
     public CaseData(@JsonProperty("caseReference") String caseReference,
@@ -26,7 +26,7 @@ public class CaseData {
                     @JsonProperty("hearings") List<Hearing> hearings,
                     @JsonProperty("evidence") Evidence evidence,
                     @JsonProperty("dwpTimeExtension") List<DwpTimeExtension> dwpTimeExtension,
-                    @JsonProperty("events") List<Events> events) {
+                    @JsonProperty("events") List<Event> events) {
         this.caseReference = caseReference;
         this.appeal = appeal;
         this.hearings = hearings;

@@ -4,14 +4,29 @@
     "name": "Mr Jason Mock",
     "surname": "Mock",
     "appealNumber": "NotKnownInCCD",
-    "benefitType": "pip",
-    "status": "APPEAL_RECEIVED",
+    "benefitType": "esa",
+    "status": "DWP_RESPOND",
     "latestEvents": [
       {
-        "date": "2017-03-10T13:00:42.233Z",
+        "date": "2017-04-12T13:00:42.233Z",
         "type": "EVIDENCE_RECEIVED",
-        "evidenceProvidedBy": "Evidence received",
         "evidenceType": "Evidence received",
+        "evidenceProvidedBy": "Evidence received",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "date": "2017-04-10T12:01:47.620Z",
+        "type": "DWP_RESPOND",
+        "contentKey": "status.dwpRespond",
+        "hearingContactDate": "2017-05-22T12:01:47.620Z"
+      }
+    ],
+    "historicalEvents": [
+      {
+        "date": "2017-03-10T12:01:47.620Z",
+        "type": "EVIDENCE_RECEIVED",
+        "evidenceType": "Evidence received",
+        "evidenceProvidedBy": "Evidence received",
         "contentKey": "status.evidenceReceived"
       },
       {

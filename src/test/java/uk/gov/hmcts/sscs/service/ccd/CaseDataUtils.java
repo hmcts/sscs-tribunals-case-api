@@ -52,9 +52,11 @@ public final class CaseDataUtils {
                 .benefitType(benefitType)
                 .hearingOptions(hearingOptions)
                 .build();
-
+        Address venueAddress = Address.builder()
+                .postcode("Aberdeen")
+                .build();
         Venue venue = Venue.builder()
-                .venueTown("Aberdeen")
+                .address(venueAddress)
                 .build();
         HearingDetails hearingDetails = HearingDetails.builder()
                 .venue(venue)
@@ -91,13 +93,13 @@ public final class CaseDataUtils {
         List<DwpTimeExtension> dwpTimeExtensionList = new ArrayList<>();
         dwpTimeExtensionList.add(dwpTimeExtension);
 
-        Event event = Event.builder()
+        EventDetails eventDetails = EventDetails.builder()
                 .type("appealCreated")
                 .description("Appeal Created")
                 .date("2001-12-14T21:59:43.10-05:00")
                 .build();
-        Events events = Events.builder()
-                .value(event)
+        Event events = Event.builder()
+                .value(eventDetails)
                 .build();
 
         return CaseData.builder()

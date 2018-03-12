@@ -1,24 +1,23 @@
 {
-  "caseReference": "SC123/45/00001",
+  "caseReference": "SC333/33/33333",
   "appeal": {
     "appellant": {
       "name": {
-        "title": "Mr",
-        "lastName": "Mock",
-        "firstName": "Jason"
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
       }
     },
     "benefitType": {
-      "code": "PIP",
-      "description": "benefit Type"
+      "code": "PIP"
     }
   },
   "events": [
     {
       "value": {
         "date": "2017-03-10T13:00:42.233",
-        "type": "evidenceReceived",
-        "description": "Evidence received"
+        "type": "dwpRespondOverdue",
+        "description": "Dwp respond overdue"
       }
     },
     {
