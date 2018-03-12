@@ -16,10 +16,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.Subscription;
+import uk.gov.hmcts.sscs.model.ccd.Subscriptions;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 
 @Service
@@ -125,11 +126,13 @@ public class CcdService {
 
         String benefitType = null;
         try {
-            Subscription subscription = new Subscription(Boolean.FALSE, Boolean.FALSE, reason);
             CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
             //The following need to be implemented as per CCD def for subscriptions
-            //ccdCase.setSubscription(subscription);
-            //createCase(ccdCase);
+            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription();
+            subscription.toBuilder().subscribeEmail("No").subscribeSms("No").reason(reason);
+            caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build();
+
+            //createCase(caseData);
             benefitType = caseData.getAppeal().getBenefitType().getCode();
         } catch (Exception ex) {
             LOG.error("Error while unsubscribing case from ccd: ", ex);
@@ -143,7 +146,10 @@ public class CcdService {
         try {
             CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
             //The following need to be implemented as per CCD def for subscriptions
-            //ccdCase.setSubscription(subscription);
+            Subscriptions subscriptions = Subscriptions.builder()
+                    .appellantSubscription(subscription)
+                    .build();
+            caseData.toBuilder().subscriptions(subscriptions);
             //createCase(ccdCase);
             benefitType = caseData.getAppeal().getBenefitType().getCode();
         } catch (Exception ex) {

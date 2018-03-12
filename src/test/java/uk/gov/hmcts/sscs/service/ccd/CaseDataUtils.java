@@ -104,6 +104,27 @@ public final class CaseDataUtils {
                 .value(eventDetails)
                 .build();
 
+        Subscription appellantSubscription = Subscription.builder()
+                .tya("")
+                .email("")
+                .mobile("")
+                .subscribeEmail("yes/no")
+                .subscribeSms("yes/no")
+                .reason("")
+                .build();
+        Subscription supporterSubscription = Subscription.builder()
+                .tya("")
+                .email("")
+                .mobile("")
+                .subscribeEmail("")
+                .subscribeSms("")
+                .reason("")
+                .build();
+        Subscriptions subscriptions = Subscriptions.builder()
+                .appellantSubscription(appellantSubscription)
+                .supporterSubscription(supporterSubscription)
+                .build();
+
         return CaseData.builder()
                 .caseReference("SC068/17/00013")
                 .appeal(appeal)
@@ -111,6 +132,7 @@ public final class CaseDataUtils {
                 .evidence(evidence)
                 .dwpTimeExtension(dwpTimeExtensionList)
                 .events(Collections.singletonList(events))
+                .subscriptions(subscriptions)
                 .build();
     }
 

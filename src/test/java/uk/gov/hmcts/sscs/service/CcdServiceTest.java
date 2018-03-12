@@ -27,9 +27,9 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.sscs.domain.corecase.Appellant;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.domain.corecase.Name;
-import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 
@@ -175,7 +175,7 @@ public class CcdServiceTest {
         setup();
         mockCaseData();
 
-        String benefitType = ccdService.updateSubscription(anyString(), new Subscription());
+        String benefitType = ccdService.updateSubscription(anyString(), Subscription.builder().build());
 
         verify(readCoreCaseDataService).getCcdCaseData(anyString());
 

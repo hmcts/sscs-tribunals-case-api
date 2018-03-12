@@ -16,9 +16,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException;
+import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
@@ -81,11 +81,12 @@ public class SubscriptionsControllerTest {
         // Given
         when(tribunalsService.updateSubscription(eq(APPEAL_ID), any(Subscription.class))).thenReturn("benefitTypeValue");
 
-        Subscription subscription = new Subscription();
-        subscription.setEmailAddress("testuser@gmail.com");
-        subscription.setPhoneNumber("07788996655");
-        subscription.setEmailSubscribe(true);
-        subscription.setMobileSubscribe(true);
+        Subscription subscription = Subscription.builder()
+                .email("testuser@gmail.com")
+                .mobile("07788996655")
+                .subscribeEmail("Yes")
+                .subscribeSms("Yes")
+                .build();
 
         //When
         ResponseEntity<String> benefitType = controller.updateSubscription(APPEAL_ID, subscription);

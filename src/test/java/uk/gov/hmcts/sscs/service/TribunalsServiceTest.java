@@ -16,11 +16,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.sscs.domain.corecase.Appeal;
 import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
-import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
@@ -106,14 +106,17 @@ public class TribunalsServiceTest {
 
     @Test
     public void shouldUpdateSubscriptionDetails() throws CcdException {
-        Subscription subscription = new Subscription();
-        tribunalsService.updateSubscription(APPEAL_NUMBER, subscription);
+        tribunalsService.updateSubscription(APPEAL_NUMBER, getSubscription());
 
-        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(subscription));
+        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(getSubscription()));
     }
 
     private CaseData getCaseData() {
         return CaseData.builder().build();
+    }
+
+    private Subscription getSubscription() {
+        return Subscription.builder().build();
     }
 
 }
