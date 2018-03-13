@@ -1,4 +1,4 @@
-package ccd;
+package uk.gov.hmcts.sscs.ccd;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -11,7 +11,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.service.ccd.CreateCoreCaseDataService;
-import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

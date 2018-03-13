@@ -40,7 +40,7 @@ public class CcdServiceTest {
     public void setup() {
         ccdService = new CcdService(readCoreCaseDataService, createCoreCaseDataService);
 
-        when(readCoreCaseDataService.getCcdCaseData(anyString()))
+        when(readCoreCaseDataService.getCcdCaseDataByAppealNumber(anyString()))
                 .thenReturn(CaseDataUtils.buildCaseData());
 
         when(createCoreCaseDataService.createCcdCase(CaseDataUtils.buildCaseData()))
@@ -71,7 +71,7 @@ public class CcdServiceTest {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumber(anyString());
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertNotNull(caseData);
     }
@@ -81,7 +81,7 @@ public class CcdServiceTest {
 
         String benefitType = ccdService.unsubscribe(anyString(), "reason");
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
@@ -91,7 +91,7 @@ public class CcdServiceTest {
 
         String benefitType = ccdService.updateSubscription(anyString(), Subscription.builder().build());
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
@@ -101,7 +101,7 @@ public class CcdServiceTest {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), SURNAME);
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertNotNull(caseData);
         assertEquals(SURNAME, caseData.getAppeal().getAppellant().getName().getLastName());
@@ -112,7 +112,7 @@ public class CcdServiceTest {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "XXX");
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertNull(caseData);
     }

@@ -1,4 +1,4 @@
-package ccd;
+package uk.gov.hmcts.sscs.ccd;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -20,7 +20,13 @@ public class ReadCaseFromCcd {
 
     @Test
     public void givenACaseId_shouldRetrieveCaseDetails() {
-        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetails("1520116198612015");
+        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByCaseId("1520966754095462");
+        assertNotNull(caseDetails);
+    }
+
+    @Test
+    public void givenAnAppealNumber_shouldRetrieveCaseDetails() {
+        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByAppealNumber("abcde12345");
         assertNotNull(caseDetails);
     }
 

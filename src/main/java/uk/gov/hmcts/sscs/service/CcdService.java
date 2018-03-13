@@ -51,7 +51,7 @@ public class CcdService {
     public CaseData findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
 
         try {
-            return readCoreCaseDataService.getCcdCaseData(appealNumber);
+            return readCoreCaseDataService.getCcdCaseDataByAppealNumber(appealNumber);
         } catch (Exception ex) {
             LOG.error("Error while getting case from ccd", ex);
             throw new CcdException("Error while getting case from ccd" + ex.getMessage());

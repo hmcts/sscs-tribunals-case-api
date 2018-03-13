@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.exception.ApplicationErrorException;
@@ -149,6 +146,10 @@ public final class CaseDataUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<CaseDetails> buildCaseDetailsList() {
+        return Arrays.asList(CaseDetails.builder().data(buildCaseDataMap()).build());
     }
 
     private CaseData getCaseData() {
