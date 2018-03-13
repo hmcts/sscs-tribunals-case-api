@@ -68,7 +68,7 @@ public class CcdService {
             subscription.toBuilder().subscribeEmail("No").subscribeSms("No").reason(reason);
             caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build();
 
-            //createCase(caseData);
+            createCase(caseData);
             benefitType = caseData.getAppeal().getBenefitType().getCode();
         } catch (Exception ex) {
             LOG.error("Error while unsubscribing case from ccd: ", ex);
@@ -86,7 +86,8 @@ public class CcdService {
                     .appellantSubscription(subscription)
                     .build();
             caseData.toBuilder().subscriptions(subscriptions);
-            //createCase(ccdCase);
+
+            createCase(caseData);
             benefitType = caseData.getAppeal().getBenefitType().getCode();
         } catch (Exception ex) {
             LOG.error("Error while updating subscription details in ccd: ", ex);
