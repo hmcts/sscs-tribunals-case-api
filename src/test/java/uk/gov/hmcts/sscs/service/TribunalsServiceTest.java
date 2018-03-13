@@ -14,16 +14,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.gov.hmcts.sscs.domain.corecase.Appeal;
-import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.model.ccd.Appeal;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.Subscription;
+import uk.gov.hmcts.sscs.model.ccd.Subscriptions;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
-import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDeserializer;
+import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,7 +45,7 @@ public class TribunalsServiceTest {
             "to@hmcts.net", "Your appeal", "Your appeal has been created");
 
     @Mock
-    private SubmitYourAppealToCcdCaseDeserializer transformer;
+    private SubmitYourAppealToCcdCaseDataDeserializer transformer;
 
     @Mock
     private AppealNumberGenerator appealNumberGenerator;
@@ -53,7 +54,7 @@ public class TribunalsServiceTest {
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Captor
-    private ArgumentCaptor<CcdCase> captor;
+    private ArgumentCaptor<CaseData> captor;
 
     @Before
     public void setUp() {
@@ -79,11 +80,19 @@ public class TribunalsServiceTest {
     public void shouldSendSubmitYourAppealEmail() throws CcdException {
         SyaCaseWrapper syaCaseWrapper = new SyaCaseWrapper();
 
-        CcdCase ccdCase = new CcdCase();
-        Appeal appeal = new Appeal();
-        ccdCase.setAppeal(appeal);
+        Appeal appeal = Appeal.builder().build();
+        Subscription appellantSubscription = Subscription.builder()
+                .tya(APPEAL_NUMBER)
+                .build();
+        Subscriptions subscriptions = Subscriptions.builder()
+                .appellantSubscription(appellantSubscription)
+                .build();
+        CaseData caseData = CaseData.builder()
+                .appeal(appeal)
+                .subscriptions(subscriptions)
+                .build();
 
-        given(transformer.convertSyaToCcdCase(syaCaseWrapper)).willReturn(ccdCase);
+        given(transformer.convertSyaToCcdCaseData(syaCaseWrapper)).willReturn(caseData);
         given(appealNumberGenerator.generate()).willReturn(APPEAL_NUMBER);
 
         tribunalsService.submitAppeal(syaCaseWrapper);
@@ -91,9 +100,9 @@ public class TribunalsServiceTest {
         verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
         verify(ccdService).createCase(captor.capture());
 
-        CcdCase savedCase = captor.getValue();
+        CaseData savedCase = captor.getValue();
 
-        assertEquals(APPEAL_NUMBER, savedCase.getAppeal().getAppealNumber());
+        assertEquals(APPEAL_NUMBER, savedCase.getSubscriptions().getAppellantSubscription().getTya());
     }
 
     @Test
