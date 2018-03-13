@@ -22,5 +22,6 @@ public class CoreCaseDataPropertiesTest {
         assertNotNull(coreCaseDataProperties.getUserId());
         assertNotNull(coreCaseDataProperties.getJurisdictionId());
         assertNotNull(coreCaseDataProperties.getCaseTypeId());
+        assertNotNull(coreCaseDataProperties.getApi().getUrl());
     }
 }

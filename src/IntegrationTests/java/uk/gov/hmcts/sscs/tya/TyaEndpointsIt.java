@@ -18,7 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
+import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.util.SerializeJsonMessageManager;
@@ -51,7 +51,7 @@ public class TyaEndpointsIt {
 
     @Test
     public void shouldValidateSurnameAgainstAppealNumber() throws Exception {
-        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a")).thenReturn(new CcdCase());
+        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a")).thenReturn(CaseData.builder().build());
 
         mockMvc.perform(get("/appeals/1/surname/a"))
             .andExpect(status().isOk());

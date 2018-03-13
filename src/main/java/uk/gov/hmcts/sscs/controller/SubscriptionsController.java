@@ -12,8 +12,8 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.sscs.domain.corecase.Subscription;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 

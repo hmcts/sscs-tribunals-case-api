@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 
 public final class CaseDataUtils {
@@ -52,9 +54,11 @@ public final class CaseDataUtils {
                 .benefitType(benefitType)
                 .hearingOptions(hearingOptions)
                 .build();
-
+        Address venueAddress = Address.builder()
+                .postcode("Aberdeen")
+                .build();
         Venue venue = Venue.builder()
-                .venueTown("Aberdeen")
+                .address(venueAddress)
                 .build();
         HearingDetails hearingDetails = HearingDetails.builder()
                 .venue(venue)
@@ -91,13 +95,34 @@ public final class CaseDataUtils {
         List<DwpTimeExtension> dwpTimeExtensionList = new ArrayList<>();
         dwpTimeExtensionList.add(dwpTimeExtension);
 
-        Event event = Event.builder()
+        EventDetails eventDetails = EventDetails.builder()
                 .type("appealCreated")
                 .description("Appeal Created")
                 .date("2001-12-14T21:59:43.10-05:00")
                 .build();
-        Events events = Events.builder()
-                .value(event)
+        Event events = Event.builder()
+                .value(eventDetails)
+                .build();
+
+        Subscription appellantSubscription = Subscription.builder()
+                .tya("")
+                .email("")
+                .mobile("")
+                .subscribeEmail("yes/no")
+                .subscribeSms("yes/no")
+                .reason("")
+                .build();
+        Subscription supporterSubscription = Subscription.builder()
+                .tya("")
+                .email("")
+                .mobile("")
+                .subscribeEmail("")
+                .subscribeSms("")
+                .reason("")
+                .build();
+        Subscriptions subscriptions = Subscriptions.builder()
+                .appellantSubscription(appellantSubscription)
+                .supporterSubscription(supporterSubscription)
                 .build();
 
         return CaseData.builder()
@@ -107,6 +132,7 @@ public final class CaseDataUtils {
                 .evidence(evidence)
                 .dwpTimeExtension(dwpTimeExtensionList)
                 .events(Collections.singletonList(events))
+                .subscriptions(subscriptions)
                 .build();
     }
 
@@ -122,6 +148,18 @@ public final class CaseDataUtils {
             return mapper.readValue(json, new TypeReference<Map<String, Object>>(){});
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private CaseData getCaseData() {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+
+        try {
+            return mapper.convertValue(buildCaseDetails().getData(), CaseData.class);
+        } catch (Exception e) {
+            throw new ApplicationErrorException("Error occurred when CaseDetails are mapped into CcdCase", e);
         }
     }
 }

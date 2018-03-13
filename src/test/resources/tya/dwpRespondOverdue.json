@@ -1,23 +1,24 @@
 {
   "appeal": {
-    "caseReference": "SC123/45/00001",
-    "name": "Mr Jason Mock",
-    "surname": "Mock",
+    "caseReference": "SC333/33/33333",
     "appealNumber": "NotKnownInCCD",
     "benefitType": "pip",
-    "status": "APPEAL_RECEIVED",
+    "name": "Mr. C Charlie",
+    "surname": "Charlie",
+    "status": "DWP_RESPOND_OVERDUE",
     "latestEvents": [
       {
+        "dwpResponseDate": "2017-04-14T13:00:42.233Z",
         "date": "2017-03-10T13:00:42.233Z",
-        "type": "EVIDENCE_RECEIVED",
-        "evidenceProvidedBy": "Evidence received",
-        "evidenceType": "Evidence received",
-        "contentKey": "status.evidenceReceived"
-      },
+        "type": "DWP_RESPOND_OVERDUE",
+        "contentKey": "status.dwpRespondOverdue"
+      }
+    ],
+    "historicalEvents": [
       {
+        "dwpResponseDate": "2017-04-12T12:01:47.620Z",
         "date": "2017-03-08T12:01:47.620Z",
         "type": "APPEAL_RECEIVED",
-        "dwpResponseDate": "2017-04-12T12:01:47.620Z",
         "contentKey": "status.appealReceived"
       }
     ],

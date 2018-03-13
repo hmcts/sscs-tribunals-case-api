@@ -1,0 +1,43 @@
+{
+  "appeal": {
+    "caseReference": "SC333/33/33333",
+    "appealNumber": "NotKnownInCCD",
+    "benefitType": "pip",
+    "name": "Mr. C Charlie",
+    "surname": "Charlie",
+    "status": "NEW_HEARING_BOOKED",
+    "latestEvents": [
+      {
+        "postcode": "L2 5UZ",
+        "venueName": "Prudential House",
+        "hearingDateTime": "2017-07-17T23:00:00.000Z",
+        "addressLine1": "36 Dale Street",
+        "addressLine2": "",
+        "addressLine3": "Liverpool",
+        "googleMapUrl": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509",
+        "date": "2017-06-26T14:11:34.013Z",
+        "type": "NEW_HEARING_BOOKED",
+        "contentKey": "status.newHearingBooked"
+      }
+    ],
+    "historicalEvents": [
+      {
+        "adjournedDate": "",
+        "adjournedLetterReceivedByDate": "2017-07-01T14:09:24.883Z",
+        "hearingContactDate": "2017-08-05T14:09:24.883Z",
+        "date": "2017-06-24T14:09:24.883Z",
+        "type": "ADJOURNED",
+        "contentKey": "status.adjourned"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
+  }
+}

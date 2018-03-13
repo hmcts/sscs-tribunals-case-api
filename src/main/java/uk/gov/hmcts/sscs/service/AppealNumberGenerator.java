@@ -1,13 +1,14 @@
 package uk.gov.hmcts.sscs.service;
 
 import java.security.SecureRandom;
+
 import org.apache.commons.text.CharacterPredicates;
 import org.apache.commons.text.RandomStringGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
 @Component
 public class AppealNumberGenerator {
@@ -29,8 +30,8 @@ public class AppealNumberGenerator {
         int count = 3;
         while (count-- > 0 && "".equals(appealNumber)) {
             appealNumber = generateAppealNumber();
-            CcdCase ccdCase = ccdService.findCcdCaseDetailsByAppealNumber(appealNumber);
-            if (isDuplicateInCcd(ccdCase)) {
+            CaseData caseData = ccdService.findCcdCaseByAppealNumber(appealNumber);
+            if (isDuplicateInCcd(caseData)) {
                 appealNumber = "";
             }
             if (count == 0 && "".equals(appealNumber)) {
@@ -42,8 +43,8 @@ public class AppealNumberGenerator {
 
     }
 
-    private boolean isDuplicateInCcd(CcdCase ccdCase) {
-        return ccdCase != null && ccdCase.getAppeal() != null;
+    private boolean isDuplicateInCcd(CaseData caseData) {
+        return caseData != null && caseData.getAppealNumber() != null;
     }
 
     protected String generateAppealNumber() {

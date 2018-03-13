@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.CcdService;
@@ -27,7 +28,7 @@ public class ReminderController {
     @RequestMapping(value = "/reminder", method = POST, produces = APPLICATION_JSON_VALUE)
     public void reminder(@RequestBody ReminderResponse reminderResponse) throws CcdException {
         LOG.info("Reminder received from job scheduler: ", reminderResponse);
-        service.createEvent(null, reminderResponse);
+        service.createEvent(reminderResponse);
     }
 }
 

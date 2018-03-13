@@ -9,18 +9,17 @@ import lombok.Value;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
-@Builder(toBuilder = true)
-public class Event {
-    String date;
-    String type;
-    String description;
+@Builder
+public class Event implements Comparable<Event> {
+    EventDetails value;
 
     @JsonCreator
-    public Event(@JsonProperty("date") String date,
-                 @JsonProperty("type") String type,
-                 @JsonProperty("description") String description) {
-        this.date = date;
-        this.type = type;
-        this.description = description;
+    public Event(@JsonProperty("value") EventDetails value) {
+        this.value = value;
+    }
+
+    @Override
+    public int compareTo(Event o) {
+        return value.getDate().compareTo(o.getValue().getDate());
     }
 }

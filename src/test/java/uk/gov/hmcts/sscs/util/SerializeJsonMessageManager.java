@@ -17,7 +17,29 @@ import uk.gov.hmcts.sscs.model.ccd.CaseData;
 public enum SerializeJsonMessageManager {
 
     APPEAL_RECEIVED("appealReceived.json"),
-    APPEAL_RECEIVED_CCD("appealReceivedCcd.json");
+    APPEAL_RECEIVED_CCD("appealReceivedCcd.json"),
+    DWP_RESPOND("dwpRespond.json"),
+    DWP_RESPOND_CCD("dwpRespondCcd.json"),
+    HEARING_BOOKED("hearingBooked.json"),
+    HEARING_BOOKED_CCD("hearingBookedCcd.json"),
+    ADJOURNED("adjourned.json"),
+    ADJOURNED_CCD("adjournedCcd.json"),
+    DORMANT("dormant.json"),
+    DORMANT_CCD("dormantCcd.json"),
+    HEARING("hearing.json"),
+    HEARING_CCD("hearingCcd.json"),
+    NEW_HEARING_BOOKED("newHearingBooked.json"),
+    NEW_HEARING_BOOKED_CCD("newHearingBookedCcd.json"),
+    PAST_HEARING_BOOKED("pastHearingBooked.json"),
+    PAST_HEARING_BOOKED_CCD("pastHearingBookedCcd.json"),
+    DWP_RESPOND_OVERDUE("dwpRespondOverdue.json"),
+    DWP_RESPOND_OVERDUE_CCD("dwpRespondOverdueCcd.json"),
+    POSTPONED("postponed.json"),
+    POSTPONED_CCD("postponedCcd.json"),
+    WITHDRAWN("withdrawn.json"),
+    WITHDRAWN_CCD("withdrawnCcd.json"),
+    CLOSED("closed.json"),
+    CLOSED_CCD("closedCcd.json");
 
     private final String serializedMessage;
 

@@ -1,0 +1,54 @@
+{
+  "appeal": {
+    "caseReference": "SC333/33/33333",
+    "appealNumber": "NotKnownInCCD",
+    "benefitType": "pip",
+    "name": "Mr. C Charlie",
+    "surname": "Charlie",
+    "status": "HEARING_BOOKED",
+    "latestEvents": [
+      {
+        "evidenceType": "Evidence received",
+        "evidenceProvidedBy": "Evidence received",
+        "date": "2017-06-24T14:15:34.013Z",
+        "type": "EVIDENCE_RECEIVED",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "postcode": "CH1 2XA",
+        "hearingDateTime": "2017-07-17T23:00:00.000Z",
+        "venueName": "Chester Magistrate's Court",
+        "addressLine1": "Chester Magistrate's Court",
+        "addressLine2": "Grosvenor Street",
+        "addressLine3": "Chester",
+        "googleMapUrl": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632",
+        "date": "2017-06-24T14:11:34.013Z",
+        "type": "HEARING_BOOKED",
+        "contentKey": "status.hearingBooked"
+      }
+    ],
+    "historicalEvents": [
+      {
+        "hearingContactDate": "2017-08-05T14:09:24.883Z",
+        "date": "2017-06-24T14:09:24.883Z",
+        "type": "DWP_RESPOND",
+        "contentKey": "status.dwpRespond"
+      },
+      {
+        "dwpResponseDate": "2017-07-29T14:09:24.883Z",
+        "date": "2017-06-24T14:09:24.883Z",
+        "type": "APPEAL_RECEIVED",
+        "contentKey": "status.appealReceived"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
+  }
+}

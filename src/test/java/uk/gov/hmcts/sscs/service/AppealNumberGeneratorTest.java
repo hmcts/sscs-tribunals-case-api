@@ -11,9 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import uk.gov.hmcts.sscs.domain.corecase.Appeal;
-import uk.gov.hmcts.sscs.domain.corecase.CcdCase;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AppealNumberGeneratorTest {
@@ -31,11 +30,11 @@ public class AppealNumberGeneratorTest {
     @Test
     public void shouldGenerateAppealNumberWhenCcdReturnNullObject() throws CcdException {
 
-        given(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).willReturn(null);
+        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(null);
 
         String appealNumber = appealNumberGenerator.generate();
 
-        verify(ccdService).findCcdCaseDetailsByAppealNumber(anyString());
+        verify(ccdService).findCcdCaseByAppealNumber(anyString());
 
         assertNotNull(appealNumber);
     }
@@ -43,11 +42,11 @@ public class AppealNumberGeneratorTest {
     @Test
     public void shouldGenerateAppealNumberWhenCcdReturnEmptyObject() throws CcdException {
 
-        given(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).willReturn(new CcdCase());
+        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(CaseData.builder().build());
 
         String appealNumber = appealNumberGenerator.generate();
 
-        verify(ccdService).findCcdCaseDetailsByAppealNumber(anyString());
+        verify(ccdService).findCcdCaseByAppealNumber(anyString());
 
         assertNotNull(appealNumber);
     }
@@ -55,43 +54,32 @@ public class AppealNumberGeneratorTest {
     @Test
     public void shouldGenerateAppealNumberInSecondAttempt() throws Exception {
 
-        Appeal appeal = new Appeal();
-        appeal.setAppealNumber("abcd1efgh2");
-        CcdCase ccdCase = new CcdCase();
-        ccdCase.setAppeal(appeal);
-
-        when(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).thenReturn(ccdCase, null);
+        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(getCaseData(), null);
 
         appealNumberGenerator.generate();
 
-        verify(ccdService, times(2)).findCcdCaseDetailsByAppealNumber(anyString());
+        verify(ccdService, times(2)).findCcdCaseByAppealNumber(anyString());
     }
 
     @Test
     public void shouldGenerateAppealNumberInThirdAttempt() throws Exception {
 
-        Appeal appeal = new Appeal();
-        appeal.setAppealNumber("abcd1efgh2");
-        CcdCase ccdCase = new CcdCase();
-        ccdCase.setAppeal(appeal);
-
-        when(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).thenReturn(ccdCase, ccdCase, null);
+        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(getCaseData(), getCaseData(), null);
 
         appealNumberGenerator.generate();
 
-        verify(ccdService, times(3)).findCcdCaseDetailsByAppealNumber(anyString());
+        verify(ccdService, times(3)).findCcdCaseByAppealNumber(anyString());
     }
 
     @Test(expected = CcdException.class)
     public void shouldThrowExceptionTryingThreeAttempts() throws Exception {
 
-        Appeal appeal = new Appeal();
-        appeal.setAppealNumber("abcd1efgh2");
-        CcdCase ccdCase = new CcdCase();
-        ccdCase.setAppeal(appeal);
-
-        given(ccdService.findCcdCaseDetailsByAppealNumber(anyString())).willReturn(ccdCase);
+        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(getCaseData());
 
         appealNumberGenerator.generate();
+    }
+
+    private CaseData getCaseData() {
+        return CaseData.builder().appealNumber("abcd1efgh2").build();
     }
 }
