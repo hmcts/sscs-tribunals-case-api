@@ -26,7 +26,6 @@ public class ReadCoreCaseDataService {
     }
 
     public CaseDetails getCcdCaseDetailsByCaseId(String caseId) {
-        log.info("Get CcdCaseDetails by CaseId...");
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
 
@@ -34,7 +33,6 @@ public class ReadCoreCaseDataService {
     }
 
     public CaseData getCcdCaseDataByCaseId(String caseId) {
-        log.info("Get CcdCaseData by CaseId...");
         CaseDetails caseDetails = getCcdCaseDetailsByCaseId(caseId);
         return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
     }
@@ -53,7 +51,6 @@ public class ReadCoreCaseDataService {
     }
 
     public CaseDetails getCcdCaseDetailsByAppealNumber(String appealNumber) {
-        log.info("Get CcdCaseDetails by appealNumber...");
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
 
@@ -66,7 +63,6 @@ public class ReadCoreCaseDataService {
     }
 
     public CaseData getCcdCaseDataByAppealNumber(String appealNumber) {
-        log.info("Get CcdCaseData by appealNumber...");
         CaseDetails caseDetails = getCcdCaseDetailsByAppealNumber(appealNumber);
         return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
     }
