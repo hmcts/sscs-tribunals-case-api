@@ -14,7 +14,7 @@ import uk.gov.hmcts.sscs.service.ccd.CreateCoreCaseDataService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class CreateCaseInCcd {
+public class CreateCaseInCcdTest {
 
     @Autowired
     private CreateCoreCaseDataService createCoreCaseDataService;

@@ -14,7 +14,6 @@ import lombok.Value;
 @Builder(toBuilder = true)
 public class CaseData {
     private String caseReference;
-    private String appealNumber;
     private Appeal appeal;
     private List<Hearing> hearings;
     private Evidence evidence;
@@ -24,7 +23,6 @@ public class CaseData {
 
     @JsonCreator
     public CaseData(@JsonProperty("caseReference") String caseReference,
-                    @JsonProperty("appealNumber") String appealNumber,
                     @JsonProperty("appeal") Appeal appeal,
                     @JsonProperty("hearings") List<Hearing> hearings,
                     @JsonProperty("evidence") Evidence evidence,
@@ -32,7 +30,6 @@ public class CaseData {
                     @JsonProperty("events") List<Event> events,
                     @JsonProperty("subscriptions") Subscriptions subscriptions) {
         this.caseReference = caseReference;
-        this.appealNumber = appealNumber;
         this.appeal = appeal;
         this.hearings = hearings;
         this.evidence = evidence;

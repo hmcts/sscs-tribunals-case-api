@@ -13,7 +13,7 @@ import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class ReadCaseFromCcd {
+public class ReadCaseFromCcdTest {
 
     @Autowired
     private ReadCoreCaseDataService readCoreCaseDataService;

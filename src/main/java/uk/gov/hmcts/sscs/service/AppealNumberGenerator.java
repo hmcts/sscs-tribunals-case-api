@@ -44,7 +44,7 @@ public class AppealNumberGenerator {
     }
 
     private boolean isDuplicateInCcd(CaseData caseData) {
-        return caseData != null && caseData.getAppealNumber() != null;
+        return caseData != null;
     }
 
     protected String generateAppealNumber() {
