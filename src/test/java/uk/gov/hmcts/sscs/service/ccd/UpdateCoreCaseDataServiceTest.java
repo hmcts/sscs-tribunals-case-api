@@ -20,26 +20,26 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CreateCoreCaseDataServiceTest {
+public class UpdateCoreCaseDataServiceTest {
 
     @Mock
     private CoreCaseDataApi coreCaseDataApiMock;
     @Mock
     private CoreCaseDataService coreCaseDataServiceMock;
 
-    private CreateCoreCaseDataService createCoreCaseDataService;
+    private UpdateCoreCaseDataService updateCoreCaseDataService;
 
     @Before
     public void setUp() {
-        createCoreCaseDataService = new CreateCoreCaseDataService(coreCaseDataServiceMock);
+        updateCoreCaseDataService = new UpdateCoreCaseDataService(coreCaseDataServiceMock);
     }
 
     @Test
-    public void givenACase_shouldSaveItIntoCcd() {
+    public void givenACase_shouldUpdateCaseItIntoCcd() {
         //Given
         mockStartEventResponse();
         mockCaseDetails();
-        when(coreCaseDataServiceMock.getEventRequestData(eq("appealCreated")))
+        when(coreCaseDataServiceMock.getEventRequestData(anyString()))
                 .thenReturn(EventRequestData.builder().build());
         when(coreCaseDataServiceMock.generateServiceAuthorization())
                 .thenReturn("s2s token");
@@ -53,25 +53,26 @@ public class CreateCoreCaseDataServiceTest {
         when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
 
         //When
-        CaseDetails caseDetails = createCoreCaseDataService.createCcdCase(
-            CaseDataUtils.buildCaseData());
+        CaseDetails caseDetails = updateCoreCaseDataService.updateCcdCase(
+            CaseDataUtils.buildCaseData(), anyLong(), "appeal Updated");
 
         //Then
         assertNotNull(caseDetails);
-        verify(coreCaseDataApiMock).submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class));
+        verify(coreCaseDataApiMock).submitEventForCaseWorker(anyString(), anyString(), anyString(), anyString(),
+                anyString(), anyString(), anyBoolean(), any(CaseDataContent.class));
         String caseReference = (String) caseDetails.getData().get("caseReference");
         assertEquals("SC068/17/00013", caseReference);
     }
 
     private void mockCaseDetails() {
-        when(coreCaseDataApiMock.submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class))).thenReturn(CaseDataUtils.buildCaseDetails());
+        when(coreCaseDataApiMock.submitEventForCaseWorker(anyString(), anyString(), anyString(), anyString(),
+                anyString(),anyString(), anyBoolean(), any(CaseDataContent.class)))
+                .thenReturn(CaseDataUtils.buildCaseDetails());
     }
 
     private void mockStartEventResponse() {
-        when(coreCaseDataApiMock.startForCaseworker(anyString(), anyString(), anyString(), anyString(),
-            anyString(), anyString())).thenReturn(StartEventResponse.builder()
+        when(coreCaseDataApiMock.startEventForCaseWorker(anyString(), anyString(), anyString(), anyString(),
+            anyString(), anyString(), anyString())).thenReturn(StartEventResponse.builder()
             .caseDetails(CaseDetails.builder().build())
             .build());
     }

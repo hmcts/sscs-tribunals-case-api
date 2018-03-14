@@ -1,7 +1,5 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
@@ -13,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
-import uk.gov.hmcts.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.CcdUtil;
 
 @Service
 @Slf4j
@@ -38,7 +36,7 @@ public class ReadCoreCaseDataService {
     public CaseData getCcdCaseDataByCaseId(String caseId) {
         log.info("Get CcdCaseData by CaseId...");
         CaseDetails caseDetails = getCcdCaseDetailsByCaseId(caseId);
-        return getCaseData(caseDetails != null ? caseDetails.getData() : null);
+        return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
     }
 
     private CaseDetails getByCaseId(EventRequestData eventRequestData, String serviceAuthorization,
@@ -70,7 +68,7 @@ public class ReadCoreCaseDataService {
     public CaseData getCcdCaseDataByAppealNumber(String appealNumber) {
         log.info("Get CcdCaseData by appealNumber...");
         CaseDetails caseDetails = getCcdCaseDetailsByAppealNumber(appealNumber);
-        return getCaseData(caseDetails != null ? caseDetails.getData() : null);
+        return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
     }
 
     private List<CaseDetails> getByAppealNumber(EventRequestData eventRequestData, String serviceAuthorization,
@@ -84,17 +82,5 @@ public class ReadCoreCaseDataService {
                 eventRequestData.getCaseTypeId(),
                 ImmutableMap.of("case.subscriptions.appellantSubscription.tya", appealNumber)
         );
-    }
-
-    private CaseData getCaseData(Object object) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-
-        try {
-            return mapper.convertValue(object, CaseData.class);
-        } catch (Exception e) {
-            throw new ApplicationErrorException("Error occurred when CaseDetails are mapped into CcdCase", e);
-        }
     }
 }

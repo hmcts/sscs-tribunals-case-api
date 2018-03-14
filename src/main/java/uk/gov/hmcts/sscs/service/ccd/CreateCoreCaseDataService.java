@@ -23,6 +23,7 @@ public class CreateCoreCaseDataService {
     }
 
     public CaseDetails createCcdCase(CaseData caseData) {
+        log.info("*** tribunals-service *** createCcdCase ");
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
         log.info("*** tribunals-service *** eventRequestData: {}", eventRequestData);
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
