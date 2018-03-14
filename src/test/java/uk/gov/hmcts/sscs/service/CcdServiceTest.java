@@ -3,7 +3,7 @@ package uk.gov.hmcts.sscs.service;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +21,7 @@ import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.service.ccd.CreateCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
+import uk.gov.hmcts.sscs.service.ccd.UpdateCoreCaseDataService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
@@ -35,26 +36,31 @@ public class CcdServiceTest {
     @Mock
     private CreateCoreCaseDataService createCoreCaseDataService;
 
+    @Mock
+    private UpdateCoreCaseDataService updateCoreCaseDataService;
+
 
     @Before
     public void setup() {
-        ccdService = new CcdService(readCoreCaseDataService, createCoreCaseDataService);
+        ccdService = new CcdService(readCoreCaseDataService, createCoreCaseDataService, updateCoreCaseDataService);
 
-        when(readCoreCaseDataService.getCcdCaseData(anyString()))
+        when(readCoreCaseDataService.getCcdCaseDataByAppealNumber(anyString()))
                 .thenReturn(CaseDataUtils.buildCaseData());
 
         when(createCoreCaseDataService.createCcdCase(CaseDataUtils.buildCaseData()))
                 .thenReturn(CaseDataUtils.buildCaseDetails());
+
+        when(updateCoreCaseDataService.updateCcdCase(any(CaseData.class), anyLong(), anyString()))
+                .thenReturn(CaseDataUtils.buildCaseDetails("SC666/66/66666"));
     }
 
     @Test
     public void shouldSendCaseToCcd() throws Exception {
 
-        CaseData caseData = CaseDataUtils.buildCaseData();
-        CaseDetails caseDetails = ccdService.createCase(caseData);
+        CaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData());
 
         assertNotNull(caseDetails);
-        verify(createCoreCaseDataService).createCcdCase(caseData);
+        verify(createCoreCaseDataService).createCcdCase(CaseDataUtils.buildCaseData());
     }
 
     @Test
@@ -71,7 +77,7 @@ public class CcdServiceTest {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumber(anyString());
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertNotNull(caseData);
     }
@@ -81,17 +87,19 @@ public class CcdServiceTest {
 
         String benefitType = ccdService.unsubscribe(anyString(), "reason");
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
 
     @Test
     public void shouldUpdateSubscriptionInCcd() throws Exception {
+        when(readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(anyString()))
+                .thenReturn(CaseDataUtils.buildCaseDetails());
 
         String benefitType = ccdService.updateSubscription(anyString(), Subscription.builder().build());
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDetailsByAppealNumber(anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
@@ -101,7 +109,7 @@ public class CcdServiceTest {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), SURNAME);
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertNotNull(caseData);
         assertEquals(SURNAME, caseData.getAppeal().getAppellant().getName().getLastName());
@@ -112,8 +120,19 @@ public class CcdServiceTest {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "XXX");
 
-        verify(readCoreCaseDataService).getCcdCaseData(anyString());
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
 
         assertNull(caseData);
+    }
+
+    @Test
+    public void shouldUpdateCaseInCcd() throws Exception {
+
+        CaseDetails caseDetails = ccdService.updateCase(any(CaseData.class),
+                anyLong(),anyString());
+
+        assertNotNull(caseDetails);
+        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class),
+                anyLong(),anyString());
     }
 }

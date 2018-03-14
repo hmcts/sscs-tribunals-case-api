@@ -1,17 +1,12 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 
 public final class CaseDataUtils {
@@ -108,8 +103,8 @@ public final class CaseDataUtils {
                 .tya("")
                 .email("")
                 .mobile("")
-                .subscribeEmail("yes/no")
-                .subscribeSms("yes/no")
+                .subscribeEmail("Yes")
+                .subscribeSms("Yes")
                 .reason("")
                 .build();
         Subscription supporterSubscription = Subscription.builder()
@@ -137,29 +132,26 @@ public final class CaseDataUtils {
     }
 
     public static CaseDetails buildCaseDetails() {
-        return CaseDetails.builder().data(buildCaseDataMap()).build();
+        return CaseDetails.builder().data(buildCaseDataMap(buildCaseData())).build();
     }
 
-    private static Map<String, Object> buildCaseDataMap() {
+    public static CaseDetails buildCaseDetails(String caseReference) {
+        CaseData caseData = buildCaseData().toBuilder().caseReference(caseReference).build();
+        return CaseDetails.builder().data(buildCaseDataMap(caseData)).build();
+    }
+
+    private static Map<String, Object> buildCaseDataMap(CaseData caseData) {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            String json = mapper.writeValueAsString(buildCaseData());
+            String json = mapper.writeValueAsString(caseData);
             return mapper.readValue(json, new TypeReference<Map<String, Object>>(){});
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private CaseData getCaseData() {
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-
-        try {
-            return mapper.convertValue(buildCaseDetails().getData(), CaseData.class);
-        } catch (Exception e) {
-            throw new ApplicationErrorException("Error occurred when CaseDetails are mapped into CcdCase", e);
-        }
+    public static List<CaseDetails> buildCaseDetailsList() {
+        return Arrays.asList(CaseDetails.builder().data(buildCaseDataMap(buildCaseData())).build());
     }
 }
