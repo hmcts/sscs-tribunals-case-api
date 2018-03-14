@@ -42,5 +42,10 @@
         "description": "Hearing booked"
       }
     }
-  ]
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
 }
