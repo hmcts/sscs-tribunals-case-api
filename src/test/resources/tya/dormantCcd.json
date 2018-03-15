@@ -21,5 +21,10 @@
         "description": "Dormant"
       }
     }
-  ]
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
 }

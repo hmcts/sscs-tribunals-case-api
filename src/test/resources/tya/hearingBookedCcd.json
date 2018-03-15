@@ -57,5 +57,10 @@
         "description": "Appeal received"
       }
     }
-  ]
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
 }

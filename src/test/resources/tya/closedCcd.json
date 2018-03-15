@@ -20,5 +20,10 @@
         "description": "Closed"
       }
     }
-  ]
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
 }

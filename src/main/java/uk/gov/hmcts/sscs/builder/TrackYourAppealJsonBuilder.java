@@ -30,8 +30,6 @@ import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilder {
 
-    private static final String NOT_KNOWN_IN_CCD = "NotKnownInCCD";
-
     private TrackYourAppealJsonBuilder() {
 
     }
@@ -43,7 +41,7 @@ public class TrackYourAppealJsonBuilder {
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
-        caseNode.put("appealNumber", NOT_KNOWN_IN_CCD);
+        caseNode.put("appealNumber", caseData.getSubscriptions().getAppellantSubscription().getTya());
         caseNode.put("status", getAppealStatus(caseData.getEvents()));
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
 

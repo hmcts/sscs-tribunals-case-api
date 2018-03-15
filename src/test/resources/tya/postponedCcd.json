@@ -43,5 +43,10 @@
         "description": "Postponed"
       }
     }
-  ]
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
 }

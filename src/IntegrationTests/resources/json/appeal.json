@@ -1,24 +1,49 @@
 {
   "appeal": {
     "caseReference": "SC123/45/00001",
-    "appealNumber": "NotKnownInCCD",
-    "benefitType": "pip",
-    "status": "APPEAL_RECEIVED",
-    "name": "Mr Leah Strickland",
-    "surname": "Strickland",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
+    "appealNumber": "abcde12345",
+    "benefitType": "esa",
+    "status": "DWP_RESPOND",
     "latestEvents": [
       {
-        "date": "2017-03-10T00:00:00Z",
+        "date": "2017-04-12T13:00:42.233Z",
         "type": "EVIDENCE_RECEIVED",
         "evidenceType": "Evidence received",
+        "evidenceProvidedBy": "Evidence received",
         "contentKey": "status.evidenceReceived"
       },
       {
-        "date": "2017-03-08T00:00:00Z",
+        "date": "2017-04-10T12:01:47.620Z",
+        "type": "DWP_RESPOND",
+        "contentKey": "status.dwpRespond",
+        "hearingContactDate": "2017-05-22T12:01:47.620Z"
+      }
+    ],
+    "historicalEvents": [
+      {
+        "date": "2017-03-10T12:01:47.620Z",
+        "type": "EVIDENCE_RECEIVED",
+        "evidenceType": "Evidence received",
+        "evidenceProvidedBy": "Evidence received",
+        "contentKey": "status.evidenceReceived"
+      },
+      {
+        "date": "2017-03-08T12:01:47.620Z",
         "type": "APPEAL_RECEIVED",
-        "dwpResponseDate": "2017-04-12T00:00:00Z",
+        "dwpResponseDate": "2017-04-12T12:01:47.620Z",
         "contentKey": "status.appealReceived"
       }
-    ]
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
   }
 }
