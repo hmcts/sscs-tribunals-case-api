@@ -7,17 +7,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVReader;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
@@ -25,8 +22,8 @@ import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 public class RegionalProcessingCenterService {
     private static final Logger LOG = getLogger(RegionalProcessingCenterService.class);
 
-    public static final String RPC_DATA_JSON = "src/main/resources/reference-data/rpc-data.json";
-    private static final String CSV_FILE_PATH = "src/main/resources/reference-data/sscs-venues.csv";
+    public static final String RPC_DATA_JSON = "reference-data/rpc-data.json";
+    private static final String CSV_FILE_PATH = "reference-data/sscs-venues.csv";
     public static final char SEPARATOR_CHAR = '/';
     public static final String SSCS_BIRMINGHAM = "SSCS Birmingham";
 
@@ -41,7 +38,8 @@ public class RegionalProcessingCenterService {
     }
 
     private void loadSccodeRpcMetadata() {
-        try (CSVReader reader = new CSVReader(new FileReader(CSV_FILE_PATH))) {
+        ClassPathResource classPathResource = new ClassPathResource(CSV_FILE_PATH);
+        try (CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()))) {
 
             List<String[]> linesList = reader.readAll();
             linesList.forEach(line ->
@@ -53,7 +51,8 @@ public class RegionalProcessingCenterService {
     }
 
     private void populateRpcMetadata() {
-        try (InputStream inputStream  = FileUtils.openInputStream(new File(RPC_DATA_JSON))) {
+        ClassPathResource classPathResource = new ClassPathResource(RPC_DATA_JSON);
+        try (InputStream inputStream  = classPathResource.getInputStream()) {
             ObjectMapper mapper = new ObjectMapper();
             regionalProcessingCenterMap =
                     mapper.readValue(inputStream, new TypeReference<Map<String,RegionalProcessingCenter>>(){});
