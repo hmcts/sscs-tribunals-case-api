@@ -40,18 +40,6 @@ public class AppealNumberGeneratorTest {
     }
 
     @Test
-    public void shouldGenerateAppealNumberWhenCcdReturnEmptyObject() throws CcdException {
-
-        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(CaseData.builder().build());
-
-        String appealNumber = appealNumberGenerator.generate();
-
-        verify(ccdService).findCcdCaseByAppealNumber(anyString());
-
-        assertNotNull(appealNumber);
-    }
-
-    @Test
     public void shouldGenerateAppealNumberInSecondAttempt() throws Exception {
 
         when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(getCaseData(), null);
@@ -80,6 +68,6 @@ public class AppealNumberGeneratorTest {
     }
 
     private CaseData getCaseData() {
-        return CaseData.builder().appealNumber("abcd1efgh2").build();
+        return CaseData.builder().build();
     }
 }
