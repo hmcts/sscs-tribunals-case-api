@@ -32,7 +32,7 @@
     {
       "value": {
         "date": "2017-06-29T12:50:11.437",
-        "type": "dormant",
+        "type": "appealDormant",
         "description": "Dormant"
       }
     },
@@ -53,7 +53,7 @@
     {
       "value": {
         "date": "2017-06-26T12:17:37.497",
-        "type": "adjourned",
+        "type": "hearingAdjourned",
         "description": "Hearing adjourned"
       }
     },
@@ -67,7 +67,7 @@
     {
       "value": {
         "date": "2009-06-16T10:43:16.297",
-        "type": "dwpRespond",
+        "type": "responseReceived",
         "description": "Dwp Respond"
       }
     },
