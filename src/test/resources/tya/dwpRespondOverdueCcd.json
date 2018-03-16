@@ -16,7 +16,7 @@
     {
       "value": {
         "date": "2017-03-10T13:00:42.233",
-        "type": "dwpRespondOverdue",
+        "type": "responseOverdue",
         "description": "Dwp respond overdue"
       }
     },

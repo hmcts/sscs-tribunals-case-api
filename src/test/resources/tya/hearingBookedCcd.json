@@ -46,7 +46,7 @@
     {
       "value": {
         "date": "2017-06-24T14:09:24.883",
-        "type": "dwpRespond",
+        "type": "responseReceived",
         "description": "Dwp Respond"
       }
     },

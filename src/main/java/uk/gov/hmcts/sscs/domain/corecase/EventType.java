@@ -4,27 +4,28 @@ import com.google.common.base.CaseFormat;
 
 public enum EventType {
 
-    APPEAL_RECEIVED("appealReceived", 1, true),
-    DWP_RESPOND("dwpRespond", 2, true),
-    HEARING_BOOKED("hearingBooked", 3, true),
-    HEARING("hearing", 4, false),
-    ADJOURNED("adjourned", 5, true),
-    LAPSED_REVISED("lapsedRevised", 6, true),
-    WITHDRAWN("withdrawn", 7, true),
-    POSTPONED("postponed", 8, true),
-    NEW_HEARING_BOOKED("newHearingBooked", 9, true),
-    PAST_HEARING_BOOKED("pastHearingBooked", 10, true),
-    DORMANT("dormant", 11, false),
-    CLOSED("closed", 12, false),
-    DWP_RESPOND_OVERDUE("dwpRespondOverdue", 13, true),
-    EVIDENCE_RECEIVED("evidenceReceived", -1, true),
-    EVIDENCE_REMINDER("evidenceRemainder", -2, true),
+    APPEAL_RECEIVED("appealReceived", "appealReceived", 1, true),
+    DWP_RESPOND("dwpRespond", "responseReceived", 2, true),
+    HEARING_BOOKED("hearingBooked", "hearingBooked", 3, true),
+    HEARING("hearing", "hearing", 4, false),
+    ADJOURNED("adjourned", "hearingAdjourned", 5, true),
+    LAPSED_REVISED("lapsedRevised", "lapsedRevised", 6, true),
+    WITHDRAWN("withdrawn", "appealWithdrawn", 7, true),
+    POSTPONED("postponed", "hearingPostponed",8, true),
+    NEW_HEARING_BOOKED("newHearingBooked", "newHearingBooked", 9, true),
+    PAST_HEARING_BOOKED("pastHearingBooked", "pastHearingBooked", 10, true),
+    DORMANT("dormant", "appealDormant", 11, false),
+    CLOSED("closed", "appealClosed", 12, false),
+    DWP_RESPOND_OVERDUE("dwpRespondOverdue", "responseOverdue", 13, true),
+    EVIDENCE_RECEIVED("evidenceReceived", "evidenceReceived", -1, true),
+    EVIDENCE_REMINDER("evidenceRemainder", "evidenceReminder", -2, true),
     SUBSCRIBE_APPELLANT(0, true),
     SUBSCRIBE_SUPPORTER(0, true),
     SUBSCRIBE_APPELLANT_UPDATE_OLD(0, true),
     SUBSCRIBE_APPELLANT_UPDATE_NEW(0, true);
 
     private String type;
+    private String ccdType;
     private final int order;
     private boolean notifiable;
 
@@ -33,10 +34,15 @@ public enum EventType {
         this.notifiable = notifiable;
     }
 
-    EventType(String type, int order, boolean notifiable) {
+    EventType(String type, String ccdType, int order, boolean notifiable) {
         this.type = type;
+        this.ccdType = ccdType;
         this.order = order;
         this.notifiable = notifiable;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public int getOrder() {
@@ -55,13 +61,14 @@ public enum EventType {
         return notifiable;
     }
 
-    public static EventType getEventTypeByType(String type) {
+    public static EventType getEventTypeByCcdType(String ccdType) {
         EventType e = null;
         for (EventType event : EventType.values()) {
-            if (type.equals(event.type)) {
+            if (ccdType.equals(event.ccdType)) {
                 e = event;
             }
         }
         return e;
     }
 }
+

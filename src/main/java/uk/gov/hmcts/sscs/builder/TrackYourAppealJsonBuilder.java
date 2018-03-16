@@ -73,7 +73,7 @@ public class TrackYourAppealJsonBuilder {
 
             eventNode.put(DATE, getUtcDate((event)));
             eventNode.put(TYPE, getEventType(event).toString());
-            eventNode.put(CONTENT_KEY,"status." + event.getValue().getType());
+            eventNode.put(CONTENT_KEY,"status." + getEventType(event).getType());
 
             buildEventNode(event, eventNode, caseData);
 
@@ -166,7 +166,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private static EventType getEventType(Event event) {
-        return EventType.getEventTypeByType(event.getValue().getType());
+        return EventType.getEventTypeByCcdType(event.getValue().getType());
     }
 
     private static String getUtcDate(Event event) {
