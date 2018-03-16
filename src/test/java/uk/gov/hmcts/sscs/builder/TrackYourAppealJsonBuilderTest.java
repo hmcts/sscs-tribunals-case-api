@@ -108,6 +108,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(CLOSED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void lapsedRevisedTest() {
+        CaseData caseData = LAPSED_REVISED_CCD.getDeserializeMessage();
+        ObjectNode objectNode = TrackYourAppealJsonBuilder.buildTrackYourAppealJson(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
         regionalProcessingCenter.setName("LIVERPOOL");
