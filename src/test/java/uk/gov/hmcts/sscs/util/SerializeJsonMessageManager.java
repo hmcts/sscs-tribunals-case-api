@@ -39,7 +39,10 @@ public enum SerializeJsonMessageManager {
     WITHDRAWN("withdrawn.json"),
     WITHDRAWN_CCD("withdrawnCcd.json"),
     CLOSED("closed.json"),
-    CLOSED_CCD("closedCcd.json");
+    CLOSED_CCD("closedCcd.json"),
+    LAPSED_REVISED("lapsedRevised.json"),
+    LAPSED_REVISED_CCD("lapsedRevisedCcd.json");
+
 
     private final String serializedMessage;
 
