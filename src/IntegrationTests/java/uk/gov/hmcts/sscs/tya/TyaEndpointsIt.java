@@ -1,12 +1,15 @@
 package uk.gov.hmcts.sscs.tya;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +26,7 @@ import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.util.SerializeJsonMessageManager;
 
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,6 +40,7 @@ public class TyaEndpointsIt {
 
     @MockBean
     MessageAuthenticationService macService;
+
 
     @Test
     public void shouldReturnAnAppealGivenAnAppealNumber() throws Exception {
@@ -67,13 +72,30 @@ public class TyaEndpointsIt {
 
     @Test
     public void shouldValidateMacToken() throws Exception {
-        when(macService.validateMacTokenAndReturnBenefitType("abcde12345")).thenReturn("002");
+        Map<String, Object> macResponseMap = getValidTokenResponseMap();
 
-        MvcResult mvcResult = mockMvc.perform(get("/appeals/tokens/abcde12345"))
+        when(macService.decryptMacToken("abcde12345"))
+                .thenReturn(macResponseMap);
+
+        MvcResult mvcResult = mockMvc.perform(get("/tokens/abcde12345"))
                 .andExpect(status().isOk())
                 .andReturn();
 
         String result = mvcResult.getResponse().getContentAsString();
-        assertThat(result, is("{\"benefitType\":\"002\"}"));
+
+        assertThat(result, equalTo("{\"token\":"
+                +  "{\"decryptedToken\":\"de-crypted-token\",\"benefitType\":\"002\","
+                +  "\"subscriptionId\":\"subscriptionId\","
+                +  "\"appealId\":\"dfdsf435345\"}}"));
+    }
+
+
+    private Map<String, Object> getValidTokenResponseMap() {
+        Map<String, Object> macResponseMap = new HashMap<>();
+        macResponseMap.put("decryptedToken", "de-crypted-token");
+        macResponseMap.put("benefitType", "002");
+        macResponseMap.put("subscriptionId", "subscriptionId");
+        macResponseMap.put("appealId", "dfdsf435345");
+        return macResponseMap;
     }
 }

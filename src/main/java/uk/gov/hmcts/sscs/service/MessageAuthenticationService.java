@@ -14,6 +14,8 @@ import java.nio.charset.StandardCharsets;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.Mac;
 
@@ -36,6 +38,10 @@ public class MessageAuthenticationService {
     public static final String ZONE_ID = "Europe/London";
     public static final String MAC_ALGO = "HmacSHA256";
     public static final String ERROR_MESSAGE = "Error while decrypting HMAC token ";
+    public static final String SUBSCRIPTION_ID = "subscriptionId";
+    public static final String APPEAL_ID = "appealId";
+    public static final String DECRYPTED_TOKEN = "decryptedToken";
+    public static final String BENEFIT_TYPE = "benefitType";
 
     private Mac mac;
     private String macString;
@@ -82,7 +88,18 @@ public class MessageAuthenticationService {
         }
     }
 
-    private void validateMacToken(String encryptedToken) throws InvalidKeyException,
+    public Map<String, Object> decryptMacToken(String encryptedToken) {
+        try {
+            validateMacToken(encryptedToken);
+            return getSubscriptions(encryptedToken);
+        } catch (Exception ex) {
+            LOG.error(ERROR_MESSAGE + encryptedToken, ex);
+            throw new InvalidSubscriptionTokenException(ERROR_MESSAGE + encryptedToken);
+        }
+    }
+
+
+    private String validateMacToken(String encryptedToken) throws InvalidKeyException,
             NoSuchAlgorithmException {
         String decrypted = decryptToken(encryptedToken);
         String[] parts = tokenParts(decrypted);
@@ -95,6 +112,8 @@ public class MessageAuthenticationService {
         if (!decrypted.equals(macToken)) {
             throw new InvalidSubscriptionTokenException(ERROR_MESSAGE + encryptedToken);
         }
+
+        return macToken;
     }
 
     private String getBenefitType(String encryptedToken) {
@@ -110,5 +129,15 @@ public class MessageAuthenticationService {
         return new String(getDecoder().decode(encryptedToken), CHARSET);
     }
 
+    private Map<String, Object> getSubscriptions(String encryptedToken) {
+        String decrypted = decryptToken(encryptedToken);
+        String[] parts = tokenParts(decrypted);
+        Map<String,Object> tokenDetails = new HashMap<>();
+        tokenDetails.put(SUBSCRIPTION_ID, SUBSCRIPTION_ID);  // Dummy subscription id for TYA frontend
+        tokenDetails.put(APPEAL_ID, parts[0]);
+        tokenDetails.put(DECRYPTED_TOKEN, decrypted);
+        tokenDetails.put(BENEFIT_TYPE, parts[1]);
+        return tokenDetails;
+    }
 
 }

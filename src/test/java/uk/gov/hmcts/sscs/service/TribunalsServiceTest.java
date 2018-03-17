@@ -22,6 +22,7 @@ import uk.gov.hmcts.sscs.model.ccd.Appeal;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.model.ccd.Subscriptions;
+import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
@@ -52,6 +53,9 @@ public class TribunalsServiceTest {
 
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
+
+    @Mock
+    private SubscriptionRequest subscriptionRequest;
 
     @Captor
     private ArgumentCaptor<CaseData> captor;
@@ -115,9 +119,9 @@ public class TribunalsServiceTest {
 
     @Test
     public void shouldUpdateSubscriptionDetails() throws CcdException {
-        tribunalsService.updateSubscription(APPEAL_NUMBER, getSubscription());
+        tribunalsService.updateSubscription(APPEAL_NUMBER, subscriptionRequest);
 
-        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(getSubscription()));
+        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(subscriptionRequest));
     }
 
     private CaseData getCaseData() {
