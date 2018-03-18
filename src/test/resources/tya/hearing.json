@@ -42,13 +42,13 @@
         "contentKey": "status.adjourned"
       },
       {
-        "postcode": "CH1 2XA",
-        "venueName": "Chester Magistrate's Court",
-        "hearingDateTime": "2017-07-17T23:00:00.000Z",
-        "addressLine1": "Chester Magistrate's Court",
-        "addressLine2": "Grosvenor Street",
-        "addressLine3": "Chester",
-        "googleMapUrl": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632",
+        "postcode": "L2 5UZ",
+        "venueName": "Prudential House",
+        "hearingDateTime": "2017-07-12T23:00:00.000Z",
+        "addressLine1": "36 Dale Street",
+        "addressLine2": "",
+        "addressLine3": "Liverpool",
+        "googleMapUrl": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509",
         "date": "2017-06-24T14:11:34.013Z",
         "type": "HEARING_BOOKED",
         "contentKey": "status.hearingBooked"

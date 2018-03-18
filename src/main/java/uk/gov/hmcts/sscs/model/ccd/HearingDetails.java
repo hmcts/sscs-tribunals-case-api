@@ -15,15 +15,18 @@ public class HearingDetails {
     private String hearingDate;
     private String time;
     private String adjourned;
+    private String eventDate;
 
     @JsonCreator
     public HearingDetails(@JsonProperty("venue") Venue venue,
                           @JsonProperty("hearingDate") String hearingDate,
                           @JsonProperty("time") String time,
-                          @JsonProperty("adjourned") String adjourned) {
+                          @JsonProperty("adjourned") String adjourned,
+                          @JsonProperty("eventDate") String eventDate) {
         this.venue = venue;
         this.hearingDate = hearingDate;
         this.time = time;
         this.adjourned = adjourned;
+        this.eventDate = eventDate;
     }
 }

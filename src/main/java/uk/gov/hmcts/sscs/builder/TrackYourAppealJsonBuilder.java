@@ -14,10 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
@@ -137,7 +134,7 @@ public class TrackYourAppealJsonBuilder {
                 break;
             case HEARING_BOOKED :
             case NEW_HEARING_BOOKED :
-                Hearing hearing = caseData.getHearings().get(0);
+                Hearing hearing = getHearing(event, caseData.getHearings());
                 eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                 eventNode.put(HEARING_DATETIME,
                         getHearingDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
@@ -224,5 +221,17 @@ public class TrackYourAppealJsonBuilder {
         dateCalculator.setStartDate(startDate);
         LocalDate decisionDate = dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
         return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
+    }
+
+    private static Hearing getHearing(Event event, List<Hearing> hearings) {
+        Optional<Hearing> optionalHearing = hearings.stream()
+                .filter(hearing ->
+                        getDate(event.getValue().getDate()).equals(getDate(hearing.getValue().getEventDate())))
+                        .findFirst();
+        return optionalHearing.orElse(null);
+    }
+
+    private static String getDate(String localDateTime) {
+        return LocalDateTime.parse(localDateTime).toLocalDate().toString();
     }
 }
