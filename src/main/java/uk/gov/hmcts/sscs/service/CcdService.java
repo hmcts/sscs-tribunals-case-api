@@ -107,10 +107,6 @@ public class CcdService {
                     appellantSubscription.setSubscribeEmail(YES);
                 }
 
-                if (null != subscriptionRequest.getMobileNumber()) {
-                    appellantSubscription.setMobile(subscriptionRequest.getMobileNumber());
-                    appellantSubscription.setMobile(YES);
-                }
                 caseData.getSubscriptions().setAppellantSubscription(appellantSubscription);
 
                 Long caseId = caseDetails.getId();
