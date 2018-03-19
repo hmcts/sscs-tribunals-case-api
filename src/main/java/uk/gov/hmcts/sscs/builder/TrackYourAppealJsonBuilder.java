@@ -135,14 +135,16 @@ public class TrackYourAppealJsonBuilder {
             case HEARING_BOOKED :
             case NEW_HEARING_BOOKED :
                 Hearing hearing = getHearing(event, caseData.getHearings());
-                eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
-                eventNode.put(HEARING_DATETIME,
-                        getHearingDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
-                eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
-                eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
-                eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
-                eventNode.put(ADDRESS_LINE_3, hearing.getValue().getVenue().getAddress().getTown());
-                eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
+                if (hearing != null) {
+                    eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
+                    eventNode.put(HEARING_DATETIME,
+                            getHearingDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                    eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
+                    eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
+                    eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
+                    eventNode.put(ADDRESS_LINE_3, hearing.getValue().getVenue().getAddress().getTown());
+                    eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
+                }
                 break;
             case ADJOURNED :
                 eventNode.put(ADJOURNED_DATE, "");
