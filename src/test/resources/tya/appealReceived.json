@@ -8,10 +8,10 @@
     "status": "APPEAL_RECEIVED",
     "latestEvents": [
       {
+        "evidenceType": "General",
+        "evidenceProvidedBy": "Appellant",
         "date": "2017-03-10T13:00:42.233Z",
         "type": "EVIDENCE_RECEIVED",
-        "evidenceProvidedBy": "Evidence received",
-        "evidenceType": "Evidence received",
         "contentKey": "status.evidenceReceived"
       },
       {

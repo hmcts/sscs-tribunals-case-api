@@ -68,14 +68,14 @@ public final class CaseDataUtils {
         List<Hearing> hearingsList = new ArrayList<>();
         hearingsList.add(hearings);
 
-        Doc doc = Doc.builder()
+        DocumentDetails doc = DocumentDetails.builder()
                 .dateReceived("2017-05-24")
                 .description("1")
                 .build();
-        Documents documents = Documents.builder()
+        Document documents = Document.builder()
                 .value(doc)
                 .build();
-        List<Documents> documentsList = new ArrayList<>();
+        List<Document> documentsList = new ArrayList<>();
         documentsList.add(documents);
         final Evidence evidence = Evidence.builder()
                 .documents(documentsList)

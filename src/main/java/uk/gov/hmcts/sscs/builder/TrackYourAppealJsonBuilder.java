@@ -20,9 +20,7 @@ import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.Event;
-import uk.gov.hmcts.sscs.model.ccd.Hearing;
+import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilder {
@@ -123,8 +121,11 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
             case EVIDENCE_RECEIVED :
-                eventNode.put(EVIDENCE_TYPE, event.getValue().getDescription());
-                eventNode.put(EVIDENCE_PROVIDED_BY, event.getValue().getDescription());
+                Document document = getEvidenceDocument(event, caseData.getEvidence());
+                if (document != null) {
+                    eventNode.put(EVIDENCE_TYPE, document.getValue().getEvidenceType());
+                    eventNode.put(EVIDENCE_PROVIDED_BY, document.getValue().getEvidenceProvidedBy());
+                }
                 break;
             case DWP_RESPOND :
             case PAST_HEARING_BOOKED :
@@ -147,7 +148,7 @@ public class TrackYourAppealJsonBuilder {
                 }
                 break;
             case ADJOURNED :
-                eventNode.put(ADJOURNED_DATE, "");
+                eventNode.put(ADJOURNED_DATE, getUtcDate((event)));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
                         HEARING_DATE_CONTACT_WEEKS, false));
                 eventNode.put(ADJOURNED_LETTER_RECEIVED_BY_DATE, getCalculatedDate(event,
@@ -235,5 +236,13 @@ public class TrackYourAppealJsonBuilder {
 
     private static String getDate(String localDateTime) {
         return LocalDateTime.parse(localDateTime).toLocalDate().toString();
+    }
+
+    private static Document getEvidenceDocument(Event event, Evidence evidence) {
+        Optional<Document> optionalDocument = evidence.getDocuments().stream()
+                .filter(document ->
+                        getDate(event.getValue().getDate()).equals(document.getValue().getDateReceived()))
+                .findFirst();
+        return optionalDocument.orElse(null);
     }
 }

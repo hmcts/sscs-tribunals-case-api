@@ -29,6 +29,16 @@
       "eventDate": "2017-06-24T18:11:34.013"
     }
   }],
+  "evidence": {
+    "documents": [{
+      "value": {
+        "dateReceived": "2017-06-24",
+        "description": "1",
+        "evidenceType": "General",
+        "evidenceProvidedBy": "Appellant"
+      }
+    }]
+  },
   "events": [
     {
       "value": {
