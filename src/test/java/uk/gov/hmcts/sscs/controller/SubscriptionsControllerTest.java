@@ -117,7 +117,6 @@ public class SubscriptionsControllerTest {
     private SubscriptionRequest getSubscriptionRequest() {
         SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
         subscriptionRequest.setEmail("email@email.com");
-        subscriptionRequest.setMobileNumber("0777777777");
         return subscriptionRequest;
     }
 

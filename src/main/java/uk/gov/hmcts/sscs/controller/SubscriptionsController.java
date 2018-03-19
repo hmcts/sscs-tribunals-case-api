@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Collections;
 import java.util.Map;
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +67,7 @@ public class SubscriptionsController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Updated subscription", response = String.class)})
     @RequestMapping(value = "/appeals/{appealNumber}/subscriptions/{subscriptionId}", method = POST, consumes = APPLICATION_JSON_VALUE,
             produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateSubscription(@Valid @RequestBody SubscriptionRequest subscriptionRequest, @PathVariable String appealNumber,
+    public ResponseEntity<String> updateSubscription(@RequestBody SubscriptionRequest subscriptionRequest, @PathVariable String appealNumber,
                                                    @PathVariable String subscriptionId) throws CcdException {
         String benefitType = tribunalsService.updateSubscription(appealNumber, subscriptionRequest);
         return ok().body(format("{\"benefitType\":\"%s\"}", benefitType));
