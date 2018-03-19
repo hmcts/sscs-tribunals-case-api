@@ -14,10 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
@@ -137,15 +134,17 @@ public class TrackYourAppealJsonBuilder {
                 break;
             case HEARING_BOOKED :
             case NEW_HEARING_BOOKED :
-                Hearing hearing = caseData.getHearings().get(0);
-                eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
-                eventNode.put(HEARING_DATETIME,
-                        getHearingDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
-                eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
-                eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
-                eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
-                eventNode.put(ADDRESS_LINE_3, hearing.getValue().getVenue().getAddress().getTown());
-                eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
+                Hearing hearing = getHearing(event, caseData.getHearings());
+                if (hearing != null) {
+                    eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
+                    eventNode.put(HEARING_DATETIME,
+                            getHearingDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                    eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
+                    eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
+                    eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
+                    eventNode.put(ADDRESS_LINE_3, hearing.getValue().getVenue().getAddress().getTown());
+                    eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
+                }
                 break;
             case ADJOURNED :
                 eventNode.put(ADJOURNED_DATE, "");
@@ -224,5 +223,17 @@ public class TrackYourAppealJsonBuilder {
         dateCalculator.setStartDate(startDate);
         LocalDate decisionDate = dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
         return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
+    }
+
+    private static Hearing getHearing(Event event, List<Hearing> hearings) {
+        Optional<Hearing> optionalHearing = hearings.stream()
+                .filter(hearing ->
+                        getDate(event.getValue().getDate()).equals(getDate(hearing.getValue().getEventDate())))
+                        .findFirst();
+        return optionalHearing.orElse(null);
+    }
+
+    private static String getDate(String localDateTime) {
+        return LocalDateTime.parse(localDateTime).toLocalDate().toString();
     }
 }
