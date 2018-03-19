@@ -12,7 +12,7 @@ import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.CcdUtil;
 import uk.gov.hmcts.sscs.model.ccd.Subscription;
-import uk.gov.hmcts.sscs.model.ccd.Subscriptions;
+import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.ccd.CreateCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.ccd.UpdateCoreCaseDataService;
@@ -20,6 +20,7 @@ import uk.gov.hmcts.sscs.service.ccd.UpdateCoreCaseDataService;
 @Service
 public class CcdService {
     private static final Logger LOG = getLogger(CcdService.class);
+    public static final String YES = "yes";
 
     private ReadCoreCaseDataService readCoreCaseDataService;
     private CreateCoreCaseDataService createCoreCaseDataService;
@@ -91,21 +92,28 @@ public class CcdService {
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
 
-    public String updateSubscription(String appealNumber, Subscription subscription) throws CcdException {
+    public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) throws CcdException {
         String benefitType = null;
         try {
             CaseDetails caseDetails = findCcdCaseDetailsByAppealNumber(appealNumber);
 
             if (caseDetails != null) {
                 CaseData caseData = CcdUtil.getCaseData(caseDetails.getData());
+
+                Subscription appellantSubscription = caseData.getSubscriptions().getAppellantSubscription();
+
+                if (null != subscriptionRequest.getEmail()) {
+                    appellantSubscription.setEmail(subscriptionRequest.getEmail());
+                    appellantSubscription.setSubscribeEmail(YES);
+                }
+
+                if (null != subscriptionRequest.getMobileNumber()) {
+                    appellantSubscription.setMobile(subscriptionRequest.getMobileNumber());
+                    appellantSubscription.setMobile(YES);
+                }
+                caseData.getSubscriptions().setAppellantSubscription(appellantSubscription);
+
                 Long caseId = caseDetails.getId();
-
-                //The following need to be implemented as per CCD def for subscriptions
-                Subscriptions subscriptions = Subscriptions.builder()
-                        .appellantSubscription(subscription)
-                        .build();
-                caseData.toBuilder().subscriptions(subscriptions);
-
                 updateCase(caseData, caseId, "subscriptionUpdated");
                 benefitType = caseData.getAppeal().getBenefitType().getCode();
             }

@@ -11,8 +11,8 @@ import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
+import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
@@ -65,8 +65,8 @@ public class TribunalsService {
         return ccdService.unsubscribe(appealNumber, reason);
     }
 
-    public String updateSubscription(String appealNumber, Subscription subscription) throws CcdException {
-        return ccdService.updateSubscription(appealNumber, subscription);
+    public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) throws CcdException {
+        return ccdService.updateSubscription(appealNumber, subscriptionRequest);
     }
 
     public boolean validateSurname(String appealNumber, String surname) throws CcdException {

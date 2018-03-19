@@ -17,7 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.Subscription;
+import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.service.ccd.CreateCoreCaseDataService;
 import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
@@ -97,9 +97,11 @@ public class CcdServiceTest {
         when(readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(anyString()))
                 .thenReturn(CaseDataUtils.buildCaseDetails());
 
-        String benefitType = ccdService.updateSubscription(anyString(), Subscription.builder().build());
+
+        String benefitType = ccdService.updateSubscription(anyString(), getSubscriptionRequest());
 
         verify(readCoreCaseDataService).getCcdCaseDetailsByAppealNumber(anyString());
+        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class), anyLong(), anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
@@ -135,4 +137,12 @@ public class CcdServiceTest {
         verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class),
                 anyLong(),anyString());
     }
+
+    private SubscriptionRequest getSubscriptionRequest() {
+        SubscriptionRequest subscriptionRequest = new SubscriptionRequest();
+        subscriptionRequest.setEmail("email@email.com");
+        subscriptionRequest.setMobileNumber("0777777777");
+        return subscriptionRequest;
+    }
+
 }

@@ -102,7 +102,7 @@ public final class CaseDataUtils {
 
         Subscription appellantSubscription = Subscription.builder()
                 .tya("")
-                .email("")
+                .email("appellant@email.com")
                 .mobile("")
                 .subscribeEmail("Yes")
                 .subscribeSms("Yes")
@@ -110,7 +110,7 @@ public final class CaseDataUtils {
                 .build();
         Subscription supporterSubscription = Subscription.builder()
                 .tya("")
-                .email("")
+                .email("supporter@email.com")
                 .mobile("")
                 .subscribeEmail("")
                 .subscribeSms("")
