@@ -71,3 +71,7 @@ variable "ccd_idam_s2s_auth_microservice"{
 variable "idam_oauth2_client_id"{
   default = "sscs"
 }
+
+variable "idam_redirect_url" {
+  default = "https://evidence-sharing-dev.sscs.reform.hmcts.net"
+}
