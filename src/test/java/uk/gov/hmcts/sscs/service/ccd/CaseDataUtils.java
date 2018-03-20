@@ -70,7 +70,7 @@ public final class CaseDataUtils {
 
         DocumentDetails doc = DocumentDetails.builder()
                 .dateReceived("2017-05-24")
-                .description("1")
+                .evidenceType("General")
                 .build();
         Document documents = Document.builder()
                 .value(doc)
