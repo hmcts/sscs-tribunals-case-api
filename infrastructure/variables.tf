@@ -72,3 +72,6 @@ variable "idam_oauth2_client_id"{
   default = "sscs"
 }
 
+variable "idam_redirect_url" {
+  default = "https://sscs-case-loader-${var.env}.service.${local.aseName}.internal"
+}
