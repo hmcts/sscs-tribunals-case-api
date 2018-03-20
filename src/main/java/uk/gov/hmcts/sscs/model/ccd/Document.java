@@ -10,11 +10,16 @@ import lombok.Value;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @Builder
-public class Document {
+public class Document implements Comparable<Document> {
     private DocumentDetails value;
 
     @JsonCreator
     public Document(@JsonProperty("value") DocumentDetails value) {
         this.value = value;
+    }
+
+    @Override
+    public int compareTo(Document o) {
+        return value.getDateReceived().compareTo(o.getValue().getDateReceived());
     }
 }

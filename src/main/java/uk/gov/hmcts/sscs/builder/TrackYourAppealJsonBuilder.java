@@ -121,7 +121,7 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
             case EVIDENCE_RECEIVED :
-                Document document = getEvidenceDocument(event, caseData.getEvidence());
+                Document document = getDocument(event, caseData);
                 if (document != null) {
                     eventNode.put(EVIDENCE_TYPE, document.getValue().getEvidenceType());
                     eventNode.put(EVIDENCE_PROVIDED_BY, document.getValue().getEvidenceProvidedBy());
@@ -239,11 +239,31 @@ public class TrackYourAppealJsonBuilder {
         return LocalDateTime.parse(localDateTime).toLocalDate().toString();
     }
 
-    private static Document getEvidenceDocument(Event event, Evidence evidence) {
-        Optional<Document> optionalDocument = evidence.getDocuments().stream()
-                .filter(document ->
-                        getDate(event.getValue().getDate()).equals(document.getValue().getDateReceived()))
-                .findFirst();
-        return optionalDocument.orElse(null);
+    private static Map<Event, Document> buildEventDocumentMap(CaseData caseData) {
+
+        Map<Event, Document> eventDocumentMap = new HashMap<>();
+        Evidence evidence = caseData.getEvidence();
+        List<Document> documentList = evidence != null ? evidence.getDocuments() : null;
+
+        if (documentList != null && !documentList.isEmpty()) {
+            List<Event> events = caseData.getEvents();
+            List<Document> documents = caseData.getEvidence().getDocuments();
+            Collections.sort(documents, Comparator.reverseOrder());
+            if (null != events && !events.isEmpty()) {
+                int documentIndex = 0;
+                for (Event event : events) {
+                    if (EVIDENCE_RECEIVED.equals(getEventType(event))) {
+                        eventDocumentMap.put(event, documents.get(documentIndex));
+                        documentIndex++;
+                    }
+                }
+            }
+        }
+
+        return  eventDocumentMap;
+    }
+
+    private static Document getDocument(Event event, CaseData caseData) {
+        return buildEventDocumentMap(caseData).get(event);
     }
 }
