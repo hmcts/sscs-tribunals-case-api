@@ -61,8 +61,8 @@ public class TribunalsService {
                 caseByAppealNumber, regionalProcessingCenter);
     }
 
-    public String unsubscribe(String appealNumber, String reason) throws CcdException {
-        return ccdService.unsubscribe(appealNumber, reason);
+    public String unsubscribe(String appealNumber) throws CcdException {
+        return ccdService.unsubscribe(appealNumber);
     }
 
     public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) throws CcdException {

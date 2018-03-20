@@ -39,6 +39,7 @@ public class SubscriptionsControllerTest {
 
     public static final String APPEAL_ID = "appeal-id";
     public static final String CONTENT = "{\"email\":\"test@gmail.com\",\"mobileNumber\": \"+447777777777\"}";
+    public static final String SUBSCRIPTION_ID = "subid";
 
     @Mock
     private TribunalsService tribunalsService;
@@ -87,10 +88,10 @@ public class SubscriptionsControllerTest {
     @Test
     public void unsubscribeForGivenAppealNumber() throws CcdException {
         // Given
-        when(tribunalsService.unsubscribe(APPEAL_ID, "reason")).thenReturn("benefitTypeValue");
+        when(tribunalsService.unsubscribe(APPEAL_ID)).thenReturn("benefitTypeValue");
 
         // When
-        ResponseEntity<String> benefitType = controller.unsubscribe(APPEAL_ID, "reason");
+        ResponseEntity<String> benefitType = controller.unsubscribe(APPEAL_ID, SUBSCRIPTION_ID);
 
         // Then
         assertThat(benefitType.getStatusCode(), equalTo(HttpStatus.OK));
@@ -107,7 +108,7 @@ public class SubscriptionsControllerTest {
 
         //When
         ResponseEntity<String> benefitType = controller
-                .updateSubscription(subscriptionRequest, APPEAL_ID, "subid");
+                .updateSubscription(subscriptionRequest, APPEAL_ID, SUBSCRIPTION_ID);
 
         // Then
         assertThat(benefitType.getStatusCode(), equalTo(HttpStatus.OK));
