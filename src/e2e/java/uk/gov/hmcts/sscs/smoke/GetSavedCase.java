@@ -1,14 +1,13 @@
 package uk.gov.hmcts.sscs.smoke;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.RestAssured;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
 public class GetSavedCase {
-    public String sscsAppealNumber = "7S9MxdSBpt";
+    private String sscsAppealNumber = "7S9MxdSBpt";
 
     private final String tcaInstance = System.getenv("TEST_URL");
 
@@ -21,7 +20,7 @@ public class GetSavedCase {
         String response = RestAssured
                 .given()
                 .when()
-                .get("/appeals/"+ sscsAppealNumber)
+                .get("/appeals/" + sscsAppealNumber)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .and()
