@@ -113,6 +113,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'pdf-service-client', version: '5.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.4.0'
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '2.5.0'
+    compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
 
     compileOnly 'org.projectlombok:lombok:1.16.20'
     apt "org.projectlombok:lombok:1.16.20"
@@ -197,6 +198,11 @@ sonarqube {
     }
 }
 
-task smoke(type: Test, description: 'Runs the smoke tests.', group: 'Verification') {
-
+task smoke(type: Test) {
+    group = 'verification'
+    description = 'Executes non-destructive smoke tests against a running Tribual Case API'
+    setTestClassesDirs(sourceSets.e2e.output.classesDirs)
+    setClasspath(sourceSets.e2e.runtimeClasspath)
+    include "uk/gov/hmcts/sscs/smoke/**"
+    exclude "uk/gov/hmcts/sscs/ccd/**"
 }
