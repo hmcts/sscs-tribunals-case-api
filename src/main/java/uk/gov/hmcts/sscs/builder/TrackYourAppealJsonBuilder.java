@@ -25,6 +25,8 @@ import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilder {
 
+    private static Map<Event, Document> eventDocumentMap;
+
     private TrackYourAppealJsonBuilder() {
 
     }
@@ -33,6 +35,7 @@ public class TrackYourAppealJsonBuilder {
                                                       RegionalProcessingCenter regionalProcessingCenter) {
 
         caseData.getEvents().sort(Comparator.reverseOrder());
+        eventDocumentMap = buildEventDocumentMap(caseData);
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -121,7 +124,7 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
             case EVIDENCE_RECEIVED :
-                Document document = getDocument(event, caseData);
+                Document document = eventDocumentMap.get(event);
                 if (document != null) {
                     eventNode.put(EVIDENCE_TYPE, document.getValue().getEvidenceType());
                     eventNode.put(EVIDENCE_PROVIDED_BY, document.getValue().getEvidenceProvidedBy());
@@ -218,7 +221,7 @@ public class TrackYourAppealJsonBuilder {
         return rpcAddressArray;
     }
 
-    public static String getBusinessDay(Event event, int numberOfBusinessDays) {
+    private static String getBusinessDay(Event event, int numberOfBusinessDays) {
         LocalDateTime localDateTime = parse(event.getValue().getDate());
         LocalDate startDate = localDateTime.toLocalDate();
         DateCalculator<LocalDate> dateCalculator = LocalDateKitCalculatorsFactory.forwardCalculator("UK");
@@ -264,7 +267,4 @@ public class TrackYourAppealJsonBuilder {
         return  eventDocumentMap;
     }
 
-    private static Document getDocument(Event event, CaseData caseData) {
-        return buildEventDocumentMap(caseData).get(event);
-    }
 }
