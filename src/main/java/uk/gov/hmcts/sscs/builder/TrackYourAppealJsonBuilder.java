@@ -32,7 +32,7 @@ public class TrackYourAppealJsonBuilder {
     public static ObjectNode buildTrackYourAppealJson(CaseData caseData,
                                                       RegionalProcessingCenter regionalProcessingCenter) {
 
-        Collections.sort(caseData.getEvents(), Comparator.reverseOrder());
+        caseData.getEvents().sort(Comparator.reverseOrder());
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -247,13 +247,14 @@ public class TrackYourAppealJsonBuilder {
 
         if (documentList != null && !documentList.isEmpty()) {
             List<Event> events = caseData.getEvents();
-            List<Document> documents = caseData.getEvidence().getDocuments();
-            Collections.sort(documents, Comparator.reverseOrder());
+
+            documentList.sort(Comparator.reverseOrder());
+
             if (null != events && !events.isEmpty()) {
                 int documentIndex = 0;
                 for (Event event : events) {
                     if (EVIDENCE_RECEIVED.equals(getEventType(event))) {
-                        eventDocumentMap.put(event, documents.get(documentIndex));
+                        eventDocumentMap.put(event, documentList.get(documentIndex));
                         documentIndex++;
                     }
                 }
