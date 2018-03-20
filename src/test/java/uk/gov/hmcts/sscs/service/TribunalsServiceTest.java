@@ -112,9 +112,9 @@ public class TribunalsServiceTest {
     @Test
     public void shouldUnsubscribe() throws CcdException {
 
-        tribunalsService.unsubscribe(APPEAL_NUMBER, "reason");
+        tribunalsService.unsubscribe(APPEAL_NUMBER);
 
-        verify(ccdService).unsubscribe(eq(APPEAL_NUMBER), eq("reason"));
+        verify(ccdService).unsubscribe(eq(APPEAL_NUMBER));
     }
 
     @Test
