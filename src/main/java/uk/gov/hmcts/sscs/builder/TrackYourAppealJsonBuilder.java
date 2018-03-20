@@ -136,6 +136,7 @@ public class TrackYourAppealJsonBuilder {
             case HEARING_BOOKED :
             case NEW_HEARING_BOOKED :
                 Hearing hearing = getHearing(event, caseData.getHearings());
+                hearing = (hearing == null) ? caseData.getHearings().get(0) : hearing;
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
@@ -229,8 +230,8 @@ public class TrackYourAppealJsonBuilder {
     private static Hearing getHearing(Event event, List<Hearing> hearings) {
         Optional<Hearing> optionalHearing = hearings.stream()
                 .filter(hearing ->
-                        getDate(event.getValue().getDate()).equals(getDate(hearing.getValue().getEventDate())))
-                        .findFirst();
+                        hearing.getValue().getEventDate() != null && getDate(event.getValue().getDate()).equals(
+                                getDate(hearing.getValue().getEventDate()))).findFirst();
         return optionalHearing.orElse(null);
     }
 
