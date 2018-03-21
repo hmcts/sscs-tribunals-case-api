@@ -19,17 +19,16 @@ import java.util.*;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
+import org.springframework.stereotype.Service;
+
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
+@Service
 public class TrackYourAppealJsonBuilder {
 
-    private TrackYourAppealJsonBuilder() {
-
-    }
-
-    public static ObjectNode buildTrackYourAppealJson(CaseData caseData,
+    public ObjectNode buildTrackYourAppealJson(CaseData caseData,
                                                       RegionalProcessingCenter regionalProcessingCenter) {
 
         caseData.getEvents().sort(Comparator.reverseOrder());
@@ -63,7 +62,7 @@ public class TrackYourAppealJsonBuilder {
         return root;
     }
 
-    private static ArrayNode buildEventArray(List<Event> events,
+    private ArrayNode buildEventArray(List<Event> events,
                                              Map<Event, Document> eventDocumentMap,
                                              Map<Event, Hearing> eventHearingMap) {
 
@@ -84,7 +83,7 @@ public class TrackYourAppealJsonBuilder {
         return eventsNode;
     }
 
-    private static List<Event> buildLatestEvents(List<Event> events) {
+    private List<Event> buildLatestEvents(List<Event> events) {
         List<Event> latestEvents = new ArrayList<>();
 
         for (Event event: events) {
@@ -99,13 +98,13 @@ public class TrackYourAppealJsonBuilder {
         return latestEvents;
     }
 
-    private static List<Event> buildHistoricalEvents(List<Event> events, List<Event> latestEvents) {
+    private List<Event> buildHistoricalEvents(List<Event> events, List<Event> latestEvents) {
 
         return events.stream().skip(latestEvents.size()).collect(toList());
 
     }
 
-    private static String getAppealStatus(List<Event> events) {
+    private String getAppealStatus(List<Event> events) {
         String appealStatus = "";
 
         if (null != events && !events.isEmpty()) {
@@ -119,7 +118,7 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private static void buildEventNode(Event event, ObjectNode eventNode,
+    private void buildEventNode(Event event, ObjectNode eventNode,
                                        Map<Event, Document> eventDocumentMap,
                                        Map<Event, Hearing> eventHearingMap) {
 
@@ -173,15 +172,15 @@ public class TrackYourAppealJsonBuilder {
         }
     }
 
-    private static EventType getEventType(Event event) {
+    private EventType getEventType(Event event) {
         return EventType.getEventTypeByCcdType(event.getValue().getType());
     }
 
-    private static String getUtcDate(Event event) {
+    private String getUtcDate(Event event) {
         return formatDateTime(parse(event.getValue().getDate()));
     }
 
-    private static String getCalculatedDate(Event event, int days, boolean isDays) {
+    private String getCalculatedDate(Event event, int days, boolean isDays) {
         if (isDays) {
             return formatDateTime(parse(event.getValue().getDate()).plusDays(days));
         } else {
@@ -189,17 +188,17 @@ public class TrackYourAppealJsonBuilder {
         }
     }
 
-    private static String getHearingDateTime(String localDate, String localTime) {
+    private String getHearingDateTime(String localDate, String localTime) {
         return formatDateTime(LocalDateTime.of(LocalDate.parse(localDate), LocalTime.parse(localTime)));
     }
 
-    private static String formatDateTime(LocalDateTime localDateTime) {
+    private String formatDateTime(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 + "T"
                 + localDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS'Z'"));
     }
 
-    private static void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode) {
+    private void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode) {
         if (null != regionalProcessingCenter) {
             ObjectNode rpcNode = JsonNodeFactory.instance.objectNode();
 
@@ -214,7 +213,7 @@ public class TrackYourAppealJsonBuilder {
         }
     }
 
-    private static ArrayNode buildRpcAddressArray(RegionalProcessingCenter regionalProcessingCenter) {
+    private ArrayNode buildRpcAddressArray(RegionalProcessingCenter regionalProcessingCenter) {
         ArrayNode rpcAddressArray = JsonNodeFactory.instance.arrayNode();
 
         rpcAddressArray.add(regionalProcessingCenter.getAddress1());
@@ -225,7 +224,7 @@ public class TrackYourAppealJsonBuilder {
         return rpcAddressArray;
     }
 
-    private static String getBusinessDay(Event event, int numberOfBusinessDays) {
+    private String getBusinessDay(Event event, int numberOfBusinessDays) {
         LocalDateTime localDateTime = parse(event.getValue().getDate());
         LocalDate startDate = localDateTime.toLocalDate();
         DateCalculator<LocalDate> dateCalculator = LocalDateKitCalculatorsFactory.forwardCalculator("UK");
@@ -234,7 +233,7 @@ public class TrackYourAppealJsonBuilder {
         return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
     }
 
-    private static Map<Event, Document> buildEventDocumentMap(CaseData caseData) {
+    private Map<Event, Document> buildEventDocumentMap(CaseData caseData) {
 
         Map<Event, Document> eventDocumentMap = new HashMap<>();
         Evidence evidence = caseData.getEvidence();
@@ -259,7 +258,7 @@ public class TrackYourAppealJsonBuilder {
         return  eventDocumentMap;
     }
 
-    private static Map<Event, Hearing> buildEventHearingMap(CaseData caseData) {
+    private Map<Event, Hearing> buildEventHearingMap(CaseData caseData) {
 
         Map<Event, Hearing> eventHearingMap = new HashMap<>();
         List<Hearing> hearingList = caseData.getHearings();
