@@ -122,7 +122,8 @@ public class CcdService {
 
     public CaseData findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) throws CcdException {
         CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
-        return caseData.getAppeal().getAppellant().getName().getLastName().equals(surname) ? caseData : null;
+        return caseData != null && caseData.getAppeal().getAppellant().getName().getLastName().equalsIgnoreCase(surname)
+                ? caseData : null;
 
     }
 
