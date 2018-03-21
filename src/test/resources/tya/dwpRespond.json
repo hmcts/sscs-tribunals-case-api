@@ -8,10 +8,10 @@
     "status": "DWP_RESPOND",
     "latestEvents": [
       {
+        "evidenceType": "EvidenceType2",
+        "evidenceProvidedBy": "Appellant2",
         "date": "2017-04-12T13:00:42.233Z",
         "type": "EVIDENCE_RECEIVED",
-        "evidenceType": "Evidence received",
-        "evidenceProvidedBy": "Evidence received",
         "contentKey": "status.evidenceReceived"
       },
       {
@@ -23,10 +23,10 @@
     ],
     "historicalEvents": [
       {
+        "evidenceType": "EvidenceType1",
+        "evidenceProvidedBy": "Appellant1",
         "date": "2017-03-10T12:01:47.620Z",
         "type": "EVIDENCE_RECEIVED",
-        "evidenceType": "Evidence received",
-        "evidenceProvidedBy": "Evidence received",
         "contentKey": "status.evidenceReceived"
       },
       {

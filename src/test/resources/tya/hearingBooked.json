@@ -8,8 +8,8 @@
     "status": "HEARING_BOOKED",
     "latestEvents": [
       {
-        "evidenceType": "Evidence received",
-        "evidenceProvidedBy": "Evidence received",
+        "evidenceType": "General",
+        "evidenceProvidedBy": "Appellant",
         "date": "2017-06-24T14:15:34.013Z",
         "type": "EVIDENCE_RECEIVED",
         "contentKey": "status.evidenceReceived"

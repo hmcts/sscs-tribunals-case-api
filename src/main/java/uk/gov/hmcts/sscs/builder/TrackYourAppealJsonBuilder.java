@@ -20,9 +20,7 @@ import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.Event;
-import uk.gov.hmcts.sscs.model.ccd.Hearing;
+import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilder {
@@ -34,7 +32,8 @@ public class TrackYourAppealJsonBuilder {
     public static ObjectNode buildTrackYourAppealJson(CaseData caseData,
                                                       RegionalProcessingCenter regionalProcessingCenter) {
 
-        Collections.sort(caseData.getEvents(), Comparator.reverseOrder());
+        caseData.getEvents().sort(Comparator.reverseOrder());
+        final Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -48,10 +47,10 @@ public class TrackYourAppealJsonBuilder {
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
-        caseNode.set("latestEvents", buildEventArray(latestEvents, caseData));
+        caseNode.set("latestEvents", buildEventArray(latestEvents, caseData, eventDocumentMap));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
-            caseNode.set("historicalEvents", buildEventArray(historicalEvents, caseData));
+            caseNode.set("historicalEvents", buildEventArray(historicalEvents, caseData, eventDocumentMap));
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
@@ -61,7 +60,8 @@ public class TrackYourAppealJsonBuilder {
         return root;
     }
 
-    private static ArrayNode buildEventArray(List<Event> events, CaseData caseData) {
+    private static ArrayNode buildEventArray(List<Event> events, CaseData caseData,
+                                             Map<Event, Document> eventDocumentMap) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
@@ -72,7 +72,7 @@ public class TrackYourAppealJsonBuilder {
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY,"status." + getEventType(event).getType());
 
-            buildEventNode(event, eventNode, caseData);
+            buildEventNode(event, eventNode, caseData, eventDocumentMap);
 
             eventsNode.add(eventNode);
         }
@@ -115,7 +115,8 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private static void buildEventNode(Event event, ObjectNode eventNode, CaseData caseData) {
+    private static void buildEventNode(Event event, ObjectNode eventNode, CaseData caseData,
+                                       Map<Event, Document> eventDocumentMap) {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED :
@@ -123,8 +124,11 @@ public class TrackYourAppealJsonBuilder {
                 eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
             case EVIDENCE_RECEIVED :
-                eventNode.put(EVIDENCE_TYPE, event.getValue().getDescription());
-                eventNode.put(EVIDENCE_PROVIDED_BY, event.getValue().getDescription());
+                Document document = eventDocumentMap.get(event);
+                if (document != null) {
+                    eventNode.put(EVIDENCE_TYPE, document.getValue().getEvidenceType());
+                    eventNode.put(EVIDENCE_PROVIDED_BY, document.getValue().getEvidenceProvidedBy());
+                }
                 break;
             case DWP_RESPOND :
             case PAST_HEARING_BOOKED :
@@ -148,7 +152,7 @@ public class TrackYourAppealJsonBuilder {
                 }
                 break;
             case ADJOURNED :
-                eventNode.put(ADJOURNED_DATE, "");
+                eventNode.put(ADJOURNED_DATE, getUtcDate((event)));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
                         HEARING_DATE_CONTACT_WEEKS, false));
                 eventNode.put(ADJOURNED_LETTER_RECEIVED_BY_DATE, getCalculatedDate(event,
@@ -217,7 +221,7 @@ public class TrackYourAppealJsonBuilder {
         return rpcAddressArray;
     }
 
-    public static String getBusinessDay(Event event, int numberOfBusinessDays) {
+    private static String getBusinessDay(Event event, int numberOfBusinessDays) {
         LocalDateTime localDateTime = parse(event.getValue().getDate());
         LocalDate startDate = localDateTime.toLocalDate();
         DateCalculator<LocalDate> dateCalculator = LocalDateKitCalculatorsFactory.forwardCalculator("UK");
@@ -237,4 +241,30 @@ public class TrackYourAppealJsonBuilder {
     private static String getDate(String localDateTime) {
         return LocalDateTime.parse(localDateTime).toLocalDate().toString();
     }
+
+    private static Map<Event, Document> buildEventDocumentMap(CaseData caseData) {
+
+        Map<Event, Document> eventDocumentMap = new HashMap<>();
+        Evidence evidence = caseData.getEvidence();
+        List<Document> documentList = evidence != null ? evidence.getDocuments() : null;
+
+        if (documentList != null && !documentList.isEmpty()) {
+            List<Event> events = caseData.getEvents();
+
+            documentList.sort(Comparator.reverseOrder());
+
+            if (null != events && !events.isEmpty()) {
+                int documentIndex = 0;
+                for (Event event : events) {
+                    if (EVIDENCE_RECEIVED.equals(getEventType(event))) {
+                        eventDocumentMap.put(event, documentList.get(documentIndex));
+                        documentIndex++;
+                    }
+                }
+            }
+        }
+
+        return  eventDocumentMap;
+    }
+
 }
