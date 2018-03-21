@@ -3,7 +3,7 @@ package uk.gov.hmcts.sscs.builder;
 import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -34,6 +34,7 @@ public class TrackYourAppealJsonBuilder {
 
         caseData.getEvents().sort(Comparator.reverseOrder());
         final Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
+        final Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -47,10 +48,12 @@ public class TrackYourAppealJsonBuilder {
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
-        caseNode.set("latestEvents", buildEventArray(latestEvents, caseData, eventDocumentMap));
+        caseNode.set("latestEvents",
+                buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
-            caseNode.set("historicalEvents", buildEventArray(historicalEvents, caseData, eventDocumentMap));
+            caseNode.set("historicalEvents",
+                    buildEventArray(historicalEvents, eventDocumentMap, eventHearingMap));
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
@@ -60,8 +63,9 @@ public class TrackYourAppealJsonBuilder {
         return root;
     }
 
-    private static ArrayNode buildEventArray(List<Event> events, CaseData caseData,
-                                             Map<Event, Document> eventDocumentMap) {
+    private static ArrayNode buildEventArray(List<Event> events,
+                                             Map<Event, Document> eventDocumentMap,
+                                             Map<Event, Hearing> eventHearingMap) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
@@ -72,7 +76,7 @@ public class TrackYourAppealJsonBuilder {
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY,"status." + getEventType(event).getType());
 
-            buildEventNode(event, eventNode, caseData, eventDocumentMap);
+            buildEventNode(event, eventNode, eventDocumentMap, eventHearingMap);
 
             eventsNode.add(eventNode);
         }
@@ -115,8 +119,9 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private static void buildEventNode(Event event, ObjectNode eventNode, CaseData caseData,
-                                       Map<Event, Document> eventDocumentMap) {
+    private static void buildEventNode(Event event, ObjectNode eventNode,
+                                       Map<Event, Document> eventDocumentMap,
+                                       Map<Event, Hearing> eventHearingMap) {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED :
@@ -138,8 +143,7 @@ public class TrackYourAppealJsonBuilder {
                 break;
             case HEARING_BOOKED :
             case NEW_HEARING_BOOKED :
-                Hearing hearing = getHearing(event, caseData.getHearings());
-                hearing = (hearing == null) ? caseData.getHearings().get(0) : hearing;
+                Hearing hearing = eventHearingMap.get(event);
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
@@ -230,18 +234,6 @@ public class TrackYourAppealJsonBuilder {
         return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
     }
 
-    private static Hearing getHearing(Event event, List<Hearing> hearings) {
-        Optional<Hearing> optionalHearing = hearings.stream()
-                .filter(hearing ->
-                        hearing.getValue().getEventDate() != null && getDate(event.getValue().getDate()).equals(
-                                getDate(hearing.getValue().getEventDate()))).findFirst();
-        return optionalHearing.orElse(null);
-    }
-
-    private static String getDate(String localDateTime) {
-        return LocalDateTime.parse(localDateTime).toLocalDate().toString();
-    }
-
     private static Map<Event, Document> buildEventDocumentMap(CaseData caseData) {
 
         Map<Event, Document> eventDocumentMap = new HashMap<>();
@@ -265,6 +257,31 @@ public class TrackYourAppealJsonBuilder {
         }
 
         return  eventDocumentMap;
+    }
+
+    private static Map<Event, Hearing> buildEventHearingMap(CaseData caseData) {
+
+        Map<Event, Hearing> eventHearingMap = new HashMap<>();
+        List<Hearing> hearingList = caseData.getHearings();
+
+        if (hearingList != null && !hearingList.isEmpty()) {
+            List<Event> events = caseData.getEvents();
+
+            hearingList.sort(Comparator.reverseOrder());
+
+            if (null != events && !events.isEmpty()) {
+                int hearingIndex = 0;
+                for (Event event : events) {
+                    if (HEARING_BOOKED.equals(getEventType(event))
+                            || NEW_HEARING_BOOKED.equals(getEventType(event))) {
+                        eventHearingMap.put(event, hearingList.get(hearingIndex));
+                        hearingIndex++;
+                    }
+                }
+            }
+        }
+
+        return  eventHearingMap;
     }
 
 }
