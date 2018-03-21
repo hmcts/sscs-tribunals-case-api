@@ -15,6 +15,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
@@ -55,6 +56,9 @@ public class TribunalsServiceTest {
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Mock
+    private TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
+
+    @Mock
     private SubscriptionRequest subscriptionRequest;
 
     @Captor
@@ -63,7 +67,8 @@ public class TribunalsServiceTest {
     @Before
     public void setUp() {
         tribunalsService = new TribunalsService(ccdService,
-                emailService, email, transformer, appealNumberGenerator, regionalProcessingCenterService);
+                emailService, email, transformer, appealNumberGenerator, regionalProcessingCenterService,
+                trackYourAppealJsonBuilder);
     }
 
     @Test

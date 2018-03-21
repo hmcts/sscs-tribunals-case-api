@@ -13,6 +13,16 @@
       "description": "benefit Type"
     }
   },
+  "evidence": {
+    "documents": [{
+      "value": {
+        "dateReceived": "2017-03-10",
+        "description": "1",
+        "evidenceType": "General",
+        "evidenceProvidedBy": "Appellant"
+      }
+    }]
+  },
   "events": [
     {
       "value": {

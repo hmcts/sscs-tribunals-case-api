@@ -2,6 +2,8 @@ package uk.gov.hmcts.sscs.service;
 
 import javax.mail.internet.MimeMessage;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.sscs.email.EmailAttachment;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 
 @Service
+@Slf4j
 public class EmailService {
 
     private final JavaMailSender javaMailSender;
@@ -44,6 +47,7 @@ public class EmailService {
 
             javaMailSender.send(message);
         } catch (Exception e) {
+            log.error("Error while sending email" + e);
             throw new EmailSendFailedException(e);
         }
     }

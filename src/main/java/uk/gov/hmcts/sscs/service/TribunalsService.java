@@ -25,19 +25,22 @@ public class TribunalsService {
     private SubmitYourAppealToCcdCaseDataDeserializer transformer;
     private AppealNumberGenerator appealNumberGenerator;
     private RegionalProcessingCenterService regionalProcessingCenterService;
+    private TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
 
     @Autowired
     TribunalsService(CcdService ccdService,
                      EmailService emailService, SubmitYourAppealEmail email,
                      SubmitYourAppealToCcdCaseDataDeserializer transformer,
                      AppealNumberGenerator appealNumberGenerator,
-                     RegionalProcessingCenterService regionalProcessingCenterService) {
+                     RegionalProcessingCenterService regionalProcessingCenterService,
+                     TrackYourAppealJsonBuilder trackYourAppealJsonBuilder) {
         this.ccdService = ccdService;
         this.emailService = emailService;
         this.email = email;
         this.transformer = transformer;
         this.appealNumberGenerator = appealNumberGenerator;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
+        this.trackYourAppealJsonBuilder = trackYourAppealJsonBuilder;
     }
 
     public CaseDetails submitAppeal(SyaCaseWrapper syaCaseWrapper) throws CcdException {
@@ -57,7 +60,7 @@ public class TribunalsService {
         CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
         RegionalProcessingCenter regionalProcessingCenter =
                 regionalProcessingCenterService.getByScReferenceCode(caseByAppealNumber.getCaseReference());
-        return TrackYourAppealJsonBuilder.buildTrackYourAppealJson(
+        return trackYourAppealJsonBuilder.build(
                 caseByAppealNumber, regionalProcessingCenter);
     }
 

@@ -13,10 +13,10 @@ import lombok.Value;
 @Value
 @Builder
 public class Evidence {
-    private List<Documents> documents;
+    private List<Document> documents;
 
     @JsonCreator
-    public Evidence(@JsonProperty("documents") List<Documents> documents) {
+    public Evidence(@JsonProperty("documents") List<Document> documents) {
         this.documents = documents;
     }
 }

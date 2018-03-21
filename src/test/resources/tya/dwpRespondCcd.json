@@ -12,6 +12,26 @@
       "code": "ESA"
     }
   },
+  "evidence": {
+    "documents": [
+      {
+        "value": {
+          "dateReceived": "2017-03-10",
+          "description": "1",
+          "evidenceType": "EvidenceType1",
+          "evidenceProvidedBy": "Appellant1"
+        }
+      },
+      {
+        "value": {
+          "dateReceived": "2017-04-12",
+          "description": "1",
+          "evidenceType": "EvidenceType2",
+          "evidenceProvidedBy": "Appellant2"
+        }
+      }
+    ]
+  },
   "events": [
     {
       "value": {

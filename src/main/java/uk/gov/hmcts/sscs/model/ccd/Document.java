@@ -10,14 +10,16 @@ import lombok.Value;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @Builder
-public class Doc {
-    private String dateReceived;
-    private String description;
+public class Document implements Comparable<Document> {
+    private DocumentDetails value;
 
     @JsonCreator
-    public Doc(@JsonProperty("dateReceived") String dateReceived,
-               @JsonProperty("description") String description) {
-        this.dateReceived = dateReceived;
-        this.description = description;
+    public Document(@JsonProperty("value") DocumentDetails value) {
+        this.value = value;
+    }
+
+    @Override
+    public int compareTo(Document o) {
+        return value.getDateReceived().compareTo(o.getValue().getDateReceived());
     }
 }
