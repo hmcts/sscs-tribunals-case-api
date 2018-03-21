@@ -60,7 +60,7 @@ public class TribunalsService {
         CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
         RegionalProcessingCenter regionalProcessingCenter =
                 regionalProcessingCenterService.getByScReferenceCode(caseByAppealNumber.getCaseReference());
-        return trackYourAppealJsonBuilder.buildTrackYourAppealJson(
+        return trackYourAppealJsonBuilder.build(
                 caseByAppealNumber, regionalProcessingCenter);
     }
 

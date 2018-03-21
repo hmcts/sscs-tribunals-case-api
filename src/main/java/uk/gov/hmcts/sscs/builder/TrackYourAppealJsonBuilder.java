@@ -28,12 +28,15 @@ import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 @Service
 public class TrackYourAppealJsonBuilder {
 
-    public ObjectNode buildTrackYourAppealJson(CaseData caseData,
-                                                      RegionalProcessingCenter regionalProcessingCenter) {
+    private Map<Event, Document> eventDocumentMap;
+    private Map<Event, Hearing> eventHearingMap;
+
+    public ObjectNode build(CaseData caseData,
+                            RegionalProcessingCenter regionalProcessingCenter) {
 
         caseData.getEvents().sort(Comparator.reverseOrder());
-        final Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
-        final Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+        eventDocumentMap = buildEventDocumentMap(caseData);
+        eventHearingMap = buildEventHearingMap(caseData);
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -47,12 +50,10 @@ public class TrackYourAppealJsonBuilder {
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
-        caseNode.set("latestEvents",
-                buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
+        caseNode.set("latestEvents", buildEventArray(latestEvents));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
-            caseNode.set("historicalEvents",
-                    buildEventArray(historicalEvents, eventDocumentMap, eventHearingMap));
+            caseNode.set("historicalEvents", buildEventArray(historicalEvents));
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
@@ -62,9 +63,7 @@ public class TrackYourAppealJsonBuilder {
         return root;
     }
 
-    private ArrayNode buildEventArray(List<Event> events,
-                                             Map<Event, Document> eventDocumentMap,
-                                             Map<Event, Hearing> eventHearingMap) {
+    private ArrayNode buildEventArray(List<Event> events) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
@@ -75,7 +74,7 @@ public class TrackYourAppealJsonBuilder {
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY,"status." + getEventType(event).getType());
 
-            buildEventNode(event, eventNode, eventDocumentMap, eventHearingMap);
+            buildEventNode(event, eventNode);
 
             eventsNode.add(eventNode);
         }
@@ -118,9 +117,7 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private void buildEventNode(Event event, ObjectNode eventNode,
-                                       Map<Event, Document> eventDocumentMap,
-                                       Map<Event, Hearing> eventHearingMap) {
+    private void buildEventNode(Event event, ObjectNode eventNode) {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED :
@@ -235,7 +232,7 @@ public class TrackYourAppealJsonBuilder {
 
     private Map<Event, Document> buildEventDocumentMap(CaseData caseData) {
 
-        Map<Event, Document> eventDocumentMap = new HashMap<>();
+        eventDocumentMap = new HashMap<>();
         Evidence evidence = caseData.getEvidence();
         List<Document> documentList = evidence != null ? evidence.getDocuments() : null;
 
@@ -260,7 +257,7 @@ public class TrackYourAppealJsonBuilder {
 
     private Map<Event, Hearing> buildEventHearingMap(CaseData caseData) {
 
-        Map<Event, Hearing> eventHearingMap = new HashMap<>();
+        eventHearingMap = new HashMap<>();
         List<Hearing> hearingList = caseData.getHearings();
 
         if (hearingList != null && !hearingList.isEmpty()) {
