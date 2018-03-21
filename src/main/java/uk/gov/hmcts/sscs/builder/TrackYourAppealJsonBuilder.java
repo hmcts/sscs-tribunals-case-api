@@ -25,8 +25,6 @@ import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilder {
 
-    private static Map<Event, Document> eventDocumentMap;
-
     private TrackYourAppealJsonBuilder() {
 
     }
@@ -35,7 +33,7 @@ public class TrackYourAppealJsonBuilder {
                                                       RegionalProcessingCenter regionalProcessingCenter) {
 
         caseData.getEvents().sort(Comparator.reverseOrder());
-        eventDocumentMap = buildEventDocumentMap(caseData);
+        final Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseReference", caseData.getCaseReference());
@@ -49,10 +47,10 @@ public class TrackYourAppealJsonBuilder {
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
-        caseNode.set("latestEvents", buildEventArray(latestEvents, caseData));
+        caseNode.set("latestEvents", buildEventArray(latestEvents, caseData, eventDocumentMap));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
-            caseNode.set("historicalEvents", buildEventArray(historicalEvents, caseData));
+            caseNode.set("historicalEvents", buildEventArray(historicalEvents, caseData, eventDocumentMap));
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
@@ -62,7 +60,8 @@ public class TrackYourAppealJsonBuilder {
         return root;
     }
 
-    private static ArrayNode buildEventArray(List<Event> events, CaseData caseData) {
+    private static ArrayNode buildEventArray(List<Event> events, CaseData caseData,
+                                             Map<Event, Document> eventDocumentMap) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
@@ -73,7 +72,7 @@ public class TrackYourAppealJsonBuilder {
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY,"status." + getEventType(event).getType());
 
-            buildEventNode(event, eventNode, caseData);
+            buildEventNode(event, eventNode, caseData, eventDocumentMap);
 
             eventsNode.add(eventNode);
         }
@@ -116,7 +115,8 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private static void buildEventNode(Event event, ObjectNode eventNode, CaseData caseData) {
+    private static void buildEventNode(Event event, ObjectNode eventNode, CaseData caseData,
+                                       Map<Event, Document> eventDocumentMap) {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED :
