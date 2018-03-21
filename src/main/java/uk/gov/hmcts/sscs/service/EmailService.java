@@ -29,7 +29,6 @@ public class EmailService {
             backoff = @Backoff(delay = 100, maxDelay = 500))
     public void sendEmail(final Email email) {
         try {
-            log.info("****EmailService***** About to send an email");
             final MimeMessage message = javaMailSender.createMimeMessage();
             final MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true);
 
@@ -47,8 +46,8 @@ public class EmailService {
             }
 
             javaMailSender.send(message);
-            log.info("****EmailService***** Email successfully sent");
         } catch (Exception e) {
+            log.error("Error while sending email" + e);
             throw new EmailSendFailedException(e);
         }
     }
