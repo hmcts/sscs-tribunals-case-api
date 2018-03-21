@@ -21,6 +21,9 @@ import uk.gov.hmcts.sscs.service.ccd.UpdateCoreCaseDataService;
 public class CcdService {
     private static final Logger LOG = getLogger(CcdService.class);
     public static final String YES = "yes";
+    public static final String NO = "no";
+    public static final String EMPTY_STRING = "";
+    public static final String SUBSCRIPTION_UPDATED = "subscriptionUpdated";
 
     private ReadCoreCaseDataService readCoreCaseDataService;
     private CreateCoreCaseDataService createCoreCaseDataService;
@@ -73,21 +76,28 @@ public class CcdService {
         }
     }
 
-    public String unsubscribe(String appealNumber, String reason) throws CcdException {
+    public String unsubscribe(String appealNumber) throws CcdException {
 
         String benefitType = null;
         try {
-            CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
-            //The following need to be implemented as per CCD def for subscriptions
-            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription();
-            subscription.toBuilder().subscribeEmail("No").subscribeSms("No").reason(reason);
-            caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build();
+            CaseDetails caseDetails = findCcdCaseDetailsByAppealNumber(appealNumber);
 
-            createCase(caseData);
-            benefitType = caseData.getAppeal().getBenefitType().getCode();
+            if (caseDetails != null) {
+                CaseData caseData = CcdUtil.getCaseData(caseDetails.getData());
+
+                Subscription appellantSubscription = caseData.getSubscriptions().getAppellantSubscription();
+                appellantSubscription.setEmail(EMPTY_STRING);
+                appellantSubscription.setSubscribeEmail(NO);
+
+                caseData.getSubscriptions().setAppellantSubscription(appellantSubscription);
+
+                Long caseId = caseDetails.getId();
+                updateCase(caseData, caseId, SUBSCRIPTION_UPDATED);
+                benefitType = caseData.getAppeal().getBenefitType().getCode();
+            }
         } catch (Exception ex) {
-            LOG.error("Error while unsubscribing case from ccd: ", ex);
-            throw new CcdException("Error while unsubscribing case from ccd: " + ex.getMessage());
+            LOG.error("Error while un subscribing details in ccd: ", ex);
+            throw new CcdException("Error while updating case in ccd: " + ex.getMessage());
         }
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
@@ -110,7 +120,7 @@ public class CcdService {
                 caseData.getSubscriptions().setAppellantSubscription(appellantSubscription);
 
                 Long caseId = caseDetails.getId();
-                updateCase(caseData, caseId, "subscriptionUpdated");
+                updateCase(caseData, caseId, SUBSCRIPTION_UPDATED);
                 benefitType = caseData.getAppeal().getBenefitType().getCode();
             }
         } catch (Exception ex) {

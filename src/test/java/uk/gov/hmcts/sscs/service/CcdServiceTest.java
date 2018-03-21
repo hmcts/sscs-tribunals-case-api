@@ -83,16 +83,6 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldUnsubscribeFromCcd() throws Exception {
-
-        String benefitType = ccdService.unsubscribe(anyString(), "reason");
-
-        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
-
-        assertEquals(BENEFIT_TYPE, benefitType);
-    }
-
-    @Test
     public void shouldUpdateSubscriptionInCcd() throws Exception {
         when(readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(anyString()))
                 .thenReturn(CaseDataUtils.buildCaseDetails());
@@ -136,6 +126,20 @@ public class CcdServiceTest {
         assertNotNull(caseDetails);
         verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class),
                 anyLong(),anyString());
+    }
+
+    @Test
+    public void shouldUnSubscribeEmailNotification() throws Exception {
+        when(readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(anyString()))
+                .thenReturn(CaseDataUtils.buildCaseDetails());
+
+
+        String benefitType = ccdService.unsubscribe(anyString());
+
+        verify(readCoreCaseDataService).getCcdCaseDetailsByAppealNumber(anyString());
+        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class), anyLong(), anyString());
+
+        assertEquals(BENEFIT_TYPE, benefitType);
     }
 
     private SubscriptionRequest getSubscriptionRequest() {

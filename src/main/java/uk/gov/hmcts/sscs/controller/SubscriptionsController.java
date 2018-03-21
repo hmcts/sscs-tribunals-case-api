@@ -48,28 +48,29 @@ public class SubscriptionsController {
         return ok(json);
     }
 
-    @ApiOperation(value = "unsubscribe", notes = "Removes subscription and returns benefit type in the response json",
-            response = String.class, responseContainer = "Unsubscribed appeal benefit type")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Removed subscription", response = String.class)})
-    @ResponseBody
-    @RequestMapping(value = "/appeals/{appealNumber}/subscribe/reason/{reason}", method = DELETE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> unsubscribe(@PathVariable String appealNumber, @PathVariable String reason)
-            throws CcdException {
-        String benefitType = tribunalsService.unsubscribe(appealNumber, reason);
+    @ApiOperation(value = "UpdateSubscription",
+            response = String.class, responseContainer = "benefit type for the updated subscription")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Updated subscription", response = String.class)})
+    @RequestMapping(value = "/appeals/{appealNumber}/subscriptions/{subscriptionId}",
+            method = POST, consumes = APPLICATION_JSON_VALUE,
+            produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> updateSubscription(@RequestBody SubscriptionRequest subscriptionRequest,
+                                                     @PathVariable String appealNumber,
+                                                   @PathVariable String subscriptionId) throws CcdException {
+        String benefitType = tribunalsService.updateSubscription(appealNumber, subscriptionRequest);
         return ok().body(format(BENEFIT_TYPE_FORMAT, benefitType));
     }
 
-
-    @ApiOperation(value = "oldUpdateSubscription",
-            notes = "Old endpoint for updating subscription of an appellant for an appeal "
-                    + "and returns benefit type in the response json",
-            response = String.class, responseContainer = "benefit type for the updated subscription")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Updated subscription", response = String.class)})
-    @RequestMapping(value = "/appeals/{appealNumber}/subscriptions/{subscriptionId}", method = POST, consumes = APPLICATION_JSON_VALUE,
-            produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateSubscription(@RequestBody SubscriptionRequest subscriptionRequest, @PathVariable String appealNumber,
-                                                   @PathVariable String subscriptionId) throws CcdException {
-        String benefitType = tribunalsService.updateSubscription(appealNumber, subscriptionRequest);
-        return ok().body(format("{\"benefitType\":\"%s\"}", benefitType));
+    @ApiOperation(value = "Unsubscribe email notification",
+            response = String.class, responseContainer = "unsubscribed appeal benefit type")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Removed email notification "
+            + "subscription", response = String.class)})
+    @ResponseBody
+    @RequestMapping(value = "/appeals/{id}/subscriptions/{subscriptionId}",
+            method = DELETE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> unsubscribe(@PathVariable(value = "id") String appealNumber,
+                                         @PathVariable String subscriptionId) throws CcdException {
+        String benefitType = tribunalsService.unsubscribe(appealNumber);
+        return ok().body(format(BENEFIT_TYPE_FORMAT, benefitType));
     }
 }
