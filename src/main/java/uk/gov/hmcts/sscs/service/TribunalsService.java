@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
@@ -58,6 +59,9 @@ public class TribunalsService {
 
     public ObjectNode findAppeal(String appealNumber) throws CcdException {
         CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
+        if (caseByAppealNumber == null) {
+            throw new AppealNotFoundException(appealNumber);
+        }
         RegionalProcessingCenter regionalProcessingCenter =
                 regionalProcessingCenterService.getByScReferenceCode(caseByAppealNumber.getCaseReference());
         return trackYourAppealJsonBuilder.build(

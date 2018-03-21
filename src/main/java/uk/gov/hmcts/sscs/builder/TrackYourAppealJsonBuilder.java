@@ -22,6 +22,7 @@ import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
+import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
@@ -32,9 +33,14 @@ public class TrackYourAppealJsonBuilder {
     private Map<Event, Hearing> eventHearingMap;
 
     public ObjectNode build(CaseData caseData,
-                            RegionalProcessingCenter regionalProcessingCenter) {
+                            RegionalProcessingCenter regionalProcessingCenter) throws CcdException {
 
-        caseData.getEvents().sort(Comparator.reverseOrder());
+        List<Event> eventList = caseData.getEvents();
+        if (eventList == null || eventList.isEmpty()) {
+            throw new CcdException("No events exists for this appeal");
+        }
+
+        eventList.sort(Comparator.reverseOrder());
         eventDocumentMap = buildEventDocumentMap(caseData);
         eventHearingMap = buildEventHearingMap(caseData);
 

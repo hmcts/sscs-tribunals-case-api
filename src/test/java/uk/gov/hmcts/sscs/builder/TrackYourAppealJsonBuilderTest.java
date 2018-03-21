@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
 
+import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
@@ -21,7 +22,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void appealReceivedTest() {
+    public void appealReceivedTest() throws CcdException {
         CaseData caseData = APPEAL_RECEIVED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -29,7 +30,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void dwpRespondTest() {
+    public void dwpRespondTest() throws CcdException {
         CaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -37,7 +38,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void hearingBookedTest() {
+    public void hearingBookedTest() throws CcdException {
         CaseData caseData = HEARING_BOOKED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -45,7 +46,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void adjournedTest() {
+    public void adjournedTest() throws CcdException {
         CaseData caseData = ADJOURNED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -53,7 +54,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void dormantTest() {
+    public void dormantTest() throws CcdException {
         CaseData caseData = DORMANT_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -61,7 +62,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void hearingTest() {
+    public void hearingTest() throws CcdException {
         CaseData caseData = HEARING_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -69,7 +70,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void newHearingBookedTest() {
+    public void newHearingBookedTest() throws CcdException {
         CaseData caseData = NEW_HEARING_BOOKED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -77,7 +78,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void pastHearingBookedTest() {
+    public void pastHearingBookedTest() throws CcdException {
         CaseData caseData = PAST_HEARING_BOOKED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -85,7 +86,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void dwpRespondOverdueTest() {
+    public void dwpRespondOverdueTest() throws CcdException {
         CaseData caseData = DWP_RESPOND_OVERDUE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -93,7 +94,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void postponedTest() {
+    public void postponedTest() throws CcdException {
         CaseData caseData = POSTPONED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -101,7 +102,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void withdrawnTest() {
+    public void withdrawnTest() throws CcdException {
         CaseData caseData = WITHDRAWN_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -109,7 +110,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void closedTest() {
+    public void closedTest() throws CcdException {
         CaseData caseData = CLOSED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -117,7 +118,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void lapsedRevisedTest() {
+    public void lapsedRevisedTest() throws CcdException {
         CaseData caseData = LAPSED_REVISED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());

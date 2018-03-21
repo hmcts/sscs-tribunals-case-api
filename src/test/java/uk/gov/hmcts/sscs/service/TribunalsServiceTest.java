@@ -18,6 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.Appeal;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
@@ -69,6 +70,13 @@ public class TribunalsServiceTest {
         tribunalsService = new TribunalsService(ccdService,
                 emailService, email, transformer, appealNumberGenerator, regionalProcessingCenterService,
                 trackYourAppealJsonBuilder);
+    }
+
+    @Test(expected = AppealNotFoundException.class)
+    public void shouldThrowExceptionIfAppealNumberNotFound() throws CcdException {
+        given(ccdService.findCcdCaseByAppealNumber(APPEAL_NUMBER)).willReturn(null);
+
+        tribunalsService.findAppeal(APPEAL_NUMBER);
     }
 
     @Test
