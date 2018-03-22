@@ -63,7 +63,7 @@ public class TribunalsService {
     public ObjectNode findAppeal(String appealNumber) throws CcdException {
         CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
         if (caseByAppealNumber == null) {
-            log.info("Appeal not exists");
+            log.info("Appeal not exists for appeal number: " + appealNumber);
             throw new AppealNotFoundException(appealNumber);
         }
         RegionalProcessingCenter regionalProcessingCenter =
@@ -83,7 +83,7 @@ public class TribunalsService {
     public boolean validateSurname(String appealNumber, String surname) throws CcdException {
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname);
         if (caseData == null) {
-            log.info("Not a valid surname");
+            log.info("Not a valid surname: " + surname);
             throw new InvalidSurnameException();
         }
         return true;

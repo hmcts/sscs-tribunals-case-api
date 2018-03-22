@@ -18,6 +18,8 @@ import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 @SpringBootTest
 public class ReadCaseFromCcdTest {
 
+    private static final String APPEAL_NUMBER = "abcde12345";
+
     @Autowired
     private ReadCoreCaseDataService readCoreCaseDataService;
 
@@ -25,20 +27,26 @@ public class ReadCaseFromCcdTest {
     private CcdService ccdService;
 
     @Test
-    public void givenACaseId_shouldRetrieveCaseDetails() {
+    public void givenACaseIdShouldRetrieveCaseDetails() {
         CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByCaseId("1520966754095462");
         assertNotNull(caseDetails);
     }
 
     @Test
-    public void givenAnAppealNumber_shouldRetrieveCaseDetails() {
-        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByAppealNumber("abcde12345");
+    public void givenAnAppealNumberShouldRetrieveCaseDetails() {
+        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(APPEAL_NUMBER);
         assertNotNull(caseDetails);
     }
 
     @Test
-    public void givenAnAppealNumber_shouldRetrieveCaseDetails_service() throws CcdException {
-        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname("abcde12345", "Test");
+    public void givenAnAppealNumberandSurnameShouldRetrieveCaseDetailsUsingCcdService() throws CcdException {
+        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, "test");
+        assertNotNull(caseData);
+    }
+
+    @Test
+    public void givenAnAppealNumberShouldRetrieveCaseDetailsUsingCcdService() throws CcdException {
+        CaseData caseData = ccdService.findCcdCaseByAppealNumber(APPEAL_NUMBER);
         assertNotNull(caseData);
     }
 

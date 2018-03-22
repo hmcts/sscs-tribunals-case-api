@@ -134,7 +134,7 @@ public class CcdService {
     public CaseData findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) throws CcdException {
         CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
         if (caseData == null) {
-            LOG.info("Appeal not exists");
+            LOG.info("Appeal not exists for appeal number: {}", appealNumber);
             throw new AppealNotFoundException(appealNumber);
         }
         return caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null
