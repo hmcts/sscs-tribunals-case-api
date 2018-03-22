@@ -43,14 +43,10 @@ public class CoreCaseDataService {
     }
 
     protected String generateServiceAuthorization() {
-
-        String s2sToken = authTokenGenerator.generate();
-        log.info("s2s Token: {}", s2sToken);
-        return s2sToken;
+        return authTokenGenerator.generate();
     }
 
     private String getIdamOauth2Token() {
-        log.info("getIdamOauth2Token...");
         String authorisation = idamProperties.getOauth2().getUser().getEmail()
             + ":" + idamProperties.getOauth2().getUser().getPassword();
         String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
@@ -70,9 +66,7 @@ public class CoreCaseDataService {
             idamProperties.getOauth2().getClient().getSecret()
         );
 
-        String oauth2Token = "Bearer " + authorizeToken.getAccessToken();
-        log.info("oauth2Token: " + oauth2Token);
-        return oauth2Token;
+        return  "Bearer " + authorizeToken.getAccessToken();
     }
 
     protected EventRequestData getEventRequestData(String eventId) {

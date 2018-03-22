@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
+import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.CcdUtil;
@@ -20,10 +21,10 @@ import uk.gov.hmcts.sscs.service.ccd.UpdateCoreCaseDataService;
 @Service
 public class CcdService {
     private static final Logger LOG = getLogger(CcdService.class);
-    public static final String YES = "yes";
-    public static final String NO = "no";
-    public static final String EMPTY_STRING = "";
-    public static final String SUBSCRIPTION_UPDATED = "subscriptionUpdated";
+    private static final String YES = "yes";
+    private static final String NO = "no";
+    private static final String EMPTY_STRING = "";
+    private static final String SUBSCRIPTION_UPDATED = "subscriptionUpdated";
 
     private ReadCoreCaseDataService readCoreCaseDataService;
     private CreateCoreCaseDataService createCoreCaseDataService;
@@ -132,9 +133,15 @@ public class CcdService {
 
     public CaseData findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) throws CcdException {
         CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
-        return caseData != null && caseData.getAppeal().getAppellant().getName().getLastName().equalsIgnoreCase(surname)
+        if (caseData == null) {
+            LOG.info("Appeal not exists for appeal number: {}", appealNumber);
+            throw new AppealNotFoundException(appealNumber);
+        }
+        return caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null
+                && caseData.getAppeal().getAppellant().getName() != null
+                && caseData.getAppeal().getAppellant().getName().getLastName() != null
+                && caseData.getAppeal().getAppellant().getName().getLastName().equalsIgnoreCase(surname)
                 ? caseData : null;
-
     }
 
     private CaseDetails findCcdCaseDetailsByAppealNumber(String appealNumber) throws CcdException {

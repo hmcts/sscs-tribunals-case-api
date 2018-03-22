@@ -2,6 +2,8 @@ package uk.gov.hmcts.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +11,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @Service
+@Slf4j
 public class TribunalsService {
     private CcdService ccdService;
     private EmailService emailService;
@@ -52,12 +56,16 @@ public class TribunalsService {
         return caseDetails;
     }
 
-    public CaseDetails saveAppeal(CaseData caseData) throws CcdException {
+    private CaseDetails saveAppeal(CaseData caseData) throws CcdException {
         return ccdService.createCase(caseData);
     }
 
     public ObjectNode findAppeal(String appealNumber) throws CcdException {
         CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
+        if (caseByAppealNumber == null) {
+            log.info("Appeal not exists for appeal number: " + appealNumber);
+            throw new AppealNotFoundException(appealNumber);
+        }
         RegionalProcessingCenter regionalProcessingCenter =
                 regionalProcessingCenterService.getByScReferenceCode(caseByAppealNumber.getCaseReference());
         return trackYourAppealJsonBuilder.build(
@@ -75,6 +83,7 @@ public class TribunalsService {
     public boolean validateSurname(String appealNumber, String surname) throws CcdException {
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname);
         if (caseData == null) {
+            log.info("Not a valid surname: " + surname);
             throw new InvalidSurnameException();
         }
         return true;
