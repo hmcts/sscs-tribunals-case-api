@@ -16,7 +16,7 @@
     {
       "value": {
         "date": "2017-06-29T12:50:11.437",
-        "type": "pastHearingBooked",
+        "type": "responseReceived",
         "description": "Past hearing booked"
       }
     },

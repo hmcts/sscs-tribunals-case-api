@@ -16,7 +16,7 @@
     {
       "value": {
         "date": "2017-03-02T17:27:50.297",
-        "type": "appealClosed",
+        "type": "appealDormant",
         "description": "Closed"
       }
     }

@@ -42,6 +42,7 @@ public class TrackYourAppealJsonBuilder {
         }
 
         eventList.sort(Comparator.reverseOrder());
+        processExceptions(caseData.getEvents());
         eventDocumentMap = buildEventDocumentMap(caseData);
         eventHearingMap = buildEventHearingMap(caseData);
 
@@ -68,6 +69,55 @@ public class TrackYourAppealJsonBuilder {
         root.set("appeal", caseNode);
 
         return root;
+    }
+
+    private void processExceptions(List<Event> eventList) {
+        if (null != eventList && !eventList.isEmpty()) {
+
+            Event currentEvent = eventList.get(0);
+
+            if (isPastHearingBookedDate(currentEvent)) {
+                setLatestEventAs(eventList, currentEvent, PAST_HEARING_BOOKED);
+            } else if (isNewHearingBookedEvent(eventList)) {
+                setLatestEventAs(eventList, currentEvent, NEW_HEARING_BOOKED);
+            } else if (isAppealClosed(currentEvent)) {
+                setLatestEventAs(eventList, currentEvent, CLOSED);
+            } else if (isDwpRespondOverdue(currentEvent)) {
+                setLatestEventAs(eventList, currentEvent, DWP_RESPOND_OVERDUE);
+            }
+        }
+    }
+
+    private void setLatestEventAs(List<Event> eventList, Event currentEvent, EventType eventType) {
+        Event event = Event.builder().value(currentEvent.getValue().toBuilder().type(eventType
+                .getCcdType()).build()).build();
+        eventList.set(0, event);
+    }
+
+    private boolean isPastHearingBookedDate(Event event) {
+        return DWP_RESPOND.equals(getEventType(event))
+                && LocalDateTime.now().isAfter(
+                LocalDateTime.parse(event.getValue().getDate()).plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS));
+    }
+
+    private boolean isNewHearingBookedEvent(List<Event> eventList) {
+        return eventList.size() > 1
+                && HEARING_BOOKED.equals(getEventType(eventList.get(0)))
+                && (POSTPONED.equals(getEventType(eventList.get(1)))
+                || ADJOURNED.equals(getEventType(eventList.get(1))));
+    }
+
+    private boolean isAppealClosed(Event event) {
+        return DORMANT.equals(getEventType(event))
+                && LocalDateTime.now().isAfter(
+                LocalDateTime.parse(event.getValue().getDate()).plusMonths(
+                        DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
+    }
+
+    private boolean isDwpRespondOverdue(Event event) {
+        return APPEAL_RECEIVED.equals(getEventType(event))
+                && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
+                MAX_DWP_RESPONSE_DAYS));
     }
 
     private ArrayNode buildEventArray(List<Event> events) {

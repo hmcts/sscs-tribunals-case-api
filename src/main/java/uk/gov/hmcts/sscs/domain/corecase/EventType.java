@@ -45,6 +45,10 @@ public enum EventType {
         return type;
     }
 
+    public String getCcdType() {
+        return ccdType;
+    }
+
     public int getOrder() {
         return order;
     }
