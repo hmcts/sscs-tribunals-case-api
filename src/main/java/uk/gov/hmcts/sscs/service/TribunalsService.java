@@ -2,6 +2,8 @@ package uk.gov.hmcts.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @Service
+@Slf4j
 public class TribunalsService {
     private CcdService ccdService;
     private EmailService emailService;
@@ -53,13 +56,14 @@ public class TribunalsService {
         return caseDetails;
     }
 
-    public CaseDetails saveAppeal(CaseData caseData) throws CcdException {
+    private CaseDetails saveAppeal(CaseData caseData) throws CcdException {
         return ccdService.createCase(caseData);
     }
 
     public ObjectNode findAppeal(String appealNumber) throws CcdException {
         CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
         if (caseByAppealNumber == null) {
+            log.info("Appeal not exists");
             throw new AppealNotFoundException(appealNumber);
         }
         RegionalProcessingCenter regionalProcessingCenter =
@@ -79,6 +83,7 @@ public class TribunalsService {
     public boolean validateSurname(String appealNumber, String surname) throws CcdException {
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname);
         if (caseData == null) {
+            log.info("Invalid surname or appealNumber");
             throw new InvalidSurnameException();
         }
         return true;
