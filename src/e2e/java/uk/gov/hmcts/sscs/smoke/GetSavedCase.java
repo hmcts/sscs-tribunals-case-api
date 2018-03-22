@@ -21,10 +21,10 @@ public class GetSavedCase {
                 .when()
                 .get("/appeals/" + sscsAppealNumber)
                 .then()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .and()
                 .extract().body().asString();
         assertThat(response).doesNotContain("Error while getting case from ccdConnect");
-        assertThat(response).contains("No message available");
+        assertThat(response).contains("No appeal for given id");
     }
 }
