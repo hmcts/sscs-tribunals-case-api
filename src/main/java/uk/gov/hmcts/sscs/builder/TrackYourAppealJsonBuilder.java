@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
+import uk.gov.hmcts.sscs.util.DateTimeUtils;
 
 @Service
 public class TrackYourAppealJsonBuilder {
@@ -143,7 +144,7 @@ public class TrackYourAppealJsonBuilder {
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
-                            getHearingDateTime(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                            DateTimeUtils.convertLocalDateTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
                     eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
                     eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
                     eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
