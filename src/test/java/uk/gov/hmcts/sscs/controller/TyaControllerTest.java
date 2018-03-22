@@ -21,9 +21,9 @@ import uk.gov.hmcts.sscs.service.TribunalsService;
 @RunWith(MockitoJUnitRunner.class)
 public class TyaControllerTest {
 
-    public static final String APPEAL_ID = "appeal-id";
-    public static final String SURNAME = "surname";
-    public static final String NOT_FOUND_APPEAL_ID = "not-found-appeal-id";
+    private static final String APPEAL_ID = "appeal-id";
+    private static final String SURNAME = "surname";
+    private static final String NOT_FOUND_APPEAL_ID = "not-found-appeal-id";
 
     @Mock
     private TribunalsService tribunalsService;
