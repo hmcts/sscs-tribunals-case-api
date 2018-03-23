@@ -15,13 +15,6 @@
   "events": [
     {
       "value": {
-        "date": "2017-03-10T13:00:42.233",
-        "type": "responseOverdue",
-        "description": "Dwp respond overdue"
-      }
-    },
-    {
-      "value": {
         "date": "2017-03-08T12:01:47.620",
         "type": "appealReceived",
         "description": "Appeal received"

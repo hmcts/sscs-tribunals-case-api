@@ -33,7 +33,7 @@
     {
       "value": {
         "date": "2017-06-26T14:11:34.013",
-        "type": "newHearingBooked",
+        "type": "hearingBooked",
         "description": "New hearing booked"
       }
     },
