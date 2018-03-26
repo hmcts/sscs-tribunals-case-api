@@ -10,7 +10,7 @@
       {
         "evidenceType": "EvidenceType2",
         "evidenceProvidedBy": "Appellant2",
-        "date": "2017-04-12T13:00:42.233Z",
+        "date": "2017-04-12T00:00:00.000Z",
         "type": "EVIDENCE_RECEIVED",
         "contentKey": "status.evidenceReceived"
       },
@@ -25,7 +25,7 @@
       {
         "evidenceType": "EvidenceType1",
         "evidenceProvidedBy": "Appellant1",
-        "date": "2017-03-10T12:01:47.620Z",
+        "date": "2017-03-10T00:00:00.000Z",
         "type": "EVIDENCE_RECEIVED",
         "contentKey": "status.evidenceReceived"
       },

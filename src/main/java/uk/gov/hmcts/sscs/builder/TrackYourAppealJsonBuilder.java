@@ -41,6 +41,7 @@ public class TrackYourAppealJsonBuilder {
             throw new CcdException("No events exists for this appeal");
         }
 
+        createEvidenceResponseEvents(caseData);
         eventList.sort(Comparator.reverseOrder());
         processExceptions(caseData.getEvents());
         eventDocumentMap = buildEventDocumentMap(caseData);
@@ -285,6 +286,29 @@ public class TrackYourAppealJsonBuilder {
         dateCalculator.setStartDate(startDate);
         LocalDate decisionDate = dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
         return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
+    }
+
+    private void createEvidenceResponseEvents(CaseData caseData) {
+        Evidence evidence = caseData.getEvidence();
+        List<Document> documentList = evidence != null ? evidence.getDocuments() : null;
+
+        if (documentList != null && !documentList.isEmpty()) {
+            List<Event> events = new ArrayList<>();
+            for (Document document : documentList) {
+                if (document != null && document.getValue() != null) {
+                    EventDetails eventDetails = EventDetails.builder()
+                            .date(document.getValue().getDateReceived() + "T00:00:00.000")
+                            .type(EventType.EVIDENCE_RECEIVED.getCcdType())
+                            .description("Evidence received")
+                            .build();
+
+                    events.add(Event.builder()
+                            .value(eventDetails)
+                            .build());
+                }
+            }
+            caseData.getEvents().addAll(events);
+        }
     }
 
     private Map<Event, Document> buildEventDocumentMap(CaseData caseData) {

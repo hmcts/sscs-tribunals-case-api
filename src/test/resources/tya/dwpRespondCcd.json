@@ -35,23 +35,9 @@
   "events": [
     {
       "value": {
-        "date": "2017-04-12T13:00:42.233",
-        "type": "evidenceReceived",
-        "description": "Evidence received"
-      }
-    },
-    {
-      "value": {
         "date": "2017-04-10T12:01:47.620",
         "type": "responseReceived",
         "description": "Dwp respond"
-      }
-    },
-    {
-      "value": {
-        "date": "2017-03-10T12:01:47.620",
-        "type": "evidenceReceived",
-        "description": "Evidence received"
       }
     },
     {
