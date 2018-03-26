@@ -9,7 +9,7 @@ public enum EventType {
     HEARING_BOOKED("hearingBooked", "hearingBooked", 3, true),
     HEARING("hearing", "hearing", 4, false),
     ADJOURNED("adjourned", "hearingAdjourned", 5, true),
-    LAPSED_REVISED("lapsedRevised", "lapsedRevised", 6, true),
+    LAPSED_REVISED("lapsedRevised", "appealLapsed", 6, true),
     WITHDRAWN("withdrawn", "appealWithdrawn", 7, true),
     POSTPONED("postponed", "hearingPostponed",8, true),
     NEW_HEARING_BOOKED("newHearingBooked", "newHearingBooked", 9, true),
