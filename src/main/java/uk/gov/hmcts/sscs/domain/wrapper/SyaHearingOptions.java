@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Arrays;
 
-public class SyaHearing {
+public class SyaHearingOptions {
 
     private Boolean scheduleHearing;
 
@@ -14,12 +14,16 @@ public class SyaHearing {
 
     private Boolean wantsToAttend;
 
+    private String interpreterLanguageType;
+
+    private String signLanguageType;
+
     private String[] datesCantAttend;
 
     @JsonProperty("arrangements")
     private SyaArrangements arrangements;
 
-    public SyaHearing() {
+    public SyaHearingOptions() {
         // For JSON
     }
 
@@ -80,6 +84,24 @@ public class SyaHearing {
                 + ", wantsToAttend=" + wantsToAttend
                 + ", datesCantAttend=" + Arrays.toString(datesCantAttend)
                 + ", arrangements=" + arrangements
+                + ", interpreterLanguageType=" + interpreterLanguageType
+                + ", signLanguageType=" + signLanguageType
                 + '}';
+    }
+
+    public String getInterpreterLanguageType() {
+        return interpreterLanguageType;
+    }
+
+    public void setInterpreterLanguageType(String interpreterLanguageType) {
+        this.interpreterLanguageType = interpreterLanguageType;
+    }
+
+    public String getSignLanguageType() {
+        return signLanguageType;
+    }
+
+    public void setSignLanguageType(String signLanguageType) {
+        this.signLanguageType = signLanguageType;
     }
 }
