@@ -5,14 +5,13 @@ import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
+import static uk.gov.hmcts.sscs.util.DateTimeUtils.*;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -25,7 +24,6 @@ import uk.gov.hmcts.sscs.domain.corecase.EventType;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
-import uk.gov.hmcts.sscs.util.DateTimeUtils;
 
 @Service
 public class TrackYourAppealJsonBuilder {
@@ -41,6 +39,7 @@ public class TrackYourAppealJsonBuilder {
             throw new CcdException("No events exists for this appeal");
         }
 
+        createEvidenceResponseEvents(caseData);
         eventList.sort(Comparator.reverseOrder());
         processExceptions(caseData.getEvents());
         eventDocumentMap = buildEventDocumentMap(caseData);
@@ -200,7 +199,7 @@ public class TrackYourAppealJsonBuilder {
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
-                            DateTimeUtils.convertLocalDateTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                            convertLocalDateTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
                     eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
                     eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
                     eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
@@ -247,9 +246,8 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private String formatDateTime(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                + "T"
-                + localDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss.SSS'Z'"));
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of(EUROPE_LONDON));
+        return zonedDateTime.format(DateTimeFormatter.ofPattern(UTC_STRING_FORMAT));
     }
 
     private void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode) {
@@ -285,6 +283,29 @@ public class TrackYourAppealJsonBuilder {
         dateCalculator.setStartDate(startDate);
         LocalDate decisionDate = dateCalculator.moveByBusinessDays(numberOfBusinessDays).getCurrentBusinessDate();
         return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
+    }
+
+    private void createEvidenceResponseEvents(CaseData caseData) {
+        Evidence evidence = caseData.getEvidence();
+        List<Document> documentList = evidence != null ? evidence.getDocuments() : null;
+
+        if (documentList != null && !documentList.isEmpty()) {
+            List<Event> events = new ArrayList<>();
+            for (Document document : documentList) {
+                if (document != null && document.getValue() != null) {
+                    EventDetails eventDetails = EventDetails.builder()
+                            .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().toString())
+                            .type(EventType.EVIDENCE_RECEIVED.getCcdType())
+                            .description("Evidence received")
+                            .build();
+
+                    events.add(Event.builder()
+                            .value(eventDetails)
+                            .build());
+                }
+            }
+            caseData.getEvents().addAll(events);
+        }
     }
 
     private Map<Event, Document> buildEventDocumentMap(CaseData caseData) {

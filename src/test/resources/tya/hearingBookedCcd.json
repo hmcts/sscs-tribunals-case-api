@@ -32,7 +32,7 @@
   "evidence": {
     "documents": [{
       "value": {
-        "dateReceived": "2017-06-24",
+        "dateReceived": "2017-06-25",
         "description": "1",
         "evidenceType": "General",
         "evidenceProvidedBy": "Appellant"
@@ -40,13 +40,6 @@
     }]
   },
   "events": [
-    {
-      "value": {
-        "date": "2017-06-24T14:15:34.013",
-        "type": "evidenceReceived",
-        "description": "Evidence received"
-      }
-    },
     {
       "value": {
         "date": "2017-06-24T14:11:34.013",
