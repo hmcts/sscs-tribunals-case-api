@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class  SyaCaseWrapper {
 
     @JsonProperty("hearing")
-    private SyaHearing hearing;
+    private SyaHearingOptions syaHearingOptions;
 
     @JsonProperty("reasonsForAppealing")
     private SyaReasonsForAppealing reasonsForAppealing;
@@ -41,12 +41,12 @@ public class  SyaCaseWrapper {
         // For Json
     }
 
-    public SyaHearing getHearing() {
-        return hearing;
+    public SyaHearingOptions getSyaHearingOptions() {
+        return syaHearingOptions;
     }
 
-    public void setHearing(SyaHearing syaHearing) {
-        this.hearing = syaHearing;
+    public void setSyaHearingOptions(SyaHearingOptions syaHearingOptions) {
+        this.syaHearingOptions = syaHearingOptions;
     }
 
     public SyaReasonsForAppealing getReasonsForAppealing() {
@@ -108,7 +108,7 @@ public class  SyaCaseWrapper {
     @Override
     public String toString() {
         return "SyaCaseWrapper{"
-                +  "hearing=" + hearing
+                +  "syaHearingOptions=" + syaHearingOptions
                 + ", reasonsForAppealing=" + reasonsForAppealing
                 + ", representative=" + representative
                 + ", benefitType='" + benefitType + '\''

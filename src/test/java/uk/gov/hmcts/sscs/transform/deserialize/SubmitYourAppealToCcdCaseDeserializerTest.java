@@ -18,7 +18,7 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
     private SyaCaseWrapper testData;
     private SyaAppellant appellant;
     private SyaReasonsForAppealing reasonsForAppealing;
-    private SyaHearing hearing;
+    private SyaHearingOptions hearingOptions;
     private SyaRepresentative representative;
     private SyaSmsNotify smsNotify;
     private SyaMrn mrn;
@@ -34,7 +34,7 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
 
         testData.setAppellant(setupAppellantData());
         testData.setReasonsForAppealing(setupReasonsForAppealingData());
-        testData.setHearing(setupHearingData());
+        testData.setSyaHearingOptions(setupHearingData());
         testData.setRepresentative(setupRepresentativeData());
         testData.setSmsNotify(setupSmsNotifyData());
         testData.setMrn(setupMrnData());
@@ -79,23 +79,22 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
         return reasonsForAppealing;
     }
 
-    public SyaHearing setupHearingData() {
-        hearing = new SyaHearing();
+    public SyaHearingOptions setupHearingData() {
+        hearingOptions = new SyaHearingOptions();
 
-        hearing.setScheduleHearing(true);
-        hearing.setAnythingElse("Nothing else today.");
-        hearing.setWantsSupport(true);
-        hearing.setWantsToAttend(true);
-        hearing.setDatesCantAttend(new String[] {"25/01/1972"});
+        hearingOptions.setScheduleHearing(true);
+        hearingOptions.setAnythingElse("Nothing else today.");
+        hearingOptions.setWantsSupport(true);
+        hearingOptions.setWantsToAttend(true);
+        hearingOptions.setDatesCantAttend(new String[] {"25/01/1972"});
         SyaArrangements syaArrangements = new SyaArrangements();
-        syaArrangements.setDisabledAccess(true);
         syaArrangements.setHearingLoop(true);
         syaArrangements.setLanguageInterpreter(true);
         syaArrangements.setSignLanguageInterpreter(true);
 
-        hearing.setArrangements(syaArrangements);
+        hearingOptions.setArrangements(syaArrangements);
 
-        return hearing;
+        return hearingOptions;
     }
 
     public SyaRepresentative setupRepresentativeData() {
@@ -178,18 +177,17 @@ public class SubmitYourAppealToCcdCaseDeserializerTest {
                 ccdCase.getReasonsForAppealing().getOtherReasons());
 
         //Hearing
-        assertEquals(hearing.getAnythingElse(), ccdCase.getHearings().get(0)
+        assertEquals(hearingOptions.getAnythingElse(), ccdCase.getHearings().get(0)
                 .getAdditionalInformation());
         assertEquals(true, ccdCase.getHearings().get(0).getLanguageInterpreterRequired());
         assertEquals(true, ccdCase.getHearings().get(0).getSignLanguageRequired());
         assertEquals(true, ccdCase.getHearings().get(0).getHearingLoopRequired());
-        assertEquals(true, ccdCase.getHearings().get(0).getHasDisabilityNeeds());
-        assertEquals(hearing.getDatesCantAttend()[0],
+        assertEquals(hearingOptions.getDatesCantAttend()[0],
                 ccdCase.getHearings().get(0).getExcludeDates()[0].getStart());
-        assertEquals(hearing.getScheduleHearing(),
+        assertEquals(hearingOptions.getScheduleHearing(),
                 ccdCase.getHearings().get(0).getScheduleHearing());
-        assertEquals(hearing.getWantsSupport(), ccdCase.getHearings().get(0).getWantsSupport());
-        assertEquals(hearing.getWantsToAttend(), ccdCase.getHearings().get(0).getWantsToAttend());
+        assertEquals(hearingOptions.getWantsSupport(), ccdCase.getHearings().get(0).getWantsSupport());
+        assertEquals(hearingOptions.getWantsToAttend(), ccdCase.getHearings().get(0).getWantsToAttend());
 
         //Representative
         assertEquals(representative.getContactDetails().getAddressLine1(),

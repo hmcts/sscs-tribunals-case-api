@@ -6,9 +6,11 @@ public class SyaArrangements {
 
     private Boolean languageInterpreter;
 
-    private Boolean disabledAccess;
-
     private Boolean hearingLoop;
+
+    private Boolean accessibleHearingRoom;
+
+    private Boolean other;
 
     public Boolean getSignLanguageInterpreter() {
         return signLanguageInterpreter;
@@ -26,14 +28,6 @@ public class SyaArrangements {
         this.languageInterpreter = languageInterpreter;
     }
 
-    public Boolean getDisabledAccess() {
-        return disabledAccess;
-    }
-
-    public void setDisabledAccess(Boolean disabledAccess) {
-        this.disabledAccess = disabledAccess;
-    }
-
     public Boolean getHearingLoop() {
         return hearingLoop;
     }
@@ -42,13 +36,30 @@ public class SyaArrangements {
         this.hearingLoop = hearingLoop;
     }
 
+    public Boolean getAccessibleHearingRoom() {
+        return accessibleHearingRoom;
+    }
+
+    public void setAccessibleHearingRoom(Boolean accessibleHearingRoom) {
+        this.accessibleHearingRoom = accessibleHearingRoom;
+    }
+
+    public Boolean getOther() {
+        return other;
+    }
+
+    public void setOther(Boolean other) {
+        this.other = other;
+    }
+
     @Override
     public String toString() {
         return "SyaArrangements{"
             + "signLanguageInterpreter=" + signLanguageInterpreter
             + ", languageInterpreter=" + languageInterpreter
-            + ", disabledAccess=" + disabledAccess
             + ", hearingLoop=" + hearingLoop
+            + ", accessibleHearingRoom=" + accessibleHearingRoom
+            + ", other=" + other
             + '}';
     }
 }

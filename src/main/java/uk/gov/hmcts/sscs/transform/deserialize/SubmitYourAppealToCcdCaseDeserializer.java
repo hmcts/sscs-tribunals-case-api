@@ -20,7 +20,7 @@ public class SubmitYourAppealToCcdCaseDeserializer {
                 syaCaseWrapper.getReasonsForAppealing()));
 
         List<Hearing> hearings = new ArrayList<>();
-        hearings.add(convertHearing(syaCaseWrapper.getHearing()));
+        hearings.add(convertHearing(syaCaseWrapper.getSyaHearingOptions()));
         ccdCase.setHearings(hearings);
 
         ccdCase.setSmsNotify(convertSmsNotify(syaCaseWrapper.getSmsNotify()));
@@ -84,21 +84,20 @@ public class SubmitYourAppealToCcdCaseDeserializer {
         return reasonsForAppealing;
     }
 
-    private Hearing convertHearing(SyaHearing syaHearing) {
+    private Hearing convertHearing(SyaHearingOptions syaHearingOptions) {
         Hearing hearing = new Hearing();
 
-        hearing.setAdditionalInformation(syaHearing.getAnythingElse());
+        hearing.setAdditionalInformation(syaHearingOptions.getAnythingElse());
 
-        hearing.setExcludeDates(convertExcludedDates(syaHearing.getDatesCantAttend()));
-        hearing.setScheduleHearing(syaHearing.getScheduleHearing());
-        hearing.setWantsSupport(syaHearing.getWantsSupport());
-        hearing.setWantsToAttend(syaHearing.getWantsToAttend());
+        hearing.setExcludeDates(convertExcludedDates(syaHearingOptions.getDatesCantAttend()));
+        hearing.setScheduleHearing(syaHearingOptions.getScheduleHearing());
+        hearing.setWantsSupport(syaHearingOptions.getWantsSupport());
+        hearing.setWantsToAttend(syaHearingOptions.getWantsToAttend());
 
-        if (null != syaHearing.getArrangements()) {
-            hearing.setHasDisabilityNeeds(syaHearing.getArrangements().getDisabledAccess());
-            hearing.setHearingLoopRequired(syaHearing.getArrangements().getHearingLoop());
-            hearing.setLanguageInterpreterRequired(syaHearing.getArrangements().getLanguageInterpreter());
-            hearing.setSignLanguageRequired(syaHearing.getArrangements().getSignLanguageInterpreter());
+        if (null != syaHearingOptions.getArrangements()) {
+            hearing.setHearingLoopRequired(syaHearingOptions.getArrangements().getHearingLoop());
+            hearing.setLanguageInterpreterRequired(syaHearingOptions.getArrangements().getLanguageInterpreter());
+            hearing.setSignLanguageRequired(syaHearingOptions.getArrangements().getSignLanguageInterpreter());
         }
 
 
