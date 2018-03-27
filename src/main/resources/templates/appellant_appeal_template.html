@@ -295,34 +295,60 @@
         <div>
             <dt class="cya-question">Language interpreter</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.languageInterpreter == true ? "Yes" : "No" }}, language interpreter required
+                {% if SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.languageInterpreter == true %}
+                    {% if SyaCaseWrapper.hearing.interpreterLanguageType is defined and SyaCaseWrapper.hearing.interpreterLanguageType != '' %}
+                        {{ SyaCaseWrapper.hearing.interpreterLanguageType }}
+                    {% else %}
+                        Required
+                    {% endif %}
+                {% else %}
+                    Not required
+                {% endif %}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Sign language interpreter</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.signLanguageInterpreter == true ? "Yes" : "No" }}, sign language interpreter required
+                {% if SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.signLanguageInterpreter == true %}
+                    {% if SyaCaseWrapper.hearing.signLanguageType is defined and SyaCaseWrapper.hearing.signLanguageType != '' %}
+                        {{ SyaCaseWrapper.hearing.signLanguageType }}
+                    {% else %}
+                        Required
+                    {% endif %}
+                {% else %}
+                    Not required
+                {% endif %}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Hearing loop</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.hearingLoop == true ? "Yes" : "No" }}, hearing loop required
+                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.hearingLoop == true ? "Required" : "Not required" }}
             </dd>
         </div>
 
         <div>
-            <dt class="cya-question">Disabled access</dt>
+            <dt class="cya-question">Accessible hearing room</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.disabledAccess == true ? "Yes" : "No" }}, disabled access required
+                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.accessibleHearingRoom == true ? "Required" : "Not required" }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Any other arrangements</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.hearing.anythingElse | default('None') }}</dd>
+            <dd class="cya-answer">
+                {% if SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.other == true %}
+                    {% if SyaCaseWrapper.hearing.anythingElse is defined and SyaCaseWrapper.hearing.anythingElse != '' %}
+                        {{ SyaCaseWrapper.hearing.anythingElse }}
+                    {% else %}
+                        Required
+                    {% endif %}
+                {% else %}
+                    Not required
+                {% endif %}
+            </dd>
         </div>
     </dl>
 
