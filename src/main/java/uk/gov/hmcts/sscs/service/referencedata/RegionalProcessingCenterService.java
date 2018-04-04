@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.sscs.exception.RegionalProcessingCenterServiceException;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 @Service
@@ -46,7 +47,7 @@ public class RegionalProcessingCenterService {
                     sccodeRegionalProcessingCentermap.put(line[1], line[2])
             );
         } catch (IOException e) {
-            LOG.error("Error occurred while loading the sscs venues reference data file: {} ", CSV_FILE_PATH + e);
+            LOG.error("Error occurred while loading the sscs venues reference data file: " + CSV_FILE_PATH, new RegionalProcessingCenterServiceException(e));
         }
     }
 
@@ -58,7 +59,7 @@ public class RegionalProcessingCenterService {
                     mapper.readValue(inputStream, new TypeReference<Map<String,RegionalProcessingCenter>>(){});
 
         } catch (IOException e) {
-            LOG.error("Error while reading RegionalProcessingCenter from {} ", RPC_DATA_JSON, e);
+            LOG.error("Error while reading RegionalProcessingCenter from " + RPC_DATA_JSON, new RegionalProcessingCenterServiceException(e));
         }
     }
 

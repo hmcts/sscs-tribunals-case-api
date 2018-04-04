@@ -1,18 +1,19 @@
 package uk.gov.hmcts.sscs.service;
 
-import java.security.SecureRandom;
+import static org.slf4j.LoggerFactory.getLogger;
 
+import java.security.SecureRandom;
 import org.apache.commons.text.CharacterPredicates;
 import org.apache.commons.text.RandomStringGenerator;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
 @Component
 public class AppealNumberGenerator {
-
+    private static final Logger LOG = getLogger(AppealNumberGenerator.class);
     private static final int LENGTH = 10;
     public static final char MINIMUM_CODE_POINT = '0';
     public static final char MAXIMUM_CODE_POINT = 'z';
@@ -35,7 +36,10 @@ public class AppealNumberGenerator {
                 appealNumber = "";
             }
             if (count == 0 && "".equals(appealNumber)) {
-                throw new CcdException("AppealNumberGenerator has generated duplicate appeal number against CCD");
+                String message = "AppealNumberGenerator has generated duplicate appeal number against CCD";
+                CcdException ccdException = new CcdException(new Exception(message));
+                LOG.error(message, ccdException);
+                throw ccdException;
             }
         }
 

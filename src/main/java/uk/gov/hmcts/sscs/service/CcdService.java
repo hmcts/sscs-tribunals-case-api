@@ -44,8 +44,7 @@ public class CcdService {
             //Implement
             LOG.info("creteEvent needs implementation post MVP : " + reminderResponse.getEventId());
         } catch (Exception ex) {
-            LOG.error("Error while creating event in ccd", ex);
-            throw new CcdException("Error while creating event in ccd" + ex.getMessage());
+            throw logCcdException("Error while creating event in ccd", ex);
         }
     }
 
@@ -53,8 +52,7 @@ public class CcdService {
         try {
             return createCoreCaseDataService.createCcdCase(caseData);
         } catch (Exception ex) {
-            LOG.error("Error while creating case in ccd", ex);
-            throw new CcdException("Error while creating case in ccd" + ex.getMessage());
+            throw logCcdException("Error while creating case in ccd", ex);
         }
     }
 
@@ -62,18 +60,15 @@ public class CcdService {
         try {
             return updateCoreCaseDataService.updateCcdCase(caseData, caseId, eventId);
         } catch (Exception ex) {
-            LOG.error("Error while updating case in ccd", ex);
-            throw new CcdException("Error while updating case in ccd" + ex.getMessage());
+            throw logCcdException("Error while updating case in ccd", ex);
         }
     }
 
     public CaseData findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
-
         try {
             return readCoreCaseDataService.getCcdCaseDataByAppealNumber(appealNumber);
         } catch (Exception ex) {
-            LOG.error("Error while getting case from ccd", ex);
-            throw new CcdException("Error while getting case from ccd" + ex.getMessage());
+            throw logCcdException("Error while getting case from ccd", ex);
         }
     }
 
@@ -97,8 +92,7 @@ public class CcdService {
                 benefitType = caseData.getAppeal().getBenefitType().getCode();
             }
         } catch (Exception ex) {
-            LOG.error("Error while un subscribing details in ccd: ", ex);
-            throw new CcdException("Error while updating case in ccd: " + ex.getMessage());
+            throw logCcdException("Error while unsubscribing details in ccd", ex);
         }
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
@@ -125,8 +119,7 @@ public class CcdService {
                 benefitType = caseData.getAppeal().getBenefitType().getCode();
             }
         } catch (Exception ex) {
-            LOG.error("Error while updating subscription details in ccd: ", ex);
-            throw new CcdException("Error while updating case in ccd: " + ex.getMessage());
+            throw logCcdException("Error while updating subscription details in ccd", ex);
         }
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
@@ -134,7 +127,7 @@ public class CcdService {
     public CaseData findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) throws CcdException {
         CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
         if (caseData == null) {
-            LOG.info("Appeal not exists for appeal number: {}", appealNumber);
+            LOG.info("Appeal does not exist for appeal number: {}", appealNumber);
             throw new AppealNotFoundException(appealNumber);
         }
         return caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null
@@ -145,14 +138,16 @@ public class CcdService {
     }
 
     private CaseDetails findCcdCaseDetailsByAppealNumber(String appealNumber) throws CcdException {
-
         try {
             return readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(appealNumber);
         } catch (Exception ex) {
-            LOG.error("Error while getting case from ccd", ex);
-            throw new CcdException("Error while getting case from ccd" + ex.getMessage());
+            throw logCcdException("Error while getting case from ccd", ex);
         }
     }
 
-
+    private CcdException logCcdException(String message, Exception ex) {
+        CcdException ccdException = new CcdException(ex);
+        LOG.error(message, ccdException);
+        return ccdException;
+    }
 }
