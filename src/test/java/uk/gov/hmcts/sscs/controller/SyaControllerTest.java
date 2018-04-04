@@ -55,7 +55,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
-        doThrow(new PdfGenerationException("malformed html template"))
+        doThrow(new PdfGenerationException(new Exception("malformed html template")))
                 .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class));
         String json = getSyaCaseWrapperJson();
 
