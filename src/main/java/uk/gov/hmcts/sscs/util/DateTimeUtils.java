@@ -1,31 +1,39 @@
 package uk.gov.hmcts.sscs.util;
 
-import static java.time.format.DateTimeFormatter.*;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 
 
 public final class DateTimeUtils {
 
-    public static final String EUROPE_LONDON = "Europe/London";
-    public static final String UTC = "UTC";
-    public static final String UTC_STRING_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    private static final String EUROPE_LONDON = "Europe/London";
+    private static final String UTC = "UTC";
+    private static final String UTC_STRING_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 
     private DateTimeUtils() {
         //
     }
     
-    public static String convertLocalDateTimetoUtc(String localDateStr, String localTimeStr) {
+    public static String convertLocalDateLocalTimetoUtc(String localDateStr, String localTimeStr) {
 
         LocalDate localDate = LocalDate.parse(localDateStr);
         LocalTime localTime = LocalTime.parse(localTimeStr);
         ZonedDateTime zonedDateTime = ZonedDateTime.of(localDate, localTime, ZoneId.of(EUROPE_LONDON));
-        ZonedDateTime utcZonedDateTime = ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZoneId.of(UTC));
-        return utcZonedDateTime.format(ofPattern(UTC_STRING_FORMAT));
+        return formatUtc(zonedDateTime);
 
     }
-    
+
+    public static String convertLocalDateTimetoUtc(LocalDateTime localDateTime) {
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of(EUROPE_LONDON));
+        return formatUtc(zonedDateTime);
+
+    }
+
+    private static String formatUtc(ZonedDateTime zonedDateTime) {
+        ZonedDateTime utcZonedDateTime = ZonedDateTime.ofInstant(zonedDateTime.toInstant(), ZoneId.of(UTC));
+        return utcZonedDateTime.format(ofPattern(UTC_STRING_FORMAT));
+    }
+
 }

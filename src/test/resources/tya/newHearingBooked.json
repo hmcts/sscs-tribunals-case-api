@@ -15,17 +15,17 @@
         "addressLine2": "",
         "addressLine3": "Liverpool",
         "googleMapUrl": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509",
-        "date": "2017-06-26T14:11:34.013Z",
+        "date": "2017-06-26T13:11:34.013Z",
         "type": "NEW_HEARING_BOOKED",
         "contentKey": "status.newHearingBooked"
       }
     ],
     "historicalEvents": [
       {
-        "adjournedDate": "2017-06-24T14:09:24.883Z",
-        "adjournedLetterReceivedByDate": "2017-07-01T14:09:24.883Z",
-        "hearingContactDate": "2017-08-05T14:09:24.883Z",
-        "date": "2017-06-24T14:09:24.883Z",
+        "adjournedDate": "2017-06-24T13:09:24.883Z",
+        "adjournedLetterReceivedByDate": "2017-07-01T13:09:24.883Z",
+        "hearingContactDate": "2017-08-05T13:09:24.883Z",
+        "date": "2017-06-24T13:09:24.883Z",
         "type": "ADJOURNED",
         "contentKey": "status.adjourned"
       }
