@@ -25,7 +25,7 @@ public class AppealNumberGenerator {
         this.ccdService = ccdService;
     }
 
-    public String generate() throws CcdException {
+    public String generate() {
 
         String appealNumber = "";
         int count = 3;
