@@ -30,7 +30,7 @@ public class TrackYourAppealJsonBuilder {
     private Map<Event, Hearing> eventHearingMap;
 
     public ObjectNode build(CaseData caseData,
-                            RegionalProcessingCenter regionalProcessingCenter) throws CcdException {
+                            RegionalProcessingCenter regionalProcessingCenter) {
 
         List<Event> eventList = caseData.getEvents();
         if (eventList == null || eventList.isEmpty()) {
@@ -240,10 +240,6 @@ public class TrackYourAppealJsonBuilder {
         } else {
             return formatDateTime(parse(event.getValue().getDate()).plusWeeks(days));
         }
-    }
-
-    private String getHearingDateTime(String localDate, String localTime) {
-        return formatDateTime(LocalDateTime.of(LocalDate.parse(localDate), LocalTime.parse(localTime)));
     }
 
     private String formatDateTime(LocalDateTime localDateTime) {

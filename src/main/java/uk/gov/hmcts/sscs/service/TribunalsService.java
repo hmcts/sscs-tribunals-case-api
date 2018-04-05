@@ -1,18 +1,14 @@
 package uk.gov.hmcts.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
@@ -47,7 +43,7 @@ public class TribunalsService {
         this.trackYourAppealJsonBuilder = trackYourAppealJsonBuilder;
     }
 
-    public CaseDetails submitAppeal(SyaCaseWrapper syaCaseWrapper) throws CcdException {
+    public CaseDetails submitAppeal(SyaCaseWrapper syaCaseWrapper) {
         CaseData caseData = transformer.convertSyaToCcdCaseData(syaCaseWrapper);
         String appealNumber = appealNumberGenerator.generate();
         caseData.getSubscriptions().getAppellantSubscription().toBuilder().tya(appealNumber);
@@ -56,11 +52,11 @@ public class TribunalsService {
         return caseDetails;
     }
 
-    private CaseDetails saveAppeal(CaseData caseData) throws CcdException {
+    private CaseDetails saveAppeal(CaseData caseData) {
         return ccdService.createCase(caseData);
     }
 
-    public ObjectNode findAppeal(String appealNumber) throws CcdException {
+    public ObjectNode findAppeal(String appealNumber) {
         CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
         if (caseByAppealNumber == null) {
             log.info("Appeal not exists for appeal number: " + appealNumber);
@@ -72,15 +68,15 @@ public class TribunalsService {
                 caseByAppealNumber, regionalProcessingCenter);
     }
 
-    public String unsubscribe(String appealNumber) throws CcdException {
+    public String unsubscribe(String appealNumber) {
         return ccdService.unsubscribe(appealNumber);
     }
 
-    public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) throws CcdException {
+    public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) {
         return ccdService.updateSubscription(appealNumber, subscriptionRequest);
     }
 
-    public boolean validateSurname(String appealNumber, String surname) throws CcdException {
+    public boolean validateSurname(String appealNumber, String surname) {
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname);
         if (caseData == null) {
             log.info("Not a valid surname: " + surname);

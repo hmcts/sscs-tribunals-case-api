@@ -5,7 +5,6 @@ import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
@@ -39,7 +38,7 @@ public class CcdService {
         this.updateCoreCaseDataService = updateCoreCaseDataService;
     }
 
-    public void createEvent(ReminderResponse reminderResponse) throws CcdException {
+    public void createEvent(ReminderResponse reminderResponse) {
         try {
             //Implement
             LOG.info("creteEvent needs implementation post MVP : " + reminderResponse.getEventId());
@@ -48,7 +47,7 @@ public class CcdService {
         }
     }
 
-    public CaseDetails createCase(CaseData caseData) throws CcdException {
+    public CaseDetails createCase(CaseData caseData) {
         try {
             return createCoreCaseDataService.createCcdCase(caseData);
         } catch (Exception ex) {
@@ -56,7 +55,7 @@ public class CcdService {
         }
     }
 
-    public CaseDetails updateCase(CaseData caseData, Long caseId, String eventId) throws CcdException {
+    public CaseDetails updateCase(CaseData caseData, Long caseId, String eventId) {
         try {
             return updateCoreCaseDataService.updateCcdCase(caseData, caseId, eventId);
         } catch (Exception ex) {
@@ -64,7 +63,7 @@ public class CcdService {
         }
     }
 
-    public CaseData findCcdCaseByAppealNumber(String appealNumber) throws CcdException {
+    public CaseData findCcdCaseByAppealNumber(String appealNumber) {
         try {
             return readCoreCaseDataService.getCcdCaseDataByAppealNumber(appealNumber);
         } catch (Exception ex) {
@@ -72,7 +71,7 @@ public class CcdService {
         }
     }
 
-    public String unsubscribe(String appealNumber) throws CcdException {
+    public String unsubscribe(String appealNumber) {
 
         String benefitType = null;
         try {
@@ -97,7 +96,7 @@ public class CcdService {
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
 
-    public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) throws CcdException {
+    public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) {
         String benefitType = null;
         try {
             CaseDetails caseDetails = findCcdCaseDetailsByAppealNumber(appealNumber);
@@ -124,7 +123,7 @@ public class CcdService {
         return benefitType != null ? benefitType.toLowerCase() : "";
     }
 
-    public CaseData findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) throws CcdException {
+    public CaseData findCcdCaseByAppealNumberAndSurname(String appealNumber, String surname) {
         CaseData caseData = findCcdCaseByAppealNumber(appealNumber);
         if (caseData == null) {
             LOG.info("Appeal does not exist for appeal number: {}", appealNumber);
@@ -137,7 +136,7 @@ public class CcdService {
                 ? caseData : null;
     }
 
-    private CaseDetails findCcdCaseDetailsByAppealNumber(String appealNumber) throws CcdException {
+    private CaseDetails findCcdCaseDetailsByAppealNumber(String appealNumber) {
         try {
             return readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(appealNumber);
         } catch (Exception ex) {

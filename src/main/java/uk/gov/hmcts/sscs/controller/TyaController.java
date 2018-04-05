@@ -7,14 +7,11 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RestController
@@ -35,7 +32,7 @@ public class TyaController {
             produces = APPLICATION_JSON_UTF8_VALUE)
     public void validateSurname(
             @PathVariable(value = "appealNumber") String appealNumber,
-            @PathVariable(value = "surname") String surname) throws CcdException {
+            @PathVariable(value = "surname") String surname) {
         tribunalsService.validateSurname(appealNumber, surname);
     }
 
@@ -45,7 +42,7 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
     @RequestMapping(value = "/appeals/{appealNumber}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> getAppeal(
-            @PathVariable(value = "appealNumber") String appealNumber) throws CcdException {
+            @PathVariable(value = "appealNumber") String appealNumber) {
         return ok(tribunalsService.findAppeal(appealNumber).toString());
     }
 }

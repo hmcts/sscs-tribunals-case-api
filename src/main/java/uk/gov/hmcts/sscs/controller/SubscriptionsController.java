@@ -12,11 +12,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.util.Collections;
 import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
@@ -56,7 +54,7 @@ public class SubscriptionsController {
             produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updateSubscription(@RequestBody SubscriptionRequest subscriptionRequest,
                                                      @PathVariable String appealNumber,
-                                                   @PathVariable String subscriptionId) throws CcdException {
+                                                   @PathVariable String subscriptionId) {
         String benefitType = tribunalsService.updateSubscription(appealNumber, subscriptionRequest);
         return ok().body(format(BENEFIT_TYPE_FORMAT, benefitType));
     }
@@ -69,7 +67,7 @@ public class SubscriptionsController {
     @RequestMapping(value = "/appeals/{id}/subscriptions/{subscriptionId}",
             method = DELETE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> unsubscribe(@PathVariable(value = "id") String appealNumber,
-                                         @PathVariable String subscriptionId) throws CcdException {
+                                         @PathVariable String subscriptionId) {
         String benefitType = tribunalsService.unsubscribe(appealNumber);
         return ok().body(format(BENEFIT_TYPE_FORMAT, benefitType));
     }
