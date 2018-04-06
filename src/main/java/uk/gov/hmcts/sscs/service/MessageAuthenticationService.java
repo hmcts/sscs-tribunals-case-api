@@ -29,6 +29,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException;
+import uk.gov.hmcts.sscs.exception.MacException;
+import uk.gov.hmcts.sscs.exception.TokenException;
 
 @Service
 public class MessageAuthenticationService {
@@ -59,7 +61,7 @@ public class MessageAuthenticationService {
             mac.init(key);
             return mac;
         } catch (NoSuchAlgorithmException | InvalidKeyException ex) {
-            LOG.error("Error while initializing MAC Key: ", ex);
+            LOG.error("Error while initializing MAC Key", new MacException(ex));
             throw ex;
         }
     }
@@ -73,8 +75,9 @@ public class MessageAuthenticationService {
             String macToken = format("%s|%s", originalMessage, macSubString);
             return getEncoder().withoutPadding().encodeToString(macToken.getBytes(CHARSET));
         } catch (Exception ex) {
-            LOG.error("Error while generating MAC: ", ex);
-            throw ex;
+            TokenException tokenException = new TokenException(ex);
+            LOG.error("Error while generating MAC", tokenException);
+            throw tokenException;
         }
     }
 
@@ -83,8 +86,7 @@ public class MessageAuthenticationService {
             validateMacToken(encryptedToken);
             return getBenefitType(encryptedToken);
         } catch (Exception ex) {
-            LOG.error(ERROR_MESSAGE + encryptedToken, ex);
-            throw new InvalidSubscriptionTokenException(ERROR_MESSAGE + encryptedToken);
+            throw logInvalidSubscriptionTokenException(ex, encryptedToken);
         }
     }
 
@@ -93,11 +95,9 @@ public class MessageAuthenticationService {
             validateMacToken(encryptedToken);
             return getSubscriptions(encryptedToken);
         } catch (Exception ex) {
-            LOG.error(ERROR_MESSAGE + encryptedToken, ex);
-            throw new InvalidSubscriptionTokenException(ERROR_MESSAGE + encryptedToken);
+            throw logInvalidSubscriptionTokenException(ex, encryptedToken);
         }
     }
-
 
     private String validateMacToken(String encryptedToken) throws InvalidKeyException,
             NoSuchAlgorithmException {
@@ -110,10 +110,16 @@ public class MessageAuthenticationService {
         String macSubString = printBase64Binary(digest).substring(0, 10);
         String macToken = format("%s|%s", originalMessage, macSubString);
         if (!decrypted.equals(macToken)) {
-            throw new InvalidSubscriptionTokenException(ERROR_MESSAGE + encryptedToken);
+            throw logInvalidSubscriptionTokenException(new Exception(ERROR_MESSAGE + encryptedToken), encryptedToken);
         }
 
         return macToken;
+    }
+
+    private InvalidSubscriptionTokenException logInvalidSubscriptionTokenException(Exception ex, String encryptedToken) {
+        InvalidSubscriptionTokenException invalidSubscriptionTokenException = new InvalidSubscriptionTokenException(ex);
+        LOG.error(ERROR_MESSAGE + encryptedToken, invalidSubscriptionTokenException);
+        return invalidSubscriptionTokenException;
     }
 
     private String getBenefitType(String encryptedToken) {

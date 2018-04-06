@@ -60,11 +60,12 @@ public class SubmitAppealService {
             submitYourAppealEmail.setAttachments(newArrayList(pdf(pdf,appellantUniqueId + ".pdf")));
             emailService.sendEmail(submitYourAppealEmail);
         } catch (EmailSendFailedException ex) {
-            LOG.error("Error while emailing pdf ", ex);
+            LOG.error("Error while emailing pdf", ex);
             throw ex;
         } catch (Exception ex) {
-            LOG.error("Error while generating pdf ", ex);
-            throw new PdfGenerationException(ex.getMessage());
+            PdfGenerationException pdfGenerationException = new PdfGenerationException(ex);
+            LOG.error("Error while generating pdf", ex);
+            throw pdfGenerationException;
         }
     }
 

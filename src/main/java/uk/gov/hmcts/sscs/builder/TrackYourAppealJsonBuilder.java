@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.builder;
 import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
 import static uk.gov.hmcts.sscs.util.DateTimeUtils.convertLocalDateLocalTimetoUtc;
@@ -18,6 +19,7 @@ import java.util.*;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
+import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.corecase.EventType;
@@ -28,16 +30,19 @@ import uk.gov.hmcts.sscs.util.DateTimeUtils;
 
 @Service
 public class TrackYourAppealJsonBuilder {
-
+    private static final Logger LOG = getLogger(TrackYourAppealJsonBuilder.class);
     private Map<Event, Document> eventDocumentMap;
     private Map<Event, Hearing> eventHearingMap;
 
     public ObjectNode build(CaseData caseData,
-                            RegionalProcessingCenter regionalProcessingCenter) throws CcdException {
+                            RegionalProcessingCenter regionalProcessingCenter) {
 
         List<Event> eventList = caseData.getEvents();
         if (eventList == null || eventList.isEmpty()) {
-            throw new CcdException("No events exists for this appeal");
+            String message = "No events exists for this appeal";
+            CcdException ccdException = new CcdException(new Exception(message));
+            LOG.error(message, ccdException);
+            throw ccdException;
         }
 
         createEvidenceResponseEvents(caseData);

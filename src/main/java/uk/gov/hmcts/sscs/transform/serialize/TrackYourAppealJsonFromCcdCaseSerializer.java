@@ -13,6 +13,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.gov.hmcts.sscs.domain.corecase.*;
+import uk.gov.hmcts.sscs.exception.TyaJsonProcessingException;
 
 
 class TrackYourAppealJsonFromCcdCaseSerializer extends StdSerializer<CcdCase> {
@@ -37,7 +38,7 @@ class TrackYourAppealJsonFromCcdCaseSerializer extends StdSerializer<CcdCase> {
         try {
             json = mapper.writeValueAsString(ccdCase);
         } catch (JsonProcessingException e) {
-            log.error("JsonProcessingException : ", e);
+            log.error("Error whilst processing json", new TyaJsonProcessingException(e));
         }
         return json;
     }
