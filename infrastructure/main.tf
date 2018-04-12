@@ -77,12 +77,13 @@ data "vault_generic_secret" "idam_oauth2_client_secret" {
 
 locals {
   aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  app_full_name = "${var.product}-${var.component}"
 }
 
 
 module "tribunals-case-api" {
   source       = "git@github.com:contino/moj-module-webapp?ref=master"
-  product      = "${var.product}-${var.component}"
+  product      = "${local.app_full_name}"
   location     = "${var.location}"
   env          = "${var.env}"
   ilbIp        = "${var.ilbIp}"
