@@ -1,14 +1,11 @@
-FROM openjdk:8-alpine
+FROM openjdk:8-jre
 
-RUN mkdir -p /opt/sscs/tribunals-case-api
+COPY build/install/tribunals-case-api /opt/app/
 
-COPY build/libs/tribunals-case-api*.jar /opt/sscs/tribunals-case-api/app.jar
+WORKDIR /opt/app
 
-ENV JAVA_OPTS=""
+HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" curl --silent --fail http://localhost:8083/health
 
-EXPOSE 8080
+EXPOSE 8083
 
-HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" wget -qO- --spider http://localhost:8080/health -q
-
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /opt/sscs/tribunals-case-api/app.jar" ]
-
+ENTRYPOINT ["/opt/app/bin/tribunals-case-api"]
