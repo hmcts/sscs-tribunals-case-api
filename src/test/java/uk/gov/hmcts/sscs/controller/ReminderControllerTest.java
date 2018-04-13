@@ -6,16 +6,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
-import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.CcdException;
+import uk.gov.hmcts.sscs.model.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.service.CcdService;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -28,8 +26,6 @@ public class ReminderControllerTest {
 
     private ReminderController controller;
 
-    private ReminderResponse reminderResponse;
-
     @Before
     public void setUp() {
         controller = new ReminderController(ccdService);
@@ -37,7 +33,6 @@ public class ReminderControllerTest {
     }
 
     @Test
-    @Ignore
     public void shouldReturnHttpStatusCode201ForTheSubmittedReminder() throws Exception {
 
         String json = "{\n"
@@ -52,10 +47,11 @@ public class ReminderControllerTest {
     }
 
     @Test(expected = CcdException.class)
-    public void shouldHandleExceptionForGetRequest() throws Exception {
-        reminderResponse = new ReminderResponse("12345", "hearingReminderNotification");
+    public void shouldHandleExceptionForGetRequest() {
+        ReminderResponse reminderResponse = new ReminderResponse("12345","hearingReminderNotification");
 
-        doThrow(new CcdException(new Exception("Malformed Reminder Response"))).when(ccdService).createEvent(reminderResponse);
+        doThrow(new CcdException(new Exception("Malformed Reminder Response"))).when(ccdService).updateCase(
+            null, Long.valueOf(reminderResponse.getCaseId()), reminderResponse.getEventId());
 
         controller.reminder(reminderResponse);
     }

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
@@ -36,15 +35,6 @@ public class CcdService {
         this.readCoreCaseDataService = readCoreCaseDataService;
         this.createCoreCaseDataService = createCoreCaseDataService;
         this.updateCoreCaseDataService = updateCoreCaseDataService;
-    }
-
-    public void createEvent(ReminderResponse reminderResponse) {
-        try {
-            //Implement
-            LOG.info("creteEvent needs implementation post MVP : " + reminderResponse.getEventId());
-        } catch (Exception ex) {
-            throw logCcdException("Error while creating event in ccd", ex);
-        }
     }
 
     public CaseDetails createCase(CaseData caseData) {

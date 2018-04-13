@@ -8,14 +8,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.sscs.domain.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
@@ -55,7 +52,7 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldSendCaseToCcd() throws Exception {
+    public void shouldSendCaseToCcd() {
 
         CaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData());
 
@@ -64,16 +61,7 @@ public class CcdServiceTest {
     }
 
     @Test
-    @Ignore
-    public void shouldStartEventInCcd() throws Exception {
-
-        ReminderResponse reminder = new ReminderResponse("123", "hearingReminderNotification");
-
-        ccdService.createEvent(reminder);
-    }
-
-    @Test
-    public void shouldGetCaseFromCcd() throws Exception {
+    public void shouldGetCaseFromCcd() {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumber(anyString());
 
@@ -83,7 +71,7 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldUpdateSubscriptionInCcd() throws Exception {
+    public void shouldUpdateSubscriptionInCcd() {
         when(readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(anyString()))
                 .thenReturn(CaseDataUtils.buildCaseDetails());
 
@@ -97,7 +85,7 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldReturnCaseGivenSurnameAndAppealNumber() throws Exception {
+    public void shouldReturnCaseGivenSurnameAndAppealNumber() {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), SURNAME);
 
@@ -108,7 +96,7 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldReturnNullIfSurnameInvalid() throws Exception {
+    public void shouldReturnNullIfSurnameInvalid() {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "XXX");
 
@@ -118,7 +106,7 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldUpdateCaseInCcd() throws Exception {
+    public void shouldUpdateCaseInCcd() {
 
         CaseDetails caseDetails = ccdService.updateCase(any(CaseData.class),
                 anyLong(),anyString());
@@ -129,7 +117,7 @@ public class CcdServiceTest {
     }
 
     @Test
-    public void shouldUnSubscribeEmailNotification() throws Exception {
+    public void shouldUnSubscribeEmailNotification() {
         when(readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(anyString()))
                 .thenReturn(CaseDataUtils.buildCaseDetails());
 

@@ -26,7 +26,7 @@ public class ReadCoreCaseDataService {
     }
 
     public CaseDetails getCcdCaseDetailsByCaseId(String caseId) {
-        EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
+        EventRequestData eventRequestData = coreCaseDataService.getEventRequestData(null);
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
 
         return getByCaseId(eventRequestData, serviceAuthorization, caseId);
@@ -51,7 +51,7 @@ public class ReadCoreCaseDataService {
     }
 
     public CaseDetails getCcdCaseDetailsByAppealNumber(String appealNumber) {
-        EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
+        EventRequestData eventRequestData = coreCaseDataService.getEventRequestData(null);
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
 
         List<CaseDetails> caseDetailsList = getByAppealNumber(eventRequestData, serviceAuthorization, appealNumber);
