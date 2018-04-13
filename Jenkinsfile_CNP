@@ -10,9 +10,9 @@ def type = "java"
 
 def product = "sscs"
 
-def app = "tribunals-api"
+def component = "tribunals-api"
 
-withPipeline(type, product, app) {
+withPipeline(type, product, component) {
     enableSlackNotifications('#sscs-tech')
 }
 
