@@ -47,7 +47,7 @@ public class ReminderControllerTest {
     }
 
     @Test(expected = CcdException.class)
-    public void shouldHandleExceptionForGetRequest() {
+    public void shouldHandleCcdExceptionWhenAMalformedReminderIsReceived() {
         ReminderResponse reminderResponse = new ReminderResponse("12345","hearingReminderNotification");
 
         doThrow(new CcdException(new Exception("Malformed Reminder Response"))).when(ccdService).updateCase(
