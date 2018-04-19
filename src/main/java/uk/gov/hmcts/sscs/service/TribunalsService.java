@@ -62,10 +62,20 @@ public class TribunalsService {
             log.info("Appeal not exists for appeal number: " + appealNumber);
             throw new AppealNotFoundException(appealNumber);
         }
-        RegionalProcessingCenter regionalProcessingCenter =
-                regionalProcessingCenterService.getByScReferenceCode(caseByAppealNumber.getCaseReference());
-        return trackYourAppealJsonBuilder.build(
-                caseByAppealNumber, regionalProcessingCenter);
+
+        return trackYourAppealJsonBuilder.build(caseByAppealNumber, getRegionalProcessingCenter(caseByAppealNumber));
+    }
+
+    private RegionalProcessingCenter getRegionalProcessingCenter(CaseData caseByAppealNumber) {
+        RegionalProcessingCenter regionalProcessingCenter;
+
+        if (null == caseByAppealNumber.getRegionalProcessingCenter()) {
+            regionalProcessingCenter =
+                    regionalProcessingCenterService.getByScReferenceCode(caseByAppealNumber.getCaseReference());
+        } else {
+            regionalProcessingCenter = caseByAppealNumber.getRegionalProcessingCenter();
+        }
+        return regionalProcessingCenter;
     }
 
     public String unsubscribe(String appealNumber) {
