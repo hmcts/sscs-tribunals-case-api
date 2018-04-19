@@ -229,7 +229,7 @@
         <div>
             <dt class="cya-question">Date appeal submitted</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.mrn.dateAppealSubmitted | date(existingFormat="yyyy-MM-dd", format="dd MMMM yyyy") | default('Not applicable') }}
+                {{ SyaCaseWrapper.mrn.dateAppealSubmitted | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") | default('Not applicable') }}
             </dd>
         </div>
 

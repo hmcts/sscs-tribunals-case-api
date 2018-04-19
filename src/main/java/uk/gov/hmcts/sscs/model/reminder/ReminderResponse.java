@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.domain.reminder;
+package uk.gov.hmcts.sscs.model.reminder;
 
 public class ReminderResponse {
 
@@ -20,13 +20,5 @@ public class ReminderResponse {
     public ReminderResponse(String caseId, String eventId) {
         this.caseId = caseId;
         this.eventId = eventId;
-    }
-
-    @Override
-    public String toString() {
-        return "ReminderResponse{"
-                + " caseId='" + caseId + '\''
-                + ", eventId='" + eventId + '\''
-                + '}';
     }
 }

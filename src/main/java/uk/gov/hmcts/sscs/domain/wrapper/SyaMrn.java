@@ -1,6 +1,8 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDate;
 
 public class SyaMrn {
@@ -12,7 +14,11 @@ public class SyaMrn {
 
     private String reasonForBeingLate;
 
+    @JsonProperty("reasonForNoMRN")
     private String reasonForNoMrn;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDate dateAppealSubmitted;
 
 
     public SyaMrn() {
@@ -51,6 +57,14 @@ public class SyaMrn {
         this.reasonForNoMrn = reasonForNoMrn;
     }
 
+    public LocalDate getDateAppealSubmitted() {
+        return dateAppealSubmitted;
+    }
+
+    public void setDateAppealSubmitted(LocalDate dateAppealSubmitted) {
+        this.dateAppealSubmitted = dateAppealSubmitted;
+    }
+
     @Override
     public String toString() {
         return "SyaMrn{"
@@ -58,6 +72,7 @@ public class SyaMrn {
                 + ", date=" + date
                 + ", reasonForBeingLate='" + reasonForBeingLate + '\''
                 + ", reasonForNoMrn='" + reasonForNoMrn + '\''
+                + ", dateAppealSubmitted='" + dateAppealSubmitted + '\''
                 + '}';
     }
 }

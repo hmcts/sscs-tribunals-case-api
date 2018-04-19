@@ -36,7 +36,7 @@ public class ReadCoreCaseDataServiceTest {
         //Given
         when(coreCaseDataApiMock.readForCaseWorker(anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyString())).thenReturn(CaseDataUtils.buildCaseDetails());
-        when(coreCaseDataServiceMock.getEventRequestData(eq("appealCreated")))
+        when(coreCaseDataServiceMock.getEventRequestData(eq("emptyEvent")))
                 .thenReturn(EventRequestData.builder().build());
         when(coreCaseDataServiceMock.generateServiceAuthorization())
                 .thenReturn("s2s token");
@@ -57,7 +57,7 @@ public class ReadCoreCaseDataServiceTest {
         //Given
         when(coreCaseDataApiMock.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyMap())).thenReturn(CaseDataUtils.buildCaseDetailsList());
-        when(coreCaseDataServiceMock.getEventRequestData(eq("appealCreated")))
+        when(coreCaseDataServiceMock.getEventRequestData(eq("emptyEvent")))
                 .thenReturn(EventRequestData.builder().build());
         when(coreCaseDataServiceMock.generateServiceAuthorization())
                 .thenReturn("s2s token");
