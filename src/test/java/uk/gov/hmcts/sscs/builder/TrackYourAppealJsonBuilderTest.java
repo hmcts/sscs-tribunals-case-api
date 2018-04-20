@@ -5,20 +5,12 @@ import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.Event;
-import uk.gov.hmcts.sscs.model.ccd.EventDetails;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilderTest {
