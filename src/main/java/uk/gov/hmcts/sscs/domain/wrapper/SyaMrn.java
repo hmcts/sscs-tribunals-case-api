@@ -12,7 +12,7 @@ public class SyaMrn {
     private String dwpIssuingOffice;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @JsonDeserialize(using= LocalDateDeserializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate date;
 
     @JsonProperty("reasonWhyMRNisLate")
@@ -22,7 +22,7 @@ public class SyaMrn {
     private String reasonForNoMrn;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    @JsonDeserialize(using= LocalDateDeserializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate dateAppealSubmitted;
 
 

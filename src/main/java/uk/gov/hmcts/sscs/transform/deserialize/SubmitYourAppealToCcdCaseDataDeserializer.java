@@ -146,7 +146,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private List<String> getExcludedDates(String[] dates) {
-        return (dates != null && dates.length > 0) ? Arrays.asList(dates) : null ;
+        return (dates != null && dates.length > 0) ? Arrays.asList(dates) : null;
     }
 
     private List<String> getArrangements(SyaArrangements syaArrangements) {
