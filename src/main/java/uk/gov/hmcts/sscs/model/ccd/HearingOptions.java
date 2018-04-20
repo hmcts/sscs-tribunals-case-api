@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Value;
 
@@ -11,10 +13,22 @@ import lombok.Value;
 @Value
 @Builder
 public class HearingOptions {
+    private String languageInterpreter;
+    private String languages;
+    private List<String> arrangements;
+    private List<String> excludeDates;
     private String other;
 
     @JsonCreator
-    public HearingOptions(@JsonProperty("other") String other) {
+    public HearingOptions(@JsonProperty("languageInterpreter") String languageInterpreter,
+                          @JsonProperty("languages") String languages,
+                          @JsonProperty("arrangements") List<String> arrangements,
+                          @JsonProperty("excludeDates") List<String> excludeDates,
+                          @JsonProperty("other") String other) {
+        this.languageInterpreter = languageInterpreter;
+        this.languages = languages;
+        this.arrangements = arrangements;
+        this.excludeDates = excludeDates;
         this.other = other;
     }
 }

@@ -2,6 +2,8 @@ package uk.gov.hmcts.sscs.domain.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 import java.time.LocalDate;
 
@@ -14,6 +16,7 @@ public class SyaAppellant {
     private String lastName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonDeserialize(using= LocalDateDeserializer.class)
     private LocalDate dob;
 
     private String nino;

@@ -1,10 +1,12 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class  SyaCaseWrapper {
 
     @JsonProperty("hearing")
@@ -55,6 +57,14 @@ public class  SyaCaseWrapper {
 
     public void setReasonsForAppealing(SyaReasonsForAppealing syaReasonsForAppealing) {
         this.reasonsForAppealing = syaReasonsForAppealing;
+    }
+
+    public Boolean hasRepresentative() {
+        return hasRepresentative;
+    }
+
+    public void setHasRepresentative(Boolean hasRepresentative) {
+        this.hasRepresentative = hasRepresentative;
     }
 
     public SyaRepresentative getRepresentative() {

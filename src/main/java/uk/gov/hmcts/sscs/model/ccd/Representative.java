@@ -10,24 +10,21 @@ import lombok.Value;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 @Builder
-public class Appellant {
+public class Representative {
 
+    private String organisation;
     private Name name;
     private Address address;
     private Contact contact;
-    private Identity identity;
-    private String isAppointee;
 
     @JsonCreator
-    public Appellant(@JsonProperty("name") Name name,
-                     @JsonProperty("address") Address address,
-                     @JsonProperty("contact") Contact contact,
-                     @JsonProperty("identity") Identity identity,
-                     @JsonProperty("isAppointee") String isAppointee) {
+    public Representative(@JsonProperty("identity") String organisation,
+                          @JsonProperty("name") Name name,
+                          @JsonProperty("address") Address address,
+                          @JsonProperty("contact") Contact contact) {
+        this.organisation = organisation;
         this.name = name;
         this.address = address;
         this.contact = contact;
-        this.identity = identity;
-        this.isAppointee = isAppointee;
     }
 }
