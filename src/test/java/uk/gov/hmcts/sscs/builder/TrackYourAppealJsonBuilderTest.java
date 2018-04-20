@@ -66,7 +66,6 @@ public class TrackYourAppealJsonBuilderTest {
     @Ignore
     public void dormantTest() throws CcdException {
         CaseData caseData = DORMANT_CCD.getDeserializeMessage();
-        caseData = updateEventDate(caseData);
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
         assertJsonEquals(DORMANT.getSerializedMessage(), objectNode);
@@ -149,25 +148,6 @@ public class TrackYourAppealJsonBuilderTest {
         regionalProcessingCenter.setFaxNumber("0870 324 0109");
         return regionalProcessingCenter;
     }
-
-    private CaseData updateEventDate(CaseData caseData) {
-        EventDetails eventDetails = caseData.getEvents().get(0).getValue().toBuilder()
-                .date(LocalDateTime.now().toString())
-                .build();
-        return buildCaseData(caseData, eventDetails);
-    }
-
-    private CaseData buildCaseData(CaseData caseData, EventDetails eventDetails) {
-        Event event = Event.builder()
-                .value(eventDetails)
-                .build();
-
-        List<Event> eventList = new ArrayList<>();
-        eventList.add(event);
-
-        return caseData.toBuilder()
-                .events(eventList)
-                .build();
-    }
+    
 }
 
