@@ -107,9 +107,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
             appealReasons.add(appealReason);
         }
 
-        // This is done. Remove after ccd def confirmation
-        // reasonsForAppealing.setOtherReasons(syaReasonsForAppealing.getOtherReasons());
-
         return AppealReasons.builder()
                 .reasons(appealReasons)
                 .otherReasons(syaReasonsForAppealing.getOtherReasons())

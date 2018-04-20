@@ -36,7 +36,8 @@
       "languages": "An interpreter language",
       "arrangements": [
         "signLanguageInterpreter",
-        "hearingLoop"
+        "hearingLoop",
+        "disabledAccess"
       ],
       "excludeDates": null,
       "other": "Yes, this..."
