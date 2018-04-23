@@ -16,14 +16,14 @@ public class HearingOptions {
     private String languageInterpreter;
     private String languages;
     private List<String> arrangements;
-    private List<String> excludeDates;
+    private List<ExcludeDate> excludeDates;
     private String other;
 
     @JsonCreator
     public HearingOptions(@JsonProperty("languageInterpreter") String languageInterpreter,
                           @JsonProperty("languages") String languages,
                           @JsonProperty("arrangements") List<String> arrangements,
-                          @JsonProperty("excludeDates") List<String> excludeDates,
+                          @JsonProperty("excludeDates") List<ExcludeDate> excludeDates,
                           @JsonProperty("other") String other) {
         this.languageInterpreter = languageInterpreter;
         this.languages = languages;

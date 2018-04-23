@@ -64,8 +64,8 @@
     "wantsToAttend": true,
     "wantsSupport": true,
     "anythingElse": "Yes, this...",
-    "interpreterLanguageType": "An interpreter language",
-    "signLanguageType": "A sign language",
+    "interpreterLanguageType": "enUK",
+    "signLanguageType": "enUK",
     "arrangements": {
       "languageInterpreter": true,
       "signLanguageInterpreter": true,

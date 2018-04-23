@@ -1,7 +1,8 @@
 package uk.gov.hmcts.sscs.transform.deserialize;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -126,7 +127,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 arrangements = getArrangements(syaHearingOptions.getArrangements());
             }
 
-            List<String> excludedDates = null;
+            List<ExcludeDate> excludedDates = null;
             if (syaHearingOptions.getScheduleHearing()) {
                 excludedDates = getExcludedDates(syaHearingOptions.getDatesCantAttend());
             }
@@ -142,8 +143,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return hearingOptions;
     }
 
-    private List<String> getExcludedDates(String[] dates) {
-        return (dates != null && dates.length > 0) ? Arrays.asList(dates) : null;
+    private List<ExcludeDate> getExcludedDates(String[] dates) {
+        List<ExcludeDate> excludeDates = new ArrayList<>();
+        for(String date : dates) {
+            DateRange dateRange = DateRange.builder()
+                    .start(getLocalDate(date))
+                    .end(getLocalDate(date))
+                    .build();
+            excludeDates.add(ExcludeDate.builder().value(dateRange).build());
+        }
+        return excludeDates;
     }
 
     private List<String> getArrangements(SyaArrangements syaArrangements) {
@@ -217,5 +226,10 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         }
 
         return representative;
+    }
+
+    private String getLocalDate(String dateStr) {
+        LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        return localDate.toString();
     }
 }
