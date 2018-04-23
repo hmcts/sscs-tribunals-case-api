@@ -22,14 +22,20 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
+import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
-    public static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
+    private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
 
     private ObjectMapper mapper;
+
+    @Mock
+    private CcdService ccdService;
 
     @Mock
     private PDFServiceClient pdfServiceClient;
@@ -45,10 +51,25 @@ public class SubmitAppealServiceTest {
     public void setUp() {
         mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
+        SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer = new
+                SubmitYourAppealToCcdCaseDataDeserializer();
+
         submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
 
-        service = new SubmitAppealService(TEMPLATE_PATH,
+        service = new SubmitAppealService(TEMPLATE_PATH, submitYourAppealToCcdCaseDataDeserializer, ccdService,
                 pdfServiceClient, emailService, submitYourAppealEmail);
+    }
+
+    @Test
+    public void shouldCreateCaseWithAppealDetails() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class),
+                any(Map.class))).willReturn(expected);
+
+        service.submitAppeal(appealData);
+
+        verify(ccdService).createCase(any(CaseData.class));
     }
 
     @Test
@@ -62,6 +83,15 @@ public class SubmitAppealServiceTest {
 
         assertThat(submitYourAppealEmail.getSubject(), is("Bloggs_33C"));
         verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
+    }
+
+    @Test(expected = CcdException.class)
+    public void shouldHandleCcdServiceException() {
+        given(ccdService.createCase(any(CaseData.class)))
+                .willThrow(new CcdException(
+                        new RuntimeException("Error while creating case in CCD")));
+
+        service.submitAppeal(getSyaCaseWrapper());
     }
 
     @Test(expected = PdfGenerationException.class)

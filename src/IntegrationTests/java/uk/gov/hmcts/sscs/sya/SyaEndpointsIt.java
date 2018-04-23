@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.Properties;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -24,7 +23,6 @@ import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +36,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.sscs.controller.SyaController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.sscs.service.CcdService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -50,17 +49,21 @@ import uk.gov.hmcts.sscs.service.SubmitAppealService;
 @AutoConfigureMockMvc
 public class SyaEndpointsIt {
 
-    public static final String PDF = "abc";
-    @MockBean
-    PDFServiceClient pdfServiceClient;
+    private static final String PDF = "abc";
 
     @MockBean
-    JavaMailSender mailSender;
+    private CcdService ccdService;
+
+    @MockBean
+    private PDFServiceClient pdfServiceClient;
+
+    @MockBean
+    private JavaMailSender mailSender;
 
     @Autowired
     private MockMvc mockMvc;
 
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
 
     private Session session = Session.getInstance(new Properties());
 
@@ -91,8 +94,6 @@ public class SyaEndpointsIt {
 
     @Test
     public void shouldGeneratePdfAndSend() throws Exception {
-        HashMap<String, Object> placeHolder = new HashMap<>();
-        placeHolder.put(SubmitAppealService.SYA_CASE_WRAPPER, caseWrapper);
         when(pdfServiceClient.generateFromHtml(eq(getTemplate()), any())).thenReturn(PDF.getBytes());
 
         mockMvc.perform(post("/appeals")
