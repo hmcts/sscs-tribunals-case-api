@@ -270,5 +270,11 @@
         <gav regex="true">^io\.netty:netty-common:.*$</gav>
         <cpe>cpe:/a:netty_project:netty</cpe>
     </suppress>
-
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-annotations-api-8.5.27.jar
+   ]]></notes>
+        <gav regex="true">^org\.apache\.tomcat:tomcat-annotations-api:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
 </suppressions>
