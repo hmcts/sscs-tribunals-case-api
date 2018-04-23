@@ -143,7 +143,7 @@ configurations {
     e2eCompile.extendsFrom(testCompile)
 }
 
-def springBootVersion = plugins.getPlugin('org.springframework.boot').class.package.implementationVersion
+def springBootVersion = '1.5.10.RELEASE'
 
 def versions = [
         reformLogging: '2.0.2',
