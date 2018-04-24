@@ -109,7 +109,14 @@
   "dwpTimeExtension": [],
   "events": [],
   "subscriptions": {
-    "appellantSubscription": null,
+    "appellantSubscription": {
+      "tya": null,
+      "email": "joe@bloggs.com",
+      "mobile": null,
+      "subscribeEmail": "Yes",
+      "subscribeSms": "No",
+      "reason": null
+    },
     "supporterSubscription": null
   }
 }

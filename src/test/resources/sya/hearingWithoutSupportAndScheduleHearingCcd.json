@@ -89,9 +89,9 @@
   "subscriptions": {
     "appellantSubscription": {
       "tya": null,
-      "email": null,
+      "email": "joe@bloggs.com",
       "mobile": "07411333333",
-      "subscribeEmail": null,
+      "subscribeEmail": "Yes",
       "subscribeSms": "Yes",
       "reason": null
     },

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.wrapper.*;
@@ -182,13 +183,13 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-        Subscription subscription = null;
-        if (smsNotify.isWantsSmsNotifications()) {
-            subscription = Subscription.builder()
-                    .subscribeSms(YES)
-                    .mobile(smsNotify.getSmsNumber())
-                    .build();
-        }
+        String email = syaCaseWrapper.getAppellant().getContactDetails().getEmailAddress();
+        Subscription subscription = Subscription.builder()
+                .subscribeSms(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                .mobile(smsNotify.getSmsNumber())
+                .subscribeEmail(StringUtils.isNotBlank(email) ? YES : NO)
+                .email(email)
+                .build();
 
         return Subscriptions.builder()
                 .appellantSubscription(subscription)
