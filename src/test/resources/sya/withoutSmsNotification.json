@@ -19,11 +19,14 @@
       "addressLine2": "Off Hairy Park",
       "townCity": "Hairyfield",
       "county": "Kent",
-      "postCode": "TN32 6PL"
+      "postCode": "TN32 6PL",
+      "phoneNumber": "07411222222",
+      "emailAddress": "joe@bloggs.com"
     }
   },
   "smsNotify": {
-    "wantsSMSNotifications": false
+    "wantsSMSNotifications": false,
+    "smsNumber": "07411222222"
   },
   "hasRepresentative": true,
   "representative": {

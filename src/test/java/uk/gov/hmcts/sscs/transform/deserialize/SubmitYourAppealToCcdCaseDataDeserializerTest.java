@@ -37,6 +37,20 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void syaWithoutEmailNotificationTest() {
+        SyaCaseWrapper syaCaseWrapper = WITHOUT_EMAIL_NOTIFICATION.getDeserializeMessage();
+        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper);
+        assertJsonEquals(WITHOUT_EMAIL_NOTIFICATION_CCD.getSerializedMessage(), getJson(caseData));
+    }
+
+    @Test
+    public void syaWithoutSmsNotificationTest() {
+        SyaCaseWrapper syaCaseWrapper = WITHOUT_SMS_NOTIFICATION.getDeserializeMessage();
+        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper);
+        assertJsonEquals(WITHOUT_SMS_NOTIFICATION_CCD.getSerializedMessage(), getJson(caseData));
+    }
+
+    @Test
     public void syaWithoutRepresentativeTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_REPRESENTATIVE.getDeserializeMessage();
         CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper);
