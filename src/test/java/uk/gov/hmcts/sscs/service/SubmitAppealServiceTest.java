@@ -35,6 +35,9 @@ public class SubmitAppealServiceTest {
     private ObjectMapper mapper;
 
     @Mock
+    private AppealNumberGenerator appealNumberGenerator;
+
+    @Mock
     private CcdService ccdService;
 
     @Mock
@@ -56,7 +59,8 @@ public class SubmitAppealServiceTest {
 
         submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
 
-        service = new SubmitAppealService(TEMPLATE_PATH, submitYourAppealToCcdCaseDataDeserializer, ccdService,
+        service = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
+                submitYourAppealToCcdCaseDataDeserializer, ccdService,
                 pdfServiceClient, emailService, submitYourAppealEmail);
     }
 
@@ -69,6 +73,7 @@ public class SubmitAppealServiceTest {
 
         service.submitAppeal(appealData);
 
+        verify(appealNumberGenerator).generate();
         verify(ccdService).createCase(any(CaseData.class));
     }
 

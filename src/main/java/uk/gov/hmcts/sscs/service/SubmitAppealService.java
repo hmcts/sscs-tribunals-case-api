@@ -22,16 +22,19 @@ import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
+import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @Service
 public class SubmitAppealService {
     private static final Logger LOG = getLogger(SubmitAppealService.class);
 
-    public static final String SYA_CASE_WRAPPER = "SyaCaseWrapper";
+    private static final String SYA_CASE_WRAPPER = "SyaCaseWrapper";
     private static final String ID_FORMAT = "%s_%s";
 
     private String appellantTemplatePath;
+    private AppealNumberGenerator appealNumberGenerator;
     private final SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer;
     private final CcdService ccdService;
     private final PDFServiceClient pdfServiceClient;
@@ -40,6 +43,7 @@ public class SubmitAppealService {
 
     @Autowired
     SubmitAppealService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
+                               AppealNumberGenerator appealNumberGenerator,
                                SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer,
                                CcdService ccdService,
                                PDFServiceClient pdfServiceClient,
@@ -47,6 +51,7 @@ public class SubmitAppealService {
                                SubmitYourAppealEmail submitYourAppealEmail) {
 
         this.appellantTemplatePath = appellantTemplatePath;
+        this.appealNumberGenerator = appealNumberGenerator;
         this.submitYourAppealToCcdCaseDataDeserializer = submitYourAppealToCcdCaseDataDeserializer;
         this.ccdService = ccdService;
         this.pdfServiceClient = pdfServiceClient;
@@ -61,7 +66,12 @@ public class SubmitAppealService {
         String appellantUniqueId = String.format(ID_FORMAT, appellantLastName, nino.substring(nino.length() - 3));
 
         try {
-            ccdService.createCase(submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal));
+            CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
+            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
+                    .tya(appealNumberGenerator.generate())
+                    .build();
+            caseData.getSubscriptions().setAppellantSubscription(subscription);
+            ccdService.createCase(caseData);
             Map<String, Object> placeholders = Collections.singletonMap(SYA_CASE_WRAPPER, appeal);
             byte[] pdf = pdfServiceClient.generateFromHtml(getTemplate(), placeholders);
 
