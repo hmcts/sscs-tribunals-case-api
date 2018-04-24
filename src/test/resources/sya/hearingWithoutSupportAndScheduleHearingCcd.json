@@ -82,10 +82,10 @@
       "organisation": "HP Ltd"
     }
   },
-  "hearings": null,
+  "hearings": [],
   "evidence": null,
-  "dwpTimeExtension": null,
-  "events": null,
+  "dwpTimeExtension": [],
+  "events": [],
   "subscriptions": {
     "appellantSubscription": {
       "tya": null,

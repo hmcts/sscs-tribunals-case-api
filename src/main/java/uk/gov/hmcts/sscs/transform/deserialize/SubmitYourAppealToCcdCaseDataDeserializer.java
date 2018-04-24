@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.transform.deserialize;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -24,6 +25,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return CaseData.builder()
                 .appeal(appeal)
+                .hearings(Collections.emptyList())
+                .dwpTimeExtension(Collections.emptyList())
+                .events(Collections.emptyList())
                 .subscriptions(subscriptions)
                 .build();
     }
@@ -145,7 +149,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private List<ExcludeDate> getExcludedDates(String[] dates) {
         List<ExcludeDate> excludeDates = new ArrayList<>();
-        for(String date : dates) {
+        for (String date : dates) {
             DateRange dateRange = DateRange.builder()
                     .start(getLocalDate(date))
                     .end(getLocalDate(date))
