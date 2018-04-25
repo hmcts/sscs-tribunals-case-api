@@ -21,7 +21,7 @@ public class SyaController {
     private SubmitAppealService submitAppealService;
 
     @Autowired
-    public SyaController(SubmitAppealService submitAppealService) {
+    SyaController(SubmitAppealService submitAppealService) {
         this.submitAppealService = submitAppealService;
     }
 
