@@ -6,7 +6,6 @@ import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.gov.hmcts.sscs.exception.CcdException;
@@ -55,7 +54,6 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    @Ignore
     public void dormantTest() throws CcdException {
         CaseData caseData = DORMANT_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
