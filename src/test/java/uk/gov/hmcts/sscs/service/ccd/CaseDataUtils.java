@@ -42,6 +42,8 @@ public final class CaseDataUtils {
                 .build();
 
         HearingOptions hearingOptions = HearingOptions.builder()
+                .arrangements(Collections.emptyList())
+                .excludeDates(Collections.emptyList())
                 .other("No")
                 .build();
         final Appeal appeal = Appeal.builder()
