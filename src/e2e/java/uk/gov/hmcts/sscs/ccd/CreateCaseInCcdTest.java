@@ -1,22 +1,16 @@
 package uk.gov.hmcts.sscs.ccd;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
-
-import java.net.ConnectException;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.client.ResourceAccessException;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;

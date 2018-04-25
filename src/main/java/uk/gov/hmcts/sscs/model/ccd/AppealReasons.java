@@ -18,7 +18,7 @@ public class AppealReasons {
 
     @JsonCreator
     public AppealReasons(@JsonProperty("reasons") List<AppealReason> reasons,
-                         @JsonProperty("otherReason") String otherReasons) {
+                         @JsonProperty("otherReasons") String otherReasons) {
         this.reasons = reasons;
         this.otherReasons = otherReasons;
     }

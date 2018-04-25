@@ -18,7 +18,7 @@ public class Representative {
     private Contact contact;
 
     @JsonCreator
-    public Representative(@JsonProperty("identity") String organisation,
+    public Representative(@JsonProperty("organisation") String organisation,
                           @JsonProperty("name") Name name,
                           @JsonProperty("address") Address address,
                           @JsonProperty("contact") Contact contact) {
