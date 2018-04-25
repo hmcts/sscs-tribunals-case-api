@@ -83,7 +83,8 @@
       ],
       "otherReasons": "Another reason"
     },
-    "rep": null
+    "rep": null,
+    "signer": "Joe Bloggs"
   },
   "hearings": [],
   "evidence": null,
