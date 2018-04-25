@@ -33,7 +33,7 @@
     },
     "hearingOptions": {
       "languageInterpreter": "Yes",
-      "languages": "An interpreter language",
+      "languages": "Telugu",
       "arrangements": [
         "signLanguageInterpreter",
         "hearingLoop"
