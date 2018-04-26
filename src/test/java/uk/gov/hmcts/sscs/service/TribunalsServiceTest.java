@@ -2,8 +2,9 @@ package uk.gov.hmcts.sscs.service;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +12,14 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
@@ -86,8 +89,47 @@ public class TribunalsServiceTest {
         verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(subscriptionRequest));
     }
 
+    @Test
+    public void shouldAddRegionalProcessingCenterFromCcdIfItsPresent() {
+        Mockito.when(ccdService.findCcdCaseByAppealNumber(APPEAL_NUMBER)).thenReturn(getCaseDataWithRpc());
+
+        tribunalsService.findAppeal(APPEAL_NUMBER);
+
+        verify(regionalProcessingCenterService, never()).getByScReferenceCode(anyString());
+
+    }
+
+    @Test
+    public void shouldGetRpcfromRegionalProcessingServiceIfItsNotPresentInCcdCase() {
+
+        Mockito.when(ccdService.findCcdCaseByAppealNumber(APPEAL_NUMBER)).thenReturn(getCaseData());
+
+        tribunalsService.findAppeal(APPEAL_NUMBER);
+
+        verify(regionalProcessingCenterService, times(1)).getByScReferenceCode(anyString());
+    }
+
+    private CaseData getCaseDataWithRpc() {
+        return  CaseData.builder().regionalProcessingCenter(getRegionalProcessingCenter()).build();
+    }
+
     private CaseData getCaseData() {
         return CaseData.builder().build();
+    }
+
+
+    private RegionalProcessingCenter getRegionalProcessingCenter() {
+        RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
+        regionalProcessingCenter.setName("CARDIFF");
+        regionalProcessingCenter.setAddress1("HM Courts & Tribunals Service");
+        regionalProcessingCenter.setAddress2("Social Security & Child Support Appeals");
+        regionalProcessingCenter.setAddress3("Eastgate House");
+        regionalProcessingCenter.setAddress4("Newport Road");
+        regionalProcessingCenter.setCity("CARDIFF");
+        regionalProcessingCenter.setPostcode("CF24 0AB");
+        regionalProcessingCenter.setPhoneNumber("0300 123 1142");
+        regionalProcessingCenter.setFaxNumber("0870 739 4438");
+        return regionalProcessingCenter;
     }
 
 }
