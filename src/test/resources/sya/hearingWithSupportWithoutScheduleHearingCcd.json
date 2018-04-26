@@ -1,9 +1,11 @@
 {
   "caseReference": null,
   "appeal": {
-    "mrnDate": "2018-02-01",
-    "mrnLateReason": null,
-    "mrnMissingReason": null,
+    "mrnDetails": {
+      "mrnDate": "2018-02-01",
+      "mrnLateReason": null,
+      "mrnMissingReason": null
+    },
     "appellant": {
       "name": {
         "title": "Mr",

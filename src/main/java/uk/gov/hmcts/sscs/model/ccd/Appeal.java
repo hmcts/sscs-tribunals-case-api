@@ -10,9 +10,7 @@ import lombok.Value;
 @Value
 @Builder
 public class Appeal {
-    private String mrnDate;
-    private String mrnLateReason;
-    private String mrnMissingReason;
+    private MrnDetails mrnDetails;
     private Appellant appellant;
     private BenefitType benefitType;
     private HearingOptions hearingOptions;
@@ -20,18 +18,14 @@ public class Appeal {
     private Representative rep;
     private String signer;
 
-    public Appeal(@JsonProperty("mrnDate") String mrnDate,
-                  @JsonProperty("mrnLateReason") String mrnLateReason,
-                  @JsonProperty("mrnMissingReason") String mrnMissingReason,
+    public Appeal(@JsonProperty("mrnDetails") MrnDetails mrnDetails,
                   @JsonProperty("appellant") Appellant appellant,
                   @JsonProperty("benefitType") BenefitType benefitType,
                   @JsonProperty("hearingOptions") HearingOptions hearingOptions,
                   @JsonProperty("appealReasons") AppealReasons appealReasons,
                   @JsonProperty("rep") Representative rep,
                   @JsonProperty("signer") String signer) {
-        this.mrnDate = mrnDate;
-        this.mrnLateReason = mrnLateReason;
-        this.mrnMissingReason = mrnMissingReason;
+        this.mrnDetails = mrnDetails;
         this.appellant = appellant;
         this.benefitType = benefitType;
         this.hearingOptions = hearingOptions;

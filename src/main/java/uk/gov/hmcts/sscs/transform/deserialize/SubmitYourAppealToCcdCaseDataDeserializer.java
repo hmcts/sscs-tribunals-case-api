@@ -35,6 +35,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
 
+        MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper);
+
         Appellant appellant = getAppellant(syaCaseWrapper);
 
         BenefitType benefitType = BenefitType.builder()
@@ -48,10 +50,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         Representative representative = getRepresentative(syaCaseWrapper);
 
         return Appeal.builder()
-                .mrnDate(syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
-                        null)
-                .mrnLateReason(syaCaseWrapper.getMrn().getReasonForBeingLate())
-                .mrnMissingReason(syaCaseWrapper.getMrn().getReasonForNoMrn())
+                .mrnDetails(mrnDetails)
                 .appellant(appellant)
                 .benefitType(benefitType)
                 .hearingOptions(hearingOptions)
@@ -59,6 +58,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .rep(representative)
                 .signer(syaCaseWrapper.getSignAndSubmit().getSigner())
                 .build();
+    }
+
+    private MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
+        return MrnDetails.builder()
+                .mrnDate(syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
+                        null)
+                .mrnLateReason(syaCaseWrapper.getMrn().getReasonForBeingLate())
+                .mrnMissingReason(syaCaseWrapper.getMrn().getReasonForNoMrn())
+                .build();
+
     }
 
     private Appellant getAppellant(SyaCaseWrapper syaCaseWrapper) {
