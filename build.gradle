@@ -5,7 +5,7 @@ plugins {
     id 'org.sonarqube' version '2.6.2'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.4.RELEASE'
-    id 'org.springframework.boot' version '1.5.9.RELEASE'
+    id 'org.springframework.boot' version '1.5.10.RELEASE'
     id 'org.owasp.dependencycheck' version '3.1.1'
     id 'com.github.ben-manes.versions' version '0.17.0'
     id 'net.ltgt.apt' version '0.13'
@@ -143,7 +143,7 @@ configurations {
     e2eCompile.extendsFrom(testCompile)
 }
 
-def springBootVersion = plugins.getPlugin('org.springframework.boot').class.package.implementationVersion
+def springBootVersion = '1.5.10.RELEASE'
 
 def versions = [
         reformLogging: '2.0.2',

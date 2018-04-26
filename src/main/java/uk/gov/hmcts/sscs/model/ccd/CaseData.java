@@ -8,6 +8,7 @@ import java.util.List;
 
 import lombok.Builder;
 import lombok.Value;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
@@ -20,6 +21,7 @@ public class CaseData {
     private List<DwpTimeExtension> dwpTimeExtension;
     private List<Event> events;
     private Subscriptions subscriptions;
+    private RegionalProcessingCenter regionalProcessingCenter;
 
     @JsonCreator
     public CaseData(@JsonProperty("caseReference") String caseReference,
@@ -28,7 +30,8 @@ public class CaseData {
                     @JsonProperty("evidence") Evidence evidence,
                     @JsonProperty("dwpTimeExtension") List<DwpTimeExtension> dwpTimeExtension,
                     @JsonProperty("events") List<Event> events,
-                    @JsonProperty("subscriptions") Subscriptions subscriptions) {
+                    @JsonProperty("subscriptions") Subscriptions subscriptions,
+                    @JsonProperty("regionalProcessingCenter")  RegionalProcessingCenter regionalProcessingCenter) {
         this.caseReference = caseReference;
         this.appeal = appeal;
         this.hearings = hearings;
@@ -36,5 +39,6 @@ public class CaseData {
         this.dwpTimeExtension = dwpTimeExtension;
         this.events = events;
         this.subscriptions = subscriptions;
+        this.regionalProcessingCenter = regionalProcessingCenter;
     }
 }
