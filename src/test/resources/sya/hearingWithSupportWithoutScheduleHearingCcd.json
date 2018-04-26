@@ -2,6 +2,7 @@
   "caseReference": null,
   "appeal": {
     "mrnDetails": {
+      "dwpIssuingOffice": "1",
       "mrnDate": "2018-02-01",
       "mrnLateReason": null,
       "mrnMissingReason": null

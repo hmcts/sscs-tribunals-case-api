@@ -11,14 +11,17 @@ import lombok.Value;
 @Value
 @Builder
 public class MrnDetails {
+    private String dwpIssuingOffice;
     private String mrnDate;
     private String mrnLateReason;
     private String mrnMissingReason;
 
     @JsonCreator
-    public MrnDetails(@JsonProperty("mrnDate") String mrnDate,
+    public MrnDetails(@JsonProperty("dwpIssuingOffice") String dwpIssuingOffice,
+                      @JsonProperty("mrnDate") String mrnDate,
                       @JsonProperty("mrnLateReason") String mrnLateReason,
                       @JsonProperty("mrnMissingReason") String mrnMissingReason) {
+        this.dwpIssuingOffice = dwpIssuingOffice;
         this.mrnDate = mrnDate;
         this.mrnLateReason = mrnLateReason;
         this.mrnMissingReason = mrnMissingReason;

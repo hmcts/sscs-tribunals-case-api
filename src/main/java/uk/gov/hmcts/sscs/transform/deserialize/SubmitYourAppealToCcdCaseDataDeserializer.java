@@ -62,6 +62,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
         return MrnDetails.builder()
+                .dwpIssuingOffice(syaCaseWrapper.getMrn().getDwpIssuingOffice())
                 .mrnDate(syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
                         null)
                 .mrnLateReason(syaCaseWrapper.getMrn().getReasonForBeingLate())
