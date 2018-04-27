@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.domain.corecase;
+package uk.gov.hmcts.sscs.ccd;
 
 import com.google.common.base.CaseFormat;
 

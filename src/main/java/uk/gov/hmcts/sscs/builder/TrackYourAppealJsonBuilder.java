@@ -4,7 +4,7 @@ import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
+import static uk.gov.hmcts.sscs.ccd.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
 import static uk.gov.hmcts.sscs.util.DateTimeUtils.*;
 
@@ -18,7 +18,7 @@ import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.sscs.domain.corecase.EventType;
+import uk.gov.hmcts.sscs.ccd.EventType;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;

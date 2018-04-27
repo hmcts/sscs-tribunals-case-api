@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import uk.gov.hmcts.sscs.ccd.EventType;
+
 public class EventTypeTest {
 
     @Test
