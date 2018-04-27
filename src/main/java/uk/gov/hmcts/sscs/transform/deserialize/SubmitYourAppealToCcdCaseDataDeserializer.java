@@ -132,28 +132,39 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {
 
-        HearingOptions hearingOptions = null;
+        HearingOptions hearingOptions;
 
         if (syaHearingOptions.getWantsToAttend()) {
 
             String languageInterpreter = null;
-            List<String> arrangements = null;
+            List<String> arrangements = Collections.emptyList();
+            String wantsSupport = syaHearingOptions.getWantsSupport() ? YES : NO;
             if (syaHearingOptions.getWantsSupport()) {
                 languageInterpreter = syaHearingOptions.getArrangements().getLanguageInterpreter() ? YES : NO;
                 arrangements = getArrangements(syaHearingOptions.getArrangements());
             }
 
-            List<ExcludeDate> excludedDates = null;
+            String scheduleHearing = syaHearingOptions.getScheduleHearing() ? YES : NO;
+            List<ExcludeDate> excludedDates = Collections.emptyList();
             if (syaHearingOptions.getScheduleHearing()) {
                 excludedDates = getExcludedDates(syaHearingOptions.getDatesCantAttend());
             }
 
             hearingOptions = HearingOptions.builder()
+                    .wantsToAttend(YES)
+                    .wantsSupport(wantsSupport)
                     .languageInterpreter(languageInterpreter)
                     .languages(syaHearingOptions.getInterpreterLanguageType())
+                    .scheduleHearing(scheduleHearing)
                     .arrangements(arrangements)
                     .excludeDates(excludedDates)
                     .other(syaHearingOptions.getAnythingElse())
+                    .build();
+        } else {
+            hearingOptions = HearingOptions.builder()
+                    .wantsToAttend(NO)
+                    .arrangements(Collections.emptyList())
+                    .excludeDates(Collections.emptyList())
                     .build();
         }
         return hearingOptions;
@@ -194,10 +205,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
+        String wantNotifications = smsNotify.isWantsSmsNotifications() ? YES : NO;
         String email = syaCaseWrapper.getAppellant().getContactDetails().getEmailAddress();
         String mobile = syaCaseWrapper.getAppellant().getContactDetails().getPhoneNumber();
         Subscription subscription = Subscription.builder()
-                .subscribeSms(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                .wantSmsNotifications(wantNotifications)
+                .subscribeSms(wantNotifications)
                 .mobile(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile)
                 .subscribeEmail(StringUtils.isNotBlank(email) ? YES : NO)
                 .email(email)
@@ -210,7 +223,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
 
-        Representative representative = null;
+        Representative representative;
 
         if (syaCaseWrapper.hasRepresentative()) {
 
@@ -235,10 +248,15 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                     .build();
 
             representative = Representative.builder()
+                    .hasRepresentative(YES)
                     .organisation(syaRepresentative.getOrganisation())
                     .name(name)
                     .address(address)
                     .contact(contact)
+                    .build();
+        } else {
+            representative = Representative.builder()
+                    .hasRepresentative(NO)
                     .build();
         }
 

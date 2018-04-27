@@ -12,16 +12,19 @@ import lombok.Value;
 @Builder
 public class Representative {
 
+    private String hasRepresentative;
     private String organisation;
     private Name name;
     private Address address;
     private Contact contact;
 
     @JsonCreator
-    public Representative(@JsonProperty("organisation") String organisation,
+    public Representative(@JsonProperty("hasRepresentative") String hasRepresentative,
+                          @JsonProperty("organisation") String organisation,
                           @JsonProperty("name") Name name,
                           @JsonProperty("address") Address address,
                           @JsonProperty("contact") Contact contact) {
+        this.hasRepresentative = hasRepresentative;
         this.organisation = organisation;
         this.name = name;
         this.address = address;

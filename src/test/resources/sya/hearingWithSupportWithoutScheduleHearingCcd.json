@@ -35,6 +35,8 @@
       "code": "PIP"
     },
     "hearingOptions": {
+      "wantsToAttend": "Yes",
+      "wantsSupport": "Yes",
       "languageInterpreter": "Yes",
       "languages": "Telugu",
       "arrangements": [
@@ -42,7 +44,8 @@
         "hearingLoop",
         "disabledAccess"
       ],
-      "excludeDates": null,
+      "scheduleHearing": "No",
+      "excludeDates": [],
       "other": "Yes, this..."
     },
     "appealReasons": {
@@ -69,6 +72,7 @@
       "otherReasons": "Another reason"
     },
     "rep": {
+      "hasRepresentative": "Yes",
       "name": {
         "title": null,
         "firstName": "Harry",
@@ -96,6 +100,7 @@
   "events": [],
   "subscriptions": {
     "appellantSubscription": {
+      "wantSmsNotifications": "Yes",
       "tya": null,
       "email": "joe@bloggs.com",
       "mobile": "07411333333",

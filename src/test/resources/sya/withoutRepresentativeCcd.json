@@ -35,12 +35,15 @@
       "code": "PIP"
     },
     "hearingOptions": {
+      "wantsToAttend": "Yes",
+      "wantsSupport": "Yes",
       "languageInterpreter": "Yes",
       "languages": "Telugu",
       "arrangements": [
         "signLanguageInterpreter",
         "hearingLoop"
       ],
+      "scheduleHearing": "Yes",
       "excludeDates": [
         {
           "value": {
@@ -86,7 +89,13 @@
       ],
       "otherReasons": "Another reason"
     },
-    "rep": null,
+    "rep": {
+      "hasRepresentative": "No",
+      "name": null,
+      "address": null,
+      "contact": null,
+      "organisation": null
+    },
     "signer": "Joe Bloggs"
   },
   "hearings": [],
@@ -95,6 +104,7 @@
   "events": [],
   "subscriptions": {
     "appellantSubscription": {
+      "wantSmsNotifications": "Yes",
       "tya": null,
       "email": "joe@bloggs.com",
       "mobile": "07411333333",

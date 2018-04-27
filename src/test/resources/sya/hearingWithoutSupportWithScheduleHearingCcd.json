@@ -35,9 +35,12 @@
       "code": "PIP"
     },
     "hearingOptions": {
+      "wantsToAttend": "Yes",
+      "wantsSupport": "No",
       "languageInterpreter": null,
       "languages": null,
-      "arrangements": null,
+      "arrangements": [],
+      "scheduleHearing": "Yes",
       "excludeDates": [
         {
           "value": {
@@ -84,6 +87,7 @@
       "otherReasons": "Another reason"
     },
     "rep": {
+      "hasRepresentative": "Yes",
       "name": {
         "title": null,
         "firstName": "Harry",
@@ -111,6 +115,7 @@
   "events": [],
   "subscriptions": {
     "appellantSubscription": {
+      "wantSmsNotifications": "Yes",
       "tya": null,
       "email": "joe@bloggs.com",
       "mobile": "07411333333",
