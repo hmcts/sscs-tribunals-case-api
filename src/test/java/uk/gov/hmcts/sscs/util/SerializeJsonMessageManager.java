@@ -41,7 +41,9 @@ public enum SerializeJsonMessageManager {
     CLOSED("closed.json"),
     CLOSED_CCD("closedCcd.json"),
     LAPSED_REVISED("lapsedRevised.json"),
-    LAPSED_REVISED_CCD("lapsedRevisedCcd.json");
+    LAPSED_REVISED_CCD("lapsedRevisedCcd.json"),
+    MISSING_HEARING_CCD("missingHearingBookedCcd.json"),
+    MISSING_HEARING("missingHearingBooked.json");
 
 
     private final String serializedMessage;

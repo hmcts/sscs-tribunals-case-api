@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.builder;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.junit.Before;
@@ -123,6 +124,15 @@ public class TrackYourAppealJsonBuilderTest {
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
         assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldHandleMissingHearings() throws CcdException, JsonProcessingException {
+        CaseData caseData = MISSING_HEARING_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(MISSING_HEARING.getSerializedMessage(), objectNode);
+
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
