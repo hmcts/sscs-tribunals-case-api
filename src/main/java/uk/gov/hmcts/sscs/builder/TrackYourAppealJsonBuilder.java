@@ -349,8 +349,10 @@ public class TrackYourAppealJsonBuilder {
                 for (Event event : events) {
                     if (HEARING_BOOKED.equals(getEventType(event))
                             || NEW_HEARING_BOOKED.equals(getEventType(event))) {
-                        eventHearingMap.put(event, hearingList.get(hearingIndex));
-                        hearingIndex++;
+                        if (hearingIndex < hearingList.size()) {
+                            eventHearingMap.put(event, hearingList.get(hearingIndex));
+                            hearingIndex++;
+                        }
                     }
                 }
             }
