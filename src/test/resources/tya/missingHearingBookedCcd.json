@@ -1,0 +1,62 @@
+{
+  "caseReference": "SC333/33/33333",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
+      }
+    },
+    "benefitType": {
+      "code": "PIP"
+    }
+  },
+  "hearings": [
+    {
+    "value": {
+      "venue": {
+        "name": "Prudential House",
+        "address": {
+          "line1": "36 Dale Street",
+          "line2": "",
+          "town": "Liverpool",
+          "postcode": "L2 5UZ"
+        },
+        "googleMapLink": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509"
+      },
+      "hearingDate": "2017-07-17",
+      "time": "23:00",
+      "eventDate": "2017-06-26T18:11:34.013"
+    }
+  }
+  ],
+  "events": [
+    {
+      "value": {
+        "date": "2017-06-26T14:11:34.013",
+        "type": "hearingBooked",
+        "description": "New hearing booked"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-06-24T14:09:24.883",
+        "type": "hearingAdjourned",
+        "description": "Hearing adjourned"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-05-26T14:10:34.013",
+        "type": "hearingBooked",
+        "description": "New hearing booked"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}
