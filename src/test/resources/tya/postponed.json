@@ -7,8 +7,8 @@
     "surname": "Charlie",
     "status": "POSTPONED",
     "latestEvents": [{
-        "hearingContactDate": "2017-08-05T15:09:24.883Z",
-        "date": "2017-06-24T15:09:24.883Z",
+        "hearingContactDate": "2017-08-05T14:09:24.883Z",
+        "date": "2017-06-24T14:09:24.883Z",
         "type": "POSTPONED",
         "contentKey": "status.postponed"
       }
@@ -22,7 +22,7 @@
         "addressLine2": "Grosvenor Street",
         "addressLine3": "Chester",
         "googleMapUrl": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632",
-        "date": "2017-06-24T14:11:34.013Z",
+        "date": "2017-06-24T13:11:34.013Z",
         "type": "HEARING_BOOKED",
         "contentKey": "status.hearingBooked"
       }

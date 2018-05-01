@@ -8,7 +8,7 @@
     "surname":"Charlie",
     "latestEvents":[
       {
-        "date":"2017-06-26T14:11:34.013Z",
+        "date":"2017-06-26T13:11:34.013Z",
         "type":"NEW_HEARING_BOOKED",
         "contentKey":"status.newHearingBooked",
         "postcode":"L2 5UZ",
@@ -22,15 +22,15 @@
     ],
     "historicalEvents":[
       {
-        "date":"2017-06-24T14:09:24.883Z",
+        "date":"2017-06-24T13:09:24.883Z",
         "type":"ADJOURNED",
         "contentKey":"status.adjourned",
-        "adjournedDate":"2017-06-24T14:09:24.883Z",
-        "hearingContactDate":"2017-08-05T14:09:24.883Z",
-        "adjournedLetterReceivedByDate":"2017-07-01T14:09:24.883Z"
+        "adjournedDate":"2017-06-24T13:09:24.883Z",
+        "hearingContactDate":"2017-08-05T13:09:24.883Z",
+        "adjournedLetterReceivedByDate":"2017-07-01T13:09:24.883Z"
       },
       {
-        "date":"2017-05-26T14:10:34.013Z",
+        "date":"2017-05-26T13:10:34.013Z",
         "type":"HEARING_BOOKED",
         "contentKey":"status.hearingBooked"
       }
