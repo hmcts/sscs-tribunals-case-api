@@ -3,7 +3,6 @@ package uk.gov.hmcts.sscs.transform.deserialize;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,9 +25,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return CaseData.builder()
                 .appeal(appeal)
-                .hearings(Collections.emptyList())
-                .dwpTimeExtension(Collections.emptyList())
-                .events(Collections.emptyList())
                 .subscriptions(subscriptions)
                 .build();
     }
@@ -137,7 +133,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         if (syaHearingOptions.getWantsToAttend()) {
 
             String languageInterpreter = null;
-            List<String> arrangements = Collections.emptyList();
+            List<String> arrangements = null;
             String wantsSupport = syaHearingOptions.getWantsSupport() ? YES : NO;
             if (syaHearingOptions.getWantsSupport()) {
                 languageInterpreter = syaHearingOptions.getArrangements().getLanguageInterpreter() ? YES : NO;
@@ -145,7 +141,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
             }
 
             String scheduleHearing = syaHearingOptions.getScheduleHearing() ? YES : NO;
-            List<ExcludeDate> excludedDates = Collections.emptyList();
+            List<ExcludeDate> excludedDates = null;
             if (syaHearingOptions.getScheduleHearing()) {
                 excludedDates = getExcludedDates(syaHearingOptions.getDatesCantAttend());
             }
@@ -163,8 +159,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         } else {
             hearingOptions = HearingOptions.builder()
                     .wantsToAttend(NO)
-                    .arrangements(Collections.emptyList())
-                    .excludeDates(Collections.emptyList())
                     .build();
         }
         return hearingOptions;

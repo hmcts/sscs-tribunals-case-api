@@ -1,5 +1,4 @@
 {
-  "caseReference": null,
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "1",
@@ -45,7 +44,6 @@
         "disabledAccess"
       ],
       "scheduleHearing": "No",
-      "excludeDates": [],
       "other": "Yes, this..."
     },
     "appealReasons": {
@@ -94,10 +92,6 @@
     },
     "signer": "Joe Bloggs"
   },
-  "hearings": [],
-  "evidence": null,
-  "dwpTimeExtension": [],
-  "events": [],
   "subscriptions": {
     "appellantSubscription": {
       "wantSmsNotifications": "Yes",
@@ -109,6 +103,5 @@
       "reason": null
     },
     "supporterSubscription": null
-  },
-  "regionalProcessingCenter": null
+  }
 }

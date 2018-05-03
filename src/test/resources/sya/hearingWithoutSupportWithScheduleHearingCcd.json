@@ -1,5 +1,4 @@
 {
-  "caseReference": null,
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "1",
@@ -37,9 +36,6 @@
     "hearingOptions": {
       "wantsToAttend": "Yes",
       "wantsSupport": "No",
-      "languageInterpreter": null,
-      "languages": null,
-      "arrangements": [],
       "scheduleHearing": "Yes",
       "excludeDates": [
         {
@@ -60,8 +56,7 @@
             "end": "2018-04-06"
           }
         }
-      ],
-      "other": null
+      ]
     },
     "appealReasons": {
       "reasons": [
@@ -109,10 +104,6 @@
     },
     "signer": "Joe Bloggs"
   },
-  "hearings": [],
-  "evidence": null,
-  "dwpTimeExtension": [],
-  "events": [],
   "subscriptions": {
     "appellantSubscription": {
       "wantSmsNotifications": "Yes",
@@ -124,6 +115,5 @@
       "reason": null
     },
     "supporterSubscription": null
-  },
-  "regionalProcessingCenter": null
+  }
 }
