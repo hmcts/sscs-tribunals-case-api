@@ -1,10 +1,8 @@
-package uk.gov.hmcts.sscs.domain.corecase;
+package uk.gov.hmcts.sscs.model.ccd;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-
-import uk.gov.hmcts.sscs.ccd.EventType;
 
 public class EventTypeTest {
 

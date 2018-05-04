@@ -41,16 +41,39 @@ public final class CaseDataUtils {
                 .code("1325")
                 .build();
 
+        DateRange dateRange = DateRange.builder()
+                .start("2018-06-30")
+                .end("2018-06-30")
+                .build();
+        ExcludeDate excludeDate = ExcludeDate.builder()
+                .value(dateRange)
+                .build();
+
         HearingOptions hearingOptions = HearingOptions.builder()
-                .arrangements(Collections.emptyList())
-                .excludeDates(Collections.emptyList())
+                .wantsToAttend("Yes")
+                .arrangements(Arrays.asList("disabledAccess", "hearingLoop"))
+                .excludeDates(Collections.singletonList(excludeDate))
                 .other("No")
                 .build();
+
+        MrnDetails mrnDetails = MrnDetails.builder()
+                .mrnDate("2018-06-30")
+                .dwpIssuingOffice("1")
+                .build();
+
+        Representative representative = Representative.builder()
+                .hasRepresentative("Yes")
+                .build();
+
         final Appeal appeal = Appeal.builder()
                 .appellant(appellant)
                 .benefitType(benefitType)
                 .hearingOptions(hearingOptions)
+                .mrnDetails(mrnDetails)
+                .rep(representative)
+                .signer("Signer")
                 .build();
+
         Address venueAddress = Address.builder()
                 .postcode("AB12 3ED")
                 .build();

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.ccd;
+package uk.gov.hmcts.sscs.model.ccd;
 
 import com.google.common.base.CaseFormat;
 

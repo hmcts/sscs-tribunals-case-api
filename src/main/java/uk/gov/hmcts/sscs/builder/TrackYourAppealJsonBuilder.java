@@ -4,21 +4,24 @@ import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.sscs.ccd.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
+import static uk.gov.hmcts.sscs.model.ccd.EventType.*;
 import static uk.gov.hmcts.sscs.util.DateTimeUtils.*;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
+
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.sscs.ccd.EventType;
+
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
