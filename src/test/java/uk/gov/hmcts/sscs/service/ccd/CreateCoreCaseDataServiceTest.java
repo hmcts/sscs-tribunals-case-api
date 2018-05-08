@@ -39,7 +39,7 @@ public class CreateCoreCaseDataServiceTest {
         //Given
         mockStartEventResponse();
         mockCaseDetails();
-        when(coreCaseDataServiceMock.getEventRequestData(eq("appealReceived_SYA")))
+        when(coreCaseDataServiceMock.getEventRequestData(eq("appealCreated")))
                 .thenReturn(EventRequestData.builder().build());
         when(coreCaseDataServiceMock.generateServiceAuthorization())
                 .thenReturn("s2s token");

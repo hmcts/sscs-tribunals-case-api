@@ -24,7 +24,7 @@ public class CreateCoreCaseDataService {
 
     public CaseDetails createCcdCase(CaseData caseData) {
         log.info("*** tribunals-service *** createCcdCase ");
-        EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealReceived_SYA");
+        EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
         StartEventResponse startEventResponse = start(eventRequestData, serviceAuthorization);
         return create(eventRequestData, serviceAuthorization, coreCaseDataService.getCaseDataContent(caseData,

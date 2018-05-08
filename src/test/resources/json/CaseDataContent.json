@@ -1,7 +1,7 @@
 {
   "event": {
-    "id": "appealReceived_SYA",
-    "summary": "SSCS - appeal received event",
+    "id": "appealCreated",
+    "summary": "SSCS - appeal created event",
     "description": "Created SSCS case with token"
   },
   "data": {
