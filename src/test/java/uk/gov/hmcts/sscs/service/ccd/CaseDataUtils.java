@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -148,6 +149,7 @@ public final class CaseDataUtils {
 
         return CaseData.builder()
                 .caseReference("SC068/17/00013")
+                .caseCreated(LocalDate.now().toString())
                 .appeal(appeal)
                 .hearings(hearingsList)
                 .evidence(evidence)

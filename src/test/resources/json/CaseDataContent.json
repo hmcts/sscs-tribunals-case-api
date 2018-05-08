@@ -6,6 +6,7 @@
   },
   "data": {
     "caseReference": "SC068/17/00013",
+    "caseCreated" : "${json-unit.ignore}",
     "appeal": {
       "mrnDetails": {
         "dwpIssuingOffice": "1",
