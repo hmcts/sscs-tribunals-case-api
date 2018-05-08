@@ -1,4 +1,5 @@
 {
+  "caseCreated" : "${json-unit.ignore}",
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "1",
