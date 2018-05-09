@@ -125,6 +125,22 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
     }
 
+    @Test(expected = CcdException.class)
+    public void noEventsTest() throws CcdException {
+        CaseData caseData = NO_EVENTS_CCD.getDeserializeMessage();
+        trackYourAppealJsonBuilder.build(caseData, populateRegionalProcessingCenter());
+    }
+
+    @Test
+    public void appealCreatedTest() throws CcdException {
+        CaseData caseData = APPEAL_CREATED_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(APPEAL_CREATED.getSerializedMessage(), objectNode);
+    }
+
+
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
         regionalProcessingCenter.setName("LIVERPOOL");

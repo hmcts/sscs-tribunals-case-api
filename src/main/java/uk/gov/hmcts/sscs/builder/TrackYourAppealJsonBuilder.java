@@ -12,7 +12,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -35,17 +38,23 @@ public class TrackYourAppealJsonBuilder {
     public ObjectNode build(CaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter) {
 
+        // Create appealReceived eventType for appealCreated CCD event
         List<Event> eventList = caseData.getEvents();
         if (eventList == null || eventList.isEmpty()) {
-            String message = "No events exists for this appeal";
-            CcdException ccdException = new CcdException(new Exception(message));
-            LOG.error(message, ccdException);
-            throw ccdException;
+            if (caseData.getCaseCreated() != null) {
+                caseData = createAppealReceivedEventTypeForAppealCreatedEvent(caseData);
+            } else {
+                String message = "No events exists for this appeal";
+                CcdException ccdException = new CcdException(new Exception(message));
+                LOG.error(message, ccdException);
+                throw ccdException;
+            }
         }
 
         createEvidenceResponseEvents(caseData);
+        eventList = caseData.getEvents();
         eventList.sort(Comparator.reverseOrder());
-        processExceptions(caseData.getEvents());
+        processExceptions(eventList);
         eventDocumentMap = buildEventDocumentMap(caseData);
         eventHearingMap = buildEventHearingMap(caseData);
 
@@ -356,6 +365,25 @@ public class TrackYourAppealJsonBuilder {
         }
 
         return  eventHearingMap;
+    }
+
+    private CaseData createAppealReceivedEventTypeForAppealCreatedEvent(CaseData caseData) {
+
+        EventDetails eventDetails = EventDetails.builder()
+                .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().toString())
+                .type(EventType.APPEAL_RECEIVED.getCcdType())
+                .description("Appeal received")
+                .build();
+
+        Event event = Event.builder()
+                .value(eventDetails)
+                .build();
+
+        List<Event> events = new ArrayList<>();
+        events.add(event);
+
+        return caseData.toBuilder().events(events).build();
+
     }
 
 }
