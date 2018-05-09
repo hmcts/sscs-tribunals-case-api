@@ -8,8 +8,8 @@
     "status": "DORMANT",
     "latestEvents": [
       {
-        "decisionLetterReceiveByDate": "2018-05-01T12:50:11.437Z",
-        "date": "2018-04-20T12:50:11.437Z",
+        "decisionLetterReceiveByDate": "2018-05-01T11:50:11.437Z",
+        "date": "2018-04-20T11:50:11.437Z",
         "type": "DORMANT",
         "contentKey": "status.dormant"
       }

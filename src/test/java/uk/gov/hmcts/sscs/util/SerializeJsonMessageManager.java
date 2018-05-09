@@ -44,7 +44,9 @@ public enum SerializeJsonMessageManager {
     LAPSED_REVISED_CCD("lapsedRevisedCcd.json"),
     NO_EVENTS_CCD("noEventsCcd.json"),
     APPEAL_CREATED("appealCreated.json"),
-    APPEAL_CREATED_CCD("appealCreatedCcd.json");
+    APPEAL_CREATED_CCD("appealCreatedCcd.json"),
+    MISSING_HEARING_CCD("missingHearingBookedCcd.json"),
+    MISSING_HEARING("missingHearingBooked.json");
 
 
     private final String serializedMessage;

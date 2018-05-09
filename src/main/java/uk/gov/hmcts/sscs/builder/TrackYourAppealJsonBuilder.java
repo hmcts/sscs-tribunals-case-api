@@ -6,7 +6,7 @@ import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
 import static uk.gov.hmcts.sscs.model.ccd.EventType.*;
-import static uk.gov.hmcts.sscs.util.DateTimeUtils.*;
+import static uk.gov.hmcts.sscs.util.DateTimeUtils.convertLocalDateLocalTimetoUtc;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -14,9 +14,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import net.objectlab.kit.datecalc.common.DateCalculator;
@@ -28,6 +25,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
+import uk.gov.hmcts.sscs.util.DateTimeUtils;
 
 @Service
 public class TrackYourAppealJsonBuilder {
@@ -212,7 +210,7 @@ public class TrackYourAppealJsonBuilder {
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
-                            convertLocalDateTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                            convertLocalDateLocalTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
                     eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
                     eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
                     eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
@@ -255,8 +253,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private String formatDateTime(LocalDateTime localDateTime) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(localDateTime, ZoneId.of(EUROPE_LONDON));
-        return zonedDateTime.format(DateTimeFormatter.ofPattern(UTC_STRING_FORMAT));
+        return DateTimeUtils.convertLocalDateTimetoUtc(localDateTime);
     }
 
     private void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode) {
@@ -357,8 +354,10 @@ public class TrackYourAppealJsonBuilder {
                 for (Event event : events) {
                     if (HEARING_BOOKED.equals(getEventType(event))
                             || NEW_HEARING_BOOKED.equals(getEventType(event))) {
-                        eventHearingMap.put(event, hearingList.get(hearingIndex));
-                        hearingIndex++;
+                        if (hearingIndex < hearingList.size()) {
+                            eventHearingMap.put(event, hearingList.get(hearingIndex));
+                            hearingIndex++;
+                        }
                     }
                 }
             }
