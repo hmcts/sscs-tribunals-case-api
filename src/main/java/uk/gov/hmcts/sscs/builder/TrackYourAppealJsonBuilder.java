@@ -300,7 +300,8 @@ public class TrackYourAppealJsonBuilder {
             for (Document document : documentList) {
                 if (document != null && document.getValue() != null) {
                     EventDetails eventDetails = EventDetails.builder()
-                            .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().toString())
+                            .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().plusHours(1)
+                                    .toString())
                             .type(EventType.EVIDENCE_RECEIVED.getCcdType())
                             .description("Evidence received")
                             .build();
@@ -369,7 +370,7 @@ public class TrackYourAppealJsonBuilder {
     private CaseData createAppealReceivedEventTypeForAppealCreatedEvent(CaseData caseData) {
 
         EventDetails eventDetails = EventDetails.builder()
-                .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().toString())
+                .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())
                 .type(EventType.APPEAL_RECEIVED.getCcdType())
                 .description("Appeal received")
                 .build();
