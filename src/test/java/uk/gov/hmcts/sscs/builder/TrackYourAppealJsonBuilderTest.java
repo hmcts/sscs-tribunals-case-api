@@ -3,7 +3,6 @@ package uk.gov.hmcts.sscs.builder;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.junit.Before;
