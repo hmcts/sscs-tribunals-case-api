@@ -134,7 +134,7 @@ module "tribunals-case-api" {
     IDAM_URL = "${data.vault_generic_secret.idam_api.data["value"]}"
 
     IDAM.S2S-AUTH.TOTP_SECRET ="${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
-    IDAM.S2S-AUTH = "${var.env == "prod" ? data.vault_generic_secret.idam_s2s_api.data["value"] : local.s2sCnpUrl}"
+    IDAM.S2S-AUTH = "${local.s2sCnpUrl}"
     IDAM.S2S-AUTH.MICROSERVICE = "${var.ccd_idam_s2s_auth_microservice}"
 
     IDAM_SSCS_SYSTEMUPDATE_USER = "${data.vault_generic_secret.idam_sscs_systemupdate_user.data["value"]}"
