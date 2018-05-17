@@ -37,6 +37,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.sscs.controller.SyaController;
@@ -95,6 +96,7 @@ public class SyaEndpointsIt {
     @Test
     public void shouldGeneratePdfAndSend() throws Exception {
         when(pdfServiceClient.generateFromHtml(eq(getTemplate()), any())).thenReturn(PDF.getBytes());
+        when(ccdService.createCase(any())).thenReturn(CaseDetails.builder().id(123456789876L).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
