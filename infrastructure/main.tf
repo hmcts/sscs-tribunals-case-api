@@ -79,12 +79,12 @@ locals {
   aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
   app_full_name = "${var.product}-${var.component}"
 
-  localCcdApi = "http://ccd-data-store-api-${var.env}.service.${local.aseName}.internal"
-  CcdApi = "${var.env == "preview" ? "http://ccd-data-store-api-aat.service.core-compute-aat.internal" : local.localCcdApi}"
+  local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
+  local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
-  localPdfService = "http://cmc-pdf-service-${var.env}.service.${local.aseName}.internal"
-  pdfService = "${var.env == "preview" ? "http://cmc-pdf-service-aat.service.core-compute-aat.internal" : local.localPdfService}"
-
+  ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
+  s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
+  pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
 }
 
 
@@ -99,14 +99,14 @@ module "tribunals-case-api" {
 
   app_settings = {
     AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
-    AUTH_PROVIDER_SERVICE_API_URL="${data.vault_generic_secret.idam_s2s_api.data["value"]}"
+    AUTH_PROVIDER_SERVICE_API_URL="${local.s2sCnpUrl}"
 
     IDAM_API_URL="${data.vault_generic_secret.idam_api.data["value"]}"
     IDAM_USER_ID="${data.vault_generic_secret.idam_uid.data["value"]}"
     IDAM_ROLE="${data.vault_generic_secret.idam_role.data["value"]}"
 
     CCD_CASE_WORKER_ID="${data.vault_generic_secret.ccd_case_worker_id.data["value"]}"
-    CCD_SERVICE_API_URL="${local.CcdApi}"
+    CCD_SERVICE_API_URL="${local.ccdApi}"
 
     EMAIL_FROM="${data.vault_generic_secret.appeal_email_from.data["value"]}"
     EMAIL_TO="${data.vault_generic_secret.appeal_email_to.data["value"]}"
@@ -119,13 +119,13 @@ module "tribunals-case-api" {
 
     IDAM_S2S_AUTH_TOTP_SECRET="${data.vault_generic_secret.cmc_s2s_secret.data["value"]}"
     IDAM_S2S_AUTH_MICROSERVICE="${var.idam_s2s_auth_microservice}"
-    IDAM_S2S_AUTH_URL="${data.vault_generic_secret.idam_s2s_api.data["value"]}"
+    IDAM_S2S_AUTH_URL="${local.s2sCnpUrl}"
 
     PDF_API_URL="${local.pdfService}"
 
     SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"
 
-    CORE_CASE_DATA_API_URL = "${local.CcdApi}"
+    CORE_CASE_DATA_API_URL = "${local.ccdApi}"
     CORE_CASE_DATA_USER_ID = "${var.core_case_data_user_id}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
@@ -134,7 +134,7 @@ module "tribunals-case-api" {
     IDAM_URL = "${data.vault_generic_secret.idam_api.data["value"]}"
 
     IDAM.S2S-AUTH.TOTP_SECRET ="${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
-    IDAM.S2S-AUTH = "${data.vault_generic_secret.idam_s2s_api.data["value"]}"
+    IDAM.S2S-AUTH = "${local.s2sCnpUrl}"
     IDAM.S2S-AUTH.MICROSERVICE = "${var.ccd_idam_s2s_auth_microservice}"
 
     IDAM_SSCS_SYSTEMUPDATE_USER = "${data.vault_generic_secret.idam_sscs_systemupdate_user.data["value"]}"

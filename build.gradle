@@ -188,7 +188,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'pdf-service-client', version: '5.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.4.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '0.6.0'
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '2.5.0'
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
 
