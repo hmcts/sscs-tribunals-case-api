@@ -82,7 +82,7 @@ locals {
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
-  CcdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
+  ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
 }
@@ -106,7 +106,7 @@ module "tribunals-case-api" {
     IDAM_ROLE="${data.vault_generic_secret.idam_role.data["value"]}"
 
     CCD_CASE_WORKER_ID="${data.vault_generic_secret.ccd_case_worker_id.data["value"]}"
-    CCD_SERVICE_API_URL="${local.CcdApi}"
+    CCD_SERVICE_API_URL="${local.ccdApi}"
 
     EMAIL_FROM="${data.vault_generic_secret.appeal_email_from.data["value"]}"
     EMAIL_TO="${data.vault_generic_secret.appeal_email_to.data["value"]}"
@@ -125,7 +125,7 @@ module "tribunals-case-api" {
 
     SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"
 
-    CORE_CASE_DATA_API_URL = "${local.CcdApi}"
+    CORE_CASE_DATA_API_URL = "${local.ccdApi}"
     CORE_CASE_DATA_USER_ID = "${var.core_case_data_user_id}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
