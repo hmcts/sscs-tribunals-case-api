@@ -99,7 +99,7 @@ module "tribunals-case-api" {
 
   app_settings = {
     AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
-    AUTH_PROVIDER_SERVICE_API_URL="${data.vault_generic_secret.idam_s2s_api.data["value"]}"
+    AUTH_PROVIDER_SERVICE_API_URL="${local.s2sCnpUrl}"
 
     IDAM_API_URL="${data.vault_generic_secret.idam_api.data["value"]}"
     IDAM_USER_ID="${data.vault_generic_secret.idam_uid.data["value"]}"
@@ -119,7 +119,7 @@ module "tribunals-case-api" {
 
     IDAM_S2S_AUTH_TOTP_SECRET="${data.vault_generic_secret.cmc_s2s_secret.data["value"]}"
     IDAM_S2S_AUTH_MICROSERVICE="${var.idam_s2s_auth_microservice}"
-    IDAM_S2S_AUTH_URL="${var.env == "prod" ? data.vault_generic_secret.idam_s2s_api.data["value"] : local.s2sCnpUrl}"
+    IDAM_S2S_AUTH_URL="${local.s2sCnpUrl}"
 
     PDF_API_URL="${local.pdfService}"
 
