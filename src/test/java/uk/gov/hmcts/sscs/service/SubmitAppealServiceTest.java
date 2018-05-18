@@ -18,6 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
@@ -62,6 +63,9 @@ public class SubmitAppealServiceTest {
         service = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
                 submitYourAppealToCcdCaseDataDeserializer, ccdService,
                 pdfServiceClient, emailService, submitYourAppealEmail);
+
+        given(ccdService.createCase(any(CaseData.class)))
+                .willReturn(CaseDetails.builder().id(123L).build());
     }
 
     @Test
