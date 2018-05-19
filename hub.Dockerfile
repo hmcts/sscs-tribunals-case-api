@@ -18,4 +18,4 @@ HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" wget -q 
 
 EXPOSE 8082
 
-ENTRYPOINT exec java ${JAVA_OPTS} -jar "/opt/app/tribunals-case-api.jar"
+ENTRYPOINT ["/usr/bin/java", "-jar", "/opt/app/tribunals-case-api.jar"]
