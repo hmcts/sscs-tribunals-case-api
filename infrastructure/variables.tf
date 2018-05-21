@@ -51,10 +51,6 @@ variable "idam_s2s_auth_microservice" {
   default = "cmc"
 }
 
-variable "core_case_data_user_id"{
-  default = "16"
-}
-
 variable "core_case_data_jurisdiction_id"{
   default = "SSCS"
 }
