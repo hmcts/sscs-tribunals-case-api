@@ -1,33 +1,33 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
 import com.google.common.collect.ImmutableMap;
-
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.CcdUtil;
+import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 @Service
 @Slf4j
 public class ReadCoreCaseDataService {
 
     private final CoreCaseDataService coreCaseDataService;
+    private final IdamService idamService;
 
     @Autowired
-    public ReadCoreCaseDataService(CoreCaseDataService coreCaseDataService) {
+    public ReadCoreCaseDataService(CoreCaseDataService coreCaseDataService,
+                                   IdamService idamService) {
         this.coreCaseDataService = coreCaseDataService;
+        this.idamService = idamService;
     }
 
     public CaseDetails getCcdCaseDetailsByCaseId(String caseId) {
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("emptyEvent");
-        String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
+        String serviceAuthorization = idamService.generateServiceAuthorization();
 
         return getByCaseId(eventRequestData, serviceAuthorization, caseId);
     }
@@ -52,7 +52,7 @@ public class ReadCoreCaseDataService {
 
     public CaseDetails getCcdCaseDetailsByAppealNumber(String appealNumber) {
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("emptyEvent");
-        String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
+        String serviceAuthorization = idamService.generateServiceAuthorization();
 
         List<CaseDetails> caseDetailsList = getByAppealNumber(eventRequestData, serviceAuthorization, appealNumber);
         CaseDetails caseDetails = null;

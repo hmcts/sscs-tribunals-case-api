@@ -49,14 +49,14 @@ public enum SerializeJsonMessageManager {
     private final String serializedMessage;
 
     SerializeJsonMessageManager(String fileName) {
-        this.serializedMessage = getSerialisedMessage(fileName, "tya/");
+        this.serializedMessage = getSerialisedMessage(fileName);
     }
 
     private String getSerialisedMessage(String fileName) {
         try {
 
             ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource(path + fileName).getFile());
+            File file = new File(classLoader.getResource("tya/" + fileName).getFile());
             return new String(Files.readAllBytes(file.toPath()));
 
         } catch (IOException e) {
