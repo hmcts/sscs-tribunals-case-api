@@ -1,6 +1,20 @@
 version: "3.0"
 services:
 
+  pdf-service-api:
+    image: docker.artifactory.reform.hmcts.net/reform/pdf-service-api
+    environment:
+      - S2S_URL
+      # used by java-logging library
+      - ROOT_APPENDER
+      - JSON_CONSOLE_PRETTY_PRINT
+      - ROOT_LOGGING_LEVEL
+      - REFORM_SERVICE_NAME
+      - REFORM_TEAM
+      - REFORM_ENVIRONMENT
+    ports:
+      - 5500:5500
+
   tribunals-case-api:
     build:
       context: .
@@ -10,6 +24,7 @@ services:
         - no_proxy
     image: hmcts/tribunals-case-api
     environment:
+      PDF_API_URL: http://localhost:5500
       IDAM_URL: http://localhost:4501
       IDAM_S2S-AUTH_TOTP_SECRET: "${IDAM_KEY_CCD_GATEWAY}"
       IDAM_S2S-AUTH_MICROSERVICE: sscs
@@ -24,3 +39,5 @@ services:
       CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     ports:
       - 8082:8080
+    depends_on:
+      - pdf-service-api
