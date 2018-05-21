@@ -1,0 +1,135 @@
+{
+  "event": {
+    "id": "appealCreated",
+    "summary": "SSCS - appeal created event",
+    "description": "Created SSCS case with token"
+  },
+  "data": {
+    "caseReference": "SC068/17/00013",
+    "caseCreated" : "${json-unit.ignore}",
+    "appeal": {
+      "mrnDetails": {
+        "dwpIssuingOffice": "1",
+        "mrnDate": "2018-06-30",
+        "mrnLateReason": null,
+        "mrnMissingReason": null
+      },
+      "appellant": {
+        "name": {
+          "title": "Mr",
+          "firstName": "User",
+          "lastName": "Test"
+        },
+        "address": {
+          "postcode": "L17 7AE"
+        },
+        "contact": {
+          "email": "mail@email.com",
+          "phone": "01234567890",
+          "mobile": "01234567890"
+        },
+        "identity": {
+          "dob": "1904-03-10",
+          "nino": "AB 22 55 66 B"
+        },
+        "isAppointee": null
+      },
+      "benefitType": {
+        "code": "1325"
+      },
+      "hearingOptions": {
+        "wantsToAttend": "Yes",
+        "arrangements": [
+          "disabledAccess",
+          "hearingLoop"
+        ],
+        "excludeDates": [
+          {
+            "value": {
+              "start": "2018-06-30",
+              "end": "2018-06-30"
+            }
+          }
+        ],
+        "other": "No"
+      },
+      "appealReasons": null,
+      "rep": {
+        "hasRepresentative": "Yes",
+        "organisation": null,
+        "name": null,
+        "address": null,
+        "contact": null
+      },
+      "signer": "Signer"
+    },
+    "hearings": [
+      {
+        "value": {
+          "venue": {
+            "name": "Aberdeen",
+            "address": {
+              "postcode": "AB12 3ED"
+            },
+            "googleMapLink": null
+          },
+          "hearingDate": "2017-05-24",
+          "time": "10:45",
+          "adjourned": "Yes",
+          "eventDate": null
+        }
+      }
+    ],
+    "evidence": {
+      "documents": [
+        {
+          "value": {
+            "dateReceived": "2017-05-24",
+            "evidenceType": "General",
+            "evidenceProvidedBy": null
+          }
+        }
+      ]
+    },
+    "dwpTimeExtension": [
+      {
+        "value": {
+          "requested": "Yes",
+          "granted": "Yes"
+        }
+      }
+    ],
+    "events": [
+      {
+        "value": {
+          "date": "2001-12-14T21:59:43.10-05:00",
+          "type": "appealCreated",
+          "description": "Appeal Created"
+        }
+      }
+    ],
+    "subscriptions": {
+      "appellantSubscription": {
+        "wantSmsNotifications": null,
+        "tya": "",
+        "email": "appellant@email.com",
+        "mobile": "",
+        "subscribeEmail": "Yes",
+        "subscribeSms": "Yes",
+        "reason": ""
+      },
+      "supporterSubscription": {
+        "wantSmsNotifications": null,
+        "tya": "",
+        "email": "supporter@email.com",
+        "mobile": "",
+        "subscribeEmail": "",
+        "subscribeSms": "",
+        "reason": ""
+      }
+    }
+  },
+  "security_classification": null,
+  "event_token": "user token",
+  "ignore_warning": false
+}

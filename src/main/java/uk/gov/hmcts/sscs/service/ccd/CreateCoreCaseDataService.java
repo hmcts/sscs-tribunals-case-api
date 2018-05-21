@@ -18,18 +18,15 @@ public class CreateCoreCaseDataService {
     private final CoreCaseDataService coreCaseDataService;
 
     @Autowired
-    public CreateCoreCaseDataService(CoreCaseDataService coreCaseDataService) {
+    CreateCoreCaseDataService(CoreCaseDataService coreCaseDataService) {
         this.coreCaseDataService = coreCaseDataService;
     }
 
     public CaseDetails createCcdCase(CaseData caseData) {
         log.info("*** tribunals-service *** createCcdCase ");
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("appealCreated");
-        log.info("*** tribunals-service *** eventRequestData: {}", eventRequestData);
         String serviceAuthorization = coreCaseDataService.generateServiceAuthorization();
-        log.info("*** tribunals-service *** s2s token: {}", serviceAuthorization);
         StartEventResponse startEventResponse = start(eventRequestData, serviceAuthorization);
-        log.info("*** tribunals-service *** startEventResponse: {}", startEventResponse);
         return create(eventRequestData, serviceAuthorization, coreCaseDataService.getCaseDataContent(caseData,
             startEventResponse, "SSCS - appeal created event", "Created SSCS"));
     }

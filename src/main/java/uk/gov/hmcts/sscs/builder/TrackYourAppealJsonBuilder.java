@@ -4,8 +4,8 @@ import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.sscs.domain.corecase.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
+import static uk.gov.hmcts.sscs.model.ccd.EventType.*;
 import static uk.gov.hmcts.sscs.util.DateTimeUtils.convertLocalDateLocalTimetoUtc;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -22,7 +22,6 @@ import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import uk.gov.hmcts.sscs.domain.corecase.EventType;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.*;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
@@ -37,17 +36,23 @@ public class TrackYourAppealJsonBuilder {
     public ObjectNode build(CaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter) {
 
+        // Create appealReceived eventType for appealCreated CCD event
         List<Event> eventList = caseData.getEvents();
         if (eventList == null || eventList.isEmpty()) {
-            String message = "No events exists for this appeal";
-            CcdException ccdException = new CcdException(new Exception(message));
-            LOG.error(message, ccdException);
-            throw ccdException;
+            if (caseData.getCaseCreated() != null) {
+                caseData = createAppealReceivedEventTypeForAppealCreatedEvent(caseData);
+            } else {
+                String message = "No events exists for this appeal";
+                CcdException ccdException = new CcdException(new Exception(message));
+                LOG.error(message, ccdException);
+                throw ccdException;
+            }
         }
 
         createEvidenceResponseEvents(caseData);
+        eventList = caseData.getEvents();
         eventList.sort(Comparator.reverseOrder());
-        processExceptions(caseData.getEvents());
+        processExceptions(eventList);
         eventDocumentMap = buildEventDocumentMap(caseData);
         eventHearingMap = buildEventHearingMap(caseData);
 
@@ -295,7 +300,8 @@ public class TrackYourAppealJsonBuilder {
             for (Document document : documentList) {
                 if (document != null && document.getValue() != null) {
                     EventDetails eventDetails = EventDetails.builder()
-                            .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().toString())
+                            .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().plusHours(1)
+                                    .toString())
                             .type(EventType.EVIDENCE_RECEIVED.getCcdType())
                             .description("Evidence received")
                             .build();
@@ -359,6 +365,25 @@ public class TrackYourAppealJsonBuilder {
         }
 
         return  eventHearingMap;
+    }
+
+    private CaseData createAppealReceivedEventTypeForAppealCreatedEvent(CaseData caseData) {
+
+        EventDetails eventDetails = EventDetails.builder()
+                .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())
+                .type(EventType.APPEAL_RECEIVED.getCcdType())
+                .description("Appeal received")
+                .build();
+
+        Event event = Event.builder()
+                .value(eventDetails)
+                .build();
+
+        List<Event> events = new ArrayList<>();
+        events.add(event);
+
+        return caseData.toBuilder().events(events).build();
+
     }
 
 }

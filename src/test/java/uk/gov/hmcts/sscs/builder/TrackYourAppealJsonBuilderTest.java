@@ -3,7 +3,6 @@ package uk.gov.hmcts.sscs.builder;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.junit.Before;
@@ -126,8 +125,23 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
     }
 
+    @Test(expected = CcdException.class)
+    public void noEventsTest() throws CcdException {
+        CaseData caseData = NO_EVENTS_CCD.getDeserializeMessage();
+        trackYourAppealJsonBuilder.build(caseData, populateRegionalProcessingCenter());
+    }
+
     @Test
-    public void shouldHandleMissingHearings() throws CcdException, JsonProcessingException {
+    public void appealCreatedTest() throws CcdException {
+        CaseData caseData = APPEAL_CREATED_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(APPEAL_CREATED.getSerializedMessage(), objectNode);
+    }
+
+
+    @Test
+    public void shouldHandleMissingHearings() throws CcdException {
         CaseData caseData = MISSING_HEARING_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
@@ -148,5 +162,6 @@ public class TrackYourAppealJsonBuilderTest {
         regionalProcessingCenter.setFaxNumber("0870 324 0109");
         return regionalProcessingCenter;
     }
+    
 }
 
