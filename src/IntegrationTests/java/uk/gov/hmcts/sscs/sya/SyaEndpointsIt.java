@@ -9,6 +9,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
@@ -161,6 +162,9 @@ public class SyaEndpointsIt {
 
     @Test
     public void shouldSendEmailWithPdfWhenCcdIsDown() throws Exception {
+        given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyMap())).willThrow(new RuntimeException("CCD is down"));
+
         given(coreCaseDataApi.startForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyString())).willThrow(new RuntimeException("CCD is down"));
 

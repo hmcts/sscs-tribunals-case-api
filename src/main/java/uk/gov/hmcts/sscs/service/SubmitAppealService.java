@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @Service
+@Slf4j
 public class SubmitAppealService {
 
     private static final String PDF_WRAPPER = "PdfWrapper";
@@ -71,11 +73,16 @@ public class SubmitAppealService {
 
     private CaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
         CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
-        Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
-                .tya(appealNumberGenerator.generate())
-                .build();
-        caseData.getSubscriptions().setAppellantSubscription(subscription);
-        return caseData;
+        try {
+            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
+                    .tya(appealNumberGenerator.generate())
+                    .build();
+            caseData.getSubscriptions().setAppellantSubscription(subscription);
+            return caseData;
+        } catch (CcdException e) {
+            log.info("CCD is down. Therefore the appeal number is not generated");
+            return caseData;
+        }
     }
 
     private void sendPdfByEmail(SyaCaseWrapper appeal, byte[] pdf) {
