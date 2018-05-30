@@ -94,10 +94,7 @@ public class SubmitAppealService {
         } catch (IOException e) {
             throw new PdfGenerationException("Error getting template", e);
         }
-        PdfWrapper pdfWrapper = PdfWrapper.builder()
-                .syaCaseWrapper(appeal)
-                .ccdCaseId(caseDetailsId)
-                .build();
+        PdfWrapper pdfWrapper = PdfWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetailsId).build();
         Map<String, Object> placeholders = Collections.singletonMap(PDF_WRAPPER, pdfWrapper);
         return pdfServiceClient.generateFromHtml(template, placeholders);
     }

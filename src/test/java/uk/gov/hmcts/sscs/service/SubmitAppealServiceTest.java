@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -16,6 +17,8 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -44,9 +48,12 @@ public class SubmitAppealServiceTest {
     @Mock
     private EmailService emailService;
 
+    @Captor
+    private ArgumentCaptor captor;
+
     private SubmitYourAppealEmail submitYourAppealEmail;
 
-    private SubmitAppealService service;
+    private SubmitAppealService submitAppealService;
 
     @Before
     public void setUp() {
@@ -57,7 +64,7 @@ public class SubmitAppealServiceTest {
 
         submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
 
-        service = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
+        submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
                 submitYourAppealToCcdCaseDataDeserializer, ccdService,
                 pdfServiceClient, emailService, submitYourAppealEmail);
 
@@ -71,12 +78,20 @@ public class SubmitAppealServiceTest {
                 new RuntimeException("Error while creating case in CCD")));
 
         byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), (Map<String, Object>) captor.capture()))
+                .willReturn(expected);
 
-        service.submitAppeal(getSyaCaseWrapper());
+        submitAppealService.submitAppeal(getSyaCaseWrapper());
 
         then(pdfServiceClient).should(times(1)).generateFromHtml(any(), any());
         then(emailService).should(times(1)).sendEmail(any(SubmitYourAppealEmail.class));
+
+        assertNull(getPdfWrapper().getCcdCaseId());
+    }
+
+    private PdfWrapper getPdfWrapper() {
+        Map placeHolders = (Map) captor.getAllValues().get(0);
+        return (PdfWrapper) placeHolders.get("PdfWrapper");
     }
 
     @Test
@@ -86,7 +101,7 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
 
-        service.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData);
 
         verify(appealNumberGenerator).generate();
         verify(ccdService).createCase(any(CaseData.class));
@@ -100,7 +115,7 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
 
-        service.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData);
 
         assertThat(submitYourAppealEmail.getSubject(), is("Bloggs_33C"));
         verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
