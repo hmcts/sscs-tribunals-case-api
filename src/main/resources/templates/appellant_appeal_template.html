@@ -105,7 +105,7 @@
         </div>
         <div>
             <dt class="cya-question">Appeal reference</dt>
-            <dd class="cya-answer">{{ PdfWrapper.ccdCaseId }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.ccdCaseId | default('Not provided') }}</dd>
         </div>
     </dl>
 
