@@ -14,7 +14,6 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -55,7 +54,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
-        doThrow(new PdfGenerationException(new Exception("malformed html template")))
+        doThrow(new PdfGenerationException("malformed html template", new Exception()))
                 .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class));
         String json = getSyaCaseWrapperJson();
 

@@ -3,13 +3,13 @@ package uk.gov.hmcts.sscs.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
@@ -20,12 +20,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
-import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
@@ -69,6 +66,20 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
+    public void shouldSendPdfByEmailWhenCcdIsDown() {
+        given(ccdService.createCase(any(CaseData.class))).willThrow(new CcdException(
+                new RuntimeException("Error while creating case in CCD")));
+
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
+
+        service.submitAppeal(getSyaCaseWrapper());
+
+        then(pdfServiceClient).should(times(1)).generateFromHtml(any(), any());
+        then(emailService).should(times(1)).sendEmail(any(SubmitYourAppealEmail.class));
+    }
+
+    @Test
     public void shouldCreateCaseWithAppealDetails() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         byte[] expected = {};
@@ -81,6 +92,7 @@ public class SubmitAppealServiceTest {
         verify(ccdService).createCase(any(CaseData.class));
     }
 
+
     @Test
     public void shouldCreatePdfWithAppealDetails() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
@@ -92,36 +104,6 @@ public class SubmitAppealServiceTest {
 
         assertThat(submitYourAppealEmail.getSubject(), is("Bloggs_33C"));
         verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
-    }
-
-    @Test(expected = CcdException.class)
-    public void shouldHandleCcdServiceException() {
-        given(ccdService.createCase(any(CaseData.class)))
-                .willThrow(new CcdException(
-                        new RuntimeException("Error while creating case in CCD")));
-
-        service.submitAppeal(getSyaCaseWrapper());
-    }
-
-    @Test(expected = PdfGenerationException.class)
-    public void shouldHandlePdfServiceClientException() {
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any(Map.class)))
-                .willThrow(
-                        new PDFServiceClientException(
-                                new RuntimeException("Malformed html error")));
-
-        service.submitAppeal(getSyaCaseWrapper());
-    }
-
-    @Test(expected = EmailSendFailedException.class)
-    public void shouldHandleEmailSendFailedException() {
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any(Map.class))).willReturn(new byte[]{});
-        doThrow(new EmailSendFailedException(new Exception("Error Sending email")))
-                .when(emailService).sendEmail(any(SubmitYourAppealEmail.class));
-
-        service.submitAppeal(getSyaCaseWrapper());
     }
 
     private SyaCaseWrapper getSyaCaseWrapper() {

@@ -18,7 +18,7 @@ import uk.gov.hmcts.sscs.service.SubmitAppealService;
 @RestController
 public class SyaController {
 
-    private SubmitAppealService submitAppealService;
+    private final SubmitAppealService submitAppealService;
 
     @Autowired
     SyaController(SubmitAppealService submitAppealService) {
@@ -26,13 +26,12 @@ public class SyaController {
     }
 
     @ApiOperation(value = "submitAppeal",
-        notes = "Creates a case from the SYA details",
-        response = String.class, responseContainer = "Appeal details")
+            notes = "Creates a case from the SYA details",
+            response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
             response = String.class)})
-    @RequestMapping(value = "/appeals", method = POST,  consumes = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/appeals", method = POST, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
-
         submitAppealService.submitAppeal(syaCaseWrapper);
         return status(201).build();
     }
