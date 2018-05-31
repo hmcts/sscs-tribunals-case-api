@@ -42,6 +42,9 @@ public enum SerializeJsonMessageManager {
     CLOSED_CCD("closedCcd.json"),
     LAPSED_REVISED("lapsedRevised.json"),
     LAPSED_REVISED_CCD("lapsedRevisedCcd.json"),
+    NO_EVENTS_CCD("noEventsCcd.json"),
+    APPEAL_CREATED("appealCreated.json"),
+    APPEAL_CREATED_CCD("appealCreatedCcd.json"),
     MISSING_HEARING_CCD("missingHearingBookedCcd.json"),
     MISSING_HEARING("missingHearingBooked.json");
 
@@ -49,13 +52,12 @@ public enum SerializeJsonMessageManager {
     private final String serializedMessage;
 
     SerializeJsonMessageManager(String fileName) {
-        this.serializedMessage = getSerialisedMessage(fileName,
-                "src/test/resources/tya/");
+        this.serializedMessage = getSerialisedMessage(fileName);
     }
 
-    private String getSerialisedMessage(String fileName, String path) {
+    private String getSerialisedMessage(String fileName) {
         try {
-            return new String(Files.readAllBytes(Paths.get(path + fileName)));
+            return new String(Files.readAllBytes(Paths.get("src/test/resources/tya/" + fileName)));
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException();

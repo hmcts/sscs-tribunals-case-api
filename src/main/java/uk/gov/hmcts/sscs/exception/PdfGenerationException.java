@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.logging.exception.UnknownErrorCodeException;
 @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR,
         reason = "Error while generating appeal pdf")
 public class PdfGenerationException extends UnknownErrorCodeException {
-    public PdfGenerationException(Throwable cause) {
+    public PdfGenerationException(String message, Throwable cause) {
         super(AlertLevel.P4, cause);
     }
 }

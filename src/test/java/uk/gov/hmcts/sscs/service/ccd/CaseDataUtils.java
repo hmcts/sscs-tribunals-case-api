@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -41,14 +42,39 @@ public final class CaseDataUtils {
                 .code("1325")
                 .build();
 
+        DateRange dateRange = DateRange.builder()
+                .start("2018-06-30")
+                .end("2018-06-30")
+                .build();
+        ExcludeDate excludeDate = ExcludeDate.builder()
+                .value(dateRange)
+                .build();
+
         HearingOptions hearingOptions = HearingOptions.builder()
+                .wantsToAttend("Yes")
+                .arrangements(Arrays.asList("disabledAccess", "hearingLoop"))
+                .excludeDates(Collections.singletonList(excludeDate))
                 .other("No")
                 .build();
+
+        MrnDetails mrnDetails = MrnDetails.builder()
+                .mrnDate("2018-06-30")
+                .dwpIssuingOffice("1")
+                .build();
+
+        Representative representative = Representative.builder()
+                .hasRepresentative("Yes")
+                .build();
+
         final Appeal appeal = Appeal.builder()
                 .appellant(appellant)
                 .benefitType(benefitType)
                 .hearingOptions(hearingOptions)
+                .mrnDetails(mrnDetails)
+                .rep(representative)
+                .signer("Signer")
                 .build();
+
         Address venueAddress = Address.builder()
                 .postcode("AB12 3ED")
                 .build();
@@ -123,6 +149,7 @@ public final class CaseDataUtils {
 
         return CaseData.builder()
                 .caseReference("SC068/17/00013")
+                .caseCreated(LocalDate.now().toString())
                 .appeal(appeal)
                 .hearings(hearingsList)
                 .evidence(evidence)

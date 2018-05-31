@@ -11,6 +11,8 @@ import lombok.Data;
 @Data
 @Builder(toBuilder = true)
 public class Subscription {
+
+    String wantSmsNotifications;
     String tya;
     String email;
     String mobile;
@@ -19,12 +21,14 @@ public class Subscription {
     String reason;
 
     @JsonCreator
-    public Subscription(@JsonProperty("tya") String tya,
-                @JsonProperty("email") String email,
-                @JsonProperty("mobile") String mobile,
-                @JsonProperty("subscribeEmail") String subscribeEmail,
-                @JsonProperty("subscribeSms") String subscribeSms,
-                @JsonProperty("reason") String reason) {
+    public Subscription(@JsonProperty("wantSmsNotifications") String wantSmsNotifications,
+                        @JsonProperty("tya") String tya,
+                        @JsonProperty("email") String email,
+                        @JsonProperty("mobile") String mobile,
+                        @JsonProperty("subscribeEmail") String subscribeEmail,
+                        @JsonProperty("subscribeSms") String subscribeSms,
+                        @JsonProperty("reason") String reason) {
+        this.wantSmsNotifications = wantSmsNotifications;
         this.tya = tya;
         this.email = email;
         this.mobile = mobile;

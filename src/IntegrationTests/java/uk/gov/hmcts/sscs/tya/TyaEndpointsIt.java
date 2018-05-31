@@ -1,7 +1,7 @@
 package uk.gov.hmcts.sscs.tya;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,7 +10,6 @@ import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;

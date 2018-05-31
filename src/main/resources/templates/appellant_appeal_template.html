@@ -97,11 +97,15 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">Benefit name</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.benefitType.description }} ({{ SyaCaseWrapper.benefitType.code }})</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.benefitType.description }} ({{ PdfWrapper.syaCaseWrapper.benefitType.code }})</dd>
         </div>
         <div>
             <dt class="cya-question">NINO</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.appellant.nino }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.appellant.nino }}</dd>
+        </div>
+        <div>
+            <dt class="cya-question">Appeal reference</dt>
+            <dd class="cya-answer">{{ PdfWrapper.ccdCaseId | default('Not provided') }}</dd>
         </div>
     </dl>
 
@@ -111,48 +115,48 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">Title</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.appellant.title }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.appellant.title }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">First name</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.appellant.firstName }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.appellant.firstName }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Surname</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.appellant.lastName }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.appellant.lastName }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Date of birth</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.appellant.dob | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.appellant.dob | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Address</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.appellant.contactDetails.addressLine1 }}<br/>
+                {{ PdfWrapper.syaCaseWrapper.appellant.contactDetails.addressLine1 }}<br/>
 
                 <!-- This field is optional, only add it if it exists. -->
-                {% if SyaCaseWrapper.appellant.contactDetails.addressLine2 is not empty %}
-                {{ SyaCaseWrapper.appellant.contactDetails.addressLine2 }}<br/>
+                {% if PdfWrapper.syaCaseWrapper.appellant.contactDetails.addressLine2 is not empty %}
+                {{ PdfWrapper.syaCaseWrapper.appellant.contactDetails.addressLine2 }}<br/>
                 {% endif %}
 
-                {{ SyaCaseWrapper.appellant.contactDetails.townCity }}<br/>
-                {{ SyaCaseWrapper.appellant.contactDetails.county }}<br/>
-                {{ SyaCaseWrapper.appellant.contactDetails.postCode }}<br/>
+                {{ PdfWrapper.syaCaseWrapper.appellant.contactDetails.townCity }}<br/>
+                {{ PdfWrapper.syaCaseWrapper.appellant.contactDetails.county }}<br/>
+                {{ PdfWrapper.syaCaseWrapper.appellant.contactDetails.postCode }}<br/>
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Phone number</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.appellant.contactDetails.phoneNumber | default('Not provided') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.appellant.contactDetails.phoneNumber | default('Not provided') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Email</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.appellant.contactDetails.emailAddress | default('Not provided') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.appellant.contactDetails.emailAddress | default('Not provided') }}</dd>
         </div>
     </dl>
 
@@ -162,35 +166,35 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">Name</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.representative.fullName | default('Not provided') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.representative.fullName | default('Not provided') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Organisation</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.representative.organisation | default('Not provided') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.representative.organisation | default('Not provided') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Address</dt>
             <dd class="cya-answer">
 
-                {% if SyaCaseWrapper.representative is defined %}
+                {% if PdfWrapper.syaCaseWrapper.representative is defined %}
 
-                {{ SyaCaseWrapper.representative.contactDetails.addressLine1 }}<br/>
-
-                <!-- This field is optional, only add it if it exists. -->
-                {% if SyaCaseWrapper.representative.contactDetails.addressLine2 is not empty %}
-                {{ SyaCaseWrapper.representative.contactDetails.addressLine2 }}<br/>
-                {% endif %}
-
-                {{ SyaCaseWrapper.representative.contactDetails.townCity }}<br/>
+                {{ PdfWrapper.syaCaseWrapper.representative.contactDetails.addressLine1 }}<br/>
 
                 <!-- This field is optional, only add it if it exists. -->
-                {% if SyaCaseWrapper.representative.contactDetails.county is not empty %}
-                {{ SyaCaseWrapper.representative.contactDetails.county }}<br/>
+                {% if PdfWrapper.syaCaseWrapper.representative.contactDetails.addressLine2 is not empty %}
+                {{ PdfWrapper.syaCaseWrapper.representative.contactDetails.addressLine2 }}<br/>
                 {% endif %}
 
-                {{ SyaCaseWrapper.representative.contactDetails.postCode }}<br/>
+                {{ PdfWrapper.syaCaseWrapper.representative.contactDetails.townCity }}<br/>
+
+                <!-- This field is optional, only add it if it exists. -->
+                {% if PdfWrapper.syaCaseWrapper.representative.contactDetails.county is not empty %}
+                {{ PdfWrapper.syaCaseWrapper.representative.contactDetails.county }}<br/>
+                {% endif %}
+
+                {{ PdfWrapper.syaCaseWrapper.representative.contactDetails.postCode }}<br/>
 
                 {% else %}
                 Not provided
@@ -201,12 +205,12 @@
 
         <div>
             <dt class="cya-question">Phone number</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.representative.contactDetails.phoneNumber | default('Not provided') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.representative.contactDetails.phoneNumber | default('Not provided') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Email address</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.representative.contactDetails.emailAddress | default('Not provided') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.representative.contactDetails.emailAddress | default('Not provided') }}</dd>
         </div>
     </dl>
 
@@ -216,31 +220,31 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">MRN originating office</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.mrn.dwpIssuingOffice | default('Not applicable') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.mrn.dwpIssuingOffice | default('Not applicable') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Date of decision</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.mrn.date | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") | default('Not applicable') }}
+                {{ PdfWrapper.syaCaseWrapper.mrn.date | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") | default('Not applicable') }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Date appeal submitted</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.mrn.dateAppealSubmitted | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") | default('Not applicable') }}
+                {{ PdfWrapper.syaCaseWrapper.mrn.dateAppealSubmitted | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") | default('Not applicable') }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Why appeal is late</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.mrn.reasonForBeingLate | default('Not applicable') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.mrn.reasonForBeingLate | default('Not applicable') }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">No MRN</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.mrn.reasonForNoMRN | default('Not applicable') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.mrn.reasonForNoMRN | default('Not applicable') }}</dd>
         </div>
     </dl>
 
@@ -248,7 +252,7 @@
 
     <h2 class="heading-medium">Reasons for appealing</h2>
     <dl class="govuk-check-your-answers">
-        {% for reason in SyaCaseWrapper.reasonsForAppealing.reasons %}
+        {% for reason in PdfWrapper.syaCaseWrapper.reasonsForAppealing.reasons %}
             <div>
                 <dt class="cya-question">What you disagree with</dt>
                 <dd class="cya-answer">{{ reason.whatYouDisagreeWith }}</dd>
@@ -260,7 +264,7 @@
         {% endfor %}
         <div>
             <dt class="cya-question">Anything else you want to tell the tribunal</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.reasonsForAppealing.otherReasons | default('Not provided') }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.reasonsForAppealing.otherReasons | default('Not provided') }}</dd>
         </div>
     </dl>
 
@@ -270,14 +274,14 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">Attending the hearing</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.hearing.wantsToAttend ? "Yes" : "No" }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.hearing.wantsToAttend ? "Yes" : "No" }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Dates you're not available</dt>
             <dd class="cya-answer">
-                {% if SyaCaseWrapper.hearing.scheduleHearing == true  %}
-                {% for date in SyaCaseWrapper.hearing.datesCantAttend %}
+                {% if PdfWrapper.syaCaseWrapper.hearing.scheduleHearing == true  %}
+                {% for date in PdfWrapper.syaCaseWrapper.hearing.datesCantAttend %}
                 {{ date | date(existingFormat="dd-MM-yyyy", format="dd MMMM yyyy") }}<br/>
                 {% endfor %}
                 {% else %}
@@ -295,9 +299,9 @@
         <div>
             <dt class="cya-question">Language interpreter</dt>
             <dd class="cya-answer">
-                {% if SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.languageInterpreter == true %}
-                    {% if SyaCaseWrapper.hearing.interpreterLanguageType is defined and SyaCaseWrapper.hearing.interpreterLanguageType != '' %}
-                        {{ SyaCaseWrapper.hearing.interpreterLanguageType }}
+                {% if PdfWrapper.syaCaseWrapper.hearing.arrangements is defined and PdfWrapper.syaCaseWrapper.hearing.arrangements.languageInterpreter == true %}
+                    {% if PdfWrapper.syaCaseWrapper.hearing.interpreterLanguageType is defined and PdfWrapper.syaCaseWrapper.hearing.interpreterLanguageType != '' %}
+                        {{ PdfWrapper.syaCaseWrapper.hearing.interpreterLanguageType }}
                     {% else %}
                         Required
                     {% endif %}
@@ -310,9 +314,9 @@
         <div>
             <dt class="cya-question">Sign language interpreter</dt>
             <dd class="cya-answer">
-                {% if SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.signLanguageInterpreter == true %}
-                    {% if SyaCaseWrapper.hearing.signLanguageType is defined and SyaCaseWrapper.hearing.signLanguageType != '' %}
-                        {{ SyaCaseWrapper.hearing.signLanguageType }}
+                {% if PdfWrapper.syaCaseWrapper.hearing.arrangements is defined and PdfWrapper.syaCaseWrapper.hearing.arrangements.signLanguageInterpreter == true %}
+                    {% if PdfWrapper.syaCaseWrapper.hearing.signLanguageType is defined and PdfWrapper.syaCaseWrapper.hearing.signLanguageType != '' %}
+                        {{ PdfWrapper.syaCaseWrapper.hearing.signLanguageType }}
                     {% else %}
                         Required
                     {% endif %}
@@ -325,23 +329,23 @@
         <div>
             <dt class="cya-question">Hearing loop</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.hearingLoop == true ? "Required" : "Not required" }}
+                {{ PdfWrapper.syaCaseWrapper.hearing.arrangements is defined and PdfWrapper.syaCaseWrapper.hearing.arrangements.hearingLoop == true ? "Required" : "Not required" }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Accessible hearing room</dt>
             <dd class="cya-answer">
-                {{ SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.accessibleHearingRoom == true ? "Required" : "Not required" }}
+                {{ PdfWrapper.syaCaseWrapper.hearing.arrangements is defined and PdfWrapper.syaCaseWrapper.hearing.arrangements.accessibleHearingRoom == true ? "Required" : "Not required" }}
             </dd>
         </div>
 
         <div>
             <dt class="cya-question">Any other arrangements</dt>
             <dd class="cya-answer">
-                {% if SyaCaseWrapper.hearing.arrangements is defined and SyaCaseWrapper.hearing.arrangements.other == true %}
-                    {% if SyaCaseWrapper.hearing.anythingElse is defined and SyaCaseWrapper.hearing.anythingElse != '' %}
-                        {{ SyaCaseWrapper.hearing.anythingElse }}
+                {% if PdfWrapper.syaCaseWrapper.hearing.arrangements is defined and PdfWrapper.syaCaseWrapper.hearing.arrangements.other == true %}
+                    {% if PdfWrapper.syaCaseWrapper.hearing.anythingElse is defined and PdfWrapper.syaCaseWrapper.hearing.anythingElse != '' %}
+                        {{ PdfWrapper.syaCaseWrapper.hearing.anythingElse }}
                     {% else %}
                         Required
                     {% endif %}
@@ -358,14 +362,14 @@
     <dl class="govuk-check-your-answers">
         <div>
             <dt class="cya-question">Receive text message reminders</dt>
-            <dd class="cya-answer">{{ SyaCaseWrapper.smsNotify.wantsSMSNotifications? "Yes" : "No" }}</dd>
+            <dd class="cya-answer">{{ PdfWrapper.syaCaseWrapper.smsNotify.wantsSMSNotifications? "Yes" : "No" }}</dd>
         </div>
 
         <div>
             <dt class="cya-question">Mobile number</dt>
             <dd class="cya-answer">
-                {% if SyaCaseWrapper.smsNotify.wantsSMSNotifications == true  %}
-                {{ SyaCaseWrapper.smsNotify.smsNumber }}
+                {% if PdfWrapper.syaCaseWrapper.smsNotify.wantsSMSNotifications == true  %}
+                {{ PdfWrapper.syaCaseWrapper.smsNotify.smsNumber }}
                 {% else %}
                 Not Applicable
                 {% endif %}
@@ -379,13 +383,13 @@
 
         <p>The information I have provided in this appeal is accurate, to the best of my knowledge.</p>
 
-        {% if SyaCaseWrapper.hasRepresentative == true %}
+        {% if PdfWrapper.syaCaseWrapper.hasRepresentative == true %}
         <p>I give permission for the tribunal to correspond with my named representative about my appeal.</p>
         {% endif %}
 
         <p>I agree to the terms and conditions of using the ‘Appeal a benefit decision’ service.</p>
 
-        <p><span>Signed: </span>{{ SyaCaseWrapper.signAndSubmit.signer }}</p>
+        <p><span>Signed: </span>{{ PdfWrapper.syaCaseWrapper.signAndSubmit.signer }}</p>
 
         <p>SSCS1 - Notice of appeal against a decision of the Department for Work and Pensions (09.13)</p>
 

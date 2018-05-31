@@ -6,7 +6,7 @@ import uk.gov.hmcts.reform.logging.exception.UnknownErrorCodeException;
 @SuppressWarnings("squid:MaximumInheritanceDepth")
 public class EmailSendFailedException extends UnknownErrorCodeException {
 
-    public EmailSendFailedException(Throwable cause) {
+    public EmailSendFailedException(String message, Throwable cause) {
         super(AlertLevel.P3, cause);
     }
 }
