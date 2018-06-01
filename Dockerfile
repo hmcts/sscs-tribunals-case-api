@@ -6,6 +6,6 @@ WORKDIR /opt/app
 
 HEALTHCHECK NONE
 
-EXPOSE 8082
+EXPOSE 8080
 
 ENTRYPOINT ["/usr/bin/java", "-jar", "/opt/app/tribunals-case-api.jar"]
