@@ -2,7 +2,10 @@ package uk.gov.hmcts.sscs.service.ccd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,13 +14,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CreateCoreCaseDataServiceTest {
@@ -25,13 +28,17 @@ public class CreateCoreCaseDataServiceTest {
     @Mock
     private CoreCaseDataApi coreCaseDataApiMock;
     @Mock
+    private IdamService idamServiceMock;
+    @Mock
     private CoreCaseDataService coreCaseDataServiceMock;
 
     private CreateCoreCaseDataService createCoreCaseDataService;
 
     @Before
     public void setUp() {
-        createCoreCaseDataService = new CreateCoreCaseDataService(coreCaseDataServiceMock);
+        createCoreCaseDataService = new CreateCoreCaseDataService(
+            coreCaseDataServiceMock, idamServiceMock
+        );
     }
 
     @Test
@@ -41,7 +48,7 @@ public class CreateCoreCaseDataServiceTest {
         mockCaseDetails();
         when(coreCaseDataServiceMock.getEventRequestData(eq("appealCreated")))
                 .thenReturn(EventRequestData.builder().build());
-        when(coreCaseDataServiceMock.generateServiceAuthorization())
+        when(idamServiceMock.generateServiceAuthorization())
                 .thenReturn("s2s token");
         when(coreCaseDataServiceMock.getCaseDataContent(
                 any(CaseData.class),

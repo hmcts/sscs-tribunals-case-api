@@ -2,7 +2,9 @@ package uk.gov.hmcts.sscs.service.ccd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,10 +13,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReadCoreCaseDataServiceTest {
@@ -22,13 +24,17 @@ public class ReadCoreCaseDataServiceTest {
     @Mock
     private CoreCaseDataApi coreCaseDataApiMock;
     @Mock
+    private IdamService idamServiceMock;
+    @Mock
     private CoreCaseDataService coreCaseDataServiceMock;
 
     private ReadCoreCaseDataService readCoreCaseDataService;
 
     @Before
     public void setUp() {
-        readCoreCaseDataService = new ReadCoreCaseDataService(coreCaseDataServiceMock);
+        readCoreCaseDataService = new ReadCoreCaseDataService(
+            coreCaseDataServiceMock, idamServiceMock
+        );
     }
 
     @Test
@@ -38,7 +44,7 @@ public class ReadCoreCaseDataServiceTest {
                 anyString())).thenReturn(CaseDataUtils.buildCaseDetails());
         when(coreCaseDataServiceMock.getEventRequestData(eq("emptyEvent")))
                 .thenReturn(EventRequestData.builder().build());
-        when(coreCaseDataServiceMock.generateServiceAuthorization())
+        when(idamServiceMock.generateServiceAuthorization())
                 .thenReturn("s2s token");
         when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
 
@@ -59,7 +65,7 @@ public class ReadCoreCaseDataServiceTest {
                 anyMap())).thenReturn(CaseDataUtils.buildCaseDetailsList());
         when(coreCaseDataServiceMock.getEventRequestData(eq("emptyEvent")))
                 .thenReturn(EventRequestData.builder().build());
-        when(coreCaseDataServiceMock.generateServiceAuthorization())
+        when(idamServiceMock.generateServiceAuthorization())
                 .thenReturn("s2s token");
         when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
 

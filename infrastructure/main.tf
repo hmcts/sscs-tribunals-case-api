@@ -126,7 +126,6 @@ module "tribunals-case-api" {
     SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"
 
     CORE_CASE_DATA_API_URL = "${local.ccdApi}"
-    CORE_CASE_DATA_USER_ID = "${var.core_case_data_user_id}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
     CORE_CASE_DATA_EVENT_ID = "${var.core_case_data_event_id}"

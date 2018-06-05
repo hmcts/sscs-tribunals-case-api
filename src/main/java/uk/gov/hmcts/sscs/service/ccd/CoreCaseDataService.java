@@ -1,23 +1,16 @@
 package uk.gov.hmcts.sscs.service.ccd;
 
-import java.util.Base64;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.sscs.ccd.properties.CoreCaseDataProperties;
-import uk.gov.hmcts.sscs.ccd.properties.IdamProperties;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.idam.Authorize;
-import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
+import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 @Service
 @Slf4j
@@ -25,55 +18,23 @@ public class CoreCaseDataService {
 
     private final CoreCaseDataApi coreCaseDataApi;
     private final CoreCaseDataProperties coreCaseDataProperties;
-    private final AuthTokenGenerator authTokenGenerator;
-    private final IdamApiClient idamApiClient;
-    private final IdamProperties idamProperties;
+    private final IdamService idamService;
 
     @Autowired
     public CoreCaseDataService(CoreCaseDataApi coreCaseDataApi,
                                CoreCaseDataProperties coreCaseDataProperties,
-                               AuthTokenGenerator authTokenGenerator,
-                               IdamApiClient idamApiClient,
-                               IdamProperties idamProperties) {
+                               IdamService idamService) {
         this.coreCaseDataApi = coreCaseDataApi;
         this.coreCaseDataProperties = coreCaseDataProperties;
-        this.authTokenGenerator = authTokenGenerator;
-        this.idamApiClient = idamApiClient;
-        this.idamProperties = idamProperties;
-    }
-
-    protected String generateServiceAuthorization() {
-        return authTokenGenerator.generate();
-    }
-
-    private String getIdamOauth2Token() {
-        String authorisation = idamProperties.getOauth2().getUser().getEmail()
-            + ":" + idamProperties.getOauth2().getUser().getPassword();
-        String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
-
-        Authorize authorize = idamApiClient.authorizeCodeType(
-            "Basic " + base64Authorisation,
-            "code",
-            idamProperties.getOauth2().getClient().getId(),
-            idamProperties.getOauth2().getRedirectUrl()
-        );
-
-        Authorize authorizeToken = idamApiClient.authorizeToken(
-            authorize.getCode(),
-            "authorization_code",
-            idamProperties.getOauth2().getRedirectUrl(),
-            idamProperties.getOauth2().getClient().getId(),
-            idamProperties.getOauth2().getClient().getSecret()
-        );
-
-        return  "Bearer " + authorizeToken.getAccessToken();
+        this.idamService = idamService;
     }
 
     protected EventRequestData getEventRequestData(String eventId) {
         log.info("getEventRequestData...");
+        String oauth2Token = idamService.getIdamOauth2Token();
         return EventRequestData.builder()
-            .userToken(getIdamOauth2Token())
-            .userId(coreCaseDataProperties.getUserId())
+            .userToken(oauth2Token)
+            .userId(idamService.getUserId(oauth2Token))
             .jurisdictionId(coreCaseDataProperties.getJurisdictionId())
             .caseTypeId(coreCaseDataProperties.getCaseTypeId())
             .eventId(eventId)

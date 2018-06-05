@@ -15,8 +15,7 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Setter
 public class CoreCaseDataProperties {
-    @NotBlank
-    private String userId;
+
     @NotBlank
     private String jurisdictionId;
     @NotBlank
