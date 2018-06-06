@@ -1,11 +1,11 @@
 FROM openjdk:8-jre
 
-COPY build/install/tribunals-case-api /opt/app/
+COPY build/libs/tribunals-case-api.jar /opt/app/
 
 WORKDIR /opt/app
 
-HEALTHCHECK --interval=10s --timeout=10s --retries=10 CMD http_proxy="" curl --silent --fail http://localhost:8083/health
+HEALTHCHECK NONE
 
-EXPOSE 8083
+EXPOSE 8080
 
-ENTRYPOINT ["/opt/app/bin/tribunals-case-api"]
+ENTRYPOINT ["/usr/bin/java", "-jar", "/opt/app/tribunals-case-api.jar"]
