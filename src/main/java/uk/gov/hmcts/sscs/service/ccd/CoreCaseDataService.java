@@ -5,6 +5,7 @@ import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -13,8 +14,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.sscs.ccd.properties.CoreCaseDataProperties;
-import uk.gov.hmcts.sscs.ccd.properties.IdamProperties;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
 import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
@@ -24,22 +23,43 @@ import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 public class CoreCaseDataService {
 
     private final CoreCaseDataApi coreCaseDataApi;
-    private final CoreCaseDataProperties coreCaseDataProperties;
     private final AuthTokenGenerator authTokenGenerator;
     private final IdamApiClient idamApiClient;
-    private final IdamProperties idamProperties;
+
+    @Value("${idam.oauth2.user.email}")
+    private String idamOauth2UserEmail;
+
+    @Value("${idam.oauth2.user.password}")
+    private String idamOauth2UserPassword;
+
+    @Value("${idam.oauth2.client.id}")
+    private String idamOauth2ClientId;
+
+    @Value("${idam.oauth2.client.secret}")
+    private String idamOauth2ClientSecret;
+
+    @Value("${idam.oauth2.client.secret}")
+    private String idamOauth2RedirectUrl;
+
+    @Value("${core_case_data.api.url}")
+    private String coreCaseDataApiUrl;
+
+    @Value("${core_case_data.userId}")
+    private String coreCaseDataUserId;
+
+    @Value("${core_case_data.jurisdictionId}")
+    private String coreCaseDataJurisdictionId;
+
+    @Value("${core_case_data.caseTypeId}")
+    private String coreCaseDataCaseTypeId;
 
     @Autowired
     public CoreCaseDataService(CoreCaseDataApi coreCaseDataApi,
-                               CoreCaseDataProperties coreCaseDataProperties,
                                AuthTokenGenerator authTokenGenerator,
-                               IdamApiClient idamApiClient,
-                               IdamProperties idamProperties) {
+                               IdamApiClient idamApiClient) {
         this.coreCaseDataApi = coreCaseDataApi;
-        this.coreCaseDataProperties = coreCaseDataProperties;
         this.authTokenGenerator = authTokenGenerator;
         this.idamApiClient = idamApiClient;
-        this.idamProperties = idamProperties;
     }
 
     protected String generateServiceAuthorization() {
@@ -47,23 +67,23 @@ public class CoreCaseDataService {
     }
 
     private String getIdamOauth2Token() {
-        String authorisation = idamProperties.getOauth2().getUser().getEmail()
-            + ":" + idamProperties.getOauth2().getUser().getPassword();
+        String authorisation = idamOauth2UserEmail
+            + ":" + idamOauth2UserPassword;
         String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
 
         Authorize authorize = idamApiClient.authorizeCodeType(
             "Basic " + base64Authorisation,
             "code",
-            idamProperties.getOauth2().getClient().getId(),
-            idamProperties.getOauth2().getRedirectUrl()
+            idamOauth2ClientId,
+            idamOauth2RedirectUrl
         );
 
         Authorize authorizeToken = idamApiClient.authorizeToken(
             authorize.getCode(),
             "authorization_code",
-            idamProperties.getOauth2().getRedirectUrl(),
-            idamProperties.getOauth2().getClient().getId(),
-            idamProperties.getOauth2().getClient().getSecret()
+            idamOauth2RedirectUrl,
+            idamOauth2ClientId,
+            idamOauth2ClientSecret
         );
 
         return  "Bearer " + authorizeToken.getAccessToken();
@@ -73,9 +93,9 @@ public class CoreCaseDataService {
         log.info("getEventRequestData...");
         return EventRequestData.builder()
             .userToken(getIdamOauth2Token())
-            .userId(coreCaseDataProperties.getUserId())
-            .jurisdictionId(coreCaseDataProperties.getJurisdictionId())
-            .caseTypeId(coreCaseDataProperties.getCaseTypeId())
+            .userId(coreCaseDataUserId)
+            .jurisdictionId(coreCaseDataJurisdictionId)
+            .caseTypeId(coreCaseDataCaseTypeId)
             .eventId(eventId)
             .ignoreWarning(true)
             .build();
@@ -95,7 +115,7 @@ public class CoreCaseDataService {
     }
 
     public String getCcdUrl() {
-        return coreCaseDataProperties.getApi().getUrl();
+        return coreCaseDataApiUrl;
     }
 
     protected CoreCaseDataApi getCoreCaseDataApi() {

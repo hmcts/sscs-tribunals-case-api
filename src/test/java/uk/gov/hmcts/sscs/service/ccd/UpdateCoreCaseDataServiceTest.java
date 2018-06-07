@@ -22,6 +22,12 @@ import uk.gov.hmcts.sscs.model.ccd.CaseData;
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateCoreCaseDataServiceTest {
 
+    public static final String S_2_S_TOKEN = "s2s token";
+    public static final String APPEAL_UPDATED = "appeal Updated";
+    public static final String SSCS_APPEAL_UPDATED_EVENT = "SSCS - appeal updated event";
+    public static final String UPDATED_SSCS = "Updated SSCS";
+    public static final Long caseid = 1L;
+
     @Mock
     private CoreCaseDataApi coreCaseDataApiMock;
     @Mock
@@ -37,24 +43,45 @@ public class UpdateCoreCaseDataServiceTest {
     @Test
     public void givenACase_shouldUpdateCaseItIntoCcd() {
         //Given
-        mockStartEventResponse();
-        mockCaseDetails();
-        when(coreCaseDataServiceMock.getEventRequestData(anyString()))
-                .thenReturn(EventRequestData.builder().build());
+        CaseData caseData = CaseDataUtils.buildCaseData();
+        EventRequestData eventRequestData = EventRequestData.builder()
+                .userId("user-id").eventId(APPEAL_UPDATED).caseTypeId("case-type-id").userToken("user-token")
+                .jurisdictionId("jurisdiction-id").ignoreWarning(true).build();
+
+        StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().build()).build();
+        CaseDataContent caseDataContent = CaseDataContent.builder().build();
+
+        when(coreCaseDataApiMock.startEventForCaseWorker(eventRequestData.getUserToken(),
+                S_2_S_TOKEN,
+                eventRequestData.getUserId(),
+                eventRequestData.getJurisdictionId(),
+                eventRequestData.getCaseTypeId(),
+                caseid.toString(),
+                eventRequestData.getEventId())).thenReturn(startEventResponse);
+
+        when(coreCaseDataApiMock.submitEventForCaseWorker(eventRequestData.getUserToken(),
+                S_2_S_TOKEN,
+                eventRequestData.getUserId(),
+                eventRequestData.getJurisdictionId(),
+                eventRequestData.getCaseTypeId(),
+                caseid.toString(),
+                eventRequestData.isIgnoreWarning(),
+                caseDataContent))
+                .thenReturn(CaseDataUtils.buildCaseDetails());
+
+        when(coreCaseDataServiceMock.getEventRequestData(eventRequestData.getEventId()))
+                .thenReturn(eventRequestData);
         when(coreCaseDataServiceMock.generateServiceAuthorization())
-                .thenReturn("s2s token");
-        when(coreCaseDataServiceMock.getCaseDataContent(
-                any(CaseData.class),
-                any(StartEventResponse.class),
-                anyString(),
-                anyString()
-        )).thenReturn(CaseDataContent.builder().build());
+                .thenReturn(S_2_S_TOKEN);
+        when(coreCaseDataServiceMock.getCaseDataContent(caseData,
+                startEventResponse,
+                SSCS_APPEAL_UPDATED_EVENT, UPDATED_SSCS)).thenReturn(caseDataContent);
         when(coreCaseDataServiceMock.getCcdUrl()).thenReturn("ccdUrl");
         when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
 
         //When
         CaseDetails caseDetails = updateCoreCaseDataService.updateCcdCase(
-            CaseDataUtils.buildCaseData(), anyLong(), "appeal Updated");
+            caseData, caseid, APPEAL_UPDATED);
 
         //Then
         assertNotNull(caseDetails);
@@ -64,16 +91,4 @@ public class UpdateCoreCaseDataServiceTest {
         assertEquals("SC068/17/00013", caseReference);
     }
 
-    private void mockCaseDetails() {
-        when(coreCaseDataApiMock.submitEventForCaseWorker(anyString(), anyString(), anyString(), anyString(),
-                anyString(),anyString(), anyBoolean(), any(CaseDataContent.class)))
-                .thenReturn(CaseDataUtils.buildCaseDetails());
-    }
-
-    private void mockStartEventResponse() {
-        when(coreCaseDataApiMock.startEventForCaseWorker(anyString(), anyString(), anyString(), anyString(),
-            anyString(), anyString(), anyString())).thenReturn(StartEventResponse.builder()
-            .caseDetails(CaseDetails.builder().build())
-            .build());
-    }
 }

@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.controller;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.MockitoAnnotations.*;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,16 +17,13 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
 
-@RunWith(MockitoJUnitRunner.class)
 public class SyaControllerTest {
 
     private MockMvc mockMvc;
@@ -36,6 +34,7 @@ public class SyaControllerTest {
 
     @Before
     public void setUp() {
+        initMocks(this);
         SyaController controller = new SyaController(submitAppealService);
         mockMvc = standaloneSetup(controller).build();
     }

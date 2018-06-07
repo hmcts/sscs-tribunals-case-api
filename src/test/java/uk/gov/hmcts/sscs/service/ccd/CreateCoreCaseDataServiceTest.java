@@ -2,8 +2,7 @@ package uk.gov.hmcts.sscs.service.ccd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -22,6 +21,9 @@ import uk.gov.hmcts.sscs.model.ccd.CaseData;
 @RunWith(MockitoJUnitRunner.class)
 public class CreateCoreCaseDataServiceTest {
 
+    public static final String S_2_S_TOKEN = "s2s token";
+    public static final String SSCS_APPEAL_CREATED_EVENT = "SSCS - appeal created event";
+    public static final String CREATED_SSCS = "Created SSCS";
     @Mock
     private CoreCaseDataApi coreCaseDataApiMock;
     @Mock
@@ -37,42 +39,45 @@ public class CreateCoreCaseDataServiceTest {
     @Test
     public void givenACase_shouldSaveItIntoCcd() {
         //Given
-        mockStartEventResponse();
-        mockCaseDetails();
+
+        CaseData caseData = CaseDataUtils.buildCaseData();
+        EventRequestData eventRequestData = EventRequestData.builder().build();
+
+        StartEventResponse startEventResponse = StartEventResponse.builder().caseDetails(CaseDetails.builder().build()).build();
+        CaseDataContent caseDataContent = CaseDataContent.builder().build();
+
+        when(coreCaseDataApiMock.startForCaseworker(eventRequestData.getUserToken(), S_2_S_TOKEN, eventRequestData.getUserId(),
+                eventRequestData.getJurisdictionId(),
+                eventRequestData.getCaseTypeId(),
+                eventRequestData.getEventId())).thenReturn(startEventResponse);
+
+        when(coreCaseDataApiMock.submitForCaseworker(eventRequestData.getUserToken(),
+                S_2_S_TOKEN,
+                eventRequestData.getUserId(),
+                eventRequestData.getJurisdictionId(),
+                eventRequestData.getCaseTypeId(),
+                eventRequestData.isIgnoreWarning(),
+                caseDataContent)).thenReturn(CaseDataUtils.buildCaseDetails());
+
         when(coreCaseDataServiceMock.getEventRequestData(eq("appealCreated")))
-                .thenReturn(EventRequestData.builder().build());
+                .thenReturn(eventRequestData);
         when(coreCaseDataServiceMock.generateServiceAuthorization())
-                .thenReturn("s2s token");
-        when(coreCaseDataServiceMock.getCaseDataContent(
-                any(CaseData.class),
-                any(StartEventResponse.class),
-                anyString(),
-                anyString()
-        )).thenReturn(CaseDataContent.builder().build());
+                .thenReturn(S_2_S_TOKEN);
+        when(coreCaseDataServiceMock.getCaseDataContent(caseData,
+                startEventResponse,
+                SSCS_APPEAL_CREATED_EVENT,
+                CREATED_SSCS)).thenReturn(caseDataContent);
         when(coreCaseDataServiceMock.getCcdUrl()).thenReturn("ccdUrl");
         when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
 
         //When
         CaseDetails caseDetails = createCoreCaseDataService.createCcdCase(
-            CaseDataUtils.buildCaseData());
+                caseData);
 
         //Then
         assertNotNull(caseDetails);
-        verify(coreCaseDataApiMock).submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class));
         String caseReference = (String) caseDetails.getData().get("caseReference");
         assertEquals("SC068/17/00013", caseReference);
     }
 
-    private void mockCaseDetails() {
-        when(coreCaseDataApiMock.submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class))).thenReturn(CaseDataUtils.buildCaseDetails());
-    }
-
-    private void mockStartEventResponse() {
-        when(coreCaseDataApiMock.startForCaseworker(anyString(), anyString(), anyString(), anyString(),
-            anyString(), anyString())).thenReturn(StartEventResponse.builder()
-            .caseDetails(CaseDetails.builder().build())
-            .build());
-    }
 }
