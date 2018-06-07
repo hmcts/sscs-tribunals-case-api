@@ -12,6 +12,7 @@ import uk.gov.hmcts.sscs.service.idam.IdamService;
 @Service
 public class EvidenceManagementService {
 
+    public static final String DUMMY_OAUTH_2_TOKEN = "oauth2Token";
     private IdamService idamService;
     private DocumentUploadClientApi documentUploadClientApi;
 
@@ -23,7 +24,6 @@ public class EvidenceManagementService {
 
     public UploadResponse upload(List<MultipartFile> multipartFileList) {
         String serviceAuthorization = idamService.generateServiceAuthorization();
-        String oauth2Token = idamService.getIdamOauth2Token();
-        return documentUploadClientApi.upload(oauth2Token, serviceAuthorization, multipartFileList);
+        return documentUploadClientApi.upload(DUMMY_OAUTH_2_TOKEN, serviceAuthorization, multipartFileList);
     }
 }
