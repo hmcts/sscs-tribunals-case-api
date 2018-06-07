@@ -7,7 +7,7 @@
 
     "caseCode": {
       "type": "string",
-      "pattern" : "\\d{3}"
+      "pattern" : "^\\d{3}DD$"
     },
     "appellantNino": {"type": "string"},
     "caseCreatedDate": {"$ref": "#/definitions/dateType"},
@@ -18,8 +18,8 @@
       "type": "string",
       "enum": ["Paper", "Oral"]
     },
-    "wantsToAttendedHearing": {"$ref": "#/definitions/yesOrNo"},
-    "hearingRequestingParty": {"type" : "string"},
+    "wantsToAttendHearing": {"$ref": "#/definitions/yesOrNo"},
+    "hearingRequestParty": {"type" : "string"},
     "appellant": {"$ref": "#/definitions/person"},
     "representative": {"$ref": "#/definitions/person"},
     "hearingArrangements": {
@@ -41,6 +41,8 @@
     }
 
   },
+  "required": ["caseCode", "appellantNino", "caseCreatedDate", "mrnDate", "mrnReasonForBeingLate", "appealDate", "hearingType",
+  "wantsToAttendHearing", "appellant", "hearingArrangements"],
 
   "definitions": {
     "person": {
@@ -57,7 +59,7 @@
         "phoneNumber": { "type": "string" },
         "email": { "type": "string" }
       },
-      "required": ["title", "firstName", "lastName", "addressLine1", "addressLine2","townOrCity", "county", "postCode"]
+      "required": ["title", "firstName", "lastName", "addressLine1","townOrCity", "county", "postCode","phoneNumber","email"]
     },
     "yesOrNo" : {
       "type": "string",
