@@ -16,7 +16,7 @@ import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 public class EvidenceManagementServiceTest {
 
-    public static final String OAUTH_TOKEN = "oauth-token";
+    public static final String OAUTH_TOKEN = "oauth2Token";
     public static final String SERVICE_AUTHORIZATION = "service-authorization";
     @Mock
     private IdamService idamService;
@@ -42,7 +42,6 @@ public class EvidenceManagementServiceTest {
     public void shouldCallUploadDocumentManagementClient() {
 
         when(idamService.generateServiceAuthorization()).thenReturn(SERVICE_AUTHORIZATION);
-        when(idamService.getIdamOauth2Token()).thenReturn(OAUTH_TOKEN);
         when(documentUploadClientApi.upload(OAUTH_TOKEN, SERVICE_AUTHORIZATION, multipartFileList))
                 .thenReturn(uploadResponse);
 
