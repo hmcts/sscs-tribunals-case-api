@@ -57,6 +57,7 @@ import uk.gov.hmcts.sscs.controller.SyaController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
+import uk.gov.hmcts.sscs.service.idam.AuthTokenSubjectExtractor;
 import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 
 @RunWith(SpringRunner.class)
@@ -81,6 +82,9 @@ public class SyaEndpointsIt {
 
     @MockBean
     private JavaMailSender mailSender;
+
+    @MockBean
+    private AuthTokenSubjectExtractor authTokenSubjectExtractor;
 
     @Captor
     private ArgumentCaptor captor;
@@ -130,6 +134,8 @@ public class SyaEndpointsIt {
                 .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
+
+        given(authTokenSubjectExtractor.extract(anyString())).willReturn("userId");
     }
 
     @Test

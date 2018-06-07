@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CreateCoreCaseDataServiceTest {
@@ -28,12 +29,15 @@ public class CreateCoreCaseDataServiceTest {
     private CoreCaseDataApi coreCaseDataApiMock;
     @Mock
     private CoreCaseDataService coreCaseDataServiceMock;
+    @Mock
+    private IdamService idamService;
 
     private CreateCoreCaseDataService createCoreCaseDataService;
 
     @Before
     public void setUp() {
-        createCoreCaseDataService = new CreateCoreCaseDataService(coreCaseDataServiceMock);
+        createCoreCaseDataService = new CreateCoreCaseDataService(coreCaseDataServiceMock, idamService);
+        when(idamService.generateServiceAuthorization()).thenReturn(S_2_S_TOKEN);
     }
 
     @Test
@@ -61,8 +65,6 @@ public class CreateCoreCaseDataServiceTest {
 
         when(coreCaseDataServiceMock.getEventRequestData(eq("appealCreated")))
                 .thenReturn(eventRequestData);
-        when(coreCaseDataServiceMock.generateServiceAuthorization())
-                .thenReturn(S_2_S_TOKEN);
         when(coreCaseDataServiceMock.getCaseDataContent(caseData,
                 startEventResponse,
                 SSCS_APPEAL_CREATED_EVENT,

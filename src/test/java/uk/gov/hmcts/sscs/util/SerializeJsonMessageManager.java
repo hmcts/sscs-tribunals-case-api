@@ -2,14 +2,11 @@ package uk.gov.hmcts.sscs.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import lombok.Getter;
 import lombok.ToString;
-
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
 @Getter
@@ -57,7 +54,11 @@ public enum SerializeJsonMessageManager {
 
     private String getSerialisedMessage(String fileName) {
         try {
-            return new String(Files.readAllBytes(Paths.get("src/test/resources/tya/" + fileName)));
+
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("tya/" + fileName).getFile());
+            return new String(Files.readAllBytes(file.toPath()));
+
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException();

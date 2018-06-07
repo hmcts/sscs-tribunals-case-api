@@ -18,6 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReadCoreCaseDataServiceTest {
@@ -31,12 +32,15 @@ public class ReadCoreCaseDataServiceTest {
     private CoreCaseDataApi coreCaseDataApiMock;
     @Mock
     private CoreCaseDataService coreCaseDataServiceMock;
+    @Mock
+    private IdamService idamService;
 
     private ReadCoreCaseDataService readCoreCaseDataService;
 
     @Before
     public void setUp() {
-        readCoreCaseDataService = new ReadCoreCaseDataService(coreCaseDataServiceMock);
+        readCoreCaseDataService = new ReadCoreCaseDataService(coreCaseDataServiceMock, idamService);
+        when(idamService.generateServiceAuthorization()).thenReturn(S_2_S_TOKEN);
     }
 
     @Test
@@ -53,8 +57,6 @@ public class ReadCoreCaseDataServiceTest {
                 CASE_ID)).thenReturn(CaseDataUtils.buildCaseDetails());
         when(coreCaseDataServiceMock.getEventRequestData(eq(EMPTY_EVENT)))
                 .thenReturn(eventRequestData);
-        when(coreCaseDataServiceMock.generateServiceAuthorization())
-                .thenReturn(S_2_S_TOKEN);
         when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
 
         //When
@@ -82,8 +84,7 @@ public class ReadCoreCaseDataServiceTest {
                 .thenReturn(CaseDataUtils.buildCaseDetailsList());
         when(coreCaseDataServiceMock.getEventRequestData(eq("emptyEvent")))
                 .thenReturn(eventRequestData);
-        when(coreCaseDataServiceMock.generateServiceAuthorization())
-                .thenReturn(S_2_S_TOKEN);
+
         when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
 
         //When
