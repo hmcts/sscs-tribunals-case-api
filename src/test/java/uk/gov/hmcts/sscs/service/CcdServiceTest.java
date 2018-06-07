@@ -3,7 +3,7 @@ package uk.gov.hmcts.sscs.service;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,18 +36,24 @@ public class CcdServiceTest {
     @Mock
     private UpdateCoreCaseDataService updateCoreCaseDataService;
 
+    private CaseData testCaseData;
+
+    private Long caseId = 1L;
+
+    private String eventId = "event-id";
+
 
     @Before
     public void setup() {
         ccdService = new CcdService(readCoreCaseDataService, createCoreCaseDataService, updateCoreCaseDataService);
-
+        testCaseData = CaseDataUtils.buildCaseData();
         when(readCoreCaseDataService.getCcdCaseDataByAppealNumber(anyString()))
                 .thenReturn(CaseDataUtils.buildCaseData());
 
         when(createCoreCaseDataService.createCcdCase(CaseDataUtils.buildCaseData()))
                 .thenReturn(CaseDataUtils.buildCaseDetails());
 
-        when(updateCoreCaseDataService.updateCcdCase(any(CaseData.class), anyLong(), anyString()))
+        when(updateCoreCaseDataService.updateCcdCase(testCaseData, 1L, eventId))
                 .thenReturn(CaseDataUtils.buildCaseDetails("SC666/66/66666"));
     }
 
@@ -79,7 +85,7 @@ public class CcdServiceTest {
         String benefitType = ccdService.updateSubscription(anyString(), getSubscriptionRequest());
 
         verify(readCoreCaseDataService).getCcdCaseDetailsByAppealNumber(anyString());
-        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class), anyLong(), anyString());
+        verify(updateCoreCaseDataService).updateCcdCase(any(), eq(null), anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
@@ -108,12 +114,10 @@ public class CcdServiceTest {
     @Test
     public void shouldUpdateCaseInCcd() {
 
-        CaseDetails caseDetails = ccdService.updateCase(any(CaseData.class),
-                anyLong(),anyString());
+        CaseDetails caseDetails = ccdService.updateCase(testCaseData, caseId, eventId);
 
         assertNotNull(caseDetails);
-        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class),
-                anyLong(),anyString());
+        verify(updateCoreCaseDataService).updateCcdCase(testCaseData, caseId, eventId);
     }
 
     @Test
@@ -125,7 +129,7 @@ public class CcdServiceTest {
         String benefitType = ccdService.unsubscribe(anyString());
 
         verify(readCoreCaseDataService).getCcdCaseDetailsByAppealNumber(anyString());
-        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class), anyLong(), anyString());
+        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class), eq(null), anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }

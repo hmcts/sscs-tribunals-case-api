@@ -11,8 +11,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.sscs.ccd.properties.IdamProperties;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -21,21 +21,22 @@ public class IdamServiceTest {
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
-    private AuthTokenSubjectExtractor authTokenSubjectExtractor;
-    @Mock
     private IdamApiClient idamApiClient;
 
     private Authorize authToken;
-    private IdamProperties idamProperties;
+
     private IdamService idamService;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         authToken = new Authorize("redirect/", "authCode", "access");
-        idamProperties = new IdamProperties();
-        idamService = new IdamService(
-            authTokenGenerator, authTokenSubjectExtractor, idamApiClient, idamProperties
-        );
+        idamService = new IdamService(authTokenGenerator, idamApiClient);
+
+        ReflectionTestUtils.setField(idamService, "idamOauth2UserEmail", "email");
+        ReflectionTestUtils.setField(idamService, "idamOauth2UserPassword", "pass");
+        ReflectionTestUtils.setField(idamService, "idamOauth2ClientId", "id");
+        ReflectionTestUtils.setField(idamService, "idamOauth2ClientSecret", "secret");
+        ReflectionTestUtils.setField(idamService, "idamOauth2RedirectUrl", "redirect/");
     }
 
     @Test
@@ -46,27 +47,7 @@ public class IdamServiceTest {
     }
 
     @Test
-    public void shouldReturnServiceUserIdGivenAuthToken() {
-        String auth = "token_with_sub_16";
-        String userId = "16";
-        when(authTokenSubjectExtractor.extract(auth)).thenReturn(userId);
-        assertThat(idamService.getUserId(auth), is(userId));
-    }
-
-    @Test
     public void shouldReturnIdamTokenGivenRequestForS2S() {
-        IdamProperties.Oauth2 oauth2 = new IdamProperties.Oauth2();
-        IdamProperties.Oauth2.User user = new IdamProperties.Oauth2.User();
-        user.setEmail("email");
-        user.setPassword("pass");
-        oauth2.setUser(user);
-        IdamProperties.Oauth2.Client client = new IdamProperties.Oauth2.Client();
-        client.setId("id");
-        client.setSecret("secret");
-        oauth2.setClient(client);
-        oauth2.setRedirectUrl("redirect/");
-        idamProperties.setOauth2(oauth2);
-
         String base64Authorisation = Base64.getEncoder().encodeToString("email:pass".getBytes());
 
         when(idamApiClient.authorizeCodeType("Basic " + base64Authorisation,

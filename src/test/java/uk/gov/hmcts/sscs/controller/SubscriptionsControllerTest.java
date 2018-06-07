@@ -7,6 +7,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -18,10 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,6 @@ import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
 
-@RunWith(MockitoJUnitRunner.class)
 public class SubscriptionsControllerTest {
 
     public static final String APPEAL_ID = "appeal-id";
@@ -53,6 +51,7 @@ public class SubscriptionsControllerTest {
 
     @Before
     public void setUp() {
+        initMocks(this);
         controller = new SubscriptionsController(macService, tribunalsService);
         mockMvc = standaloneSetup(controller).build();
     }
