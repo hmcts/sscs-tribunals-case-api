@@ -2,19 +2,15 @@ package uk.gov.hmcts.sscs.sya;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,7 +83,7 @@ public class SyaEndpointsIt {
     private AuthTokenSubjectExtractor authTokenSubjectExtractor;
 
     @Captor
-    private ArgumentCaptor captor;
+    private ArgumentCaptor<Map<String, Object>> captor;
 
     @Autowired
     private MockMvc mockMvc;
@@ -121,17 +117,17 @@ public class SyaEndpointsIt {
         message = new MimeMessage(session);
         when(mailSender.createMimeMessage()).thenReturn(message);
 
-        given(pdfServiceClient.generateFromHtml(eq(getTemplate()), (Map<String, Object>) captor.capture()))
-                .willReturn(PDF.getBytes());
+        given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
+            .willReturn(PDF.getBytes());
 
         given(coreCaseDataApi.readForCaseWorker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString())).willReturn(null);
+            anyString())).willReturn(null);
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
         given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString()))
-                .willReturn(authorize);
+            .willReturn(authorize);
         given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .willReturn(authorize);
+            .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
 
@@ -141,15 +137,15 @@ public class SyaEndpointsIt {
     @Test
     public void shouldGeneratePdfAndSend() throws Exception {
         given(coreCaseDataApi.startForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString())).willReturn(StartEventResponse.builder().build());
+            anyString())).willReturn(StartEventResponse.builder().build());
 
         given(coreCaseDataApi.submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class))).willReturn(CaseDetails.builder().id(123456789876L).build());
+            anyBoolean(), any(CaseDataContent.class))).willReturn(CaseDetails.builder().id(123456789876L).build());
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getCase()))
+            .andExpect(status().isCreated());
 
         assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
@@ -162,22 +158,22 @@ public class SyaEndpointsIt {
     }
 
     private PdfWrapper getPdfWrapper() {
-        Map placeHolders = (Map) captor.getAllValues().get(0);
+        Map<String, Object> placeHolders = captor.getAllValues().get(0);
         return (PdfWrapper) placeHolders.get("PdfWrapper");
     }
 
     @Test
     public void shouldSendEmailWithPdfWhenCcdIsDown() throws Exception {
         given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyMap())).willThrow(new RuntimeException("CCD is down"));
+            anyMap())).willThrow(new RuntimeException("CCD is down"));
 
         given(coreCaseDataApi.startForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString())).willThrow(new RuntimeException("CCD is down"));
+            anyString())).willThrow(new RuntimeException("CCD is down"));
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getCase()))
+            .andExpect(status().isCreated());
 
         then(mailSender).should(times(1)).send(message);
 

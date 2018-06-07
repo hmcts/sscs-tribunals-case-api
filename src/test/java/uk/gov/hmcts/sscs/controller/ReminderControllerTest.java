@@ -1,22 +1,20 @@
 package uk.gov.hmcts.sscs.controller;
 
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.reminder.ReminderResponse;
 import uk.gov.hmcts.sscs.service.CcdService;
 
-@RunWith(MockitoJUnitRunner.class)
 public class ReminderControllerTest {
 
     private MockMvc mockMvc;
@@ -28,6 +26,7 @@ public class ReminderControllerTest {
 
     @Before
     public void setUp() {
+        initMocks(this);
         controller = new ReminderController(ccdService);
         mockMvc = standaloneSetup(controller).build();
     }

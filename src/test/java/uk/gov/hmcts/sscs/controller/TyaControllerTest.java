@@ -3,22 +3,19 @@ package uk.gov.hmcts.sscs.controller;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
-@RunWith(MockitoJUnitRunner.class)
 public class TyaControllerTest {
 
     private static final String APPEAL_ID = "appeal-id";
@@ -32,6 +29,7 @@ public class TyaControllerTest {
 
     @Before
     public void setUp() {
+        initMocks(this);
         controller = new TyaController(tribunalsService);
     }
 
