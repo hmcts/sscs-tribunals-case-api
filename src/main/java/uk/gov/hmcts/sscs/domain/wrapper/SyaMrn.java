@@ -15,7 +15,6 @@ public class SyaMrn {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate date;
 
-    @JsonProperty("reasonWhyMRNisLate")
     private String reasonForBeingLate;
 
     @JsonProperty("reasonForNoMRN")
