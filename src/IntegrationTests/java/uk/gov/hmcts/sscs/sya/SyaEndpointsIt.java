@@ -33,6 +33,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -71,16 +72,17 @@ public class SyaEndpointsIt {
     private IdamApiClient idamApiClient;
 
     @MockBean
+    @Qualifier("authTokenGenerator")
     private AuthTokenGenerator authTokenGenerator;
+
+    @MockBean
+    private AuthTokenSubjectExtractor authTokenSubjectExtractor;
 
     @MockBean
     private PDFServiceClient pdfServiceClient;
 
     @MockBean
     private JavaMailSender mailSender;
-
-    @MockBean
-    private AuthTokenSubjectExtractor authTokenSubjectExtractor;
 
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
@@ -130,7 +132,6 @@ public class SyaEndpointsIt {
             .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
-
         given(authTokenSubjectExtractor.extract(anyString())).willReturn("userId");
     }
 

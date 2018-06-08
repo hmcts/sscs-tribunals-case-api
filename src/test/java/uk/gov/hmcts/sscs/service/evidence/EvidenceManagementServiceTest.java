@@ -4,53 +4,51 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.util.Collections;
 import java.util.List;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.sscs.service.idam.IdamService;
 
 public class EvidenceManagementServiceTest {
 
-    public static final String OAUTH_TOKEN = "oauth2Token";
     public static final String SERVICE_AUTHORIZATION = "service-authorization";
-    @Mock
-    private IdamService idamService;
 
+    @Mock
+    private AuthTokenGenerator authTokenGenerator;
     @Mock
     private DocumentUploadClientApi documentUploadClientApi;
-
-    @Mock
-    private List<MultipartFile> multipartFileList;
-
-    @Mock
-    private UploadResponse uploadResponse;
 
     private EvidenceManagementService evidenceManagementService;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         initMocks(this);
-        evidenceManagementService = new EvidenceManagementService(idamService, documentUploadClientApi);
+        evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi);
     }
 
     @Test
     public void shouldCallUploadDocumentManagementClient() {
 
-        when(idamService.generateServiceAuthorization()).thenReturn(SERVICE_AUTHORIZATION);
-        when(documentUploadClientApi.upload(OAUTH_TOKEN, SERVICE_AUTHORIZATION, multipartFileList))
-                .thenReturn(uploadResponse);
+        List<MultipartFile> files = Collections.emptyList();
 
-        UploadResponse actualUploadedResponse = evidenceManagementService.upload(multipartFileList);
+        UploadResponse expectedUploadResponse = mock(UploadResponse.class);
 
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTHORIZATION);
+        when(documentUploadClientApi.upload(any(), eq(SERVICE_AUTHORIZATION), eq(files)))
+                .thenReturn(expectedUploadResponse);
+
+        UploadResponse actualUploadedResponse = evidenceManagementService.upload(files);
 
         verify(documentUploadClientApi, times(1))
-                .upload(OAUTH_TOKEN, SERVICE_AUTHORIZATION, multipartFileList);
+                .upload(any(), eq(SERVICE_AUTHORIZATION), eq(files));
 
-        assertThat(actualUploadedResponse, Matchers.equalTo(uploadResponse));
+        assertThat(actualUploadedResponse, Matchers.equalTo(expectedUploadResponse));
     }
+
 }

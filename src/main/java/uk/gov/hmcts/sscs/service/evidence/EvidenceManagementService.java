@@ -2,28 +2,39 @@ package uk.gov.hmcts.sscs.service.evidence;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.sscs.service.idam.IdamService;
-
 
 @Service
 public class EvidenceManagementService {
 
     public static final String DUMMY_OAUTH_2_TOKEN = "oauth2Token";
-    private IdamService idamService;
-    private DocumentUploadClientApi documentUploadClientApi;
+
+    private final AuthTokenGenerator authTokenGenerator;
+    private final DocumentUploadClientApi documentUploadClientApi;
 
     @Autowired
-    public EvidenceManagementService(IdamService idamService, DocumentUploadClientApi documentUploadClientApi) {
-        this.idamService = idamService;
+    public EvidenceManagementService(
+        @Qualifier("em") AuthTokenGenerator authTokenGenerator,
+        DocumentUploadClientApi documentUploadClientApi
+    ) {
+        this.authTokenGenerator = authTokenGenerator;
         this.documentUploadClientApi = documentUploadClientApi;
     }
 
-    public UploadResponse upload(List<MultipartFile> multipartFileList) {
-        String serviceAuthorization = idamService.generateServiceAuthorization();
-        return documentUploadClientApi.upload(DUMMY_OAUTH_2_TOKEN, serviceAuthorization, multipartFileList);
+    public UploadResponse upload(List<MultipartFile> files) {
+
+        String serviceAuthorization = authTokenGenerator.generate();
+
+        return documentUploadClientApi.upload(
+            DUMMY_OAUTH_2_TOKEN,
+            serviceAuthorization,
+            files
+        );
     }
+
 }
