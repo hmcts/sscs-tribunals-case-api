@@ -34,91 +34,91 @@ public class RoboticsSchemaTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForCaseCode_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForCaseCode_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "002CC", "caseCode");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForNino_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForNino_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "JB01X123B", "appellantNino");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForPostCode_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForPostCode_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "B231ABXXX", "appellant", "postCode");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForPhoneNumber_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForPhoneNumber_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "0798", "appellant", "phoneNumber");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForCaseCreatedDate_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForCaseCreatedDate_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "2018/06/01", "caseCreatedDate");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForMrnDate_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForMrnDate_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "2018/06/02", "mrnDate");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForAppealDate_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForAppealDate_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "2018/06/03", "appealDate");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForHearingType_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForHearingType_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Computer", "hearingType");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForWantsToAttendHearing_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForWantsToAttendHearing_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "wantsToAttendHearing");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "hearingArrangements", "languageInterpreter");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenYesInputForLanguageInterpreterWithNoInterpreterLanguageType_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenYesInputForLanguageInterpreterWithNoInterpreterLanguageType_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Yes", "hearingArrangements", "languageInterpreter");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForSignLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForSignLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "hearingArrangements", "signLanguageInterpreter");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForHearingLoop_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForHearingLoop_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "hearingArrangements", "hearingLoop");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForAccessibleHearingRoom_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForAccessibleHearingRoom_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "hearingArrangements", "accessibleHearingRoom");
         schema.validate(jsonData);
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForDisabilityAccess_throwExceptionWhenValidatingAgainstSchema() throws ValidationException {
+    public void givenInvalidInputForDisabilityAccess_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "hearingArrangements", "disabilityAccess");
         schema.validate(jsonData);
     }
@@ -129,24 +129,20 @@ public class RoboticsSchemaTest {
         schema.validate(jsonData);
     }
 
-    private static JSONObject updateEmbeddedJson(String json, String value, String... keys) {
+    private static JSONObject updateEmbeddedJson(String json, String value, String... keys) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
 
-        JSONObject jsonObject = null;
-        try {
-            Map map = objectMapper.readValue(json, Map.class);
+        Map map = objectMapper.readValue(json, Map.class);
 
-            Map t = map;
-            for (int i = 0; i < keys.length - 1; i++) {
-                t = (Map) t.get(keys[i]);
-            }
-
-            t.put(keys[keys.length - 1], value);
-
-            jsonObject = new JSONObject(objectMapper.writeValueAsString(map));
-        } catch (IOException e) {
-            e.printStackTrace();
+        Map t = map;
+        for (int i = 0; i < keys.length - 1; i++) {
+            t = (Map) t.get(keys[i]);
         }
+
+        t.put(keys[keys.length - 1], value);
+
+        JSONObject jsonObject = new JSONObject(objectMapper.writeValueAsString(map));
+
         return jsonObject;
     }
 
