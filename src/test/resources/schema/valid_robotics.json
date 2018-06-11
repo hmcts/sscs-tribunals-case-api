@@ -1,13 +1,13 @@
 {
   "caseCode": "002DD",
-  "appellantNino": "JB0123456B",
-  "caseCreatedDate": "2018-01-26T11:05:08.866",
-  "mrnDate": "2018-06-23",
+  "appellantNino": "JB012345B",
+  "caseCreatedDate": "2018-06-01",
+  "mrnDate": "2018-06-02",
   "mrnReasonForBeingLate": "It got lost",
-  "appealDate": "2018-06-01",
+  "appealDate": "2018-06-03",
   "hearingType": "Oral",
   "wantsToAttendHearing": "No",
-  "hearingRequestParty": "Bla",
+  "hearingRequestParty": "The party",
   "appellant": {
     "title": "Mr",
     "firstName": "George",
@@ -25,6 +25,7 @@
     "lastName": "Kane",
     "addressLine1": "1 My Road",
     "addressLine2": "The Village",
+    "organisation": "My company",
     "townOrCity": "My Town",
     "county": "Yorkshire",
     "postCode": "EH12 8PK",
@@ -36,7 +37,7 @@
     "signLanguageInterpreter": "No",
     "hearingLoop": "No",
     "accessibleHearingRoom": "No",
-    "others": "Bla",
+    "other": "Bla",
     "datesCantAttend": [
       "2018-08-12",
       "2018-08-22"
