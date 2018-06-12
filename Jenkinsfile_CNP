@@ -36,6 +36,9 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
+    after('build') {
+       sh 'git config --local http.postBuffer 2M'
+    }
     enableSlackNotifications('#sscs-tech')
     loadVaultSecrets(secrets)
 }
