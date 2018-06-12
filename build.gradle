@@ -237,7 +237,7 @@ dependencies {
     runtime "org.springframework.boot:spring-boot-properties-migrator"
 }
 
-jar {
+bootJar {
     archiveName 'tribunals-case-api.jar'
     manifest {
         attributes 'Implementation-Title': project.name,
