@@ -94,6 +94,7 @@ locals {
   ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
+  documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 }
 
 
@@ -151,6 +152,8 @@ module "tribunals-case-api" {
     IDAM_OAUTH2_CLIENT_ID = "${var.idam_oauth2_client_id}"
     IDAM_OAUTH2_CLIENT_SECRET = "${data.vault_generic_secret.idam_oauth2_client_secret.data["value"]}"
     IDAM_OAUTH2_REDIRECT_URL = "${var.idam_redirect_url}"
+
+    DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
   }
 }
