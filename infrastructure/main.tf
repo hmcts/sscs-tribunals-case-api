@@ -106,6 +106,7 @@ module "tribunals-case-api" {
   ilbIp        = "${var.ilbIp}"
   is_frontend  = false
   subscription = "${var.subscription}"
+  capacity     = "${(var.env == "preview") ? 1 : 2}"
 
   app_settings = {
     AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
