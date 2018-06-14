@@ -1,13 +1,11 @@
 {
   "caseCode": "002DD",
+  "caseId": 153331343532523535,
   "appellantNino": "JB012345B",
-  "caseCreatedDate": "2018-06-01",
   "mrnDate": "2018-06-02",
   "mrnReasonForBeingLate": "It got lost",
   "appealDate": "2018-06-03",
-  "hearingType": "Oral",
-  "wantsToAttendHearing": "No",
-  "hearingRequestParty": "The party",
+  "hearingType": "Paper",
   "appellant": {
     "title": "Mr",
     "firstName": "George",

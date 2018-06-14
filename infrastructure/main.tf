@@ -55,6 +55,14 @@ data "vault_generic_secret" "appeal_email_to" {
   path = "secret/${var.infrastructure_env}/sscs/appeal_email_to"
 }
 
+data "vault_generic_secret" "robotics_email_from" {
+  path = "secret/${var.infrastructure_env}/sscs/robotics_email_from"
+}
+
+data "vault_generic_secret" "robotics_email_to" {
+  path = "secret/${var.infrastructure_env}/sscs/robotics_email_to"
+}
+
 data "vault_generic_secret" "smtp_host" {
   path = "secret/${var.infrastructure_env}/sscs/smtp_host"
 }
@@ -120,6 +128,13 @@ module "tribunals-case-api" {
     EMAIL_TO="${data.vault_generic_secret.appeal_email_to.data["value"]}"
     EMAIL_SUBJECT="${var.appeal_email_subject}"
     EMAIL_MESSAGE="${var.appeal_email_message}"
+
+    ROBOTICS_EMAIL_FROM="${data.vault_generic_secret.robotics_email_from.data["value"]}"
+    ROBOTICS_EMAIL_TO="${data.vault_generic_secret.robotics_email_to.data["value"]}"
+    ROBOTICS_EMAIL_SUBJECT="${var.robotics_email_subject}"
+    ROBOTICS_EMAIL_MESSAGE="${var.robotics_email_message}"
+    ROBOTICS_ENABLED="${var.robotics_enabled}"
+
     EMAIL_SERVER_HOST="${data.vault_generic_secret.smtp_host.data["value"]}"
     EMAIL_SERVER_PORT="${data.vault_generic_secret.smtp_port.data["value"]}"
     EMAIL_SMTP_TLS_ENABLED="${var.appeal_email_smtp_tls_enabled}"

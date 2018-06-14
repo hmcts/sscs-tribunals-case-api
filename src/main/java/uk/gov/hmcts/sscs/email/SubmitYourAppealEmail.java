@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 public class SubmitYourAppealEmail extends Email {
 
     public SubmitYourAppealEmail(@Value("${appeal.email.from}") String from,
-                                   @Value("${appeal.email.to}") String to,
-                                   @Value("${appeal.email.subject}") String subject,
-                                   @Value("${appeal.email.message}") String message) {
+                                 @Value("${appeal.email.to}") String to,
+                                 @Value("${appeal.email.subject}") String subject,
+                                 @Value("${appeal.email.message}") String message) {
         this.from = from;
         this.to = to;
         this.subject = subject;

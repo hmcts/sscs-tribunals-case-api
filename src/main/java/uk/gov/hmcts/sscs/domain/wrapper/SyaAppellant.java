@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.domain.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -77,6 +78,11 @@ public class SyaAppellant {
 
     public void setContactDetails(SyaContactDetails contactDetails) {
         this.contactDetails = contactDetails;
+    }
+
+    @JsonIgnore
+    public String getFullName() {
+        return title + " " + firstName + " " + lastName;
     }
 
     @Override

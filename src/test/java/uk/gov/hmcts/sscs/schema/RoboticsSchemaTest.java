@@ -82,6 +82,12 @@ public class RoboticsSchemaTest {
     }
 
     @Test(expected = ValidationException.class)
+    public void givenOralInputForLanguageInterpreterWithNoHearingRequestParty_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
+        jsonData =  updateEmbeddedJson(jsonData.toString(), "Oral", "hearingType");
+        schema.validate(jsonData);
+    }
+
+    @Test(expected = ValidationException.class)
     public void givenInvalidInputForWantsToAttendHearing_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "wantsToAttendHearing");
         schema.validate(jsonData);
@@ -90,12 +96,6 @@ public class RoboticsSchemaTest {
     @Test(expected = ValidationException.class)
     public void givenInvalidInputForLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData =  updateEmbeddedJson(jsonData.toString(), "Bla", "hearingArrangements", "languageInterpreter");
-        schema.validate(jsonData);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void givenYesInputForLanguageInterpreterWithNoInterpreterLanguageType_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData =  updateEmbeddedJson(jsonData.toString(), "Yes", "hearingArrangements", "languageInterpreter");
         schema.validate(jsonData);
     }
 
