@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.evidence;
+package uk.gov.hmcts.sscs.functional.evidence;
 
 import io.restassured.RestAssured;
 import java.io.File;

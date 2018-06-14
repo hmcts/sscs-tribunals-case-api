@@ -50,7 +50,7 @@ pmd {
 }
 
 sourceSets {
-    functional {
+    integrationTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
@@ -70,14 +70,35 @@ sourceSets {
 }
 
 dependencies {
-    functionalCompile(sourceSets.test.output)
+    integrationTestCompile(sourceSets.test.output)
     e2eCompile(sourceSets.test.output)
 }
 
-task functional(type: Test, description: 'Runs the functional tests.', group: 'Verification') {
-    description = 'Runs the integration tests tests'
-    setTestClassesDirs(sourceSets.functional.output.classesDirs)
-    setClasspath(sourceSets.functional.runtimeClasspath)
+task integration(type: Test) {
+    setTestClassesDirs(sourceSets.integrationTest.output.classesDirs)
+    setClasspath(sourceSets.integrationTest.runtimeClasspath)
+}
+
+task functional(type: Test) {
+    group = 'Functional Tests'
+    description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
+    setTestClassesDirs(sourceSets.e2e.output.classesDirs)
+    setClasspath(sourceSets.e2e.runtimeClasspath)
+    include "uk/gov/hmcts/sscs/functional/**"
+    exclude "uk/gov/hmcts/sscs/smoke/**"
+}
+
+jacoco {
+    toolVersion = "0.8.1"
+}
+
+jacocoTestReport {
+    executionData(test, integration)
+    reports {
+        xml.enabled = true
+        csv.enabled = false
+        xml.destination file("${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml")
+    }
 }
 
 dependencyUpdates.resolutionStrategy = {
@@ -125,19 +146,19 @@ repositories {
     mavenCentral()
 }
 
-project.tasks['sonarqube'].dependsOn test, functional
-check.dependsOn functional
+project.tasks['sonarqube'].dependsOn test, integration
+check.dependsOn integration
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
-functional.shouldRunAfter(checkstyleFunctional)
-functional.shouldRunAfter(test)
+integration.shouldRunAfter(checkstyleIntegrationTest)
+integration.shouldRunAfter(test)
 
 sonarqube {
     properties {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
         property "sonar.projectKey", "SSCSTCA"
         property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
-        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/functional.exec"
+        property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +
@@ -147,10 +168,10 @@ sonarqube {
 }
 
 configurations {
-    functionalCompile.extendsFrom(testCompile)
-    functionalRuntime.extendsFrom(testRuntime)
-    e2eRuntime.extendsFrom(testRuntime)
+    integrationTestCompile.extendsFrom(testCompile)
+    integrationTestRuntime.extendsFrom(testRuntime)
     e2eCompile.extendsFrom(testCompile)
+    e2eRuntime.extendsFrom(testRuntime)
 }
 
 def springBootVersion = '2.0.1.RELEASE'
@@ -246,7 +267,7 @@ bootJar {
 }
 
 jacocoTestReport {
-    executionData(test, functional)
+    executionData(test, integration)
     reports {
         xml.enabled = true
         csv.enabled = false
@@ -259,5 +280,5 @@ task smoke(type: Test) {
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
     setClasspath(sourceSets.e2e.runtimeClasspath)
     include "uk/gov/hmcts/sscs/smoke/**"
-    exclude "uk/gov/hmcts/sscs/ccd/**"
+    exclude "uk/gov/hmcts/sscs/functional/**"
 }

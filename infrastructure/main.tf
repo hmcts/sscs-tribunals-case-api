@@ -126,7 +126,7 @@ module "tribunals-case-api" {
     EMAIL_SERVER_PORT="${data.vault_generic_secret.smtp_port.data["value"]}"
     EMAIL_SMTP_TLS_ENABLED="${var.appeal_email_smtp_tls_enabled}"
     EMAIL_SMTP_SSL_TRUST="${var.appeal_email_smtp_ssl_trust}"
-    
+
     PDF_API_URL="${local.pdfService}"
 
     SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"

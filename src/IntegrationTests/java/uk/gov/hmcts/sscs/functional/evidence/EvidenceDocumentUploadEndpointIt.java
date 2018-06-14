@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.evidence;
+package uk.gov.hmcts.sscs.functional.evidence;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.ccd;
+package uk.gov.hmcts.sscs.functional.ccd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
