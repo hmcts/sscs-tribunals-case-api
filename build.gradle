@@ -111,6 +111,8 @@ repositories {
         url "https://dl.bintray.com/hmcts/hmcts-maven"
     }
 
+    maven { url 'https://jitpack.io' }
+
     jcenter()
     mavenCentral()
 }
@@ -169,7 +171,7 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.2'
 
-    compile group: 'org.json', name: 'json', version: '20140107'
+    compile group: 'org.json', name: 'json', version: '20180130'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-common', version: '1.4.0'
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.0'
@@ -177,6 +179,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
+    compile group: 'com.github.everit-org.json-schema', name: 'org.everit.json.schema', version: '1.9.0'
     compile 'com.migesok:jaxb-java-time-adapters:1.1.3'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-feign', version: '1.3.5.RELEASE'
 
