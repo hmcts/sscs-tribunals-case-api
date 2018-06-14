@@ -126,11 +126,7 @@ module "tribunals-case-api" {
     EMAIL_SERVER_PORT="${data.vault_generic_secret.smtp_port.data["value"]}"
     EMAIL_SMTP_TLS_ENABLED="${var.appeal_email_smtp_tls_enabled}"
     EMAIL_SMTP_SSL_TRUST="${var.appeal_email_smtp_ssl_trust}"
-
-    IDAM_S2S_AUTH_TOTP_SECRET="${data.vault_generic_secret.cmc_s2s_secret.data["value"]}"
-    IDAM_S2S_AUTH_MICROSERVICE="${var.idam_s2s_auth_microservice}"
-    IDAM_S2S_AUTH_URL="${local.s2sCnpUrl}"
-
+    
     PDF_API_URL="${local.pdfService}"
 
     SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"
