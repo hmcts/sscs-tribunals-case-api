@@ -2,16 +2,16 @@ package uk.gov.hmcts.sscs.evidence;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.document.domain.UploadResponse.*;
+import static uk.gov.hmcts.reform.document.domain.UploadResponse.Embedded;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,11 +21,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.sscs.service.evidence.EvidenceManagementAuthTokenGenerator;
 import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -45,8 +44,7 @@ public class EvidenceDocumentUploadEndpointIt {
     private IdamApiClient idamApiClient;
 
     @MockBean
-    @Qualifier("em")
-    private EvidenceManagementAuthTokenGenerator authTokenGenerator;
+    private AuthTokenGenerator authTokenGenerator;
 
     @MockBean
     private DocumentUploadClientApi documentUploadClientApi;

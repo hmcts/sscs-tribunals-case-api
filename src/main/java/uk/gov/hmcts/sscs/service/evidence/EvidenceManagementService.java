@@ -2,7 +2,6 @@ package uk.gov.hmcts.sscs.service.evidence;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -19,7 +18,7 @@ public class EvidenceManagementService {
 
     @Autowired
     public EvidenceManagementService(
-        @Qualifier("em") AuthTokenGenerator authTokenGenerator,
+        AuthTokenGenerator authTokenGenerator,
         DocumentUploadClientApi documentUploadClientApi
     ) {
         this.authTokenGenerator = authTokenGenerator;
