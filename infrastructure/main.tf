@@ -2,6 +2,11 @@ provider "vault" {
   address = "https://vault.reform.hmcts.net:6200"
 }
 
+resource "azurerm_resource_group" "rg" {
+  name     = "${var.product}-${var.component}-${var.env}"
+  location = "${var.location}"
+}
+
 data "vault_generic_secret" "cmc_s2s_secret" {
   path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/cmc"
 }
@@ -82,6 +87,10 @@ locals {
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
+  previewVaultName       = "tca-api"
+  nonPreviewVaultName    = "tca-api-${var.env}"
+  vaultName              = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
+
   ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
@@ -144,4 +153,15 @@ module "tribunals-case-api" {
     IDAM_OAUTH2_REDIRECT_URL = "${var.idam_redirect_url}"
 
   }
+}
+
+module "sscs-tca-key-vault" {
+  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
+  name                = "${local.vaultName}"
+  product             = "${var.product}"
+  env                 = "${var.env}"
+  tenant_id           = "${var.tenant_id}"
+  object_id           = "${var.jenkins_AAD_objectId}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  product_group_object_id = "300e771f-856c-45cc-b899-40d78281e9c1"
 }
