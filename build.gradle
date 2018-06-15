@@ -86,7 +86,6 @@ task functional(type: Test) {
     setClasspath(sourceSets.e2e.runtimeClasspath)
     include "uk/gov/hmcts/sscs/functional/**"
     exclude "uk/gov/hmcts/sscs/smoke/**"
-    exclude "uk/gov/hmcts/sscs/functional/ccd/**"
 }
 
 jacoco {
