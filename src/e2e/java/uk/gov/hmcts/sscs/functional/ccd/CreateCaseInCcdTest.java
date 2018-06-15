@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.functional.ccd;
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,13 +45,14 @@ public class CreateCaseInCcdTest {
     }
 
     @Test
+    @Ignore
     public void givenASyaCaseShouldBeSavedIntoCcdViaSubmitAppealService() {
         try {
             submitAppealService.submitAppeal(ALL_DETAILS.getDeserializeMessage());
         } catch (EmailSendFailedException | PdfGenerationException ep) {
             assertTrue(true);
         } catch (Exception ex) {
-            assertFalse(true);
+            fail();
         }
 
     }

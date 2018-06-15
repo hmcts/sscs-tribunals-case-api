@@ -69,7 +69,7 @@ public class ReadCoreCaseDataService {
 
     private List<CaseDetails> getByAppealNumber(EventRequestData eventRequestData, String serviceAuthorization,
                                                 String appealNumber) {
-        log.info("Get getByAppealNumber...");
+        log.info("Get getByAppealNumber {} ...", appealNumber);
         return coreCaseDataService.getCoreCaseDataApi().searchForCaseworker(
                 eventRequestData.getUserToken(),
                 serviceAuthorization,

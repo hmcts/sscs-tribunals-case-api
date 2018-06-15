@@ -18,7 +18,7 @@ import uk.gov.hmcts.sscs.service.ccd.ReadCoreCaseDataService;
 @SpringBootTest
 public class ReadCaseFromCcdTest {
 
-    private static final String APPEAL_NUMBER = "abcde12345";
+    private static final String APPEAL_NUMBER = "vUXyPb17L3";
 
     @Autowired
     private ReadCoreCaseDataService readCoreCaseDataService;
@@ -28,7 +28,7 @@ public class ReadCaseFromCcdTest {
 
     @Test
     public void givenACaseIdShouldRetrieveCaseDetails() {
-        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByCaseId("1520966754095462");
+        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByCaseId("1526918685452662");
         assertNotNull(caseDetails);
     }
 
