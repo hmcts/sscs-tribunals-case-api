@@ -66,7 +66,7 @@ resource "azurerm_key_vault_secret" "ccd-tid" {
 
 resource "azurerm_key_vault_secret" "s2s-micro" {
   name      = "s2s-micro"
-  value     = "${var.idam_s2s_auth_microservice}"
+  value     = "${var.ccd_idam_s2s_auth_microservice}"
   vault_uri = "${module.sscs-tca-key-vault.key_vault_uri}"
 }
 

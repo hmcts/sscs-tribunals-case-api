@@ -112,10 +112,7 @@ module "tribunals-case-api" {
     AUTH_PROVIDER_SERVICE_API_URL="${local.s2sCnpUrl}"
 
     IDAM_API_URL="${data.vault_generic_secret.idam_api.data["value"]}"
-    IDAM_USER_ID="${data.vault_generic_secret.idam_uid.data["value"]}"
-    IDAM_ROLE="${data.vault_generic_secret.idam_role.data["value"]}"
 
-    CCD_CASE_WORKER_ID="${data.vault_generic_secret.ccd_case_worker_id.data["value"]}"
     CCD_SERVICE_API_URL="${local.ccdApi}"
 
     EMAIL_FROM="${data.vault_generic_secret.appeal_email_from.data["value"]}"
@@ -134,7 +131,6 @@ module "tribunals-case-api" {
     CORE_CASE_DATA_API_URL = "${local.ccdApi}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
-    CORE_CASE_DATA_EVENT_ID = "${var.core_case_data_event_id}"
 
     IDAM_URL = "${data.vault_generic_secret.idam_api.data["value"]}"
 
