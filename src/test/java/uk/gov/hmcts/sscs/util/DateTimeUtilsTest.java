@@ -3,7 +3,6 @@ package uk.gov.hmcts.sscs.util;
 import static org.junit.Assert.assertThat;
 
 import java.time.LocalDateTime;
-
 import org.hamcrest.Matchers;
 import org.junit.Test;
 

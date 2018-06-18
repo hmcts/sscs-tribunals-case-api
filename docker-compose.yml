@@ -231,7 +231,6 @@ services:
       IDAM_OAUTH2_CLIENT_SECRET: QM5RQQ53LZFOSIXJ
       IDAM_SSCS_URL: https://localhost:9000/poc
       CORE_CASE_DATA_API_URL: http://ccd-data-store-api:4452
-      CORE_CASE_DATA_USER_ID: 16
       CORE_CASE_DATA_JURISDICTION_ID: SSCS
       CORE_CASE_DATA_CASE_TYPE_ID: Benefit
     ports:

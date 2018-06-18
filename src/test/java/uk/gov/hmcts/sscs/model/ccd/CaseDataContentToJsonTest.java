@@ -4,10 +4,8 @@ import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;

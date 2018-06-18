@@ -1,13 +1,12 @@
 package uk.gov.hmcts.sscs.service;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +16,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
-
 import uk.gov.hmcts.sscs.email.Email;
 import uk.gov.hmcts.sscs.email.EmailAttachment;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;

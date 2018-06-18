@@ -94,6 +94,7 @@ locals {
   ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
+  documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 }
 
 
@@ -111,10 +112,7 @@ module "tribunals-case-api" {
     AUTH_PROVIDER_SERVICE_API_URL="${local.s2sCnpUrl}"
 
     IDAM_API_URL="${data.vault_generic_secret.idam_api.data["value"]}"
-    IDAM_USER_ID="${data.vault_generic_secret.idam_uid.data["value"]}"
-    IDAM_ROLE="${data.vault_generic_secret.idam_role.data["value"]}"
 
-    CCD_CASE_WORKER_ID="${data.vault_generic_secret.ccd_case_worker_id.data["value"]}"
     CCD_SERVICE_API_URL="${local.ccdApi}"
 
     EMAIL_FROM="${data.vault_generic_secret.appeal_email_from.data["value"]}"
@@ -126,10 +124,6 @@ module "tribunals-case-api" {
     EMAIL_SMTP_TLS_ENABLED="${var.appeal_email_smtp_tls_enabled}"
     EMAIL_SMTP_SSL_TRUST="${var.appeal_email_smtp_ssl_trust}"
 
-    IDAM_S2S_AUTH_TOTP_SECRET="${data.vault_generic_secret.cmc_s2s_secret.data["value"]}"
-    IDAM_S2S_AUTH_MICROSERVICE="${var.idam_s2s_auth_microservice}"
-    IDAM_S2S_AUTH_URL="${local.s2sCnpUrl}"
-
     PDF_API_URL="${local.pdfService}"
 
     SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"
@@ -137,7 +131,6 @@ module "tribunals-case-api" {
     CORE_CASE_DATA_API_URL = "${local.ccdApi}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
-    CORE_CASE_DATA_EVENT_ID = "${var.core_case_data_event_id}"
 
     IDAM_URL = "${data.vault_generic_secret.idam_api.data["value"]}"
 
@@ -151,6 +144,8 @@ module "tribunals-case-api" {
     IDAM_OAUTH2_CLIENT_ID = "${var.idam_oauth2_client_id}"
     IDAM_OAUTH2_CLIENT_SECRET = "${data.vault_generic_secret.idam_oauth2_client_secret.data["value"]}"
     IDAM_OAUTH2_REDIRECT_URL = "${var.idam_redirect_url}"
+
+    DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
   }
 }

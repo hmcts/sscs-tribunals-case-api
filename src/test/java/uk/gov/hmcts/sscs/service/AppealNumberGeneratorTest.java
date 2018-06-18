@@ -1,8 +1,8 @@
 package uk.gov.hmcts.sscs.service;
 
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
@@ -42,7 +41,7 @@ public class AppealNumberGeneratorTest {
     @Test
     public void shouldGenerateAppealNumberInSecondAttempt() throws Exception {
 
-        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(getCaseData(), null);
+        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(getCaseData(), (CaseData) null);
 
         appealNumberGenerator.generate();
 
