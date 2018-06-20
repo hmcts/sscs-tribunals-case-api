@@ -3,10 +3,10 @@ package uk.gov.hmcts.sscs.service;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
@@ -65,27 +65,27 @@ public class SubmitAppealServiceTest {
     public void setUp() {
 
         SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer = new
-                SubmitYourAppealToCcdCaseDataDeserializer();
+            SubmitYourAppealToCcdCaseDataDeserializer();
 
         submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
         roboticsEmail = new RoboticsEmail("from", "to", "dummy", "message");
 
         submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
-                submitYourAppealToCcdCaseDataDeserializer, ccdService,
-                pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail, false);
+            submitYourAppealToCcdCaseDataDeserializer, ccdService,
+            pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail, false);
 
         given(ccdService.createCase(any(CaseData.class)))
-                .willReturn(CaseDetails.builder().id(123L).build());
+            .willReturn(CaseDetails.builder().id(123L).build());
     }
 
     @Test
     public void shouldSendPdfByEmailWhenCcdIsDown() {
         given(ccdService.createCase(any(CaseData.class))).willThrow(new CcdException(
-                new RuntimeException("Error while creating case in CCD")));
+            new RuntimeException("Error while creating case in CCD")));
 
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), captor.capture()))
-                .willReturn(expected);
+            .willReturn(expected);
 
         submitAppealService.submitAppeal(getSyaCaseWrapper());
 
@@ -105,7 +105,7 @@ public class SubmitAppealServiceTest {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any())).willReturn(expected);
+            any())).willReturn(expected);
 
         submitAppealService.submitAppeal(appealData);
 
@@ -119,7 +119,7 @@ public class SubmitAppealServiceTest {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any())).willReturn(expected);
+            any())).willReturn(expected);
 
         submitAppealService.submitAppeal(appealData);
 
@@ -137,7 +137,7 @@ public class SubmitAppealServiceTest {
         JSONObject json = new JSONObject();
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any(Map.class))).willReturn(expected);
+            any(Map.class))).willReturn(expected);
         given(roboticsService.generateRobotics(eq(roboticsWrapper))).willReturn(json);
 
         submitAppealService.submitAppeal(appealData);
