@@ -87,8 +87,8 @@ locals {
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
-  previewVaultName       = "tca-api"
-  nonPreviewVaultName    = "tca-api-${var.env}"
+  previewVaultName       = "${var.product}-api"
+  nonPreviewVaultName    = "${var.product}-api-${var.env}"
   vaultName              = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
   ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
