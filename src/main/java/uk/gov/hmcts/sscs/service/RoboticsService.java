@@ -1,32 +1,35 @@
 package uk.gov.hmcts.sscs.service;
 
-import java.io.InputStream;
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.sscs.json.RoboticsJsonGenerator;
+import uk.gov.hmcts.sscs.json.RoboticsJsonMapper;
+import uk.gov.hmcts.sscs.json.RoboticsJsonValidator;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
 
 @Service
 public class RoboticsService {
 
-    private final InputStream inputStream;
+    private final RoboticsJsonMapper roboticsJsonMapper;
+    private final RoboticsJsonValidator roboticsJsonValidator;
 
-    private final Schema schema;
-
-    public RoboticsService() {
-        inputStream = getClass().getResourceAsStream("/schema/sscs-robotics.json");
-        schema = SchemaLoader.load(new JSONObject(new JSONTokener(inputStream)));
+    @Autowired
+    public RoboticsService(
+        RoboticsJsonMapper roboticsJsonMapper,
+        RoboticsJsonValidator roboticsJsonValidator
+    ) {
+        this.roboticsJsonMapper = roboticsJsonMapper;
+        this.roboticsJsonValidator = roboticsJsonValidator;
     }
 
-    public JSONObject generateRobotics(RoboticsWrapper appeal) {
+    public JSONObject createRobotics(RoboticsWrapper appeal) {
 
-        JSONObject roboticsJson = RoboticsJsonGenerator.create(appeal);
+        JSONObject roboticsAppeal =
+            roboticsJsonMapper.map(appeal);
 
-        schema.validate(roboticsJson);
+        roboticsJsonValidator.validate(roboticsAppeal);
 
-        return roboticsJson;
+        return roboticsAppeal;
     }
+
 }

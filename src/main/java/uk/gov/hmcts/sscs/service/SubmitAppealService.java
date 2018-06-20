@@ -78,7 +78,7 @@ public class SubmitAppealService {
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
         if (roboticsEnabled) {
-            JSONObject roboticsJson = roboticsService.generateRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetails.getId()).build());
+            JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetails.getId()).build());
             sendJsonByEmail(appeal.getAppellant(), roboticsJson);
         }
     }

@@ -4,15 +4,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.sscs.domain.wrapper.*;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
 
-public final class RoboticsJsonGenerator {
+@Component
+public class RoboticsJsonMapper {
 
-    private RoboticsJsonGenerator() {
-    }
+    public JSONObject map(RoboticsWrapper wrapper) {
 
-    public static JSONObject create(RoboticsWrapper wrapper) {
         SyaCaseWrapper appeal = wrapper.getSyaCaseWrapper();
         JSONObject obj = new JSONObject();
 
@@ -26,7 +26,10 @@ public final class RoboticsJsonGenerator {
         }
 
         if (appeal.getSyaHearingOptions() != null) {
-            obj.put("hearingArrangements", buildHearingOptions(appeal.getSyaHearingOptions()));
+            JSONObject hearingArrangements = buildHearingOptions(appeal.getSyaHearingOptions());
+            if (hearingArrangements.length() > 0) {
+                obj.put("hearingArrangements", hearingArrangements);
+            }
         }
 
         return obj;
@@ -86,17 +89,20 @@ public final class RoboticsJsonGenerator {
     private static JSONObject buildHearingOptions(SyaHearingOptions hearingOptions) {
         JSONObject hearingArrangements = new JSONObject();
 
-        SyaArrangements arrangements = hearingOptions.getArrangements();
-        hearingArrangements.put("languageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getLanguageInterpreter() ? true : false));
-        hearingArrangements.put("signLanguageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getSignLanguageInterpreter() ? true : false));
-        hearingArrangements.put("hearingLoop", convertBooleanToYesNo(arrangements != null && arrangements.getHearingLoop() ? true : false));
-        hearingArrangements.put("accessibleHearingRoom", convertBooleanToYesNo(arrangements != null && arrangements.getAccessibleHearingRoom() ? true : false));
+        if (hearingOptions.getArrangements() != null) {
+            SyaArrangements arrangements = hearingOptions.getArrangements();
+            hearingArrangements.put("languageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getLanguageInterpreter() ? true : false));
+            hearingArrangements.put("signLanguageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getSignLanguageInterpreter() ? true : false));
+            hearingArrangements.put("hearingLoop", convertBooleanToYesNo(arrangements != null && arrangements.getHearingLoop() ? true : false));
+            hearingArrangements.put("accessibleHearingRoom", convertBooleanToYesNo(arrangements != null && arrangements.getAccessibleHearingRoom() ? true : false));
+        }
 
         if (hearingOptions.getAnythingElse() != null) {
             hearingArrangements.put("other", hearingOptions.getAnythingElse());
         }
 
-        if (hearingOptions.getDatesCantAttend().length > 0) {
+        if (hearingOptions.getDatesCantAttend() != null
+            && hearingOptions.getDatesCantAttend().length > 0) {
             JSONArray datesCantAttendArray = new JSONArray();
             for (String a : hearingOptions.getDatesCantAttend()) {
                 datesCantAttendArray.add(getLocalDate(a));

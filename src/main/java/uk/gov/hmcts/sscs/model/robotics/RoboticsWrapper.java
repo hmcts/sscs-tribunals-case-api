@@ -10,5 +10,5 @@ public class RoboticsWrapper {
 
     private SyaCaseWrapper syaCaseWrapper;
 
-    private Long ccdCaseId;
+    private long ccdCaseId;
 }

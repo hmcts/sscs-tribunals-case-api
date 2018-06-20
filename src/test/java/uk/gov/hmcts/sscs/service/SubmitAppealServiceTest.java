@@ -138,7 +138,7 @@ public class SubmitAppealServiceTest {
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
             any(Map.class))).willReturn(expected);
-        given(roboticsService.generateRobotics(eq(roboticsWrapper))).willReturn(json);
+        given(roboticsService.createRobotics(eq(roboticsWrapper))).willReturn(json);
 
         submitAppealService.submitAppeal(appealData);
 
