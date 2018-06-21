@@ -86,6 +86,7 @@ public class RoboticsJsonMapper {
         return buildContactDetails(json, rep.getContactDetails());
     }
 
+    @SuppressWarnings("unchecked")
     private static JSONObject buildHearingOptions(SyaHearingOptions hearingOptions) {
         JSONObject hearingArrangements = new JSONObject();
 
