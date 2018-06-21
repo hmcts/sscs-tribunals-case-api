@@ -30,7 +30,9 @@ public enum SyaJsonMessageSerializer {
     HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING("hearingWithoutSupportWithScheduleHearing.json"),
     HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING_CCD("hearingWithoutSupportWithScheduleHearingCcd.json"),
     HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING("hearingWithSupportWithoutScheduleHearing.json"),
-    HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD("hearingWithSupportWithoutScheduleHearingCcd.json");
+    HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD("hearingWithSupportWithoutScheduleHearingCcd.json"),
+    EVIDENCE_DOCUMENT("appealWithEvidenceDocuments.json"),
+    EVIDENCE_DOCUMENT_CCD("appealWithEvidenceDocumentsCcd.json");
 
     private final String serializedMessage;
 

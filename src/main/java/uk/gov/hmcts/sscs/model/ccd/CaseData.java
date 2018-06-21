@@ -25,6 +25,7 @@ public class CaseData {
     private List<Event> events;
     private Subscriptions subscriptions;
     private RegionalProcessingCenter regionalProcessingCenter;
+    private List<SscsDocument> sscsDocument;
 
     @JsonCreator
     public CaseData(@JsonProperty("caseReference") String caseReference,
@@ -35,7 +36,8 @@ public class CaseData {
                     @JsonProperty("dwpTimeExtension") List<DwpTimeExtension> dwpTimeExtension,
                     @JsonProperty("events") List<Event> events,
                     @JsonProperty("subscriptions") Subscriptions subscriptions,
-                    @JsonProperty("regionalProcessingCenter")  RegionalProcessingCenter regionalProcessingCenter) {
+                    @JsonProperty("regionalProcessingCenter")  RegionalProcessingCenter regionalProcessingCenter,
+                    @JsonProperty("sscsDocument") List<SscsDocument> sscsDocument) {
         this.caseReference = caseReference;
         this.caseCreated = caseCreated;
         this.appeal = appeal;
@@ -45,5 +47,6 @@ public class CaseData {
         this.events = events;
         this.subscriptions = subscriptions;
         this.regionalProcessingCenter = regionalProcessingCenter;
+        this.sscsDocument = sscsDocument;
     }
 }

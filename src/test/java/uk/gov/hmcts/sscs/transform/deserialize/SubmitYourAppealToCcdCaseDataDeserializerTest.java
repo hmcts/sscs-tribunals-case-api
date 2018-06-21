@@ -82,6 +82,13 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertJsonEquals(HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD.getSerializedMessage(), getJson(caseData));
     }
 
+    @Test
+    public void shouldAddEvidenceDocumentDetailsIfPresent() {
+        SyaCaseWrapper syaCaseWrapper = EVIDENCE_DOCUMENT.getDeserializeMessage();
+        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper);
+        assertJsonEquals(EVIDENCE_DOCUMENT_CCD.getSerializedMessage(), getJson(caseData));
+    }
+
     private String getJson(CaseData caseData) {
         ObjectMapper mapper = new ObjectMapper();
         try {
