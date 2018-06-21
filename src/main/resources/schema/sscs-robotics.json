@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Case",
+  "type": "object",
+  "properties": {
+    "caseCode": {
+      "type": "string",
+      "pattern": "^\\d{3}DD$"
+    },
+    "appellantNino": {
+      "type": "string",
+      "pattern": "^(?!BG)(?!GB)(?!NK)(?!KN)(?!TN)(?!NT)(?!ZZ)\\s?(?:[A-CEGHJ-PR-TW-Z]\\s?[A-CEGHJ-NPR-TW-Z])\\s?(?:\\d\\s?){6}([A-D]|\\s)\\s?"
+    },
+    "appellantPostCode": {"type": "string"},
+    "caseCreatedDate": {"$ref": "#/definitions/dateType"},
+    "mrnDate": {"$ref": "#/definitions/dateType"},
+    "mrnReasonForBeingLate": {"type": "string"},
+    "appealDate": {"$ref": "#/definitions/dateType"},
+    "hearingType": {
+      "type": "string",
+      "enum": ["Paper", "Oral"]
+    },
+    "wantsToAttendHearing": {"$ref": "#/definitions/yesOrNo"},
+    "hearingRequestParty": {"type" : "string"},
+    "pipNumber" : {"type" : "string"},
+    "appellant": {"$ref": "#/definitions/person"},
+    "representative": {"$ref": "#/definitions/person"},
+    "hearingArrangements": {
+      "type": "object",
+      "properties" : {
+        "languageInterpreter": {"$ref": "#/definitions/yesOrNo"},
+        "interpreterLanguageType": {"type": "string"},
+        "signLanguageInterpreter": {"$ref": "#/definitions/yesOrNo"},
+        "hearingLoop": {"$ref": "#/definitions/yesOrNo"},
+        "accessibleHearingRoom": {"$ref": "#/definitions/yesOrNo"},
+        "disabilityAccess ": {"$ref": "#/definitions/yesOrNo"},
+        "other": {"type" : "string"},
+        "datesCantAttend": {
+          "type" : "array",
+          "items": {
+            "$ref": "#/definitions/dateType"
+          }
+        }
+      },
+      "dependencies": {
+        "languageInterpreter": {
+          "oneOf": [
+            {
+              "properties": {
+                "languageInterpreter": {
+                  "enum": ["No"]
+                }
+              },
+              "not": { "required": ["interpreterLanguageType"] }
+            },
+            {
+              "properties": {
+                "languageInterpreter": {
+                  "enum": ["Yes"]
+                }
+              },
+              "required": [
+                "interpreterLanguageType"
+              ]
+            }
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "caseCode",
+    "appellantNino",
+    "caseCreatedDate",
+    "mrnDate",
+    "mrnReasonForBeingLate",
+    "appealDate",
+    "hearingType",
+    "wantsToAttendHearing",
+    "appellant",
+    "hearingArrangements"
+  ],
+
+  "definitions": {
+    "person": {
+      "type": "object",
+      "properties": {
+        "title" : { "type" : "string"},
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string"},
+        "organisation": { "type": "string"},
+        "addressLine1": { "type": "string"},
+        "addressLine2": { "type": "string"},
+        "townOrCity": { "type": "string"},
+        "county": { "type": "string" },
+        "postCode": {
+          "type": "string",
+          "pattern": "^((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])|([Gg][Ii][Rr]))))\\s?([0-9][A-Za-z]{2})|(0[Aa]{2}))$"},
+        "phoneNumber": {
+          "type": "string",
+          "pattern": "^[0-9\\-+ ]{10,17}$"
+        },
+        "email": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "firstName",
+        "lastName",
+        "addressLine1",
+        "townOrCity",
+        "county",
+        "postCode",
+        "phoneNumber",
+        "email"
+      ]
+    },
+    "yesOrNo" : {
+      "type": "string",
+      "enum": ["Yes", "No"]
+    },
+    "dateType": {
+      "type": "string",
+      "format": "date"
+    }
+  }
+}
+

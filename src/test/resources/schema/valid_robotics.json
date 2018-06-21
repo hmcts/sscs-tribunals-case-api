@@ -1,0 +1,46 @@
+{
+  "caseCode": "002DD",
+  "appellantNino": "JB012345B",
+  "caseCreatedDate": "2018-06-01",
+  "mrnDate": "2018-06-02",
+  "mrnReasonForBeingLate": "It got lost",
+  "appealDate": "2018-06-03",
+  "hearingType": "Oral",
+  "wantsToAttendHearing": "No",
+  "hearingRequestParty": "The party",
+  "appellant": {
+    "title": "Mr",
+    "firstName": "George",
+    "lastName": "Jones",
+    "addressLine1": "3 My Road",
+    "townOrCity": "The Town",
+    "county": "Birmingham",
+    "postCode": "B231AB",
+    "phoneNumber": "07900000001",
+    "email": "george@email.com"
+  },
+  "representative": {
+    "title": "Mrs",
+    "firstName": "Fiona",
+    "lastName": "Kane",
+    "addressLine1": "1 My Road",
+    "addressLine2": "The Village",
+    "organisation": "My company",
+    "townOrCity": "My Town",
+    "county": "Yorkshire",
+    "postCode": "EH12 8PK",
+    "phoneNumber": "07345939294",
+    "email": "fiona@email.com"
+  },
+  "hearingArrangements": {
+    "languageInterpreter": "No",
+    "signLanguageInterpreter": "No",
+    "hearingLoop": "No",
+    "accessibleHearingRoom": "No",
+    "other": "Bla",
+    "datesCantAttend": [
+      "2018-08-12",
+      "2018-08-22"
+    ]
+  }
+}

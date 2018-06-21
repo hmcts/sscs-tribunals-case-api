@@ -46,21 +46,12 @@ variable "appeal_email_smtp_ssl_trust" {
   default = "*"
 }
 
-variable "idam_s2s_auth_microservice" {
-  type    = "string"
-  default = "cmc"
-}
-
 variable "core_case_data_jurisdiction_id"{
   default = "SSCS"
 }
 
 variable "core_case_data_case_type_id"{
   default = "Benefit"
-}
-
-variable "core_case_data_event_id"{
-  default = "appealCreated"
 }
 
 variable "ccd_idam_s2s_auth_microservice"{
@@ -73,4 +64,10 @@ variable "idam_oauth2_client_id"{
 
 variable "idam_redirect_url" {
   default = "https://sscs-case-loader-sandbox.service.core-compute-sandbox.internal"
+}
+
+variable "tenant_id" {}
+
+variable "jenkins_AAD_objectId" {
+  type        = "string"
 }

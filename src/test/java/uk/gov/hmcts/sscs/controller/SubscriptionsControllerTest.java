@@ -1,12 +1,11 @@
 package uk.gov.hmcts.sscs.controller;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -18,14 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException;
@@ -33,8 +28,6 @@ import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
-
-@RunWith(MockitoJUnitRunner.class)
 public class SubscriptionsControllerTest {
 
     public static final String APPEAL_ID = "appeal-id";
@@ -53,26 +46,27 @@ public class SubscriptionsControllerTest {
 
     @Before
     public void setUp() {
+        initMocks(this);
         controller = new SubscriptionsController(macService, tribunalsService);
         mockMvc = standaloneSetup(controller).build();
     }
 
     @Test
     public void shouldValidateToken() throws Exception {
-        Map<String,Object> tokenDetails = new HashMap<>();
+        Map<String, Object> tokenDetails = new HashMap<>();
         tokenDetails.put("subscriptionId", 1L);
-        tokenDetails.put("appealId","sdkfdkwfid");
+        tokenDetails.put("appealId", "sdkfdkwfid");
         tokenDetails.put("decryptedToken", "rgfd");
-        tokenDetails.put("benefitType","pip");
+        tokenDetails.put("benefitType", "pip");
 
         given(macService.decryptMacToken("token123")).willReturn(tokenDetails);
 
         mockMvc.perform(get("/tokens/token123")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(CONTENT)
-                .accept(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json("{\"token\":{\"decryptedToken\":\"rgfd\",\"benefitType\":\"pip\",\"subscriptionId\":1,\"appealId\":\"sdkfdkwfid\"}}"));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(CONTENT)
+            .accept(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().json("{\"token\":{\"decryptedToken\":\"rgfd\",\"benefitType\":\"pip\",\"subscriptionId\":1,\"appealId\":\"sdkfdkwfid\"}}"));
     }
 
     @Test(expected = InvalidSubscriptionTokenException.class)
@@ -102,13 +96,13 @@ public class SubscriptionsControllerTest {
     public void updateSubscriptionForGivenAppealNumber() throws Exception {
         // Given
         when(tribunalsService.updateSubscription(eq(APPEAL_ID), any(SubscriptionRequest.class)))
-                .thenReturn("benefitTypeValue");
+            .thenReturn("benefitTypeValue");
 
         SubscriptionRequest subscriptionRequest = getSubscriptionRequest();
 
         //When
         ResponseEntity<String> benefitType = controller
-                .updateSubscription(subscriptionRequest, APPEAL_ID, SUBSCRIPTION_ID);
+            .updateSubscription(subscriptionRequest, APPEAL_ID, SUBSCRIPTION_ID);
 
         // Then
         assertThat(benefitType.getStatusCode(), equalTo(HttpStatus.OK));

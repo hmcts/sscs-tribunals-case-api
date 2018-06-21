@@ -2,11 +2,9 @@ package uk.gov.hmcts.sscs.service.ccd;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.model.ccd.*;
 

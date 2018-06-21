@@ -2,14 +2,11 @@ package uk.gov.hmcts.sscs.util;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import lombok.Getter;
 import lombok.ToString;
-
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 
 @Getter

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.sscs.service;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 import org.junit.Before;
@@ -14,7 +14,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.exception.CcdException;
@@ -23,7 +22,6 @@ import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
@@ -106,7 +104,7 @@ public class TribunalsServiceTest {
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
-        verify(regionalProcessingCenterService, times(1)).getByScReferenceCode(anyString());
+        verify(regionalProcessingCenterService, times(1)).getByScReferenceCode(eq(null));
     }
 
     private CaseData getCaseDataWithRpc() {
