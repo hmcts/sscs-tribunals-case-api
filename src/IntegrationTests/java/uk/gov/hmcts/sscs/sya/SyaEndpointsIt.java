@@ -59,7 +59,6 @@ import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
 import uk.gov.hmcts.sscs.model.idam.UserDetails;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
-import uk.gov.hmcts.sscs.service.idam.AuthTokenSubjectExtractor;
 import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 
 @RunWith(SpringRunner.class)
@@ -79,9 +78,6 @@ public class SyaEndpointsIt {
     @MockBean
     @Qualifier("authTokenGenerator")
     private AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
-    private AuthTokenSubjectExtractor authTokenSubjectExtractor;
 
     @MockBean
     private PDFServiceClient pdfServiceClient;
