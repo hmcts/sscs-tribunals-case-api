@@ -4,6 +4,7 @@ import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
@@ -13,7 +14,6 @@ import uk.gov.hmcts.sscs.model.idam.Authorize;
 public class IdamService {
 
     private final AuthTokenGenerator authTokenGenerator;
-    private final AuthTokenSubjectExtractor authTokenSubjectExtractor;
     private final IdamApiClient idamApiClient;
 
     @Value("${idam.oauth2.user.email}")
@@ -32,11 +32,8 @@ public class IdamService {
     private String idamOauth2RedirectUrl;
 
     @Autowired
-    public IdamService(AuthTokenGenerator authTokenGenerator,
-                       AuthTokenSubjectExtractor authTokenSubjectExtractor,
-                       IdamApiClient idamApiClient) {
+    IdamService(AuthTokenGenerator authTokenGenerator, IdamApiClient idamApiClient) {
         this.authTokenGenerator = authTokenGenerator;
-        this.authTokenSubjectExtractor = authTokenSubjectExtractor;
         this.idamApiClient = idamApiClient;
     }
 
@@ -44,8 +41,9 @@ public class IdamService {
         return authTokenGenerator.generate();
     }
 
+    @Retryable
     public String getUserId(String oauth2Token) {
-        return authTokenSubjectExtractor.extract(oauth2Token);
+        return idamApiClient.getUserDetails(oauth2Token).getId();
     }
 
     public String getIdamOauth2Token() {
@@ -53,18 +51,18 @@ public class IdamService {
         String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
 
         Authorize authorize = idamApiClient.authorizeCodeType(
-            "Basic " + base64Authorisation,
-            "code",
-            idamOauth2ClientId,
-            idamOauth2RedirectUrl
+                "Basic " + base64Authorisation,
+                "code",
+                idamOauth2ClientId,
+                idamOauth2RedirectUrl
         );
 
         Authorize authorizeToken = idamApiClient.authorizeToken(
-            authorize.getCode(),
-            "authorization_code",
-            idamOauth2RedirectUrl,
-            idamOauth2ClientId,
-            idamOauth2ClientSecret
+                authorize.getCode(),
+                "authorization_code",
+                idamOauth2RedirectUrl,
+                idamOauth2ClientId,
+                idamOauth2ClientSecret
         );
 
         return "Bearer " + authorizeToken.getAccessToken();
