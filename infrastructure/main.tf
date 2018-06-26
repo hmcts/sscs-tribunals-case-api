@@ -142,7 +142,7 @@ module "tribunals-case-api" {
   }
 }
 
-module "tribunals-case-api-key-vault" {
+module "sscs-tca-key-vault" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
   name                = "${local.vaultName}"
   product             = "${var.product}"
