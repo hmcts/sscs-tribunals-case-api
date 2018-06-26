@@ -28,16 +28,8 @@ data "vault_generic_secret" "idam_s2s_api" {
   path = "secret/${var.infrastructure_env}/sscs/idam_s2s_api"
 }
 
-data "vault_generic_secret" "idam_uid" {
-  path = "secret/${var.infrastructure_env}/sscs/idam_uid"
-}
-
 data "vault_generic_secret" "idam_key_sscs" {
   path = "secret/${var.infrastructure_env}/sscs/idam_key_sscs"
-}
-
-data "vault_generic_secret" "idam_role" {
-  path = "secret/${var.infrastructure_env}/sscs/idam_role"
 }
 
 data "vault_generic_secret" "ccd_api" {
@@ -93,7 +85,7 @@ locals {
   pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
   documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 
-  idamUrl = "${(var.env == "saat") ? "http://idam-api-idam-${local.local_env}.service.${local.local_ase}.internal" : data.vault_generic_secret.idam_api.data["value"]}"
+  idamUrl = "${(var.env == "saat") ? "http://idam-api-idam-${local.local_env}.service.${local.local_ase}.internal:80" : data.vault_generic_secret.idam_api.data["value"]}"
   previewVaultName       = "${var.product}-api"
   nonPreviewVaultName    = "${var.product}-api-${var.env}"
   vaultName              = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
@@ -133,8 +125,6 @@ module "tribunals-case-api" {
     CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
 
     IDAM_URL = "${local.idamUrl}"
-    IDAM_USER_ID="${data.vault_generic_secret.idam_uid.data["value"]}"
-    IDAM_ROLE="${data.vault_generic_secret.idam_role.data["value"]}"
 
     IDAM.S2S-AUTH.TOTP_SECRET ="${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
     IDAM.S2S-AUTH = "${local.s2sCnpUrl}"
