@@ -15,7 +15,7 @@ List<LinkedHashMap<String, Object>> secrets = [
   secret('s2s-api', 'IDAM.S2S-AUTH'),
   secret('s2s-auth', 'IDAM.S2S-AUTH.TOTP_SECRET'),
   secret('idam-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
-  secret('idam-pass', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
+  secret('idam-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
   secret('mac-secret', 'SUBSCRIPTIOS_MAC_SECRET'),
   secret('idam-oauth-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
   secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
