@@ -2,7 +2,9 @@ package uk.gov.hmcts.sscs.sya;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -10,7 +12,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -53,8 +57,8 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.controller.SyaController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.model.idam.Authorize;
+import uk.gov.hmcts.sscs.model.idam.UserDetails;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
-import uk.gov.hmcts.sscs.service.idam.AuthTokenSubjectExtractor;
 import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 
 @RunWith(SpringRunner.class)
@@ -74,9 +78,6 @@ public class SyaEndpointsIt {
     @MockBean
     @Qualifier("authTokenGenerator")
     private AuthTokenGenerator authTokenGenerator;
-
-    @MockBean
-    private AuthTokenSubjectExtractor authTokenSubjectExtractor;
 
     @MockBean
     private PDFServiceClient pdfServiceClient;
@@ -120,33 +121,33 @@ public class SyaEndpointsIt {
         when(mailSender.createMimeMessage()).thenReturn(message);
 
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
-            .willReturn(PDF.getBytes());
+                .willReturn(PDF.getBytes());
 
         given(coreCaseDataApi.readForCaseWorker(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString())).willReturn(null);
+                anyString())).willReturn(null);
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
         given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString()))
-            .willReturn(authorize);
+                .willReturn(authorize);
         given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString()))
-            .willReturn(authorize);
+                .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
-        given(authTokenSubjectExtractor.extract(anyString())).willReturn("userId");
+        given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId"));
     }
 
     @Test
     public void shouldGeneratePdfAndSend() throws Exception {
         given(coreCaseDataApi.startForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString())).willReturn(StartEventResponse.builder().build());
+                anyString())).willReturn(StartEventResponse.builder().build());
 
         given(coreCaseDataApi.submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyBoolean(), any(CaseDataContent.class))).willReturn(CaseDetails.builder().id(123456789876L).build());
+                anyBoolean(), any(CaseDataContent.class))).willReturn(CaseDetails.builder().id(123456789876L).build());
 
         mockMvc.perform(post("/appeals")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(getCase()))
-            .andExpect(status().isCreated());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase()))
+                .andExpect(status().isCreated());
 
         assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
@@ -166,15 +167,15 @@ public class SyaEndpointsIt {
     @Test
     public void shouldSendEmailWithPdfWhenCcdIsDown() throws Exception {
         given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyMap())).willThrow(new RuntimeException("CCD is down"));
+                anyMap())).willThrow(new RuntimeException("CCD is down"));
 
         given(coreCaseDataApi.startForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString())).willThrow(new RuntimeException("CCD is down"));
+                anyString())).willThrow(new RuntimeException("CCD is down"));
 
         mockMvc.perform(post("/appeals")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(getCase()))
-            .andExpect(status().isCreated());
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase()))
+                .andExpect(status().isCreated());
 
         then(mailSender).should(times(1)).send(message);
 
