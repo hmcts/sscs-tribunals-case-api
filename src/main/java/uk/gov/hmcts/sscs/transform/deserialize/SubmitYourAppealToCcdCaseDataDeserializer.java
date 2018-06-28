@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Subscriptions subscriptions = getAppellantSubscription(syaCaseWrapper);
 
+        List<SscsDocument> sscsDocuments =  getEvidenceDocumentDetails(syaCaseWrapper);
+
         return CaseData.builder()
                 .caseCreated(LocalDate.now().toString())
                 .appeal(appeal)
                 .subscriptions(subscriptions)
+                .sscsDocument(sscsDocuments)
                 .build();
     }
+
 
     private Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
 
@@ -261,5 +266,23 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     private String getLocalDate(String dateStr) {
         LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         return localDate.toString();
+    }
+
+    private List<SscsDocument> getEvidenceDocumentDetails(SyaCaseWrapper syaCaseWrapper) {
+        List<SyaEvidence> evidences = syaCaseWrapper.getReasonsForAppealing().getEvidences();
+
+        if (null != evidences && !evidences.isEmpty()) {
+            return evidences.stream()
+                    .map(syaEvidence -> {
+                        DocumentLink documentLink = DocumentLink.builder().documentUrl(syaEvidence.getUrl()).build();
+                        SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
+                                .documentFileName(syaEvidence.getFileName())
+                                .documentDateAdded(syaEvidence.getUploadedDate().format(DateTimeFormatter.ISO_DATE))
+                                .documentLink(documentLink)
+                                .build();
+                        return SscsDocument.builder().value(sscsDocumentDetails).build();
+                    }).collect(Collectors.toList());
+        }
+        return null;
     }
 }
