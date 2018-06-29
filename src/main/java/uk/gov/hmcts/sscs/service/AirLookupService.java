@@ -49,8 +49,8 @@ public class AirLookupService {
      * @throws IOException pass up any IO errors
      */
     private void parseSpreadSheet(File file) throws IOException {
-        try (NPOIFSFileSystem fs = new NPOIFSFileSystem(file)) {
-            HSSFWorkbook wb = new HSSFWorkbook(fs.getRoot(), true);
+        try (NPOIFSFileSystem fs = new NPOIFSFileSystem(file);
+             HSSFWorkbook wb = new HSSFWorkbook(fs.getRoot(), true)) {
 
             for (Sheet sheet: wb) {
                 if (sheet.getSheetName().equals("AIR")) {
