@@ -1,23 +1,25 @@
 package uk.gov.hmcts.sscs.functional;
 
 import io.restassured.RestAssured;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-
-import java.io.File;
-
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PostCodeTest {
-    public static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json;charset=UTF-8";
 
-    private final String tcaInstance = System.getenv("TEST_URL");
-    private final String localInstance = "http://localhost:8080";
+@RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:config/application_e2e.properties")
+public class PostCodeTest {
+
+    @Value("${test-url}")
+    private String testUrl;
 
     @Test
     public void postcodeReturnsRegionalCentre() {
-        RestAssured.baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
+        RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
         String response = RestAssured
@@ -33,7 +35,7 @@ public class PostCodeTest {
 
     @Test
     public void postcodeReturnsNotFound() {
-        RestAssured.baseURI = StringUtils.isNotBlank(tcaInstance) ? tcaInstance : localInstance;
+        RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
         RestAssured
