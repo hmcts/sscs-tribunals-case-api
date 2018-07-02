@@ -39,7 +39,7 @@ public class AirLookupService {
 
             parseSpreadSheet(classPathResource.getFile());
         } catch (IOException e) {
-            LOG.error("Unable to read in spreadsheet with post code data: eference-data/AIRLookup RC.xls");
+            LOG.error("Unable to read in spreadsheet with post code data: reference-data/AIRLookup RC.xls", e);
         }
     }
 

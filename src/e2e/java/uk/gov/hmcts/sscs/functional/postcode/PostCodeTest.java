@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.functional;
+package uk.gov.hmcts.sscs.functional.postcode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
