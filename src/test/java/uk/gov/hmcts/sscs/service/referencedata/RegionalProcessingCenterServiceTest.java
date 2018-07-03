@@ -94,6 +94,24 @@ public class RegionalProcessingCenterServiceTest {
                 regionalProcessingCenterService.getByScReferenceCode(referenceNumber);
 
         //Then
+        assertBirminghamRpc(regionalProcessingCenter);
+
+    }
+
+    @Test
+    public void shouldReturnBirminghamRpcIfThereIsNoScNumber() {
+        //Given
+        regionalProcessingCenterService.init();
+
+        //When
+        RegionalProcessingCenter regionalProcessingCenter =
+                regionalProcessingCenterService.getByScReferenceCode(null);
+
+        //Then
+        assertBirminghamRpc(regionalProcessingCenter);
+    }
+
+    private void assertBirminghamRpc(RegionalProcessingCenter regionalProcessingCenter) {
         assertThat(regionalProcessingCenter.getName(), equalTo("BIRMINGHAM"));
         assertThat(regionalProcessingCenter.getAddress1(), equalTo("HM Courts & Tribunals Service"));
         assertThat(regionalProcessingCenter.getAddress2(), equalTo("Social Security & Child Support Appeals"));
@@ -103,6 +121,5 @@ public class RegionalProcessingCenterServiceTest {
         assertThat(regionalProcessingCenter.getPostcode(), equalTo("B16 6FR"));
         assertThat(regionalProcessingCenter.getPhoneNumber(), equalTo("0300 123 1142"));
         assertThat(regionalProcessingCenter.getFaxNumber(), equalTo("0126 434 7983"));
-
     }
 }

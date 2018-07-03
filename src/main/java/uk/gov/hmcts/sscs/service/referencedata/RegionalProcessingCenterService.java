@@ -65,6 +65,11 @@ public class RegionalProcessingCenterService {
 
 
     public RegionalProcessingCenter getByScReferenceCode(String referenceNumber) {
+
+        if (null == referenceNumber) {
+            return regionalProcessingCenterMap.get(SSCS_BIRMINGHAM);
+        }
+
         String[] splitReferenceNumber = StringUtils.split(referenceNumber, SEPARATOR_CHAR);
         String regionalProcessingCenter = sccodeRegionalProcessingCentermap.get(splitReferenceNumber[0]);
 
