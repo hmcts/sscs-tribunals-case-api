@@ -33,9 +33,14 @@ public class PostCodeController {
     @RequestMapping(value = "/regionalcentre/{postCode}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> getRegionalCentre(@PathVariable(value = "postCode") String postCode) {
         String regionalCentre = airLookupService.lookupRegionalCentre(postCode);
+
         if (regionalCentre == null) {
+            LOG.error("Could not find postcode " + postCode);
             return notFound().build();
         }
+
+        LOG.debug("Found regional centre " + regionalCentre + " for post code " + postCode);
+
         return ok("{\"regionalCentre\": \"" + regionalCentre + "\"}");
     }
 }
