@@ -99,13 +99,26 @@ public class RegionalProcessingCenterServiceTest {
     }
 
     @Test
-    public void shouldReturnBirminghamRpcIfThereIsNoScNumber() {
+    public void shouldReturnBirminghamRpcIfTheScNumberIsNull() {
         //Given
         regionalProcessingCenterService.init();
 
         //When
         RegionalProcessingCenter regionalProcessingCenter =
                 regionalProcessingCenterService.getByScReferenceCode(null);
+
+        //Then
+        assertBirminghamRpc(regionalProcessingCenter);
+    }
+
+    @Test
+    public void shouldReturnBirminghamRpcIfTheScNumberIsEmpty() {
+        //Given
+        regionalProcessingCenterService.init();
+
+        //When
+        RegionalProcessingCenter regionalProcessingCenter =
+                regionalProcessingCenterService.getByScReferenceCode("");
 
         //Then
         assertBirminghamRpc(regionalProcessingCenter);
