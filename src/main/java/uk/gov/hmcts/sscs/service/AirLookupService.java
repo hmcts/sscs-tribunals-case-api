@@ -37,7 +37,11 @@ public class AirLookupService {
         try {
             ClassPathResource classPathResource = new ClassPathResource("reference-data/AIRLookup RC.xls");
 
+            LOG.debug("classPathResource.isFile() " + classPathResource.isFile());
+
             parseSpreadSheet(classPathResource.getFile());
+
+            LOG.debug("Successfully loaded lookup data for postcode endpoint");
         } catch (IOException e) {
             LOG.error("Unable to read in spreadsheet with post code data: reference-data/AIRLookup RC.xls", e);
         }
