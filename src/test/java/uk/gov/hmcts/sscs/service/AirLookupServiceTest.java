@@ -1,12 +1,15 @@
 package uk.gov.hmcts.sscs.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
 
 public class AirLookupServiceTest {
     AirLookupService airLookupService;
+
+    private static String DEFAULT_VENUE_NAME = "Birmingham";
 
     @Before
     public void setUp() {
@@ -42,6 +45,29 @@ public class AirLookupServiceTest {
     public void lookupFirstValue() {
         String adminGroup = airLookupService.lookupRegionalCentre("ab1");
         assertEquals("Glasgow", adminGroup);
+    }
+
+    //Tests for parsing the venue
+    @Test
+    public void checkForPip() {
+        String cellWithPip = "Bristol Magistrates- 03 - PIP/DLA";
+        assertTrue(airLookupService.hasPip(cellWithPip));
+    }
+
+    //Tests for the venue ID lookup
+    @Test
+    public void checkAirPostcodeWithNoPipReturnsBirmingham() {
+        assertEquals(DEFAULT_VENUE_NAME, airLookupService.lookupAirVenueNameByPostCode("ec1m"));
+    }
+
+    @Test
+    public void checkVenueIdForPostCodeWithNoPip() {
+        assertEquals(24, airLookupService.lookupVenueId("ec1m"));
+    }
+
+    @Test
+    public void checkVenueIdForValidPostCode() {
+        assertEquals(1223, airLookupService.lookupVenueId("NN85"));
     }
 
     @Test
