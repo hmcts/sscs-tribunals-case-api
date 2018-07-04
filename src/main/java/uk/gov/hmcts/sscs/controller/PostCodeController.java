@@ -21,7 +21,7 @@ import uk.gov.hmcts.sscs.service.AirLookupService;
  */
 @RestController
 public class PostCodeController {
-    private static final org.slf4j.Logger LOG = getLogger(ReminderController.class);
+    private static final org.slf4j.Logger LOG = getLogger(PostCodeController.class);
 
     @Autowired
     private AirLookupService airLookupService;

@@ -24,7 +24,7 @@ public class AirLookupService {
         return lookupData.get(postcode.toLowerCase());
     }
 
-    private static final Logger LOG = getLogger(CcdService.class);
+    private static final Logger LOG = getLogger(AirLookupService.class);
     private static int POSTCODE_COLUMN = 1;
     private static int REGIONAL_CENTRE_COLUMN = 3;
 
