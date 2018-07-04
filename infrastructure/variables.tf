@@ -66,6 +66,21 @@ variable "idam_redirect_url" {
   default = "https://sscs-case-loader-sandbox.service.core-compute-sandbox.internal"
 }
 
+variable "robotics_email_subject" {
+  type    = "string"
+  default = "Robotics Data"
+}
+
+variable "robotics_email_message" {
+  type    = "string"
+  default = "Please find attached the robotics json file \nPlease do not respond to this email"
+}
+
+variable "robotics_enabled" {
+  type    = "string"
+  default = "false"
+}
+
 variable "tenant_id" {}
 
 variable "jenkins_AAD_objectId" {
