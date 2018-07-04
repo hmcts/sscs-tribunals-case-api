@@ -47,6 +47,29 @@ public class AirLookupServiceTest {
         assertEquals("Glasgow", adminGroup);
     }
 
+    //Tests for parsing the venue
+    @Test
+    public void checkForPip() {
+        String cellWithPip = "Bristol Magistrates- 03 - PIP/DLA";
+        assertTrue(airLookupService.hasPip(cellWithPip));
+    }
+
+    //Tests for the venue ID lookup
+    @Test
+    public void checkAirPostcodeWithNoPipReturnsBirmingham() {
+        assertEquals(DEFAULT_VENUE_NAME, airLookupService.lookupAirVenueNameByPostCode("ec1m"));
+    }
+
+    @Test
+    public void checkVenueIdForPostCodeWithNoPip() {
+        assertEquals(24, airLookupService.lookupVenueId("ec1m"));
+    }
+
+    @Test
+    public void checkVenueIdForValidPostCode() {
+        assertEquals(1223, airLookupService.lookupVenueId("NN85"));
+    }
+
     @Test
     public void lookupShortPostcode() {
         String adminGroup = airLookupService.lookupRegionalCentre("l2 1RT");

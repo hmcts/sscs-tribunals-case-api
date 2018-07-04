@@ -3,7 +3,6 @@ package uk.gov.hmcts.sscs.service;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.opencsv.CSVReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -14,6 +13,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+
 
 /**
  * Service that ingests a spreadsheet and a csv file containing the
