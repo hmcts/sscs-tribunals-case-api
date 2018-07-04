@@ -2,7 +2,6 @@ package uk.gov.hmcts.sscs.service;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import javax.annotation.PostConstruct;
@@ -36,8 +35,6 @@ public class AirLookupService {
 
         try {
             ClassPathResource classPathResource = new ClassPathResource("reference-data/AIRLookup RC.xls");
-
-            LOG.debug("classPathResource.isFile() " + classPathResource.isFile());
 
             parseSpreadSheet(classPathResource);
 
