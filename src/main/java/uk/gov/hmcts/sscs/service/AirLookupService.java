@@ -39,7 +39,7 @@ public class AirLookupService {
 
             LOG.debug("classPathResource.isFile() " + classPathResource.isFile());
 
-            parseSpreadSheet(classPathResource.getFile());
+            parseSpreadSheet(classPathResource);
 
             LOG.debug("Successfully loaded lookup data for postcode endpoint");
         } catch (IOException e) {
@@ -49,11 +49,11 @@ public class AirLookupService {
 
     /**
      * Read in spreadsheet and populate the Map with postcode.
-     * @param file The file containing the spreadsheet
+     * @param classPathResource The file containing the spreadsheet
      * @throws IOException pass up any IO errors
      */
-    private void parseSpreadSheet(File file) throws IOException {
-        try (NPOIFSFileSystem fs = new NPOIFSFileSystem(file);
+    private void parseSpreadSheet(ClassPathResource classPathResource) throws IOException {
+        try (NPOIFSFileSystem fs = new NPOIFSFileSystem(classPathResource.getInputStream());
              HSSFWorkbook wb = new HSSFWorkbook(fs.getRoot(), true)) {
 
             for (Sheet sheet: wb) {
