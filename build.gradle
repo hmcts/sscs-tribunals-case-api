@@ -23,7 +23,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 compileJava {
-    options.compilerArgs << '-parameters' << '-Xlint:deprecation'
+    options.compilerArgs << '-parameters' << '-Xlint:deprecation' << "-Xlint:unchecked"
 }
 
 compileTestJava {
