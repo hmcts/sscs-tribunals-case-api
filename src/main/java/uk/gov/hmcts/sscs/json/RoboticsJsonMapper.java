@@ -16,7 +16,7 @@ public class RoboticsJsonMapper {
         SyaCaseWrapper appeal = wrapper.getSyaCaseWrapper();
         JSONObject obj = new JSONObject();
 
-        obj = buildAppealDetails(obj, appeal);
+        obj = buildAppealDetails(obj, appeal, wrapper.getVenueName());
 
         obj.put("caseId", wrapper.getCcdCaseId());
         obj.put("appellant", buildAppellantDetails(appeal.getAppellant()));
@@ -35,11 +35,11 @@ public class RoboticsJsonMapper {
         return obj;
     }
 
-    private static JSONObject buildAppealDetails(JSONObject obj, SyaCaseWrapper appeal) {
+    private static JSONObject buildAppealDetails(JSONObject obj, SyaCaseWrapper appeal, String venueName) {
         obj.put("caseCode", "002DD");
         obj.put("appellantNino", appeal.getAppellant().getNino());
         //FIXME: To be implemented at a future date as part of another ticket
-        obj.put("appellantPostCode", "Bedford");
+        obj.put("appellantPostCode", venueName);
         obj.put("appealDate", LocalDate.now().toString());
 
         if (appeal.getMrn() != null) {
