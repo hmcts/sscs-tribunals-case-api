@@ -7,6 +7,10 @@ output "vaultName" {
   value = "${local.vaultName}"
 }
 
+output "microserviceName" {
+  value = "${var.component}"
+}
+
 output "sscs-output" {
   value = "sscs-output"
 }

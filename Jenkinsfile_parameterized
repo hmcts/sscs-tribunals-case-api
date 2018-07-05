@@ -3,17 +3,39 @@
 
 properties([
   parameters([
-    string(name: 'PRODUCT_NAME', defaultValue: 'sscs', description: ''),
-    string(name: 'APP', defaultValue: 'tribunals-api', description: ''),
-    string(name: 'TYPE', defaultValue: 'java', description: ''),
-    string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
-    choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+    string(name: 'ENVIRONMENT', choices: 'saat\nsprod', description: 'Environment where code should be build and deployed'),
   ]),
   [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
   pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
-withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+List<LinkedHashMap<String, Object>> secrets = [
+    secret('idam-url', 'IDAM_URL'),
+    secret('s2s-api', 'IDAM.S2S-AUTH'),
+    secret('s2s-auth', 'IDAM.S2S-AUTH.TOTP_SECRET'),
+    secret('sysupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
+    secret('sysupdate-pass', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
+    secret('mac-secret', 'SUBSCRIPTIOS_MAC_SECRET'),
+    secret('idam-oauth-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+    secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
+    secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
+    secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
+    secret('ccd-tid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
+    secret('s2s-micro', 'IDAM.S2S-AUTH.MICROSERVICE'),
+    secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
+]
 
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
+withParameterizedPipeline('java', 'sscs', 'tribunals-api', params.ENVIRONMENT, 'sandbox') {
+    enableSlackNotifications('#sscs-tech')
+    loadVaultSecrets(secrets)
 }
 

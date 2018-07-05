@@ -69,5 +69,5 @@ variable "idam_redirect_url" {
 variable "tenant_id" {}
 
 variable "jenkins_AAD_objectId" {
-  type        = "string"
+  type = "string"
 }

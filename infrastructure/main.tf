@@ -2,6 +2,7 @@ provider "vault" {
   address = "https://vault.reform.hmcts.net:6200"
 }
 
+# Make sure the resource group exists
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = "${var.location}"
@@ -27,16 +28,8 @@ data "vault_generic_secret" "idam_s2s_api" {
   path = "secret/${var.infrastructure_env}/sscs/idam_s2s_api"
 }
 
-data "vault_generic_secret" "idam_uid" {
-  path = "secret/${var.infrastructure_env}/sscs/idam_uid"
-}
-
 data "vault_generic_secret" "idam_key_sscs" {
   path = "secret/${var.infrastructure_env}/sscs/idam_key_sscs"
-}
-
-data "vault_generic_secret" "idam_role" {
-  path = "secret/${var.infrastructure_env}/sscs/idam_role"
 }
 
 data "vault_generic_secret" "ccd_api" {
@@ -87,16 +80,16 @@ locals {
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
-  previewVaultName       = "${var.product}-api"
-  nonPreviewVaultName    = "${var.product}-api-${var.env}"
-  vaultName              = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
-
   ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
   documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
-}
 
+  idamUrl = "${(var.env == "saat") ? "http://idam-api-idam-${local.local_env}.service.${local.local_ase}.internal:80" : data.vault_generic_secret.idam_api.data["value"]}"
+  previewVaultName       = "${var.product}-api"
+  nonPreviewVaultName    = "${var.product}-api-${var.env}"
+  vaultName              = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
+}
 
 module "tribunals-case-api" {
   source       = "git@github.com:hmcts/moj-module-webapp.git?ref=RPE-389/local-cache"
@@ -111,8 +104,6 @@ module "tribunals-case-api" {
   app_settings = {
     AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
     AUTH_PROVIDER_SERVICE_API_URL="${local.s2sCnpUrl}"
-
-    IDAM_API_URL="${data.vault_generic_secret.idam_api.data["value"]}"
 
     CCD_SERVICE_API_URL="${local.ccdApi}"
 
@@ -133,7 +124,7 @@ module "tribunals-case-api" {
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
 
-    IDAM_URL = "${data.vault_generic_secret.idam_api.data["value"]}"
+    IDAM_URL = "${local.idamUrl}"
 
     IDAM.S2S-AUTH.TOTP_SECRET ="${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
     IDAM.S2S-AUTH = "${local.s2sCnpUrl}"
