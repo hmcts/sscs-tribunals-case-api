@@ -44,7 +44,9 @@ public class SubmitAppealService {
     private final RoboticsService roboticsService;
     private final SubmitYourAppealEmail submitYourAppealEmail;
     private final RoboticsEmail roboticsEmail;
+    private final AirLookupService airLookupService;
     private final Boolean roboticsEnabled;
+
 
     @Autowired
     SubmitAppealService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
@@ -56,6 +58,7 @@ public class SubmitAppealService {
                         RoboticsService roboticsService,
                         SubmitYourAppealEmail submitYourAppealEmail,
                         RoboticsEmail roboticsEmail,
+                        AirLookupService airLookupService,
                         @Value("${robotics.email.enabled}") Boolean roboticsEnabled) {
 
         this.appellantTemplatePath = appellantTemplatePath;
@@ -67,6 +70,7 @@ public class SubmitAppealService {
         this.roboticsService = roboticsService;
         this.submitYourAppealEmail = submitYourAppealEmail;
         this.roboticsEmail = roboticsEmail;
+        this.airLookupService = airLookupService;
         this.roboticsEnabled = roboticsEnabled;
     }
 
@@ -78,9 +82,19 @@ public class SubmitAppealService {
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
         if (roboticsEnabled) {
+            String postcode = getFirstHalfOfPostcode(appeal);
+            String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
             JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetails.getId()).build());
             sendJsonByEmail(appeal.getAppellant(), roboticsJson);
         }
+    }
+
+    protected String getFirstHalfOfPostcode(SyaCaseWrapper appeal) {
+        String postcode = appeal.getAppellant().getContactDetails().getPostCode();
+        if (postcode != null && postcode.indexOf(" ") != -1) {
+            return postcode.substring(0,postcode.indexOf(" "));
+        }
+        return "";
     }
 
     private CaseDetails createCaseInCcd(CaseData caseData) {
