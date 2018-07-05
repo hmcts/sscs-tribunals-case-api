@@ -164,11 +164,19 @@ public class SubmitAppealServiceTest {
     @Test
     public void testPostcodeSplitWithNoSpace() {
         assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN326PL"));
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+
+        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode(appealData));
     }
 
     @Test
     public void testInvalidPostCode() {
         assertEquals("", submitAppealService.getFirstHalfOfPostcode(""));
+
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode("");
+
+        assertEquals("", submitAppealService.getFirstHalfOfPostcode(appealData));
     }
 
     @Test
@@ -185,6 +193,8 @@ public class SubmitAppealServiceTest {
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
         CaseData caseData = submitAppealService.transformAppealToCaseData(appealData,"Cardiff", rpc);
         assertEquals("Cardiff", caseData.getRegion());
+
+        assertEquals("", submitAppealService.getFirstHalfOfPostcode(appealData));
     }
 
 }

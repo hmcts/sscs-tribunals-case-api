@@ -28,6 +28,8 @@ public class RoboticsJsonMapperTest {
     public void mapsAppealToRoboticsJson() {
         String venueName = "Bromley";
 
+        String venueName = "Bromley";
+
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
