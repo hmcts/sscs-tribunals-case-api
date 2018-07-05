@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,6 +53,9 @@ public class SubmitAppealServiceTest {
     @Mock
     private RoboticsService roboticsService;
 
+    @Mock
+    private AirLookupService airLookupService;
+
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
@@ -72,7 +76,8 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
             submitYourAppealToCcdCaseDataDeserializer, ccdService,
-            pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail, false);
+            pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail,
+                airLookupService, false);
 
         given(ccdService.createCase(any(CaseData.class)))
             .willReturn(CaseDetails.builder().id(123L).build());
@@ -143,6 +148,29 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData);
 
         then(emailService).should(times(2)).sendEmail(any(Email.class));
+    }
+
+    @Test
+    public void testPostcodeSplit() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+
+        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode(appealData));
+    }
+
+    @Test
+    public void testInvalidPostCode() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode("");
+
+        assertEquals("", submitAppealService.getFirstHalfOfPostcode(appealData));
+    }
+
+    @Test
+    public void testNullPostCode() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode(null);
+
+        assertEquals("", submitAppealService.getFirstHalfOfPostcode(appealData));
     }
 
 }
