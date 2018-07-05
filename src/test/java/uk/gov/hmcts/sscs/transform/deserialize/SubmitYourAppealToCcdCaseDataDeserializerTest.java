@@ -89,6 +89,13 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertJsonEquals(EVIDENCE_DOCUMENT_CCD.getSerializedMessage(), getJson(caseData));
     }
 
+    @Test
+    public void shouldRemoveSpacesFromAppellantPhoneNumbers() {
+        final SyaCaseWrapper syaCaseWrapper = APPELLANT_PHONE_WITH_SPACES.getDeserializeMessage();
+        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper);
+        assertJsonEquals(APPELLANT_PHONE_WITHOUT_SPACES_CCD.getSerializedMessage(), getJson(caseData));
+    }
+
     private String getJson(CaseData caseData) {
         ObjectMapper mapper = new ObjectMapper();
         try {
