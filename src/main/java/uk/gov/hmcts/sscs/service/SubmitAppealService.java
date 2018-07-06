@@ -50,8 +50,6 @@ public class SubmitAppealService {
     private final Boolean roboticsEnabled;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
-
-
     @Autowired
     SubmitAppealService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
                         AppealNumberGenerator appealNumberGenerator,
@@ -101,23 +99,17 @@ public class SubmitAppealService {
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
         if (roboticsEnabled) {
-
             JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal)
                     .ccdCaseId(caseDetails.getId()).venueName(venue).build());
-
-            String postcode = getFirstHalfOfPostcode(appeal);
-            String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
-            JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetails.getId()).build());
 
             sendJsonByEmail(appeal.getAppellant(), roboticsJson);
         }
     }
 
 
-    protected String getFirstHalfOfPostcode(SyaCaseWrapper appeal) {
-        String postcode = appeal.getAppellant().getContactDetails().getPostCode();
-        if (postcode != null && postcode.indexOf(" ") != -1) {
-            return postcode.substring(0,postcode.indexOf(" "));
+    protected String getFirstHalfOfPostcode(String postcode) {
+        if (postcode != null && postcode.length() > 3) {
+            return postcode.substring(0, postcode.length() - 3).trim();
         }
         return "";
     }

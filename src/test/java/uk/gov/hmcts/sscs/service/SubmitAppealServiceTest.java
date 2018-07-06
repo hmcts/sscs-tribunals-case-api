@@ -164,9 +164,6 @@ public class SubmitAppealServiceTest {
     @Test
     public void testPostcodeSplitWithNoSpace() {
         assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN326PL"));
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
-
-        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode(appealData));
     }
 
     @Test
