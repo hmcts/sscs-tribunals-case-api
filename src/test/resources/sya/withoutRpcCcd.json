@@ -1,22 +1,5 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "generatedDOB" : "1990-02-26",
-  "generatedEmail" : "joe@bloggs.com",
-  "generatedMobile" : "07411222222",
-  "generatedNino" : "AB877533C",
-  "generatedSurname" : "Bloggs",
-  "region": "CARDIFF",
-  "regionalProcessingCenter": {
-    "name" : "CARDIFF",
-    "address1" : "HM Courts & Tribunals Service",
-    "address2" : "Social Security & Child Support Appeals",
-    "address3" : "Eastgate House",
-    "address4" : "Newport Road",
-    "city" : "CARDIFF",
-    "postcode" : "CF24 0AB",
-    "phoneNumber" : "0300 123 1142",
-    "faxNumber" : "0870 739 4438"
-  },
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "1",
@@ -52,7 +35,36 @@
       "code": "PIP"
     },
     "hearingOptions": {
-      "wantsToAttend": "No"
+      "wantsToAttend": "Yes",
+      "wantsSupport": "Yes",
+      "languageInterpreter": "Yes",
+      "languages": "Telugu",
+      "arrangements": [
+        "signLanguageInterpreter",
+        "hearingLoop"
+      ],
+      "scheduleHearing": "Yes",
+      "excludeDates": [
+        {
+          "value": {
+            "start": "2018-04-04",
+            "end": "2018-04-04"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-05",
+            "end": "2018-04-05"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-06",
+            "end": "2018-04-06"
+          }
+        }
+      ],
+      "other": "Yes, this..."
     },
     "appealReasons": {
       "reasons": [
@@ -80,7 +92,7 @@
     "rep": {
       "hasRepresentative": "Yes",
       "name": {
-        "title": "Mr",
+        "title": null,
         "firstName": "Harry",
         "lastName": "Potter"
       },

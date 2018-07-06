@@ -26,6 +26,8 @@ import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
+import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @Service
@@ -46,6 +48,7 @@ public class SubmitAppealService {
     private final RoboticsEmail roboticsEmail;
     private final AirLookupService airLookupService;
     private final Boolean roboticsEnabled;
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
 
 
     @Autowired
@@ -59,6 +62,7 @@ public class SubmitAppealService {
                         SubmitYourAppealEmail submitYourAppealEmail,
                         RoboticsEmail roboticsEmail,
                         AirLookupService airLookupService,
+                        RegionalProcessingCenterService regionalProcessingCenterService,
                         @Value("${robotics.email.enabled}") Boolean roboticsEnabled) {
 
         this.appellantTemplatePath = appellantTemplatePath;
@@ -71,28 +75,40 @@ public class SubmitAppealService {
         this.submitYourAppealEmail = submitYourAppealEmail;
         this.roboticsEmail = roboticsEmail;
         this.airLookupService = airLookupService;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.roboticsEnabled = roboticsEnabled;
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        CaseData caseData = transformAppealToCaseData(appeal);
+        //add RPC and venue
+        String postcode = getFirstHalfOfPostcode(appeal.getAppellant().getContactDetails().getPostCode());
+        String region = airLookupService.lookupRegionalCentre(postcode);
+        String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByName(region);
+
+        CaseData caseData;
+        if (rpc == null) {
+            caseData = transformAppealToCaseData(appeal);
+        } else {
+            caseData = transformAppealToCaseData(appeal, rpc.getName(), rpc);
+        }
+
+
         CaseDetails caseDetails = createCaseInCcd(caseData);
 
         byte[] pdf = generatePdf(appeal, caseDetails.getId());
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
         if (roboticsEnabled) {
-            String postcode = getFirstHalfOfPostcode(appeal);
-            String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
-            JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetails.getId()).build());
+            JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal)
+                    .ccdCaseId(caseDetails.getId()).venueName(venue).build());
             sendJsonByEmail(appeal.getAppellant(), roboticsJson);
         }
     }
 
-    protected String getFirstHalfOfPostcode(SyaCaseWrapper appeal) {
-        String postcode = appeal.getAppellant().getContactDetails().getPostCode();
-        if (postcode != null && postcode.indexOf(" ") != -1) {
-            return postcode.substring(0,postcode.indexOf(" "));
+    protected String getFirstHalfOfPostcode(String postcode) {
+        if (postcode != null && postcode.length() > 3) {
+            return postcode.substring(0, postcode.length() - 3).trim();
         }
         return "";
     }
@@ -105,8 +121,20 @@ public class SubmitAppealService {
         }
     }
 
-    private CaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
+    protected CaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
         CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
+
+        return sendToCcd(caseData);
+    }
+
+    protected CaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
+
+        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, region, rpc);
+
+        return sendToCcd(caseData);
+    }
+
+    private CaseData sendToCcd(CaseData caseData) {
         try {
             Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
                     .tya(appealNumberGenerator.generate())

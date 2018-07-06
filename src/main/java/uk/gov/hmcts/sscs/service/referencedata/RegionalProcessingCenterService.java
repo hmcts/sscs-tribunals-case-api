@@ -80,6 +80,26 @@ public class RegionalProcessingCenterService {
         }
     }
 
+    /**
+     * Lookup by the name of the RPC. We should be getting rid of the above code to
+     * get it from the SC Reference. Restructure the json file to work by just the name.
+     * @param name the RPC name
+     * @return
+     */
+    public RegionalProcessingCenter getByName(String name) {
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+
+        String regionalProcessingCenter = sccodeRegionalProcessingCentermap.get("SSCS " + name);
+
+        if (null != regionalProcessingCenter) {
+            return regionalProcessingCenterMap.get(regionalProcessingCenter);
+        } else {
+            return null;
+        }
+    }
+
     public Map<String, RegionalProcessingCenter> getRegionalProcessingCenterMap() {
         return regionalProcessingCenterMap;
     }
