@@ -98,7 +98,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Contact contact = Contact.builder()
                 .email(syaAppellant.getContactDetails().getEmailAddress())
-                .mobile(syaAppellant.getContactDetails().getPhoneNumber())
+                .mobile(getPhoneNumberWithOutSpaces(syaAppellant.getContactDetails().getPhoneNumber()))
                 .build();
 
         Identity identity = Identity.builder()
@@ -216,7 +216,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         Subscription subscription = Subscription.builder()
                 .wantSmsNotifications(wantNotifications)
                 .subscribeSms(wantNotifications)
-                .mobile(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile)
+                .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
                 .subscribeEmail(StringUtils.isNotBlank(email) ? YES : NO)
                 .email(email)
                 .build();
@@ -249,7 +249,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
             Contact contact = Contact.builder()
                     .email(syaRepresentative.getContactDetails().getEmailAddress())
-                    .mobile(syaRepresentative.getContactDetails().getPhoneNumber())
+                    .mobile(getPhoneNumberWithOutSpaces(syaRepresentative.getContactDetails().getPhoneNumber()))
                     .build();
 
             representative = Representative.builder()
@@ -289,5 +289,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                     }).collect(Collectors.toList());
         }
         return null;
+    }
+
+    private String getPhoneNumberWithOutSpaces(String phoneNumber) {
+        if (StringUtils.isNotBlank(phoneNumber)) {
+            return phoneNumber.replaceAll("\\s", "");
+        }
+        return phoneNumber;
     }
 }
