@@ -148,17 +148,18 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
-        RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
-        regionalProcessingCenter.setName("LIVERPOOL");
-        regionalProcessingCenter.setAddress1("HM Courts & Tribunals Service");
-        regionalProcessingCenter.setAddress2("Social Security & Child Support Appeals");
-        regionalProcessingCenter.setAddress3("Prudential Buildings");
-        regionalProcessingCenter.setAddress4("36 Dale Street");
-        regionalProcessingCenter.setCity("LIVERPOOL");
-        regionalProcessingCenter.setPostcode("L2 5UZ");
-        regionalProcessingCenter.setPhoneNumber("0300 123 1142");
-        regionalProcessingCenter.setFaxNumber("0870 324 0109");
-        return regionalProcessingCenter;
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+                .name("LIVERPOOL")
+                .address1("HM Courts & Tribunals Service")
+                .address2("Social Security & Child Support Appeals")
+                .address3("Prudential Buildings")
+                .address4("36 Dale Street")
+                .city("LIVERPOOL")
+                .postcode("L2 5UZ")
+                .phoneNumber("0300 123 1142")
+                .faxNumber("0870 324 0109")
+                .build();
+        return rpc;
     }
     
 }
