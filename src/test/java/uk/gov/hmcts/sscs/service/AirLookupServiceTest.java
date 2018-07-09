@@ -72,6 +72,12 @@ public class AirLookupServiceTest {
         assertEquals("Birmingham", adminGroup);
     }
 
+    @Test
+    public void lookupLongPostcodeOutcode() {
+        String adminGroup = airLookupService.lookupRegionalCentre("HP27");
+        assertEquals("Birmingham", adminGroup);
+    }
+
     //Tests for parsing the venue
     @Test
     public void checkForPip() {
@@ -93,36 +99,5 @@ public class AirLookupServiceTest {
     @Test
     public void checkVenueIdForValidPostCode() {
         assertEquals(1223, airLookupService.lookupVenueId("NN85"));
-    }
-
-    @Test
-    public void lookupShortPostcode() {
-        String adminGroup = airLookupService.lookupRegionalCentre("l2 1RT");
-        assertEquals("Liverpool", adminGroup);
-    }
-
-    @Test
-    public void lookupLongPostcode() {
-        String adminGroup = airLookupService.lookupRegionalCentre("HP27 1RT");
-        assertEquals("Birmingham", adminGroup);
-    }
-
-    @Test
-    public void lookupShortPostcodeNoSpace() {
-        String adminGroup = airLookupService.lookupRegionalCentre("l21RT");
-        assertEquals("Liverpool", adminGroup);
-    }
-
-
-    @Test
-    public void lookupLongPostcodeNoSpace() {
-        String adminGroup = airLookupService.lookupRegionalCentre("HP271RT");
-        assertEquals("Birmingham", adminGroup);
-    }
-
-    @Test
-    public void lookupLongPostcodeOutcode() {
-        String adminGroup = airLookupService.lookupRegionalCentre("HP27");
-        assertEquals("Birmingham", adminGroup);
     }
 }
