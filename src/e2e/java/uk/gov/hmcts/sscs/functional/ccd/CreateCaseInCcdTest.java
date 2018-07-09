@@ -62,7 +62,6 @@ public class CreateCaseInCcdTest {
     }
 
     @Test
-
     public void givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
