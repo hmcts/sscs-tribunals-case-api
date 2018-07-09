@@ -47,6 +47,31 @@ public class AirLookupServiceTest {
         assertEquals("Glasgow", adminGroup);
     }
 
+    @Test
+    public void lookupShortPostcode() {
+        String adminGroup = airLookupService.lookupRegionalCentre("l2 1RT");
+        assertEquals("Liverpool", adminGroup);
+    }
+
+    @Test
+    public void lookupLongPostcode() {
+        String adminGroup = airLookupService.lookupRegionalCentre("HP27 1RT");
+        assertEquals("Birmingham", adminGroup);
+    }
+
+    @Test
+    public void lookupShortPostcodeNoSpace() {
+        String adminGroup = airLookupService.lookupRegionalCentre("l21RT");
+        assertEquals("Liverpool", adminGroup);
+    }
+
+
+    @Test
+    public void lookupLongPostcodeNoSpace() {
+        String adminGroup = airLookupService.lookupRegionalCentre("HP271RT");
+        assertEquals("Birmingham", adminGroup);
+    }
+
     //Tests for parsing the venue
     @Test
     public void checkForPip() {
