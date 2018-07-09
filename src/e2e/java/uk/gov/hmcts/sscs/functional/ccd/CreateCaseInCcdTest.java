@@ -62,7 +62,7 @@ public class CreateCaseInCcdTest {
     }
 
     @Test
-    public void givenASyaCaseWithoutAMatchingRPCShouldBeSavedIntoCcd() {
+    public void givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
         CaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper);
