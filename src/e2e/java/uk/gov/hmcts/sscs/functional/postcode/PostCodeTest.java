@@ -26,7 +26,7 @@ public class PostCodeTest {
         String response = RestAssured
                 .given()
                 .when()
-                .get("/regionalcentre/" + "AB1")
+                .get("/regionalcentre/" + "AB1 1AB")
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .and()

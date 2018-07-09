@@ -27,7 +27,7 @@ public class PostCodeController {
     private AirLookupService airLookupService;
 
     @ApiOperation(value = "getRegionalCentre",
-            notes = "Returns the regional centre given the appellants post code",
+            notes = "Returns the regional centre given the appellants full post code",
             response = String.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Regional Centre", response = String.class)})
     @RequestMapping(value = "/regionalcentre/{postCode}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
