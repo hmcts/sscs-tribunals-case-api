@@ -68,4 +68,10 @@ public class AirLookupServiceTest {
         String adminGroup = airLookupService.lookupRegionalCentre("HP271RT");
         assertEquals("Birmingham", adminGroup);
     }
+
+    @Test
+    public void lookupLongPostcodeOutcode() {
+        String adminGroup = airLookupService.lookupRegionalCentre("HP27");
+        assertEquals("Birmingham", adminGroup);
+    }
 }
