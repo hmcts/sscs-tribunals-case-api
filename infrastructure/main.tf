@@ -107,6 +107,7 @@ module "tribunals-case-api" {
   is_frontend  = false
   subscription = "${var.subscription}"
   capacity     = "${(var.env == "preview") ? 1 : 2}"
+  common_tags  = "${var.common_tags}"
 
   app_settings = {
     AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
