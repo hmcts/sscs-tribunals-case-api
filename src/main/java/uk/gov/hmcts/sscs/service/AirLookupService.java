@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AirLookupService {
     public String lookupRegionalCentre(String postcode) {
-        if(postcode.length() >= 5) {
+        if (postcode.length() >= 5) {
             int index = postcode.length() - 3;
             //trim last 3 chars to leave the outcode
             String outcode = postcode.toLowerCase().substring(0, index).trim();
