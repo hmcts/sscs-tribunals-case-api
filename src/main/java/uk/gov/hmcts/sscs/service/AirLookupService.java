@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-
 /**
  * Service that ingests a spreadsheet and a csv file containing the
  * venues and regional centres for handling all post codes.
