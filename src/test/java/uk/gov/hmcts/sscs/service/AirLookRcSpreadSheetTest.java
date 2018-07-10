@@ -28,19 +28,22 @@ public class AirLookRcSpreadSheetTest {
     }
 
     //TODO known issue been referred to business waiting for reply
-    static Set<String> knownMissingVenues = new HashSet<>(Arrays.asList("ec1m", "ec3m", "ec4a", "cw28",
+    static Set<String> realPostcodesWithNoVenue = new HashSet<>(Arrays.asList("ec1m", "ec3m", "ec4a",
+            "nw1w", "bt82", "bl11", "bl78", "wc1v", "s31", "s30"));
+    //TODO These are not real post codes so can be ignored
+    static Set<String> notRealPostcodes = new HashSet<>(Arrays.asList("cw28",
             "cw29", "cw26", "cw27", "cw24", "cw25", "cw22", "cw23", "cw20", "cw21", "cw19", "cw17", "cw18",
-            "cw15", "cw16", "cw13", "cw14", "cw48", "cw49", "cw46", "cw47", "cw44", "cw45", "cw42", "nw1w",
-            "cw43", "cw40", "cw41", "cw39", "cw37", "cw38", "cw35", "cw36", "cw33", "cw34", "cw31", "cw32",
-            "cw30", "cw60", "cw61", "cw68", "cw69", "cw66", "cw67", "cw64", "cw65", "cw62", "cw63", "cw50",
+            "cw15", "cw16", "cw13", "cw14", "cw48", "cw49", "cw46", "cw47", "cw44", "cw45", "cw42", "cw43", 
+            "cw40", "cw41", "cw39", "cw37", "cw38", "cw35", "cw36", "cw33", "cw34", "cw31", "cw32", "cw30", 
+            "cw60", "cw61", "cw68", "cw69", "cw66", "cw67", "cw64", "cw65", "cw62", "cw63", "cw50",
             "cw59", "cw57", "cw58", "cw55", "cw56", "cw53", "cw54", "cw51", "cw52", "cw82", "cw83", "cw80",
             "cw81", "cw88", "cw89", "cw86", "cw87", "cw84", "cw85", "cw71", "cw72", "cw70", "cf53", "cw79",
             "cw77", "cw78", "cw75", "cw76", "cw73", "cw74", "cw93", "cw94", "cw91", "cw92", "cw90", "cw99",
-            "cw97", "cw95", "cw96", "bt82", "bl15", "bl16", "bl13", "bl14", "bl11", "bl12", "bl10", "bl19",
+            "cw97", "cw95", "cw96", "bl15", "bl16", "bl13", "bl14", "bl12", "bl10", "bl19",
             "bl17", "bl18", "bl37", "bl38", "bl35", "bl36", "bl33", "bl34", "bl31", "bl32", "bl30", "bl39",
             "bl26", "bl27", "bl24", "bl25", "bl22", "bl23", "bl20", "bl21", "bl28", "bl29", "bl59", "bl57",
             "bl58", "bl55", "bl56", "bl53", "bl54", "bl51", "bl52", "bl50", "bl48", "bl49", "bl46", "bl47",
-            "bl44", "bl45", "bl42", "bl43", "bl40", "bl41", "bl79", "bl77", "bl78", "bl75", "bl76", "bl73",
+            "bl44", "bl45", "bl42", "bl43", "bl40", "bl41", "bl79", "bl77", "bl75", "bl76", "bl73",
             "bl74", "bl71", "bl72", "bl70", "bl68", "bl69", "bl66", "bl67", "bl64", "bl65", "bl62", "bl63",
             "bl60", "bl61", "bl99", "bl97", "bl98", "bl95", "bl96", "bl93", "bl94", "bl91", "bl92", "bl90",
             "bl88", "bl89", "bl86", "bl87", "bl84", "bl85", "bl82", "bl83", "bl80", "bl81", "fy10", "fy11",
@@ -57,7 +60,7 @@ public class AirLookRcSpreadSheetTest {
             "np43", "np42", "np49", "np48", "np47", "np46", "np81", "np80", "np85", "np84", "np83", "np82",
             "np78", "np77", "np76", "np75", "np79", "np70", "np74", "np73", "np72", "np71", "np67", "np66",
             "np65", "np64", "np69", "np68", "wn9", "np99", "np98", "np97", "np92", "np91", "np90", "np96",
-            "np95", "np94", "np93", "np89", "np88", "np87", "np86", "fy9", "wc1v", "s31", "s30", "nk15",
+            "np95", "np94", "np93", "np89", "np88", "np87", "np86", "fy9", "nk15",
             "wn11", "wn10", "wn19", "wn18", "wn17", "wn16", "wn15", "wn14", "wn13", "wn12", "item", "wn33",
             "wn32", "wn31", "wn30", "wn39", "wn38", "wn37", "wn36", "wn35", "wn34", "wn22", "wn21", "wn20",
             "wn29", "wn28", "wn27", "wn26", "wn25", "wn24", "wn23", "wn55", "wn54", "wn53", "wn52", "wn51",
@@ -82,7 +85,7 @@ public class AirLookRcSpreadSheetTest {
         while (iterator.hasNext()) {
             String postcode = iterator.next();
             if (!venueData.keySet().contains(postcode) && !lookupData.get(postcode).equals("Glasgow")) {
-                if (!knownMissingVenues.contains(postcode)) {
+                if (!realPostcodesWithNoVenue.contains(postcode)  && !notRealPostcodes.contains(postcode)) {
                     missingPipVenuePostcodes.add(postcode);
                 }
             }
