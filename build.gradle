@@ -262,6 +262,10 @@ dependencies {
     runtime "org.springframework.boot:spring-boot-properties-migrator"
 }
 
+// this is required to force Java running on the Azure Windows Server OS into using
+// UTF-8 as the default character set instead of windows-1252 which causes issues
+applicationDefaultJvmArgs = ["-Dfile.encoding=UTF-8"]
+
 bootJar {
     archiveName 'tribunals-case-api.jar'
     manifest {
