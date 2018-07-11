@@ -26,6 +26,12 @@ public class CaseData {
     private Subscriptions subscriptions;
     private RegionalProcessingCenter regionalProcessingCenter;
     private List<SscsDocument> sscsDocument;
+    private String generatedNino;
+    private String generatedSurname;
+    private String generatedEmail;
+    private String generatedMobile;
+    @JsonProperty("generatedDOB")
+    private String generatedDob;
 
     @JsonCreator
     public CaseData(@JsonProperty("caseReference") String caseReference,
@@ -37,7 +43,12 @@ public class CaseData {
                     @JsonProperty("events") List<Event> events,
                     @JsonProperty("subscriptions") Subscriptions subscriptions,
                     @JsonProperty("regionalProcessingCenter")  RegionalProcessingCenter regionalProcessingCenter,
-                    @JsonProperty("sscsDocument") List<SscsDocument> sscsDocument) {
+                    @JsonProperty("sscsDocument") List<SscsDocument> sscsDocument,
+                    @JsonProperty("generatedNino") String generatedNino,
+                    @JsonProperty("generatedSurname") String generatedSurname,
+                    @JsonProperty("generatedEmail") String generatedEmail,
+                    @JsonProperty("generatedMobile") String generatedMobile,
+                    @JsonProperty("generatedDOB") String generatedDob) {
         this.caseReference = caseReference;
         this.caseCreated = caseCreated;
         this.appeal = appeal;
@@ -48,5 +59,10 @@ public class CaseData {
         this.subscriptions = subscriptions;
         this.regionalProcessingCenter = regionalProcessingCenter;
         this.sscsDocument = sscsDocument;
+        this.generatedNino = generatedNino;
+        this.generatedSurname = generatedSurname;
+        this.generatedEmail = generatedEmail;
+        this.generatedMobile = generatedMobile;
+        this.generatedDob = generatedDob;
     }
 }
