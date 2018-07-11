@@ -4,8 +4,9 @@
     "code": "PIP"
   },
   "mrn": {
-    "dwpIssuingOffice": "1",
-    "date": "01-02-2018"
+    "dwpIssuingOffice": "DWP PIP (1)",
+    "date": "01-02-2018",
+    "reasonForBeingLate": "Lost my paperwork"
   },
   "isAppointee": false,
   "appellant": {
