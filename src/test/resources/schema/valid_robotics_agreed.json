@@ -1,0 +1,48 @@
+{
+  "appealDate": "2018-06-18",
+  "appellant": {
+    "addressLine1": "Cupidatat enim dolor consequatur facilis dolorum perspiciatis quibusdam aut",
+    "addressLine2": "Distinctio Commodo animi consequatur Aut iure ut odit dolor hic est architecto anim consequat Dolorem est",
+    "county": "Cupiditate incididunt repellendus Iure quia",
+    "email": "wygimyq@email.com",
+    "firstName": "Jeff",
+    "lastName": "Banks",
+    "phoneNumber": "07683736513",
+    "postCode": "CM12 0HN",
+    "title": "Mr",
+    "townOrCity": "Perferendis nemo id velit dolore qui officia"
+  },
+  "appellantNino": "JT012020B",
+  "appellantPostCode": "Bedford",
+  "caseCode": "002DD",
+  "caseId": 1529335642096820,
+  "hearingArrangements": {
+    "accessibleHearingRoom": "No",
+    "datesCantAttend": [
+      "2018-08-13",
+      "2018-08-22"
+    ],
+    "hearingLoop": "Yes",
+    "languageInterpreter": "Yes",
+    "signLanguageInterpreter": "No",
+    "other": "Bla"
+  },
+  "hearingRequestParty": "Mr Jeff Banks",
+  "hearingType": "Oral",
+  "mrnDate": "2017-10-10",
+  "mrnReasonForBeingLate": "It was late",
+  "pipNumber": "Liverpool2 SSO",
+  "representative": {
+    "title": "Mrs",
+    "firstName": "Fiona",
+    "lastName": "Kane",
+    "addressLine1": "1 My Road",
+    "addressLine2": "The Village",
+    "organisation": "My company",
+    "townOrCity": "My Town",
+    "county": "Yorkshire",
+    "postCode": "EH12 8PK",
+    "phoneNumber": "07345939294",
+    "email": "fiona@email.com"
+  }
+}
