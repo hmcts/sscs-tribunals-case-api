@@ -2,7 +2,7 @@ package uk.gov.hmcts.sscs.email;
 
 import java.util.List;
 
-public class Email {
+public abstract class Email {
 
     protected String from;
     protected String to;

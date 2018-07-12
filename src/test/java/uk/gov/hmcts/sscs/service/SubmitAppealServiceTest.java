@@ -4,16 +4,15 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
-import java.net.URL;
 import java.util.Map;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,20 +20,22 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.sscs.email.Email;
+import uk.gov.hmcts.sscs.email.RoboticsEmail;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
+import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
-
-    private ObjectMapper mapper;
 
     @Mock
     private AppealNumberGenerator appealNumberGenerator;
@@ -48,38 +49,43 @@ public class SubmitAppealServiceTest {
     @Mock
     private EmailService emailService;
 
+    @Mock
+    private RoboticsService roboticsService;
+
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
     private SubmitYourAppealEmail submitYourAppealEmail;
 
+    private RoboticsEmail roboticsEmail;
+
     private SubmitAppealService submitAppealService;
 
     @Before
     public void setUp() {
-        mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
         SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer = new
-                SubmitYourAppealToCcdCaseDataDeserializer();
+            SubmitYourAppealToCcdCaseDataDeserializer();
 
         submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
+        roboticsEmail = new RoboticsEmail("from", "to", "dummy", "message");
 
         submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
-                submitYourAppealToCcdCaseDataDeserializer, ccdService,
-                pdfServiceClient, emailService, submitYourAppealEmail);
+            submitYourAppealToCcdCaseDataDeserializer, ccdService,
+            pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail, false);
 
         given(ccdService.createCase(any(CaseData.class)))
-                .willReturn(CaseDetails.builder().id(123L).build());
+            .willReturn(CaseDetails.builder().id(123L).build());
     }
 
     @Test
     public void shouldSendPdfByEmailWhenCcdIsDown() {
         given(ccdService.createCase(any(CaseData.class))).willThrow(new CcdException(
-                new RuntimeException("Error while creating case in CCD")));
+            new RuntimeException("Error while creating case in CCD")));
 
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), captor.capture()))
-                .willReturn(expected);
+            .willReturn(expected);
 
         submitAppealService.submitAppeal(getSyaCaseWrapper());
 
@@ -99,7 +105,7 @@ public class SubmitAppealServiceTest {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any())).willReturn(expected);
+            any())).willReturn(expected);
 
         submitAppealService.submitAppeal(appealData);
 
@@ -113,7 +119,7 @@ public class SubmitAppealServiceTest {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any())).willReturn(expected);
+            any())).willReturn(expected);
 
         submitAppealService.submitAppeal(appealData);
 
@@ -121,13 +127,22 @@ public class SubmitAppealServiceTest {
         verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
     }
 
-    private SyaCaseWrapper getSyaCaseWrapper() {
-        URL resource = getClass().getClassLoader().getResource("json/sya.json");
-        try {
-            return mapper.readValue(resource, SyaCaseWrapper.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    public void shouldSendRoboticsByEmailWhenFeatureFlagEnabled() {
+
+        ReflectionTestUtils.setField(submitAppealService, "roboticsEnabled", true);
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        RoboticsWrapper roboticsWrapper = RoboticsWrapper.builder().syaCaseWrapper(appealData).ccdCaseId(123L).build();
+        byte[] expected = {};
+        JSONObject json = new JSONObject();
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class),
+            any(Map.class))).willReturn(expected);
+        given(roboticsService.createRobotics(eq(roboticsWrapper))).willReturn(json);
+
+        submitAppealService.submitAppeal(appealData);
+
+        then(emailService).should(times(2)).sendEmail(any(Email.class));
     }
 
 }
