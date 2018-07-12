@@ -1,5 +1,10 @@
+
 {
   "caseCreated" : "${json-unit.ignore}",
+  "generatedDOB" : "1990-02-26",
+  "generatedNino" : "AB877533C",
+  "generatedSurname" : "Bloggs",
+
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "1",

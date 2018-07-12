@@ -28,6 +28,11 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return CaseData.builder()
                 .caseCreated(LocalDate.now().toString())
+                .generatedSurname(syaCaseWrapper.getAppellant().getLastName())
+                .generatedEmail(syaCaseWrapper.getAppellant().getContactDetails().getEmailAddress())
+                .generatedMobile(getPhoneNumberWithOutSpaces(syaCaseWrapper.getAppellant().getContactDetails().getPhoneNumber()))
+                .generatedNino(syaCaseWrapper.getAppellant().getNino())
+                .generatedDob(syaCaseWrapper.getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .appeal(appeal)
                 .subscriptions(subscriptions)
                 .sscsDocument(sscsDocuments)

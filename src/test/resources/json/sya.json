@@ -5,7 +5,8 @@
   },
   "mrn": {
     "dwpIssuingOffice": "1",
-    "date": "01-02-2018"
+    "date": "01-02-2018",
+    "reasonForBeingLate": "Lost my paperwork"
   },
   "isAppointee": false,
   "appellant": {
