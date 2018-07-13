@@ -76,8 +76,13 @@ public class RoboticsJsonMapper {
     private static JSONObject buildRepresentativeDetails(SyaRepresentative rep) {
         JSONObject json = new JSONObject();
 
-        json.put("firstName", rep.getFirstName());
-        json.put("lastName", rep.getLastName());
+        String title = rep.getTitle() != null ? rep.getTitle() : "s/m";
+        String firstName = rep.getFirstName() != null ? rep.getFirstName() : ".";
+        String lastName = rep.getLastName() != null ? rep.getLastName() : ".";
+
+        json.put("title", title);
+        json.put("firstName", firstName);
+        json.put("lastName", lastName);
 
         if (rep.getOrganisation() != null) {
             json.put("organisation", rep.getOrganisation());

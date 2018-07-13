@@ -235,6 +235,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
             SyaRepresentative syaRepresentative = syaCaseWrapper.getRepresentative();
 
             Name name = Name.builder()
+                    .title(syaRepresentative.getTitle())
                     .firstName(syaRepresentative.getFirstName())
                     .lastName(syaRepresentative.getLastName())
                     .build();
