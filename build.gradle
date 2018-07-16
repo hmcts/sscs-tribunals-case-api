@@ -6,7 +6,7 @@ plugins {
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.0.5.RELEASE'
     id 'org.springframework.boot' version '2.0.3.RELEASE'
-    id 'org.owasp.dependencycheck' version '3.1.1'
+    id 'org.owasp.dependencycheck' version '3.2.1'
     id 'com.github.ben-manes.versions' version '0.17.0'
     id 'net.ltgt.apt' version '0.13'
 }

@@ -164,6 +164,8 @@ module "tribunals-case-api" {
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
+    MAX_FILE_SIZE = "${var.max_file_size}"
+    MAX_REQUEST_SIZE = "${var.max_request_size}"
   }
 }
 

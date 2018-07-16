@@ -90,3 +90,13 @@ variable "jenkins_AAD_objectId" {
 variable "common_tags" {
   type = "map"
 }
+
+variable "max_file_size" {
+  type = "string"
+  default = "10MB"
+}
+
+variable "max_request_size" {
+  type = "string"
+  default = "10MB"
+}

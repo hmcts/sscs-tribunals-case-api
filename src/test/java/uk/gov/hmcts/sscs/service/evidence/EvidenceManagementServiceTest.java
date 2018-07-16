@@ -10,10 +10,14 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
+import uk.gov.hmcts.sscs.exception.UnSupportedDocumentTypeException;
 
 public class EvidenceManagementServiceTest {
 
@@ -51,4 +55,26 @@ public class EvidenceManagementServiceTest {
         assertThat(actualUploadedResponse, Matchers.equalTo(expectedUploadResponse));
     }
 
+    @Test(expected = UnSupportedDocumentTypeException.class)
+    public void shouldThrowUnSupportedDocumentTypeExceptionIfAnyGivenDocumentTypeIsNotSupportedByDocumentStore() {
+        List<MultipartFile> files = Collections.emptyList();
+
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTHORIZATION);
+        when(documentUploadClientApi.upload(any(), eq(SERVICE_AUTHORIZATION), eq(files)))
+                .thenThrow(new HttpClientErrorException(HttpStatus.UNPROCESSABLE_ENTITY));
+
+        evidenceManagementService.upload(files);
+
+    }
+
+    @Test(expected = AppealNotFoundException.class)
+    public void shouldRethrowAnyExceptionIfItsNotHttpClientErrorException() {
+        List<MultipartFile> files = Collections.emptyList();
+
+        when(authTokenGenerator.generate()).thenReturn(SERVICE_AUTHORIZATION);
+        when(documentUploadClientApi.upload(any(), eq(SERVICE_AUTHORIZATION), eq(files)))
+                .thenThrow(new AppealNotFoundException("AppealNumber"));
+
+        evidenceManagementService.upload(files);
+    }
 }
