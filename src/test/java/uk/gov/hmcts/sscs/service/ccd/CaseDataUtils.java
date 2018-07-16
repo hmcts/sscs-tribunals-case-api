@@ -13,10 +13,14 @@ public final class CaseDataUtils {
     }
 
     public static CaseData buildCaseData() {
+        return buildCaseData("Test");
+    }
+
+    public static CaseData buildCaseData(String surname) {
         Name name = Name.builder()
                 .title("Mr")
                 .firstName("User")
-                .lastName("Test")
+                .lastName(surname)
                 .build();
         Address address = Address.builder()
                 .postcode("L17 7AE")
