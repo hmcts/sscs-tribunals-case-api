@@ -32,16 +32,10 @@ public class EvidenceManagementService {
         String serviceAuthorization = authTokenGenerator.generate();
 
         try {
-            return documentUploadClientApi.upload(
-                    DUMMY_OAUTH_2_TOKEN,
-                    serviceAuthorization,
-                    files
-            );
-        } catch (Throwable throwable) {
-            if (throwable instanceof HttpClientErrorException) {
-                throw new UnSupportedDocumentTypeException(throwable);
-            }
-            throw throwable;
+            return documentUploadClientApi
+                    .upload(DUMMY_OAUTH_2_TOKEN, serviceAuthorization, files);
+        } catch (HttpClientErrorException httpClientErrorException) {
+            throw new UnSupportedDocumentTypeException(httpClientErrorException);
         }
     }
 
