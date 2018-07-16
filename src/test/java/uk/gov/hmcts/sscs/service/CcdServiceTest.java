@@ -102,6 +102,54 @@ public class CcdServiceTest {
     }
 
     @Test
+    public void shouldReturnCaseGivenWhenSurnameHasAccent() {
+        when(readCoreCaseDataService.getCcdCaseDataByAppealNumber(anyString()))
+                .thenReturn(CaseDataUtils.buildCaseData());
+
+        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "Tést");
+
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
+
+        assertNotNull(caseData);
+    }
+
+    @Test
+    public void shouldReturnCaseGivenWhenSurnameInCcdHasAccent() {
+        when(readCoreCaseDataService.getCcdCaseDataByAppealNumber(anyString()))
+                .thenReturn(CaseDataUtils.buildCaseData("Tést"));
+
+        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "Test");
+
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
+
+        assertNotNull(caseData);
+    }
+
+    @Test
+    public void shouldReturnCaseGivenSurnameContainsNotAlphaCharacter() {
+        when(readCoreCaseDataService.getCcdCaseDataByAppealNumber(anyString()))
+                .thenReturn(CaseDataUtils.buildCaseData());
+
+        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "Te-st");
+
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
+
+        assertNotNull(caseData);
+    }
+
+    @Test
+    public void shouldReturnCaseGivenSurnameInCcdContainsNotAlphaCharacter() {
+        when(readCoreCaseDataService.getCcdCaseDataByAppealNumber(anyString()))
+                .thenReturn(CaseDataUtils.buildCaseData("Te-st"));
+
+        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "Test");
+
+        verify(readCoreCaseDataService).getCcdCaseDataByAppealNumber(anyString());
+
+        assertNotNull(caseData);
+    }
+
+    @Test
     public void shouldReturnNullIfSurnameInvalid() {
 
         CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(anyString(), "XXX");

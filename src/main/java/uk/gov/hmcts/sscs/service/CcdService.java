@@ -1,5 +1,6 @@
 package uk.gov.hmcts.sscs.service;
 
+import static gcardone.junidecode.Junidecode.unidecode;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import org.slf4j.Logger;
@@ -122,8 +123,15 @@ public class CcdService {
         return caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null
                 && caseData.getAppeal().getAppellant().getName() != null
                 && caseData.getAppeal().getAppellant().getName().getLastName() != null
-                && caseData.getAppeal().getAppellant().getName().getLastName().equalsIgnoreCase(surname)
+                && compareSurnames(surname, caseData)
                 ? caseData : null;
+    }
+
+    private boolean compareSurnames(String surname, CaseData caseData) {
+        String caseDataSurname = unidecode(caseData.getAppeal().getAppellant().getName().getLastName())
+                .replaceAll("[^a-zA-Z]", "");
+        String unidecodeSurname = unidecode(surname).replaceAll("[^a-zA-Z]", "");
+        return caseDataSurname.equalsIgnoreCase(unidecodeSurname);
     }
 
     private CaseDetails findCcdCaseDetailsByAppealNumber(String appealNumber) {
