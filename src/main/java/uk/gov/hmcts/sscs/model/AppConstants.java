@@ -28,7 +28,7 @@ public class AppConstants {
     public static final int HEARING_DATE_CONTACT_WEEKS = 6;
     public static final int HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS = 7;
     public static final int MAX_DWP_RESPONSE_DAYS = 35;
-    public static final int PAST_HEARING_BOOKED_IN_WEEKS = 6;
+    public static final int PAST_HEARING_BOOKED_IN_WEEKS = 8;
 
     private AppConstants(){
         //
