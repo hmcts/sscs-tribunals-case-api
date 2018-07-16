@@ -248,6 +248,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '3.0.0'
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.0.7'
 
+    compile group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
+
     compileOnly 'org.projectlombok:lombok:1.16.20'
     apt "org.projectlombok:lombok:1.16.20"
 
