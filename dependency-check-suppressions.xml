@@ -7,4 +7,18 @@
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
         <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: groovy-xml-2.4.15.jar
+   ]]></notes>
+        <gav regex="true">^org\.codehaus\.groovy:groovy-xml:.*$</gav>
+        <cve>CVE-2016-6497</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: groovy-json-2.4.15.jar
+   ]]></notes>
+        <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
+        <cve>CVE-2016-6497</cve>
+    </suppress>
 </suppressions>
