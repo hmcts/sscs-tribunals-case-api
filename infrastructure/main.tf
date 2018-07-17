@@ -2,11 +2,6 @@ provider "vault" {
   address = "https://vault.reform.hmcts.net:6200"
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "${var.product}-${var.component}-${var.env}"
-  location = "${var.location}"
-}
-
 data "vault_generic_secret" "cmc_s2s_secret" {
   path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/cmc"
 }
@@ -103,6 +98,12 @@ locals {
   s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
   documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
+
+  is_preview           = "${(var.env == "preview" || var.env == "spreview")}"
+  preview_account_name = "${var.product}bsp"
+  default_account_name = "${var.product}bsp${var.env}"
+  base_account_name    = "${local.is_preview ? local.preview_account_name : local.default_account_name}"
+  account_name         = "${replace(local.base_account_name, "-", "")}"
 }
 
 
@@ -167,6 +168,25 @@ module "tribunals-case-api" {
   }
 }
 
+resource "azurerm_storage_account" "provider" {
+  name                      = "${local.account_name}"
+  resource_group_name       = "${module.tribunals-case-api.resource_group_name}"
+  location                  = "${var.location}"
+  account_tier              = "Standard"
+  account_replication_type  = "LRS"
+  account_kind              = "BlobStorage"
+  enable_https_traffic_only = true
+}
+
+resource "azurerm_storage_container" "sscs" {
+  name                  = "sscs"
+  resource_group_name   = "${module.tribunals-case-api.resource_group_name}"
+  storage_account_name  = "${azurerm_storage_account.provider.name}"
+  container_access_type = "private"
+
+  depends_on = ["azurerm_storage_account.provider"]
+}
+
 module "sscs-tca-key-vault" {
   source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
   name                = "${local.vaultName}"
@@ -174,6 +194,6 @@ module "sscs-tca-key-vault" {
   env                 = "${var.env}"
   tenant_id           = "${var.tenant_id}"
   object_id           = "${var.jenkins_AAD_objectId}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
+  resource_group_name = "${module.tribunals-case-api.resource_group_name}"
   product_group_object_id = "300e771f-856c-45cc-b899-40d78281e9c1"
 }
