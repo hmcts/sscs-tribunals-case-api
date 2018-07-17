@@ -221,11 +221,11 @@ public class TrackYourAppealJsonBuilder {
             case ADJOURNED :
                 eventNode.put(ADJOURNED_DATE, getUtcDate((event)));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        HEARING_DATE_CONTACT_WEEKS, false));
+                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
                 eventNode.put(ADJOURNED_LETTER_RECEIVED_BY_DATE, getCalculatedDate(event,
                         ADJOURNED_LETTER_RECEIVED_MAX_DAYS, true));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        HEARING_DATE_CONTACT_WEEKS, false));
+                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
                 break;
             case DORMANT :
             case HEARING :
