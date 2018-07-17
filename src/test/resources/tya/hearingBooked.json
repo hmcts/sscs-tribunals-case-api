@@ -29,7 +29,7 @@
     ],
     "historicalEvents": [
       {
-        "hearingContactDate": "2017-08-05T13:09:24.883Z",
+        "hearingContactDate": "2017-08-19T13:09:24.883Z",
         "date": "2017-06-24T13:09:24.883Z",
         "type": "DWP_RESPOND",
         "contentKey": "status.dwpRespond"
