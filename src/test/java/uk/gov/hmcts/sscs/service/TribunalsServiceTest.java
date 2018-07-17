@@ -117,17 +117,18 @@ public class TribunalsServiceTest {
 
 
     private RegionalProcessingCenter getRegionalProcessingCenter() {
-        RegionalProcessingCenter regionalProcessingCenter = new RegionalProcessingCenter();
-        regionalProcessingCenter.setName("CARDIFF");
-        regionalProcessingCenter.setAddress1("HM Courts & Tribunals Service");
-        regionalProcessingCenter.setAddress2("Social Security & Child Support Appeals");
-        regionalProcessingCenter.setAddress3("Eastgate House");
-        regionalProcessingCenter.setAddress4("Newport Road");
-        regionalProcessingCenter.setCity("CARDIFF");
-        regionalProcessingCenter.setPostcode("CF24 0AB");
-        regionalProcessingCenter.setPhoneNumber("0300 123 1142");
-        regionalProcessingCenter.setFaxNumber("0870 739 4438");
-        return regionalProcessingCenter;
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+                .name("CARDIFF")
+                .address1("HM Courts & Tribunals Service")
+                .address2("Social Security & Child Support Appeals")
+                .address3("Eastgate House")
+                .address4("Newport Road")
+                .city("CARDIFF")
+                .postcode("CF24 0AB")
+                .phoneNumber("0300 123 1142")
+                .faxNumber("0870 739 4438")
+                .build();
+        return rpc;
     }
 
 }

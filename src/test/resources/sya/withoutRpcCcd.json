@@ -1,21 +1,10 @@
 {
   "caseCreated" : "${json-unit.ignore}",
   "generatedDOB" : "1990-02-26",
+  "generatedEmail" : "joe@bloggs.com",
   "generatedMobile" : "07411222222",
   "generatedNino" : "AB877533C",
   "generatedSurname" : "Bloggs",
-  "region": "CARDIFF",
-  "regionalProcessingCenter": {
-    "name" : "CARDIFF",
-    "address1" : "HM Courts & Tribunals Service",
-    "address2" : "Social Security & Child Support Appeals",
-    "address3" : "Eastgate House",
-    "address4" : "Newport Road",
-    "city" : "CARDIFF",
-    "postcode" : "CF24 0AB",
-    "phoneNumber" : "0300 123 1142",
-    "faxNumber" : "0870 739 4438"
-  },
   "appeal": {
     "mrnDetails": {
       "dwpIssuingOffice": "1",
@@ -37,7 +26,7 @@
         "postcode": "TN32 6PL"
       },
       "contact": {
-        "email": null,
+        "email": "joe@bloggs.com",
         "phone": null,
         "mobile": "07411222222"
       },
@@ -130,12 +119,12 @@
   },
   "subscriptions": {
     "appellantSubscription": {
-      "wantSmsNotifications": "No",
+      "wantSmsNotifications": "Yes",
       "tya": null,
-      "email": null,
-      "mobile": "07411222222",
-      "subscribeEmail": "No",
-      "subscribeSms": "No",
+      "email": "joe@bloggs.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
       "reason": null
     },
     "supporterSubscription": null

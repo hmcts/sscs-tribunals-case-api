@@ -5,6 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public final class SyaServiceHelper {
 
@@ -17,6 +18,15 @@ public final class SyaServiceHelper {
         URL resource = SyaServiceHelper.class.getClassLoader().getResource("json/sya.json");
         try {
             return mapper.readValue(resource, SyaCaseWrapper.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static RegionalProcessingCenter getRegionalProcessingCenter() {
+        URL resource = SyaServiceHelper.class.getClassLoader().getResource("json/rpc.json");
+        try {
+            return mapper.readValue(resource, RegionalProcessingCenter.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
