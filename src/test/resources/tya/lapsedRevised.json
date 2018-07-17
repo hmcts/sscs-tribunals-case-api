@@ -27,7 +27,7 @@
         "contentKey": "status.hearingBooked"
       },
       {
-        "hearingContactDate": "2016-12-15T15:11:45.827Z",
+        "hearingContactDate": "2016-12-29T15:11:45.827Z",
         "date": "2016-11-03T15:11:45.827Z",
         "type": "DWP_RESPOND",
         "contentKey": "status.dwpRespond"

@@ -23,7 +23,7 @@ public class AppConstants {
     public static final String VENUE_NAME = "venueName";
 
     public static final int ADJOURNED_LETTER_RECEIVED_MAX_DAYS = 7;
-    public static final int DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT = 42;
+    public static final int DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS = 8;
     public static final int DORMANT_TO_CLOSED_DURATION_IN_MONTHS = 1;
     public static final int HEARING_DATE_CONTACT_WEEKS = 6;
     public static final int HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS = 7;
