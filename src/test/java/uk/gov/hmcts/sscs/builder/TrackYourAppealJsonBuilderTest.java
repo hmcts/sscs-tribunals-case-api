@@ -1,7 +1,7 @@
 package uk.gov.hmcts.sscs.builder;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static uk.gov.hmcts.sscs.model.AppConstants.HEARING_DATE_CONTACT_WEEKS;
+import static uk.gov.hmcts.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;
 import static uk.gov.hmcts.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
 import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
 
@@ -93,7 +93,7 @@ public class TrackYourAppealJsonBuilderTest {
 
         String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS).toString();
         String dwpResponseDateUtc = localUtcDate.toString();
-        String hearingContactDate = localUtcDate.plusWeeks(HEARING_DATE_CONTACT_WEEKS).toString();
+        String hearingContactDate = localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS).toString();
 
         CaseData caseData = buildHearingBookedEvent(PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
 
@@ -115,7 +115,7 @@ public class TrackYourAppealJsonBuilderTest {
 
         String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1).toString();
         String dwpResponseDateUtc = localUtcDate.toString();
-        String hearingContactDate = localUtcDate.plusWeeks(HEARING_DATE_CONTACT_WEEKS).toString();
+        String hearingContactDate = localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS).toString();
 
         CaseData caseData = buildHearingBookedEvent(NOT_PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
 
