@@ -3,7 +3,6 @@ package uk.gov.hmcts.sscs.service;
 import static org.slf4j.LoggerFactory.getLogger;
 
 import com.opencsv.CSVReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
