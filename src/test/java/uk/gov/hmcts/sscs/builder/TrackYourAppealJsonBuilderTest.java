@@ -89,9 +89,9 @@ public class TrackYourAppealJsonBuilderTest {
 
         Instant instant = Instant.now();
 
-        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS);
+        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS);
 
-        String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS).toString();
+        String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS).toString();
         String dwpResponseDateUtc = localUtcDate.toString();
         String hearingContactDate = localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS).toString();
 
@@ -111,9 +111,9 @@ public class TrackYourAppealJsonBuilderTest {
 
         Instant instant = Instant.now();
 
-        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1);
+        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1);
 
-        String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1).toString();
+        String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1).toString();
         String dwpResponseDateUtc = localUtcDate.toString();
         String hearingContactDate = localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS).toString();
 
