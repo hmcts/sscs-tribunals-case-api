@@ -6,7 +6,9 @@ import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
 import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
@@ -47,6 +50,7 @@ public class SubmitAppealService {
     private final SubmitYourAppealEmail submitYourAppealEmail;
     private final RoboticsEmail roboticsEmail;
     private final AirLookupService airLookupService;
+    private final PdfStoreService pdfStoreService;
     private final Boolean roboticsEnabled;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
 
@@ -62,6 +66,7 @@ public class SubmitAppealService {
                         RoboticsEmail roboticsEmail,
                         AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
+                        PdfStoreService pdfStoreService,
                         @Value("${robotics.email.enabled}") Boolean roboticsEnabled) {
 
         this.appellantTemplatePath = appellantTemplatePath;
@@ -75,6 +80,7 @@ public class SubmitAppealService {
         this.roboticsEmail = roboticsEmail;
         this.airLookupService = airLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
+        this.pdfStoreService = pdfStoreService;
         this.roboticsEnabled = roboticsEnabled;
     }
 
@@ -94,8 +100,16 @@ public class SubmitAppealService {
 
 
         CaseDetails caseDetails = createCaseInCcd(caseData);
-
         byte[] pdf = generatePdf(appeal, caseDetails.getId());
+
+        String fileName = generateUniqueEmailId(appeal.getAppellant()) + ".pdf";
+        List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, fileName);
+
+        List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
+
+        CaseData caseDataWithAppealPdf = caseData.toBuilder().sscsDocument(allDocuments).build();
+        updateCaseInCcd(caseDataWithAppealPdf, caseDetails.getId(), "uploadDocument");
+
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
         if (roboticsEnabled) {
@@ -104,6 +118,16 @@ public class SubmitAppealService {
 
             sendJsonByEmail(appeal.getAppellant(), roboticsJson);
         }
+    }
+
+    private List<SscsDocument> combineEvidenceAndAppealPdf(CaseData caseData, List<SscsDocument> pdfDocuments) {
+        List<SscsDocument> evidenceDocuments = caseData.getSscsDocument();
+        List<SscsDocument> allDocuments = new ArrayList<>();
+        if (evidenceDocuments != null) {
+            allDocuments.addAll(evidenceDocuments);
+        }
+        allDocuments.addAll(pdfDocuments);
+        return allDocuments;
     }
 
 
@@ -118,6 +142,17 @@ public class SubmitAppealService {
         try {
             return ccdService.createCase(caseData);
         } catch (CcdException ccdEx) {
+            log.info("Failed to create ccd case but carrying on [" + caseData.getCaseReference() + "]");
+            return CaseDetails.builder().build();
+        }
+    }
+
+    private CaseDetails updateCaseInCcd(CaseData caseData, Long caseId, String eventId) {
+        try {
+            return ccdService.updateCase(caseData, caseId, eventId);
+        } catch (CcdException ccdEx) {
+            log.info("Failed to update ccd case but carrying on [" + caseId + "] ["
+                    + caseData.getCaseReference() + "] with event [" + eventId + "]");
             return CaseDetails.builder().build();
         }
     }
@@ -184,4 +219,5 @@ public class SubmitAppealService {
         InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
         return IOUtils.toByteArray(in);
     }
+
 }

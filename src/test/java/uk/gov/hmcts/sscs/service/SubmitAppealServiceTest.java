@@ -1,11 +1,11 @@
 package uk.gov.hmcts.sscs.service;
 
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
+import java.util.List;
 import java.util.Map;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -31,6 +32,8 @@ import uk.gov.hmcts.sscs.email.RoboticsEmail;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
+import uk.gov.hmcts.sscs.model.ccd.SscsDocumentDetails;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
@@ -68,6 +71,9 @@ public class SubmitAppealServiceTest {
 
     private SubmitAppealService submitAppealService;
 
+    @Mock
+    private PdfStoreService pdfStoreService;
+
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Before
@@ -83,7 +89,7 @@ public class SubmitAppealServiceTest {
         submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
             submitYourAppealToCcdCaseDataDeserializer, ccdService,
             pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail,
-                airLookupService, regionalProcessingCenterService,false);
+                airLookupService, regionalProcessingCenterService, pdfStoreService, false);
 
         given(ccdService.createCase(any(CaseData.class)))
             .willReturn(CaseDetails.builder().id(123L).build());
@@ -187,4 +193,60 @@ public class SubmitAppealServiceTest {
         assertEquals("Cardiff", caseData.getRegion());
     }
 
+    @Test
+    public void shouldStorePdfInDocumentStore() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        byte[] expected = {1, 2, 3};
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class),
+                any(Map.class))).willReturn(expected);
+
+        submitAppealService.submitAppeal(appealData);
+
+        then(pdfStoreService).should().store(expected, "Bloggs_33C.pdf");
+    }
+
+    @Test
+    public void shouldUpdateCcdWithPdf() {
+        byte[] expected = {1, 2, 3};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class),
+                any(Map.class))).willReturn(expected);
+        long ccdId = 987L;
+        given(ccdService.createCase(any(CaseData.class))).willReturn(CaseDetails.builder().id(ccdId).build());
+        SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
+        List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
+        given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService).updateCase(
+                argThat(caseData ->  sscsDocuments.equals(caseData.getSscsDocument())),
+                eq(ccdId),
+                eq("uploadDocument")
+        );
+    }
+
+    @Test
+    public void shouldUpdateCcdWithPdfCombinedWithEvidence() {
+        byte[] expected = {1, 2, 3};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class),
+                any(Map.class))).willReturn(expected);
+        long ccdId = 987L;
+        given(ccdService.createCase(any(CaseData.class))).willReturn(CaseDetails.builder().id(ccdId)
+                .build());
+        SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
+        List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
+        given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
+        SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService).updateCase(
+                argThat(caseData -> caseData.getSscsDocument().size() == 3
+                        && caseData.getSscsDocument().get(2).equals(sscsDocuments.get(0))),
+                eq(ccdId),
+                eq("uploadDocument")
+        );
+    }
 }

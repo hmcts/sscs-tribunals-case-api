@@ -2,9 +2,7 @@ package uk.gov.hmcts.sscs.sya;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -12,9 +10,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import javax.mail.MessagingException;
@@ -48,11 +45,15 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
+import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.controller.SyaController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
@@ -68,6 +69,8 @@ import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 public class SyaEndpointsIt {
 
     private static final String PDF = "abc";
+    private static final String AUTH_TOKEN = "authToken";
+    private static final String DUMMY_OAUTH_2_TOKEN = "oauth2Token";
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
@@ -81,6 +84,9 @@ public class SyaEndpointsIt {
 
     @MockBean
     private PDFServiceClient pdfServiceClient;
+
+    @MockBean
+    private DocumentUploadClientApi documentUploadClientApi;
 
     @MockBean
     private JavaMailSender mailSender;
@@ -134,6 +140,9 @@ public class SyaEndpointsIt {
 
         given(authTokenGenerator.generate()).willReturn("authToken");
         given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId"));
+
+        UploadResponse uploadResponse = createUploadResponse();
+        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), any())).willReturn(uploadResponse);
     }
 
     @Test
@@ -187,6 +196,19 @@ public class SyaEndpointsIt {
         assertNull(getPdfWrapper().getCcdCaseId());
     }
 
+    @Test
+    public void shouldSendEmailWithPdfWhenDocumentStoreIsDown() throws Exception {
+        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), any()))
+                .willThrow(new RestClientException("Document store is down"));
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase()))
+                .andExpect(status().isCreated());
+
+        then(mailSender).should(times(1)).send(message);
+    }
+
     private String getPdf() throws IOException, MessagingException {
         MimeMultipart content = (MimeMultipart) new MimeMessageHelper(message).getMimeMessage().getContent();
         InputStream input = (InputStream) content.getBodyPart(1).getContent();
@@ -214,4 +236,24 @@ public class SyaEndpointsIt {
         URL resource = getClass().getClassLoader().getResource(syaCaseJson);
         return mapper.readValue(resource, SyaCaseWrapper.class);
     }
+
+    private UploadResponse createUploadResponse() {
+        UploadResponse response = mock(UploadResponse.class);
+        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
+        when(response.getEmbedded()).thenReturn(embedded);
+        Document document = createDocument();
+        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
+        return response;
+    }
+
+    private Document createDocument() {
+        Document document = new Document();
+        Document.Links links = new Document.Links();
+        Document.Link link = new Document.Link();
+        link.href = "some location";
+        links.self = link;
+        document.links = links;
+        return document;
+    }
+
 }

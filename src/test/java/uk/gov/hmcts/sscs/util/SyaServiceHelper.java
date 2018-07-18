@@ -23,6 +23,15 @@ public final class SyaServiceHelper {
         }
     }
 
+    public static SyaCaseWrapper getSyaCaseWrapper(String name) {
+        URL resource = SyaServiceHelper.class.getClassLoader().getResource(name);
+        try {
+            return mapper.readValue(resource, SyaCaseWrapper.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static RegionalProcessingCenter getRegionalProcessingCenter() {
         URL resource = SyaServiceHelper.class.getClassLoader().getResource("json/rpc.json");
         try {
