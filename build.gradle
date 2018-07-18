@@ -84,8 +84,8 @@ task functional(type: Test) {
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
     setClasspath(sourceSets.e2e.runtimeClasspath)
-    include "uk/gov/hmcts/sscs/functional/**"
-    exclude "uk/gov/hmcts/sscs/smoke/**"
+//    include "uk/gov/hmcts/sscs/functional/**"
+//    exclude "uk/gov/hmcts/sscs/smoke/**"
 }
 
 jacoco {
@@ -290,6 +290,6 @@ task smoke(type: Test) {
     description = 'Executes non-destructive smoke tests against a running Tribual Case API'
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
     setClasspath(sourceSets.e2e.runtimeClasspath)
-    include "uk/gov/hmcts/sscs/smoke/**"
-    exclude "uk/gov/hmcts/sscs/functional/**"
+//    include "uk/gov/hmcts/sscs/smoke/**"
+//    exclude "uk/gov/hmcts/sscs/functional/**"
 }
