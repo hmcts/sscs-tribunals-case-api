@@ -1,7 +1,7 @@
 {
   "caseCreated" : "${json-unit.ignore}",
   "generatedDOB" : "1990-02-26",
-  "generatedEmail" : "joe@bloggs.com",
+  "generatedEmail" : "sscstest@greencroftconsulting.com",
   "generatedMobile" : "07411222222",
   "generatedNino" : "AB877533C",
   "generatedSurname" : "Bloggs",
@@ -38,7 +38,7 @@
         "postcode": "TN32 6PL"
       },
       "contact": {
-        "email": "joe@bloggs.com",
+        "email": "sscstest@greencroftconsulting.com",
         "phone": null,
         "mobile": "07411222222"
       },
@@ -133,8 +133,8 @@
     "appellantSubscription": {
       "wantSmsNotifications": "Yes",
       "tya": null,
-      "email": "joe@bloggs.com",
-      "mobile": "07411333333",
+      "email": "sscstest@greencroftconsulting.com",
+      "mobile": "07398785050",
       "subscribeEmail": "Yes",
       "subscribeSms": "Yes",
       "reason": null
