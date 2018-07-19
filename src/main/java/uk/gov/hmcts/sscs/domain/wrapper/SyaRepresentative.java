@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SyaRepresentative {
 
+    private String title;
+
     private String lastName;
 
     private String organisation;
@@ -16,6 +18,14 @@ public class SyaRepresentative {
 
     public SyaRepresentative() {
         // For Json
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getLastName() {
@@ -57,10 +67,11 @@ public class SyaRepresentative {
     @Override
     public String toString() {
         return "SyaRepresentative{"
-                + " lastName='" + lastName + '\''
+                + " title='" + title + '\''
+                + ", firstName='" + firstName + '\''
+                + ", lastName='" + lastName + '\''
                 + ", organisation='" + organisation + '\''
                 + ", contactDetails=" + contactDetails
-                + ", firstName='" + firstName + '\''
                 + '}';
     }
 }

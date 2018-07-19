@@ -7,10 +7,6 @@ resource "azurerm_resource_group" "rg" {
   location = "${var.location}"
 }
 
-data "vault_generic_secret" "cmc_s2s_secret" {
-  path = "secret/${var.infrastructure_env}/ccidam/service-auth-provider/api/microservice-keys/cmc"
-}
-
 data "vault_generic_secret" "email_mac_secret" {
   path = "secret/${var.infrastructure_env}/sscs/sscs_email_mac_secret_text"
 }
