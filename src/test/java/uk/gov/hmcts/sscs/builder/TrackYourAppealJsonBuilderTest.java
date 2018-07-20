@@ -1,13 +1,22 @@
 package uk.gov.hmcts.sscs.builder;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
+import static uk.gov.hmcts.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;
+import static uk.gov.hmcts.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
 import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.Event;
+import uk.gov.hmcts.sscs.model.ccd.EventDetails;
 import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public class TrackYourAppealJsonBuilderTest {
@@ -76,11 +85,60 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void pastHearingBookedTest() throws CcdException {
-        CaseData caseData = PAST_HEARING_BOOKED_CCD.getDeserializeMessage();
+    public void pastHearingBookedDate_shouldReturnAPastHearingBookedEvent() throws CcdException {
+
+        Instant instant = Instant.now();
+
+        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS);
+
+        String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS).toString();
+        String dwpResponseDateUtc = localUtcDate.toString();
+        String hearingContactDate = localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS).toString();
+
+        CaseData caseData = buildHearingBookedEvent(PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
+
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
-        assertJsonEquals(PAST_HEARING_BOOKED.getSerializedMessage(), objectNode);
+
+        String updatedString = PAST_HEARING_BOOKED.getSerializedMessage()
+                .replace("2017-06-29T11:50:11.987Z", dwpResponseDateUtc + "Z")
+                .replace("2017-08-24T11:50:11.437Z", hearingContactDate + "Z");
+        assertJsonEquals(updatedString, objectNode);
+    }
+
+    @Test
+    public void notPastHearingBookedDate_shouldReturnADwpResponseEvent() throws CcdException {
+
+        Instant instant = Instant.now();
+
+        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1);
+
+        String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1).toString();
+        String dwpResponseDateUtc = localUtcDate.toString();
+        String hearingContactDate = localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS).toString();
+
+        CaseData caseData = buildHearingBookedEvent(NOT_PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
+
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+
+        String updatedString = NOT_PAST_HEARING_BOOKED.getSerializedMessage()
+                .replace("2017-06-29T11:50:11.987Z", dwpResponseDateUtc + "Z")
+                .replace("2017-08-24T11:50:11.437Z", hearingContactDate + "Z");
+        assertJsonEquals(updatedString, objectNode);
+    }
+
+    private CaseData buildHearingBookedEvent(CaseData caseData, String dwpResponseDate) {
+        Event event = caseData.getEvents().get(0);
+
+        EventDetails details = event.getValue().toBuilder().date(dwpResponseDate).build();
+        event = Event.builder().value(details).build();
+
+        List<Event> events = caseData.getEvents();
+        events.remove(0);
+        events.add(event);
+
+        return caseData.toBuilder().events(events).build();
     }
 
     @Test

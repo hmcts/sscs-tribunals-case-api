@@ -202,7 +202,7 @@ public class TrackYourAppealJsonBuilder {
             case PAST_HEARING_BOOKED :
             case POSTPONED :
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        DAYS_FROM_DWP_RESPONSE_DATE_FOR_HEARING_CONTACT, true));
+                        DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS, false));
                 break;
             case HEARING_BOOKED :
             case NEW_HEARING_BOOKED :
@@ -221,11 +221,11 @@ public class TrackYourAppealJsonBuilder {
             case ADJOURNED :
                 eventNode.put(ADJOURNED_DATE, getUtcDate((event)));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        HEARING_DATE_CONTACT_WEEKS, false));
+                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
                 eventNode.put(ADJOURNED_LETTER_RECEIVED_BY_DATE, getCalculatedDate(event,
                         ADJOURNED_LETTER_RECEIVED_MAX_DAYS, true));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        HEARING_DATE_CONTACT_WEEKS, false));
+                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
                 break;
             case DORMANT :
             case HEARING :

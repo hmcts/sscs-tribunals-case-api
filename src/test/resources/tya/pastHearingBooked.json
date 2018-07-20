@@ -8,8 +8,8 @@
     "status": "PAST_HEARING_BOOKED",
     "latestEvents": [
       {
-        "hearingContactDate": "2017-08-10T11:50:11.437Z",
-        "date": "2017-06-29T11:50:11.437Z",
+        "hearingContactDate": "2017-08-24T11:50:11.437Z",
+        "date": "2017-06-29T11:50:11.987Z",
         "type": "PAST_HEARING_BOOKED",
         "contentKey": "status.pastHearingBooked"
       }

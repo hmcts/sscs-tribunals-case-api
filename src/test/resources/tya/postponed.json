@@ -7,7 +7,7 @@
     "surname": "Charlie",
     "status": "POSTPONED",
     "latestEvents": [{
-        "hearingContactDate": "2017-08-05T14:09:24.883Z",
+        "hearingContactDate": "2017-08-19T14:09:24.883Z",
         "date": "2017-06-24T14:09:24.883Z",
         "type": "POSTPONED",
         "contentKey": "status.postponed"

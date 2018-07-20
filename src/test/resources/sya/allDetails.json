@@ -21,15 +21,16 @@
       "county": "Kent",
       "postCode": "TN32 6PL",
       "phoneNumber": "07411222222",
-      "emailAddress": "joe@bloggs.com"
+      "emailAddress": "sscstest@greencroftconsulting.com"
     }
   },
   "smsNotify": {
     "wantsSMSNotifications": true,
-    "smsNumber": "07411333333"
+    "smsNumber": "07398785050"
   },
   "hasRepresentative": true,
   "representative": {
+    "title": "Mr",
     "firstName": "Harry",
     "lastName": "Potter",
     "organisation": "HP Ltd",

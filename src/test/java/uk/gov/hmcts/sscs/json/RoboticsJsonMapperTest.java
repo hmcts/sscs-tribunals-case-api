@@ -5,22 +5,26 @@ import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
 
 public class RoboticsJsonMapperTest {
 
     private RoboticsJsonMapper roboticsJsonMapper = new RoboticsJsonMapper();
+    private RoboticsWrapper appeal;
+
+    @Before
+    public void setup() {
+        appeal = RoboticsWrapper
+                    .builder()
+                    .syaCaseWrapper(getSyaCaseWrapper())
+                    .ccdCaseId(123L)
+                    .build();
+    }
 
     @Test
     public void mapsAppealToRoboticsJson() {
-
-        RoboticsWrapper appeal =
-            RoboticsWrapper
-                .builder()
-                .syaCaseWrapper(getSyaCaseWrapper())
-                .ccdCaseId(123L)
-                .build();
 
         JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
 
@@ -57,10 +61,11 @@ public class RoboticsJsonMapperTest {
         assertEquals("joe@bloggs.com", roboticsJson.getJSONObject("appellant").get("email"));
 
         assertEquals(
-            "If this fails, add an assertion, do not just increment the number :)", 10,
+            "If this fails, add an assertion, do not just increment the number :)", 11,
             roboticsJson.getJSONObject("representative").length()
         );
 
+        assertEquals("Mr", roboticsJson.getJSONObject("representative").get("title"));
         assertEquals("Harry", roboticsJson.getJSONObject("representative").get("firstName"));
         assertEquals("Potter", roboticsJson.getJSONObject("representative").get("lastName"));
         assertEquals("HP Ltd", roboticsJson.getJSONObject("representative").get("organisation"));
@@ -86,6 +91,36 @@ public class RoboticsJsonMapperTest {
         assertEquals("2018-04-04", roboticsJson.getJSONObject("hearingArrangements").getJSONArray("datesCantAttend").get(0));
         assertEquals("2018-04-05", roboticsJson.getJSONObject("hearingArrangements").getJSONArray("datesCantAttend").get(1));
         assertEquals("2018-04-06", roboticsJson.getJSONObject("hearingArrangements").getJSONArray("datesCantAttend").get(2));
+    }
+
+    @Test
+    public void mapRepTitleToDefaultValuesWhenSetToNull() {
+
+        appeal.getSyaCaseWrapper().getRepresentative().setTitle(null);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertEquals("s/m", roboticsJson.getJSONObject("representative").get("title"));
+    }
+
+    @Test
+    public void mapRepFirstNameToDefaultValuesWhenSetToNull() {
+
+        appeal.getSyaCaseWrapper().getRepresentative().setFirstName(null);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertEquals(".", roboticsJson.getJSONObject("representative").get("firstName"));
+    }
+
+    @Test
+    public void mapRepLastNameToDefaultValuesWhenSetToNull() {
+
+        appeal.getSyaCaseWrapper().getRepresentative().setLastName(null);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertEquals(".", roboticsJson.getJSONObject("representative").get("lastName"));
     }
 
 }
