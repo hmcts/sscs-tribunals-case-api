@@ -1,4 +1,3 @@
-
 output "vaultUri" {
   value = "${module.sscs-tca-key-vault.key_vault_uri}"
 }

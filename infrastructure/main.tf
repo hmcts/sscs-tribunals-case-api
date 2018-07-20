@@ -5,6 +5,9 @@ provider "vault" {
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = "${var.location}"
+  tags = "${merge(var.common_tags,
+    map("lastUpdated", "${timestamp()}")
+    )}"
 }
 
 data "vault_generic_secret" "email_mac_secret" {
@@ -83,24 +86,22 @@ data "vault_generic_secret" "idam_oauth2_client_secret" {
   path = "secret/${var.infrastructure_env}/ccidam/idam-api/oauth2/client-secrets/sscs"
 }
 
-
 locals {
-  aseName = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
+  aseName       = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
   app_full_name = "${var.product}-${var.component}"
 
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
-  previewVaultName       = "${var.product}-api"
-  nonPreviewVaultName    = "${var.product}-api-${var.env}"
-  vaultName              = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
+  previewVaultName    = "${var.product}-api"
+  nonPreviewVaultName = "${var.product}-api-${var.env}"
+  vaultName           = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
 
-  ccdApi = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
-  s2sCnpUrl = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
-  pdfService = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
+  ccdApi        = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
+  s2sCnpUrl     = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
+  pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
   documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 }
-
 
 module "tribunals-case-api" {
   source       = "git@github.com:hmcts/moj-module-webapp.git?ref=master"
@@ -114,62 +115,61 @@ module "tribunals-case-api" {
   common_tags  = "${var.common_tags}"
 
   app_settings = {
-    AUTH_PROVIDER_SERVICE_CLIENT_KEY="${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
-    AUTH_PROVIDER_SERVICE_API_URL="${local.s2sCnpUrl}"
+    AUTH_PROVIDER_SERVICE_CLIENT_KEY = "${data.vault_generic_secret.sscs_tribunals_case_secret.data["value"]}"
+    AUTH_PROVIDER_SERVICE_API_URL    = "${local.s2sCnpUrl}"
 
-    IDAM_API_URL="${data.vault_generic_secret.idam_api.data["value"]}"
+    IDAM_API_URL = "${data.vault_generic_secret.idam_api.data["value"]}"
 
-    CCD_SERVICE_API_URL="${local.ccdApi}"
+    CCD_SERVICE_API_URL = "${local.ccdApi}"
 
-    EMAIL_FROM="${data.vault_generic_secret.appeal_email_from.data["value"]}"
-    EMAIL_TO="${data.vault_generic_secret.appeal_email_to.data["value"]}"
-    EMAIL_SUBJECT="${var.appeal_email_subject}"
-    EMAIL_MESSAGE="${var.appeal_email_message}"
+    EMAIL_FROM    = "${data.vault_generic_secret.appeal_email_from.data["value"]}"
+    EMAIL_TO      = "${data.vault_generic_secret.appeal_email_to.data["value"]}"
+    EMAIL_SUBJECT = "${var.appeal_email_subject}"
+    EMAIL_MESSAGE = "${var.appeal_email_message}"
 
-    ROBOTICS_EMAIL_FROM="${data.vault_generic_secret.robotics_email_from.data["value"]}"
-    ROBOTICS_EMAIL_TO="${data.vault_generic_secret.robotics_email_to.data["value"]}"
-    ROBOTICS_EMAIL_SUBJECT="${var.robotics_email_subject}"
-    ROBOTICS_EMAIL_MESSAGE="${var.robotics_email_message}"
-    ROBOTICS_ENABLED="${var.robotics_enabled}"
+    ROBOTICS_EMAIL_FROM    = "${data.vault_generic_secret.robotics_email_from.data["value"]}"
+    ROBOTICS_EMAIL_TO      = "${data.vault_generic_secret.robotics_email_to.data["value"]}"
+    ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
+    ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
+    ROBOTICS_ENABLED       = "${var.robotics_enabled}"
 
-    EMAIL_SERVER_HOST="${data.vault_generic_secret.smtp_host.data["value"]}"
-    EMAIL_SERVER_PORT="${data.vault_generic_secret.smtp_port.data["value"]}"
-    EMAIL_SMTP_TLS_ENABLED="${var.appeal_email_smtp_tls_enabled}"
-    EMAIL_SMTP_SSL_TRUST="${var.appeal_email_smtp_ssl_trust}"
+    EMAIL_SERVER_HOST      = "${data.vault_generic_secret.smtp_host.data["value"]}"
+    EMAIL_SERVER_PORT      = "${data.vault_generic_secret.smtp_port.data["value"]}"
+    EMAIL_SMTP_TLS_ENABLED = "${var.appeal_email_smtp_tls_enabled}"
+    EMAIL_SMTP_SSL_TRUST   = "${var.appeal_email_smtp_ssl_trust}"
 
-    PDF_API_URL="${local.pdfService}"
+    PDF_API_URL = "${local.pdfService}"
 
-    SUBSCRIPTIONS_MAC_SECRET="${data.vault_generic_secret.email_mac_secret.data["value"]}"
+    SUBSCRIPTIONS_MAC_SECRET = "${data.vault_generic_secret.email_mac_secret.data["value"]}"
 
-    CORE_CASE_DATA_API_URL = "${local.ccdApi}"
+    CORE_CASE_DATA_API_URL         = "${local.ccdApi}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
-    CORE_CASE_DATA_CASE_TYPE_ID = "${var.core_case_data_case_type_id}"
+    CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
 
     IDAM_URL = "${data.vault_generic_secret.idam_api.data["value"]}"
 
-    IDAM.S2S-AUTH.TOTP_SECRET ="${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
-    IDAM.S2S-AUTH = "${local.s2sCnpUrl}"
+    IDAM.S2S-AUTH.TOTP_SECRET  = "${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
+    IDAM.S2S-AUTH              = "${local.s2sCnpUrl}"
     IDAM.S2S-AUTH.MICROSERVICE = "${var.ccd_idam_s2s_auth_microservice}"
 
-    IDAM_SSCS_SYSTEMUPDATE_USER = "${data.vault_generic_secret.idam_sscs_systemupdate_user.data["value"]}"
+    IDAM_SSCS_SYSTEMUPDATE_USER     = "${data.vault_generic_secret.idam_sscs_systemupdate_user.data["value"]}"
     IDAM_SSCS_SYSTEMUPDATE_PASSWORD = "${data.vault_generic_secret.idam_sscs_systemupdate_password.data["value"]}"
 
-    IDAM_OAUTH2_CLIENT_ID = "${var.idam_oauth2_client_id}"
+    IDAM_OAUTH2_CLIENT_ID     = "${var.idam_oauth2_client_id}"
     IDAM_OAUTH2_CLIENT_SECRET = "${data.vault_generic_secret.idam_oauth2_client_secret.data["value"]}"
-    IDAM_OAUTH2_REDIRECT_URL = "${var.idam_redirect_url}"
+    IDAM_OAUTH2_REDIRECT_URL  = "${var.idam_redirect_url}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
-
   }
 }
 
 module "sscs-tca-key-vault" {
-  source              = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                = "${local.vaultName}"
-  product             = "${var.product}"
-  env                 = "${var.env}"
-  tenant_id           = "${var.tenant_id}"
-  object_id           = "${var.jenkins_AAD_objectId}"
-  resource_group_name = "${azurerm_resource_group.rg.name}"
+  source                  = "git@github.com:hmcts/moj-module-key-vault?ref=master"
+  name                    = "${local.vaultName}"
+  product                 = "${var.product}"
+  env                     = "${var.env}"
+  tenant_id               = "${var.tenant_id}"
+  object_id               = "${var.jenkins_AAD_objectId}"
+  resource_group_name     = "${azurerm_resource_group.rg.name}"
   product_group_object_id = "300e771f-856c-45cc-b899-40d78281e9c1"
 }
