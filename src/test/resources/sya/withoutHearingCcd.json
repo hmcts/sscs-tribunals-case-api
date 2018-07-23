@@ -94,8 +94,8 @@
       "tya": null,
       "email": "joe@bloggs.com",
       "mobile": "07411333333",
-      "subscribeEmail": "Yes",
-      "subscribeSms": "Yes",
+      "subscribeEmail": "No",
+      "subscribeSms": "No",
       "reason": null
     },
     "supporterSubscription": null
