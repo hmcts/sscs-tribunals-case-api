@@ -41,7 +41,7 @@ public final class CaseDataUtils {
                 .identity(identity)
                 .build();
         BenefitType benefitType = BenefitType.builder()
-                .code("1325")
+                .code("JSA")
                 .build();
 
         DateRange dateRange = DateRange.builder()
