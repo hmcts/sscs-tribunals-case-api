@@ -97,8 +97,15 @@ public class RoboticsJsonMapper {
 
         if (hearingOptions.getArrangements() != null) {
             SyaArrangements arrangements = hearingOptions.getArrangements();
-            hearingArrangements.put("languageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getLanguageInterpreter() ? true : false));
-            hearingArrangements.put("signLanguageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getSignLanguageInterpreter() ? true : false));
+
+            if (arrangements.getLanguageInterpreter() && hearingOptions.getInterpreterLanguageType() != null) {
+                hearingArrangements.put("languageInterpreter", hearingOptions.getInterpreterLanguageType());
+            }
+
+            if (arrangements.getSignLanguageInterpreter() && hearingOptions.getSignLanguageType() != null) {
+                hearingArrangements.put("signLanguageInterpreter", hearingOptions.getSignLanguageType());
+            }
+
             hearingArrangements.put("hearingLoop", convertBooleanToYesNo(arrangements != null && arrangements.getHearingLoop() ? true : false));
             hearingArrangements.put("accessibleHearingRoom", convertBooleanToYesNo(arrangements != null && arrangements.getAccessibleHearingRoom() ? true : false));
         }

@@ -27,8 +27,8 @@
     "hearingArrangements": {
       "type": "object",
       "properties" : {
-        "languageInterpreter": {"$ref": "#/definitions/yesOrNo"},
-        "signLanguageInterpreter": {"$ref": "#/definitions/yesOrNo"},
+        "languageInterpreter": {"type" : "string"},
+        "signLanguageInterpreter": {"type" : "string"},
         "hearingLoop": {"$ref": "#/definitions/yesOrNo"},
         "accessibleHearingRoom": {"$ref": "#/definitions/yesOrNo"},
         "other": {"type" : "string"},
@@ -40,8 +40,6 @@
         }
       },
       "required": [
-        "languageInterpreter",
-        "signLanguageInterpreter",
         "hearingLoop",
         "accessibleHearingRoom"
       ],
