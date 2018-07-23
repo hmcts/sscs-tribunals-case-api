@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.functional.ccd;
 
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
+import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
@@ -39,7 +41,9 @@ public class CreateCaseInCcdTest {
     @Test
     public void givenASyaCaseShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        CaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper);
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+        CaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
+                rpc.getName(), rpc);
         CaseDetails caseDetails = ccdService.createCase(caseData);
         assertNotNull(caseDetails);
     }
@@ -55,5 +59,14 @@ public class CreateCaseInCcdTest {
             fail();
         }
 
+    }
+
+    @Test
+    public void givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+
+        CaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper);
+        CaseDetails caseDetails = ccdService.createCase(caseData);
+        assertNotNull(caseDetails);
     }
 }
