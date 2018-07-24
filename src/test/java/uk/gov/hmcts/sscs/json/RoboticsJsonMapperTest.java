@@ -28,24 +28,12 @@ public class RoboticsJsonMapperTest {
     public void mapsAppealToRoboticsJson() {
         String venueName = "Bromley";
 
-        String venueName = "Bromley";
-
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
                 .syaCaseWrapper(getSyaCaseWrapper())
                 .ccdCaseId(123L).venueName(venueName)
                 .build();
-
-        String venueName = "Bromley";
-
-        RoboticsWrapper appeal =
-            RoboticsWrapper
-                .builder()
-                .syaCaseWrapper(getSyaCaseWrapper())
-                .ccdCaseId(123L).venueName(venueName)
-                .build();
-
 
         JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
 
