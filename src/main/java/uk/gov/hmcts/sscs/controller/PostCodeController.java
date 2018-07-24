@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.sscs.service.AirLookupService;
 
-
 /**
  * Controller for handling post code queries.
  */

@@ -23,7 +23,7 @@ public class PostCodeEndpointsIt {
 
     @Test
     public void shouldReturnRegionalCentreFromPostCode() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/regionalcentre/br2")
+        MvcResult mvcResult = mockMvc.perform(get("/regionalcentre/br2 8pn")
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
