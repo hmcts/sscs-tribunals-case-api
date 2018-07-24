@@ -105,6 +105,8 @@ public class AirLookupService {
                         }
                         if (postcodeCell != null && venueCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && venueCell.getCellTypeEnum() == CellType.STRING) {
+                            // Work out whether a string value has PIP in it and extract venue name
+                            // e.g. Northampton - 03 - PIP/DLA
                             if (hasPip(venueCell.getRichStringCellValue().getString())) {
                                 String venueName = venueCell.getRichStringCellValue().getString();
 
@@ -123,12 +125,6 @@ public class AirLookupService {
         }
     }
 
-    /**
-     * Work out whether a string value has PIP in it
-     * e.g.Northampton - 03 - PIP/DLA
-     * @param cellWithPip String from spreadsheet that describes venue
-     * @return
-     */
     public boolean hasPip(String cellWithPip) {
         return cellWithPip.contains("PIP");
     }

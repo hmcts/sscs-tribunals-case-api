@@ -38,7 +38,6 @@ public class RoboticsJsonMapper {
     private static JSONObject buildAppealDetails(JSONObject obj, SyaCaseWrapper appeal, String venueName) {
         obj.put("caseCode", "002DD");
         obj.put("appellantNino", appeal.getAppellant().getNino());
-        //FIXME: To be implemented at a future date as part of another ticket
         obj.put("appellantPostCode", venueName);
         obj.put("appealDate", LocalDate.now().toString());
 

@@ -6,7 +6,6 @@ import java.util.*;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * Tests to look at the integrity of the data in a business spreadsheet
  * and our list of venues.
@@ -26,11 +25,14 @@ public class AirLookRcSpreadSheetTest {
         venueData = airLookupService.getLookupAirVenueNameByPostCode();
         lookupVenueIdByAirLookupName = airLookupService.getLookupVenueIdByAirVenueName();
     }
-
-    //TODO known issue been referred to business waiting for reply
+    /*
+    TODO there are some postcodes that do not have a matching PIP venue
+    known issue been referred to business waiting for reply, see Josh
+    */
     static Set<String> realPostcodesWithNoVenue = new HashSet<>(Arrays.asList("ec1m", "ec3m", "ec4a",
             "nw1w", "bt82", "bl11", "bl78", "wc1v", "s31", "s30"));
-    //TODO These are not real post codes so can be ignored
+
+    //These are not real post codes so can be ignored
     static Set<String> notRealPostcodes = new HashSet<>(Arrays.asList("cw28",
             "cw29", "cw26", "cw27", "cw24", "cw25", "cw22", "cw23", "cw20", "cw21", "cw19", "cw17", "cw18",
             "cw15", "cw16", "cw13", "cw14", "cw48", "cw49", "cw46", "cw47", "cw44", "cw45", "cw42", "cw43", 
