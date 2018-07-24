@@ -169,11 +169,6 @@ public class SubmitAppealServiceTest {
     @Test
     public void testInvalidPostCode() {
         assertEquals("", submitAppealService.getFirstHalfOfPostcode(""));
-
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
-        appealData.getAppellant().getContactDetails().setPostCode("");
-
-        assertEquals("", submitAppealService.getFirstHalfOfPostcode(appealData));
     }
 
     @Test
@@ -190,8 +185,6 @@ public class SubmitAppealServiceTest {
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
         CaseData caseData = submitAppealService.transformAppealToCaseData(appealData,"Cardiff", rpc);
         assertEquals("Cardiff", caseData.getRegion());
-
-        assertEquals("", submitAppealService.getFirstHalfOfPostcode(appealData));
     }
 
 }
