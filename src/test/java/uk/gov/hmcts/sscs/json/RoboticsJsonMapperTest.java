@@ -26,6 +26,14 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void mapsAppealToRoboticsJson() {
+        String venueName = "Bromley";
+
+        RoboticsWrapper appeal =
+            RoboticsWrapper
+                .builder()
+                .syaCaseWrapper(getSyaCaseWrapper())
+                .ccdCaseId(123L).venueName(venueName)
+                .build();
 
         JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
 
@@ -37,7 +45,7 @@ public class RoboticsJsonMapperTest {
         assertEquals("002DD", roboticsJson.get("caseCode"));
         assertEquals(123L, roboticsJson.get("caseId"));
         assertEquals("AB877533C", roboticsJson.get("appellantNino"));
-        assertEquals("Bedford", roboticsJson.get("appellantPostCode"));
+        assertEquals(venueName, roboticsJson.get("appellantPostCode"));
         assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
         assertEquals("2018-02-01", roboticsJson.get("mrnDate"));
         assertEquals("Lost my paperwork", roboticsJson.get("mrnReasonForBeingLate"));
