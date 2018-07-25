@@ -49,7 +49,7 @@ public class RoboticsJsonMapperTest {
         assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
         assertEquals("2018-02-01", roboticsJson.get("mrnDate"));
         assertEquals("Lost my paperwork", roboticsJson.get("mrnReasonForBeingLate"));
-        assertEquals("Liverpool2 SSO", roboticsJson.get("pipNumber"));
+        assertEquals("DWP PIP (1)", roboticsJson.get("pipNumber"));
         assertEquals("Oral", roboticsJson.get("hearingType"));
         assertEquals("Mr Joe Bloggs", roboticsJson.get("hearingRequestParty"));
 
