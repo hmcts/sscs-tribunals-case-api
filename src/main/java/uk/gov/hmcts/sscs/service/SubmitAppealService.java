@@ -20,8 +20,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaAppellant;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.email.RoboticsEmail;
-import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.email.RoboticsEmailTemplate;
+import uk.gov.hmcts.sscs.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
@@ -47,8 +47,8 @@ public class SubmitAppealService {
     private final PDFServiceClient pdfServiceClient;
     private final EmailService emailService;
     private final RoboticsService roboticsService;
-    private final SubmitYourAppealEmail submitYourAppealEmail;
-    private final RoboticsEmail roboticsEmail;
+    private final SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
+    private final RoboticsEmailTemplate roboticsEmailTemplate;
     private final AirLookupService airLookupService;
     private final PdfStoreService pdfStoreService;
     private final Boolean roboticsEnabled;
@@ -62,8 +62,8 @@ public class SubmitAppealService {
                         PDFServiceClient pdfServiceClient,
                         EmailService emailService,
                         RoboticsService roboticsService,
-                        SubmitYourAppealEmail submitYourAppealEmail,
-                        RoboticsEmail roboticsEmail,
+                        SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate,
+                        RoboticsEmailTemplate roboticsEmailTemplate,
                         AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         PdfStoreService pdfStoreService,
@@ -76,8 +76,8 @@ public class SubmitAppealService {
         this.pdfServiceClient = pdfServiceClient;
         this.emailService = emailService;
         this.roboticsService = roboticsService;
-        this.submitYourAppealEmail = submitYourAppealEmail;
-        this.roboticsEmail = roboticsEmail;
+        this.submitYourAppealEmailTemplate = submitYourAppealEmailTemplate;
+        this.roboticsEmailTemplate = roboticsEmailTemplate;
         this.airLookupService = airLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.pdfStoreService = pdfStoreService;
@@ -97,7 +97,6 @@ public class SubmitAppealService {
         } else {
             caseData = transformAppealToCaseData(appeal, rpc.getName(), rpc);
         }
-
 
         CaseDetails caseDetails = createCaseInCcd(caseData);
         byte[] pdf = generatePdf(appeal, caseDetails.getId());
@@ -185,16 +184,18 @@ public class SubmitAppealService {
 
     private void sendPdfByEmail(SyaAppellant appeal, byte[] pdf) {
         String appellantUniqueId = generateUniqueEmailId(appeal);
-        submitYourAppealEmail.setSubject(appellantUniqueId);
-        submitYourAppealEmail.setAttachments(newArrayList(pdf(pdf, appellantUniqueId + ".pdf")));
-        emailService.sendEmail(submitYourAppealEmail);
+        emailService.sendEmail(submitYourAppealEmailTemplate.generateEmail(
+                appellantUniqueId,
+                newArrayList(pdf(pdf, appellantUniqueId + ".pdf")))
+        );
     }
 
     private void sendJsonByEmail(SyaAppellant appellant, JSONObject json) {
         String appellantUniqueId = generateUniqueEmailId(appellant);
-        roboticsEmail.setSubject(appellantUniqueId);
-        roboticsEmail.setAttachments(newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".json")));
-        emailService.sendEmail(roboticsEmail);
+        emailService.sendEmail(roboticsEmailTemplate.generateEmail(
+                appellantUniqueId,
+                newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".json")))
+        );
     }
 
     private String generateUniqueEmailId(SyaAppellant appellant) {

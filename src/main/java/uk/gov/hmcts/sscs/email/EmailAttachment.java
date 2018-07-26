@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.email;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Objects;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 
@@ -54,5 +55,25 @@ public class EmailAttachment {
     public String toString() {
         return String.format("EmailAttachment{contentType='%s', filename='%s'}",
                 filename, contentType);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        EmailAttachment that = (EmailAttachment) o;
+        return Objects.equals(data, that.data)
+                && Objects.equals(contentType, that.contentType)
+                && Objects.equals(filename, that.filename);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(data, contentType, filename);
     }
 }

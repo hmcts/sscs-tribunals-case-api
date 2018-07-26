@@ -1,15 +1,15 @@
 package uk.gov.hmcts.sscs.service;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
@@ -28,8 +28,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.Email;
-import uk.gov.hmcts.sscs.email.RoboticsEmail;
-import uk.gov.hmcts.sscs.email.SubmitYourAppealEmail;
+import uk.gov.hmcts.sscs.email.RoboticsEmailTemplate;
+import uk.gov.hmcts.sscs.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
@@ -65,9 +65,9 @@ public class SubmitAppealServiceTest {
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
-    private SubmitYourAppealEmail submitYourAppealEmail;
+    private SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
 
-    private RoboticsEmail roboticsEmail;
+    private RoboticsEmailTemplate roboticsEmailTemplate;
 
     private SubmitAppealService submitAppealService;
 
@@ -78,8 +78,8 @@ public class SubmitAppealServiceTest {
 
     @Before
     public void setUp() {
-        submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
-        roboticsEmail = new RoboticsEmail("from", "to", "dummy", "message");
+        submitYourAppealEmailTemplate = new SubmitYourAppealEmailTemplate("from", "to", "message");
+        roboticsEmailTemplate = new RoboticsEmailTemplate("from", "to", "message");
         regionalProcessingCenterService = new RegionalProcessingCenterService();
         regionalProcessingCenterService.init();
 
@@ -88,7 +88,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
             submitYourAppealToCcdCaseDataDeserializer, ccdService,
-            pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail,
+            pdfServiceClient, emailService, roboticsService, submitYourAppealEmailTemplate, roboticsEmailTemplate,
                 airLookupService, regionalProcessingCenterService, pdfStoreService, false);
 
         given(ccdService.createCase(any(CaseData.class)))
@@ -107,7 +107,7 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(getSyaCaseWrapper());
 
         then(pdfServiceClient).should(times(1)).generateFromHtml(any(), any());
-        then(emailService).should(times(1)).sendEmail(any(SubmitYourAppealEmail.class));
+        then(emailService).should(times(1)).sendEmail(any(Email.class));
 
         assertNull(getPdfWrapper().getCcdCaseId());
     }
@@ -130,7 +130,6 @@ public class SubmitAppealServiceTest {
         verify(ccdService).createCase(any(CaseData.class));
     }
 
-
     @Test
     public void shouldCreatePdfWithAppealDetails() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
@@ -140,8 +139,11 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData);
 
-        assertThat(submitYourAppealEmail.getSubject(), is("Bloggs_33C"));
-        verify(emailService).sendEmail(any(SubmitYourAppealEmail.class));
+        Email expectedEmail = submitYourAppealEmailTemplate.generateEmail(
+                "Bloggs_33C",
+                newArrayList(pdf(expected, "Bloggs_33C.pdf"))
+        );
+        verify(emailService).sendEmail(expectedEmail);
     }
 
     @Test

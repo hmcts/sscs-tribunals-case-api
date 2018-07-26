@@ -1,11 +1,11 @@
 package uk.gov.hmcts.sscs.service;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +44,7 @@ public class EmailServiceTest {
     }
 
     @Test
-    public void testSendEmailSuccess() throws MessagingException {
+    public void testSendEmailSuccess() {
         Email emailData = SampleEmailData.getDefault();
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
         emailService.sendEmail(emailData);
@@ -52,15 +52,15 @@ public class EmailServiceTest {
     }
 
     @Test
-    public void testSendEmailWithNoAttachments() throws MessagingException {
-        TestEmail testEmail = new TestEmail(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_MESSAGE);
+    public void testSendEmailWithNoAttachments() {
+        Email testEmail = new Email(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_MESSAGE, emptyList());
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
         emailService.sendEmail(testEmail);
         verify(javaMailSender).send(mimeMessage);
     }
 
     @Test(expected = RuntimeException.class)
-    public void testSendEmailThrowsMailException() throws MessagingException {
+    public void testSendEmailThrowsMailException() {
         Email emailData = SampleEmailData.getDefault();
         doThrow(mock(MailException.class)).when(javaMailSender).send(any(MimeMessage.class));
         emailService.sendEmail(emailData);
@@ -78,16 +78,6 @@ public class EmailServiceTest {
         emailService.sendEmail(emailData);
     }
 
-    public static class TestEmail extends Email {
-
-        public TestEmail(String from, String to, String subject, String message) {
-            this.from = from;
-            this.to = to;
-            this.subject = subject;
-            this.message = message;
-        }
-    }
-
     public static class SampleEmailData {
 
         static Email getDefault() {
@@ -95,17 +85,15 @@ public class EmailServiceTest {
             EmailAttachment emailAttachment =
                     EmailAttachment.pdf("hello".getBytes(), "Hello.pdf");
             emailAttachmentList.add(emailAttachment);
-            TestEmail testEmail = new TestEmail(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_MESSAGE);
-            testEmail.setAttachments(emailAttachmentList);
-            return testEmail;
+            return new Email(EMAIL_FROM, EMAIL_TO, EMAIL_SUBJECT, EMAIL_MESSAGE, emailAttachmentList);
         }
 
         static Email getWithToNull() {
-            return new TestEmail(EMAIL_FROM, null, EMAIL_SUBJECT, EMAIL_MESSAGE);
+            return new Email(EMAIL_FROM, null, EMAIL_SUBJECT, EMAIL_MESSAGE, emptyList());
         }
 
         static Email getWithSubjectNull() {
-            return new TestEmail(EMAIL_FROM, EMAIL_TO, null, EMAIL_MESSAGE);
+            return new Email(EMAIL_FROM, EMAIL_TO, null, EMAIL_MESSAGE, emptyList());
         }
     }
 }
