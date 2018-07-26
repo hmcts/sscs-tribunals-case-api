@@ -50,7 +50,8 @@ public class CaseData {
                     @JsonProperty("generatedSurname") String generatedSurname,
                     @JsonProperty("generatedEmail") String generatedEmail,
                     @JsonProperty("generatedMobile") String generatedMobile,
-                    @JsonProperty("generatedDOB") String generatedDob) {
+                    @JsonProperty("generatedDOB") String generatedDob
+                    ) {
         this.caseReference = caseReference;
         this.caseCreated = caseCreated;
         this.region = region;
