@@ -110,18 +110,6 @@ public class RoboticsSchemaTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData = updateEmbeddedProperty(jsonData.toString(), "Bla", "hearingArrangements", "languageInterpreter");
-        schema.validate(jsonData);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void givenInvalidInputForSignLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData = updateEmbeddedProperty(jsonData.toString(), "Bla", "hearingArrangements", "signLanguageInterpreter");
-        schema.validate(jsonData);
-    }
-
-    @Test(expected = ValidationException.class)
     public void givenInvalidInputForHearingLoop_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "Bla", "hearingArrangements", "hearingLoop");
         schema.validate(jsonData);

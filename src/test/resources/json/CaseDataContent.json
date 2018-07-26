@@ -6,6 +6,18 @@
   },
   "data": {
     "caseReference": "SC068/17/00013",
+    "region": "CARDIFF",
+    "regionalProcessingCenter": {
+      "name" : "CARDIFF",
+      "address1" : "HM Courts & Tribunals Service",
+      "address2" : "Social Security & Child Support Appeals",
+      "address3" : "Eastgate House",
+      "address4" : "Newport Road",
+      "city" : "CARDIFF",
+      "postcode" : "CF24 0AB",
+      "phoneNumber" : "0300 123 1142",
+      "faxNumber" : "0870 739 4438"
+    },
     "caseCreated" : "${json-unit.ignore}",
     "appeal": {
       "mrnDetails": {

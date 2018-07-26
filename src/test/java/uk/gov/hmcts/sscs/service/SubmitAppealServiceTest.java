@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -9,6 +10,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.util.Map;
@@ -31,6 +33,8 @@ import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
+import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -52,6 +56,9 @@ public class SubmitAppealServiceTest {
     @Mock
     private RoboticsService roboticsService;
 
+    @Mock
+    private AirLookupService airLookupService;
+
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
@@ -61,18 +68,22 @@ public class SubmitAppealServiceTest {
 
     private SubmitAppealService submitAppealService;
 
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+
     @Before
     public void setUp() {
-
-        SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer = new
-            SubmitYourAppealToCcdCaseDataDeserializer();
-
         submitYourAppealEmail = new SubmitYourAppealEmail("from", "to", "dummy", "message");
         roboticsEmail = new RoboticsEmail("from", "to", "dummy", "message");
+        regionalProcessingCenterService = new RegionalProcessingCenterService();
+        regionalProcessingCenterService.init();
+
+        SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer = new
+                SubmitYourAppealToCcdCaseDataDeserializer();
 
         submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
             submitYourAppealToCcdCaseDataDeserializer, ccdService,
-            pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail, false);
+            pdfServiceClient, emailService, roboticsService, submitYourAppealEmail, roboticsEmail,
+                airLookupService, regionalProcessingCenterService,false);
 
         given(ccdService.createCase(any(CaseData.class)))
             .willReturn(CaseDetails.builder().id(123L).build());
@@ -143,6 +154,37 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData);
 
         then(emailService).should(times(2)).sendEmail(any(Email.class));
+    }
+
+    @Test
+    public void testPostcodeSplit() {
+        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN32 6PL"));
+    }
+
+    @Test
+    public void testPostcodeSplitWithNoSpace() {
+        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN326PL"));
+    }
+
+    @Test
+    public void testInvalidPostCode() {
+        assertEquals("", submitAppealService.getFirstHalfOfPostcode(""));
+    }
+
+    @Test
+    public void testNullPostCode() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode(null);
+
+        assertEquals("", submitAppealService.getFirstHalfOfPostcode(null));
+    }
+
+    @Test
+    public void testRegionAddedToCase() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+        CaseData caseData = submitAppealService.transformAppealToCaseData(appealData,"Cardiff", rpc);
+        assertEquals("Cardiff", caseData.getRegion());
     }
 
 }

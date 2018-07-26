@@ -11,4 +11,6 @@ public class RoboticsWrapper {
     private SyaCaseWrapper syaCaseWrapper;
 
     private long ccdCaseId;
+
+    private String venueName;
 }

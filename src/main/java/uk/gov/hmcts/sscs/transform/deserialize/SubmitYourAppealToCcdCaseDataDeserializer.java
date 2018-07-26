@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.wrapper.*;
 import uk.gov.hmcts.sscs.model.ccd.*;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 @Service
 public class SubmitYourAppealToCcdCaseDataDeserializer {
@@ -19,7 +20,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     private static final String NO = "No";
 
     public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
-
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         Subscriptions subscriptions = getAppellantSubscription(syaCaseWrapper);
@@ -37,6 +37,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .subscriptions(subscriptions)
                 .sscsDocument(sscsDocuments)
                 .build();
+    }
+
+    public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
+        CaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+
+        return caseData.toBuilder()
+                .region(region)
+                .regionalProcessingCenter(rpc).build();
     }
 
 

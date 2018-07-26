@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
@@ -25,6 +26,14 @@ public class RoboticsJsonMapperTest {
 
     @Test
     public void mapsAppealToRoboticsJson() {
+        String venueName = "Bromley";
+
+        RoboticsWrapper appeal =
+            RoboticsWrapper
+                .builder()
+                .syaCaseWrapper(getSyaCaseWrapper())
+                .ccdCaseId(123L).venueName(venueName)
+                .build();
 
         JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
 
@@ -36,11 +45,11 @@ public class RoboticsJsonMapperTest {
         assertEquals("002DD", roboticsJson.get("caseCode"));
         assertEquals(123L, roboticsJson.get("caseId"));
         assertEquals("AB877533C", roboticsJson.get("appellantNino"));
-        assertEquals("Bedford", roboticsJson.get("appellantPostCode"));
+        assertEquals(venueName, roboticsJson.get("appellantPostCode"));
         assertEquals(LocalDate.now().toString(), roboticsJson.get("appealDate"));
         assertEquals("2018-02-01", roboticsJson.get("mrnDate"));
         assertEquals("Lost my paperwork", roboticsJson.get("mrnReasonForBeingLate"));
-        assertEquals("Liverpool2 SSO", roboticsJson.get("pipNumber"));
+        assertEquals("DWP PIP (1)", roboticsJson.get("pipNumber"));
         assertEquals("Oral", roboticsJson.get("hearingType"));
         assertEquals("Mr Joe Bloggs", roboticsJson.get("hearingRequestParty"));
 
@@ -82,8 +91,8 @@ public class RoboticsJsonMapperTest {
             roboticsJson.getJSONObject("hearingArrangements").length()
         );
 
-        assertEquals("Yes", roboticsJson.getJSONObject("hearingArrangements").get("languageInterpreter"));
-        assertEquals("Yes", roboticsJson.getJSONObject("hearingArrangements").get("signLanguageInterpreter"));
+        assertEquals("An interpreter language", roboticsJson.getJSONObject("hearingArrangements").get("languageInterpreter"));
+        assertEquals("A sign language", roboticsJson.getJSONObject("hearingArrangements").get("signLanguageInterpreter"));
         assertEquals("Yes", roboticsJson.getJSONObject("hearingArrangements").get("hearingLoop"));
         assertEquals("No", roboticsJson.getJSONObject("hearingArrangements").get("accessibleHearingRoom"));
         assertEquals("Yes, this...", roboticsJson.getJSONObject("hearingArrangements").get("other"));
@@ -121,6 +130,72 @@ public class RoboticsJsonMapperTest {
         JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
 
         assertEquals(".", roboticsJson.getJSONObject("representative").get("lastName"));
+    }
+
+    @Test
+    public void givenLanguageInterpreterIsTrue_thenSetToLanguageInterpreterType() {
+
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().setInterpreterLanguageType("My Language");
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().getArrangements().setLanguageInterpreter(true);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertEquals("My Language", roboticsJson.getJSONObject("hearingArrangements").get("languageInterpreter"));
+    }
+
+    @Test
+    public void givenLanguageInterpreterIsFalse_thenDoNotSetLanguageInterpreter() {
+
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().setInterpreterLanguageType("My Language");
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().getArrangements().setLanguageInterpreter(false);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("languageInterpreter"));
+    }
+
+    @Test
+    public void givenLanguageInterpreterIsTrueAndInterpreterLanguageTypeIsNull_thenDoNotSetLanguageInterpreter() {
+
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().setInterpreterLanguageType(null);
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().getArrangements().setLanguageInterpreter(true);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("languageInterpreter"));
+    }
+
+    @Test
+    public void givenSignLanguageInterpreterIsTrue_thenSetToSignLanguageInterpreterType() {
+
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().setSignLanguageType("My Language");
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().getArrangements().setSignLanguageInterpreter(true);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertEquals("My Language", roboticsJson.getJSONObject("hearingArrangements").get("signLanguageInterpreter"));
+    }
+
+    @Test
+    public void givenSignLanguageInterpreterIsFalse_thenDoNotSetSignLanguageInterpreter() {
+
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().setSignLanguageType("My Language");
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().getArrangements().setSignLanguageInterpreter(false);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("signLanguageInterpreter"));
+    }
+
+    @Test
+    public void givenSignLanguageInterpreterIsTrueAndSignInterpreterLanguageTypeIsNull_thenDoNotSetSignLanguageInterpreter() {
+
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().setSignLanguageType(null);
+        appeal.getSyaCaseWrapper().getSyaHearingOptions().getArrangements().setSignLanguageInterpreter(true);
+
+        JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
+
+        assertFalse(roboticsJson.getJSONObject("hearingArrangements").has("signLanguageInterpreter"));
     }
 
 }
