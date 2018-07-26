@@ -50,8 +50,9 @@ public class RoboticsJsonMapper {
             }
         }
 
-        //FIXME: To be implemented at a future date as part of another ticket
-        obj.put("pipNumber", "Liverpool2 SSO");
+        if (appeal.getMrn().getDwpIssuingOffice() != null) {
+            obj.put("pipNumber", appeal.getMrn().getDwpIssuingOffice());
+        }
 
         obj.put("hearingType", convertBooleanToPaperOral(appeal.getSyaHearingOptions().getWantsToAttend()));
 
