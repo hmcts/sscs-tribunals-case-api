@@ -2,11 +2,11 @@ package uk.gov.hmcts.sscs.email;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Objects;
+import lombok.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamSource;
 
-
+@Value
 public class EmailAttachment {
 
     private final InputStreamSource data;
@@ -37,43 +37,5 @@ public class EmailAttachment {
                 "application/json",
                 fileName
         );
-    }
-
-    public InputStreamSource getData() {
-        return data;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public String getFilename() {
-        return filename;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("EmailAttachment{contentType='%s', filename='%s'}",
-                filename, contentType);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        EmailAttachment that = (EmailAttachment) o;
-        return Objects.equals(data, that.data)
-                && Objects.equals(contentType, that.contentType)
-                && Objects.equals(filename, that.filename);
-    }
-
-    @Override
-    public int hashCode() {
-
-        return Objects.hash(data, contentType, filename);
     }
 }
