@@ -232,6 +232,13 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .email(email)
                 .build();
 
+        if (null != syaCaseWrapper.getSyaHearingOptions()
+                && !syaCaseWrapper.getSyaHearingOptions().getWantsToAttend()) {
+            subscription.setSubscribeEmail(NO);
+            subscription.setSubscribeSms(NO);
+
+        }
+
         return Subscriptions.builder()
                 .appellantSubscription(subscription)
                 .build();
