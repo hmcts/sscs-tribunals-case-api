@@ -33,6 +33,7 @@ public class CaseData {
     private String generatedMobile;
     @JsonProperty("generatedDOB")
     private String generatedDob;
+    private String evidencePresent;
 
     @JsonCreator
     public CaseData(@JsonProperty("caseReference") String caseReference,
@@ -50,7 +51,8 @@ public class CaseData {
                     @JsonProperty("generatedSurname") String generatedSurname,
                     @JsonProperty("generatedEmail") String generatedEmail,
                     @JsonProperty("generatedMobile") String generatedMobile,
-                    @JsonProperty("generatedDOB") String generatedDob) {
+                    @JsonProperty("generatedDOB") String generatedDob,
+                    @JsonProperty("evidencePresent") String evidencePresent) {
         this.caseReference = caseReference;
         this.caseCreated = caseCreated;
         this.region = region;
@@ -67,5 +69,6 @@ public class CaseData {
         this.generatedEmail = generatedEmail;
         this.generatedMobile = generatedMobile;
         this.generatedDob = generatedDob;
+        this.evidencePresent = evidencePresent;
     }
 }
