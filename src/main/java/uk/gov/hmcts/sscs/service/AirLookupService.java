@@ -13,6 +13,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.sscs.exception.AirLookupServiceException;
 
 /**
  * Service that ingests a spreadsheet and a csv file containing the
@@ -69,7 +70,9 @@ public class AirLookupService {
             LOG.debug("Air Venue data has " + lookupAirVenueNameByPostCode.keySet().size() + " post codes");
 
         } catch (IOException e) {
-            LOG.error("Unable to read in spreadsheet with post code data: reference-data/AIRLookup RC.xls", e);
+            String message = "Unable to read in spreadsheet with post code data: reference-data/AIRLookup RC.xls";
+            AirLookupServiceException ex = new AirLookupServiceException(e);
+            LOG.error(message, ex);
         }
         try {
             ClassPathResource classPathResource = new ClassPathResource(CSV_FILE_PATH);
@@ -78,7 +81,9 @@ public class AirLookupService {
 
             LOG.debug("Venue map has " + lookupAirVenueNameByPostCode.keySet().size() + " venue ids");
         } catch (IOException e) {
-            LOG.error("Unable to read in csv with post code - venue id data: reference-data/airLookupVenueIds.csv", e);
+            String message = "Unable to read in csv with post code - venue id data: reference-data/airLookupVenueIds.csv";
+            AirLookupServiceException ex = new AirLookupServiceException(e);
+            LOG.error(message, ex);
         }
     }
 
@@ -115,7 +120,9 @@ public class AirLookupService {
                                     lookupAirVenueNameByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(),
                                             venueName.substring(0, venueName.indexOf(venueNameSplitChar)).trim());
                                 } else {
-                                    LOG.error("Unknown venue name type" + venueName);
+                                    String message = "Unknown venue name type" + venueName;
+                                    AirLookupServiceException ex = new AirLookupServiceException(new Exception(message));
+                                    LOG.error(message, ex);
                                 }
                             }
                         }
