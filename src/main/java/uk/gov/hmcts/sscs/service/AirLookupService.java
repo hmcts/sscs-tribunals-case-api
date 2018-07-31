@@ -36,6 +36,7 @@ public class AirLookupService {
     }
 
     private static final Logger LOG = getLogger(AirLookupService.class);
+    private static int LOOKUP_ID_COLUMN = 0;
     private static int POSTCODE_COLUMN = 1;
     private static int REGIONAL_CENTRE_COLUMN = 3;
     private static int VENUE_COLUMN = 2;
@@ -99,6 +100,7 @@ public class AirLookupService {
             for (Sheet sheet: wb) {
                 if (sheet.getSheetName().equals("AIR")) {
                     for (Row row : sheet) {
+                        Cell lookupIdColumn = row.getCell(LOOKUP_ID_COLUMN);
                         Cell postcodeCell = row.getCell(POSTCODE_COLUMN);
                         Cell adminGroupCell = row.getCell(REGIONAL_CENTRE_COLUMN);
                         Cell venueCell = row.getCell(VENUE_COLUMN);
@@ -108,7 +110,9 @@ public class AirLookupService {
                                 + " Regional office: " + adminGroupCell.getRichStringCellValue().getString());
                             lookupRegionalCentreByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(), adminGroupCell.getRichStringCellValue().getString());
                         }
-                        if (postcodeCell != null && venueCell != null
+
+                        if (lookupIdColumn != null && lookupIdColumn.getCellTypeEnum() == CellType.NUMERIC && String.valueOf(lookupIdColumn.getNumericCellValue()).equals("1.0")
+                                && postcodeCell != null && venueCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && venueCell.getCellTypeEnum() == CellType.STRING) {
                             // Work out whether a string value has PIP in it and extract venue name
                             // e.g. Northampton - 03 - PIP/DLA
