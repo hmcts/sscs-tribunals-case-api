@@ -194,7 +194,7 @@ public class SubmitAppealService {
         String appellantUniqueId = generateUniqueEmailId(appellant);
         emailService.sendEmail(roboticsEmailTemplate.generateEmail(
                 appellantUniqueId,
-                newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".json")))
+                newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".txt")))
         );
     }
 
