@@ -1,53 +1,23 @@
 package uk.gov.hmcts.sscs.email;
 
 import java.util.List;
+import lombok.Value;
 
-public abstract class Email {
+@Value
+public class Email {
 
-    protected String from;
-    protected String to;
-    protected String subject;
-    protected String message;
+    private final String from;
+    private final String to;
+    private final String subject;
+    private final String message;
 
-    private List<EmailAttachment> attachments;
+    private final List<EmailAttachment> attachments;
 
-    public String getFrom() {
-        return from;
-    }
-
-    public void setFrom(String from) {
+    public Email(String from, String to, String subject, String message, List<EmailAttachment> attachments) {
         this.from = from;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setTo(String to) {
         this.to = to;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
         this.subject = subject;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
         this.message = message;
-    }
-
-    public List<EmailAttachment> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<EmailAttachment> attachments) {
         this.attachments = attachments;
     }
 
