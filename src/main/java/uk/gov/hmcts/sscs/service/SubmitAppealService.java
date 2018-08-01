@@ -115,7 +115,7 @@ public class SubmitAppealService {
             JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal)
                     .ccdCaseId(caseDetails.getId()).venueName(venue).build());
 
-            sendJsonByEmail(appeal.getAppellant(), roboticsJson);
+            sendJsonByEmail(appeal.getAppellant(), roboticsJson, pdf);
         }
     }
 
@@ -190,12 +190,13 @@ public class SubmitAppealService {
         );
     }
 
-    private void sendJsonByEmail(SyaAppellant appellant, JSONObject json) {
+    private void sendJsonByEmail(SyaAppellant appellant, JSONObject json, byte[] pdf) {
         String appellantUniqueId = generateUniqueEmailId(appellant);
         emailService.sendEmail(roboticsEmailTemplate.generateEmail(
                 appellantUniqueId,
-                newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".json")))
-        );
+                newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".json"),
+                        pdf(pdf, appellantUniqueId + ".json"))
+        ));
     }
 
     private String generateUniqueEmailId(SyaAppellant appellant) {
