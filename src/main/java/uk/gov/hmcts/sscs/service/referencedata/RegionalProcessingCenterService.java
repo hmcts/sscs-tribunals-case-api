@@ -74,7 +74,13 @@ public class RegionalProcessingCenterService {
         String regionalProcessingCenter = sccodeRegionalProcessingCentermap.get(splitReferenceNumber[0]);
 
         if (null != regionalProcessingCenter) {
-            return regionalProcessingCenterMap.get(regionalProcessingCenter);
+            if (regionalProcessingCenterMap.get(regionalProcessingCenter) == null) {
+                String text = "Venue could not be mapped to a valid RPC that SSCS knows about";
+                LOG.error(text, new RegionalProcessingCenterServiceException(new Exception(text)));
+                return null;
+            } else {
+                return regionalProcessingCenterMap.get(regionalProcessingCenter);
+            }
         } else {
             return regionalProcessingCenterMap.get(SSCS_BIRMINGHAM);
         }
