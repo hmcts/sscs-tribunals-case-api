@@ -195,7 +195,7 @@ public class SubmitAppealService {
         emailService.sendEmail(roboticsEmailTemplate.generateEmail(
                 appellantUniqueId,
                 newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".txt"),
-                        pdf(pdf, appellantUniqueId + ".json"))
+                        pdf(pdf, appellantUniqueId + ".pdf"))
         ));
     }
 
