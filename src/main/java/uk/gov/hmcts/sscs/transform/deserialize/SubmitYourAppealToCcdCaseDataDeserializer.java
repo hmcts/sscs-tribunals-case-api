@@ -36,8 +36,11 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .appeal(appeal)
                 .subscriptions(subscriptions)
                 .sscsDocument(sscsDocuments)
+                .evidencePresent(hasEvidence(sscsDocuments))
                 .build();
     }
+
+
 
     public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
         CaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
@@ -312,5 +315,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
             return phoneNumber.replaceAll("\\s", "");
         }
         return phoneNumber;
+    }
+
+    private String hasEvidence(List<SscsDocument> sscsDocuments) {
+        return (null == sscsDocuments || sscsDocuments.isEmpty()) ? NO : YES;
     }
 }
