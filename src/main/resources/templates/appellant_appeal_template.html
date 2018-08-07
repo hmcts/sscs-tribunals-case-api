@@ -107,6 +107,10 @@
             <dt class="cya-question">Appeal reference</dt>
             <dd class="cya-answer">{{ PdfWrapper.ccdCaseId | default('Not provided') }}</dd>
         </div>
+        <div>
+            <dt class="cya-question">Evidence attached</dt>
+            <dd class="cya-answer">{{ PdfWrapper.caseData.evidencePresent }}</dd>
+        </div>
     </dl>
 
     <!-- Appellant -->
