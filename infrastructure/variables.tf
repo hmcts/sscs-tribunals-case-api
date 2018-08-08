@@ -1,9 +1,9 @@
 variable "product" {
-  type    = "string"
+  type = "string"
 }
 
 variable "component" {
-  type    = "string"
+  type = "string"
 }
 
 variable "location" {
@@ -24,7 +24,7 @@ variable "subscription" {
   type = "string"
 }
 
-variable "ilbIp"{}
+variable "ilbIp" {}
 
 variable "appeal_email_subject" {
   type    = "string"
@@ -46,19 +46,19 @@ variable "appeal_email_smtp_ssl_trust" {
   default = "*"
 }
 
-variable "core_case_data_jurisdiction_id"{
+variable "core_case_data_jurisdiction_id" {
   default = "SSCS"
 }
 
-variable "core_case_data_case_type_id"{
+variable "core_case_data_case_type_id" {
   default = "Benefit"
 }
 
-variable "ccd_idam_s2s_auth_microservice"{
+variable "ccd_idam_s2s_auth_microservice" {
   default = "sscs"
 }
 
-variable "idam_oauth2_client_id"{
+variable "idam_oauth2_client_id" {
   default = "sscs"
 }
 
@@ -84,7 +84,7 @@ variable "robotics_enabled" {
 variable "tenant_id" {}
 
 variable "jenkins_AAD_objectId" {
-  type        = "string"
+  type = "string"
 }
 
 variable "common_tags" {

@@ -8,10 +8,7 @@
       "pattern": "^\\d{3}DD$"
     },
     "caseId" : {"type" : "integer"},
-    "appellantNino": {
-      "type": "string",
-      "pattern": "^(?!BG)(?!GB)(?!NK)(?!KN)(?!TN)(?!NT)(?!ZZ)\\s?(?:[A-CEGHJ-PR-TW-Z]\\s?[A-CEGHJ-NPR-TW-Z])\\s?(?:\\d\\s?){6}([A-D]|\\s)\\s?"
-    },
+    "appellantNino":  {"type": "string"},
     "appellantPostCode": {"type": "string"},
     "appealDate": {"$ref": "#/definitions/dateType"},
     "mrnDate": {"$ref": "#/definitions/dateType"},
@@ -27,8 +24,8 @@
     "hearingArrangements": {
       "type": "object",
       "properties" : {
-        "languageInterpreter": {"$ref": "#/definitions/yesOrNo"},
-        "signLanguageInterpreter": {"$ref": "#/definitions/yesOrNo"},
+        "languageInterpreter": {"type" : "string"},
+        "signLanguageInterpreter": {"type" : "string"},
         "hearingLoop": {"$ref": "#/definitions/yesOrNo"},
         "accessibleHearingRoom": {"$ref": "#/definitions/yesOrNo"},
         "other": {"type" : "string"},
@@ -40,8 +37,6 @@
         }
       },
       "required": [
-        "languageInterpreter",
-        "signLanguageInterpreter",
         "hearingLoop",
         "accessibleHearingRoom"
       ],

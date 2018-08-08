@@ -18,6 +18,7 @@ import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 public class CaseData {
     private String caseReference;
     private String caseCreated;
+    private String region;
     private Appeal appeal;
     private List<Hearing> hearings;
     private Evidence evidence;
@@ -32,10 +33,12 @@ public class CaseData {
     private String generatedMobile;
     @JsonProperty("generatedDOB")
     private String generatedDob;
+    private String evidencePresent;
 
     @JsonCreator
     public CaseData(@JsonProperty("caseReference") String caseReference,
                     @JsonProperty("caseCreated") String caseCreated,
+                    @JsonProperty("region") String region,
                     @JsonProperty("appeal") Appeal appeal,
                     @JsonProperty("hearings") List<Hearing> hearings,
                     @JsonProperty("evidence") Evidence evidence,
@@ -48,9 +51,11 @@ public class CaseData {
                     @JsonProperty("generatedSurname") String generatedSurname,
                     @JsonProperty("generatedEmail") String generatedEmail,
                     @JsonProperty("generatedMobile") String generatedMobile,
-                    @JsonProperty("generatedDOB") String generatedDob) {
+                    @JsonProperty("generatedDOB") String generatedDob,
+                    @JsonProperty("evidencePresent") String evidencePresent) {
         this.caseReference = caseReference;
         this.caseCreated = caseCreated;
+        this.region = region;
         this.appeal = appeal;
         this.hearings = hearings;
         this.evidence = evidence;
@@ -64,5 +69,6 @@ public class CaseData {
         this.generatedEmail = generatedEmail;
         this.generatedMobile = generatedMobile;
         this.generatedDob = generatedDob;
+        this.evidencePresent = evidencePresent;
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import uk.gov.hmcts.sscs.domain.wrapper.*;
 import uk.gov.hmcts.sscs.model.ccd.*;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 @Service
 public class SubmitYourAppealToCcdCaseDataDeserializer {
@@ -19,7 +20,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     private static final String NO = "No";
 
     public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
-
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         Subscriptions subscriptions = getAppellantSubscription(syaCaseWrapper);
@@ -36,7 +36,18 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .appeal(appeal)
                 .subscriptions(subscriptions)
                 .sscsDocument(sscsDocuments)
+                .evidencePresent(hasEvidence(sscsDocuments))
                 .build();
+    }
+
+
+
+    public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
+        CaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+
+        return caseData.toBuilder()
+                .region(region)
+                .regionalProcessingCenter(rpc).build();
     }
 
 
@@ -221,6 +232,13 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .email(email)
                 .build();
 
+        if (null != syaCaseWrapper.getSyaHearingOptions()
+                && !syaCaseWrapper.getSyaHearingOptions().getWantsToAttend()) {
+            subscription.setSubscribeEmail(NO);
+            subscription.setSubscribeSms(NO);
+
+        }
+
         return Subscriptions.builder()
                 .appellantSubscription(subscription)
                 .build();
@@ -297,5 +315,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
             return phoneNumber.replaceAll("\\s", "");
         }
         return phoneNumber;
+    }
+
+    private String hasEvidence(List<SscsDocument> sscsDocuments) {
+        return (null == sscsDocuments || sscsDocuments.isEmpty()) ? NO : YES;
     }
 }

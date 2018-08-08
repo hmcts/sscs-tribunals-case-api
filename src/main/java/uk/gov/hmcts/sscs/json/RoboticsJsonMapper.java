@@ -16,7 +16,7 @@ public class RoboticsJsonMapper {
         SyaCaseWrapper appeal = wrapper.getSyaCaseWrapper();
         JSONObject obj = new JSONObject();
 
-        obj = buildAppealDetails(obj, appeal);
+        obj = buildAppealDetails(obj, appeal, wrapper.getVenueName());
 
         obj.put("caseId", wrapper.getCcdCaseId());
         obj.put("appellant", buildAppellantDetails(appeal.getAppellant()));
@@ -35,11 +35,10 @@ public class RoboticsJsonMapper {
         return obj;
     }
 
-    private static JSONObject buildAppealDetails(JSONObject obj, SyaCaseWrapper appeal) {
+    private static JSONObject buildAppealDetails(JSONObject obj, SyaCaseWrapper appeal, String venueName) {
         obj.put("caseCode", "002DD");
         obj.put("appellantNino", appeal.getAppellant().getNino());
-        //FIXME: To be implemented at a future date as part of another ticket
-        obj.put("appellantPostCode", "Bedford");
+        obj.put("appellantPostCode", venueName);
         obj.put("appealDate", LocalDate.now().toString());
 
         if (appeal.getMrn() != null) {
@@ -51,8 +50,9 @@ public class RoboticsJsonMapper {
             }
         }
 
-        //FIXME: To be implemented at a future date as part of another ticket
-        obj.put("pipNumber", "Liverpool2 SSO");
+        if (appeal.getMrn().getDwpIssuingOffice() != null) {
+            obj.put("pipNumber", appeal.getMrn().getDwpIssuingOffice());
+        }
 
         obj.put("hearingType", convertBooleanToPaperOral(appeal.getSyaHearingOptions().getWantsToAttend()));
 
@@ -97,8 +97,15 @@ public class RoboticsJsonMapper {
 
         if (hearingOptions.getArrangements() != null) {
             SyaArrangements arrangements = hearingOptions.getArrangements();
-            hearingArrangements.put("languageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getLanguageInterpreter() ? true : false));
-            hearingArrangements.put("signLanguageInterpreter", convertBooleanToYesNo(arrangements != null && arrangements.getSignLanguageInterpreter() ? true : false));
+
+            if (arrangements.getLanguageInterpreter() && hearingOptions.getInterpreterLanguageType() != null) {
+                hearingArrangements.put("languageInterpreter", hearingOptions.getInterpreterLanguageType());
+            }
+
+            if (arrangements.getSignLanguageInterpreter() && hearingOptions.getSignLanguageType() != null) {
+                hearingArrangements.put("signLanguageInterpreter", hearingOptions.getSignLanguageType());
+            }
+
             hearingArrangements.put("hearingLoop", convertBooleanToYesNo(arrangements != null && arrangements.getHearingLoop() ? true : false));
             hearingArrangements.put("accessibleHearingRoom", convertBooleanToYesNo(arrangements != null && arrangements.getAccessibleHearingRoom() ? true : false));
         }

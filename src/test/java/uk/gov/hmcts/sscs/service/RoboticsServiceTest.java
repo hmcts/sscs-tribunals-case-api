@@ -33,7 +33,7 @@ public class RoboticsServiceTest {
             RoboticsWrapper
                 .builder()
                 .syaCaseWrapper(getSyaCaseWrapper())
-                .ccdCaseId(123L)
+                .ccdCaseId(123L).venueName("Bromley")
                 .build();
 
         JSONObject mappedJson = mock(JSONObject.class);

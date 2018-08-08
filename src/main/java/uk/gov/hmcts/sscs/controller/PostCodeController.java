@@ -14,8 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.sscs.exception.AirLookupServiceException;
 import uk.gov.hmcts.sscs.service.AirLookupService;
-
 
 /**
  * Controller for handling post code queries.
@@ -36,7 +36,9 @@ public class PostCodeController {
         String regionalCentre = airLookupService.lookupRegionalCentre(postCode);
 
         if (regionalCentre == null) {
-            LOG.error("Could not find postcode " + postCode);
+            String message = "Could not find postcode " + postCode;
+            AirLookupServiceException ex = new AirLookupServiceException(new Exception(message));
+            LOG.error(message, ex);
             return notFound().build();
         }
 

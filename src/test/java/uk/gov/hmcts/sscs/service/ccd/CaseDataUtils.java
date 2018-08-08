@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.util.*;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.sscs.model.ccd.*;
+import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 public final class CaseDataUtils {
     private CaseDataUtils() {
@@ -41,7 +42,7 @@ public final class CaseDataUtils {
                 .identity(identity)
                 .build();
         BenefitType benefitType = BenefitType.builder()
-                .code("1325")
+                .code("JSA")
                 .build();
 
         DateRange dateRange = DateRange.builder()
@@ -149,6 +150,18 @@ public final class CaseDataUtils {
                 .supporterSubscription(supporterSubscription)
                 .build();
 
+        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+                .name("CARDIFF")
+                .address1("HM Courts & Tribunals Service")
+                .address2("Social Security & Child Support Appeals")
+                .address3("Eastgate House")
+                .address4("Newport Road")
+                .city("CARDIFF")
+                .postcode("CF24 0AB")
+                .phoneNumber("0300 123 1142")
+                .faxNumber("0870 739 4438")
+                .build();
+
         return CaseData.builder()
                 .caseReference("SC068/17/00013")
                 .caseCreated(LocalDate.now().toString())
@@ -158,6 +171,8 @@ public final class CaseDataUtils {
                 .dwpTimeExtension(dwpTimeExtensionList)
                 .events(Collections.singletonList(events))
                 .subscriptions(subscriptions)
+                .region("CARDIFF")
+                .regionalProcessingCenter(rpc)
                 .build();
     }
 

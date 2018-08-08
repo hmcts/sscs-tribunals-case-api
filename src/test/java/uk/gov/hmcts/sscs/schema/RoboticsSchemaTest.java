@@ -48,12 +48,6 @@ public class RoboticsSchemaTest {
     }
 
     @Test(expected = ValidationException.class)
-    public void givenInvalidInputForNino_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData = updateEmbeddedProperty(jsonData.toString(), "JB01X123B", "appellantNino");
-        schema.validate(jsonData);
-    }
-
-    @Test(expected = ValidationException.class)
     public void givenInvalidInputForPostCode_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "B231ABXXX", "appellant", "postCode");
         schema.validate(jsonData);
@@ -106,18 +100,6 @@ public class RoboticsSchemaTest {
     @Test(expected = ValidationException.class)
     public void givenInvalidInputForWantsToAttendHearing_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
         jsonData = updateEmbeddedProperty(jsonData.toString(), "Bla", "wantsToAttendHearing");
-        schema.validate(jsonData);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void givenInvalidInputForLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData = updateEmbeddedProperty(jsonData.toString(), "Bla", "hearingArrangements", "languageInterpreter");
-        schema.validate(jsonData);
-    }
-
-    @Test(expected = ValidationException.class)
-    public void givenInvalidInputForSignLanguageInterpreter_throwExceptionWhenValidatingAgainstSchema() throws ValidationException, IOException {
-        jsonData = updateEmbeddedProperty(jsonData.toString(), "Bla", "hearingArrangements", "signLanguageInterpreter");
         schema.validate(jsonData);
     }
 

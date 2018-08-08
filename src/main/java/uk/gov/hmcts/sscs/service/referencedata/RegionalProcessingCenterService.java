@@ -74,9 +74,35 @@ public class RegionalProcessingCenterService {
         String regionalProcessingCenter = sccodeRegionalProcessingCentermap.get(splitReferenceNumber[0]);
 
         if (null != regionalProcessingCenter) {
-            return regionalProcessingCenterMap.get(regionalProcessingCenter);
+            if (regionalProcessingCenterMap.get(regionalProcessingCenter) == null) {
+                String text = "Venue could not be mapped to a valid RPC that SSCS knows about";
+                LOG.error(text, new RegionalProcessingCenterServiceException(new Exception(text)));
+                return null;
+            } else {
+                return regionalProcessingCenterMap.get(regionalProcessingCenter);
+            }
         } else {
             return regionalProcessingCenterMap.get(SSCS_BIRMINGHAM);
+        }
+    }
+
+    /**
+     * Lookup by the name of the RPC. We should be getting rid of the above code to
+     * get it from the SC Reference. Restructure the json file to work by just the name.
+     * @param name the RPC name
+     * @return
+     */
+    public RegionalProcessingCenter getByName(String name) {
+        if (StringUtils.isBlank(name)) {
+            return null;
+        }
+
+        String regionalProcessingCenter = sccodeRegionalProcessingCentermap.get("SSCS " + name);
+
+        if (null != regionalProcessingCenter) {
+            return regionalProcessingCenterMap.get(regionalProcessingCenter);
+        } else {
+            return null;
         }
     }
 

@@ -22,7 +22,7 @@ import uk.gov.hmcts.sscs.service.ccd.UpdateCoreCaseDataService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CcdServiceTest {
-    private static final String BENEFIT_TYPE = "1325";
+    private static final String BENEFIT_TYPE = "jsa";
     private static  final String SURNAME = "Test";
 
     private CcdService ccdService;
