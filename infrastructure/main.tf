@@ -160,6 +160,10 @@ module "tribunals-case-api" {
     IDAM_OAUTH2_REDIRECT_URL  = "${var.idam_redirect_url}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
+
+    MAX_FILE_SIZE = "${var.max_file_size}"
+    MAX_REQUEST_SIZE = "${var.max_request_size}"
+
   }
 }
 
