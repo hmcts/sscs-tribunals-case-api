@@ -7,6 +7,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
 
 @RestController
+@Slf4j
 public class SyaController {
 
     private final SubmitAppealService submitAppealService;
@@ -32,7 +34,13 @@ public class SyaController {
             response = String.class)})
     @RequestMapping(value = "/appeals", method = POST, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
+        log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
+                syaCaseWrapper.getBenefitType().getCode());
         submitAppealService.submitAppeal(syaCaseWrapper);
+        log.info("Appeal with Nino - {} and benefit type - {} processed successfully",
+                syaCaseWrapper.getAppellant().getNino(),
+                syaCaseWrapper.getBenefitType().getCode());
+
         return status(201).build();
     }
 }
