@@ -99,10 +99,17 @@ public class SubmitAppealService {
         }
 
         CaseDetails caseDetails = createCaseInCcd(caseData);
+
+        log.info("Appeal successfully created in CCD for  Nino - {} and benefit type {}",
+                appeal.getAppellant().getNino(), appeal.getBenefitType().getCode());
+
         byte[] pdf = generatePdf(appeal, caseDetails.getId());
 
         String fileName = generateUniqueEmailId(appeal.getAppellant()) + ".pdf";
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, fileName);
+
+        log.info("Appeal PDF stored in DM for  Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
+                appeal.getBenefitType().getCode());
 
         List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
 
@@ -111,11 +118,16 @@ public class SubmitAppealService {
 
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
+        log.info("PDF email sent successfully for  Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
+                appeal.getBenefitType().getCode());
+
         if (roboticsEnabled) {
             JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal)
                     .ccdCaseId(caseDetails.getId()).venueName(venue).build());
 
             sendJsonByEmail(appeal.getAppellant(), roboticsJson, pdf);
+            log.info("Robotics email sent successfully for  Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
+                    appeal.getBenefitType().getCode());
         }
     }
 
@@ -141,7 +153,8 @@ public class SubmitAppealService {
         try {
             return ccdService.createCase(caseData);
         } catch (CcdException ccdEx) {
-            log.info("Failed to create ccd case but carrying on [" + caseData.getCaseReference() + "]");
+            log.error("Failed to create ccd case for Nino - {} and Benefit type - {} but carrying on ",
+                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), ccdEx);
             return CaseDetails.builder().build();
         }
     }
@@ -150,8 +163,8 @@ public class SubmitAppealService {
         try {
             return ccdService.updateCase(caseData, caseId, eventId);
         } catch (CcdException ccdEx) {
-            log.info("Failed to update ccd case but carrying on [" + caseId + "] ["
-                    + caseData.getCaseReference() + "] with event [" + eventId + "]");
+            log.error("Failed to update ccd case but carrying on [" + caseId + "] ["
+                    + caseData.getCaseReference() + "] with event [" + eventId + "]", ccdEx);
             return CaseDetails.builder().build();
         }
     }
@@ -177,7 +190,8 @@ public class SubmitAppealService {
             caseData.getSubscriptions().setAppellantSubscription(subscription);
             return caseData;
         } catch (CcdException e) {
-            log.info("CCD is down. Therefore the appeal number is not generated");
+            log.error("Appeal number is not generated for Nino - {} and Benefit Type - {}",
+                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
             return caseData;
         }
     }

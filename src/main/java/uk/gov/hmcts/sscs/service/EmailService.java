@@ -47,6 +47,7 @@ public class EmailService {
 
             javaMailSender.send(message);
         } catch (Exception e) {
+            log.error("Error while sending email {} ", e);
             throw new EmailSendFailedException("Error while sending email", e);
         }
     }

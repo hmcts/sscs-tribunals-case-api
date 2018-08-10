@@ -12,7 +12,7 @@ import uk.gov.hmcts.sscs.exception.EvidenceDocumentsMissingException;
 import uk.gov.hmcts.sscs.service.evidence.EvidenceManagementService;
 
 @RestController
-public class EvidenceManagementController {
+public class    EvidenceManagementController {
 
     private final EvidenceManagementService evidenceManagementService;
 
