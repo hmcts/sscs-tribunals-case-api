@@ -1,3 +1,3 @@
-idam_redirect_url = "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
+idam_redirect_url = "https://sscs-case-loader-aat.service.core-compute-aat.internal"
 infrastructure_env = "preprod"
 robotics_enabled = "true"
