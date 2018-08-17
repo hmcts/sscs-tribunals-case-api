@@ -37,7 +37,7 @@ public class AppealNumberGenerator {
             }
             if (count == 0 && "".equals(appealNumber)) {
                 String message = "AppealNumberGenerator has generated duplicate appeal number against CCD";
-                CcdException ccdException = new CcdException(new Exception(message));
+                CcdException ccdException = new CcdException(message);
                 LOG.error(message, ccdException);
                 throw ccdException;
             }

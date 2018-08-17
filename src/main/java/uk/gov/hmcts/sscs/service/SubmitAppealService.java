@@ -85,7 +85,6 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        //add RPC and venue
         String postcode = getFirstHalfOfPostcode(appeal.getAppellant().getContactDetails().getPostCode());
         String region = airLookupService.lookupRegionalCentre(postcode);
         String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
@@ -100,7 +99,7 @@ public class SubmitAppealService {
 
         CaseDetails caseDetails = createCaseInCcd(caseData);
 
-        log.info("Appeal successfully created in CCD for  Nino - {} and benefit type {}",
+        log.info("Appeal successfully created in CCD for Nino - {} and benefit type {}",
                 appeal.getAppellant().getNino(), appeal.getBenefitType().getCode());
 
         byte[] pdf = generatePdf(appeal, caseDetails.getId(), caseData);
@@ -108,7 +107,7 @@ public class SubmitAppealService {
         String fileName = generateUniqueEmailId(appeal.getAppellant()) + ".pdf";
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, fileName);
 
-        log.info("Appeal PDF stored in DM for  Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
+        log.info("Appeal PDF stored in DM for Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
                 appeal.getBenefitType().getCode());
 
         List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
@@ -118,7 +117,7 @@ public class SubmitAppealService {
 
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
-        log.info("PDF email sent successfully for  Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
+        log.info("PDF email sent successfully for Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
                 appeal.getBenefitType().getCode());
 
         if (roboticsEnabled) {
@@ -126,7 +125,7 @@ public class SubmitAppealService {
                     .ccdCaseId(caseDetails.getId()).venueName(venue).build());
 
             sendJsonByEmail(appeal.getAppellant(), roboticsJson, pdf);
-            log.info("Robotics email sent successfully for  Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
+            log.info("Robotics email sent successfully for Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
                     appeal.getBenefitType().getCode());
         }
     }
@@ -191,8 +190,8 @@ public class SubmitAppealService {
             return caseData;
         } catch (CcdException e) {
             log.error("Appeal number is not generated for Nino - {} and Benefit Type - {}",
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
-            return caseData;
+                caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
+            throw e;
         }
     }
 

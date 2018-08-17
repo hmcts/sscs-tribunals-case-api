@@ -143,7 +143,7 @@ public class CcdService {
     }
 
     private CcdException logCcdException(String message, Exception ex) {
-        CcdException ccdException = new CcdException(ex);
+        CcdException ccdException = new CcdException(message, ex);
         LOG.error(message, ccdException);
         return ccdException;
     }

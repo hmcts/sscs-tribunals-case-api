@@ -7,13 +7,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.Collections;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
 
 @RestController
@@ -42,5 +47,16 @@ public class SyaController {
                 syaCaseWrapper.getBenefitType().getCode());
 
         return status(201).build();
+    }
+
+    @ExceptionHandler({CcdException.class})
+    public ResponseEntity<Map<String,String>> badRequest(CcdException e){
+        return new ResponseEntity<>(Collections.singletonMap("cause", e.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({Exception.class})
+    public ResponseEntity<Map<String,String>> internalServerError(Exception e){
+        log.error("Internal server error: " + e.getMessage());
+        return new ResponseEntity<>(Collections.singletonMap("cause", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
