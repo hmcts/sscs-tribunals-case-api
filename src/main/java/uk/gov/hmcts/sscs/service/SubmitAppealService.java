@@ -103,7 +103,7 @@ public class SubmitAppealService {
         log.info("Appeal successfully created in CCD for  Nino - {} and benefit type {}",
                 appeal.getAppellant().getNino(), appeal.getBenefitType().getCode());
 
-        byte[] pdf = generatePdf(appeal, caseDetails.getId());
+        byte[] pdf = generatePdf(appeal, caseDetails.getId(), caseData);
 
         String fileName = generateUniqueEmailId(appeal.getAppellant()) + ".pdf";
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, fileName);
@@ -219,14 +219,14 @@ public class SubmitAppealService {
         return String.format(ID_FORMAT, appellantLastName, nino.substring(nino.length() - 3));
     }
 
-    private byte[] generatePdf(SyaCaseWrapper appeal, Long caseDetailsId) {
+    private byte[] generatePdf(SyaCaseWrapper appeal, Long caseDetailsId, CaseData caseData) {
         byte[] template;
         try {
             template = getTemplate();
         } catch (IOException e) {
             throw new PdfGenerationException("Error getting template", e);
         }
-        PdfWrapper pdfWrapper = PdfWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetailsId).build();
+        PdfWrapper pdfWrapper = PdfWrapper.builder().syaCaseWrapper(appeal).ccdCaseId(caseDetailsId).caseData(caseData).build();
         Map<String, Object> placeholders = Collections.singletonMap(PDF_WRAPPER, pdfWrapper);
         return pdfServiceClient.generateFromHtml(template, placeholders);
     }
