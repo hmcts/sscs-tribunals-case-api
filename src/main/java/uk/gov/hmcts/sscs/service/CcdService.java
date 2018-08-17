@@ -48,7 +48,7 @@ public class CcdService {
 
     public CaseDetails updateCase(CaseData caseData, Long caseId, String eventId) {
         try {
-            return updateCoreCaseDataService.updateCcdCase(caseData, caseId, eventId);
+            return updateCoreCaseDataService.updateCase(caseData, caseId, eventId);
         } catch (Exception ex) {
             throw logCcdException("Error while updating case in ccd", ex);
         }

@@ -98,7 +98,7 @@ public class SubmitAppealServiceTest {
     @Test
     public void shouldSendPdfByEmailWhenCcdIsDown() {
         given(ccdService.createCase(any(CaseData.class))).willThrow(new CcdException(
-            new RuntimeException("Error while creating case in CCD")));
+            "Error while creating case in CCD"));
 
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), captor.capture()))

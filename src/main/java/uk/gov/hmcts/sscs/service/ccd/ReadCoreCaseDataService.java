@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.EventRequestData;
@@ -25,16 +27,29 @@ public class ReadCoreCaseDataService {
         this.idamService = idamService;
     }
 
+    public CaseData getCcdCaseDataByCaseId(String caseId) {
+        CaseDetails caseDetails = getCcdCaseDetailsByCaseId(caseId);
+        return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
+    }
+
+    @Retryable
     public CaseDetails getCcdCaseDetailsByCaseId(String caseId) {
+        log.info("*** tribunals-service *** get case details by case id {}", caseId);
+        return tryGetCcdCaseDetailsByCaseId(caseId);
+    }
+
+    @Recover
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private CaseDetails retryGetCcdCaseDetailsByCaseId(String caseId) {
+        log.info("*** tribunals-service *** retrying get case details by case id {}", caseId);
+        return tryGetCcdCaseDetailsByCaseId(caseId);
+    }
+
+    private CaseDetails tryGetCcdCaseDetailsByCaseId(String caseId) {
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("emptyEvent");
         String serviceAuthorization = idamService.generateServiceAuthorization();
 
         return getByCaseId(eventRequestData, serviceAuthorization, caseId);
-    }
-
-    public CaseData getCcdCaseDataByCaseId(String caseId) {
-        CaseDetails caseDetails = getCcdCaseDetailsByCaseId(caseId);
-        return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
     }
 
     private CaseDetails getByCaseId(EventRequestData eventRequestData, String serviceAuthorization,
@@ -50,7 +65,25 @@ public class ReadCoreCaseDataService {
         );
     }
 
+    public CaseData getCcdCaseDataByAppealNumber(String appealNumber) {
+        CaseDetails caseDetails = getCcdCaseDetailsByAppealNumber(appealNumber);
+        return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
+    }
+
+    @Retryable
     public CaseDetails getCcdCaseDetailsByAppealNumber(String appealNumber) {
+        log.info("*** tribunals-service *** get case details by appeal number {}", appealNumber);
+        return tryGetCcdCaseDetailsByAppealNumber(appealNumber);
+    }
+
+    @Recover
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private CaseDetails retryGetCcdCaseDetailsByAppealNumber(String appealNumber) {
+        log.info("*** tribunals-service *** retrying get case details by appeal number {}", appealNumber);
+        return tryGetCcdCaseDetailsByAppealNumber(appealNumber);
+    }
+
+    private CaseDetails tryGetCcdCaseDetailsByAppealNumber(String appealNumber) {
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("emptyEvent");
         String serviceAuthorization = idamService.generateServiceAuthorization();
 
@@ -60,11 +93,6 @@ public class ReadCoreCaseDataService {
             caseDetails = caseDetailsList.get(0);
         }
         return caseDetails;
-    }
-
-    public CaseData getCcdCaseDataByAppealNumber(String appealNumber) {
-        CaseDetails caseDetails = getCcdCaseDetailsByAppealNumber(appealNumber);
-        return CcdUtil.getCaseData(caseDetails != null ? caseDetails.getData() : null);
     }
 
     private List<CaseDetails> getByAppealNumber(EventRequestData eventRequestData, String serviceAuthorization,

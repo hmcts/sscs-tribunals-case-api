@@ -49,11 +49,6 @@ public class SyaController {
         return status(201).build();
     }
 
-    @ExceptionHandler({CcdException.class})
-    public ResponseEntity<Map<String,String>> badRequest(CcdException e){
-        return new ResponseEntity<>(Collections.singletonMap("cause", e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Map<String,String>> internalServerError(Exception e){
         log.error("Internal server error: " + e.getMessage());

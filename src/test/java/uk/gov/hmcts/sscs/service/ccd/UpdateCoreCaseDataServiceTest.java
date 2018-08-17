@@ -95,7 +95,7 @@ public class UpdateCoreCaseDataServiceTest {
         when(idamServiceMock.generateServiceAuthorization()).thenReturn(S2S_TOKEN);
 
         //When
-        CaseDetails caseDetails = updateCoreCaseDataService.updateCcdCase(caseData, caseid, APPEAL_UPDATED);
+        CaseDetails caseDetails = updateCoreCaseDataService.updateCase(caseData, caseid, APPEAL_UPDATED);
 
         //Then
         assertNotNull(caseDetails);
