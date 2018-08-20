@@ -27,12 +27,6 @@ public class ReadCaseFromCcdTest {
     private CcdService ccdService;
 
     @Test
-    public void givenACaseIdShouldRetrieveCaseDetails() {
-        CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByCaseId("1526918685452662");
-        assertNotNull(caseDetails);
-    }
-
-    @Test
     public void givenAnAppealNumberShouldRetrieveCaseDetails() {
         CaseDetails caseDetails = readCoreCaseDataService.getCcdCaseDetailsByAppealNumber(APPEAL_NUMBER);
         assertNotNull(caseDetails);

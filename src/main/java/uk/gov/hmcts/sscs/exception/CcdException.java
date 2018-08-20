@@ -1,6 +1,5 @@
 package uk.gov.hmcts.sscs.exception;
 
-import net.bytebuddy.implementation.bytecode.Throw;
 import uk.gov.hmcts.reform.logging.exception.AlertLevel;
 import uk.gov.hmcts.reform.logging.exception.UnknownErrorCodeException;
 

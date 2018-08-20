@@ -42,43 +42,6 @@ public class ReadCoreCaseDataServiceTest {
     }
 
     @Test
-    public void givenACaseId_shouldRetrieveCaseFromCcd() {
-        //Given
-
-        EventRequestData eventRequestData = EventRequestData.builder()
-            .userId("user-id")
-            .eventId(EMPTY_EVENT)
-            .caseTypeId("case-type-id")
-            .userToken("user-token")
-            .jurisdictionId("jurisdiction-id")
-            .ignoreWarning(true)
-            .build();
-
-        when(coreCaseDataApiMock.readForCaseWorker(
-            eventRequestData.getUserToken(),
-            S2S_TOKEN,
-            eventRequestData.getUserId(),
-            eventRequestData.getJurisdictionId(),
-            eventRequestData.getCaseTypeId(),
-            CASE_ID
-        )).thenReturn(CaseDataUtils.buildCaseDetails());
-
-        when(coreCaseDataServiceMock.getEventRequestData(eq(EMPTY_EVENT))).thenReturn(eventRequestData);
-        when(coreCaseDataServiceMock.getCoreCaseDataApi()).thenReturn(coreCaseDataApiMock);
-
-        when(idamServiceMock.generateServiceAuthorization()).thenReturn(S2S_TOKEN);
-
-        //When
-        CaseData caseData = readCoreCaseDataService.getCcdCaseDataByCaseId(CASE_ID);
-
-        //Then
-        assertNotNull(caseData);
-        verify(coreCaseDataApiMock).readForCaseWorker(anyString(), anyString(), anyString(), anyString(), anyString(),
-            anyString());
-        assertEquals("AB 22 55 66 B", caseData.getAppeal().getAppellant().getIdentity().getNino());
-    }
-
-    @Test
     public void givenAnAppealNumber_shouldRetrieveCaseFromCcd() {
         //Given
 

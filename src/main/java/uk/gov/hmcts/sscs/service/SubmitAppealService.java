@@ -24,7 +24,6 @@ import uk.gov.hmcts.sscs.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.sscs.model.ccd.Appeal;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
 import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
 import uk.gov.hmcts.sscs.model.ccd.Subscription;
@@ -93,7 +92,7 @@ public class SubmitAppealService {
 
         byte[] pdf = generatePdf(appeal, caseDetails.getId(), caseData);
 
-        sendPdfByEmail(appeal, caseDetails.getId(), caseData, pdf);
+        prepareCaseForPdf(appeal, caseDetails.getId(), caseData, pdf);
 
         if (roboticsEnabled) {
             sendCaseToRobotics(appeal, caseDetails.getId(), postcode, pdf);
@@ -115,7 +114,7 @@ public class SubmitAppealService {
         return caseData;
     }
 
-    private void sendPdfByEmail(SyaCaseWrapper appeal, Long caseId, CaseData caseData, byte[] pdf) {
+    private void prepareCaseForPdf(SyaCaseWrapper appeal, Long caseId, CaseData caseData, byte[] pdf) {
         String fileName = generateUniqueEmailId(appeal.getAppellant()) + ".pdf";
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, fileName);
 
