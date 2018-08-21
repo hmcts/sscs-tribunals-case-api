@@ -103,15 +103,11 @@ public class SubmitAppealService {
         String region = airLookupService.lookupRegionalCentre(postcode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByName(region);
 
-        CaseData caseData;
-
         if (rpc == null) {
-            caseData = transformAppealToCaseData(appeal);
+            return transformAppealToCaseData(appeal);
         } else {
-            caseData = transformAppealToCaseData(appeal, rpc.getName(), rpc);
+            return transformAppealToCaseData(appeal, rpc.getName(), rpc);
         }
-
-        return caseData;
     }
 
     private void prepareCaseForPdf(SyaCaseWrapper appeal, Long caseId, CaseData caseData, byte[] pdf) {
