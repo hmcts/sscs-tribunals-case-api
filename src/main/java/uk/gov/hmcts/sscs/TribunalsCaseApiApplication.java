@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
                 "uk.gov.hmcts.reform.authorisation",
                 "uk.gov.hmcts.sscs.service.idam"
         })
+@EnableRetry
 public class TribunalsCaseApiApplication {
 
     @Value("${appeal.email.host}")

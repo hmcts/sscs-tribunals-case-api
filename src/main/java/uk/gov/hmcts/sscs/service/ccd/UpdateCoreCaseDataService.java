@@ -2,6 +2,7 @@ package uk.gov.hmcts.sscs.service.ccd;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -24,8 +25,9 @@ public class UpdateCoreCaseDataService {
         this.idamService = idamService;
     }
 
-    public CaseDetails updateCcdCase(CaseData caseData, Long caseId, String eventId) {
-        log.info("*** tribunals-service *** updateCcdCase ");
+    @Retryable
+    public CaseDetails updateCase(CaseData caseData, Long caseId, String eventId) {
+        log.info("*** tribunals-service *** updateCase for caseId {} and eventId {}", caseId, eventId);
         EventRequestData eventRequestData = coreCaseDataService.getEventRequestData(eventId);
         String serviceAuthorization = idamService.generateServiceAuthorization();
         StartEventResponse startEventResponse = start(eventRequestData, serviceAuthorization, caseId);
@@ -50,7 +52,7 @@ public class UpdateCoreCaseDataService {
 
     private CaseDetails create(EventRequestData eventRequestData, String serviceAuthorization,
                                CaseDataContent caseDataContent, Long caseId) {
-
+        log.info("*** tribunals-service *** Calling CCD endpoint to update CaseDetails For CaseWorker...");
         return coreCaseDataService.getCoreCaseDataApi().submitEventForCaseWorker(
                 eventRequestData.getUserToken(),
                 serviceAuthorization,

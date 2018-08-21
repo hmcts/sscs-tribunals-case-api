@@ -53,7 +53,7 @@ public class CcdServiceTest {
         when(createCoreCaseDataService.createCcdCase(CaseDataUtils.buildCaseData()))
                 .thenReturn(CaseDataUtils.buildCaseDetails());
 
-        when(updateCoreCaseDataService.updateCcdCase(testCaseData, 1L, eventId))
+        when(updateCoreCaseDataService.updateCase(testCaseData, 1L, eventId))
                 .thenReturn(CaseDataUtils.buildCaseDetails("SC666/66/66666"));
     }
 
@@ -85,7 +85,7 @@ public class CcdServiceTest {
         String benefitType = ccdService.updateSubscription(anyString(), getSubscriptionRequest());
 
         verify(readCoreCaseDataService).getCcdCaseDetailsByAppealNumber(anyString());
-        verify(updateCoreCaseDataService).updateCcdCase(any(), eq(null), anyString());
+        verify(updateCoreCaseDataService).updateCase(any(), eq(null), anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
@@ -165,7 +165,7 @@ public class CcdServiceTest {
         CaseDetails caseDetails = ccdService.updateCase(testCaseData, caseId, eventId);
 
         assertNotNull(caseDetails);
-        verify(updateCoreCaseDataService).updateCcdCase(testCaseData, caseId, eventId);
+        verify(updateCoreCaseDataService).updateCase(testCaseData, caseId, eventId);
     }
 
     @Test
@@ -177,7 +177,7 @@ public class CcdServiceTest {
         String benefitType = ccdService.unsubscribe(anyString());
 
         verify(readCoreCaseDataService).getCcdCaseDetailsByAppealNumber(anyString());
-        verify(updateCoreCaseDataService).updateCcdCase(any(CaseData.class), eq(null), anyString());
+        verify(updateCoreCaseDataService).updateCase(any(CaseData.class), eq(null), anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
     }
