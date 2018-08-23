@@ -181,6 +181,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void emptyEventDateShouldBeIgnoredTest() throws CcdException {
+        CaseData caseData = EMPTY_EVENT_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
+    }
+
     @Test(expected = CcdException.class)
     public void noEventsTest() throws CcdException {
         CaseData caseData = NO_EVENTS_CCD.getDeserializeMessage();

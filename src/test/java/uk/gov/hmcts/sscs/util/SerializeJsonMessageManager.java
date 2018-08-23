@@ -41,6 +41,7 @@ public enum SerializeJsonMessageManager {
     CLOSED_CCD("closedCcd.json"),
     LAPSED_REVISED("lapsedRevised.json"),
     LAPSED_REVISED_CCD("lapsedRevisedCcd.json"),
+    EMPTY_EVENT_CCD("emptyEventCcd.json"),
     NO_EVENTS_CCD("noEventsCcd.json"),
     APPEAL_CREATED("appealCreated.json"),
     APPEAL_CREATED_CCD("appealCreatedCcd.json"),

@@ -50,6 +50,7 @@ public class TrackYourAppealJsonBuilder {
         }
 
         createEvidenceResponseEvents(caseData);
+        caseData.getEvents().removeIf(a -> a.getValue().getDate() == null);
         eventList = caseData.getEvents();
         eventList.sort(Comparator.reverseOrder());
         processExceptions(eventList);
