@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
@@ -118,16 +119,32 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldCreateCaseWithAppealDetails() {
+    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetails() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
             any())).willReturn(expected);
 
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any())).willReturn(null);
+
         submitAppealService.submitAppeal(appealData);
 
         verify(appealNumberGenerator).generate();
         verify(ccdService).createCase(any(CaseData.class));
+    }
+
+    @Test
+    public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class),
+                any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any())).willReturn(CaseDetails.builder().build());
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService, never()).createCase(any(CaseData.class));
     }
 
     @Test

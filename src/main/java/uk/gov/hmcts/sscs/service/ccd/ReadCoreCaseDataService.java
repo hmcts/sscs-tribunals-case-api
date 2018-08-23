@@ -58,4 +58,29 @@ public class ReadCoreCaseDataService {
                 ImmutableMap.of("case.subscriptions.appellantSubscription.tya", appealNumber)
         );
     }
+
+    @Retryable
+    public CaseDetails getCcdCaseByNinoAndBenefitTypeAndMrnDate(String nino, String benefitType, String mrnDate) {
+        log.info("*** tribunals-service *** get case details by nino and benefit type and mrn date {}, {}, {}", nino, benefitType, mrnDate);
+        EventRequestData eventRequestData = coreCaseDataService.getEventRequestData("emptyEvent");
+        String serviceAuthorization = idamService.generateServiceAuthorization();
+
+        List<CaseDetails> caseDetailsList = getByNinoAndBenefitTypeAndMrnDate(eventRequestData, serviceAuthorization, nino, benefitType, mrnDate);
+        return !caseDetailsList.isEmpty() ? caseDetailsList.get(0) : null;
+    }
+
+    private List<CaseDetails> getByNinoAndBenefitTypeAndMrnDate(EventRequestData eventRequestData, String serviceAuthorization,
+                                                                String nino, String benefitType, String mrnDate) {
+        log.info("Get getByNinoAndBenefitTypeAndMrnDate {}, {}, {} ...", nino, benefitType, mrnDate);
+        return coreCaseDataService.getCoreCaseDataApi().searchForCaseworker(
+                eventRequestData.getUserToken(),
+                serviceAuthorization,
+                eventRequestData.getUserId(),
+                eventRequestData.getJurisdictionId(),
+                eventRequestData.getCaseTypeId(),
+                ImmutableMap.of("case.generatedNino", nino,
+                        "case.appeal.benefitType.code", benefitType,
+                        "case.appeal.mrnDetails.mrnDate", mrnDate)
+        );
+    }
 }
