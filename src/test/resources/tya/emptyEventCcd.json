@@ -1,0 +1,74 @@
+{
+  "caseReference": "SC333/33/33333",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
+      }
+    },
+    "benefitType": {
+      "code": "PIP"
+    }
+  },
+  "hearings": [{
+    "value": {
+      "venue": {
+        "name": "Prudential House",
+        "address": {
+          "line1": "36 Dale Street",
+          "line2": "",
+          "town": "Liverpool",
+          "postcode": "L2 5UZ"
+        },
+        "googleMapLink": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509"
+      },
+      "hearingDate": "2017-07-17",
+      "time": "23:00",
+      "eventDate": "2017-01-20T18:15:06.223"
+    }
+  }],
+  "events": [
+    {
+      "value": {
+        "date": "2017-03-02T17:27:50.297",
+        "type": "appealLapsed",
+        "description": "Lapsed revised"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-01-20T15:15:06.223",
+        "type": "hearingBooked",
+        "description": "Hearing booked"
+      }
+    },
+    {
+      "value": {
+        "date": "2016-11-03T15:11:45.827",
+        "type": "responseReceived",
+        "description": "Dwp Respond"
+      }
+    },
+    {
+      "value": {
+        "date": "2016-09-29T08:32:44.633",
+        "type": "appealReceived",
+        "description": "Appeal received"
+      }
+    },
+    {
+      "value": {
+        "date": null,
+        "type": "",
+        "description": null
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}
