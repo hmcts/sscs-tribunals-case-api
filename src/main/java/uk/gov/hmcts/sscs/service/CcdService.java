@@ -55,12 +55,15 @@ public class CcdService {
     }
 
     public CaseDetails findCcdCaseByNinoAndBenefitTypeAndMrnDate(CaseData caseData) {
-        try {
-            return readCoreCaseDataService.getCcdCaseByNinoAndBenefitTypeAndMrnDate(
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), caseData.getAppeal().getMrnDetails().getMrnDate());
-        } catch (Exception ex) {
-            throw logCcdException("Error while getting case from ccd", ex);
+        if (caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
+            try {
+                return readCoreCaseDataService.getCcdCaseByNinoAndBenefitTypeAndMrnDate(
+                        caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), caseData.getAppeal().getMrnDetails().getMrnDate());
+            } catch (Exception ex) {
+                throw logCcdException("Error while getting case from ccd", ex);
+            }
         }
+        return null;
     }
 
     public CaseData findCcdCaseByAppealNumber(String appealNumber) {

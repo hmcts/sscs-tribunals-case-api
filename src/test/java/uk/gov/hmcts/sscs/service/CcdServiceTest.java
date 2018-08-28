@@ -13,7 +13,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.sscs.model.ccd.Appeal;
+import uk.gov.hmcts.sscs.model.ccd.BenefitType;
 import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.sscs.model.ccd.MrnDetails;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.service.ccd.CreateCoreCaseDataService;
@@ -180,6 +183,51 @@ public class CcdServiceTest {
         verify(updateCoreCaseDataService).updateCase(any(CaseData.class), eq(null), anyString());
 
         assertEquals(BENEFIT_TYPE, benefitType);
+    }
+
+    @Test
+    public void givenABenefitTypeAndNinoAndMrnDate_thenReturnCaseDetailsIfTheyExistInCcd() {
+
+        CaseData caseData = CaseData.builder().generatedNino("JT123456B")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder().code("JSA").build())
+                        .mrnDetails(MrnDetails.builder().mrnDate("2018-01-01").build()).build()).build();
+
+        when(readCoreCaseDataService.getCcdCaseByNinoAndBenefitTypeAndMrnDate("JT123456B", "JSA", "2018-01-01"))
+                .thenReturn(CaseDetails.builder().build());
+
+        CaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData);
+
+        assertNotNull(caseDetails);
+    }
+
+    @Test
+    public void givenABenefitTypeAndNinoAndMrnDate_thenReturnNullIfTheyDoNotExistInCcd() {
+
+        CaseData caseData = CaseData.builder().generatedNino("JT123456B")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder().code("JSA").build())
+                        .mrnDetails(MrnDetails.builder().mrnDate("2018-01-01").build()).build()).build();
+
+        when(readCoreCaseDataService.getCcdCaseByNinoAndBenefitTypeAndMrnDate("JT123456B", "JSA", "2018-01-01"))
+                .thenReturn(null);
+
+        CaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData);
+
+        assertNull(caseDetails);
+    }
+
+    @Test
+    public void givenABenefitTypeAndNinoAndNoMrnDate_thenReturnNull() {
+
+        CaseData caseData = CaseData.builder().generatedNino("JT123456B")
+                .appeal(Appeal.builder()
+                        .benefitType(BenefitType.builder().code("JSA").build())
+                        .mrnDetails(MrnDetails.builder().mrnDate(null).build()).build()).build();
+
+        CaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData);
+
+        assertNull(caseDetails);
     }
 
     private SubscriptionRequest getSubscriptionRequest() {
