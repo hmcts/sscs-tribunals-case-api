@@ -69,7 +69,7 @@ public class SyaAppellant {
     }
 
     public void setNino(String nino) {
-        this.nino = nino;
+        this.nino = nino.replaceAll("\\s", "");;
     }
 
     public SyaContactDetails getContactDetails() {

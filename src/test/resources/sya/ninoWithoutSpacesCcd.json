@@ -1,0 +1,145 @@
+{
+  "caseCreated" : "${json-unit.ignore}",
+  "generatedDOB" : "1990-02-26",
+  "generatedEmail" : "joe@bloggs.com",
+  "generatedMobile" : "07411222222",
+  "generatedNino" : "AB877533C",
+  "generatedSurname" : "Bloggs",
+  "region": "CARDIFF",
+  "regionalProcessingCenter": {
+    "name" : "CARDIFF",
+    "address1" : "HM Courts & Tribunals Service",
+    "address2" : "Social Security & Child Support Appeals",
+    "address3" : "Eastgate House",
+    "address4" : "Newport Road",
+    "city" : "CARDIFF",
+    "postcode" : "CF24 0AB",
+    "phoneNumber" : "0300 123 1142",
+    "faxNumber" : "0870 739 4438"
+  },
+  "appeal": {
+    "mrnDetails": {
+      "dwpIssuingOffice": "1",
+      "mrnDate": "2018-02-01",
+      "mrnLateReason": null,
+      "mrnMissingReason": null
+    },
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "firstName": "Joe",
+        "lastName": "Bloggs"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Hairyfield",
+        "county": "Kent",
+        "postcode": "TN32 6PL"
+      },
+      "contact": {
+        "email": "joe@bloggs.com",
+        "phone": null,
+        "mobile": "07411222222"
+      },
+      "identity": {
+        "dob": "1990-02-26",
+        "nino": "AB877533C"
+      },
+      "isAppointee": "No"
+    },
+    "benefitType": {
+      "code": "PIP"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes",
+      "wantsSupport": "Yes",
+      "languageInterpreter": "Yes",
+      "languages": "Telugu",
+      "arrangements": [
+        "signLanguageInterpreter",
+        "hearingLoop"
+      ],
+      "scheduleHearing": "Yes",
+      "excludeDates": [
+        {
+          "value": {
+            "start": "2018-04-04",
+            "end": "2018-04-04"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-05",
+            "end": "2018-04-05"
+          }
+        },
+        {
+          "value": {
+            "start": "2018-04-06",
+            "end": "2018-04-06"
+          }
+        }
+      ],
+      "other": "Yes, this..."
+    },
+    "appealReasons": {
+      "reasons": [
+        {
+          "value": {
+            "reason": "aaaaaaaaaa",
+            "description": "aaaaaaaaaa"
+          }
+        },
+        {
+          "value": {
+            "reason": "bbbbbbbbbb",
+            "description": "bbbbbbbbbb"
+          }
+        },
+        {
+          "value": {
+            "reason": "cccccccccc",
+            "description": "cccccccccc"
+          }
+        }
+      ],
+      "otherReasons": "Another reason"
+    },
+    "rep": {
+      "hasRepresentative": "Yes",
+      "name": {
+        "title": "Mr",
+        "firstName": "Harry",
+        "lastName": "Potter"
+      },
+      "address": {
+        "line1": "123 Hairy Lane",
+        "line2": "Off Hairy Park",
+        "town": "Town",
+        "county": "County",
+        "postcode": "CM14 4LQ"
+      },
+      "contact": {
+        "email": "harry.potter@wizards.com",
+        "phone": null,
+        "mobile": "07411999999"
+      },
+      "organisation": "HP Ltd"
+    },
+    "signer": "Joe Bloggs"
+  },
+  "subscriptions": {
+    "appellantSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": null,
+      "email": "joe@bloggs.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes",
+      "reason": null
+    },
+    "supporterSubscription": null
+  },
+  "evidencePresent" : "No"
+}

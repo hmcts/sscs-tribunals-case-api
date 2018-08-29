@@ -112,6 +112,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void shouldRemoveSpacesFromNino() {
+        final SyaCaseWrapper syaCaseWrapper = NINO_WITH_SPACES.getDeserializeMessage();
+        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(NINO_WITHOUT_SPACES_CCD.getSerializedMessage(), getJson(caseData));
+    }
+
+    @Test
     public void syaWithNoRpc() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper);
