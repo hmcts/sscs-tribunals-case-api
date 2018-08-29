@@ -153,6 +153,9 @@ public class SyaEndpointsIt {
         given(coreCaseDataApi.submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
                 anyBoolean(), any(CaseDataContent.class))).willReturn(CaseDetails.builder().id(123456789876L).build());
 
+        given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyMap())).willReturn(Collections.emptyList());
+
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(getCase()))
@@ -163,6 +166,33 @@ public class SyaEndpointsIt {
         assertThat(message.getSubject(), is("Bloggs_33C"));
         assertThat(getPdf(), is(PDF));
 
+        verify(coreCaseDataApi).submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyBoolean(), any(CaseDataContent.class));
+        verify(mailSender).send(message);
+
+        assertNotNull(getPdfWrapper().getCcdCaseId());
+    }
+
+    @Test
+    public void shouldNotAddDuplicateCaseToCcdAndStillGeneratePdfAndSend() throws Exception {
+
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+
+        given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyMap())).willReturn(Collections.singletonList(caseDetails));
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase()))
+                .andExpect(status().isCreated());
+
+        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
+        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
+        assertThat(message.getSubject(), is("Bloggs_33C"));
+        assertThat(getPdf(), is(PDF));
+
+        verify(coreCaseDataApi, never()).submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
+                anyBoolean(), any(CaseDataContent.class));
         verify(mailSender).send(message);
 
         assertNotNull(getPdfWrapper().getCcdCaseId());

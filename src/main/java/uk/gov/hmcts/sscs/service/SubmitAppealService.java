@@ -160,10 +160,16 @@ public class SubmitAppealService {
 
     private CaseDetails createCaseInCcd(CaseData caseData) {
         try {
-            CaseDetails caseDetails = ccdService.createCase(caseData);
-            log.info("Appeal successfully created in CCD for Nino - {} and benefit type {}",
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
-            return caseDetails;
+            CaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData);
+            if (caseDetails == null) {
+                caseDetails = ccdService.createCase(caseData);
+                log.info("Appeal successfully created in CCD for Nino - {} and benefit type {}",
+                        caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
+                return caseDetails;
+            } else {
+                log.info("Duplicate case found for Nino {} and benefit type {} so not creating in CCD", caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
+                return caseDetails;
+            }
         } catch (CcdException ccdEx) {
             log.error("Failed to create ccd case for Nino - {} and Benefit type - {} but carrying on ",
                     caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), ccdEx);

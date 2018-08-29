@@ -93,18 +93,27 @@ public class ReadCcdServiceRetryAndRecoverTest {
     @Test
     public void givenFindCaseDataByAppealNumberFails_shouldRetryAndRecover() {
         CaseData result = readCcdService.getCcdCaseDataByAppealNumber(CASE_REF);
-        verifyTest();
+        verifySearchForCaseworkersWereCalled();
         assertEquals(CASE_REF, CcdUtil.getCaseData(result).getCaseReference());
     }
 
     @Test
     public void givenFindCaseDetailsByAppealNumberFails_shouldRetryAndRecover() {
         CaseDetails result = readCcdService.getCcdCaseDetailsByAppealNumber(CASE_REF);
-        verifyTest();
+        verifySearchForCaseworkersWereCalled();
         assertTrue(result.getId() == 10L);
     }
 
-    private void verifyTest() {
+    @Test
+    public void givenFindCaseDetailsByByNinoAndBenefitTypeAndMrnDateFails_shouldRetryAndRecover() {
+        CaseDetails result = readCcdService.getCcdCaseByNinoAndBenefitTypeAndMrnDate("JT01234567B", "JSA", "02/08/2018");
+
+        verifySearchForCaseworkersWereCalled();
+
+        assertTrue(result.getId() == 10L);
+    }
+
+    private void verifySearchForCaseworkersWereCalled() {
 
         verify(coreCaseDataApi)
             .searchForCaseworker(
