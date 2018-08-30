@@ -30,8 +30,8 @@ public class AirLookRcSpreadSheetTest {
     TODO there are some postcodes that do not have a matching PIP venue
     known issue been referred to business waiting for reply, see Josh
     */
-    static Set<String> realPostcodesWithNoVenue = new HashSet<>(Arrays.asList("ec1m", "ec3m", "ec4a",
-            "nw1w", "bt82", "bl11", "bl78", "wc1v", "s31", "s30"));
+    static Set<String> realPostcodesWithNoVenue = new HashSet<>(Arrays.asList(
+            "nw1w", "bt82", "bl11", "bl78", "s31", "s30"));
 
     //These are not real post codes so can be ignored
     static Set<String> notRealPostcodes = new HashSet<>(Arrays.asList("cw28",

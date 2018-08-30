@@ -65,8 +65,6 @@ public class AirLookupService {
             parseSpreadSheet(classPathResource);
 
             LOG.debug("Successfully loaded lookup data for postcode endpoint");
-            parseSpreadSheet(classPathResource);
-
             LOG.debug("Regional centre data has " + lookupRegionalCentreByPostCode.keySet().size() + " post codes");
             LOG.debug("Air Venue data has " + lookupAirVenueNameByPostCode.keySet().size() + " post codes");
 
