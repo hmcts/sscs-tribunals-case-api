@@ -35,6 +35,8 @@ public enum SyaJsonMessageSerializer {
     EVIDENCE_DOCUMENT_CCD("appealWithEvidenceDocumentsCcd.json"),
     APPELLANT_PHONE_WITH_SPACES("appellantPhoneNumbersWithSpaces.json"),
     APPELLANT_PHONE_WITHOUT_SPACES_CCD("appellantPhoneNumberWithoutSpacesCcd.json"),
+    NINO_WITH_SPACES("ninoWithSpaces.json"),
+    NINO_WITHOUT_SPACES_CCD("ninoWithoutSpacesCcd.json"),
     WITHOUT_REGIONAL_PROCESSING_CENTER("withoutRpcCcd.json");
 
 
