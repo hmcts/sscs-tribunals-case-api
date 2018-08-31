@@ -88,12 +88,12 @@ public class AirLookupServiceTest {
     //Tests for the venue ID lookup
     @Test
     public void checkAirPostcodeWithNoPipReturnsBirmingham() {
-        assertEquals(DEFAULT_VENUE_NAME, airLookupService.lookupAirVenueNameByPostCode("ec1m"));
+        assertEquals(DEFAULT_VENUE_NAME, airLookupService.lookupAirVenueNameByPostCode("s30"));
     }
 
     @Test
     public void checkVenueIdForPostCodeWithNoPip() {
-        assertEquals(24, airLookupService.lookupVenueId("ec1m"));
+        assertEquals(24, airLookupService.lookupVenueId("s30"));
     }
 
     @Test
