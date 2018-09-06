@@ -1,6 +1,6 @@
 resource "azurerm_key_vault_secret" "idam-url" {
   name      = "idam-url"
-  value     = "${data.vault_generic_secret.idam_api.data["value"]}"
+  value     = "${data.azurerm_key_vault_secret.idam_api.value}"
   vault_uri = "${module.sscs-tca-key-vault.key_vault_uri}"
 }
 
@@ -12,31 +12,31 @@ resource "azurerm_key_vault_secret" "s2s-api" {
 
 resource "azurerm_key_vault_secret" "s2s-auth" {
   name      = "s2s-auth"
-  value     = "${data.vault_generic_secret.sscs_s2s_secret.data["value"]}"
+  value     = "${data.azurerm_key_vault_secret.sscs_s2s_secret.value}"
   vault_uri = "${module.sscs-tca-key-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "sysupdate-user" {
   name      = "sysupdate-user"
-  value     = "${data.vault_generic_secret.idam_sscs_systemupdate_user.data["value"]}"
+  value     = "${data.azurerm_key_vault_secret.idam_sscs_systemupdate_user.value}"
   vault_uri = "${module.sscs-tca-key-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "sysupdate-pass" {
   name      = "sysupdate-pass"
-  value     = "${data.vault_generic_secret.idam_sscs_systemupdate_password.data["value"]}"
+  value     = "${data.azurerm_key_vault_secret.idam_sscs_systemupdate_password.value}"
   vault_uri = "${module.sscs-tca-key-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "mac-secret" {
   name      = "mac-secret"
-  value     = "${data.vault_generic_secret.email_mac_secret.data["value"]}"
+  value     = "${data.azurerm_key_vault_secret.email_mac_secret.value}"
   vault_uri = "${module.sscs-tca-key-vault.key_vault_uri}"
 }
 
 resource "azurerm_key_vault_secret" "idam-oauth-secret" {
   name      = "idam-oauth-secret"
-  value     = "${data.vault_generic_secret.idam_oauth2_client_secret.data["value"]}"
+  value     = "${data.azurerm_key_vault_secret.idam_oauth2_client_secret.value}"
   vault_uri = "${module.sscs-tca-key-vault.key_vault_uri}"
 }
 
