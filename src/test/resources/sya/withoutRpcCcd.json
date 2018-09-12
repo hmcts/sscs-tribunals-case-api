@@ -115,7 +115,8 @@
       },
       "organisation": "HP Ltd"
     },
-    "signer": "Joe Bloggs"
+    "signer": "Joe Bloggs",
+    "hearingType": "oral"
   },
   "subscriptions": {
     "appellantSubscription": {

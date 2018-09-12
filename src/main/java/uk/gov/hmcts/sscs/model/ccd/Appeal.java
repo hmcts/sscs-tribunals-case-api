@@ -17,6 +17,7 @@ public class Appeal {
     private AppealReasons appealReasons;
     private Representative rep;
     private String signer;
+    private String hearingType;
 
     public Appeal(@JsonProperty("mrnDetails") MrnDetails mrnDetails,
                   @JsonProperty("appellant") Appellant appellant,
@@ -24,7 +25,8 @@ public class Appeal {
                   @JsonProperty("hearingOptions") HearingOptions hearingOptions,
                   @JsonProperty("appealReasons") AppealReasons appealReasons,
                   @JsonProperty("rep") Representative rep,
-                  @JsonProperty("signer") String signer) {
+                  @JsonProperty("signer") String signer,
+                  @JsonProperty("hearingType") String hearingType) {
         this.mrnDetails = mrnDetails;
         this.appellant = appellant;
         this.benefitType = benefitType;
@@ -32,5 +34,6 @@ public class Appeal {
         this.appealReasons = appealReasons;
         this.rep = rep;
         this.signer = signer;
+        this.hearingType = hearingType;
     }
 }

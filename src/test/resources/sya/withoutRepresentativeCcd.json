@@ -113,7 +113,8 @@
       "contact": null,
       "organisation": null
     },
-    "signer": "Joe Bloggs"
+    "signer": "Joe Bloggs",
+    "hearingType": "oral"
   },
   "subscriptions": {
     "appellantSubscription": {

@@ -73,7 +73,8 @@
         "address": null,
         "contact": null
       },
-      "signer": "Signer"
+      "signer": "Signer",
+      "hearingType" : "Oral"
     },
     "hearings": [
       {
