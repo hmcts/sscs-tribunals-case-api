@@ -18,6 +18,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static final String YES = "Yes";
     private static final String NO = "No";
+    public static final String ORAL = "oral";
+    public static final String PAPER = "paper";
 
     public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
@@ -75,6 +77,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .appealReasons(appealReasons)
                 .rep(representative)
                 .signer(syaCaseWrapper.getSignAndSubmit().getSigner())
+                .hearingType(hearingOptions.getWantsToAttend().equals(YES) ? ORAL : PAPER)
                 .build();
     }
 

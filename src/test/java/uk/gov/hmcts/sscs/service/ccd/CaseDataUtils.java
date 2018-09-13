@@ -76,6 +76,7 @@ public final class CaseDataUtils {
                 .mrnDetails(mrnDetails)
                 .rep(representative)
                 .signer("Signer")
+                .hearingType("oral")
                 .build();
 
         Address venueAddress = Address.builder()
