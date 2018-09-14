@@ -14,7 +14,7 @@
       "description": "benefit Type"
     },
     "hearingOptions": {
-      "wantsToAttend": "Yes"
+      "wantsToAttend": "No"
     }
   },
   "subscriptions": {

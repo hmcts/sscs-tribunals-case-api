@@ -29,7 +29,10 @@ import uk.gov.hmcts.sscs.util.DateTimeUtils;
 
 @Service
 public class TrackYourAppealJsonBuilder {
+    public static final String ORAL = "oral";
     private static final Logger LOG = getLogger(TrackYourAppealJsonBuilder.class);
+    public static final String YES = "Yes";
+    public static final String PAPER = "paper";
     private Map<Event, Document> eventDocumentMap;
     private Map<Event, Hearing> eventHearingMap;
 
@@ -62,6 +65,7 @@ public class TrackYourAppealJsonBuilder {
         caseNode.put("appealNumber", caseData.getSubscriptions().getAppellantSubscription().getTya());
         caseNode.put("status", getAppealStatus(caseData.getEvents()));
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
+        caseNode.put("hearingType", getHearingType(caseData));
 
         if (caseData.getAppeal().getAppellant() != null) {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
@@ -80,6 +84,15 @@ public class TrackYourAppealJsonBuilder {
         root.set("appeal", caseNode);
 
         return root;
+    }
+
+    private String getHearingType(CaseData caseData) {
+        if (null != caseData.getAppeal().getHearingType()) {
+            return caseData.getAppeal().getHearingType();
+        }
+
+        String wantsToAttend = caseData.getAppeal().getHearingOptions().getWantsToAttend();
+        return wantsToAttend.equals(YES) ? ORAL : PAPER;
     }
 
     private void processExceptions(List<Event> eventList) {

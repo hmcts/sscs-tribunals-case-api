@@ -13,9 +13,7 @@
       "code": "PIP",
       "description": "benefit Type"
     },
-    "hearingOptions": {
-      "wantsToAttend": "Yes"
-    }
+    "hearingType": "oral"
   },
   "subscriptions": {
     "appellantSubscription": {
