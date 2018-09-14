@@ -2,8 +2,8 @@ package uk.gov.hmcts.sscs.model.pdf;
 
 import lombok.Builder;
 import lombok.Value;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
 
 @Value
 @Builder
@@ -13,5 +13,5 @@ public class PdfWrapper {
 
     private Long ccdCaseId;
 
-    private CaseData caseData;
+    private SscsCaseData caseData;
 }

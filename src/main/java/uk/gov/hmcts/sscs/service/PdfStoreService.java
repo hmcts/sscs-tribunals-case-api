@@ -12,9 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.sscs.model.ccd.DocumentLink;
-import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
-import uk.gov.hmcts.sscs.model.ccd.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.sscs.service.evidence.EvidenceManagementService;
 
 @Service

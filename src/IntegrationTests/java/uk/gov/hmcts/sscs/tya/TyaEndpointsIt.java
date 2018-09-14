@@ -19,8 +19,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
 import uk.gov.hmcts.sscs.util.SerializeJsonMessageManager;
 
@@ -34,27 +37,37 @@ public class TyaEndpointsIt {
     private MockMvc mockMvc;
 
     @MockBean
+    IdamService idamService;
+
+    @MockBean
     CcdService ccdService;
 
     @MockBean
     MessageAuthenticationService macService;
 
+    IdamTokens idamTokens;
+
 
     @Test
     public void shouldReturnAnAppealGivenAnAppealNumber() throws Exception {
-        when(ccdService.findCcdCaseByAppealNumber("1"))
-                .thenReturn(SerializeJsonMessageManager.APPEAL_RECEIVED_CCD.getDeserializeMessage());
+        idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        when(ccdService.findCaseByAppealNumber("1", idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SerializeJsonMessageManager.APPEAL_RECEIVED_CCD.getDeserializeMessage()).build());
 
         MvcResult mvcResult = mockMvc.perform(get("/appeals/1"))
             .andExpect(status().isOk())
             .andReturn();
         String result = mvcResult.getResponse().getContentAsString();
         assertJsonEquals(APPEAL_RECEIVED.getSerializedMessage(), result);
+
+
     }
 
     @Test
     public void shouldValidateSurnameAgainstAppealNumber() throws Exception {
-        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a")).thenReturn(CaseData.builder().build());
+        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a", idamTokens)).thenReturn(SscsCaseData.builder().build());
 
         mockMvc.perform(get("/appeals/1/surname/a"))
             .andExpect(status().isOk());
@@ -62,7 +75,7 @@ public class TyaEndpointsIt {
 
     @Test
     public void shouldReturnNotFoundForInvalidSurname() throws Exception {
-        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a")).thenReturn(null);
+        when(ccdService.findCcdCaseByAppealNumberAndSurname("1", "a", idamTokens)).thenReturn(null);
 
         mockMvc.perform(get("/appeals/1/surname/a"))
             .andExpect(status().isNotFound());

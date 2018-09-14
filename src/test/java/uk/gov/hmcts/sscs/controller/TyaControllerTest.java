@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
 public class TyaControllerTest {

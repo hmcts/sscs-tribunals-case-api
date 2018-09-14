@@ -16,20 +16,19 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaAppellant;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmailTemplate;
-import uk.gov.hmcts.sscs.exception.CcdException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
-import uk.gov.hmcts.sscs.model.ccd.Subscription;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
@@ -53,6 +52,7 @@ public class SubmitAppealService {
     private final PdfStoreService pdfStoreService;
     private final Boolean roboticsEnabled;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
+    private final IdamService idamService;
 
     @Autowired
     SubmitAppealService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
@@ -67,7 +67,8 @@ public class SubmitAppealService {
                         AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         PdfStoreService pdfStoreService,
-                        @Value("${robotics.email.enabled}") Boolean roboticsEnabled) {
+                        @Value("${robotics.email.enabled}") Boolean roboticsEnabled,
+                        IdamService idamService) {
 
         this.appellantTemplatePath = appellantTemplatePath;
         this.appealNumberGenerator = appealNumberGenerator;
@@ -82,24 +83,26 @@ public class SubmitAppealService {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.pdfStoreService = pdfStoreService;
         this.roboticsEnabled = roboticsEnabled;
+        this.idamService = idamService;
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
         String postcode = getFirstHalfOfPostcode(appeal.getAppellant().getContactDetails().getPostCode());
 
-        CaseData caseData = prepareCaseForCcd(appeal, postcode);
-        CaseDetails caseDetails = createCaseInCcd(caseData);
+        SscsCaseData caseData = prepareCaseForCcd(appeal, postcode);
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
 
         byte[] pdf = generatePdf(appeal, caseDetails.getId(), caseData);
 
-        prepareCaseForPdf(appeal, caseDetails.getId(), caseData, pdf);
+        prepareCaseForPdf(appeal, caseDetails.getId(), caseData, pdf, idamTokens);
 
         if (roboticsEnabled) {
             sendCaseToRobotics(appeal, caseDetails.getId(), postcode, pdf);
         }
     }
 
-    private CaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
+    private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
         String region = airLookupService.lookupRegionalCentre(postcode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByName(region);
 
@@ -110,7 +113,7 @@ public class SubmitAppealService {
         }
     }
 
-    private void prepareCaseForPdf(SyaCaseWrapper appeal, Long caseId, CaseData caseData, byte[] pdf) {
+    private void prepareCaseForPdf(SyaCaseWrapper appeal, Long caseId, SscsCaseData caseData, byte[] pdf, IdamTokens idamTokens) {
         String fileName = generateUniqueEmailId(appeal.getAppellant()) + ".pdf";
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, fileName);
 
@@ -119,8 +122,8 @@ public class SubmitAppealService {
 
         List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
 
-        CaseData caseDataWithAppealPdf = caseData.toBuilder().sscsDocument(allDocuments).build();
-        updateCaseInCcd(caseDataWithAppealPdf, caseId, "uploadDocument");
+        SscsCaseData caseDataWithAppealPdf = caseData.toBuilder().sscsDocument(allDocuments).build();
+        updateCaseInCcd(caseDataWithAppealPdf, caseId, "uploadDocument", idamTokens);
 
         sendPdfByEmail(appeal.getAppellant(), pdf);
 
@@ -140,7 +143,7 @@ public class SubmitAppealService {
                 appeal.getBenefitType().getCode());
     }
 
-    private List<SscsDocument> combineEvidenceAndAppealPdf(CaseData caseData, List<SscsDocument> pdfDocuments) {
+    private List<SscsDocument> combineEvidenceAndAppealPdf(SscsCaseData caseData, List<SscsDocument> pdfDocuments) {
         List<SscsDocument> evidenceDocuments = caseData.getSscsDocument();
         List<SscsDocument> allDocuments = new ArrayList<>();
         if (evidenceDocuments != null) {
@@ -158,11 +161,11 @@ public class SubmitAppealService {
         return "";
     }
 
-    private CaseDetails createCaseInCcd(CaseData caseData) {
+    private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         try {
-            CaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData);
+            SscsCaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
             if (caseDetails == null) {
-                caseDetails = ccdService.createCase(caseData);
+                caseDetails = ccdService.createCase(caseData, idamTokens);
                 log.info("Appeal successfully created in CCD for Nino - {} and benefit type {}",
                         caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
                 return caseDetails;
@@ -173,39 +176,40 @@ public class SubmitAppealService {
         } catch (CcdException ccdEx) {
             log.error("Failed to create ccd case for Nino - {} and Benefit type - {} but carrying on ",
                     caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), ccdEx);
-            return CaseDetails.builder().build();
+            return SscsCaseDetails.builder().build();
         }
     }
 
-    private CaseDetails updateCaseInCcd(CaseData caseData, Long caseId, String eventId) {
+    private SscsCaseDetails updateCaseInCcd(SscsCaseData caseData, Long caseId, String eventId, IdamTokens idamTokens) {
         try {
-            return ccdService.updateCase(caseData, caseId, eventId);
+            return ccdService.updateCase(caseData, caseId, eventId, "SSCS - appeal updated event", "Updated SSCS", idamTokens);
         } catch (CcdException ccdEx) {
             log.error("Failed to update ccd case but carrying on [" + caseId + "] ["
                     + caseData.getCaseReference() + "] with event [" + eventId + "]", ccdEx);
-            return CaseDetails.builder().build();
+            return SscsCaseDetails.builder().build();
         }
     }
 
-    protected CaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
-        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
+    protected SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
+        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
 
         return updateCaseData(caseData);
     }
 
-    protected CaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
+    protected SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
 
-        CaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, region, rpc);
+        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, region, rpc);
 
         return updateCaseData(caseData);
     }
 
-    private CaseData updateCaseData(CaseData caseData) {
+    private SscsCaseData updateCaseData(SscsCaseData caseData) {
         try {
             Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
                     .tya(appealNumberGenerator.generate())
                     .build();
-            caseData.getSubscriptions().setAppellantSubscription(subscription);
+
+            caseData.setSubscriptions(caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build());
             return caseData;
         } catch (CcdException e) {
             log.error("Appeal number is not generated for Nino - {} and Benefit Type - {}",
@@ -237,7 +241,7 @@ public class SubmitAppealService {
         return String.format(ID_FORMAT, appellantLastName, nino.substring(nino.length() - 3));
     }
 
-    private byte[] generatePdf(SyaCaseWrapper appeal, Long caseDetailsId, CaseData caseData) {
+    private byte[] generatePdf(SyaCaseWrapper appeal, Long caseDetailsId, SscsCaseData caseData) {
         byte[] template;
         try {
             template = getTemplate();

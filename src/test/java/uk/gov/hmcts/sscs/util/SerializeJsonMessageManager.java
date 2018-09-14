@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import lombok.Getter;
 import lombok.ToString;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Getter
 @ToString
@@ -73,11 +73,11 @@ public enum SerializeJsonMessageManager {
         }
     }
 
-    public CaseData getDeserializeMessage() {
+    public SscsCaseData getDeserializeMessage() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
         try {
-            return mapper.readValue(this.serializedMessage, CaseData.class);
+            return mapper.readValue(this.serializedMessage, SscsCaseData.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

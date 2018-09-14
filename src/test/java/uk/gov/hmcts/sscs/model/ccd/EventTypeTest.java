@@ -3,6 +3,7 @@ package uk.gov.hmcts.sscs.model.ccd;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 
 public class EventTypeTest {
 

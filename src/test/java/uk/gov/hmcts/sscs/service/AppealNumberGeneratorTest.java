@@ -10,8 +10,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AppealNumberGeneratorTest {
@@ -19,21 +22,29 @@ public class AppealNumberGeneratorTest {
     @Mock
     private CcdService ccdService;
 
+    @Mock
+    private IdamService idamService;
+
     private AppealNumberGenerator appealNumberGenerator;
+
+    private IdamTokens idamTokens;
 
     @Before
     public void setup() {
-        appealNumberGenerator = new AppealNumberGenerator(ccdService);
+        appealNumberGenerator = new AppealNumberGenerator(ccdService, idamService);
+
+        idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
     }
 
     @Test
     public void shouldGenerateAppealNumberWhenCcdReturnNullObject() throws CcdException {
 
-        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(null);
+        given(ccdService.findCaseByAppealNumber(anyString(), eq(idamTokens))).willReturn(null);
 
         String appealNumber = appealNumberGenerator.generate();
 
-        verify(ccdService).findCcdCaseByAppealNumber(anyString());
+        verify(ccdService).findCaseByAppealNumber(anyString(), eq(idamTokens));
 
         assertNotNull(appealNumber);
     }
@@ -41,32 +52,32 @@ public class AppealNumberGeneratorTest {
     @Test
     public void shouldGenerateAppealNumberInSecondAttempt() throws Exception {
 
-        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(getCaseData(), (CaseData) null);
+        when(ccdService.findCaseByAppealNumber(anyString(), eq(idamTokens))).thenReturn(getCaseDetails(), (SscsCaseDetails) null);
 
         appealNumberGenerator.generate();
 
-        verify(ccdService, times(2)).findCcdCaseByAppealNumber(anyString());
+        verify(ccdService, times(2)).findCaseByAppealNumber(anyString(), eq(idamTokens));
     }
 
     @Test
     public void shouldGenerateAppealNumberInThirdAttempt() throws Exception {
 
-        when(ccdService.findCcdCaseByAppealNumber(anyString())).thenReturn(getCaseData(), getCaseData(), null);
+        when(ccdService.findCaseByAppealNumber(anyString(), eq(idamTokens))).thenReturn(getCaseDetails(), getCaseDetails(), null);
 
         appealNumberGenerator.generate();
 
-        verify(ccdService, times(3)).findCcdCaseByAppealNumber(anyString());
+        verify(ccdService, times(3)).findCaseByAppealNumber(anyString(), eq(idamTokens));
     }
 
     @Test(expected = CcdException.class)
     public void shouldThrowExceptionTryingThreeAttempts() throws Exception {
 
-        given(ccdService.findCcdCaseByAppealNumber(anyString())).willReturn(getCaseData());
+        given(ccdService.findCaseByAppealNumber(anyString(), eq(idamTokens))).willReturn(getCaseDetails());
 
         appealNumberGenerator.generate();
     }
 
-    private CaseData getCaseData() {
-        return CaseData.builder().build();
+    private SscsCaseDetails getCaseDetails() {
+        return SscsCaseDetails.builder().build();
     }
 }
