@@ -213,6 +213,32 @@ public class TrackYourAppealJsonBuilderTest {
 
     }
 
+    @Test
+    public void shouldReturnHearingTypeIfPresentInCcd() {
+        CaseData caseData = APPEAL_WITH_HEARING_TYPE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(APPEAL_WITH_HEARING_TYPE.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnOralHearingTypeIfNoHearingTypeInCcdAndWantsToAttendIsYes() {
+        CaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        System.out.println(objectNode.textValue());
+        assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_YES.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnPaperlHearingTypeIfNoHearingTypeInCcdAndWantsToAttendIsNo() {
+        CaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        System.out.println(objectNode.textValue());
+        assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_NO.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
                 .name("LIVERPOOL")

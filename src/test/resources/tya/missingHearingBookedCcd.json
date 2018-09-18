@@ -10,6 +10,9 @@
     },
     "benefitType": {
       "code": "PIP"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
     }
   },
   "hearings": [

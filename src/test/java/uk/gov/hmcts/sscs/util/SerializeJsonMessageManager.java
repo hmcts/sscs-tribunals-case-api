@@ -46,8 +46,13 @@ public enum SerializeJsonMessageManager {
     APPEAL_CREATED("appealCreated.json"),
     APPEAL_CREATED_CCD("appealCreatedCcd.json"),
     MISSING_HEARING_CCD("missingHearingBookedCcd.json"),
-    MISSING_HEARING("missingHearingBooked.json");
-
+    MISSING_HEARING("missingHearingBooked.json"),
+    APPEAL_WITH_HEARING_TYPE("appealWithHearingType.json"),
+    APPEAL_WITH_HEARING_TYPE_CCD("appealWithHearingTypeCcd.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_YES("appealWithWantsToAttendYes.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD("appealWithWantsToAttendYesCcd.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_NO("appealWithWantsToAttendYes.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD("appealWithWantsToAttendYesCcd.json");
 
     private final String serializedMessage;
 

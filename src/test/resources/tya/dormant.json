@@ -3,6 +3,7 @@
     "caseReference": "SC333/33/33333",
     "appealNumber": "abcde12345",
     "benefitType": "pip",
+    "hearingType": "oral",
     "name": "Mr. C Charlie",
     "surname": "Charlie",
     "status": "DORMANT",
