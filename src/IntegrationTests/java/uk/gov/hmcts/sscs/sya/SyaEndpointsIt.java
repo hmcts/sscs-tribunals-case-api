@@ -4,8 +4,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -47,20 +45,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.idam.Authorize;
+import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.sscs.controller.SyaController;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.model.idam.Authorize;
-import uk.gov.hmcts.sscs.model.idam.UserDetails;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
-import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -73,7 +70,7 @@ public class SyaEndpointsIt {
     private static final String DUMMY_OAUTH_2_TOKEN = "oauth2Token";
 
     @MockBean
-    private CoreCaseDataApi coreCaseDataApi;
+    private CcdClient ccdClient;
 
     @MockBean
     private IdamApiClient idamApiClient;
@@ -129,8 +126,9 @@ public class SyaEndpointsIt {
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
                 .willReturn(PDF.getBytes());
 
-        given(coreCaseDataApi.readForCaseWorker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString())).willReturn(null);
+        given(ccdClient.readForCaseworker(any(), any())).willReturn(null);
+        given(ccdClient.startEvent(any(), any(), anyString())).willReturn(StartEventResponse.builder().eventId("12345").build());
+        given(ccdClient.submitEventForCaseworker(any(), any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
         given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString()))
@@ -147,14 +145,11 @@ public class SyaEndpointsIt {
 
     @Test
     public void shouldGeneratePdfAndSend() throws Exception {
-        given(coreCaseDataApi.startForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString())).willReturn(StartEventResponse.builder().build());
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(coreCaseDataApi.submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class))).willReturn(CaseDetails.builder().id(123456789876L).build());
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
 
-        given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyMap())).willReturn(Collections.emptyList());
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -166,8 +161,7 @@ public class SyaEndpointsIt {
         assertThat(message.getSubject(), is("Bloggs_33C"));
         assertThat(getPdf(), is(PDF));
 
-        verify(coreCaseDataApi).submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class));
+        verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender).send(message);
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
@@ -178,8 +172,7 @@ public class SyaEndpointsIt {
 
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
 
-        given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyMap())).willReturn(Collections.singletonList(caseDetails));
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -191,8 +184,7 @@ public class SyaEndpointsIt {
         assertThat(message.getSubject(), is("Bloggs_33C"));
         assertThat(getPdf(), is(PDF));
 
-        verify(coreCaseDataApi, never()).submitForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyBoolean(), any(CaseDataContent.class));
+        verify(ccdClient, never()).submitForCaseworker(any(), any());
         verify(mailSender).send(message);
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
@@ -205,11 +197,9 @@ public class SyaEndpointsIt {
 
     @Test
     public void shouldSendEmailWithPdfWhenCcdIsDown() throws Exception {
-        given(coreCaseDataApi.searchForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyMap())).willThrow(new RuntimeException("CCD is down"));
+        given(ccdClient.searchForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
 
-        given(coreCaseDataApi.startForCaseworker(anyString(), anyString(), anyString(), anyString(), anyString(),
-                anyString())).willThrow(new RuntimeException("CCD is down"));
+        given(ccdClient.startCaseForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -228,6 +218,9 @@ public class SyaEndpointsIt {
 
     @Test
     public void shouldSendEmailWithPdfWhenDocumentStoreIsDown() throws Exception {
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), any()))
                 .willThrow(new RestClientException("Document store is down"));
 

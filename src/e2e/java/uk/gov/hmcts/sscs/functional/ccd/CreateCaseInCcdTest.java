@@ -4,22 +4,26 @@ import static org.junit.Assert.*;
 import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
-import uk.gov.hmcts.sscs.service.CcdService;
 import uk.gov.hmcts.sscs.service.SubmitAppealService;
-import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(SpringRunner.class)
@@ -30,11 +34,27 @@ public class CreateCaseInCcdTest {
     private CcdService ccdService;
 
     @Autowired
+    private CcdClient ccdClient;
+
+    @Autowired
+    private CcdRequestDetails ccdRequestDetails;
+
+    @Autowired
+    private IdamService idamService;
+
+    @Autowired
     private SubmitAppealService submitAppealService;
+
+    private IdamTokens idamTokens;
+
+    @Before
+    public void setup() {
+        idamTokens = idamService.getIdamTokens();
+    }
 
     @Test
     public void givenACaseShouldBeSavedIntoCcd() {
-        CaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData());
+        SscsCaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData(), idamTokens);
         assertNotNull(caseDetails);
     }
 
@@ -42,9 +62,9 @@ public class CreateCaseInCcdTest {
     public void givenASyaCaseShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        CaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
+        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
                 rpc.getName(), rpc);
-        CaseDetails caseDetails = ccdService.createCase(caseData);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
         assertNotNull(caseDetails);
     }
 
@@ -65,8 +85,8 @@ public class CreateCaseInCcdTest {
     public void givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
-        CaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper);
-        CaseDetails caseDetails = ccdService.createCase(caseData);
+        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
         assertNotNull(caseDetails);
     }
 }

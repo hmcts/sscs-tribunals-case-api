@@ -24,7 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.sscs.service.idam.IdamApiClient;
+import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

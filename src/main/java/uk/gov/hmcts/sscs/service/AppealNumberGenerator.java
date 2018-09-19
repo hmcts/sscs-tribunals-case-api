@@ -8,8 +8,10 @@ import org.apache.commons.text.RandomStringGenerator;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Component
 public class AppealNumberGenerator {
@@ -19,10 +21,12 @@ public class AppealNumberGenerator {
     public static final char MAXIMUM_CODE_POINT = 'z';
 
     private CcdService ccdService;
+    private IdamService idamService;
 
     @Autowired
-    public AppealNumberGenerator(CcdService ccdService) {
+    public AppealNumberGenerator(CcdService ccdService, IdamService idamService) {
         this.ccdService = ccdService;
+        this.idamService = idamService;
     }
 
     public String generate() {
@@ -31,7 +35,7 @@ public class AppealNumberGenerator {
         int count = 3;
         while (count-- > 0 && "".equals(appealNumber)) {
             appealNumber = generateAppealNumber();
-            CaseData caseData = ccdService.findCcdCaseByAppealNumber(appealNumber);
+            SscsCaseDetails caseData = ccdService.findCaseByAppealNumber(appealNumber, idamService.getIdamTokens());
             if (isDuplicateInCcd(caseData)) {
                 appealNumber = "";
             }
@@ -47,7 +51,7 @@ public class AppealNumberGenerator {
 
     }
 
-    private boolean isDuplicateInCcd(CaseData caseData) {
+    private boolean isDuplicateInCcd(SscsCaseDetails caseData) {
         return caseData != null;
     }
 
