@@ -33,6 +33,7 @@ public class RoboticsServiceIt {
                 .builder()
                 .syaCaseWrapper(syaCaseWrapper)
                 .ccdCaseId(1234L)
+                .evidencePresent("Yes")
                 .build();
 
         JSONObject result = roboticsService.createRobotics(appeal);
@@ -52,6 +53,7 @@ public class RoboticsServiceIt {
                 .builder()
                 .syaCaseWrapper(syaCaseWrapper)
                 .ccdCaseId(1234L)
+                .evidencePresent("Yes")
                 .build();
 
         JSONObject result = roboticsService.createRobotics(appeal);
@@ -71,6 +73,7 @@ public class RoboticsServiceIt {
                 .builder()
                 .syaCaseWrapper(syaCaseWrapper)
                 .ccdCaseId(1234L)
+                .evidencePresent("Yes")
                 .build();
 
         JSONObject result = roboticsService.createRobotics(appeal);

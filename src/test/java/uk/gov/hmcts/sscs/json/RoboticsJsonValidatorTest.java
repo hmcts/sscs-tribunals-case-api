@@ -38,6 +38,7 @@ public class RoboticsJsonValidatorTest {
         roboticsJson.put("pipNumber", "Liverpool2 SSO");
         roboticsJson.put("hearingType", "Oral");
         roboticsJson.put("hearingRequestParty", "Mr Joe Bloggs");
+        roboticsJson.put("evidencePresent", "Yes");
 
         roboticsJson.put("appellant", new JSONObject());
         roboticsJson.getJSONObject("appellant").put("title", "Mr");

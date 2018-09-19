@@ -172,7 +172,7 @@ public class SubmitAppealServiceTest {
 
         ReflectionTestUtils.setField(submitAppealService, "roboticsEnabled", true);
         SyaCaseWrapper appealData = getSyaCaseWrapper();
-        RoboticsWrapper roboticsWrapper = RoboticsWrapper.builder().syaCaseWrapper(appealData).ccdCaseId(123L).build();
+        RoboticsWrapper roboticsWrapper = RoboticsWrapper.builder().syaCaseWrapper(appealData).ccdCaseId(123L).evidencePresent("No").build();
         byte[] expected = {};
         JSONObject json = new JSONObject();
 

@@ -13,4 +13,6 @@ public class RoboticsWrapper {
     private long ccdCaseId;
 
     private String venueName;
+
+    private String evidencePresent;
 }

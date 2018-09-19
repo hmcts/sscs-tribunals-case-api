@@ -10,6 +10,7 @@
     "caseId" : {"type" : "integer"},
     "appellantNino":  {"type": "string"},
     "appellantPostCode": {"type": "string"},
+    "evidencePresent": {"$ref": "#/definitions/yesOrNo"},
     "appealDate": {"$ref": "#/definitions/dateType"},
     "mrnDate": {"$ref": "#/definitions/dateType"},
     "mrnReasonForBeingLate": {"type": "string"},
@@ -73,7 +74,8 @@
     "appellantNino",
     "appealDate",
     "hearingType",
-    "appellant"
+    "appellant",
+    "evidencePresent"
   ],
 
   "definitions": {

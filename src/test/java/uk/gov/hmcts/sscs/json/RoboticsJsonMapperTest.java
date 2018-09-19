@@ -14,6 +14,7 @@ public class RoboticsJsonMapperTest {
 
     private RoboticsJsonMapper roboticsJsonMapper = new RoboticsJsonMapper();
     private RoboticsWrapper appeal;
+    private RoboticsJsonValidator roboticsJsonValidator = new RoboticsJsonValidator("/schema/sscs-robotics.json");
 
     @Before
     public void setup() {
@@ -32,13 +33,15 @@ public class RoboticsJsonMapperTest {
             RoboticsWrapper
                 .builder()
                 .syaCaseWrapper(getSyaCaseWrapper())
-                .ccdCaseId(123L).venueName(venueName)
+                .ccdCaseId(123L).venueName(venueName).evidencePresent("Yes")
                 .build();
 
         JSONObject roboticsJson = roboticsJsonMapper.map(appeal);
 
+        roboticsJsonValidator.validate(roboticsJson);
+
         assertEquals(
-            "If this fails, add an assertion below, do not just increment the number :)", 13,
+            "If this fails, add an assertion below, do not just increment the number :)", 14,
             roboticsJson.length()
         );
 
@@ -52,6 +55,7 @@ public class RoboticsJsonMapperTest {
         assertEquals("DWP PIP (1)", roboticsJson.get("pipNumber"));
         assertEquals("Oral", roboticsJson.get("hearingType"));
         assertEquals("Mr Joe Bloggs", roboticsJson.get("hearingRequestParty"));
+        assertEquals("Yes", roboticsJson.get("evidencePresent"));
 
         assertEquals(
             "If this fails, add an assertion below, do not just increment the number :)", 10,
