@@ -52,7 +52,11 @@ public enum SerializeJsonMessageManager {
     APPEAL_WITH_WANTS_TO_ATTEND_YES("appealWithWantsToAttendYes.json"),
     APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD("appealWithWantsToAttendYesCcd.json"),
     APPEAL_WITH_WANTS_TO_ATTEND_NO("appealWithWantsToAttendYes.json"),
-    APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD("appealWithWantsToAttendYesCcd.json");
+    APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD("appealWithWantsToAttendYesCcd.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT("appealWithWantsToAttendFieldNotPresent.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT_CCD("appealWithWantsToAttendFieldNotPresentInCcd.json"),
+    APPEAL_WITH_NO_HEARING_OPTIONS("appealWithNoHearingOptions.json"),
+    APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD("appealWithNoHearingOptionsInCcd.json");
 
     private final String serializedMessage;
 
