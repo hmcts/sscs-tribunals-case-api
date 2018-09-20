@@ -85,9 +85,16 @@ public class TrackYourAppealJsonBuilder {
         if (null != caseData.getAppeal().getHearingType()) {
             return caseData.getAppeal().getHearingType();
         }
+        
+        if (null != caseData.getAppeal().getHearingOptions()) {
 
-        String wantsToAttend = caseData.getAppeal().getHearingOptions().getWantsToAttend();
-        return wantsToAttend.equals(YES) ? ORAL : PAPER;
+            String wantsToAttend = caseData.getAppeal().getHearingOptions().getWantsToAttend();
+
+            if (null != wantsToAttend) {
+                return wantsToAttend.equals(YES) ? ORAL : PAPER;
+            }
+        }
+        return ORAL;
     }
 
     private void processExceptions(List<Event> eventList) {
