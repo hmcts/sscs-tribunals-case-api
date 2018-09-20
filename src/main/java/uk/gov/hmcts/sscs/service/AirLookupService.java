@@ -98,14 +98,14 @@ public class AirLookupService {
             for (Sheet sheet: wb) {
                 if (sheet.getSheetName().equals("AIR")) {
                     for (Row row : sheet) {
+                        System.out.println(row.getRowNum());
                         Cell lookupIdColumn = row.getCell(LOOKUP_ID_COLUMN);
                         Cell postcodeCell = row.getCell(POSTCODE_COLUMN);
                         Cell adminGroupCell = row.getCell(REGIONAL_CENTRE_COLUMN);
                         Cell venueCell = row.getCell(VENUE_COLUMN);
                         if (postcodeCell != null && adminGroupCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && adminGroupCell.getCellTypeEnum() == CellType.STRING) {
-                            LOG.debug("Post code: " + postcodeCell.getRichStringCellValue().getString().toLowerCase()
-                                + " Regional office: " + adminGroupCell.getRichStringCellValue().getString());
+                            LOG.debug("Post code: " + postcodeCell.getRichStringCellValue().getString().toLowerCase().trim() + " Regional office: " + adminGroupCell.getRichStringCellValue().getString());
                             lookupRegionalCentreByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(), adminGroupCell.getRichStringCellValue().getString());
                         }
 
@@ -119,7 +119,7 @@ public class AirLookupService {
 
                                 String venueNameSplitChar = "-";
                                 if (venueName.indexOf(venueNameSplitChar) != -1) {
-                                    lookupAirVenueNameByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(),
+                                    lookupAirVenueNameByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase().trim(),
                                             venueName.substring(0, venueName.indexOf(venueNameSplitChar)).trim());
                                 } else {
                                     String message = "Unknown venue name type" + venueName;
