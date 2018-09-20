@@ -1,10 +1,16 @@
 package uk.gov.hmcts.sscs.service;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import com.opencsv.CSVReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * Tests to look at the integrity of the data in a business spreadsheet
@@ -135,5 +141,53 @@ public class AirLookRcSpreadSheetTest {
                         + "\nMissing: " + Arrays.toString(missingAirLookupNames.toArray())
                         + "\nWorking: " + Arrays.toString(workingAirLookupNames.toArray()),
                 missingAirLookupNames.size() == 0);
+    }
+
+    /*
+    Read in all current UK Post codes and check they are in the AirLookup Spreadsheet
+    Fail if there are missing postcodes and print them out.
+    We should regularly update the latest list of postcodes to test our data
+     */
+    @Test
+    public void testAllUkPostcodes() throws IOException {
+        ClassPathResource classPathResource = new ClassPathResource("AllUkPostcodes.csv");
+
+        CSVReader reader = new CSVReader(new InputStreamReader(classPathResource.getInputStream()));
+        try {
+
+            List<String> allUkPostcodes = new ArrayList();
+            //read the headers in
+            reader.readNext();
+
+            List<String[]> linesList = reader.readAll();
+            linesList.forEach(line ->
+                    allUkPostcodes.add(line[0])
+            );
+
+            int counterIn = 0;
+            int counterOut = 0;
+            for (String postcode : allUkPostcodes) {
+                if (lookupData.containsKey(postcode.toLowerCase().trim())) {
+                    //we have it
+                    counterIn++;
+                } else {
+                    //we don't
+                    counterOut++;
+                    System.out.println(postcode.trim());
+                }
+            }
+            System.out.println("Total postcodes missing is  " + counterOut);
+            if (counterOut > 0) {
+                fail("The postcodes above are missing from the spreadsheet");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
