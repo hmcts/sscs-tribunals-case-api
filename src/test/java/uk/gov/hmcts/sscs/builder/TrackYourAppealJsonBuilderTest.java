@@ -226,7 +226,6 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
-        System.out.println(objectNode.textValue());
         assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_YES.getSerializedMessage(), objectNode);
     }
 
@@ -235,7 +234,6 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
-        System.out.println(objectNode.textValue());
         assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_NO.getSerializedMessage(), objectNode);
     }
 
@@ -244,7 +242,6 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
-        System.out.println(objectNode.textValue());
         assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT.getSerializedMessage(), objectNode);
     }
 
@@ -253,7 +250,6 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter());
-        System.out.println(objectNode.textValue());
         assertJsonEquals(APPEAL_WITH_NO_HEARING_OPTIONS.getSerializedMessage(), objectNode);
     }
 

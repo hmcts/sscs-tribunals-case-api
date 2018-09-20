@@ -85,7 +85,7 @@ public class TrackYourAppealJsonBuilder {
         if (null != caseData.getAppeal().getHearingType()) {
             return caseData.getAppeal().getHearingType();
         }
-        
+
         if (null != caseData.getAppeal().getHearingOptions()) {
 
             String wantsToAttend = caseData.getAppeal().getHearingOptions().getWantsToAttend();
