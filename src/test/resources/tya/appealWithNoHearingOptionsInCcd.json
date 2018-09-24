@@ -12,9 +12,6 @@
     "benefitType": {
       "code": "PIP",
       "description": "benefit Type"
-    },
-    "hearingOptions": {
-      "wantsToAttend": "No"
     }
   },
   "subscriptions": {
