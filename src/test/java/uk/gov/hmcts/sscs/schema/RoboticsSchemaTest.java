@@ -9,35 +9,19 @@ import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.junit.Before;
 import org.junit.Test;
 
 public class RoboticsSchemaTest {
 
     InputStream inputStream = getClass().getResourceAsStream("/schema/sscs-robotics.json");
 
-    JSONObject jsonData;
+    JSONObject jsonData = new JSONObject(
+            new JSONTokener(getClass().getResourceAsStream("/schema/valid_robotics_agreed.json")));
 
-    Schema schema;
-
-    @Before
-    public void setup() {
-        schema = SchemaLoader.load(new JSONObject(new JSONTokener(inputStream)));
-
-        jsonData = new JSONObject(
-            new JSONTokener(getClass().getResourceAsStream("/schema/valid_robotics.json")));
-    }
+    Schema schema = SchemaLoader.load(new JSONObject(new JSONTokener(inputStream)));
 
     @Test
     public void givenValidInputAgreedWithAutomationTeam_thenValidateAgainstSchema() throws ValidationException {
-        schema.validate(
-            jsonData = new JSONObject(
-                new JSONTokener(getClass().getResourceAsStream("/schema/valid_robotics_agreed.json")))
-        );
-    }
-
-    @Test
-    public void givenValidInput_thenValidateAgainstSchema() throws ValidationException {
         schema.validate(jsonData);
     }
 

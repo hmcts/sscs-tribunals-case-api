@@ -19,6 +19,7 @@ public class RoboticsJsonMapper {
         obj = buildAppealDetails(obj, appeal, wrapper.getVenueName());
 
         obj.put("caseId", wrapper.getCcdCaseId());
+        obj.put("evidencePresent", wrapper.getEvidencePresent());
         obj.put("appellant", buildAppellantDetails(appeal.getAppellant()));
 
         if (appeal.getRepresentative() != null) {

@@ -98,7 +98,7 @@ public class SubmitAppealService {
         prepareCaseForPdf(appeal, caseDetails.getId(), caseData, pdf, idamTokens);
 
         if (roboticsEnabled) {
-            sendCaseToRobotics(appeal, caseDetails.getId(), postcode, pdf);
+            sendCaseToRobotics(appeal, caseDetails.getId(), postcode, pdf, caseData.getEvidencePresent());
         }
     }
 
@@ -132,11 +132,11 @@ public class SubmitAppealService {
     }
 
 
-    private void sendCaseToRobotics(SyaCaseWrapper appeal, Long caseId, String postcode, byte[] pdf) {
+    private void sendCaseToRobotics(SyaCaseWrapper appeal, Long caseId, String postcode, byte[] pdf, String evidencePresent) {
         String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
 
         JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal)
-                .ccdCaseId(caseId).venueName(venue).build());
+                .ccdCaseId(caseId).venueName(venue).evidencePresent(evidencePresent).build());
 
         sendJsonByEmail(appeal.getAppellant(), roboticsJson, pdf);
         log.info("Robotics email sent successfully for Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
