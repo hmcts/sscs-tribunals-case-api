@@ -108,8 +108,8 @@ public class AirLookupService {
                         if (postcodeCell != null && adminGroupCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && adminGroupCell.getCellTypeEnum() == CellType.STRING) {
                             if (LOG.isDebugEnabled()) {
-                                LOG.debug("Post code: " + postcodeCell.getRichStringCellValue().getString().toLowerCase().trim() + " Regional office: " +
-                                        adminGroupCell.getRichStringCellValue().getString());
+                                LOG.debug("Post code: " + postcodeCell.getRichStringCellValue().getString().toLowerCase().trim() + " Regional office: "
+                                        + adminGroupCell.getRichStringCellValue().getString());
                             }
                             lookupRegionalCentreByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(), adminGroupCell.getRichStringCellValue().getString());
                         }
