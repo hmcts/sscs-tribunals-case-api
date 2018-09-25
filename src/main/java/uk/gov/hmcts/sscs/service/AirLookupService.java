@@ -98,7 +98,6 @@ public class AirLookupService {
             for (Sheet sheet: wb) {
                 if (sheet.getSheetName().equals("AIR")) {
                     for (Row row : sheet) {
-                        System.out.println(row.getRowNum());
                         Cell lookupIdColumn = row.getCell(LOOKUP_ID_COLUMN);
                         Cell postcodeCell = row.getCell(POSTCODE_COLUMN);
                         Cell adminGroupCell = row.getCell(REGIONAL_CENTRE_COLUMN);
