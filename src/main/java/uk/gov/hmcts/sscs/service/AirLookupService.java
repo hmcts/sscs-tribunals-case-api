@@ -65,8 +65,8 @@ public class AirLookupService {
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Successfully loaded lookup data for postcode endpoint");
-                LOG.debug(String.format("Regional centre data has {0} post codes", lookupRegionalCentreByPostCode.keySet().size()));
-                LOG.debug(String.format("Air Venue data has {0} post codes", lookupAirVenueNameByPostCode.keySet().size()));
+                LOG.debug("Regional centre data has " + lookupRegionalCentreByPostCode.keySet().size() + " post codes"));
+                LOG.debug("Air Venue data has " + lookupAirVenueNameByPostCode.keySet().size() + " post codes"));
             }
 
         } catch (IOException e) {
@@ -80,7 +80,7 @@ public class AirLookupService {
             readVenueCsv(classPathResource);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Venue map has {0} venue ids", lookupAirVenueNameByPostCode.keySet().size()));
+                LOG.debug("Venue map has " + lookupAirVenueNameByPostCode.keySet().size() + " venue ids");
             }
         } catch (IOException e) {
             String message = "Unable to read in csv with post code - venue id data: reference-data/airLookupVenueIds.csv";
@@ -108,8 +108,8 @@ public class AirLookupService {
                         if (postcodeCell != null && adminGroupCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && adminGroupCell.getCellTypeEnum() == CellType.STRING) {
                             if (LOG.isDebugEnabled()) {
-                                LOG.debug(String.format("Post code: {0} Regional office: {1}", postcodeCell.getRichStringCellValue().getString().toLowerCase().trim(),
-                                        adminGroupCell.getRichStringCellValue().getString()));
+                                LOG.debug("Post code: " + postcodeCell.getRichStringCellValue().getString().toLowerCase().trim() + " Regional office: " +
+                                        adminGroupCell.getRichStringCellValue().getString());
                             }
                             lookupRegionalCentreByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(), adminGroupCell.getRichStringCellValue().getString());
                         }
