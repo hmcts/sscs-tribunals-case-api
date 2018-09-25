@@ -65,8 +65,8 @@ public class AirLookupService {
             parseSpreadSheet(classPathResource);
 
             LOG.debug("Successfully loaded lookup data for postcode endpoint");
-            LOG.debug("Regional centre data has " + lookupRegionalCentreByPostCode.keySet().size() + " post codes");
-            LOG.debug("Air Venue data has " + lookupAirVenueNameByPostCode.keySet().size() + " post codes");
+            LOG.debug("Regional centre data has {0} post codes", lookupRegionalCentreByPostCode.keySet().size());
+            LOG.debug("Air Venue data has {0} post codes", lookupAirVenueNameByPostCode.keySet().size());
 
         } catch (IOException e) {
             String message = "Unable to read in spreadsheet with post code data: reference-data/AIRLookup RC.xls";
@@ -78,7 +78,7 @@ public class AirLookupService {
 
             readVenueCsv(classPathResource);
 
-            LOG.debug("Venue map has " + lookupAirVenueNameByPostCode.keySet().size() + " venue ids");
+            LOG.debug("Venue map has {0} venue ids", lookupAirVenueNameByPostCode.keySet().size());
         } catch (IOException e) {
             String message = "Unable to read in csv with post code - venue id data: reference-data/airLookupVenueIds.csv";
             AirLookupServiceException ex = new AirLookupServiceException(e);
@@ -104,7 +104,8 @@ public class AirLookupService {
                         Cell venueCell = row.getCell(VENUE_COLUMN);
                         if (postcodeCell != null && adminGroupCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && adminGroupCell.getCellTypeEnum() == CellType.STRING) {
-                            LOG.debug("Post code: " + postcodeCell.getRichStringCellValue().getString().toLowerCase().trim() + " Regional office: " + adminGroupCell.getRichStringCellValue().getString());
+                            LOG.debug("Post code: {0} Regional office: {1}",postcodeCell.getRichStringCellValue().getString().toLowerCase().trim()
+                                    ,adminGroupCell.getRichStringCellValue().getString());
                             lookupRegionalCentreByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(), adminGroupCell.getRichStringCellValue().getString());
                         }
 
@@ -125,6 +126,8 @@ public class AirLookupService {
                                     AirLookupServiceException ex = new AirLookupServiceException(new Exception(message));
                                     LOG.error(message, ex);
                                 }
+                            } else {
+                                //Other benefit types to come
                             }
                         }
                     }
