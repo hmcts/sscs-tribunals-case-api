@@ -65,8 +65,8 @@ public class AirLookupService {
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Successfully loaded lookup data for postcode endpoint");
-                LOG.debug("Regional centre data has " + lookupRegionalCentreByPostCode.keySet().size() + " post codes"));
-                LOG.debug("Air Venue data has " + lookupAirVenueNameByPostCode.keySet().size() + " post codes"));
+                LOG.debug("Regional centre data has " + lookupRegionalCentreByPostCode.keySet().size() + " post codes");
+                LOG.debug("Air Venue data has " + lookupAirVenueNameByPostCode.keySet().size() + " post codes");
             }
 
         } catch (IOException e) {
