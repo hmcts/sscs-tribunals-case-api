@@ -104,8 +104,8 @@ public class AirLookupService {
                         Cell venueCell = row.getCell(VENUE_COLUMN);
                         if (postcodeCell != null && adminGroupCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && adminGroupCell.getCellTypeEnum() == CellType.STRING) {
-                            LOG.debug("Post code: {0} Regional office: {1}",postcodeCell.getRichStringCellValue().getString().toLowerCase().trim()
-                                    ,adminGroupCell.getRichStringCellValue().getString());
+                            LOG.debug("Post code: {0} Regional office: {1}",postcodeCell.getRichStringCellValue().getString().toLowerCase().trim(),
+                                    adminGroupCell.getRichStringCellValue().getString());
                             lookupRegionalCentreByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(), adminGroupCell.getRichStringCellValue().getString());
                         }
 
