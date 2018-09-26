@@ -253,6 +253,14 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(APPEAL_WITH_NO_HEARING_OPTIONS.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void shouldNotReturnHearingrRelatedEventsForPaperCase() {
+        SscsCaseData caseData = HEARING_BOOKED_PAPER_CASE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter());
+        assertJsonEquals(HEARING_BOOKED_PAPER_CASE.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
                 .name("LIVERPOOL")
