@@ -1,25 +1,17 @@
 {
   "appeal": {
-    "caseReference": "SC333/33/33333",
+    "caseReference": "SC123/45/00001",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
     "appealNumber": "abcde12345",
     "benefitType": "pip",
-    "hearingType": "oral",
-    "name": "Mr. C Charlie",
-    "surname": "Charlie",
-    "status": "DWP_RESPOND",
+    "hearingType": "paper",
+    "status": "APPEAL_RECEIVED",
     "latestEvents": [
       {
-        "hearingContactDate": "2017-08-24T11:50:11.437Z",
-        "date": "2017-06-29T11:50:11.987Z",
-        "type": "DWP_RESPOND",
-        "contentKey": "status.dwpRespond"
-      }
-    ],
-    "historicalEvents": [
-      {
-        "dwpResponseDate": "2017-04-12T11:01:47.620Z",
-        "date": "2017-03-08T12:01:47.620Z",
+        "date": "2028-06-08T00:00:00.000Z",
         "type": "APPEAL_RECEIVED",
+        "dwpResponseDate": "2028-07-13T00:00:00.000Z",
         "contentKey": "status.appealReceived"
       }
     ],

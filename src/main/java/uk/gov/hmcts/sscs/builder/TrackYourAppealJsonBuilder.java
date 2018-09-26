@@ -4,36 +4,34 @@ import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.sscs.model.AppConstants.*;
-import static uk.gov.hmcts.sscs.model.ccd.EventType.*;
 import static uk.gov.hmcts.sscs.util.DateTimeUtils.convertLocalDateLocalTimetoUtc;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
-
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-
-import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.model.ccd.*;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.sscs.util.DateTimeUtils;
 
 @Service
 public class TrackYourAppealJsonBuilder {
+    public static final String ORAL = "oral";
     private static final Logger LOG = getLogger(TrackYourAppealJsonBuilder.class);
+    public static final String YES = "Yes";
+    public static final String PAPER = "paper";
     private Map<Event, Document> eventDocumentMap;
     private Map<Event, Hearing> eventHearingMap;
 
-    public ObjectNode build(CaseData caseData,
+    public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter) {
 
         // Create appealReceived eventType for appealCreated CCD event
@@ -62,6 +60,7 @@ public class TrackYourAppealJsonBuilder {
         caseNode.put("appealNumber", caseData.getSubscriptions().getAppellantSubscription().getTya());
         caseNode.put("status", getAppealStatus(caseData.getEvents()));
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
+        caseNode.put("hearingType", getHearingType(caseData));
 
         if (caseData.getAppeal().getAppellant() != null) {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
@@ -80,6 +79,22 @@ public class TrackYourAppealJsonBuilder {
         root.set("appeal", caseNode);
 
         return root;
+    }
+
+    private String getHearingType(SscsCaseData caseData) {
+        if (null != caseData.getAppeal().getHearingType()) {
+            return caseData.getAppeal().getHearingType();
+        }
+
+        if (null != caseData.getAppeal().getHearingOptions()) {
+
+            String wantsToAttend = caseData.getAppeal().getHearingOptions().getWantsToAttend();
+
+            if (null != wantsToAttend) {
+                return wantsToAttend.equals(YES) ? ORAL : PAPER;
+            }
+        }
+        return ORAL;
     }
 
     private void processExceptions(List<Event> eventList) {
@@ -292,7 +307,7 @@ public class TrackYourAppealJsonBuilder {
         return formatDateTime(of(decisionDate, localDateTime.toLocalTime()));
     }
 
-    private void createEvidenceResponseEvents(CaseData caseData) {
+    private void createEvidenceResponseEvents(SscsCaseData caseData) {
         Evidence evidence = caseData.getEvidence();
         List<Document> documentList = evidence != null ? evidence.getDocuments() : null;
 
@@ -316,7 +331,7 @@ public class TrackYourAppealJsonBuilder {
         }
     }
 
-    private Map<Event, Document> buildEventDocumentMap(CaseData caseData) {
+    private Map<Event, Document> buildEventDocumentMap(SscsCaseData caseData) {
 
         eventDocumentMap = new HashMap<>();
         Evidence evidence = caseData.getEvidence();
@@ -341,7 +356,7 @@ public class TrackYourAppealJsonBuilder {
         return  eventDocumentMap;
     }
 
-    private Map<Event, Hearing> buildEventHearingMap(CaseData caseData) {
+    private Map<Event, Hearing> buildEventHearingMap(SscsCaseData caseData) {
 
         eventHearingMap = new HashMap<>();
         List<Hearing> hearingList = caseData.getHearings();
@@ -368,7 +383,7 @@ public class TrackYourAppealJsonBuilder {
         return  eventHearingMap;
     }
 
-    private CaseData createAppealReceivedEventTypeForAppealCreatedEvent(CaseData caseData) {
+    private SscsCaseData createAppealReceivedEventTypeForAppealCreatedEvent(SscsCaseData caseData) {
 
         EventDetails eventDetails = EventDetails.builder()
                 .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())

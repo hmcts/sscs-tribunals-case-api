@@ -1,6 +1,7 @@
 package uk.gov.hmcts.sscs.service;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -14,11 +15,13 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
-import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
@@ -34,6 +37,9 @@ public class TribunalsServiceTest {
     private CcdService ccdService;
 
     @Mock
+    private IdamService idamService;
+
+    @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
     @Mock
@@ -43,53 +49,64 @@ public class TribunalsServiceTest {
     private SubscriptionRequest subscriptionRequest;
 
     @Captor
-    private ArgumentCaptor<CaseData> captor;
+    private ArgumentCaptor<SscsCaseData> captor;
+
+    SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().data(SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("JSA").build()).build()).build()).build();
+
+    IdamTokens idamTokens;
 
     @Before
     public void setUp() {
+        idamTokens = IdamTokens.builder().build();
+
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
         tribunalsService = new TribunalsService(ccdService, regionalProcessingCenterService,
-                trackYourAppealJsonBuilder);
+                trackYourAppealJsonBuilder, idamService);
     }
 
     @Test(expected = AppealNotFoundException.class)
     public void shouldThrowExceptionIfAppealNumberNotFound() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumber(APPEAL_NUMBER)).willReturn(null);
+        given(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).willReturn(null);
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
     }
 
     @Test
     public void shouldReturnTrueGivenValidAppealNumberAndSurname() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME)).willReturn(getCaseData());
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(getCaseData());
 
         assertTrue(tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME));
     }
 
     @Test(expected = InvalidSurnameException.class)
     public void shouldThrowExceptionGivenValidationFails() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME)).willReturn(null);
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(null);
 
         tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
     }
 
     @Test
     public void shouldUnsubscribe() throws CcdException {
+        when(ccdService.updateSubscription(APPEAL_NUMBER, null, idamTokens)).thenReturn(sscsCaseDetails);
+        String result = tribunalsService.unsubscribe(APPEAL_NUMBER);
 
-        tribunalsService.unsubscribe(APPEAL_NUMBER);
-
-        verify(ccdService).unsubscribe(eq(APPEAL_NUMBER));
+        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(null), eq(idamTokens));
+        assertEquals(result, "jsa");
     }
 
     @Test
     public void shouldUpdateSubscriptionDetails() throws CcdException {
-        tribunalsService.updateSubscription(APPEAL_NUMBER, subscriptionRequest);
+        when(ccdService.updateSubscription(APPEAL_NUMBER, subscriptionRequest.getEmail(), idamTokens)).thenReturn(sscsCaseDetails);
+        String result = tribunalsService.updateSubscription(APPEAL_NUMBER, subscriptionRequest);
 
-        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), eq(subscriptionRequest));
+        verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), any(), eq(idamTokens));
+        assertEquals(result, "jsa");
     }
 
     @Test
     public void shouldAddRegionalProcessingCenterFromCcdIfItsPresent() {
-        Mockito.when(ccdService.findCcdCaseByAppealNumber(APPEAL_NUMBER)).thenReturn(getCaseDataWithRpc());
+        Mockito.when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetailsWithRpc());
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
@@ -100,21 +117,24 @@ public class TribunalsServiceTest {
     @Test
     public void shouldGetRpcfromRegionalProcessingServiceIfItsNotPresentInCcdCase() {
 
-        Mockito.when(ccdService.findCcdCaseByAppealNumber(APPEAL_NUMBER)).thenReturn(getCaseData());
+        Mockito.when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetails());
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
         verify(regionalProcessingCenterService, times(1)).getByScReferenceCode(eq(null));
     }
 
-    private CaseData getCaseDataWithRpc() {
-        return  CaseData.builder().regionalProcessingCenter(getRegionalProcessingCenter()).build();
+    private SscsCaseDetails getCaseDetailsWithRpc() {
+        return SscsCaseDetails.builder().data(SscsCaseData.builder().regionalProcessingCenter(getRegionalProcessingCenter()).build()).build();
     }
 
-    private CaseData getCaseData() {
-        return CaseData.builder().build();
+    private SscsCaseDetails getCaseDetails() {
+        return SscsCaseDetails.builder().data(getCaseData()).build();
     }
 
+    private SscsCaseData getCaseData() {
+        return SscsCaseData.builder().build();
+    }
 
     private RegionalProcessingCenter getRegionalProcessingCenter() {
         RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()

@@ -5,6 +5,7 @@
     "surname": "Mock",
     "appealNumber": "abcde12345",
     "benefitType": "pip",
+    "hearingType": "oral",
     "status": "APPEAL_RECEIVED",
     "latestEvents": [
       {

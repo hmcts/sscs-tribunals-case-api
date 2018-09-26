@@ -4,6 +4,7 @@
     "appealNumber":"abcde12345",
     "status":"NEW_HEARING_BOOKED",
     "benefitType":"pip",
+    "hearingType": "oral",
     "name":"Mr. C Charlie",
     "surname":"Charlie",
     "latestEvents":[

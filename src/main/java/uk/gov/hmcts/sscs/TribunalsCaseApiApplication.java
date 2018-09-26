@@ -6,18 +6,23 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
 @SpringBootApplication
+@ComponentScan(
+        basePackages = "uk.gov.hmcts.reform.sscs",
+        basePackageClasses = TribunalsCaseApiApplication.class,
+        lazyInit = true
+)
 @EnableFeignClients(basePackages =
         {
                 "uk.gov.hmcts.reform.authorisation",
-                "uk.gov.hmcts.sscs.service.idam"
+                "uk.gov.hmcts.reform.sscs.idam"
         })
-@EnableRetry
 public class TribunalsCaseApiApplication {
 
     @Value("${appeal.email.host}")
@@ -49,6 +54,15 @@ public class TribunalsCaseApiApplication {
         properties.put("mail.smtp.ssl.trust","*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
+    }
+
+    @Bean
+    public CcdRequestDetails getRequestDetails(@Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
+                                               @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
+        return CcdRequestDetails.builder()
+                .caseTypeId(coreCaseDataCaseTypeId)
+                .jurisdictionId(coreCaseDataJurisdictionId)
+                .build();
     }
 
 }

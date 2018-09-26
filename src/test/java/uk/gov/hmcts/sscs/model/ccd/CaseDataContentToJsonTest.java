@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.Event;
-import uk.gov.hmcts.sscs.service.ccd.CaseDataUtils;
+import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 
 public class CaseDataContentToJsonTest {
 

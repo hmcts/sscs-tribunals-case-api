@@ -1,16 +1,16 @@
 package uk.gov.hmcts.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
@@ -21,27 +21,30 @@ public class TribunalsService {
     private CcdService ccdService;
     private RegionalProcessingCenterService regionalProcessingCenterService;
     private TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
+    private IdamService idamService;
 
     @Autowired
     TribunalsService(CcdService ccdService,
                      RegionalProcessingCenterService regionalProcessingCenterService,
-                     TrackYourAppealJsonBuilder trackYourAppealJsonBuilder) {
+                     TrackYourAppealJsonBuilder trackYourAppealJsonBuilder,
+                     IdamService idamService) {
         this.ccdService = ccdService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.trackYourAppealJsonBuilder = trackYourAppealJsonBuilder;
+        this.idamService = idamService;
     }
 
     public ObjectNode findAppeal(String appealNumber) {
-        CaseData caseByAppealNumber = ccdService.findCcdCaseByAppealNumber(appealNumber);
+        SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(appealNumber, idamService.getIdamTokens());
         if (caseByAppealNumber == null) {
-            log.info("Appeal not exists for appeal number: " + appealNumber);
+            log.info("Appeal does not exist for appeal number: " + appealNumber);
             throw new AppealNotFoundException(appealNumber);
         }
 
-        return trackYourAppealJsonBuilder.build(caseByAppealNumber, getRegionalProcessingCenter(caseByAppealNumber));
+        return trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()));
     }
 
-    private RegionalProcessingCenter getRegionalProcessingCenter(CaseData caseByAppealNumber) {
+    private RegionalProcessingCenter getRegionalProcessingCenter(SscsCaseData caseByAppealNumber) {
         RegionalProcessingCenter regionalProcessingCenter;
 
         if (null == caseByAppealNumber.getRegionalProcessingCenter()) {
@@ -54,15 +57,19 @@ public class TribunalsService {
     }
 
     public String unsubscribe(String appealNumber) {
-        return ccdService.unsubscribe(appealNumber);
+        SscsCaseDetails sscsCaseDetails = ccdService.updateSubscription(appealNumber, null, idamService.getIdamTokens());
+
+        return sscsCaseDetails != null ? sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().toLowerCase() : "";
     }
 
     public String updateSubscription(String appealNumber, SubscriptionRequest subscriptionRequest) {
-        return ccdService.updateSubscription(appealNumber, subscriptionRequest);
+        SscsCaseDetails sscsCaseDetails = ccdService.updateSubscription(appealNumber, subscriptionRequest.getEmail(), idamService.getIdamTokens());
+
+        return sscsCaseDetails != null ? sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().toLowerCase() : "";
     }
 
     public boolean validateSurname(String appealNumber, String surname) {
-        CaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname);
+        SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
         if (caseData == null) {
             log.info("Not a valid surname: " + surname);
             throw new InvalidSurnameException();

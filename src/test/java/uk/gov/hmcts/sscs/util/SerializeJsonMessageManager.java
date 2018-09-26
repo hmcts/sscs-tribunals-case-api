@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import lombok.Getter;
 import lombok.ToString;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Getter
 @ToString
@@ -46,8 +46,17 @@ public enum SerializeJsonMessageManager {
     APPEAL_CREATED("appealCreated.json"),
     APPEAL_CREATED_CCD("appealCreatedCcd.json"),
     MISSING_HEARING_CCD("missingHearingBookedCcd.json"),
-    MISSING_HEARING("missingHearingBooked.json");
-
+    MISSING_HEARING("missingHearingBooked.json"),
+    APPEAL_WITH_HEARING_TYPE("appealWithHearingType.json"),
+    APPEAL_WITH_HEARING_TYPE_CCD("appealWithHearingTypeCcd.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_YES("appealWithWantsToAttendYes.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD("appealWithWantsToAttendYesCcd.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_NO("appealWithWantsToAttendYes.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD("appealWithWantsToAttendYesCcd.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT("appealWithWantsToAttendFieldNotPresent.json"),
+    APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT_CCD("appealWithWantsToAttendFieldNotPresentInCcd.json"),
+    APPEAL_WITH_NO_HEARING_OPTIONS("appealWithNoHearingOptions.json"),
+    APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD("appealWithNoHearingOptionsInCcd.json");
 
     private final String serializedMessage;
 
@@ -68,11 +77,11 @@ public enum SerializeJsonMessageManager {
         }
     }
 
-    public CaseData getDeserializeMessage() {
+    public SscsCaseData getDeserializeMessage() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
         try {
-            return mapper.readValue(this.serializedMessage, CaseData.class);
+            return mapper.readValue(this.serializedMessage, SscsCaseData.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertThat;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 
 public class RegionalProcessingCenterServiceTest {
 

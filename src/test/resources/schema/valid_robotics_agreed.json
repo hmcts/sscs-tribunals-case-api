@@ -14,12 +14,13 @@
   },
   "appellantNino": "JT012020B",
   "appellantPostCode": "Bedford",
+  "evidencePresent": "Yes",
   "caseCode": "002DD",
   "caseId": 1529335642096820,
   "hearingArrangements": {
     "accessibleHearingRoom": "No",
     "datesCantAttend": [
-      "2018-08-13",
+      "2018-08-12",
       "2018-08-22"
     ],
     "hearingLoop": "Yes",

@@ -5,6 +5,7 @@
     "surname": "Mock",
     "appealNumber": "abcde12345",
     "benefitType": "esa",
+    "hearingType": "oral",
     "status": "DWP_RESPOND",
     "latestEvents": [
       {

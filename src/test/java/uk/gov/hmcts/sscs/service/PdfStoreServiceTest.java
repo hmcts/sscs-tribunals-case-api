@@ -14,8 +14,8 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
-import uk.gov.hmcts.sscs.model.ccd.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.sscs.service.evidence.EvidenceManagementService;
 
 public class PdfStoreServiceTest {

@@ -4,12 +4,12 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
@@ -25,19 +25,18 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.Email;
 import uk.gov.hmcts.sscs.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmailTemplate;
-import uk.gov.hmcts.sscs.exception.CcdException;
-import uk.gov.hmcts.sscs.model.ccd.CaseData;
-import uk.gov.hmcts.sscs.model.ccd.SscsDocument;
-import uk.gov.hmcts.sscs.model.ccd.SscsDocumentDetails;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
 import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
@@ -77,6 +76,9 @@ public class SubmitAppealServiceTest {
 
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
+    @Mock
+    private IdamService idamService;
+
     @Before
     public void setUp() {
         submitYourAppealEmailTemplate = new SubmitYourAppealEmailTemplate("from", "to", "message");
@@ -90,15 +92,17 @@ public class SubmitAppealServiceTest {
         submitAppealService = new SubmitAppealService(TEMPLATE_PATH, appealNumberGenerator,
             submitYourAppealToCcdCaseDataDeserializer, ccdService,
             pdfServiceClient, emailService, roboticsService, submitYourAppealEmailTemplate, roboticsEmailTemplate,
-                airLookupService, regionalProcessingCenterService, pdfStoreService, false);
+                airLookupService, regionalProcessingCenterService, pdfStoreService, false, idamService);
 
-        given(ccdService.createCase(any(CaseData.class)))
-            .willReturn(CaseDetails.builder().id(123L).build());
+        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().id(123L).build());
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
     }
 
     @Test
     public void shouldSendPdfByEmailWhenCcdIsDown() {
-        given(ccdService.createCase(any(CaseData.class))).willThrow(new CcdException(
+        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).willThrow(new CcdException(
             "Error while creating case in CCD"));
 
         byte[] expected = {};
@@ -125,12 +129,12 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
             any())).willReturn(expected);
 
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any())).willReturn(null);
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData);
 
         verify(appealNumberGenerator).generate();
-        verify(ccdService).createCase(any(CaseData.class));
+        verify(ccdService).createCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 
     @Test
@@ -140,11 +144,11 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any())).willReturn(expected);
 
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any())).willReturn(CaseDetails.builder().build());
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(SscsCaseDetails.builder().build());
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(ccdService, never()).createCase(any(CaseData.class));
+        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 
     @Test
@@ -168,7 +172,7 @@ public class SubmitAppealServiceTest {
 
         ReflectionTestUtils.setField(submitAppealService, "roboticsEnabled", true);
         SyaCaseWrapper appealData = getSyaCaseWrapper();
-        RoboticsWrapper roboticsWrapper = RoboticsWrapper.builder().syaCaseWrapper(appealData).ccdCaseId(123L).build();
+        RoboticsWrapper roboticsWrapper = RoboticsWrapper.builder().syaCaseWrapper(appealData).ccdCaseId(123L).evidencePresent("No").build();
         byte[] expected = {};
         JSONObject json = new JSONObject();
 
@@ -208,7 +212,7 @@ public class SubmitAppealServiceTest {
     public void testRegionAddedToCase() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        CaseData caseData = submitAppealService.transformAppealToCaseData(appealData,"Cardiff", rpc);
+        SscsCaseData caseData = submitAppealService.transformAppealToCaseData(appealData,"Cardiff", rpc);
         assertEquals("Cardiff", caseData.getRegion());
     }
 
@@ -231,7 +235,7 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
         long ccdId = 987L;
-        given(ccdService.createCase(any(CaseData.class))).willReturn(CaseDetails.builder().id(ccdId).build());
+        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId).build());
         SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
         List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
         given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
@@ -242,7 +246,8 @@ public class SubmitAppealServiceTest {
         verify(ccdService).updateCase(
                 argThat(caseData ->  sscsDocuments.equals(caseData.getSscsDocument())),
                 eq(ccdId),
-                eq("uploadDocument")
+                eq("uploadDocument"),
+                any(), any(), any()
         );
     }
 
@@ -252,7 +257,7 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
         long ccdId = 987L;
-        given(ccdService.createCase(any(CaseData.class))).willReturn(CaseDetails.builder().id(ccdId)
+        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
                 .build());
         SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
         List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
@@ -265,7 +270,8 @@ public class SubmitAppealServiceTest {
                 argThat(caseData -> caseData.getSscsDocument().size() == 3
                         && caseData.getSscsDocument().get(2).equals(sscsDocuments.get(0))),
                 eq(ccdId),
-                eq("uploadDocument")
+                eq("uploadDocument"),
+                any(), any(), any()
         );
     }
 }

@@ -5,28 +5,27 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.sscs.domain.wrapper.*;
-import uk.gov.hmcts.sscs.model.ccd.*;
-import uk.gov.hmcts.sscs.model.tya.RegionalProcessingCenter;
 
 @Service
 public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static final String YES = "Yes";
     private static final String NO = "No";
+    public static final String ORAL = "oral";
+    public static final String PAPER = "paper";
 
-    public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
+    public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         Subscriptions subscriptions = getAppellantSubscription(syaCaseWrapper);
 
         List<SscsDocument> sscsDocuments =  getEvidenceDocumentDetails(syaCaseWrapper);
 
-        return CaseData.builder()
+        return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
                 .generatedSurname(syaCaseWrapper.getAppellant().getLastName())
                 .generatedEmail(syaCaseWrapper.getAppellant().getContactDetails().getEmailAddress())
@@ -42,8 +41,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
 
 
-    public CaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
-        CaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+    public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
 
         return caseData.toBuilder()
                 .region(region)
@@ -75,6 +74,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .appealReasons(appealReasons)
                 .rep(representative)
                 .signer(syaCaseWrapper.getSignAndSubmit().getSigner())
+                .hearingType(hearingOptions.getWantsToAttend().equals(YES) ? ORAL : PAPER)
                 .build();
     }
 
@@ -221,27 +221,27 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-        String wantNotifications = smsNotify.isWantsSmsNotifications() ? YES : NO;
+        String subscribeSms = smsNotify.isWantsSmsNotifications() && !isPaperCase(syaCaseWrapper) ? YES : NO;
+
         String email = syaCaseWrapper.getAppellant().getContactDetails().getEmailAddress();
+        String wantEmailNotifications = StringUtils.isNotBlank(email) && !isPaperCase(syaCaseWrapper) ? YES : NO;
+
         String mobile = syaCaseWrapper.getAppellant().getContactDetails().getPhoneNumber();
         Subscription subscription = Subscription.builder()
-                .wantSmsNotifications(wantNotifications)
-                .subscribeSms(wantNotifications)
+                .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                .subscribeSms(subscribeSms)
                 .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
-                .subscribeEmail(StringUtils.isNotBlank(email) ? YES : NO)
+                .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
-
-        if (null != syaCaseWrapper.getSyaHearingOptions()
-                && !syaCaseWrapper.getSyaHearingOptions().getWantsToAttend()) {
-            subscription.setSubscribeEmail(NO);
-            subscription.setSubscribeSms(NO);
-
-        }
 
         return Subscriptions.builder()
                 .appellantSubscription(subscription)
                 .build();
+    }
+
+    private Boolean isPaperCase(SyaCaseWrapper syaCaseWrapper) {
+        return null != syaCaseWrapper.getSyaHearingOptions() && !syaCaseWrapper.getSyaHearingOptions().getWantsToAttend();
     }
 
     private Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
