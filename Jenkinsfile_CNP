@@ -13,8 +13,8 @@ def component = "tribunals-api"
 List<LinkedHashMap<String, Object>> secrets = [
   secret('idam-api', 'IDAM_URL'),
   secret('s2s-api', 'IDAM.S2S-AUTH'),
-  secret('sscs_s2s_secret', 'IDAM.S2S-AUTH.TOTP_SECRET'),
-  secret('email_mac_secret', 'SUBSCRIPTIONS_MAC_SECRET'),
+  secret('sscs-s2s-secret', 'IDAM.S2S-AUTH.TOTP_SECRET'),
+  secret('sscs-email-mac-secret-text', 'SUBSCRIPTIONS_MAC_SECRET'),
   secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
   secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
   secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
