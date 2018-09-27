@@ -1,9 +1,9 @@
 output "vaultUri" {
-  value = "${module.sscs-tca-key-vault.key_vault_uri}"
+  value = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 output "vaultName" {
-  value = "${local.vaultName}"
+  value = "${local.azureVaultName}"
 }
 
 output "sscs-output" {
