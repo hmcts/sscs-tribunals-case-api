@@ -1,7 +1,3 @@
-provider "vault" {
-  address = "https://vault.reform.hmcts.net:6200"
-}
-
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = "${var.location}"
@@ -88,10 +84,6 @@ locals {
   local_env = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "aat" : "saat" : var.env}"
   local_ase = "${(var.env == "preview" || var.env == "spreview") ? (var.env == "preview" ) ? "core-compute-aat" : "core-compute-saat" : local.aseName}"
 
-  previewVaultName    = "${var.product}-api"
-  nonPreviewVaultName = "${var.product}-api-${var.env}"
-  vaultName           = "${(var.env == "preview") ? local.previewVaultName : local.nonPreviewVaultName}"
-
   ccdApi        = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
   s2sCnpUrl     = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
   pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
@@ -162,15 +154,4 @@ module "tribunals-case-api" {
     MAX_FILE_SIZE    = "${var.max_file_size}"
     MAX_REQUEST_SIZE = "${var.max_request_size}"
   }
-}
-
-module "sscs-tca-key-vault" {
-  source                  = "git@github.com:hmcts/moj-module-key-vault?ref=master"
-  name                    = "${local.vaultName}"
-  product                 = "${var.product}"
-  env                     = "${var.env}"
-  tenant_id               = "${var.tenant_id}"
-  object_id               = "${var.jenkins_AAD_objectId}"
-  resource_group_name     = "${azurerm_resource_group.rg.name}"
-  product_group_object_id = "300e771f-856c-45cc-b899-40d78281e9c1"
 }
