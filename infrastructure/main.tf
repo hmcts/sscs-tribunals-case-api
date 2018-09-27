@@ -1,78 +1,79 @@
 resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = "${var.location}"
+
   tags = "${merge(var.common_tags,
     map("lastUpdated", "${timestamp()}")
     )}"
 }
 
 data "azurerm_key_vault" "sscs_key_vault" {
-  name = "${local.azureVaultName}"
+  name                = "${local.azureVaultName}"
   resource_group_name = "${local.azureVaultName}"
 }
 
 data "azurerm_key_vault_secret" "email_mac_secret" {
-  name = "sscs-email-mac-secret-text"
+  name      = "sscs-email-mac-secret-text"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "idam_api" {
-  name = "idam-api"
+  name      = "idam-api"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "idam_s2s_api" {
-  name = "idam-s2s-api"
+  name      = "idam-s2s-api"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "appeal_email_from" {
-  name = "appeal-email-from"
+  name      = "appeal-email-from"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "appeal_email_to" {
-  name = "appeal-email-to"
+  name      = "appeal-email-to"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "robotics_email_from" {
-  name = "robotics-email-from"
+  name      = "robotics-email-from"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "robotics_email_to" {
-  name = "robotics-email-to"
+  name      = "robotics-email-to"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "smtp_host" {
-  name = "smtp-host"
+  name      = "smtp-host"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "smtp_port" {
-  name = "smtp-port"
+  name      = "smtp-port"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "sscs_s2s_secret" {
-  name = "sscs-s2s-secret"
+  name      = "sscs-s2s-secret"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "idam_sscs_systemupdate_user" {
-  name = "idam-sscs-systemupdate-user"
+  name      = "idam-sscs-systemupdate-user"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "idam_sscs_systemupdate_password" {
-  name = "idam-sscs-systemupdate-password"
+  name      = "idam-sscs-systemupdate-password"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
 data "azurerm_key_vault_secret" "idam_oauth2_client_secret" {
-  name = "idam-sscs-oauth2-client-secret"
+  name      = "idam-sscs-oauth2-client-secret"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
@@ -88,7 +89,7 @@ locals {
   pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
   documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 
-  azureVaultName              = "sscs-${local.local_env}"
+  azureVaultName = "sscs-${local.local_env}"
 }
 
 module "tribunals-case-api" {
@@ -101,9 +102,11 @@ module "tribunals-case-api" {
   subscription = "${var.subscription}"
   capacity     = "${(var.env == "preview") ? 1 : 2}"
   common_tags  = "${var.common_tags}"
+  asp_rg       = "${var.product}-${var.component}-${var.env}"
+  asp_name     = "${var.product}-${var.component}-${var.env}"
 
   app_settings = {
-    AUTH_PROVIDER_SERVICE_API_URL    = "${local.s2sCnpUrl}"
+    AUTH_PROVIDER_SERVICE_API_URL = "${local.s2sCnpUrl}"
 
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
@@ -148,8 +151,7 @@ module "tribunals-case-api" {
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
 
-    MAX_FILE_SIZE = "${var.max_file_size}"
+    MAX_FILE_SIZE    = "${var.max_file_size}"
     MAX_REQUEST_SIZE = "${var.max_request_size}"
-
   }
 }
