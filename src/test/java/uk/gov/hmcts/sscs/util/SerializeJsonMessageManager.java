@@ -56,7 +56,9 @@ public enum SerializeJsonMessageManager {
     APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT("appealWithWantsToAttendFieldNotPresent.json"),
     APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT_CCD("appealWithWantsToAttendFieldNotPresentInCcd.json"),
     APPEAL_WITH_NO_HEARING_OPTIONS("appealWithNoHearingOptions.json"),
-    APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD("appealWithNoHearingOptionsInCcd.json");
+    APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD("appealWithNoHearingOptionsInCcd.json"),
+    HEARING_BOOKED_PAPER_CASE("hearingBookedPaperCase.json"),
+    HEARING_BOOKED_PAPER_CASE_CCD("hearingBookedPaperCaseCcd.json");
 
     private final String serializedMessage;
 

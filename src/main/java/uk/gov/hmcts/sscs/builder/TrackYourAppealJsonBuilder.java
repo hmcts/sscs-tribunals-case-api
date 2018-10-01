@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.sscs.service.event.PaperCaseEventFilterUtil;
 import uk.gov.hmcts.sscs.util.DateTimeUtils;
 
 @Service
@@ -52,6 +53,11 @@ public class TrackYourAppealJsonBuilder {
         eventList = caseData.getEvents();
         eventList.sort(Comparator.reverseOrder());
         processExceptions(eventList);
+
+        if (getHearingType(caseData).equals(PAPER)) {
+            PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
+        }
+
         eventDocumentMap = buildEventDocumentMap(caseData);
         eventHearingMap = buildEventHearingMap(caseData);
 
