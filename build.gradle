@@ -260,7 +260,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.2'
     apt "org.projectlombok:lombok:1.16.20"
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.10.RELEASE'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.0.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.2.7'
     testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.4-atlassian-1'
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.19.0'
