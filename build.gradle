@@ -227,7 +227,7 @@ dependencies {
 
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.4'
-    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.0'
 
     compile group: 'org.json', name: 'json', version: '20180130'
 
