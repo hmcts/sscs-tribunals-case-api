@@ -229,7 +229,7 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-text', version: '1.4'
     compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
 
-    compile group: 'org.json', name: 'json', version: '20180130'
+    compile group: 'org.json', name: 'json', version: '20180813'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-common', version: '1.4.0'
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.0'
