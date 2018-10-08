@@ -90,6 +90,11 @@ locals {
   documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
 
   azureVaultName = "sscs-${local.local_env}"
+
+  shared_app_service_plan     = "${var.product}-${var.env}"
+  non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
+  app_service_plan          = "${(var.env == "saat" || var.env == "sandbox") ?  local.shared_app_service_plan : local.non_shared_app_service_plan}"
+
 }
 
 module "tribunals-case-api" {
@@ -102,8 +107,8 @@ module "tribunals-case-api" {
   subscription = "${var.subscription}"
   capacity     = "${(var.env == "preview") ? 1 : 2}"
   common_tags  = "${var.common_tags}"
-  asp_rg       = "${var.product}-${var.component}-${var.env}"
-  asp_name     = "${var.product}-${var.component}-${var.env}"
+  asp_rg       = "${local.app_service_plan}"
+  asp_name     = "${local.app_service_plan}"
 
   app_settings = {
     AUTH_PROVIDER_SERVICE_API_URL = "${local.s2sCnpUrl}"
