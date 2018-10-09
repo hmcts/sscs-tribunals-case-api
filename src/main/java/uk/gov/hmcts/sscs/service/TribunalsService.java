@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
+import uk.gov.hmcts.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 
@@ -41,7 +42,7 @@ public class TribunalsService {
             throw new AppealNotFoundException(appealNumber);
         }
 
-        return trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()));
+        return trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()), caseByAppealNumber.getId());
     }
 
     private RegionalProcessingCenter getRegionalProcessingCenter(SscsCaseData caseByAppealNumber) {
@@ -68,12 +69,12 @@ public class TribunalsService {
         return sscsCaseDetails != null ? sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().toLowerCase() : "";
     }
 
-    public boolean validateSurname(String appealNumber, String surname) {
+    public SurnameResponse validateSurname(String appealNumber, String surname) {
         SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
         if (caseData == null) {
             log.info("Not a valid surname: " + surname);
             throw new InvalidSurnameException();
         }
-        return true;
+        return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname);
     }
 }

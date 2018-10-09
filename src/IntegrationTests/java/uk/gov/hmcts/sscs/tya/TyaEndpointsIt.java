@@ -54,7 +54,7 @@ public class TyaEndpointsIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         when(ccdService.findCaseByAppealNumber("1", idamTokens))
-                .thenReturn(SscsCaseDetails.builder().data(SerializeJsonMessageManager.APPEAL_RECEIVED_CCD.getDeserializeMessage()).build());
+                .thenReturn(SscsCaseDetails.builder().id(1L).data(SerializeJsonMessageManager.APPEAL_RECEIVED_CCD.getDeserializeMessage()).build());
 
         MvcResult mvcResult = mockMvc.perform(get("/appeals/1"))
             .andExpect(status().isOk())
