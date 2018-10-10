@@ -118,8 +118,12 @@ public class SubmitAppealService {
 
         List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
 
-        SscsCaseData caseDataWithAppealPdf = caseData.toBuilder().sscsDocument(allDocuments).build();
-        updateCaseInCcd(caseDataWithAppealPdf, caseId, "uploadDocument", idamTokens);
+        if (caseId == null) {
+            log.info("caseId is empty - skipping step to update CCD with PDF");
+        } else {
+            SscsCaseData caseDataWithAppealPdf = caseData.toBuilder().sscsDocument(allDocuments).build();
+            updateCaseInCcd(caseDataWithAppealPdf, caseId, "uploadDocument", idamTokens);
+        }
 
         sendPdfByEmail(caseData.getAppeal().getAppellant(), pdf);
 
