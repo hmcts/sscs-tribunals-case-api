@@ -20,15 +20,16 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.domain.robotics.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaAppellant;
+import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
+import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.sscs.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.sscs.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
-import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
@@ -50,7 +51,6 @@ public class SubmitAppealService {
     private final RoboticsEmailTemplate roboticsEmailTemplate;
     private final AirLookupService airLookupService;
     private final PdfStoreService pdfStoreService;
-    private final Boolean roboticsEnabled;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
 
@@ -67,7 +67,6 @@ public class SubmitAppealService {
                         AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         PdfStoreService pdfStoreService,
-                        @Value("${robotics.email.enabled}") Boolean roboticsEnabled,
                         IdamService idamService) {
 
         this.appellantTemplatePath = appellantTemplatePath;
@@ -82,7 +81,6 @@ public class SubmitAppealService {
         this.airLookupService = airLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.pdfStoreService = pdfStoreService;
-        this.roboticsEnabled = roboticsEnabled;
         this.idamService = idamService;
     }
 
@@ -95,11 +93,9 @@ public class SubmitAppealService {
 
         byte[] pdf = generatePdf(appeal, caseDetails.getId(), caseData);
 
-        prepareCaseForPdf(appeal, caseDetails.getId(), caseData, pdf, idamTokens);
+        prepareCaseForPdf(caseDetails.getId(), caseData, pdf, idamTokens);
 
-        if (roboticsEnabled) {
-            sendCaseToRobotics(appeal, caseDetails.getId(), postcode, pdf, caseData.getEvidencePresent());
-        }
+        sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf);
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
@@ -113,34 +109,34 @@ public class SubmitAppealService {
         }
     }
 
-    private void prepareCaseForPdf(SyaCaseWrapper appeal, Long caseId, SscsCaseData caseData, byte[] pdf, IdamTokens idamTokens) {
-        String fileName = generateUniqueEmailId(appeal.getAppellant()) + ".pdf";
+    private void prepareCaseForPdf(Long caseId, SscsCaseData caseData, byte[] pdf, IdamTokens idamTokens) {
+        String fileName = generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
         List<SscsDocument> pdfDocuments = pdfStoreService.store(pdf, fileName);
 
-        log.info("Appeal PDF stored in DM for Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
-                appeal.getBenefitType().getCode());
+        log.info("Appeal PDF stored in DM for Nino - {} and benefit type {}", caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                caseData.getAppeal().getBenefitType().getCode());
 
         List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
 
         SscsCaseData caseDataWithAppealPdf = caseData.toBuilder().sscsDocument(allDocuments).build();
         updateCaseInCcd(caseDataWithAppealPdf, caseId, "uploadDocument", idamTokens);
 
-        sendPdfByEmail(appeal.getAppellant(), pdf);
+        sendPdfByEmail(caseData.getAppeal().getAppellant(), pdf);
 
-        log.info("PDF email sent successfully for Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
-                appeal.getBenefitType().getCode());
+        log.info("PDF email sent successfully for Nino - {} and benefit type {}", caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                caseData.getAppeal().getBenefitType().getCode());
     }
 
 
-    private void sendCaseToRobotics(SyaCaseWrapper appeal, Long caseId, String postcode, byte[] pdf, String evidencePresent) {
+    private void sendCaseToRobotics(SscsCaseData caseData, Long caseId, String postcode, byte[] pdf) {
         String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
 
-        JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().syaCaseWrapper(appeal)
-                .ccdCaseId(caseId).venueName(venue).evidencePresent(evidencePresent).build());
+        JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
+                .ccdCaseId(caseId).venueName(venue).evidencePresent(caseData.getEvidencePresent()).build());
 
-        sendJsonByEmail(appeal.getAppellant(), roboticsJson, pdf);
-        log.info("Robotics email sent successfully for Nino - {} and benefit type {}", appeal.getAppellant().getNino(),
-                appeal.getBenefitType().getCode());
+        sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, pdf);
+        log.info("Robotics email sent successfully for Nino - {} and benefit type {}", caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                caseData.getAppeal().getBenefitType().getCode());
     }
 
     private List<SscsDocument> combineEvidenceAndAppealPdf(SscsCaseData caseData, List<SscsDocument> pdfDocuments) {
@@ -218,15 +214,15 @@ public class SubmitAppealService {
         }
     }
 
-    private void sendPdfByEmail(SyaAppellant appeal, byte[] pdf) {
-        String appellantUniqueId = generateUniqueEmailId(appeal);
+    private void sendPdfByEmail(Appellant appellant, byte[] pdf) {
+        String appellantUniqueId = generateUniqueEmailId(appellant);
         emailService.sendEmail(submitYourAppealEmailTemplate.generateEmail(
                 appellantUniqueId,
                 newArrayList(pdf(pdf, appellantUniqueId + ".pdf")))
         );
     }
 
-    private void sendJsonByEmail(SyaAppellant appellant, JSONObject json, byte[] pdf) {
+    private void sendJsonByEmail(Appellant appellant, JSONObject json, byte[] pdf) {
         String appellantUniqueId = generateUniqueEmailId(appellant);
         emailService.sendEmail(roboticsEmailTemplate.generateEmail(
                 appellantUniqueId,
@@ -235,9 +231,9 @@ public class SubmitAppealService {
         ));
     }
 
-    private String generateUniqueEmailId(SyaAppellant appellant) {
-        String appellantLastName = appellant.getLastName();
-        String nino = appellant.getNino();
+    private String generateUniqueEmailId(Appellant appellant) {
+        String appellantLastName = appellant.getName().getLastName();
+        String nino = appellant.getIdentity().getNino();
         return String.format(ID_FORMAT, appellantLastName, nino.substring(nino.length() - 3));
     }
 

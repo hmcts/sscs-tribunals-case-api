@@ -156,13 +156,14 @@ public class SyaEndpointsIt {
                 .content(getCase()))
                 .andExpect(status().isCreated());
 
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
+
         assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
         assertThat(message.getSubject(), is("Bloggs_33C"));
-        assertThat(getPdf(), is(PDF));
 
         verify(ccdClient).submitForCaseworker(any(), any());
-        verify(mailSender).send(message);
+        verify(mailSender, times(2)).send(message);
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
@@ -179,13 +180,14 @@ public class SyaEndpointsIt {
                 .content(getCase()))
                 .andExpect(status().isCreated());
 
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
+
         assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
         assertThat(message.getSubject(), is("Bloggs_33C"));
-        assertThat(getPdf(), is(PDF));
 
         verify(ccdClient, never()).submitForCaseworker(any(), any());
-        verify(mailSender).send(message);
+        verify(mailSender, times(2)).send(message);
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
@@ -206,12 +208,13 @@ public class SyaEndpointsIt {
                 .content(getCase()))
                 .andExpect(status().isCreated());
 
-        then(mailSender).should(times(1)).send(message);
+        then(mailSender).should(times(2)).send(message);
+
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
 
         assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
         assertThat(message.getSubject(), is("Bloggs_33C"));
-        assertThat(getPdf(), is(PDF));
 
         assertNull(getPdfWrapper().getCcdCaseId());
     }
@@ -229,7 +232,7 @@ public class SyaEndpointsIt {
                 .content(getCase()))
                 .andExpect(status().isCreated());
 
-        then(mailSender).should(times(1)).send(message);
+        then(mailSender).should(times(2)).send(message);
     }
 
     private String getPdf() throws IOException, MessagingException {
