@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 @ComponentScan(
         basePackages = "uk.gov.hmcts.reform.sscs",
         basePackageClasses = TribunalsCaseApiApplication.class,
-        lazyInit = true
+        lazyInit = false
 )
 @EnableFeignClients(basePackages =
         {
