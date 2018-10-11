@@ -33,7 +33,7 @@ public class TrackYourAppealJsonBuilder {
     private Map<Event, Hearing> eventHearingMap;
 
     public ObjectNode build(SscsCaseData caseData,
-                            RegionalProcessingCenter regionalProcessingCenter) {
+                            RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
 
         // Create appealReceived eventType for appealCreated CCD event
         List<Event> eventList = caseData.getEvents();
@@ -62,6 +62,7 @@ public class TrackYourAppealJsonBuilder {
         eventHearingMap = buildEventHearingMap(caseData);
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
+        caseNode.put("caseId", String.valueOf(caseId));
         caseNode.put("caseReference", caseData.getCaseReference());
         caseNode.put("appealNumber", caseData.getSubscriptions().getAppellantSubscription().getTya());
         caseNode.put("status", getAppealStatus(caseData.getEvents()));
