@@ -93,6 +93,12 @@ public class SubmitAppealService {
 
         byte[] pdf = generatePdf(appeal, caseDetails.getId(), caseData);
 
+
+        sendPdfByEmail(caseData.getAppeal().getAppellant(), pdf);
+
+        log.info("PDF email sent successfully for Nino - {} and benefit type {}", caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                caseData.getAppeal().getBenefitType().getCode());
+
         prepareCaseForPdf(caseDetails.getId(), caseData, pdf, idamTokens);
 
         sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf);
@@ -116,19 +122,13 @@ public class SubmitAppealService {
         log.info("Appeal PDF stored in DM for Nino - {} and benefit type {}", caseData.getAppeal().getAppellant().getIdentity().getNino(),
                 caseData.getAppeal().getBenefitType().getCode());
 
-        List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
-
         if (caseId == null) {
             log.info("caseId is empty - skipping step to update CCD with PDF");
         } else {
+            List<SscsDocument> allDocuments = combineEvidenceAndAppealPdf(caseData, pdfDocuments);
             SscsCaseData caseDataWithAppealPdf = caseData.toBuilder().sscsDocument(allDocuments).build();
             updateCaseInCcd(caseDataWithAppealPdf, caseId, "uploadDocument", idamTokens);
         }
-
-        sendPdfByEmail(caseData.getAppeal().getAppellant(), pdf);
-
-        log.info("PDF email sent successfully for Nino - {} and benefit type {}", caseData.getAppeal().getAppellant().getIdentity().getNino(),
-                caseData.getAppeal().getBenefitType().getCode());
     }
 
 
