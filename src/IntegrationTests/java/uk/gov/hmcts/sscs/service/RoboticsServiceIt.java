@@ -1,12 +1,8 @@
 package uk.gov.hmcts.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
-import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.WITHOUT_HEARING;
-import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.WITHOUT_REPRESENTATIVE;
+import static org.junit.Assert.*;
+import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.*;
 
 import org.json.JSONObject;
 import org.junit.Test;
@@ -14,8 +10,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.domain.robotics.RoboticsWrapper;
+import uk.gov.hmcts.reform.sscs.service.RoboticsService;
 import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.model.robotics.RoboticsWrapper;
+import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -24,14 +22,18 @@ public class RoboticsServiceIt {
     @Autowired
     private RoboticsService roboticsService;
 
+    @Autowired
+    private SubmitYourAppealToCcdCaseDataDeserializer deserializer;
+
     @Test
     public void givenSyaData_makeValidRoboticsJsonThatValidatesAgainstSchema() {
 
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .syaCaseWrapper(syaCaseWrapper)
+                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();
@@ -51,7 +53,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .syaCaseWrapper(syaCaseWrapper)
+                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();
@@ -71,7 +73,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .syaCaseWrapper(syaCaseWrapper)
+                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();
