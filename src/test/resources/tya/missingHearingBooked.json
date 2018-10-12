@@ -1,5 +1,6 @@
 {
   "appeal":{
+    "caseId" : "1",
     "caseReference":"SC333/33/33333",
     "appealNumber":"abcde12345",
     "status":"NEW_HEARING_BOOKED",

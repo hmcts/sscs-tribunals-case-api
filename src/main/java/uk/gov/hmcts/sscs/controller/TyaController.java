@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.sscs.service.TribunalsService;
 
 @RestController
@@ -26,14 +27,15 @@ public class TyaController {
 
     @ApiOperation(value = "validateSurname",
         notes = "Checks valid appeal number and surname",
-        response = String.class, responseContainer = "Appeal details")
+        response = ResponseEntity.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
     @RequestMapping(value = "/appeals/{appealNumber}/surname/{surname}", method = GET,
             produces = APPLICATION_JSON_UTF8_VALUE)
-    public void validateSurname(
+    public ResponseEntity<SurnameResponse> validateSurname(
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) {
-        tribunalsService.validateSurname(appealNumber, surname);
+
+        return  ResponseEntity.ok(tribunalsService.validateSurname(appealNumber, surname));
     }
 
     @ApiOperation(value = "getAppeal",

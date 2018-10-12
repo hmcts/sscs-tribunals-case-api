@@ -42,7 +42,6 @@ public class AirLookupService {
     private static int VENUE_COLUMN = 2;
 
     private static String DEFAULT_VENUE = "Birmingham";
-    private static int DEFAULT_VENUE_ID = 24;
 
     private static final String CSV_FILE_PATH = "reference-data/airLookupVenueIds.csv";
 
@@ -65,9 +64,6 @@ public class AirLookupService {
             parseSpreadSheet(classPathResource);
 
             LOG.debug("Successfully loaded lookup data for postcode endpoint");
-            LOG.debug("Regional centre data has " + lookupRegionalCentreByPostCode.keySet().size() + " post codes");
-            LOG.debug("Air Venue data has " + lookupAirVenueNameByPostCode.keySet().size() + " post codes");
-
         } catch (IOException e) {
             String message = "Unable to read in spreadsheet with post code data: reference-data/AIRLookup RC.xls";
             AirLookupServiceException ex = new AirLookupServiceException(e);
@@ -77,8 +73,6 @@ public class AirLookupService {
             ClassPathResource classPathResource = new ClassPathResource(CSV_FILE_PATH);
 
             readVenueCsv(classPathResource);
-
-            LOG.debug("Venue map has " + lookupAirVenueNameByPostCode.keySet().size() + " venue ids");
         } catch (IOException e) {
             String message = "Unable to read in csv with post code - venue id data: reference-data/airLookupVenueIds.csv";
             AirLookupServiceException ex = new AirLookupServiceException(e);
@@ -104,8 +98,6 @@ public class AirLookupService {
                         Cell venueCell = row.getCell(VENUE_COLUMN);
                         if (postcodeCell != null && adminGroupCell != null
                                 && postcodeCell.getCellTypeEnum() == CellType.STRING && adminGroupCell.getCellTypeEnum() == CellType.STRING) {
-                            LOG.debug("Post code: " + postcodeCell.getRichStringCellValue().getString().toLowerCase()
-                                + " Regional office: " + adminGroupCell.getRichStringCellValue().getString());
                             lookupRegionalCentreByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(), adminGroupCell.getRichStringCellValue().getString());
                         }
 
@@ -119,13 +111,15 @@ public class AirLookupService {
 
                                 String venueNameSplitChar = "-";
                                 if (venueName.indexOf(venueNameSplitChar) != -1) {
-                                    lookupAirVenueNameByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase(),
+                                    lookupAirVenueNameByPostCode.put(postcodeCell.getRichStringCellValue().getString().toLowerCase().trim(),
                                             venueName.substring(0, venueName.indexOf(venueNameSplitChar)).trim());
                                 } else {
                                     String message = "Unknown venue name type" + venueName;
                                     AirLookupServiceException ex = new AirLookupServiceException(new Exception(message));
                                     LOG.error(message, ex);
                                 }
+                            } else {
+                                //Other benefit types to come
                             }
                         }
                     }
@@ -205,9 +199,6 @@ public class AirLookupService {
     public int lookupVenueId(String postcode) {
         String venueName = lookupAirVenueNameByPostCode(postcode);
         Integer venueId = getLookupVenueIdByAirVenueName().get(venueName);
-        if (venueId == null) {
-            return DEFAULT_VENUE_ID;
-        }
         return venueId;
     }
 }

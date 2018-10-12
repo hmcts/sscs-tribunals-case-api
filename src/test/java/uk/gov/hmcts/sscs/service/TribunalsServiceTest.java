@@ -1,7 +1,9 @@
 package uk.gov.hmcts.sscs.service;
 
-import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
+import uk.gov.hmcts.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
 import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
 
@@ -31,6 +34,7 @@ public class TribunalsServiceTest {
 
     private static final String APPEAL_NUMBER = "asfefsdf3223";
     private static final String SURNAME = "surname";
+    public static final String CCD_CASE_ID = "1";
     private TribunalsService tribunalsService;
 
     @Mock
@@ -70,13 +74,6 @@ public class TribunalsServiceTest {
         given(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).willReturn(null);
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
-    }
-
-    @Test
-    public void shouldReturnTrueGivenValidAppealNumberAndSurname() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(getCaseData());
-
-        assertTrue(tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME));
     }
 
     @Test(expected = InvalidSurnameException.class)
@@ -124,6 +121,16 @@ public class TribunalsServiceTest {
         verify(regionalProcessingCenterService, times(1)).getByScReferenceCode(eq(null));
     }
 
+    @Test
+    public void shouldReturnSurnameResponseWithCcdIdIfSurnameIsValidForGivenAppealNumber() {
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(getCaseData());
+
+        SurnameResponse surnameResponse =  tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
+
+        assertNotNull(surnameResponse);
+        assertThat(surnameResponse.getCaseId(), equalTo(CCD_CASE_ID));
+    }
+
     private SscsCaseDetails getCaseDetailsWithRpc() {
         return SscsCaseDetails.builder().data(SscsCaseData.builder().regionalProcessingCenter(getRegionalProcessingCenter()).build()).build();
     }
@@ -133,7 +140,7 @@ public class TribunalsServiceTest {
     }
 
     private SscsCaseData getCaseData() {
-        return SscsCaseData.builder().build();
+        return SscsCaseData.builder().ccdCaseId(CCD_CASE_ID).build();
     }
 
     private RegionalProcessingCenter getRegionalProcessingCenter() {
