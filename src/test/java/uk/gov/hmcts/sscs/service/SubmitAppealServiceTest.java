@@ -135,7 +135,7 @@ public class SubmitAppealServiceTest {
 
         verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(emailService, times(2).sendEmail(any(Email.class));
+        verify(emailService, times(2).sendEmail(any(Email.class)));
 
         assertNull(getPdfWrapper().getCcdCaseId());
     }
