@@ -6,18 +6,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
 @SpringBootApplication
-@ComponentScan(
-        basePackages = "uk.gov.hmcts.reform.sscs",
-        basePackageClasses = TribunalsCaseApiApplication.class,
-        lazyInit = true
-)
 @EnableFeignClients(basePackages =
         {
                 "uk.gov.hmcts.reform.authorisation",
