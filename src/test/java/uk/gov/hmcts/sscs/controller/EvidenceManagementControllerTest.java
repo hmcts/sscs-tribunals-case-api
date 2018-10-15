@@ -12,8 +12,8 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.sscs.exception.EvidenceDocumentsMissingException;
-import uk.gov.hmcts.sscs.service.EvidenceManagementService;
 
 
 public class EvidenceManagementControllerTest {
