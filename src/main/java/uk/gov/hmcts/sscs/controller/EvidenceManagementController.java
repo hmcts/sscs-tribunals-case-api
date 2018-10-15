@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.sscs.exception.EvidenceDocumentsMissingException;
+import uk.gov.hmcts.sscs.service.EvidenceManagementService;
 
 @RestController
 public class    EvidenceManagementController {
