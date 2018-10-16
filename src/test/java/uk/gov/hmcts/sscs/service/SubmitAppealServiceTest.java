@@ -133,8 +133,9 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData);
 
-        then(pdfServiceClient).should(times(1)).generateFromHtml(any(), any());
-        then(emailService).should(times(2)).sendEmail(any(Email.class));
+        verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
+        verify(pdfServiceClient).generateFromHtml(any(), any());
+        verify(emailService, times(2)).sendEmail(any(Email.class));
 
         assertNull(getPdfWrapper().getCcdCaseId());
     }
