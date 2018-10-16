@@ -20,9 +20,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 public class SyaControllerTest {
 

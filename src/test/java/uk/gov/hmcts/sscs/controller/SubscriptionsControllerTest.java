@@ -23,10 +23,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
-import uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException;
-import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
-import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
-import uk.gov.hmcts.sscs.service.TribunalsService;
+import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
+import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
+import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
+import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
 public class SubscriptionsControllerTest {
 

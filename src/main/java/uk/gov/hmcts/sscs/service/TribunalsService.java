@@ -9,12 +9,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.sscs.builder.TrackYourAppealJsonBuilder;
-import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
-import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
-import uk.gov.hmcts.sscs.model.tya.SurnameResponse;
-import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
-import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.builder.TrackYourAppealJsonBuilder;
+import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
+import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
+import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
+import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
+import uk.gov.hmcts.reform.sscs.service.referencedata.RegionalProcessingCenterService;
 
 @Service
 @Slf4j

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.sscs.domain.wrapper.*;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 
 @Service
 public class SubmitYourAppealToCcdCaseDataDeserializer {

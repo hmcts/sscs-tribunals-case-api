@@ -20,8 +20,8 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
-import uk.gov.hmcts.sscs.service.event.PaperCaseEventFilterUtil;
-import uk.gov.hmcts.sscs.util.DateTimeUtils;
+import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
+import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 @Service
 public class TrackYourAppealJsonBuilder {

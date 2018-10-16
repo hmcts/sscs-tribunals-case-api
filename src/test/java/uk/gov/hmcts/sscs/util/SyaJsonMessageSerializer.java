@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import lombok.Getter;
 import lombok.ToString;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 
 @Getter
 @ToString

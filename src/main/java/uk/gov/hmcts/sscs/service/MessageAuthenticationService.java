@@ -28,9 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException;
-import uk.gov.hmcts.sscs.exception.MacException;
-import uk.gov.hmcts.sscs.exception.TokenException;
+import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
+import uk.gov.hmcts.reform.sscs.exception.MacException;
+import uk.gov.hmcts.reform.sscs.exception.TokenException;
 
 @Service
 public class MessageAuthenticationService {

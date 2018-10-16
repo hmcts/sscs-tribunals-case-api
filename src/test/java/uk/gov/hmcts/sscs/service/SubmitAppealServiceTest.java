@@ -33,13 +33,13 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.email.Email;
-import uk.gov.hmcts.sscs.email.RoboticsEmailTemplate;
-import uk.gov.hmcts.sscs.email.SubmitYourAppealEmailTemplate;
-import uk.gov.hmcts.sscs.model.pdf.PdfWrapper;
-import uk.gov.hmcts.sscs.service.referencedata.RegionalProcessingCenterService;
-import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.email.Email;
+import uk.gov.hmcts.reform.sscs.email.RoboticsEmailTemplate;
+import uk.gov.hmcts.reform.sscs.email.SubmitYourAppealEmailTemplate;
+import uk.gov.hmcts.reform.sscs.model.pdf.PdfWrapper;
+import uk.gov.hmcts.reform.sscs.service.referencedata.RegionalProcessingCenterService;
+import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {

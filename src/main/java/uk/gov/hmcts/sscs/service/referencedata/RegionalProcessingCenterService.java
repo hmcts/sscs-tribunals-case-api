@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.sscs.exception.RegionalProcessingCenterServiceException;
+import uk.gov.hmcts.reform.sscs.exception.RegionalProcessingCenterServiceException;
 
 @Service
 public class RegionalProcessingCenterService {

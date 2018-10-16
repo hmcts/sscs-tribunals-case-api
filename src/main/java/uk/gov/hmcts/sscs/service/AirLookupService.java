@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.sscs.exception.AirLookupServiceException;
+import uk.gov.hmcts.reform.sscs.exception.AirLookupServiceException;
 
 /**
  * Service that ingests a spreadsheet and a csv file containing the

@@ -10,9 +10,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.sscs.email.Email;
-import uk.gov.hmcts.sscs.email.EmailAttachment;
-import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
+import uk.gov.hmcts.reform.sscs.email.Email;
+import uk.gov.hmcts.reform.sscs.email.EmailAttachment;
+import uk.gov.hmcts.reform.sscs.exception.EmailSendFailedException;
 
 @Service
 @Slf4j

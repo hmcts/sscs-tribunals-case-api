@@ -13,10 +13,10 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
-import uk.gov.hmcts.sscs.exception.AppealNotFoundException;
-import uk.gov.hmcts.sscs.model.tya.SurnameResponse;
-import uk.gov.hmcts.sscs.service.TribunalsService;
-import uk.gov.hmcts.sscs.service.exceptions.InvalidSurnameException;
+import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
+import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
+import uk.gov.hmcts.reform.sscs.service.TribunalsService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 
 public class TyaControllerTest {
 

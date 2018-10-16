@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.sscs.service.AirLookupService;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 
 /**
  * Controller for handling post code queries.

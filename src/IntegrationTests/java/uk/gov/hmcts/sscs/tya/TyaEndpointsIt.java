@@ -24,8 +24,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
-import uk.gov.hmcts.sscs.util.SerializeJsonMessageManager;
+import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
+import uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager;
 
 
 @RunWith(SpringRunner.class)

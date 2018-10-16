@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.model.pdf;
 import lombok.Builder;
 import lombok.Value;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 
 @Value
 @Builder

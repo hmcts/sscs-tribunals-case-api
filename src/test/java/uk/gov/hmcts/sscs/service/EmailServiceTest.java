@@ -16,9 +16,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.test.context.ContextConfiguration;
-import uk.gov.hmcts.sscs.email.Email;
-import uk.gov.hmcts.sscs.email.EmailAttachment;
-import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
+import uk.gov.hmcts.reform.sscs.email.Email;
+import uk.gov.hmcts.reform.sscs.email.EmailAttachment;
+import uk.gov.hmcts.reform.sscs.exception.EmailSendFailedException;
 
 @RunWith(MockitoJUnitRunner.class)
 @ContextConfiguration

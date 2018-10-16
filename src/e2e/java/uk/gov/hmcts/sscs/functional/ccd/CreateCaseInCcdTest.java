@@ -20,11 +20,11 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.sscs.exception.EmailSendFailedException;
-import uk.gov.hmcts.sscs.exception.PdfGenerationException;
-import uk.gov.hmcts.sscs.service.SubmitAppealService;
-import uk.gov.hmcts.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.exception.EmailSendFailedException;
+import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
+import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

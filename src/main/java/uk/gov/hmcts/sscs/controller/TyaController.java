@@ -12,8 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.sscs.model.tya.SurnameResponse;
-import uk.gov.hmcts.sscs.service.TribunalsService;
+import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
+import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
 @RestController
 public class TyaController {

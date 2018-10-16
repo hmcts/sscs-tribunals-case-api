@@ -15,9 +15,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uk.gov.hmcts.sscs.model.tya.SubscriptionRequest;
-import uk.gov.hmcts.sscs.service.MessageAuthenticationService;
-import uk.gov.hmcts.sscs.service.TribunalsService;
+import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
+import uk.gov.hmcts.reform.sscs.service.MessageAuthenticationService;
+import uk.gov.hmcts.reform.sscs.service.TribunalsService;
 
 
 @RestController
