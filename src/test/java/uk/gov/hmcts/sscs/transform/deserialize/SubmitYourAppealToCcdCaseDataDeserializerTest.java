@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.*;
-import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

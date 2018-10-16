@@ -10,9 +10,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
-import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
-import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
+import static uk.gov.hmcts.reform.sscs.email.EmailAttachment.pdf;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.util.List;
 import java.util.Map;

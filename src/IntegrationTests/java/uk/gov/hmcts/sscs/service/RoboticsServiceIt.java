@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.*;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 
 import org.json.JSONObject;
 import org.junit.Test;

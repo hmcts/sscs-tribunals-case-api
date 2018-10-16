@@ -1,9 +1,9 @@
 package uk.gov.hmcts.reform.sscs.builder;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
-import static uk.gov.hmcts.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;
-import static uk.gov.hmcts.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
-import static uk.gov.hmcts.sscs.util.SerializeJsonMessageManager.*;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;

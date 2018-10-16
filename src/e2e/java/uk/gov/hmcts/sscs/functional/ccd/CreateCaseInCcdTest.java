@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static org.junit.Assert.*;
-import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
-import static uk.gov.hmcts.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
+import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import org.junit.Before;
 import org.junit.Ignore;

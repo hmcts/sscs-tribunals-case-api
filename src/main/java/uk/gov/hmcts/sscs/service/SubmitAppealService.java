@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static uk.gov.hmcts.sscs.email.EmailAttachment.json;
-import static uk.gov.hmcts.sscs.email.EmailAttachment.pdf;
+import static uk.gov.hmcts.reform.sscs.email.EmailAttachment.json;
+import static uk.gov.hmcts.reform.sscs.email.EmailAttachment.pdf;
 
 import java.io.IOException;
 import java.io.InputStream;
