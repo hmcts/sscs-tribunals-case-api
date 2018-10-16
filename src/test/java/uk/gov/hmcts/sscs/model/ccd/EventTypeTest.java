@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.model.ccd;
+package uk.gov.hmcts.reform.sscs.model.ccd;
 
 import static org.junit.Assert.assertEquals;
 

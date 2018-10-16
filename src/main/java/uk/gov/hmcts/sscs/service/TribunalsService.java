@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service;
+package uk.gov.hmcts.reform.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;

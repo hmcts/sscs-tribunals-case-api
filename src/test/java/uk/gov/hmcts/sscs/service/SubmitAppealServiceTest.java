@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service;
+package uk.gov.hmcts.reform.sscs.service;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.controller;
+package uk.gov.hmcts.reform.sscs.controller;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

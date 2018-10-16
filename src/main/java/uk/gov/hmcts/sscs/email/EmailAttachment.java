@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.email;
+package uk.gov.hmcts.reform.sscs.email;
 
 import static java.util.Objects.requireNonNull;
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.controller;
+package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

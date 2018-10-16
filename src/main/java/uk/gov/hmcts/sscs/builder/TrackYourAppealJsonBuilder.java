@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.builder;
+package uk.gov.hmcts.reform.sscs.builder;
 
 import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;

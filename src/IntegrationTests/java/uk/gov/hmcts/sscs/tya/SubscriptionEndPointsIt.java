@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.tya;
+package uk.gov.hmcts.reform.sscs.tya;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.equalTo;

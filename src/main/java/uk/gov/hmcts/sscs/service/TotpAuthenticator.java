@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service;
+package uk.gov.hmcts.reform.sscs.service;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

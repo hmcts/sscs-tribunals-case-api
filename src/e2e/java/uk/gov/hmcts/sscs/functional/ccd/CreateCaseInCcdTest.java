@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.functional.ccd;
+package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static org.junit.Assert.*;
 import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;

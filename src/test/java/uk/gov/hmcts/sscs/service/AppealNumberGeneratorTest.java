@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service;
+package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyString;

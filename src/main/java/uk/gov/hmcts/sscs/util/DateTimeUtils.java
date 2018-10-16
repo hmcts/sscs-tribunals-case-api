@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.util;
+package uk.gov.hmcts.reform.sscs.util;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.config;
+package uk.gov.hmcts.reform.sscs.config;
 
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration;

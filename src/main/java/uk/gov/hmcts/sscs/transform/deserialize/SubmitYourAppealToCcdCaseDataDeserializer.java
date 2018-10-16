@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.transform.deserialize;
+package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

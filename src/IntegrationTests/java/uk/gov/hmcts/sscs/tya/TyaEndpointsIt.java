@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.tya;
+package uk.gov.hmcts.reform.sscs.tya;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.hamcrest.Matchers.equalTo;

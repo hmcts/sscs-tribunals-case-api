@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.builder;
+package uk.gov.hmcts.reform.sscs.builder;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;

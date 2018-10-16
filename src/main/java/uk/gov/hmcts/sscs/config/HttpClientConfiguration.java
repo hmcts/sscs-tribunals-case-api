@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.config;
+package uk.gov.hmcts.reform.sscs.config;
 
 import feign.Client;
 import feign.httpclient.ApacheHttpClient;

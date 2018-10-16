@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service.referencedata;
+package uk.gov.hmcts.reform.sscs.service.referencedata;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.controller;
+package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;

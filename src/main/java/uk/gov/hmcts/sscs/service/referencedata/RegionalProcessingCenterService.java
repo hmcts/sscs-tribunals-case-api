@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service.referencedata;
+package uk.gov.hmcts.reform.sscs.service.referencedata;
 
 import static com.google.common.collect.Maps.newHashMap;
 import static org.slf4j.LoggerFactory.getLogger;

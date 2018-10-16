@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.controller;
+package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.ResponseEntity.notFound;

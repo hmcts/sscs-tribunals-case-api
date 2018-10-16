@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.controller;
+package uk.gov.hmcts.reform.sscs.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

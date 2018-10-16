@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.model;
+package uk.gov.hmcts.reform.sscs.model;
 
 public class AppConstants {
 

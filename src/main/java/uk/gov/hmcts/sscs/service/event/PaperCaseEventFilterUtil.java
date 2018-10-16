@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service.event;
+package uk.gov.hmcts.reform.sscs.service.event;
 
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.model.tya;
+package uk.gov.hmcts.reform.sscs.model.tya;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;

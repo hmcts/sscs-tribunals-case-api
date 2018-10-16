@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.config;
+package uk.gov.hmcts.reform.sscs.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

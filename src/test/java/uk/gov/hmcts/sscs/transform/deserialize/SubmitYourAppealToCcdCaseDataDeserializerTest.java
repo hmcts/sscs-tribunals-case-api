@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.transform.deserialize;
+package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.sscs.util.SyaJsonMessageSerializer.*;

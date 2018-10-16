@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.postcode;
+package uk.gov.hmcts.reform.sscs.postcode;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

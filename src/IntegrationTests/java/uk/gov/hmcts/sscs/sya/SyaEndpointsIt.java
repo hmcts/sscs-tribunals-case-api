@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.sya;
+package uk.gov.hmcts.reform.sscs.sya;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;

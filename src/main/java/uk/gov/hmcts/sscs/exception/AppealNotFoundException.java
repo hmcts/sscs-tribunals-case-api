@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.exception;
+package uk.gov.hmcts.reform.sscs.exception;
 
 import org.springframework.http.HttpStatus;
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.functional.evidence;
+package uk.gov.hmcts.reform.sscs.functional.evidence;
 
 import static io.restassured.RestAssured.*;
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.domain.wrapper;
+package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

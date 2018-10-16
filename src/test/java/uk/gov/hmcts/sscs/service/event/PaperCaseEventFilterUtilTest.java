@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.service.event;
+package uk.gov.hmcts.reform.sscs.service.event;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;

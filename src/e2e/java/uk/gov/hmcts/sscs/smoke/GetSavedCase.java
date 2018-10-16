@@ -1,4 +1,4 @@
-package uk.gov.hmcts.sscs.smoke;
+package uk.gov.hmcts.reform.sscs.smoke;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
