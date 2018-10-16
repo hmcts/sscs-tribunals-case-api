@@ -56,7 +56,7 @@ public class MessageAuthenticationServiceTest {
     public void shouldHandleInvalidSubscriptionTokenException() {
         String encryptedToken = service.generateToken(APPEAL_NUMER, BENEFIT_TYPE_VALUE);
 
-        exception.expect(uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException.class);
+        exception.expect(uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException.class);
         exception.expectMessage("Error while decrypting HMAC token " + encryptedToken + "sdft5e");
 
         service.validateMacTokenAndReturnBenefitType(encryptedToken + "sdft5e");
@@ -79,7 +79,7 @@ public class MessageAuthenticationServiceTest {
     public void shouldHandleInvalidMacTokenException() {
         String encryptedToken = service.generateToken(APPEAL_NUMER, BENEFIT_TYPE_VALUE);
 
-        exception.expect(uk.gov.hmcts.sscs.exception.InvalidSubscriptionTokenException.class);
+        exception.expect(uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException.class);
         exception.expectMessage("Error while decrypting HMAC token " + encryptedToken + "sdft5e");
 
         service.decryptMacToken(encryptedToken + "sdft5e");
