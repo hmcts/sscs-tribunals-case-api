@@ -18,8 +18,6 @@ apply plugin: 'io.spring.dependency-management'
 group = 'uk.gov.hmcts.reform'
 version = '1.0.0'
 
-mainClassName = 'uk.gov.hmcts.sscs.TribunalsCaseApiApplication'
-
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -31,7 +29,7 @@ compileTestJava {
     options.compilerArgs << '-Xlint:deprecation'
 }
 
-mainClassName = 'uk.gov.hmcts.sscs.TribunalsCaseApiApplication'
+mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 
 check.dependsOn dependencyCheckAnalyze
 
@@ -164,11 +162,11 @@ sonarqube {
         property "sonar.projectKey", "SSCSTCA"
         property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/**," +
-                "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
-                "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +
-                "src/main/java/uk/gov/hmcts/sscs/config/*," +
-                "src/main/java/uk/gov/hmcts/sscs/model/**"
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/model/**"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
@@ -296,7 +294,7 @@ jacocoTestReport {
 
 pitest {
     targetClasses = ['uk.gov.hmcts.sscs.*']
-    excludedClasses = ['uk.gov.hmcts.sscs.config.*','uk.gov.hmcts.sscs.models.*','uk.gov.hmcts.sscs.TribunalsCaseApiApplication.java']
+    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*','uk.gov.hmcts.reform.sscs.models.*','uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication.java']
     threads = 10
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
@@ -308,6 +306,6 @@ task smoke(type: Test) {
     description = 'Executes non-destructive smoke tests against a running Tribual Case API'
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
     setClasspath(sourceSets.e2e.runtimeClasspath)
-    include "uk/gov/hmcts/sscs/smoke/**"
-    exclude "uk/gov/hmcts/sscs/functional/**"
+    include "uk/gov/hmcts/reform/sscs/smoke/**"
+    exclude "uk/gov/hmcts/reform/sscs/functional/**"
 }
