@@ -48,13 +48,15 @@
       "isAppointee": "No"
     },
     "benefitType": {
-      "code": "PIP"
+      "code": "PIP",
+      "description": "Personal Independence Payment"
     },
     "hearingOptions": {
       "wantsToAttend": "Yes",
       "wantsSupport": "Yes",
       "languageInterpreter": "Yes",
       "languages": "Telugu",
+      "signLanguageType": "Sign language",
       "arrangements": [
         "signLanguageInterpreter",
         "hearingLoop"
