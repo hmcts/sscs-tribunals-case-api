@@ -23,15 +23,11 @@ import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseD
 @Slf4j
 public class SubmitAppealService {
 
-    private static final String ID_FORMAT = "%s_%s";
-
     private final AppealNumberGenerator appealNumberGenerator;
     private final SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer;
     private final CcdService ccdService;
     private final SscsPdfService sscsPdfService;
-    private final EmailService emailService;
     private final RoboticsService roboticsService;
-    private final RoboticsEmailTemplate roboticsEmailTemplate;
     private final AirLookupService airLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
@@ -41,9 +37,7 @@ public class SubmitAppealService {
                         SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer,
                         CcdService ccdService,
                         SscsPdfService sscsPdfService,
-                        EmailService emailService,
                         RoboticsService roboticsService,
-                        RoboticsEmailTemplate roboticsEmailTemplate,
                         AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService) {
@@ -52,9 +46,7 @@ public class SubmitAppealService {
         this.submitYourAppealToCcdCaseDataDeserializer = submitYourAppealToCcdCaseDataDeserializer;
         this.ccdService = ccdService;
         this.sscsPdfService = sscsPdfService;
-        this.emailService = emailService;
         this.roboticsService = roboticsService;
-        this.roboticsEmailTemplate = roboticsEmailTemplate;
         this.airLookupService = airLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
@@ -69,7 +61,7 @@ public class SubmitAppealService {
 
         byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
-        sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf);
+        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf);
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
@@ -81,17 +73,6 @@ public class SubmitAppealService {
         } else {
             return transformAppealToCaseData(appeal, rpc.getName(), rpc);
         }
-    }
-
-    private void sendCaseToRobotics(SscsCaseData caseData, Long caseId, String postcode, byte[] pdf) {
-        String venue = airLookupService.lookupAirVenueNameByPostCode(postcode);
-
-        JSONObject roboticsJson = roboticsService.createRobotics(RoboticsWrapper.builder().sscsCaseData(caseData)
-                .ccdCaseId(caseId).venueName(venue).evidencePresent(caseData.getEvidencePresent()).build());
-
-        sendJsonByEmail(caseData.getAppeal().getAppellant(), roboticsJson, pdf);
-        log.info("Robotics email sent successfully for Nino - {} and benefit type {}", caseData.getAppeal().getAppellant().getIdentity().getNino(),
-                caseData.getAppeal().getBenefitType().getCode());
     }
 
     protected String getFirstHalfOfPostcode(String postcode) {
@@ -146,20 +127,5 @@ public class SubmitAppealService {
                     caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
             return caseData;
         }
-    }
-
-    private void sendJsonByEmail(Appellant appellant, JSONObject json, byte[] pdf) {
-        String appellantUniqueId = generateUniqueEmailId(appellant);
-        emailService.sendEmail(roboticsEmailTemplate.generateEmail(
-                appellantUniqueId,
-                newArrayList(json(json.toString().getBytes(), appellantUniqueId + ".txt"),
-                        pdf(pdf, appellantUniqueId + ".pdf"))
-        ));
-    }
-
-    private String generateUniqueEmailId(Appellant appellant) {
-        String appellantLastName = appellant.getName().getLastName();
-        String nino = appellant.getIdentity().getNino();
-        return String.format(ID_FORMAT, appellantLastName, nino.substring(nino.length() - 3));
     }
 }
