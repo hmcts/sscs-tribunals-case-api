@@ -58,6 +58,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         BenefitType benefitType = BenefitType.builder()
                 .code(syaCaseWrapper.getBenefitType().getCode())
+                .description(syaCaseWrapper.getBenefitType().getDescription())
                 .build();
 
         HearingOptions hearingOptions = getHearingOptions(syaCaseWrapper.getSyaHearingOptions());
@@ -173,6 +174,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                     .wantsSupport(wantsSupport)
                     .languageInterpreter(languageInterpreter)
                     .languages(syaHearingOptions.getInterpreterLanguageType())
+                    .signLanguageType(syaHearingOptions.getSignLanguageType())
                     .scheduleHearing(scheduleHearing)
                     .arrangements(arrangements)
                     .excludeDates(excludedDates)

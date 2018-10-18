@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -27,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
-import uk.gov.hmcts.reform.sscs.service.referencedata.RegionalProcessingCenterService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {

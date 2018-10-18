@@ -49,7 +49,8 @@
       "isAppointee": "No"
     },
     "benefitType": {
-      "code": "PIP"
+      "code": "PIP",
+      "description": "Personal Independence Payment"
     },
     "hearingOptions": {
       "wantsToAttend": "No"

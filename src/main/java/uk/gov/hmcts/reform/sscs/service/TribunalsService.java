@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
-import uk.gov.hmcts.reform.sscs.service.referencedata.RegionalProcessingCenterService;
 
 @Service
 @Slf4j
