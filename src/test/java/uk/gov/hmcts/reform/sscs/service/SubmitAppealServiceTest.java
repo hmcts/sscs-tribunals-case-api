@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.service.referencedata.RegionalProcessingCenterService;
 import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
