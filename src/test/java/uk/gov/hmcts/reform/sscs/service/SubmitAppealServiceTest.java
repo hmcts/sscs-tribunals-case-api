@@ -103,7 +103,7 @@ public class SubmitAppealServiceTest {
         sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService, pdfStoreService, submitYourAppealEmailTemplate, ccdService);
         roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper, roboticsJsonValidator, roboticsEmailTemplate);
 
-        regionalProcessingCenterService = new RegionalProcessingCenterService();
+        regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
 
         deserializer = new SubmitYourAppealToCcdCaseDataDeserializer();
