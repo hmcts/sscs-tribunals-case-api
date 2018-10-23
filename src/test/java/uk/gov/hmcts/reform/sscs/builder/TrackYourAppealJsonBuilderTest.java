@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.builder;
 
+import static java.time.LocalDateTime.parse;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
 public class TrackYourAppealJsonBuilderTest {
 
@@ -111,11 +113,11 @@ public class TrackYourAppealJsonBuilderTest {
 
         Instant instant = Instant.now();
 
-        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1);
+        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1);
 
-        String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1).toString();
-        String dwpResponseDateUtc = localUtcDate.toString();
-        String hearingContactDate = localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS).toString();
+        String dwpResponseDateCcd = localUtcDate.toString();
+        String dwpResponseDateUtc = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate).toString();
+        String hearingContactDate = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS)).toString();
 
         SscsCaseData caseData = buildHearingBookedEvent(NOT_PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
 
@@ -123,8 +125,8 @@ public class TrackYourAppealJsonBuilderTest {
                 populateRegionalProcessingCenter(), 1L);
 
         String updatedString = NOT_PAST_HEARING_BOOKED.getSerializedMessage()
-                .replace("2017-06-29T11:50:11.987Z", dwpResponseDateUtc + "Z")
-                .replace("2017-08-24T11:50:11.437Z", hearingContactDate + "Z");
+                .replace("2017-06-29T11:50:11.987Z", dwpResponseDateUtc)
+                .replace("2017-08-24T11:50:11.437Z", hearingContactDate);
         assertJsonEquals(updatedString, objectNode);
     }
 
