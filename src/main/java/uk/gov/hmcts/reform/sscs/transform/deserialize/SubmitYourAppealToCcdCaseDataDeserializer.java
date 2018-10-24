@@ -123,7 +123,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .address(address)
                 .contact(contact)
                 .identity(identity)
-                .isAppointee(syaCaseWrapper.getIsAppointee() ? YES : NO)
                 .build();
     }
 

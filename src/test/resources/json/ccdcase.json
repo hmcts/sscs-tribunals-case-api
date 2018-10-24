@@ -49,8 +49,7 @@
         "identity": {
           "dob": "1992-02-18",
           "nino": "Aliqua Consequatur Eu autem corrupti id aute non dolore nihil"
-        },
-        "isAppointee": ""
+        }
       },
       "supporter": {
         "name": {
@@ -153,8 +152,7 @@
                 "nino": "PUBLIC"
               },
               "classification": "PUBLIC"
-            },
-            "isAppointee": "PUBLIC"
+            }
           },
           "classification": "PUBLIC"
         },
@@ -281,8 +279,7 @@
                 "nino": "PUBLIC"
               },
               "classification": "PUBLIC"
-            },
-            "isAppointee": "PUBLIC"
+            }
           },
           "classification": "PUBLIC"
         },
