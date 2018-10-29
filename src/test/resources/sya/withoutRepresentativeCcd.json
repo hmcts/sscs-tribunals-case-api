@@ -128,7 +128,7 @@
       "subscribeSms": "Yes",
       "reason": null
     },
-    "supporterSubscription": null
+    "representativeSubscription": null
   },
   "evidencePresent" : "No"
 }

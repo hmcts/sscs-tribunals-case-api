@@ -134,7 +134,15 @@
       "subscribeSms": "Yes",
       "reason": null
     },
-    "supporterSubscription": null
+    "representativeSubscription": {
+      "wantSmsNotifications":"Yes",
+      "tya":null,
+      "email":"harry.potter@wizards.com",
+      "mobile":"07411999999",
+      "subscribeEmail":"Yes",
+      "subscribeSms":"Yes",
+      "reason":null
+    }
   },
   "evidencePresent" : "No"
 }
