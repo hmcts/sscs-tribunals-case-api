@@ -15,13 +15,13 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static final String YES = "Yes";
     private static final String NO = "No";
-    public static final String ORAL = "oral";
-    public static final String PAPER = "paper";
+    private static final String ORAL = "oral";
+    private static final String PAPER = "paper";
 
     public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
-        Subscriptions subscriptions = getAppellantSubscription(syaCaseWrapper);
+        Subscriptions subscriptions = populateSubscriptions(syaCaseWrapper);
 
         List<SscsDocument> sscsDocuments =  getEvidenceDocumentDetails(syaCaseWrapper);
 
@@ -218,7 +218,15 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return arrangements;
     }
 
-    private Subscriptions getAppellantSubscription(SyaCaseWrapper syaCaseWrapper) {
+    private Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
+
+        return Subscriptions.builder()
+                .appellantSubscription(getAppellantSubscription(syaCaseWrapper))
+                .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
+                .build();
+    }
+
+    private Subscription getAppellantSubscription(SyaCaseWrapper syaCaseWrapper) {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
@@ -228,17 +236,36 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         String wantEmailNotifications = StringUtils.isNotBlank(email) && !isPaperCase(syaCaseWrapper) ? YES : NO;
 
         String mobile = syaCaseWrapper.getAppellant().getContactDetails().getPhoneNumber();
-        Subscription subscription = Subscription.builder()
+        return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
                 .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
+    }
 
-        return Subscriptions.builder()
-                .appellantSubscription(subscription)
-                .build();
+    private Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
+
+        if (syaCaseWrapper.hasRepresentative()) {
+
+            boolean emailAddressExists = StringUtils
+                    .isNotBlank(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress());
+            boolean phoneNumberExists =  StringUtils
+                    .isNotBlank(syaCaseWrapper.getRepresentative().getContactDetails().getPhoneNumber());
+
+            return Subscription.builder()
+                    .wantSmsNotifications(phoneNumberExists ? YES : NO)
+                    .subscribeSms(phoneNumberExists ? YES : NO)
+                    .mobile(getPhoneNumberWithOutSpaces(syaCaseWrapper
+                            .getRepresentative().getContactDetails().getPhoneNumber()))
+                    .subscribeEmail(emailAddressExists ? YES : NO)
+                    .email(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress())
+                    .build();
+        }
+
+        return null;
+
     }
 
     private Boolean isPaperCase(SyaCaseWrapper syaCaseWrapper) {

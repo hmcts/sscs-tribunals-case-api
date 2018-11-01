@@ -116,6 +116,16 @@ public class SubmitAppealService {
                     .build();
 
             caseData.setSubscriptions(caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build());
+
+            if (null !=  caseData.getSubscriptions().getRepresentativeSubscription()) {
+                Subscription representativeSubscriptionBuilder =
+                        caseData.getSubscriptions().getRepresentativeSubscription().toBuilder()
+                        .tya(appealNumberGenerator.generate())
+                        .build();
+                caseData.setSubscriptions(caseData.getSubscriptions().toBuilder()
+                        .representativeSubscription(representativeSubscriptionBuilder).build());
+            }
+
             return caseData;
         } catch (CcdException e) {
             log.error("Appeal number is not generated for Nino - {} and Benefit Type - {}",
