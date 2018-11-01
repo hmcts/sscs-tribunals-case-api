@@ -134,6 +134,7 @@
       "subscribeSms": "Yes",
       "reason": null
     },
+    "supporterSubscription": null,
     "representativeSubscription": {
       "wantSmsNotifications":"Yes",
       "tya":null,
