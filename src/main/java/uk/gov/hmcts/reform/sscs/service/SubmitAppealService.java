@@ -1,6 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -10,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
@@ -26,6 +31,7 @@ public class SubmitAppealService {
     private final AirLookupService airLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
+    private final EvidenceManagementService evidenceManagementService;
 
     @Autowired
     SubmitAppealService(AppealNumberGenerator appealNumberGenerator,
@@ -35,7 +41,8 @@ public class SubmitAppealService {
                         RoboticsService roboticsService,
                         AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
-                        IdamService idamService) {
+                        IdamService idamService,
+                        EvidenceManagementService evidenceManagementService) {
 
         this.appealNumberGenerator = appealNumberGenerator;
         this.submitYourAppealToCcdCaseDataDeserializer = submitYourAppealToCcdCaseDataDeserializer;
@@ -45,6 +52,7 @@ public class SubmitAppealService {
         this.airLookupService = airLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
+        this.evidenceManagementService = evidenceManagementService;
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
@@ -56,7 +64,25 @@ public class SubmitAppealService {
 
         byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
-        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf);
+        if (hasEvidence(appeal)) {
+            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, downloadEvidence(appeal));
+        } else {
+            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf);
+        }
+    }
+
+    private boolean hasEvidence(SyaCaseWrapper appeal) {
+        return CollectionUtils.isNotEmpty(appeal.getReasonsForAppealing().getEvidences());
+    }
+
+    private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
+        return appeal.getReasonsForAppealing().getEvidences().stream()
+                .collect(Collectors.toMap(SyaEvidence::getFileName, this::downloadBinary));
+    }
+
+    private byte[] downloadBinary(SyaEvidence evidence) {
+
+        return evidenceManagementService.download(evidence.getUrl());
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
