@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -64,20 +65,20 @@ public class SubmitAppealService {
 
         byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
+        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, downloadEvidence(appeal));
+    }
+
+    private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
         if (hasEvidence(appeal)) {
-            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, downloadEvidence(appeal));
+            return appeal.getReasonsForAppealing().getEvidences().stream()
+                    .collect(Collectors.toMap(SyaEvidence::getFileName, this::downloadBinary));
         } else {
-            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf);
+            return Collections.emptyMap();
         }
     }
 
     private boolean hasEvidence(SyaCaseWrapper appeal) {
         return CollectionUtils.isNotEmpty(appeal.getReasonsForAppealing().getEvidences());
-    }
-
-    private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
-        return appeal.getReasonsForAppealing().getEvidences().stream()
-                .collect(Collectors.toMap(SyaEvidence::getFileName, this::downloadBinary));
     }
 
     private byte[] downloadBinary(SyaEvidence evidence) {
