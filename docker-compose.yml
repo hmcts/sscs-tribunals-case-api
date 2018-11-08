@@ -221,7 +221,7 @@ services:
     image: hmcts/tribunals-case-api
     environment:
       PDF_API_URL: http://pdf-service-api:5500
-      IDAM_URL: http://idam-api:8080
+      IDAM_API_URL: http://idam-api:8080
       IDAM_S2S-AUTH_TOTP_SECRET: "${IDAM_KEY_CCD_GATEWAY}"
       IDAM_S2S-AUTH_MICROSERVICE: sscs
       IDAM_S2S-AUTH: http://service-auth-provider-api:8080

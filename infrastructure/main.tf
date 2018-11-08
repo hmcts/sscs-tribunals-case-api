@@ -93,8 +93,7 @@ locals {
 
   shared_app_service_plan     = "${var.product}-${var.env}"
   non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
-  app_service_plan          = "${(var.env == "saat" || var.env == "sandbox") ?  local.shared_app_service_plan : local.non_shared_app_service_plan}"
-
+  app_service_plan            = "${(var.env == "saat" || var.env == "sandbox") ?  local.shared_app_service_plan : local.non_shared_app_service_plan}"
 }
 
 module "tribunals-case-api" {
@@ -139,8 +138,6 @@ module "tribunals-case-api" {
     CORE_CASE_DATA_API_URL         = "${local.ccdApi}"
     CORE_CASE_DATA_JURISDICTION_ID = "${var.core_case_data_jurisdiction_id}"
     CORE_CASE_DATA_CASE_TYPE_ID    = "${var.core_case_data_case_type_id}"
-
-    IDAM_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
     IDAM.S2S-AUTH.TOTP_SECRET  = "${data.azurerm_key_vault_secret.sscs_s2s_secret.value}"
     IDAM.S2S-AUTH              = "${local.s2sCnpUrl}"
