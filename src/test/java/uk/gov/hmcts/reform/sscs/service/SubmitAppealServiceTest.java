@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
-import uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
@@ -229,18 +228,6 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldSendRoboticsByEmail() {
-
-        byte[] expected = {};
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
-
-        submitAppealService.submitAppeal(appealData);
-
-        then(emailService).should(times(2)).sendEmail(any(Email.class));
-    }
-
-    @Test
     public void shouldSendRoboticsByEmailPdfOnly() {
 
         byte[] expected = {};
@@ -251,7 +238,6 @@ public class SubmitAppealServiceTest {
 
         verify(emailService, times(2)).sendEmail(emailCaptor.capture());
         Email roboticsEmail = emailCaptor.getAllValues().get(1);
-        List<EmailAttachment> attachments = roboticsEmail.getAttachments();
         assertEquals("Expecting 2 attachments", 2, roboticsEmail.getAttachments().size());
     }
 
@@ -266,8 +252,7 @@ public class SubmitAppealServiceTest {
 
         verify(emailService, times(2)).sendEmail(emailCaptor.capture());
         Email roboticsEmail = emailCaptor.getAllValues().get(1);
-        List<EmailAttachment> attachments = roboticsEmail.getAttachments();
-        assertEquals("Expecting 5 attachments", 5, attachments.size());
+        assertEquals("Expecting 5 attachments", 5, roboticsEmail.getAttachments().size());
     }
 
     @Test
