@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${SERVICE_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${SERVICE_NAME}
+    spec:
+      containers:
+      - image: ${IMAGE_NAME}
+        name: ${SERVICE_NAME}
+        env:
+          - name: AUTH_PROVIDER_SERVICE_API_URL
+            value: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+          - name: IDAM_API_URL
+            value: ${IDAM_API_URL}
+          - name: CCD_SERVICE_API_URL
+            value: "http://ccd-data-store-api-aat.service.service.core-compute-aat.internal"
+          - name: EMAIL_FROM
+            value: "sscs@hmcts.net"
+          - name: EMAIL_TO
+            value: "sscstest@greencroftconsulting.com"
+          - name: EMAIL_SUBJECT
+            value: "Your appeal"
+          - name: EMAIL_MESSAGE
+            value: "Your appeal has been created. Please do not respond to this email"
+          - name: ROBOTICS_EMAIL_FROM
+            value: "sscs@hmcts.net"
+          - name: ROBOTICS_EMAIL_TO
+            value: "fake"
+          - name: ROBOTICS_EMAIL_SUBJECT
+            value: "Robotics Data"
+          - name: ROBOTICS_EMAIL_MESSAGE
+            value: "Please find attached the robotics json file \nPlease do not respond to this email"
+          - name: EMAIL_SERVER_HOST
+            value: "mta.reform.hmcts.net"
+          - name: EMAIL_SERVER_PORT
+            value: "25"
+          - name: EMAIL_SMTP_TLS_ENABLED
+            value: "true"
+          - name: EMAIL_SMTP_SSL_TRUST
+            value: "*"
+          - name: PDF_API_URL
+            value: "http://cmc-pdf-service-aat.service.core-compute-aat.internal"
+          - name: SUBSCRIPTIONS_MAC_SECRET
+            value: ${SUBSCRIPTIONS_MAC_SECRET}
+          - name: CORE_CASE_DATA_API_URL
+            value: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+          - name: CORE_CASE_DATA_JURISDICTION_ID
+            value: "SSCS"
+          - name: CORE_CASE_DATA_CASE_TYPE_ID
+            value: "Benefit"
+          - name: IDAM.S2S-AUTH.TOTP_SECRET
+            value: ${IDAM.S2S-AUTH.TOTP_SECRET}
+          - name: IDAM.S2S-AUTH
+            value: ${IDAM.S2S-AUTH}
+          - name: IDAM.S2S-AUTH.MICROSERVICE
+            value: ${IDAM.S2S-AUTH.MICROSERVICE}
+          - name: IDAM_SSCS_SYSTEMUPDATE_USER
+            value: ${IDAM_SSCS_SYSTEMUPDATE_USER}
+          - name: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
+            value: ${IDAM_SSCS_SYSTEMUPDATE_PASSWORD}
+          - name: IDAM_OAUTH2_CLIENT_ID
+            value: "sscs"
+          - name: IDAM_OAUTH2_CLIENT_SECRET
+            value: ${IDAM_OAUTH2_CLIENT_SECRET}
+          - name: IDAM_OAUTH2_REDIRECT_URL
+            value: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
+          - name: DOCUMENT_MANAGEMENT_URL
+            value: "http://dm-store-aat.service.core-compute-aat.internal"
+          - name: MAX_FILE_SIZE
+            value: "10MB"
+          - name: MAX_REQUEST_SIZE
+            value: "10MB"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+  labels:
+    app: ${SERVICE_NAME}
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+  selector:
+    app: ${SERVICE_NAME}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: ${SERVICE_FQDN}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ${SERVICE_NAME}
+          servicePort: 80
