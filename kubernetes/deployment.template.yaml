@@ -58,11 +58,11 @@ spec:
           - name: CORE_CASE_DATA_CASE_TYPE_ID
             value: "Benefit"
           - name: IDAM.S2S-AUTH.TOTP_SECRET
-            value: ${IDAM.S2S-AUTH.TOTP_SECRET}
+            value: ${IDAM_S2S-AUTH_TOTP_SECRET}
           - name: IDAM.S2S-AUTH
-            value: ${IDAM.S2S-AUTH}
+            value: ${IDAM_S2S-AUTH}
           - name: IDAM.S2S-AUTH.MICROSERVICE
-            value: ${IDAM.S2S-AUTH.MICROSERVICE}
+            value: ${IDAM_S2S-AUTH_MICROSERVICE}
           - name: IDAM_SSCS_SYSTEMUPDATE_USER
             value: ${IDAM_SSCS_SYSTEMUPDATE_USER}
           - name: IDAM_SSCS_SYSTEMUPDATE_PASSWORD
