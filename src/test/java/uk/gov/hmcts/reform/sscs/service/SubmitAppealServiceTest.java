@@ -192,7 +192,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(appealNumberGenerator, times(2)).generate();
+        verify(appealNumberGenerator, times(2)).generateAppealNumber();
         verify(ccdService).createCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 
