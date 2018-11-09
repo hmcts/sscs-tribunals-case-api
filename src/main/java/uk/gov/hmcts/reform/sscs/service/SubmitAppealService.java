@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -66,24 +66,6 @@ public class SubmitAppealService {
         byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
         roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, downloadEvidence(appeal));
-    }
-
-    private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
-        if (hasEvidence(appeal)) {
-            return appeal.getReasonsForAppealing().getEvidences().stream()
-                    .collect(Collectors.toMap(SyaEvidence::getFileName, this::downloadBinary));
-        } else {
-            return Collections.emptyMap();
-        }
-    }
-
-    private boolean hasEvidence(SyaCaseWrapper appeal) {
-        return CollectionUtils.isNotEmpty(appeal.getReasonsForAppealing().getEvidences());
-    }
-
-    private byte[] downloadBinary(SyaEvidence evidence) {
-
-        return evidenceManagementService.download(evidence.getUrl());
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
@@ -159,5 +141,26 @@ public class SubmitAppealService {
                     caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
             return caseData;
         }
+    }
+
+    private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
+        if (hasEvidence(appeal)) {
+            Map<String, byte[]> map = new LinkedHashMap<>();
+            for (SyaEvidence evidence : appeal.getReasonsForAppealing().getEvidences()) {
+                map.put(evidence.getFileName(), downloadBinary(evidence));
+            }
+            return map;
+        } else {
+            return Collections.emptyMap();
+        }
+    }
+
+    private boolean hasEvidence(SyaCaseWrapper appeal) {
+        return CollectionUtils.isNotEmpty(appeal.getReasonsForAppealing().getEvidences());
+    }
+
+    private byte[] downloadBinary(SyaEvidence evidence) {
+
+        return evidenceManagementService.download(evidence.getUrl());
     }
 }
