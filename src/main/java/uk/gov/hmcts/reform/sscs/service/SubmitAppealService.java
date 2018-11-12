@@ -133,7 +133,7 @@ public class SubmitAppealService {
     private SscsCaseData updateCaseData(SscsCaseData caseData) {
         try {
             Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
-                    .tya(appealNumberGenerator.generate())
+                    .tya(appealNumberGenerator.generateAppealNumber())
                     .build();
 
             caseData.setSubscriptions(caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build());
@@ -141,7 +141,7 @@ public class SubmitAppealService {
             if (null !=  caseData.getSubscriptions().getRepresentativeSubscription()) {
                 Subscription representativeSubscriptionBuilder =
                         caseData.getSubscriptions().getRepresentativeSubscription().toBuilder()
-                        .tya(appealNumberGenerator.generate())
+                        .tya(appealNumberGenerator.generateAppealNumber())
                         .build();
                 caseData.setSubscriptions(caseData.getSubscriptions().toBuilder()
                         .representativeSubscription(representativeSubscriptionBuilder).build());
