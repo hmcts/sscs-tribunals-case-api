@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,15 +57,28 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
+        log.info("@@@ Enter submitAppeal() with {}", appeal.toString());
+
         String postcode = getFirstHalfOfPostcode(appeal.getAppellant().getContactDetails().getPostCode());
+        log.info("@@@ postcode: {}", postcode);
 
         SscsCaseData caseData = prepareCaseForCcd(appeal, postcode);
+        log.info("@@@ caseData: {}", caseData.toString());
+
         IdamTokens idamTokens = idamService.getIdamTokens();
+        log.info("@@@ idamTokens: {}", idamTokens.toString());
+
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
+        log.info("@@@ caseDetails: {}", caseDetails.toString());
 
         byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
+        log.info("@@@ pdf: {}", pdf.length);
 
-        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, downloadEvidence(appeal));
+        Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
+        log.info("@@@ additionalEvidence: {}", additionalEvidence.toString());
+
+        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, additionalEvidence);
+        log.info("@@@ Exit submitAppeal()");
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
@@ -122,7 +134,7 @@ public class SubmitAppealService {
     private SscsCaseData updateCaseData(SscsCaseData caseData) {
         try {
             Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
-                    .tya(appealNumberGenerator.generate())
+                    .tya(appealNumberGenerator.generateAppealNumber())
                     .build();
 
             caseData.setSubscriptions(caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build());
@@ -130,7 +142,7 @@ public class SubmitAppealService {
             if (null !=  caseData.getSubscriptions().getRepresentativeSubscription()) {
                 Subscription representativeSubscriptionBuilder =
                         caseData.getSubscriptions().getRepresentativeSubscription().toBuilder()
-                        .tya(appealNumberGenerator.generate())
+                        .tya(appealNumberGenerator.generateAppealNumber())
                         .build();
                 caseData.setSubscriptions(caseData.getSubscriptions().toBuilder()
                         .representativeSubscription(representativeSubscriptionBuilder).build());
