@@ -32,6 +32,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
+import uk.gov.hmcts.reform.document.DocumentMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -113,6 +114,8 @@ public class SubmitAppealServiceTest {
     private DocumentUploadClientApi documentUploadClientApi;
     @Mock
     private DocumentDownloadClientApi documentDownloadClientApi;
+    @Mock
+    private DocumentMetadataDownloadClientApi documentMetadataDownloadClientApi;
 
     private EvidenceManagementService evidenceManagementService;
 
@@ -136,7 +139,7 @@ public class SubmitAppealServiceTest {
         when(authTokenGenerator.generate()).thenReturn("token");
         when(documentDownloadClientApi.downloadBinary(anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
 
-        evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, documentDownloadClientApi);
+        evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, documentDownloadClientApi, documentMetadataDownloadClientApi);
 
         submitAppealService = new SubmitAppealService(appealNumberGenerator,
                 deserializer, ccdService,

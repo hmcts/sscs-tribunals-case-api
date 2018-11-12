@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -161,6 +162,6 @@ public class SubmitAppealService {
 
     private byte[] downloadBinary(SyaEvidence evidence) {
 
-        return evidenceManagementService.download(evidence.getUrl());
+        return evidenceManagementService.download(URI.create(evidence.getUrl()));
     }
 }
