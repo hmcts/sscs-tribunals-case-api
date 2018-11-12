@@ -34,6 +34,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
+import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -251,6 +252,14 @@ public class SubmitAppealServiceTest {
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
 
+        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
+        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
+        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        stubbedLinks.binary = stubbedLink;
+        stubbedDocument.links = stubbedLinks;
+        given(documentMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+
         submitAppealService.submitAppeal(appealDataWithEvidence());
 
         verify(emailService, times(2)).sendEmail(emailCaptor.capture());
@@ -326,6 +335,14 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void shouldUpdateCcdWithPdfCombinedWithEvidence() {
+        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
+        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
+        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        stubbedLinks.binary = stubbedLink;
+        stubbedDocument.links = stubbedLinks;
+        given(documentMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+
         byte[] expected = {1, 2, 3};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
