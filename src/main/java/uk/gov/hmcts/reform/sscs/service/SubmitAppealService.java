@@ -56,28 +56,28 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        log.error("@@@ Enter submitAppeal() with {}", appeal.toString());
+        log.info("@@@ Enter submitAppeal() with {}", appeal.toString());
 
         String postcode = getFirstHalfOfPostcode(appeal.getAppellant().getContactDetails().getPostCode());
-        log.error("@@@ postcode: {}", postcode);
+        log.info("@@@ postcode: {}", postcode);
 
         SscsCaseData caseData = prepareCaseForCcd(appeal, postcode);
-        log.error("@@@ caseData: {}", caseData.toString());
+        log.info("@@@ caseData: {}", caseData.toString());
 
         IdamTokens idamTokens = idamService.getIdamTokens();
-        log.error("@@@ idamTokens: {}", idamTokens.toString());
+        log.info("@@@ idamTokens: {}", idamTokens.toString());
 
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
-        log.error("@@@ caseDetails: {}", caseDetails.toString());
+        log.info("@@@ caseDetails: {}", caseDetails.toString());
 
         byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
-        log.error("@@@ pdf: {}", pdf.length);
+        log.info("@@@ pdf: {}", pdf.length);
 
         Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-        log.error("@@@ additionalEvidence: {}", additionalEvidence.toString());
+        log.info("@@@ additionalEvidence: {}", additionalEvidence.toString());
 
         roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, additionalEvidence);
-        log.error("@@@ Exit submitAppeal()");
+        log.info("@@@ Exit submitAppeal()");
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
