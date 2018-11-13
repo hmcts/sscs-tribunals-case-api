@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.evidence;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
@@ -71,7 +72,7 @@ public class EvidenceDocumentUploadEndpointIt {
 
     @Test
     public void shouldStoreTheEvidenceDocumentAndReturnMetadata() throws Exception {
-        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), any())).willReturn(uploadResponse);
+        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), anyString(), any())).willReturn(uploadResponse);
         Embedded embedded = new Embedded();
         when(uploadResponse.getEmbedded()).thenReturn(embedded);
 

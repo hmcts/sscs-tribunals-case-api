@@ -31,14 +31,14 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
-import uk.gov.hmcts.reform.document.DocumentMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
@@ -114,9 +114,9 @@ public class SubmitAppealServiceTest {
     @Mock
     private DocumentUploadClientApi documentUploadClientApi;
     @Mock
-    private DocumentDownloadClientApi documentDownloadClientApi;
+    private EvidenceDownloadClientApi evidenceDownloadClientApi;
     @Mock
-    private DocumentMetadataDownloadClientApi documentMetadataDownloadClientApi;
+    private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
 
     private EvidenceManagementService evidenceManagementService;
 
@@ -138,9 +138,9 @@ public class SubmitAppealServiceTest {
         when(mockResponseEntity.getBody()).thenReturn(stubbedResource);
 
         when(authTokenGenerator.generate()).thenReturn("token");
-        when(documentDownloadClientApi.downloadBinary(anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
+        when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
 
-        evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, documentDownloadClientApi, documentMetadataDownloadClientApi);
+        evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi, evidenceMetadataDownloadClientApi);
 
         submitAppealService = new SubmitAppealService(appealNumberGenerator,
                 deserializer, ccdService,
@@ -258,7 +258,7 @@ public class SubmitAppealServiceTest {
         uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
-        given(documentMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
 
         submitAppealService.submitAppeal(appealDataWithEvidence());
 
@@ -341,7 +341,7 @@ public class SubmitAppealServiceTest {
         uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
-        given(documentMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
 
         byte[] expected = {1, 2, 3};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
