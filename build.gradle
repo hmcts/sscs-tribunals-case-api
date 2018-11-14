@@ -239,7 +239,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.98'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version: '0.0.4'
 
-    compile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.1'
+    compile group: 'io.rest-assured', name: 'rest-assured', version: '3.2.0'
 
     compile group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
 
