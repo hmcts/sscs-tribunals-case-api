@@ -20,7 +20,14 @@
    ]]></notes>
         <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
         <cve>CVE-2016-6497</cve>
-        <cve>CVE-2018-10237</cve>
-        <!-- shaded guava dependency v20.0 -->
+    </suppress>
+    <!-- this is for the TEST jar wiremock-standalone -->
+    <suppress>
+        <notes><![CDATA[
+       file name: wiremock-standalone-2..0.jar.
+       This is only used for TESTING purposes.
+   ]]></notes>
+        <filePath regex="true">.*wiremock-standalone-.*\.jar.*</filePath>
+        <cve>CVE-2018-10237</cve><!-- shaded guava dependency v20.0 -->
     </suppress>
 </suppressions>
