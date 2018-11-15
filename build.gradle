@@ -176,7 +176,7 @@ configurations {
 def springBootVersion = '2.0.5.RELEASE'
 
 def versions = [
-        reformLogging: '3.0.1',
+        reformLogging: '3.0.3',
         springBoot: springBootVersion,
         springfoxSwagger: '2.8.0',
         pitest: '1.3.2',
@@ -201,6 +201,16 @@ dependencyManagement {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // guava v27 was applied to this project
+        // unfortunately, not propagating and applying an override for transitive dependencies
+        // no hard dependencies found and spring dependency manager solves any incompatibilities
+        // this change originated from https://nvd.nist.gov/vuln/detail/CVE-2018-10237
+        force "com.google.guava:guava:27.0-jre"
+    }
+}
+
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
@@ -208,7 +218,6 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
-    compile group: 'com.google.guava', name: 'guava', version: '23.0'
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names'
