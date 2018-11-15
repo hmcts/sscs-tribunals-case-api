@@ -27,6 +27,12 @@
        This is only used for TESTING purposes.
    ]]></notes>
         <filePath regex="true">.*wiremock-standalone-.*\.jar.*</filePath>
+        <cve>CVE-2017-7656</cve>
+        <cve>CVE-2017-7657</cve>
+        <cve>CVE-2017-7658</cve>
+        <cve>CVE-2017-9735</cve>
+        <cve>CVE-2018-5968</cve>
+        <cve>CVE-2018-7489</cve>
         <cve>CVE-2018-10237</cve>
         <!-- shaded guava dependency v20.0 -->
     </suppress>
