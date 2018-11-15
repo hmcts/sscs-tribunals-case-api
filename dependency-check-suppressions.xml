@@ -20,5 +20,7 @@
    ]]></notes>
         <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
         <cve>CVE-2016-6497</cve>
+        <cve>CVE-2018-10237</cve>
+        <!-- shaded guava dependency v20.0 -->
     </suppress>
 </suppressions>
