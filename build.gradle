@@ -201,16 +201,6 @@ dependencyManagement {
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        // guava v27 was applied to this project
-        // unfortunately, not propagating and applying an override for transitive dependencies
-        // no hard dependencies found and spring dependency manager solves any incompatibilities
-        // this change originated from https://nvd.nist.gov/vuln/detail/CVE-2018-10237
-        force "com.google.guava:guava:27.0-jre"
-    }
-}
-
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
