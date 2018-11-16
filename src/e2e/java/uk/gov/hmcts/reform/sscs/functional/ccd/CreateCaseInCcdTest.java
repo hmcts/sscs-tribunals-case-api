@@ -69,7 +69,6 @@ public class CreateCaseInCcdTest {
     }
 
     @Test
-    @Ignore
     public void givenASyaCaseShouldBeSavedIntoCcdViaSubmitAppealService() {
         try {
             submitAppealService.submitAppeal(ALL_DETAILS.getDeserializeMessage());
