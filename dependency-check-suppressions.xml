@@ -21,4 +21,12 @@
         <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
         <cve>CVE-2016-6497</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+      file name: guava-20.0.jar
+      ]]></notes>
+        <cpe>cpe:/a:google:guava:20.0</cpe>
+        <cve>CVE-2018-10237</cve>
+    </suppress>
+
 </suppressions>

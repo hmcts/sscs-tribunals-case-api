@@ -65,12 +65,12 @@
     [
       {
         "url":"http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49",
-        "fileName":"filename1",
+        "fileName":"filename1.doc",
         "uploadedDate" : "2010-10-25"
       },
       {
         "url":"http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49",
-        "fileName":"filename2",
+        "fileName":"filename2.jpg",
         "uploadedDate" : "2010-10-25"
       }
     ]

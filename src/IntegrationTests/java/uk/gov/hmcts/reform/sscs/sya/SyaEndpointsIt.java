@@ -140,7 +140,7 @@ public class SyaEndpointsIt {
         given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId"));
 
         UploadResponse uploadResponse = createUploadResponse();
-        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), any())).willReturn(uploadResponse);
+        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), anyString(), any())).willReturn(uploadResponse);
     }
 
     @Test
@@ -224,7 +224,7 @@ public class SyaEndpointsIt {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
         given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
 
-        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), any()))
+        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), anyString(), any()))
                 .willThrow(new RestClientException("Document store is down"));
 
         mockMvc.perform(post("/appeals")
