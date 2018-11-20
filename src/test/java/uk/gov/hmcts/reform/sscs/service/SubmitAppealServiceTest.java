@@ -14,8 +14,11 @@ import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,16 +27,25 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
+import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.domain.robotics.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
@@ -74,6 +86,9 @@ public class SubmitAppealServiceTest {
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
+    @Captor
+    private ArgumentCaptor<Email> emailCaptor;
+
     private SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
 
     private RoboticsEmailTemplate roboticsEmailTemplate;
@@ -94,6 +109,16 @@ public class SubmitAppealServiceTest {
 
     private SubmitYourAppealToCcdCaseDataDeserializer deserializer;
 
+    @Mock
+    private AuthTokenGenerator authTokenGenerator;
+    @Mock
+    private DocumentUploadClientApi documentUploadClientApi;
+    @Mock
+    private EvidenceDownloadClientApi evidenceDownloadClientApi;
+    @Mock
+    private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
+
+    private EvidenceManagementService evidenceManagementService;
 
     @Before
     public void setUp() {
@@ -108,10 +133,19 @@ public class SubmitAppealServiceTest {
 
         deserializer = new SubmitYourAppealToCcdCaseDataDeserializer();
 
+        ResponseEntity<Resource> mockResponseEntity = mock(ResponseEntity.class);
+        ByteArrayResource stubbedResource = new ByteArrayResource(new byte[] {});
+        when(mockResponseEntity.getBody()).thenReturn(stubbedResource);
+
+        when(authTokenGenerator.generate()).thenReturn("token");
+        when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
+
+        evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi, evidenceMetadataDownloadClientApi);
+
         submitAppealService = new SubmitAppealService(appealNumberGenerator,
                 deserializer, ccdService,
                 sscsPdfService, roboticsService,
-                airLookupService, regionalProcessingCenterService, idamService);
+                airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -198,7 +232,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldSendRoboticsByEmail() {
+    public void shouldSendRoboticsByEmailPdfOnly() {
 
         byte[] expected = {};
 
@@ -206,7 +240,31 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData);
 
-        then(emailService).should(times(2)).sendEmail(any(Email.class));
+        verify(emailService, times(2)).sendEmail(emailCaptor.capture());
+        Email roboticsEmail = emailCaptor.getAllValues().get(1);
+        assertEquals("Expecting 2 attachments", 2, roboticsEmail.getAttachments().size());
+    }
+
+    @Test
+    public void shouldSendRoboticsByEmailWithEvidence() {
+
+        byte[] expected = {};
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
+
+        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
+        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
+        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        stubbedLinks.binary = stubbedLink;
+        stubbedDocument.links = stubbedLinks;
+        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+
+        submitAppealService.submitAppeal(appealDataWithEvidence());
+
+        verify(emailService, times(2)).sendEmail(emailCaptor.capture());
+        Email roboticsEmail = emailCaptor.getAllValues().get(1);
+        assertEquals("Expecting 5 attachments", 5, roboticsEmail.getAttachments().size());
     }
 
     @Test
@@ -277,6 +335,14 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void shouldUpdateCcdWithPdfCombinedWithEvidence() {
+        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
+        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
+        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        stubbedLinks.binary = stubbedLink;
+        stubbedDocument.links = stubbedLinks;
+        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+
         byte[] expected = {1, 2, 3};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
@@ -300,5 +366,15 @@ public class SubmitAppealServiceTest {
                 eq("uploadDocument"),
                 any(), any(), any()
         );
+    }
+
+    private SyaCaseWrapper appealDataWithEvidence() {
+        SyaEvidence evidence1 = new SyaEvidence("http://localhost/1", "letter.pdf", LocalDate.now());
+        SyaEvidence evidence2 = new SyaEvidence("http://localhost/2", "photo.jpg", LocalDate.now());
+        SyaEvidence evidence3 = new SyaEvidence("http://localhost/3", "report.png", LocalDate.now());
+        SyaCaseWrapper appealDataWithEvidence = getSyaCaseWrapper();
+        appealDataWithEvidence.getReasonsForAppealing()
+                .setEvidences(Arrays.asList(evidence1, evidence2, evidence3));
+        return appealDataWithEvidence;
     }
 }

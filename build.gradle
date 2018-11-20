@@ -122,12 +122,6 @@ dependencyCheck {
         // Disable scanning of .NET related binaries
         assemblyEnabled = false
     }
-    cve {
-        url20Modified = 'https://nvd.nist.gov/feeds/xml/cve/2.0/nvdcve-2.0-modified.xml.gz'
-        url20Base = 'https://nvd.nist.gov/feeds/xml/cve/2.0/nvdcve-2.0-%d.xml.gz'
-        url12Modified = 'https://nvd.nist.gov/feeds/xml/cve/1.2/nvdcve-modified.xml.gz'
-        url12Base = 'https://nvd.nist.gov/feeds/xml/cve/1.2/nvdcve-%d.xml.gz'
-    }
 }
 
 repositories {
@@ -201,7 +195,7 @@ dependencyManagement {
     dependencies {
         // checkstyle needs a certain version and so does spring fox swagger, so can't use latest
         // fun times...
-        dependencySet(group: 'com.google.guava', version: '23.0') {
+        dependencySet(group: 'com.google.guava', version: '20.0') {
             entry 'guava'
         }
     }
@@ -214,7 +208,6 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
-    compile group: 'com.google.guava', name: 'guava', version: '23.0'
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names'
@@ -243,7 +236,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '1.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.2.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.121'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-robotics-email-common', version: '0.0.85'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-robotics-email-common', version: '0.0.86'
 
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.1'
 

@@ -15,7 +15,8 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 @EnableFeignClients(basePackages =
         {
                 "uk.gov.hmcts.reform.authorisation",
-                "uk.gov.hmcts.reform.sscs.idam"
+                "uk.gov.hmcts.reform.sscs.idam",
+                "uk.gov.hmcts.reform.sscs.document"
         })
 public class TribunalsCaseApiApplication {
 
