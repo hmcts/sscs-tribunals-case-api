@@ -76,7 +76,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .rep(representative)
                 .signer(syaCaseWrapper.getSignAndSubmit().getSigner())
                 .hearingType(hearingOptions.getWantsToAttend().equals(YES) ? ORAL : PAPER)
-                .receivedVia("")
+                .receivedVia("Online")
                 .build();
     }
 
