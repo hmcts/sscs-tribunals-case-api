@@ -57,7 +57,8 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        String postcode = getFirstHalfOfPostcode(appeal.getAppellant().getContactDetails().getPostCode());
+        String postcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
+                appeal.getAppellant().getContactDetails().getPostCode());
 
         SscsCaseData caseData = prepareCaseForCcd(appeal, postcode);
 
