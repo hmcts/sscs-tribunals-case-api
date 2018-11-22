@@ -16,6 +16,8 @@ spec:
       containers:
       - image: ${IMAGE_NAME}
         name: ${SERVICE_NAME}
+        ports:
+          - containerPort: 8080
         env:
           - name: AUTH_PROVIDER_SERVICE_API_URL
             value: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -79,6 +81,22 @@ spec:
             value: "10MB"
           - name: MAX_REQUEST_SIZE
             value: "10MB"
+
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "1024Mi"
+            cpu: "2500m"
+
+        readinessProbe:
+          timeoutSeconds: 10
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          httpGet:
+            path: /health
+            port: 8080
 ---
 apiVersion: v1
 kind: Service
