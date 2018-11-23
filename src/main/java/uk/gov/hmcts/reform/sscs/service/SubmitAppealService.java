@@ -103,9 +103,10 @@ public class SubmitAppealService {
                 log.info("Duplicate case found for Nino {} and benefit type {} so not creating in CCD", caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
                 return caseDetails;
             }
-        } catch (CcdException ccdEx) {
-            log.error("Failed to create ccd case for Nino - {} and Benefit type - {} but carrying on ",
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), ccdEx);
+        } catch (Exception e) {
+            log.error("Error found in the case creation or callback process for ccd case with "
+                            + "Nino - {} and Benefit type - {} but carrying on ",
+                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
             return SscsCaseDetails.builder().build();
         }
     }
@@ -131,11 +132,11 @@ public class SubmitAppealService {
 
             caseData.setSubscriptions(caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build());
 
-            if (null !=  caseData.getSubscriptions().getRepresentativeSubscription()) {
+            if (null != caseData.getSubscriptions().getRepresentativeSubscription()) {
                 Subscription representativeSubscriptionBuilder =
                         caseData.getSubscriptions().getRepresentativeSubscription().toBuilder()
-                        .tya(appealNumberGenerator.generateAppealNumber())
-                        .build();
+                                .tya(appealNumberGenerator.generateAppealNumber())
+                                .build();
                 caseData.setSubscriptions(caseData.getSubscriptions().toBuilder()
                         .representativeSubscription(representativeSubscriptionBuilder).build());
             }
