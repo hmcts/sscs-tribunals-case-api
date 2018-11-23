@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import org.junit.Before;
@@ -86,6 +87,16 @@ public class CreateCaseInCcdTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
         SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
+        assertNotNull(caseDetails);
+    }
+
+    @Test
+    public void givenASyaCaseWithAppointeeDetailsShouldBeSavedIntoCcd() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE.getDeserializeMessage();
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
+            rpc.getName(), rpc);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
         assertNotNull(caseDetails);
     }

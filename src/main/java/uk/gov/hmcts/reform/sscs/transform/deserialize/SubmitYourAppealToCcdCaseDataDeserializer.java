@@ -119,12 +119,54 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .nino(syaAppellant.getNino())
                 .build();
 
+        Appointee appointee = getAppointee(syaCaseWrapper);
+
         return Appellant.builder()
                 .name(name)
                 .address(address)
                 .contact(contact)
                 .identity(identity)
+                .appointee(appointee)
                 .build();
+    }
+
+    private Appointee getAppointee(SyaCaseWrapper syaCaseWrapper) {
+
+        SyaAppointee syaAppointee = syaCaseWrapper.getAppointee();
+
+        if (null != syaAppointee) {
+            Name name = Name.builder()
+                .title(syaAppointee.getTitle())
+                .firstName(syaAppointee.getFirstName())
+                .lastName(syaAppointee.getLastName())
+                .build();
+
+            Address address = Address.builder()
+                .line1(syaAppointee.getContactDetails().getAddressLine1())
+                .line2(syaAppointee.getContactDetails().getAddressLine2())
+                .town(syaAppointee.getContactDetails().getTownCity())
+                .county(syaAppointee.getContactDetails().getCounty())
+                .postcode(syaAppointee.getContactDetails().getPostCode())
+                .build();
+
+            Contact contact = Contact.builder()
+                .email(syaAppointee.getContactDetails().getEmailAddress())
+                .mobile(getPhoneNumberWithOutSpaces(syaAppointee.getContactDetails().getPhoneNumber()))
+                .build();
+
+            Identity identity = Identity.builder()
+                .dob(syaAppointee.getDob().toString())
+                .build();
+
+            return Appointee.builder()
+                .name(name)
+                .address(address)
+                .contact(contact)
+                .identity(identity)
+                .build();
+        } else {
+            return null;
+        }
     }
 
     private AppealReasons getReasonsForAppealing(

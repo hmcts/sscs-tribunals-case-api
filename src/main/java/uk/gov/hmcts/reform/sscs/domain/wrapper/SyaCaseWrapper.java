@@ -35,6 +35,9 @@ public class SyaCaseWrapper {
     @JsonProperty("appellant")
     private SyaAppellant appellant;
 
+    @JsonProperty("appointee")
+    private SyaAppointee appointee;
+
     @JsonProperty("signAndSubmit")
     private SyaSignAndSubmit signAndSubmit;
 
@@ -113,6 +116,14 @@ public class SyaCaseWrapper {
 
     public void setAppellant(SyaAppellant syaAppellant) {
         this.appellant = syaAppellant;
+    }
+
+    public SyaAppointee getAppointee() {
+        return appointee;
+    }
+
+    public void setAppointee(SyaAppointee syaAppointee) {
+        this.appointee = syaAppointee;
     }
 
     public SyaSignAndSubmit getSignAndSubmit() {
