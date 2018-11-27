@@ -37,6 +37,16 @@ Once the application running locally, please make sure
     For example:  export TEST_URL=http://localhost:8080
 3. Execute ./gradlew --info smoke
 
+### Configure local hosts
+If you are using the [sscs-docker](https://github.com/hmcts/sscs-docker) backend, add the following to your hosts file
+
+```
+127.0.0.1       dm-store
+127.0.0.1       smtp-server
+```
+
+This allows your locally-running copy of the case api to reference the same URLs as the internally-running docker images.
+
 ### Running in Docker(Work in progress...)
 Create the image of the application by executing the following command:
 
