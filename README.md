@@ -45,7 +45,7 @@ If you are using the [sscs-docker](https://github.com/hmcts/sscs-docker) backend
 127.0.0.1       smtp-server
 ```
 
-This allows your locally-running copy of the case api to reference the same URLs as the internally-running docker images.
+This allows your locally-running copy of the case api to reference the same URLs as the internally-running docker images. These are the defaults for their respective services in application.properties.
 
 ### Running in Docker(Work in progress...)
 Create the image of the application by executing the following command:
