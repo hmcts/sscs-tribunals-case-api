@@ -38,6 +38,8 @@ public class SyaCaseWrapper {
     @JsonProperty("appointee")
     private SyaAppointee appointee;
 
+    private Boolean isAddressSameAsAppointee;
+
     @JsonProperty("signAndSubmit")
     private SyaSignAndSubmit signAndSubmit;
 
@@ -126,12 +128,26 @@ public class SyaCaseWrapper {
         this.appointee = syaAppointee;
     }
 
+    public Boolean getIsAddressSameAsAppointee() {
+        return isAddressSameAsAppointee;
+    }
+
+    public void setIsAddressSameAsAppointee(Boolean isAddressSameAsAppointee) {
+        this.isAddressSameAsAppointee = isAddressSameAsAppointee;
+    }
+
     public SyaSignAndSubmit getSignAndSubmit() {
         return signAndSubmit;
     }
 
     public void setSignAndSubmit(SyaSignAndSubmit signAndSubmit) {
         this.signAndSubmit = signAndSubmit;
+    }
+
+    public SyaContactDetails getContactDetails() {
+        return ((null != getIsAddressSameAsAppointee()) && getIsAddressSameAsAppointee()) ?
+            getAppointee().getContactDetails() :
+            getAppellant().getContactDetails();
     }
 
     @Override

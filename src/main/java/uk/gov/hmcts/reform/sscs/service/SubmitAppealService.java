@@ -57,10 +57,9 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        String postcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
-                appeal.getAppellant().getContactDetails().getPostCode());
+        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
 
-        SscsCaseData caseData = prepareCaseForCcd(appeal, postcode);
+        SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
 
         IdamTokens idamTokens = idamService.getIdamTokens();
 
@@ -70,7 +69,7 @@ public class SubmitAppealService {
 
         Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
 
-        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, additionalEvidence);
+        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {

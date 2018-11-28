@@ -28,8 +28,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
                 .generatedSurname(syaCaseWrapper.getAppellant().getLastName())
-                .generatedEmail(syaCaseWrapper.getAppellant().getContactDetails().getEmailAddress())
-                .generatedMobile(getPhoneNumberWithOutSpaces(syaCaseWrapper.getAppellant().getContactDetails().getPhoneNumber()))
+                .generatedEmail(syaCaseWrapper.getContactDetails().getEmailAddress())
+                .generatedMobile(getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber()))
                 .generatedNino(syaCaseWrapper.getAppellant().getNino())
                 .generatedDob(syaCaseWrapper.getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .appeal(appeal)
@@ -101,17 +101,19 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .lastName(syaAppellant.getLastName())
                 .build();
 
+        SyaContactDetails contactDetails = syaCaseWrapper.getContactDetails();
+
         Address address = Address.builder()
-                .line1(syaAppellant.getContactDetails().getAddressLine1())
-                .line2(syaAppellant.getContactDetails().getAddressLine2())
-                .town(syaAppellant.getContactDetails().getTownCity())
-                .county(syaAppellant.getContactDetails().getCounty())
-                .postcode(syaAppellant.getContactDetails().getPostCode())
+                .line1(contactDetails.getAddressLine1())
+                .line2(contactDetails.getAddressLine2())
+                .town(contactDetails.getTownCity())
+                .county(contactDetails.getCounty())
+                .postcode(contactDetails.getPostCode())
                 .build();
 
         Contact contact = Contact.builder()
-                .email(syaAppellant.getContactDetails().getEmailAddress())
-                .mobile(getPhoneNumberWithOutSpaces(syaAppellant.getContactDetails().getPhoneNumber()))
+                .email(contactDetails.getEmailAddress())
+                .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
                 .build();
 
         Identity identity = Identity.builder()
@@ -163,6 +165,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .address(address)
                 .contact(contact)
                 .identity(identity)
+                .sameAddressAsAppellant(syaCaseWrapper.getIsAddressSameAsAppointee())
                 .build();
         } else {
             return null;
@@ -275,10 +278,10 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         String subscribeSms = smsNotify.isWantsSmsNotifications() && !isPaperCase(syaCaseWrapper) ? YES : NO;
 
-        String email = syaCaseWrapper.getAppellant().getContactDetails().getEmailAddress();
+        String email = syaCaseWrapper.getContactDetails().getEmailAddress();
         String wantEmailNotifications = StringUtils.isNotBlank(email) && !isPaperCase(syaCaseWrapper) ? YES : NO;
 
-        String mobile = syaCaseWrapper.getAppellant().getContactDetails().getPhoneNumber();
+        String mobile = syaCaseWrapper.getContactDetails().getPhoneNumber();
         return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
