@@ -249,7 +249,7 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.22.0'
     testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.4-atlassian-1'
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.19.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '1.31.1'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.1.1'
 
     testCompileOnly 'org.projectlombok:lombok:1.16.20'
     testApt "org.projectlombok:lombok:1.16.20"
