@@ -34,7 +34,7 @@ public class EvidenceManagementController {
         }
 
         return evidenceManagementService
-            .upload(files)
+            .upload(files, "sscs")
             .getEmbedded();
     }
 

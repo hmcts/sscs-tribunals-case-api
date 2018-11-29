@@ -138,7 +138,7 @@ public class SubmitAppealServiceTest {
         when(mockResponseEntity.getBody()).thenReturn(stubbedResource);
 
         when(authTokenGenerator.generate()).thenReturn("token");
-        when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
+        when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
 
         evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi, evidenceMetadataDownloadClientApi);
 
@@ -258,7 +258,7 @@ public class SubmitAppealServiceTest {
         uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
-        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
 
         submitAppealService.submitAppeal(appealDataWithEvidence());
 
@@ -341,7 +341,7 @@ public class SubmitAppealServiceTest {
         uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
-        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
 
         byte[] expected = {1, 2, 3};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),

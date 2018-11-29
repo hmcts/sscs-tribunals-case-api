@@ -167,6 +167,6 @@ public class SubmitAppealService {
 
     private byte[] downloadBinary(SyaEvidence evidence) {
 
-        return evidenceManagementService.download(URI.create(evidence.getUrl()));
+        return evidenceManagementService.download(URI.create(evidence.getUrl()), "sscs");
     }
 }

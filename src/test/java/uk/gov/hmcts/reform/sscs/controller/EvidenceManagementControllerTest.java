@@ -49,11 +49,11 @@ public class EvidenceManagementControllerTest {
         UploadResponse.Embedded uploadResponseEmbedded = mock(UploadResponse.Embedded.class);
 
         when(uploadResponse.getEmbedded()).thenReturn(uploadResponseEmbedded);
-        when(evidenceManagementService.upload(files)).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(files, "sscs")).thenReturn(uploadResponse);
 
         UploadResponse.Embedded actualUploadResponseEmbedded = controller.upload(files);
 
-        verify(evidenceManagementService, times(1)).upload(files);
+        verify(evidenceManagementService, times(1)).upload(files, "sscs");
         assertThat(actualUploadResponseEmbedded, equalTo(uploadResponseEmbedded));
 
     }
