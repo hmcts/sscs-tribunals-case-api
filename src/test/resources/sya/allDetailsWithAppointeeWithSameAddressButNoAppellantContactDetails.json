@@ -14,6 +14,7 @@
     "lastName": "Bloggs",
     "dob": "26-02-1990",
     "nino": "AB877533C",
+    "isAddressSameAsAppointee": true
   },
   "appointee": {
     "title": "Mrs",
@@ -29,7 +30,6 @@
       "emailAddress": "sscsappointee@greencroftconsulting.com"
     }
   },
-  "isAddressSameAsAppointee": true,
   "smsNotify": {
     "wantsSMSNotifications": true,
     "smsNumber": "07398785050"

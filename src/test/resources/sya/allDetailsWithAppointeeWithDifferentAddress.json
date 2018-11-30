@@ -14,6 +14,7 @@
     "lastName": "Bloggs",
     "dob": "26-02-1990",
     "nino": "AB877533C",
+    "isAddressSameAsAppointee": false,
     "contactDetails": {
       "addressLine1": "123 Hairy Lane",
       "addressLine2": "Off Hairy Park",

@@ -14,6 +14,7 @@
     "lastName": "Bloggs",
     "dob": "26-02-1990",
     "nino": "AB877533C",
+    "isAddressSameAsAppointee": true,
     "contactDetails": {
       "phoneNumber": "07411222222",
       "emailAddress": "sscstest@greencroftconsulting.com"
@@ -34,7 +35,6 @@
       "emailAddress": "sscsappointee@greencroftconsulting.com"
     }
   },
-  "isAddressSameAsAppointee": true,
   "smsNotify": {
     "wantsSMSNotifications": true,
     "smsNumber": "07398785050"

@@ -135,9 +135,9 @@ public class SyaCaseWrapper {
     }
 
     public SyaContactDetails getContactDetails() {
-        return ((null != getAppellant().getIsAddressSameAsAppointee()) && getAppellant().getIsAddressSameAsAppointee()) ?
-            getAppointee().getContactDetails() :
-            getAppellant().getContactDetails();
+        return ((null != getAppellant().getIsAddressSameAsAppointee()) && getAppellant().getIsAddressSameAsAppointee())
+            ? getAppointee().getContactDetails()
+            : getAppellant().getContactDetails();
     }
 
     @Override

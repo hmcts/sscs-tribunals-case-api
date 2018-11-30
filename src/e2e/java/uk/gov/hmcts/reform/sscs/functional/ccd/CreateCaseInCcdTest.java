@@ -1,13 +1,10 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +88,7 @@ public class CreateCaseInCcdTest {
         assertNotNull(caseDetails);
     }
 
-    @Ignore
+    @Test
     public void givenASyaCaseWithAppointeeDetailsWithSameAddressShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
@@ -99,9 +96,11 @@ public class CreateCaseInCcdTest {
             rpc.getName(), rpc);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
         assertNotNull(caseDetails);
+        assertTrue(syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee());
+        assertEquals("Yes", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
     }
 
-    @Ignore
+    @Test
     public void givenASyaCaseWithAppointeeDetailsWithDifferentAddressShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
@@ -109,9 +108,11 @@ public class CreateCaseInCcdTest {
             rpc.getName(), rpc);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
         assertNotNull(caseDetails);
+        assertFalse(syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee());
+        assertEquals("No", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
     }
 
-    @Ignore
+    @Test
     public void givenASyaCaseWithAppointeeDetailsWithSameAddressButNoAppellantContactDetailsShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NOT_APPELLANT_CONTACT_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
@@ -119,5 +120,7 @@ public class CreateCaseInCcdTest {
             rpc.getName(), rpc);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
         assertNotNull(caseDetails);
+        assertTrue(syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee());
+        assertEquals("Yes", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
     }
 }
