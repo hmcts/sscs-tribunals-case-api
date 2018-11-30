@@ -276,10 +276,10 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-        String subscribeSms = smsNotify.isWantsSmsNotifications() && !isPaperCase(syaCaseWrapper) ? YES : NO;
+        String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
 
         String email = syaCaseWrapper.getContactDetails().getEmailAddress();
-        String wantEmailNotifications = StringUtils.isNotBlank(email) && !isPaperCase(syaCaseWrapper) ? YES : NO;
+        String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
 
         String mobile = syaCaseWrapper.getContactDetails().getPhoneNumber();
         return Subscription.builder()
@@ -312,10 +312,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return null;
 
-    }
-
-    private Boolean isPaperCase(SyaCaseWrapper syaCaseWrapper) {
-        return null != syaCaseWrapper.getSyaHearingOptions() && !syaCaseWrapper.getSyaHearingOptions().getWantsToAttend();
     }
 
     private Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
