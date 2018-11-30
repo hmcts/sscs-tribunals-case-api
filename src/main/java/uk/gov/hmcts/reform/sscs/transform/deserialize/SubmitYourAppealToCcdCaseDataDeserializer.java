@@ -129,6 +129,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .contact(contact)
                 .identity(identity)
                 .appointee(appointee)
+                .isAddressSameAsAppointee(syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee())
                 .build();
     }
 
@@ -165,7 +166,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .address(address)
                 .contact(contact)
                 .identity(identity)
-                .sameAddressAsAppellant(syaCaseWrapper.getIsAddressSameAsAppointee())
                 .build();
         } else {
             return null;

@@ -28,6 +28,9 @@ public class SyaAppellant {
     @JsonProperty("contactDetails")
     private SyaContactDetails contactDetails;
 
+    @JsonProperty("isAddressSameAsAppointee")
+    private Boolean isAddressSameAsAppointee;
+
     public SyaAppellant() {
         // For JSON
     }
@@ -80,6 +83,14 @@ public class SyaAppellant {
         this.contactDetails = contactDetails;
     }
 
+    public Boolean getIsAddressSameAsAppointee() {
+        return isAddressSameAsAppointee;
+    }
+
+    public void setIsAddressSameAsAppointee(Boolean isAddressSameAsAppointee) {
+        this.isAddressSameAsAppointee = isAddressSameAsAppointee;
+    }
+
     @JsonIgnore
     public String getFullName() {
         return title + " " + firstName + " " + lastName;
@@ -94,6 +105,7 @@ public class SyaAppellant {
                 + ", dob=" + dob
                 + ", nino='" + nino + '\''
                 + ", contactDetails=" + contactDetails
+                + ", isAddressSameAsAppointee=" + isAddressSameAsAppointee
                 + '}';
     }
 }

@@ -15,11 +15,6 @@
     "dob": "26-02-1990",
     "nino": "AB877533C",
     "contactDetails": {
-      "addressLine1": "123 Hairy Lane",
-      "addressLine2": "Off Hairy Park",
-      "townCity": "Hairyfield",
-      "county": "Kent",
-      "postCode": "TN32 6PL",
       "phoneNumber": "07411222222",
       "emailAddress": "sscstest@greencroftconsulting.com"
     }
@@ -39,6 +34,7 @@
       "emailAddress": "sscsappointee@greencroftconsulting.com"
     }
   },
+  "isAddressSameAsAppointee": true,
   "smsNotify": {
     "wantsSMSNotifications": true,
     "smsNumber": "07398785050"

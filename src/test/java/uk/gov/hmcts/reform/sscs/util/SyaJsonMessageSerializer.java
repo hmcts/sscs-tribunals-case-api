@@ -38,7 +38,9 @@ public enum SyaJsonMessageSerializer {
     NINO_WITH_SPACES("ninoWithSpaces.json"),
     NINO_WITHOUT_SPACES_CCD("ninoWithoutSpacesCcd.json"),
     WITHOUT_REGIONAL_PROCESSING_CENTER("withoutRpcCcd.json"),
-    ALL_DETAILS_WITH_APPOINTEE("allDetailsWithAppointee.json");
+    ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS("allDetailsWithAppointeeWithSameAddress.json"),
+    ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NOT_APPELLANT_CONTACT_DETAILS("allDetailsWithAppointeeWithSameAddressButNoAppellantContactDetails.json"),
+    ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS("allDetailsWithAppointeeWithDifferentAddress.json");
 
     private final String serializedMessage;
 
