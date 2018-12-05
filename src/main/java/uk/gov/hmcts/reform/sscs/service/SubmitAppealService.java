@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseD
 @Service
 @Slf4j
 public class SubmitAppealService {
+    public static final String DM_STORE_USER_ID = "sscs";
 
     private final AppealNumberGenerator appealNumberGenerator;
     private final SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer;
@@ -166,6 +167,6 @@ public class SubmitAppealService {
 
     private byte[] downloadBinary(SyaEvidence evidence) {
 
-        return evidenceManagementService.download(URI.create(evidence.getUrl()));
+        return evidenceManagementService.download(URI.create(evidence.getUrl()), DM_STORE_USER_ID);
     }
 }
