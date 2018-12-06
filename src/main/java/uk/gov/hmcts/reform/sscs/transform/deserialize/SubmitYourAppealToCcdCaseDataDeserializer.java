@@ -123,9 +123,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Appointee appointee = getAppointee(syaCaseWrapper);
 
-        String useSameAddress = syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee() == null
+        String useSameAddress = (syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee() == null || !syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee())
             ? "No"
-            : syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee() ? "Yes" : "No";
+            : "Yes";
 
         return Appellant.builder()
                 .name(name)
