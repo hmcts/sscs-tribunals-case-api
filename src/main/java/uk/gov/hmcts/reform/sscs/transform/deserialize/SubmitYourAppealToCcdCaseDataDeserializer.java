@@ -271,7 +271,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     private Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
 
         return Subscriptions.builder()
-                .appellantSubscription(getAppellantSubscription(syaCaseWrapper))
+                .appellantSubscription(syaCaseWrapper.getIsAppointee() ? null : getAppellantSubscription(syaCaseWrapper))
+                .appointeeSubscription(syaCaseWrapper.getIsAppointee() ? getAppointeeSubscription(syaCaseWrapper): null )
                 .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
                 .build();
     }
@@ -316,6 +317,25 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return null;
 
+    }
+
+    private Subscription getAppointeeSubscription(SyaCaseWrapper syaCaseWrapper) {
+
+        SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
+
+        String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
+
+        String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
+        String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
+
+        String mobile = syaCaseWrapper.getAppointee().getContactDetails().getPhoneNumber();
+        return Subscription.builder()
+                .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                .subscribeSms(subscribeSms)
+                .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
+                .subscribeEmail(wantEmailNotifications)
+                .email(email)
+                .build();
     }
 
     private Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
