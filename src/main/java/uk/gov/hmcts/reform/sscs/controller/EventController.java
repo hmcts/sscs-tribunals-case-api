@@ -1,14 +1,13 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.model.SscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -27,7 +26,7 @@ public class EventController {
         this.authorisationService = authorisationService;
     }
 
-    @RequestMapping(value = "/events", method = POST, produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/events", produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
     void submitEvent(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestBody SscsCaseDataWrapper sscsCaseDataWrapper) {
@@ -43,7 +42,7 @@ public class EventController {
                 sscsCaseDataWrapper.getNotificationEventType());
     }
 
-    @RequestMapping(value = "/actions", method = POST, produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/actions", produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
     void performAction(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestBody SscsCaseDataWrapper sscsCaseDataWrapper) {

@@ -62,7 +62,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return buildSscsCaseDataWrapper(node);
     }
 
-    private SscsCaseDataWrapper buildSscsCaseDataWrapper(JsonNode node) {
+    public SscsCaseDataWrapper buildSscsCaseDataWrapper(JsonNode node) {
         SscsCaseData newSscsCaseData = null;
         SscsCaseData oldSscsCaseData = null;
 
@@ -74,7 +74,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         }
 
         if (caseNode != null) {
-            newSscsCaseData = createSscsCaseDataFromNode(caseNode, caseDetailsNode);
+            newSscsCaseData = createSscsCaseDataFromNode(caseNode, node, caseDetailsNode);
         }
 
         if (getNode(node, "case_details_before") != null) {
@@ -82,7 +82,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             JsonNode oldCaseNode = getNode(oldCaseDetailsNode, "case_data");
 
             if (oldCaseNode != null) {
-                oldSscsCaseData = createSscsCaseDataFromNode(oldCaseNode, oldCaseDetailsNode);
+                oldSscsCaseData = createSscsCaseDataFromNode(oldCaseNode, node, oldCaseDetailsNode);
             }
         }
         NotificationEventType notificationEventType = NotificationEventType.getNotificationById(getField(node, "event_id"));
@@ -93,7 +93,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 .notificationEventType(notificationEventType).build();
     }
 
-    private SscsCaseData createSscsCaseDataFromNode(JsonNode caseNode, JsonNode caseDetailsNode) {
+    private SscsCaseData createSscsCaseDataFromNode(JsonNode caseNode, JsonNode node, JsonNode caseDetailsNode) {
         SscsCaseData ccdResponse = deserializeCaseNode(caseNode);
         ccdResponse.setCcdCaseId(getField(caseDetailsNode, "id"));
         return ccdResponse;
@@ -123,7 +123,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 .build();
     }
 
-    private OnlinePanel deserializeOnlinePanelJson(JsonNode caseNode) {
+    public OnlinePanel deserializeOnlinePanelJson(JsonNode caseNode) {
         JsonNode panelNode = getNode(caseNode, "onlinePanel");
 
         if (panelNode != null) {
@@ -155,7 +155,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 .signer(getField(appealNode, "signer")).build();
     }
 
-    private MrnDetails deserializeMrnDetailsJson(JsonNode appealNode) {
+    public MrnDetails deserializeMrnDetailsJson(JsonNode appealNode) {
         JsonNode mrnNode = getNode(appealNode, "mrnDetails");
 
         String dwpIssuingOffice = getField(mrnNode, "dwpIssuingOffice");
@@ -170,7 +170,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 .mrnMissingReason(mrnMissingReason).build();
     }
 
-    private Appellant deserializeAppellantDetailsJson(JsonNode appealNode) {
+    public Appellant deserializeAppellantDetailsJson(JsonNode appealNode) {
         JsonNode appellantNode = getNode(appealNode, "appellant");
 
         Name name = deserializeNameJson(appellantNode);
@@ -200,7 +200,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 .nino(getField(nameNode, "nino")).build();
     }
 
-    private BenefitType deserializeBenefitDetailsJson(JsonNode appealNode) {
+    public BenefitType deserializeBenefitDetailsJson(JsonNode appealNode) {
         JsonNode benefitTypeNode = getNode(appealNode, "benefitType");
 
         if (benefitTypeNode != null) {
@@ -210,7 +210,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return null;
     }
 
-    private HearingOptions deserializeHearingOptionsJson(JsonNode appealNode) {
+    public HearingOptions deserializeHearingOptionsJson(JsonNode appealNode) {
         JsonNode hearingOptionsNode = getNode(appealNode, "hearingOptions");
 
         String wantsToAttend = getField(hearingOptionsNode, "wantsToAttend");
@@ -270,7 +270,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return excludeDates;
     }
 
-    private AppealReasons deserializeAppealReasonsJson(JsonNode appealNode) {
+    public AppealReasons deserializeAppealReasonsJson(JsonNode appealNode) {
         JsonNode appealReasonsNode = getNode(appealNode, "appealReasons");
 
         List<AppealReason> reasons = buildAppealReasons(appealReasonsNode);
@@ -300,11 +300,11 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return appealReasons;
     }
 
-    private Representative deserializeRepresentativeReasons(JsonNode appealReasonsNode) {
+    public Representative deserializeRepresentativeReasons(JsonNode appealReasonsNode) {
         final JsonNode repNode = appealReasonsNode.get("rep");
 
         String hasRepresentative = getField(repNode, "hasRepresentative");
-        if (hasRepresentative != null && hasRepresentative.toLowerCase().equals("yes")) {
+        if (hasRepresentative != null && hasRepresentative.equalsIgnoreCase("yes")) {
             Name name = deserializeNameJson(repNode);
             Address address = deserializeAddressJson(repNode);
             Contact contact = deserializeContactJson(repNode);
@@ -317,7 +317,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return null;
     }
 
-    private Subscriptions deserializeSubscriptionsJson(JsonNode subscriptionsNode) {
+    public Subscriptions deserializeSubscriptionsJson(JsonNode subscriptionsNode) {
         return Subscriptions.builder()
                 .appellantSubscription(deserializeSubscriptionJson(
                         subscriptionsNode, "appellantSubscription"))
@@ -337,7 +337,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return subscription;
     }
 
-    private List<Event> deserializeEventDetailsJson(JsonNode caseNode) {
+    public List<Event> deserializeEventDetailsJson(JsonNode caseNode) {
         final JsonNode eventNode = caseNode.get("events");
 
         if (eventNode != null && eventNode.isArray()) {
@@ -352,13 +352,13 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 events.add(Event.builder().value(EventDetails.builder().date(date).type(eventType).build()).build());
 
             }
-            events.sort(Collections.reverseOrder());
+            Collections.sort(events, Collections.reverseOrder());
             return events;
         }
         return null;
     }
 
-    private List<Hearing> deserializeHearingDetailsJson(JsonNode caseNode) {
+    public List<Hearing> deserializeHearingDetailsJson(JsonNode caseNode) {
         final JsonNode hearingNode = caseNode.get("hearings");
 
         if (hearingNode != null && hearingNode.isArray()) {
@@ -379,7 +379,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
 
                 hearings.add(hearing);
             }
-            hearings.sort(Collections.reverseOrder());
+            Collections.sort(hearings, Collections.reverseOrder());
             return hearings;
         }
         return null;
@@ -404,7 +404,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
 
                     documents.add(document);
                 }
-                documents.sort(Collections.reverseOrder());
+                Collections.sort(documents, Collections.reverseOrder());
             }
             return Evidence.builder().documents(documents).build();
         }
@@ -448,15 +448,15 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return field == null || field.equals("") ? "No" : field;
     }
 
-    private JsonNode getNode(JsonNode node, String field) {
+    public JsonNode getNode(JsonNode node, String field) {
         return node != null && node.has(field) && !node.get(field).getNodeType().equals(JsonNodeType.NULL) ? node.get(field) : null;
     }
 
-    private String getField(JsonNode node, String field) {
+    public String getField(JsonNode node, String field) {
         return node != null && !node.asText().equals("null") && node.has(field) && !node.get(field).asText().equals("null") ? node.get(field).asText() : null;
     }
 
-    private RegionalProcessingCenter deserializeRegionalProcessingCenterJson(JsonNode rpcNode) {
+    public RegionalProcessingCenter deserializeRegionalProcessingCenterJson(JsonNode rpcNode) {
         JsonNode regionalProcessingCenterNode = getNode(rpcNode, "regionalProcessingCenter");
 
         if (null != regionalProcessingCenterNode) {
