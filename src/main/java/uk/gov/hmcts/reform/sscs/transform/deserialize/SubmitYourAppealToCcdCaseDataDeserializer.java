@@ -272,7 +272,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return Subscriptions.builder()
                 .appellantSubscription(syaCaseWrapper.getIsAppointee() ? null : getAppellantSubscription(syaCaseWrapper))
-                .appointeeSubscription(syaCaseWrapper.getIsAppointee() ? getAppointeeSubscription(syaCaseWrapper): null )
+                .appointeeSubscription(syaCaseWrapper.getIsAppointee() ? getAppointeeSubscription(syaCaseWrapper) : null)
                 .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
                 .build();
     }

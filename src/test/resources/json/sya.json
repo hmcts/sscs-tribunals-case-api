@@ -8,6 +8,7 @@
     "date": "01-02-2018",
     "reasonForBeingLate": "Lost my paperwork"
   },
+  "isAppointee": false,
   "appellant": {
     "title": "Mr",
     "firstName": "Joe",
