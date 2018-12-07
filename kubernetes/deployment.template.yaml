@@ -81,6 +81,11 @@ spec:
             value: "10MB"
           - name: MAX_REQUEST_SIZE
             value: "10MB"
+          - name: SB_CONN_STRING
+            valueFrom:
+              secretKeyRef:
+                name: ${SERVICE_NAME}-servicebus-secret
+                key: connectionString
 
         resources:
           requests:
@@ -129,3 +134,25 @@ spec:
         backend:
           serviceName: ${SERVICE_NAME}
           servicePort: 80
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: ${SERVICE_NAME}-servicebus-instance
+  namespace: ${NAMESPACE}
+spec:
+  clusterServiceClassExternalName: azure-servicebus
+  clusterServicePlanExternalName: basic
+  parameters:
+    location: uksouth
+    resourceGroup: sscs-tribunals-api-aks
+---
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceBinding
+metadata:
+  name: ${SERVICE_NAME}-servicebus-binding
+  namespace: ${NAMESPACE}
+spec:
+  instanceRef:
+    name: ${SERVICE_NAME}-servicebus-instance
+  secretName: ${SERVICE_NAME}-servicebus-secret
