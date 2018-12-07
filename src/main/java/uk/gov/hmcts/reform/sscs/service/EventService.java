@@ -26,12 +26,12 @@ public class EventService {
 
     @Async
     public void submitEvent(NotificationEventType eventType, SscsCaseData caseData) {
-        performAction(eventType, caseData);
+        handleEvent(eventType, caseData);
     }
 
-    public boolean performAction(NotificationEventType actionType, SscsCaseData caseData) {
+    public boolean handleEvent(NotificationEventType eventType, SscsCaseData caseData) {
 
-        if (CREATE_APPEAL_PDF == actionType) {
+        if (CREATE_APPEAL_PDF == eventType) {
             createAppealPdf(caseData);
             return true;
         }

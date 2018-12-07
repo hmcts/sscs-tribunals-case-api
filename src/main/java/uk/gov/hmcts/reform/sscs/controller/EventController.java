@@ -41,21 +41,4 @@ public class EventController {
         log.info("Event submitted for case {}, {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
                 sscsCaseDataWrapper.getNotificationEventType());
     }
-
-    @PostMapping(value = "/actions", produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    void performAction(
-            @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
-            @RequestBody SscsCaseDataWrapper sscsCaseDataWrapper) {
-
-        log.info("Action received for case id: {}, {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
-                sscsCaseDataWrapper.getNotificationEventType());
-
-        authorisationService.authorise(serviceAuthHeader);
-        eventService.performAction(sscsCaseDataWrapper.getNotificationEventType(),
-                sscsCaseDataWrapper.getNewSscsCaseData());
-
-        log.info("Action performed for case {}, {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
-                sscsCaseDataWrapper.getNotificationEventType());
-    }
-
 }

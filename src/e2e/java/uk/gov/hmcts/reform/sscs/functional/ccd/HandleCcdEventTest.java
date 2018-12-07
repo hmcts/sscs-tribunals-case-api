@@ -52,7 +52,7 @@ public class HandleCcdEventTest {
         SscsCaseDetails caseDetails = ccdService.createCase(createAppealPdfCaseData(), idamTokens);
         assertNull(caseDetails.getData().getSscsDocument());
 
-        eventService.performAction(CREATE_APPEAL_PDF, extractCaseData(caseDetails));
+        eventService.handleEvent(CREATE_APPEAL_PDF, extractCaseData(caseDetails));
 
         SscsCaseDetails updatedCaseDetails = findCaseInCcd(caseDetails.getId());
 

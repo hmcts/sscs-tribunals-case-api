@@ -57,7 +57,7 @@ public class EventServiceTest {
 
         SscsCaseData caseData = buildCaseDataWithoutPdf();
 
-        boolean handled = eventService.performAction(CREATE_APPEAL_PDF, caseData);
+        boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
         assertTrue(handled);
 
@@ -69,7 +69,7 @@ public class EventServiceTest {
 
         SscsCaseData caseData = buildCaseDataWithPdf();
 
-        boolean handled = eventService.performAction(CREATE_APPEAL_PDF, caseData);
+        boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
         assertTrue(handled);
 
@@ -79,7 +79,7 @@ public class EventServiceTest {
     @Test
     public void shouldNotHandleEvent() throws CcdException {
 
-        boolean handled = eventService.performAction(DO_NOT_SEND, null);
+        boolean handled = eventService.handleEvent(DO_NOT_SEND, null);
 
         verify(sscsPdfService, never()).generateAndSendPdf(any(), any(), any());
 
