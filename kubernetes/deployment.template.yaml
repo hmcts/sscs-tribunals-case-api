@@ -86,6 +86,8 @@ spec:
               secretKeyRef:
                 name: ${SERVICE_NAME}-servicebus-secret
                 key: connectionString
+          - name: QUEUE_CONNECTION_STRING
+            value: "$(SB_CONN_STRING);EntityPath=queue"
 
         resources:
           requests:
