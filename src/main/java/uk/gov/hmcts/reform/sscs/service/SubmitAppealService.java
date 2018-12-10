@@ -34,6 +34,7 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
+    private boolean duplicateCaseFound = false;
 
     @Autowired
     SubmitAppealService(AppealNumberGenerator appealNumberGenerator,
@@ -66,11 +67,13 @@ public class SubmitAppealService {
 
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
 
-        byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
+        if(false == duplicateCaseFound) {
+            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
-        Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
+            Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
 
-        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
+            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
+        }
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
@@ -101,6 +104,7 @@ public class SubmitAppealService {
                 return caseDetails;
             } else {
                 log.info("Duplicate case found for Nino {} and benefit type {} so not creating in CCD", caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
+                duplicateCaseFound=true;
                 return caseDetails;
             }
         } catch (Exception e) {
