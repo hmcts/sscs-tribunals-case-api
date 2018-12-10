@@ -311,7 +311,6 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             String organisation = getField(repNode, "organisation");
 
             return Representative.builder()
-                    .hasRepresentative(hasRepresentative)
                     .name(name).address(address).contact(contact).organisation(organisation).build();
         }
         return null;
