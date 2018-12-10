@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
@@ -84,7 +82,7 @@ public class SubmitAppealService {
         }
     }
 
-    protected String getFirstHalfOfPostcode(String postcode) {
+    String getFirstHalfOfPostcode(String postcode) {
         if (postcode != null && postcode.length() > 3) {
             return postcode.substring(0, postcode.length() - 3).trim();
         }
@@ -111,42 +109,12 @@ public class SubmitAppealService {
         }
     }
 
-    protected SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
-        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
-
-        return updateCaseData(caseData);
+    private SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
+        return submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, appealNumberGenerator);
     }
 
-    protected SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
-
-        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, region, rpc);
-
-        return updateCaseData(caseData);
-    }
-
-    private SscsCaseData updateCaseData(SscsCaseData caseData) {
-        try {
-            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription().toBuilder()
-                    .tya(appealNumberGenerator.generateAppealNumber())
-                    .build();
-
-            caseData.setSubscriptions(caseData.getSubscriptions().toBuilder().appellantSubscription(subscription).build());
-
-            if (null != caseData.getSubscriptions().getRepresentativeSubscription()) {
-                Subscription representativeSubscriptionBuilder =
-                        caseData.getSubscriptions().getRepresentativeSubscription().toBuilder()
-                                .tya(appealNumberGenerator.generateAppealNumber())
-                                .build();
-                caseData.setSubscriptions(caseData.getSubscriptions().toBuilder()
-                        .representativeSubscription(representativeSubscriptionBuilder).build());
-            }
-
-            return caseData;
-        } catch (CcdException e) {
-            log.error("Appeal number is not generated for Nino - {} and Benefit Type - {}",
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
-            return caseData;
-        }
+    SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
+        return submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, region, rpc);
     }
 
     private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
