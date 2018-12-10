@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
 import java.util.Collections;
 import java.util.List;
@@ -49,11 +50,11 @@ public class EvidenceManagementControllerTest {
         UploadResponse.Embedded uploadResponseEmbedded = mock(UploadResponse.Embedded.class);
 
         when(uploadResponse.getEmbedded()).thenReturn(uploadResponseEmbedded);
-        when(evidenceManagementService.upload(files)).thenReturn(uploadResponse);
+        when(evidenceManagementService.upload(files, DM_STORE_USER_ID)).thenReturn(uploadResponse);
 
         UploadResponse.Embedded actualUploadResponseEmbedded = controller.upload(files);
 
-        verify(evidenceManagementService, times(1)).upload(files);
+        verify(evidenceManagementService, times(1)).upload(files, DM_STORE_USER_ID);
         assertThat(actualUploadResponseEmbedded, equalTo(uploadResponseEmbedded));
 
     }
