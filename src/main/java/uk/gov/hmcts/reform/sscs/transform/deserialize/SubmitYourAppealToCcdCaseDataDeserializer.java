@@ -32,8 +32,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Subscriptions subscriptions = populateSubscriptions(syaCaseWrapper, appealNumberGenerator);
 
-        System.out.println(subscriptions);
-
         List<SscsDocument> sscsDocuments =  getEvidenceDocumentDetails(syaCaseWrapper);
 
         return SscsCaseData.builder()

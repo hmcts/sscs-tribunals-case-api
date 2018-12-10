@@ -134,10 +134,11 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
     @Test
     public void willAddTyaNumberForAppointee() {
-        given(appealNumberGenerator.generateAppealNumber()).willReturn("tyaNumber");
-        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
-        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper, appealNumberGenerator);
-        assertEquals(caseData.getSubscriptions().getAppointeeSubscription().getTya(), "tyaNumber");
+        final String expectedTrackYourAppealNumber = "tyaNumber";
+        given(appealNumberGenerator.generateAppealNumber()).willReturn(expectedTrackYourAppealNumber);
+        final SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
+        final SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper, appealNumberGenerator);
+        assertEquals(expectedTrackYourAppealNumber, caseData.getSubscriptions().getAppointeeSubscription().getTya());
     }
 
 }
