@@ -34,7 +34,6 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
-    private boolean duplicateCaseFound = false;
 
     @Autowired
     SubmitAppealService(AppealNumberGenerator appealNumberGenerator,
