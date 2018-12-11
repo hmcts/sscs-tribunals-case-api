@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -65,7 +66,12 @@ public class HandleCcdEventTest {
     }
 
     private SscsCaseData createAppealPdfCaseData() {
-        return CaseDataUtils.buildCaseData("Create-Appeal-Pdf");
+        SscsCaseData caseData = CaseDataUtils.buildCaseData("Create-Appeal-Pdf");
+        Appointee appointee = Appointee.builder()
+                .address(caseData.getAppeal().getAppellant().getAddress())
+                .build();
+        caseData.getAppeal().getAppellant().setAppointee(appointee);
+        return caseData;
     }
 
     private SscsCaseDetails findCaseInCcd(Long caseId) {
