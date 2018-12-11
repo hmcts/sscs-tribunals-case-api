@@ -67,64 +67,67 @@ public class SubmitAppealService {
 
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
 
-        if(false == duplicateCaseFound) {
-            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
+        byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
-            Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
+        Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
 
-            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
-        }
+        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
         String region = airLookupService.lookupRegionalCentre(postcode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByName(region);
-
-        if (rpc == null) {
-            return transformAppealToCaseData(appeal);
-        } else {
-            return transformAppealToCaseData(appeal, rpc.getName(), rpc);
-        }
+        
+        return transformAppealToCaseData(appeal, rpc);
     }
 
     protected String getFirstHalfOfPostcode(String postcode) {
         if (postcode != null && postcode.length() > 3) {
             return postcode.substring(0, postcode.length() - 3).trim();
         }
+
         return "";
     }
 
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
+        SscsCaseDetails caseDetails;
+
         try {
-            SscsCaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
-            if (caseDetails == null) {
-                caseDetails = ccdService.createCase(caseData, idamTokens);
-                log.info("Appeal successfully created in CCD for Nino - {} and benefit type {}",
-                        caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
-                return caseDetails;
-            } else {
-                log.info("Duplicate case found for Nino {} and benefit type {} so not creating in CCD", caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
-                duplicateCaseFound=true;
-                return caseDetails;
-            }
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
         } catch (Exception e) {
-            log.error("Error found in the case creation or callback process for ccd case with "
-                            + "Nino - {} and Benefit type - {} but carrying on ",
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
-            return SscsCaseDetails.builder().build();
+            throw new CcdException("Error found in the case creation or callback process for ccd case with"
+                                    + " Nino - " + caseData.getGeneratedNino() 
+                                    + " and Benefit type - " + caseData.getAppeal().getBenefitType().getCode());
         }
+
+        if (caseDetails != null) {
+            throw new CcdException("Duplicate case found for Nino " + caseData.getGeneratedNino() 
+                                    + " and benefit type " + caseData.getAppeal().getBenefitType().getCode());
+        }
+
+        try {
+            caseDetails = ccdService.createCase(caseData, idamTokens);
+        } catch (Exception e) {
+            throw new CcdException("Error found in the case creation or callback process for ccd case with"
+                                    + " Nino - " + caseData.getGeneratedNino() 
+                                    + " and Benefit type - " + caseData.getAppeal().getBenefitType().getCode());
+        }
+
+        log.info("Appeal successfully created in CCD for Nino - {} and benefit type {}",
+                caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
+
+        return caseDetails;
     }
 
-    protected SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
-        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
+    protected SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, RegionalProcessingCenter rpc) {
+        SscsCaseData caseData;
 
-        return updateCaseData(caseData);
-    }
-
-    protected SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
-
-        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, region, rpc);
-
+        if (null == rpc) {
+            caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
+        } else {
+            caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
+        }
+    
         return updateCaseData(caseData);
     }
 
