@@ -19,22 +19,13 @@ public class EventService {
 
     private final SscsPdfService sscsPdfService;
     private final CcdService ccdService;
-    private final RoboticsService roboticsService;
-    private final EvidenceManagementService evidenceManagementService;
-    private final EmailService emailService;
     private final ThreadLocal<IdamTokens> idamTokens;
 
     @Autowired
     EventService(SscsPdfService sscsPdfService,
                  IdamService idamService,
-                 RoboticsService roboticsService,
-                 EvidenceManagementService evidenceManagementService,
-                 EmailService emailService,
                  CcdService ccdService) {
         this.sscsPdfService = sscsPdfService;
-        this.roboticsService = roboticsService;
-        this.evidenceManagementService = evidenceManagementService;
-        this.emailService = emailService;
         this.ccdService = ccdService;
         this.idamTokens = ThreadLocal.withInitial(idamService::getIdamTokens);
     }
