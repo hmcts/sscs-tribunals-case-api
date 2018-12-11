@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseD
 @Service
 @Slf4j
 public class SubmitAppealService {
+    public static final String DM_STORE_USER_ID = "sscs";
 
     private final AppealNumberGenerator appealNumberGenerator;
     private final SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer;
@@ -57,10 +58,9 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        String postcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
-                appeal.getAppellant().getContactDetails().getPostCode());
+        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
 
-        SscsCaseData caseData = prepareCaseForCcd(appeal, postcode);
+        SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
 
         IdamTokens idamTokens = idamService.getIdamTokens();
 
@@ -70,7 +70,7 @@ public class SubmitAppealService {
 
         Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
 
-        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), postcode, pdf, additionalEvidence);
+        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
@@ -167,6 +167,6 @@ public class SubmitAppealService {
 
     private byte[] downloadBinary(SyaEvidence evidence) {
 
-        return evidenceManagementService.download(URI.create(evidence.getUrl()));
+        return evidenceManagementService.download(URI.create(evidence.getUrl()), DM_STORE_USER_ID);
     }
 }

@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -34,7 +36,7 @@ public class EvidenceManagementController {
         }
 
         return evidenceManagementService
-            .upload(files)
+            .upload(files, DM_STORE_USER_ID)
             .getEmbedded();
     }
 

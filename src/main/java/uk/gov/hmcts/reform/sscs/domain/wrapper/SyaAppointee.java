@@ -10,7 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import java.time.LocalDate;
 
-public class SyaAppellant {
+public class SyaAppointee {
 
     private String title;
 
@@ -23,15 +23,10 @@ public class SyaAppellant {
     @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate dob;
 
-    private String nino;
-
     @JsonProperty("contactDetails")
     private SyaContactDetails contactDetails;
 
-    @JsonProperty("isAddressSameAsAppointee")
-    private Boolean isAddressSameAsAppointee;
-
-    public SyaAppellant() {
+    public SyaAppointee() {
         // For JSON
     }
 
@@ -67,28 +62,12 @@ public class SyaAppellant {
         this.dob = dob;
     }
 
-    public String getNino() {
-        return nino;
-    }
-
-    public void setNino(String nino) {
-        this.nino = nino.replaceAll("\\s", "");;
-    }
-
     public SyaContactDetails getContactDetails() {
         return contactDetails;
     }
 
     public void setContactDetails(SyaContactDetails contactDetails) {
         this.contactDetails = contactDetails;
-    }
-
-    public Boolean getIsAddressSameAsAppointee() {
-        return isAddressSameAsAppointee;
-    }
-
-    public void setIsAddressSameAsAppointee(Boolean isAddressSameAsAppointee) {
-        this.isAddressSameAsAppointee = isAddressSameAsAppointee;
     }
 
     @JsonIgnore
@@ -98,14 +77,12 @@ public class SyaAppellant {
 
     @Override
     public String toString() {
-        return "SyaAppellant{"
+        return "SyaAppointee{"
                 + " title='" + title + '\''
                 + ", firstName='" + firstName + '\''
                 + ", lastName='" + lastName + '\''
                 + ", dob=" + dob
-                + ", nino='" + nino + '\''
                 + ", contactDetails=" + contactDetails
-                + ", isAddressSameAsAppointee=" + isAddressSameAsAppointee
                 + '}';
     }
 }
