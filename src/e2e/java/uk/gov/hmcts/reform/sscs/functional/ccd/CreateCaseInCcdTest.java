@@ -118,7 +118,7 @@ public class CreateCaseInCcdTest {
 
     @Test
     public void givenASyaCaseWithAppointeeDetailsWithSameAddressButNoAppellantContactDetailsShouldBeSavedIntoCcd() {
-        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NOT_APPELLANT_CONTACT_DETAILS.getDeserializeMessage();
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
         SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer(appealNumberGenerator).convertSyaToCcdCaseData(syaCaseWrapper,
             rpc.getName(), rpc);

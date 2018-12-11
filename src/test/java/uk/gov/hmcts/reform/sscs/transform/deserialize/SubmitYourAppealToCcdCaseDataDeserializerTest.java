@@ -141,4 +141,28 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertEquals(expectedTrackYourAppealNumber, caseData.getSubscriptions().getAppointeeSubscription().getTya());
     }
 
+    @Test
+    public void syaWithAppointeeAtSameAddress() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
+        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+
+        assertJsonEquals(ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_CCD.getSerializedMessage(), caseData);
+    }
+
+    @Test
+    public void syaWithAppointeeAtDifferentAddress() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS.getDeserializeMessage();
+        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD.getSerializedMessage(), caseData);
+    }
+
+    @Test
+    public void syaWithAppointeeAtSameAddressButNoAppointeeContactDetails() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS.getDeserializeMessage();
+        SscsCaseData caseData = submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS_CCD.getSerializedMessage(), caseData);
+    }
 }
