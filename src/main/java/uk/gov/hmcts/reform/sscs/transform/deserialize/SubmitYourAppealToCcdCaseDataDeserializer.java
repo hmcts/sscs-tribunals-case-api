@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
@@ -21,9 +20,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     private static final String ORAL = "oral";
     private static final String PAPER = "paper";
 
-    @Autowired
-    public SubmitYourAppealToCcdCaseDataDeserializer() {
-    }
 
     public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
