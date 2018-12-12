@@ -25,9 +25,6 @@ public class RoboticsServiceIt {
     @Autowired
     private SubmitYourAppealToCcdCaseDataDeserializer deserializer;
 
-    @Autowired
-    private AppealNumberGenerator appealNumberGenerator;
-
     @Test
     public void givenSyaData_makeValidRoboticsJsonThatValidatesAgainstSchema() {
 
@@ -36,7 +33,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper, appealNumberGenerator))
+                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();
@@ -56,7 +53,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper, appealNumberGenerator))
+                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();
@@ -76,7 +73,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper, appealNumberGenerator))
+                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();

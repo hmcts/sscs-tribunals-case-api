@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static uk.gov.hmcts.reform.sscs.service.AppealNumberGenerator.generateAppealNumber;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -10,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
-import uk.gov.hmcts.reform.sscs.service.AppealNumberGenerator;
 
 @Service
 public class SubmitYourAppealToCcdCaseDataDeserializer {
@@ -20,17 +21,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     private static final String ORAL = "oral";
     private static final String PAPER = "paper";
 
-    private final AppealNumberGenerator appealNumberGenerator;
-
     @Autowired
-    public SubmitYourAppealToCcdCaseDataDeserializer(AppealNumberGenerator appealNumberGenerator) {
-        this.appealNumberGenerator = appealNumberGenerator;
+    public SubmitYourAppealToCcdCaseDataDeserializer() {
     }
 
-    public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, final AppealNumberGenerator appealNumberGenerator) {
+    public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
-        Subscriptions subscriptions = populateSubscriptions(syaCaseWrapper, appealNumberGenerator);
+        Subscriptions subscriptions = populateSubscriptions(syaCaseWrapper);
 
         List<SscsDocument> sscsDocuments =  getEvidenceDocumentDetails(syaCaseWrapper);
 
@@ -48,10 +46,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-
-
     public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, appealNumberGenerator);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
 
         return caseData.toBuilder()
                 .region(region)
@@ -277,16 +273,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return arrangements;
     }
 
-    private Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper, final AppealNumberGenerator appealNumberGenerator) {
+    private Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
 
         return Subscriptions.builder()
-                .appellantSubscription(!syaCaseWrapper.getIsAppointee() ? getAppellantSubscription(syaCaseWrapper, appealNumberGenerator) : null)
-                .appointeeSubscription(syaCaseWrapper.getIsAppointee() ? getAppointeeSubscription(syaCaseWrapper, appealNumberGenerator) : null)
-                .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper, appealNumberGenerator))
+                .appellantSubscription(!syaCaseWrapper.getIsAppointee() ? getAppellantSubscription(syaCaseWrapper) : null)
+                .appointeeSubscription(syaCaseWrapper.getIsAppointee() ? getAppointeeSubscription(syaCaseWrapper) : null)
+                .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
                 .build();
     }
 
-    private Subscription getAppellantSubscription(SyaCaseWrapper syaCaseWrapper, final AppealNumberGenerator appealNumberGenerator) {
+    private Subscription getAppellantSubscription(SyaCaseWrapper syaCaseWrapper) {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
@@ -299,14 +295,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
-                .tya(appealNumberGenerator.generateAppealNumber())
+                .tya(generateAppealNumber())
                 .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
     }
 
-    private Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper, final AppealNumberGenerator appealNumberGenerator) {
+    private Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
 
         if (syaCaseWrapper.hasRepresentative()) {
 
@@ -322,7 +318,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                             .getRepresentative().getContactDetails().getPhoneNumber()))
                     .subscribeEmail(emailAddressExists ? YES : NO)
                     .email(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress())
-                    .tya(appealNumberGenerator.generateAppealNumber())
+                    .tya(generateAppealNumber())
                     .build();
         }
 
@@ -330,7 +326,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     }
 
-    private Subscription getAppointeeSubscription(SyaCaseWrapper syaCaseWrapper, final AppealNumberGenerator appealNumberGenerator) {
+    private Subscription getAppointeeSubscription(SyaCaseWrapper syaCaseWrapper) {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
@@ -343,7 +339,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
-                .tya(appealNumberGenerator.generateAppealNumber())
+                .tya(generateAppealNumber())
                 .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)

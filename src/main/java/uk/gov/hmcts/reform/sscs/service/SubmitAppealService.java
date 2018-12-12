@@ -23,7 +23,6 @@ import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseD
 public class SubmitAppealService {
     public static final String DM_STORE_USER_ID = "sscs";
 
-    private final AppealNumberGenerator appealNumberGenerator;
     private final SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer;
     private final CcdService ccdService;
     private final SscsPdfService sscsPdfService;
@@ -34,8 +33,7 @@ public class SubmitAppealService {
     private final EvidenceManagementService evidenceManagementService;
 
     @Autowired
-    SubmitAppealService(AppealNumberGenerator appealNumberGenerator,
-                        SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer,
+    SubmitAppealService(SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer,
                         CcdService ccdService,
                         SscsPdfService sscsPdfService,
                         RoboticsService roboticsService,
@@ -44,7 +42,6 @@ public class SubmitAppealService {
                         IdamService idamService,
                         EvidenceManagementService evidenceManagementService) {
 
-        this.appealNumberGenerator = appealNumberGenerator;
         this.submitYourAppealToCcdCaseDataDeserializer = submitYourAppealToCcdCaseDataDeserializer;
         this.ccdService = ccdService;
         this.sscsPdfService = sscsPdfService;
@@ -110,7 +107,7 @@ public class SubmitAppealService {
     }
 
     private SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
-        return submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, appealNumberGenerator);
+        return submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
     }
 
     SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {

@@ -57,9 +57,6 @@ public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
 
     @Mock
-    private AppealNumberGenerator appealNumberGenerator;
-
-    @Mock
     private CcdService ccdService;
 
     @Mock
@@ -131,7 +128,7 @@ public class SubmitAppealServiceTest {
         regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
 
-        deserializer = new SubmitYourAppealToCcdCaseDataDeserializer(appealNumberGenerator);
+        deserializer = new SubmitYourAppealToCcdCaseDataDeserializer();
 
         ResponseEntity<Resource> mockResponseEntity = mock(ResponseEntity.class);
         ByteArrayResource stubbedResource = new ByteArrayResource(new byte[] {});
@@ -142,8 +139,7 @@ public class SubmitAppealServiceTest {
 
         evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi, evidenceMetadataDownloadClientApi);
 
-        submitAppealService = new SubmitAppealService(appealNumberGenerator,
-                deserializer, ccdService,
+        submitAppealService = new SubmitAppealService(deserializer, ccdService,
                 sscsPdfService, roboticsService,
                 airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService);
 
@@ -155,7 +151,7 @@ public class SubmitAppealServiceTest {
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData, appealNumberGenerator)).ccdCaseId(123L).evidencePresent("No").build();
+                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(123L).evidencePresent("No").build();
 
         given(roboticsJsonMapper.map(any())).willReturn(json);
     }
@@ -170,7 +166,7 @@ public class SubmitAppealServiceTest {
             .willReturn(expected);
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData, appealNumberGenerator)).ccdCaseId(null).evidencePresent("No").build();
+                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
 
         submitAppealService.submitAppeal(appealData);
 
@@ -193,11 +189,9 @@ public class SubmitAppealServiceTest {
             any())).willReturn(expected);
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
-        reset(appealNumberGenerator);
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(appealNumberGenerator, times(2)).generateAppealNumber();
         verify(ccdService).createCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 
@@ -210,7 +204,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(SscsCaseDetails.builder().build());
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData, appealNumberGenerator)).ccdCaseId(null).evidencePresent("No").build();
+                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
 
         submitAppealService.submitAppeal(appealData);
 
@@ -322,7 +316,7 @@ public class SubmitAppealServiceTest {
         given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData, appealNumberGenerator)).ccdCaseId(987L).evidencePresent("No").build();
+                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("No").build();
 
         submitAppealService.submitAppeal(appealData);
 
@@ -356,7 +350,7 @@ public class SubmitAppealServiceTest {
         SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData, appealNumberGenerator)).ccdCaseId(987L).evidencePresent("Yes").build();
+                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
 
         submitAppealService.submitAppeal(appealData);
 
