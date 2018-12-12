@@ -26,7 +26,7 @@ public class EventService {
     private final RoboticsService roboticsService;
     private final EvidenceManagementService evidenceManagementService;
     private final EmailService emailService;
-    private final ThreadLocal<IdamTokens> idamTokens;
+    private final IdamService idamService;
 
     @Autowired
     EventService(SscsPdfService sscsPdfService,
@@ -40,7 +40,7 @@ public class EventService {
         this.evidenceManagementService = evidenceManagementService;
         this.emailService = emailService;
         this.ccdService = ccdService;
-        this.idamTokens = ThreadLocal.withInitial(idamService::getIdamTokens);
+        this.idamService = idamService;
     }
 
     @Async
@@ -50,24 +50,25 @@ public class EventService {
 
     public boolean handleEvent(NotificationEventType eventType, SscsCaseData caseData) {
 
-        idamTokens.remove();
-
         if (CREATE_APPEAL_PDF == eventType) {
-            return createAppealPdf(Long.parseLong(caseData.getCcdCaseId()));
+            return createAppealPdfAndSendToRobotics(Long.parseLong(caseData.getCcdCaseId()));
         }
 
         return false;
     }
 
-    private boolean createAppealPdf(long caseId) {
-        SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens.get());
+    private boolean createAppealPdfAndSendToRobotics(long caseId) {
+
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
+
         if (caseDetails != null) {
             SscsCaseData caseData = caseDetails.getData();
             caseData.setEvidencePresent(hasEvidence(caseData));
 
             String postcode = caseData.getAppeal().getAppellant().getAddress().getPostcode();
 
-            byte[] pdf = sscsPdfService.generateAndSendPdf(caseDetails.getData(), caseId, idamTokens.get());
+            byte[] pdf = sscsPdfService.generateAndSendPdf(caseDetails.getData(), caseId, idamTokens);
 
             Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
 
