@@ -284,7 +284,7 @@ jacocoTestReport {
 
 pitest {
     targetClasses = ['uk.gov.hmcts.sscs.*']
-    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*','uk.gov.hmcts.reform.sscs.models.*','uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication.java','uk.gov.hmcts.reform.sscs.transform.deserialize.SscsCaseDataWrapperDeserializer']
+    excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*','uk.gov.hmcts.reform.sscs.models.*','uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication.java']
     threads = 10
     outputFormats = ['XML', 'HTML']
     timestampedReports = false
