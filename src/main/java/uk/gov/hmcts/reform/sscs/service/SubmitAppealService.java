@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -16,14 +18,12 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @Service
 @Slf4j
 public class SubmitAppealService {
     public static final String DM_STORE_USER_ID = "sscs";
 
-    private final SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer;
     private final CcdService ccdService;
     private final SscsPdfService sscsPdfService;
     private final RoboticsService roboticsService;
@@ -33,8 +33,7 @@ public class SubmitAppealService {
     private final EvidenceManagementService evidenceManagementService;
 
     @Autowired
-    SubmitAppealService(SubmitYourAppealToCcdCaseDataDeserializer submitYourAppealToCcdCaseDataDeserializer,
-                        CcdService ccdService,
+    SubmitAppealService(CcdService ccdService,
                         SscsPdfService sscsPdfService,
                         RoboticsService roboticsService,
                         AirLookupService airLookupService,
@@ -42,7 +41,6 @@ public class SubmitAppealService {
                         IdamService idamService,
                         EvidenceManagementService evidenceManagementService) {
 
-        this.submitYourAppealToCcdCaseDataDeserializer = submitYourAppealToCcdCaseDataDeserializer;
         this.ccdService = ccdService;
         this.sscsPdfService = sscsPdfService;
         this.roboticsService = roboticsService;
@@ -107,11 +105,11 @@ public class SubmitAppealService {
     }
 
     private SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
-        return submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal);
+        return convertSyaToCcdCaseData(appeal);
     }
 
     SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
-        return submitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(appeal, region, rpc);
+        return convertSyaToCcdCaseData(appeal, region, rpc);
     }
 
     private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {

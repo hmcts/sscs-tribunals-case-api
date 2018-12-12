@@ -11,6 +11,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
@@ -50,7 +51,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -104,8 +104,6 @@ public class SubmitAppealServiceTest {
 
     private JSONObject json = new JSONObject();
 
-    private SubmitYourAppealToCcdCaseDataDeserializer deserializer;
-
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
@@ -128,8 +126,6 @@ public class SubmitAppealServiceTest {
         regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
 
-        deserializer = new SubmitYourAppealToCcdCaseDataDeserializer();
-
         ResponseEntity<Resource> mockResponseEntity = mock(ResponseEntity.class);
         ByteArrayResource stubbedResource = new ByteArrayResource(new byte[] {});
         when(mockResponseEntity.getBody()).thenReturn(stubbedResource);
@@ -139,7 +135,7 @@ public class SubmitAppealServiceTest {
 
         evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi, evidenceMetadataDownloadClientApi);
 
-        submitAppealService = new SubmitAppealService(deserializer, ccdService,
+        submitAppealService = new SubmitAppealService(ccdService,
                 sscsPdfService, roboticsService,
                 airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService);
 
@@ -151,7 +147,7 @@ public class SubmitAppealServiceTest {
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(123L).evidencePresent("No").build();
+                convertSyaToCcdCaseData(appealData)).ccdCaseId(123L).evidencePresent("No").build();
 
         given(roboticsJsonMapper.map(any())).willReturn(json);
     }
@@ -166,7 +162,7 @@ public class SubmitAppealServiceTest {
             .willReturn(expected);
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
+                convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
 
         submitAppealService.submitAppeal(appealData);
 
@@ -204,7 +200,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(SscsCaseDetails.builder().build());
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
+                convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
 
         submitAppealService.submitAppeal(appealData);
 
@@ -316,7 +312,7 @@ public class SubmitAppealServiceTest {
         given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("No").build();
+                convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("No").build();
 
         submitAppealService.submitAppeal(appealData);
 
@@ -350,7 +346,7 @@ public class SubmitAppealServiceTest {
         SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
+                convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
 
         submitAppealService.submitAppeal(appealData);
 
