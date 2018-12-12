@@ -64,6 +64,9 @@ public class EventServiceTest {
         emailService = new EmailService(mock(JavaMailSender.class));
         eventService = new EventService(sscsPdfService,
                 idamService,
+                roboticsService,
+                evidenceManagementService,
+                emailService,
                 ccdService);
     }
 
