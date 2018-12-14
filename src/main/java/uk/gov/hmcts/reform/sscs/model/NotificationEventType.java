@@ -22,7 +22,7 @@ public enum NotificationEventType {
         return b;
     }
 
-    private String getId() {
+    public String getId() {
         return id;
     }
 }

@@ -12,7 +12,6 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
 @SpringBootApplication
 @EnableAsync
@@ -53,15 +52,6 @@ public class TribunalsCaseApiApplication {
         properties.put("mail.smtp.ssl.trust","*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
-    }
-
-    @Bean
-    public CcdRequestDetails getRequestDetails(@Value("${core_case_data.jurisdictionId}") String coreCaseDataJurisdictionId,
-                                               @Value("${core_case_data.caseTypeId}") String coreCaseDataCaseTypeId) {
-        return CcdRequestDetails.builder()
-                .caseTypeId(coreCaseDataCaseTypeId)
-                .jurisdictionId(coreCaseDataJurisdictionId)
-                .build();
     }
 
     @Bean
