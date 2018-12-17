@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.model.NotificationEventType.CREATE_APPEAL
 import static uk.gov.hmcts.reform.sscs.model.NotificationEventType.DO_NOT_SEND;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -102,6 +102,7 @@ public class EventServiceTest {
 
     private SscsCaseData buildCaseDataWithoutPdf() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
+        caseData.setSscsDocument(Collections.emptyList());
         caseData.setCcdCaseId(CCD_CASE_ID.toString());
         return caseData;
     }
