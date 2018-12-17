@@ -202,12 +202,6 @@ dependencyManagement {
 }
 
 dependencies {
-
-    // Added these due to vulnerability https://nvd.nist.gov/vuln/detail/CVE-2018-8088
-    // Remove when springboot has been upgraded to a later version of slf4j
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
-    compile group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.8.0-beta2'
-    
     compile group: 'org.springframework.boot', name: 'spring-boot-starter'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
