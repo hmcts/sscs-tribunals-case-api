@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Evidence;
@@ -36,6 +37,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.OnlinePanel;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
@@ -110,11 +113,13 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         List<Hearing> hearings = deserializeHearingDetailsJson(caseNode);
         Evidence evidence = deserializeEvidenceDetailsJson(caseNode);
         RegionalProcessingCenter rpc = deserializeRegionalProcessingCenterJson(caseNode);
+        List<SscsDocument> sscsDocument = deserializeSscsDocuments(caseNode);
 
         return SscsCaseData.builder()
                 .caseReference(getField(caseNode, "caseReference"))
                 .onlinePanel(onlinePanel)
                 .appeal(appeal)
+                .sscsDocument(sscsDocument)
                 .subscriptions(subscriptions)
                 .events(events)
                 .hearings(hearings)
@@ -354,7 +359,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             Collections.sort(events, Collections.reverseOrder());
             return events;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     public List<Hearing> deserializeHearingDetailsJson(JsonNode caseNode) {
@@ -381,7 +386,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             Collections.sort(hearings, Collections.reverseOrder());
             return hearings;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private Evidence deserializeEvidenceDetailsJson(JsonNode caseNode) {
@@ -472,4 +477,37 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         }
         return null;
     }
+
+    private List<SscsDocument> deserializeSscsDocuments(JsonNode caseNode) {
+        List<SscsDocument> list = new ArrayList<>();
+        JsonNode sscsDocument = getNode(caseNode, "sscsDocument");
+
+        for (int i = 0; sscsDocument != null && i < sscsDocument.size(); ++i) {
+            JsonNode doc = sscsDocument.get(i);
+            JsonNode value = getNode(doc, "value");
+            JsonNode link = getNode(value, "documentLink");
+            if (doc == null || value == null || link == null) {
+                continue;
+            }
+
+            list.add(SscsDocument.builder()
+                    .value(
+                            SscsDocumentDetails.builder()
+                                    .documentDateAdded(getField(value, "documentDateAdded"))
+                                    .documentFileName(getField(value, "documentFileName"))
+                                    .documentLink(
+                                            DocumentLink.builder()
+                                                    .documentUrl(getField(link, "document_url"))
+                                                    .documentBinaryUrl(getField(link, "document_binary_url"))
+                                                    .documentFilename(getField(link, "document_filename"))
+                                                    .build()
+                                    )
+                                    .build()
+                    )
+                    .build()
+            );
+        }
+        return list;
+    }
+
 }

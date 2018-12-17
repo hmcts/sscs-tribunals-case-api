@@ -21,7 +21,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mail.javamail.JavaMailSender;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -74,9 +73,6 @@ public class EventServiceTest {
     public void shouldCallPdfService() throws CcdException {
 
         SscsCaseData caseData = buildCaseDataWithoutPdf();
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).id(CCD_CASE_ID).build();
-
-        when(ccdService.getByCaseId(CCD_CASE_ID, idamTokens)).thenReturn(caseDetails);
 
         boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
@@ -89,15 +85,12 @@ public class EventServiceTest {
     public void shouldNotCallPdfService() throws CcdException {
 
         SscsCaseData caseData = buildCaseDataWithPdf();
-        SscsCaseDetails caseDetails = SscsCaseDetails.builder().data(caseData).id(CCD_CASE_ID).build();
-
-        when(ccdService.getByCaseId(CCD_CASE_ID, idamTokens)).thenReturn(caseDetails);
 
         boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
         assertTrue(handled);
 
-        verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens));
+        verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens));
     }
 
     @Test

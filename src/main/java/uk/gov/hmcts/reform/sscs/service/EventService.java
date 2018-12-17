@@ -7,10 +7,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -43,37 +41,39 @@ public class EventService {
         this.idamService = idamService;
     }
 
-    @Async
-    public void submitEvent(NotificationEventType eventType, SscsCaseData caseData) {
-        handleEvent(eventType, caseData);
-    }
-
     public boolean handleEvent(NotificationEventType eventType, SscsCaseData caseData) {
 
         if (CREATE_APPEAL_PDF == eventType) {
-            return createAppealPdfAndSendToRobotics(Long.parseLong(caseData.getCcdCaseId()));
+            createAppealPdfAndSendToRobotics(caseData);
+            return true;
         }
 
         return false;
     }
 
-    private boolean createAppealPdfAndSendToRobotics(long caseId) {
+    private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
 
-        IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseDetails caseDetails = ccdService.getByCaseId(caseId, idamTokens);
+        if (!hasDocument(caseData)) {
 
-        if (caseDetails != null) {
-            SscsCaseData caseData = caseDetails.getData();
-            caseData.setEvidencePresent(hasEvidence(caseData));
-
-            String postcode = caseData.getAppeal().getAppellant().getAddress().getPostcode();
-
-            byte[] pdf = sscsPdfService.generateAndSendPdf(caseDetails.getData(), caseId, idamTokens);
+            IdamTokens idamTokens = idamService.getIdamTokens();
+            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()), idamTokens);
 
             Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
+            caseData.setEvidencePresent(additionalEvidence.size() > 0 ? "Yes" : "No");
+            String postcode = caseData.getAppeal().getAppellant().getAddress().getPostcode();
+            roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()), postcode, pdf, additionalEvidence);
+        }
+    }
 
-            roboticsService.sendCaseToRobotics(caseData, caseId, postcode, pdf, additionalEvidence);
-            return true;
+    private boolean hasDocument(SscsCaseData caseData) {
+        String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        if (caseData.getSscsDocument() != null && fileName != null) {
+            // Case has documents attached - look by name
+            for (SscsDocument document : caseData.getSscsDocument()) {
+                if (document != null && fileName.equals(document.getValue().getDocumentFileName())) {
+                    return true;
+                }
+            }
         }
         return false;
     }
@@ -96,15 +96,4 @@ public class EventService {
                 SubmitAppealService.DM_STORE_USER_ID);
     }
 
-    private String hasEvidence(SscsCaseData caseData) {
-        String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
-        if (caseData.getSscsDocument() != null) {
-            for (SscsDocument document : caseData.getSscsDocument()) {
-                if (document != null && !fileName.equals(document.getValue().getDocumentFileName())) {
-                    return "Yes";
-                }
-            }
-        }
-        return "No";
-    }
 }

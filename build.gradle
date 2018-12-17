@@ -158,7 +158,6 @@ sonarqube {
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
         property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/transform/deserialize/SscsCaseDataWrapperDeserializer.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/model/**"
