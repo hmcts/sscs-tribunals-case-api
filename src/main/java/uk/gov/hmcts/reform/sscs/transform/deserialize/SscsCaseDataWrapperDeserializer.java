@@ -77,7 +77,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         }
 
         if (caseNode != null) {
-            newSscsCaseData = createSscsCaseDataFromNode(caseNode, node, caseDetailsNode);
+            newSscsCaseData = createSscsCaseDataFromNode(caseNode, caseDetailsNode);
         }
 
         if (getNode(node, "case_details_before") != null) {
@@ -85,7 +85,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             JsonNode oldCaseNode = getNode(oldCaseDetailsNode, "case_data");
 
             if (oldCaseNode != null) {
-                oldSscsCaseData = createSscsCaseDataFromNode(oldCaseNode, node, oldCaseDetailsNode);
+                oldSscsCaseData = createSscsCaseDataFromNode(oldCaseNode, oldCaseDetailsNode);
             }
         }
         NotificationEventType notificationEventType = NotificationEventType.getNotificationById(getField(node, "event_id"));
@@ -96,7 +96,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 .notificationEventType(notificationEventType).build();
     }
 
-    private SscsCaseData createSscsCaseDataFromNode(JsonNode caseNode, JsonNode node, JsonNode caseDetailsNode) {
+    private SscsCaseData createSscsCaseDataFromNode(JsonNode caseNode, JsonNode caseDetailsNode) {
         SscsCaseData ccdResponse = deserializeCaseNode(caseNode);
         ccdResponse.setCcdCaseId(getField(caseDetailsNode, "id"));
         return ccdResponse;

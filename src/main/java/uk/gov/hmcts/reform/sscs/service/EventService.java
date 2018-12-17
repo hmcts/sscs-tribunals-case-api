@@ -20,7 +20,6 @@ import uk.gov.hmcts.reform.sscs.model.NotificationEventType;
 public class EventService {
 
     private final SscsPdfService sscsPdfService;
-    private final CcdService ccdService;
     private final RoboticsService roboticsService;
     private final EvidenceManagementService evidenceManagementService;
     private final EmailService emailService;
@@ -31,13 +30,11 @@ public class EventService {
                  IdamService idamService,
                  RoboticsService roboticsService,
                  EvidenceManagementService evidenceManagementService,
-                 EmailService emailService,
-                 CcdService ccdService) {
+                 EmailService emailService) {
         this.sscsPdfService = sscsPdfService;
         this.roboticsService = roboticsService;
         this.evidenceManagementService = evidenceManagementService;
         this.emailService = emailService;
-        this.ccdService = ccdService;
         this.idamService = idamService;
     }
 
@@ -67,12 +64,9 @@ public class EventService {
 
     private boolean hasDocument(SscsCaseData caseData) {
         String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
-        if (caseData.getSscsDocument() != null && fileName != null) {
-            // Case has documents attached - look by name
-            for (SscsDocument document : caseData.getSscsDocument()) {
-                if (document != null && fileName.equals(document.getValue().getDocumentFileName())) {
-                    return true;
-                }
+        for (SscsDocument document : caseData.getSscsDocument()) {
+            if (document != null && fileName.equals(document.getValue().getDocumentFileName())) {
+                return true;
             }
         }
         return false;

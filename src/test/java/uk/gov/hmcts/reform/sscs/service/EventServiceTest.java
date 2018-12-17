@@ -46,9 +46,6 @@ public class EventServiceTest {
     @Mock
     private EvidenceManagementService evidenceManagementService;
 
-    @Mock
-    private CcdService ccdService;
-
     private IdamTokens idamTokens;
 
     private EmailService emailService;
@@ -65,8 +62,7 @@ public class EventServiceTest {
                 idamService,
                 roboticsService,
                 evidenceManagementService,
-                emailService,
-                ccdService);
+                emailService);
     }
 
     @Test
