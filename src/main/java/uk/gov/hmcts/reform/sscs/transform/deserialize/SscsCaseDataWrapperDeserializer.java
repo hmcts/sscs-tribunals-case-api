@@ -48,6 +48,8 @@ import uk.gov.hmcts.reform.sscs.model.SscsCaseDataWrapper;
 @Service
 public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDataWrapper> {
 
+    public static final String VALUE = "value";
+
     public SscsCaseDataWrapperDeserializer() {
         this(null);
     }
@@ -264,7 +266,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
 
             if (excludeDatesNode != null && excludeDatesNode.isArray()) {
                 for (final JsonNode objNode : excludeDatesNode) {
-                    final JsonNode valueNode = getNode(objNode, "value");
+                    final JsonNode valueNode = getNode(objNode, VALUE);
 
                     excludeDates.add(ExcludeDate.builder().value(DateRange.builder()
                             .start(getField(valueNode, "start"))
@@ -294,7 +296,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
 
             if (reasonsNode != null && reasonsNode.isArray()) {
                 for (final JsonNode objNode : reasonsNode) {
-                    final JsonNode valueNode = getNode(objNode, "value");
+                    final JsonNode valueNode = getNode(objNode, VALUE);
 
                     appealReasons.add(AppealReason.builder().value(AppealReasonDetails.builder()
                             .description(getField(valueNode, "description"))
@@ -348,7 +350,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             List<Event> events = new ArrayList<>();
 
             for (final JsonNode objNode : eventNode) {
-                JsonNode valueNode = getNode(objNode, "value");
+                JsonNode valueNode = getNode(objNode, VALUE);
 
                 String date = getField(valueNode, "date");
                 String eventType = getField(valueNode, "type");
@@ -369,7 +371,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             List<Hearing> hearings = new ArrayList<>();
 
             for (final JsonNode objNode : hearingNode) {
-                JsonNode valueNode = getNode(objNode, "value");
+                JsonNode valueNode = getNode(objNode, VALUE);
                 JsonNode venueNode = getNode(valueNode, "venue");
 
                 Hearing hearing = Hearing.builder().value(HearingDetails.builder()
@@ -399,7 +401,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             if (documentsNode != null && documentsNode.isArray()) {
                 for (final JsonNode objNode : documentsNode) {
 
-                    JsonNode valueNode = getNode(objNode, "value");
+                    JsonNode valueNode = getNode(objNode, VALUE);
 
                     Document document = Document.builder().value(DocumentDetails.builder()
                             .dateReceived(getField(valueNode, "dateReceived"))
@@ -484,7 +486,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
 
         for (int i = 0; sscsDocument != null && i < sscsDocument.size(); ++i) {
             JsonNode doc = sscsDocument.get(i);
-            JsonNode value = getNode(doc, "value");
+            JsonNode value = getNode(doc, VALUE);
             JsonNode link = getNode(value, "documentLink");
             if (doc == null || value == null || link == null) {
                 continue;
