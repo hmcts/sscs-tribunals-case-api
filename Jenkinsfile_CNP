@@ -42,12 +42,45 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-    if (env.CHANGE_TITLE && !env.CHANGE_TITLE.startsWith('Bump')) {
-        enableDockerBuild()
-        enableDeployToAKS()
+  if (env.CHANGE_TITLE && !env.CHANGE_TITLE.startsWith('Bump')) {
+    enableDockerBuild()
+    enableDeployToAKS()
+  }
+  enableSlackNotifications('#sscs-tech')
+  loadVaultSecrets(secrets)
+  setVaultName('sscs')
+  before('smoketest:aks') {
+    withAksClient('nonprod') {
+      def az = { cmd -> return sh(script: "env AZURE_CONFIG_DIR=/opt/jenkins/.azure-${env.SUBSCRIPTION_NAME} az $cmd", returnStdout: true).trim() }
+
+      def dockerImage = new DockerImage(product, component, null, env.BRANCH_NAME)
+      def subscription = env.SUBSCRIPTION_NAME
+      def aksServiceName = dockerImage.getAksServiceName().toLowerCase()
+      def storageSecret = "${aksServiceName}-storage-secret"
+      def serviceBusSecret = "${aksServiceName}-servicebus-secret"
+      def queueNames = [
+        "envelopes",
+        "notifications"
+      ]
+      def storageContainers = [testInputStorageContainerName, testRejectedStorageContainerName, "sscs"]
+
+      def namespace = aksServiceName
+      def kubectl = new Kubectl(this, subscription, namespace)
+      kubectl.login()
+
+      // Get service bus connection string and parse to get namespace
+      def serviceBusConnectionStr = kubectl.getSecret(serviceBusSecret, namespace, "{.data.connectionString}")
+      //Regex: Endpoint=sb:\/\/([-a-zA-Z0-9]+)\.servicebus\.windows\.net.*
+      def serviceBusNamespace = serviceBusConnectionStr.substring(14).split("\\.")[0]
+
+      // create queue
+      def queues = az "servicebus queue list --resource-group ${env.RESOURCE_GROUP} --namespace-name ${serviceBusNamespace} --query '[].name'"
+      queueNames.each {
+        if (!queues.contains("${it}")) {
+          az "servicebus queue create --resource-group ${env.RESOURCE_GROUP} --namespace-name ${serviceBusNamespace} --name ${it}"
+        }
+      }
     }
-    enableSlackNotifications('#sscs-tech')
-    loadVaultSecrets(secrets)
-    setVaultName('sscs')
+  }
 }
 
