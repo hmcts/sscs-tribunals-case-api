@@ -22,19 +22,22 @@ public class EventService {
     private final RoboticsService roboticsService;
     private final EvidenceManagementService evidenceManagementService;
     private final EmailService emailService;
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
 
     @Autowired
     EventService(SscsPdfService sscsPdfService,
-                 IdamService idamService,
                  RoboticsService roboticsService,
+                 RegionalProcessingCenterService regionalProcessingCenterService,
+                 IdamService idamService,
                  EvidenceManagementService evidenceManagementService,
                  EmailService emailService) {
         this.sscsPdfService = sscsPdfService;
         this.roboticsService = roboticsService;
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
+        this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
         this.emailService = emailService;
-        this.idamService = idamService;
     }
 
     public boolean handleEvent(NotificationEventType eventType, SscsCaseData caseData) {
@@ -51,13 +54,17 @@ public class EventService {
 
         if (!hasDocument(caseData)) {
 
+            String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
+                    caseData.getAppeal().getAppellant().getAddress().getPostcode());
+
             IdamTokens idamTokens = idamService.getIdamTokens();
+
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()), idamTokens);
 
             Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
-            caseData.setEvidencePresent(additionalEvidence.size() > 0 ? "Yes" : "No");
-            String postcode = caseData.getAppeal().getAppellant().getAddress().getPostcode();
-            roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()), postcode, pdf, additionalEvidence);
+
+            roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()),
+                    firstHalfOfPostcode, pdf, additionalEvidence);
         }
     }
 

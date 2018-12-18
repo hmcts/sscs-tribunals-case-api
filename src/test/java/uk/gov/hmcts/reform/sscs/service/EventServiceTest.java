@@ -46,6 +46,9 @@ public class EventServiceTest {
     @Mock
     private EvidenceManagementService evidenceManagementService;
 
+    @Mock
+    private RegionalProcessingCenterService regionalProcessingCenterService;
+
     private IdamTokens idamTokens;
 
     private EmailService emailService;
@@ -59,8 +62,9 @@ public class EventServiceTest {
 
         emailService = new EmailService(mock(JavaMailSender.class));
         eventService = new EventService(sscsPdfService,
-                idamService,
                 roboticsService,
+                regionalProcessingCenterService,
+                idamService,
                 evidenceManagementService,
                 emailService);
     }
