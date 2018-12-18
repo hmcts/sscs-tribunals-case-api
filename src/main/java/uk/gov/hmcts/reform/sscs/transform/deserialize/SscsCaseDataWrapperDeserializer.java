@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
-import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.NO;
-import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.YES;
-
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -125,7 +122,6 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
                 .onlinePanel(onlinePanel)
                 .appeal(appeal)
                 .sscsDocument(sscsDocument)
-                .evidencePresent(hasEvidence(sscsDocument))
                 .subscriptions(subscriptions)
                 .events(events)
                 .hearings(hearings)
@@ -516,7 +512,4 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         return list;
     }
 
-    private String hasEvidence(List<SscsDocument> sscsDocuments) {
-        return (null == sscsDocuments || sscsDocuments.isEmpty()) ? NO : YES;
-    }
 }

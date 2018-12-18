@@ -54,6 +54,7 @@ public class EventService {
 
         if (!hasDocument(caseData)) {
 
+            caseData.setEvidencePresent(hasEvidence(caseData));
             String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
                     caseData.getAppeal().getAppellant().getAddress().getPostcode());
 
@@ -76,6 +77,18 @@ public class EventService {
             }
         }
         return false;
+    }
+
+    private String hasEvidence(SscsCaseData caseData) {
+        String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        if (caseData.getSscsDocument() != null) {
+            for (SscsDocument document : caseData.getSscsDocument()) {
+                if (document != null && !fileName.equals(document.getValue().getDocumentFileName())) {
+                    return "Yes";
+                }
+            }
+        }
+        return "No";
     }
 
     private Map<String, byte[]> downloadEvidence(SscsCaseData caseData) {
