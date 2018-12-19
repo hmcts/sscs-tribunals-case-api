@@ -12,9 +12,11 @@ public class Norm {
     }
 
     public static String dwpIssuingOffice(String value) {
-        Matcher m = PIP_NUMBER.matcher(value);
-        if (m.find()) {
-            return m.replaceFirst("DWP PIP ($1)");
+        if (value != null) {
+            Matcher m = PIP_NUMBER.matcher(value);
+            if (m.find()) {
+                return m.replaceFirst("DWP PIP ($1)");
+            }
         }
         return value;
     }
