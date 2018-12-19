@@ -66,8 +66,6 @@ withPipeline(type, product, component) {
         "envelopes",
         "notifications"
       ]
-      def storageContainers = [testInputStorageContainerName, testRejectedStorageContainerName, "sscs"]
-
       def namespace = aksServiceName
       def kubectl = new Kubectl(this, subscription, namespace)
       kubectl.login()
