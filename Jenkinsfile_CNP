@@ -6,6 +6,10 @@ properties([
 
 @Library("Infrastructure")
 
+import uk.gov.hmcts.contino.GradleBuilder
+import uk.gov.hmcts.contino.Kubectl
+import uk.gov.hmcts.contino.DockerImage
+
 def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
