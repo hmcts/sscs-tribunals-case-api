@@ -13,8 +13,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 
 public class SubmitYourAppealToCcdCaseDataDeserializer {
 
-    public static final String YES = "Yes";
-    public static final String NO = "No";
+    private static final String YES = "Yes";
+    private static final String NO = "No";
     private static final String ORAL = "oral";
     private static final String PAPER = "paper";
 
