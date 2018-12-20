@@ -155,7 +155,8 @@
     "receivedVia": "Online"
   },
   "subscriptions": {
-    "appellantSubscription": {
+    "appellantSubscription": null,
+    "appointeeSubscription": {
       "wantSmsNotifications": "Yes",
       "tya": null,
       "email": "sscsappointee@greencroftconsulting.com",

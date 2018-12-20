@@ -156,10 +156,11 @@
     "receivedVia": "Online"
   },
   "subscriptions": {
-    "appellantSubscription": {
+    "appellantSubscription" : null,
+    "appointeeSubscription": {
       "wantSmsNotifications": "Yes",
       "tya": null,
-      "email": "sscstest@greencroftconsulting.com",
+      "email": "sscsappointee@greencroftconsulting.com",
       "mobile": "07398785050",
       "subscribeEmail": "Yes",
       "subscribeSms": "Yes",
