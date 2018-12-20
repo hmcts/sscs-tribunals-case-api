@@ -131,6 +131,7 @@
       "reason": null
     },
     "supporterSubscription": null,
+    "appointeeSubscription": null,
     "representativeSubscription": null
   },
   "evidencePresent" : "No"
