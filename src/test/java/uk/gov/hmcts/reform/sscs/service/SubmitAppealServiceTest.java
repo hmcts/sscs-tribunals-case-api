@@ -31,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -119,13 +120,6 @@ public class SubmitAppealServiceTest {
     public void setUp() {
         submitYourAppealEmailTemplate =
                 new SubmitYourAppealEmailTemplate("from", "to", "message");
-        RoboticsEmailTemplate roboticsEmailTemplate =
-                new RoboticsEmailTemplate("from", "to", "message");
-
-        SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
-                pdfStoreService, submitYourAppealEmailTemplate, ccdService);
-        RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
-                roboticsJsonValidator, roboticsEmailTemplate);
 
         RegionalProcessingCenterService regionalProcessingCenterService =
                 new RegionalProcessingCenterService(airLookupService);
@@ -143,9 +137,18 @@ public class SubmitAppealServiceTest {
                 new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi,
                         evidenceMetadataDownloadClientApi);
 
-        submitAppealService = new SubmitAppealService(ccdService,
-                sscsPdfService, roboticsService,
-                airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService);
+        SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
+                pdfStoreService, submitYourAppealEmailTemplate, ccdService);
+
+        RoboticsEmailTemplate roboticsEmailTemplate =
+                new RoboticsEmailTemplate("from", "to", "message");
+
+        RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
+                roboticsJsonValidator, roboticsEmailTemplate);
+
+        submitAppealService = Mockito.spy(new SubmitAppealService(
+                ccdService, sscsPdfService, roboticsService, airLookupService, regionalProcessingCenterService,
+                idamService, evidenceManagementService));
 
         given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -380,10 +383,23 @@ public class SubmitAppealServiceTest {
     }
 
     @Test(expected = CreateCaseInCcdException.class)
-    public void givenExceptionWhenCreatingCaseInCcd_shouldThrownException() {
+    public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
         submitAppealService.submitAppeal(appealData);
     }
+
+    @Test(expected = CreateCaseInCcdException.class)
+    public void givenCaseDoesExistInCcdAndGivenExceptionWhenCreatingCaseInCcd_shouldThrowException() {
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willReturn(null);
+
+        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willThrow(CreateCaseInCcdException.class);
+
+        submitAppealService.submitAppeal(appealData);
+    }
+
+    //duplicate scenario
 }
