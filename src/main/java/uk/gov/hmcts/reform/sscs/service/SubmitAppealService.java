@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
+import uk.gov.hmcts.reform.sscs.exception.CreateCaseInCcdException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -51,7 +52,8 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
+        String firstHalfOfPostcode = regionalProcessingCenterService
+                .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
 
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
 
@@ -93,14 +95,15 @@ public class SubmitAppealService {
                         caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
                 return caseDetails;
             } else {
-                log.info("Duplicate case found for Nino {} and benefit type {} so not creating in CCD", caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
+                log.info("Duplicate case found for Nino {} and benefit type {} so not creating in CCD",
+                        caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
                 return caseDetails;
             }
         } catch (Exception e) {
-            log.error("Error found in the case creation or callback process for ccd case with "
-                            + "Nino - {} and Benefit type - {} ",
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
-            return SscsCaseDetails.builder().build();
+            throw new CreateCaseInCcdException(
+                    String.format("Error found in the case creation or callback process for ccd case with "
+                                    + "Nino - %s and Benefit type - %s",
+                            caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode()), e);
         }
     }
 
