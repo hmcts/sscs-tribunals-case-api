@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
@@ -69,11 +73,47 @@ public class TribunalsService {
     }
 
     public SurnameResponse validateSurname(String appealNumber, String surname) {
-        SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
-        if (caseData == null) {
-            log.info("Not a valid surname: " + surname);
-            throw new InvalidSurnameException();
+        IdamTokens idamTokens = idamService.getIdamTokens();
+
+        // Try raw e.g. "Surname(appointee)"
+        SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamTokens);
+        if (caseData != null) {
+            return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname);
         }
-        return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname);
+        
+        // Try clean e.g. "Surname"
+        String cleanSurname = stripBracketedSuffix(surname);
+
+        if (!surname.equalsIgnoreCase(cleanSurname)) {
+            caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, cleanSurname, idamTokens);
+
+            if (caseData != null) {
+                return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, cleanSurname);
+            }
+        }
+
+        // Try neat e.g. "Surname (Appointee)"
+        String neatSurname = cleanSurname + " (Appointee)";
+
+        if (!surname.equalsIgnoreCase(neatSurname)) {
+            caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, neatSurname, idamTokens);
+
+            if (caseData != null) {
+                return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, neatSurname);
+            }
+        }
+
+        log.info("Not a valid surname: '" + surname + "' for appeal " + appealNumber);
+        throw new InvalidSurnameException();
+    }
+
+    private String stripBracketedSuffix(String input) {
+        Pattern p = Pattern.compile("^([A-Za-zÀ-ž '-]{2,})(\\s*\\(\\s*[APOINTEapointe ]{0,}\\)\\s*){0,1}$");
+        Matcher m = p.matcher(input);
+        if (m.matches()) {
+            return m.group(1).trim();
+        }
+
+        return "";
     }
 }
