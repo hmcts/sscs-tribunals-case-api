@@ -103,7 +103,7 @@ public class TribunalsService {
             }
         }
 
-        log.info("Not a valid surname: '" + surname + "' for appeal " + appealNumber);
+        log.info("Could not match surname '" + surname + "' to appeal '" + appealNumber + "'");
         throw new InvalidSurnameException();
     }
 
