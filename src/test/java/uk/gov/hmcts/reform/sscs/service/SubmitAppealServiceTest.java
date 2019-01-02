@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -362,7 +363,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test(expected = CcdException.class)
-    public void givenCaseDoesExistInCcdAndGivenExceptionWhenCreatingCaseInCcd_shouldThrowException() {
+    public void givenCaseDoesNotExistInCcdAndGivenExceptionWhenCreatingCaseInCcd_shouldThrowException() {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
                 .willReturn(null);
 
@@ -372,5 +373,12 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData);
     }
 
-    //duplicate scenario
+    @Test(expected = CcdException.class)
+    @Ignore
+    public void givenCaseIsADuplicate_shouldThrowException() {
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().build());
+
+        submitAppealService.submitAppeal(appealData);
+    }
 }
