@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
-import uk.gov.hmcts.reform.sscs.exception.CreateCaseInCcdException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -100,7 +99,7 @@ public class SubmitAppealService {
                 return caseDetails;
             }
         } catch (Exception e) {
-            throw new CreateCaseInCcdException(
+            throw new CcdException(
                     String.format("Error found in the case creation or callback process for ccd case with "
                                     + "Nino - %s and Benefit type - %s",
                             caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode()), e);
