@@ -198,28 +198,6 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void shouldSendEmailWithPdfWhenCcdIsDown() throws Exception {
-        given(ccdClient.searchForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
-
-        given(ccdClient.startCaseForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
-
-        mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
-                .andExpect(status().isCreated());
-
-        then(mailSender).should(times(2)).send(message);
-
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
-        assertNull(getPdfWrapper().getCcdCaseId());
-    }
-
-    @Test
     public void shouldSendEmailWithPdfWhenDocumentStoreIsDown() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
         given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
