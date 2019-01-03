@@ -169,8 +169,7 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void shouldNotAddDuplicateCaseToCcdAndStillGeneratePdfAndSend() throws Exception {
-
+    public void shouldNotAddDuplicateCaseToCcdAndShouldNotGeneratePdf() throws Exception {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
@@ -180,16 +179,8 @@ public class SyaEndpointsIt {
                 .content(getCase()))
                 .andExpect(status().isCreated());
 
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
+        verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
-        verify(mailSender, times(2)).send(message);
-
-        assertNotNull(getPdfWrapper().getCcdCaseId());
     }
 
     private PdfWrapper getPdfWrapper() {
