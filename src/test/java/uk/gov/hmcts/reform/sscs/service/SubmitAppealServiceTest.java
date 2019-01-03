@@ -4,6 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -25,13 +26,11 @@ import java.util.List;
 import java.util.Map;
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -144,9 +143,9 @@ public class SubmitAppealServiceTest {
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
                 roboticsJsonValidator, roboticsEmailTemplate);
 
-        submitAppealService = Mockito.spy(new SubmitAppealService(
+        submitAppealService = new SubmitAppealService(
                 ccdService, sscsPdfService, roboticsService, airLookupService, regionalProcessingCenterService,
-                idamService, evidenceManagementService));
+                idamService, evidenceManagementService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -172,23 +171,6 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData);
 
         verify(ccdService).createCase(any(SscsCaseData.class), any(IdamTokens.class));
-    }
-
-    @Test
-    public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
-                .willReturn(SscsCaseDetails.builder().build());
-
-        roboticsWrapper = RoboticsWrapper.builder()
-                .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
-
-        submitAppealService.submitAppeal(appealData);
-
-        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 
     @Test
@@ -373,12 +355,27 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData);
     }
 
-    @Test(expected = CcdException.class)
-    @Ignore
-    public void givenCaseIsADuplicate_shouldThrowException() {
+    @Test
+    public void givenCaseIsADuplicate_shouldNotResendEmails() {
+        SscsCaseDetails duplicateCase = SscsCaseDetails.builder().build();
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().build());
+                .willReturn(duplicateCase);
 
         submitAppealService.submitAppeal(appealData);
+
+        then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
+    }
+
+    @Test
+    public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
+                .willReturn(SscsCaseDetails.builder().build());
+
+        roboticsWrapper = RoboticsWrapper.builder()
+                .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 }
