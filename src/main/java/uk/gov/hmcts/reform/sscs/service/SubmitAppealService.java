@@ -62,16 +62,12 @@ public class SubmitAppealService {
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails) {
-        if (!isDuplicate(caseDetails)) {
+        if (null != caseDetails) {
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
             roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
                     additionalEvidence);
         }
-    }
-
-    private boolean isDuplicate(SscsCaseDetails caseDetails) {
-        return null == caseDetails;
     }
 
     private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
