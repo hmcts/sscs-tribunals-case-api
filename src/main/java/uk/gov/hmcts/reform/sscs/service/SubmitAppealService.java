@@ -98,7 +98,7 @@ public class SubmitAppealService {
             }
         } catch (Exception e) {
             log.error("Error found in the case creation or callback process for ccd case with "
-                            + "Nino - {} and Benefit type - {} but carrying on ",
+                            + "Nino - {} and Benefit type - {} ",
                     caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
             return SscsCaseDetails.builder().build();
         }
