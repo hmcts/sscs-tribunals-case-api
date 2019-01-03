@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
-import static uk.gov.hmcts.reform.sscs.service.AppealNumberGenerator.generateAppealNumber;
+import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
