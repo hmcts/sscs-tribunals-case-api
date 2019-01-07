@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.model.NotificationEventType.CREATE_APPEAL
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class EventService {
     public boolean handleEvent(NotificationEventType eventType, SscsCaseData caseData) {
 
         if (CREATE_APPEAL_PDF == eventType) {
-            createAppealPdfAndSendToRobotics(caseData);
+            createAppealPdfAndSendToRobotics((wrap(caseData)));
             return true;
         }
 
@@ -67,6 +68,14 @@ public class EventService {
             roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()),
                     firstHalfOfPostcode, pdf, additionalEvidence);
         }
+    }
+
+    private void createAppealPdfAndSendToRobotics(Runnable generateAppealPdf) {
+        Executors.newSingleThreadExecutor().submit(generateAppealPdf);
+    }
+
+    private Runnable wrap(SscsCaseData caseData) {
+        return () -> createAppealPdfAndSendToRobotics(caseData);
     }
 
     private boolean hasDocument(SscsCaseData caseData) {

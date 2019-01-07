@@ -49,6 +49,7 @@ import uk.gov.hmcts.reform.sscs.model.SscsCaseDataWrapper;
 public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDataWrapper> {
 
     public static final String VALUE = "value";
+    public static final String YES = "yes";
 
     public SscsCaseDataWrapperDeserializer() {
         this(null);
@@ -311,13 +312,14 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         final JsonNode repNode = appealReasonsNode.get("rep");
 
         String hasRepresentative = getField(repNode, "hasRepresentative");
-        if (hasRepresentative != null && hasRepresentative.equalsIgnoreCase("yes")) {
+        if (hasRepresentative != null && hasRepresentative.equalsIgnoreCase(YES)) {
             Name name = deserializeNameJson(repNode);
             Address address = deserializeAddressJson(repNode);
             Contact contact = deserializeContactJson(repNode);
             String organisation = getField(repNode, "organisation");
 
             return Representative.builder()
+                    .hasRepresentative(YES)
                     .name(name).address(address).contact(contact).organisation(organisation).build();
         }
         return null;
