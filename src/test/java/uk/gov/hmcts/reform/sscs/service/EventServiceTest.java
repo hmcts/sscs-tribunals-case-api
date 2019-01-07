@@ -146,7 +146,9 @@ public class EventServiceTest {
         boolean handled = eventService.handleEvent(eventType, caseData);
         try {
             Thread.sleep(200);
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+            // Void
+        }
         return handled;
     }
 
