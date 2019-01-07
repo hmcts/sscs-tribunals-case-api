@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.model.NotificationEventType;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EventServiceTest {
@@ -75,7 +74,7 @@ public class EventServiceTest {
 
         SscsCaseData caseData = buildCaseDataWithoutPdf();
 
-        boolean handled = invokeEventService(CREATE_APPEAL_PDF, caseData);
+        boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
         assertTrue(handled);
 
@@ -87,7 +86,7 @@ public class EventServiceTest {
 
         SscsCaseData caseData = buildCaseDataWithPdf();
 
-        boolean handled = invokeEventService(CREATE_APPEAL_PDF, caseData);
+        boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
         assertTrue(handled);
 
@@ -97,7 +96,7 @@ public class EventServiceTest {
     @Test
     public void shouldNotHandleEvent() throws CcdException {
 
-        boolean handled = invokeEventService(DO_NOT_SEND, null);
+        boolean handled = eventService.handleEvent(DO_NOT_SEND, null);
 
         verify(sscsPdfService, never()).generateAndSendPdf(any(), any(), any());
 
@@ -140,16 +139,6 @@ public class EventServiceTest {
                 .build()
         );
         return list;
-    }
-
-    private boolean invokeEventService(NotificationEventType eventType, SscsCaseData caseData) {
-        boolean handled = eventService.handleEvent(eventType, caseData);
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            // Void
-        }
-        return handled;
     }
 
 }

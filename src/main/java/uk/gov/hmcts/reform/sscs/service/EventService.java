@@ -44,11 +44,15 @@ public class EventService {
     public boolean handleEvent(NotificationEventType eventType, SscsCaseData caseData) {
 
         if (CREATE_APPEAL_PDF == eventType) {
-            createAppealPdfAndSendToRobotics((wrap(caseData)));
+            createAppealPdfAndSendToRobotics(caseData);
             return true;
         }
 
         return false;
+    }
+
+    private void handleEvent(Runnable eventHandler) {
+        Executors.newSingleThreadExecutor().submit(eventHandler);
     }
 
     private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
@@ -70,12 +74,18 @@ public class EventService {
         }
     }
 
-    private void createAppealPdfAndSendToRobotics(Runnable generateAppealPdf) {
-        Executors.newSingleThreadExecutor().submit(generateAppealPdf);
+    public boolean sendEvent(NotificationEventType eventType, SscsCaseData caseData) {
+
+        if (CREATE_APPEAL_PDF == eventType) {
+            handleEvent(eventHandler(eventType, caseData));
+            return true;
+        }
+
+        return false;
     }
 
-    private Runnable wrap(SscsCaseData caseData) {
-        return () -> createAppealPdfAndSendToRobotics(caseData);
+    private Runnable eventHandler(NotificationEventType eventType, SscsCaseData caseData) {
+        return () -> handleEvent(eventType, caseData);
     }
 
     private boolean hasDocument(SscsCaseData caseData) {
