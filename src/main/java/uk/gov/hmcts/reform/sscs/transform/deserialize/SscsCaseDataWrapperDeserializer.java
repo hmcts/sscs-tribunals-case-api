@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasonDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
@@ -49,7 +50,7 @@ import uk.gov.hmcts.reform.sscs.model.SscsCaseDataWrapper;
 public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDataWrapper> {
 
     public static final String VALUE = "value";
-    public static final String YES = "yes";
+    public static final String YES = "Yes";
 
     public SscsCaseDataWrapperDeserializer() {
         this(null);
@@ -185,19 +186,37 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
         Address address = deserializeAddressJson(appellantNode);
         Contact contact = deserializeContactJson(appellantNode);
         Identity identity = deserializeIdentityJson(appellantNode);
+        String isAddressSameAsAppointee = getField(appellantNode, "isAddressSameAsAppointee");
+        Appointee appointee = deserializeAppointeeDetailsJson(appellantNode);
 
         return Appellant.builder()
-                .name(name).address(address).contact(contact).identity(identity).build();
+                .name(name).address(address).contact(contact).identity(identity)
+                .isAddressSameAsAppointee(isAddressSameAsAppointee)
+                .appointee(appointee)
+                .build();
+    }
+
+    public Appointee deserializeAppointeeDetailsJson(JsonNode appellantNode) {
+        JsonNode appointeeNode = getNode(appellantNode, "appointee");
+
+        Name name = deserializeNameJson(appointeeNode);
+        Address address = deserializeAddressJson(appointeeNode);
+        Contact contact = deserializeContactJson(appointeeNode);
+        Identity identity = deserializeIdentityJson(appointeeNode);
+
+        return Appointee.builder()
+                .name(name).address(address).contact(contact).identity(identity)
+                .build();
     }
 
     private Contact deserializeContactJson(JsonNode node) {
         JsonNode contactNode = getNode(node, "contact");
 
-        String phone = getField(contactNode, "phone") != null ? getField(contactNode, "phone") : getField(contactNode, "mobile");
-
         return Contact.builder()
                 .email(getField(contactNode, "email"))
-                .phone(phone).build();
+                .phone(getField(contactNode, "phone"))
+                .mobile(getField(contactNode, "mobile"))
+                .build();
     }
 
     private Identity deserializeIdentityJson(JsonNode node) {
