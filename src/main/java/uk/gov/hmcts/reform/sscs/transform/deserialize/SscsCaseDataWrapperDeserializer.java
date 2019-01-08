@@ -212,11 +212,11 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
     private Contact deserializeContactJson(JsonNode node) {
         JsonNode contactNode = getNode(node, "contact");
 
+        String phone = getField(contactNode, "phone") != null ? getField(contactNode, "phone") : getField(contactNode, "mobile");
+
         return Contact.builder()
                 .email(getField(contactNode, "email"))
-                .phone(getField(contactNode, "phone"))
-                .mobile(getField(contactNode, "mobile"))
-                .build();
+                .phone(phone).build();
     }
 
     private Identity deserializeIdentityJson(JsonNode node) {
