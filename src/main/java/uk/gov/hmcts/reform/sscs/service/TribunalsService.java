@@ -1,9 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -80,7 +79,7 @@ public class TribunalsService {
         if (caseData != null) {
             return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname);
         }
-        
+
         // Try clean e.g. "Surname"
         String cleanSurname = stripBracketedSuffix(surname);
 
