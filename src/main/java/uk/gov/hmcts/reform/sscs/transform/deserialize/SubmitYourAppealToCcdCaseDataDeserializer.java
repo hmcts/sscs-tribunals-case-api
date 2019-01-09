@@ -113,7 +113,10 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .postcode(contactDetails.getPostCode())
                 .build();
 
-        Contact contact = getAppellantContact(syaCaseWrapper);
+        Contact contact = Contact.builder()
+                .email(contactDetails.getEmailAddress())
+                .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
+                .build();
 
         Identity identity = Identity.builder()
                 .dob(syaAppellant.getDob().toString())
@@ -129,22 +132,11 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return Appellant.builder()
                 .name(name)
                 .address(address)
-                .contact(contact)
+                .contact(appointee == null ? contact : Contact.builder().build())
                 .identity(identity)
                 .appointee(appointee)
                 .isAddressSameAsAppointee(useSameAddress)
                 .build();
-    }
-
-    private static Contact getAppellantContact(SyaCaseWrapper syaCaseWrapper) {
-        if (syaCaseWrapper.getAppointee() == null) {
-            return Contact.builder()
-                    .email(syaCaseWrapper.getContactDetails().getEmailAddress())
-                    .mobile(getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber()))
-                    .build();
-        } else {
-            return Contact.builder().build();
-        }
     }
 
     private static Appointee getAppointee(SyaCaseWrapper syaCaseWrapper) {
