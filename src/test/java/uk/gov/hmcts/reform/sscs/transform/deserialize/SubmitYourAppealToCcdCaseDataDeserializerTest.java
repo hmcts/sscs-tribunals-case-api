@@ -49,6 +49,15 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void syaDwpIssuingOfficeTest() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getMrn().setDwpIssuingOffice("DWP PIP ( 10)");
+        SscsCaseData caseData = SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertEquals("DWP PIP (10)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Test
     public void syaWithoutNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
