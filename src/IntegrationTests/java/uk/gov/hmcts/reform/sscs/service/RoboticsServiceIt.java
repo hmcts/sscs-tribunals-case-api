@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 
 import org.json.JSONObject;
@@ -13,7 +14,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.domain.robotics.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.service.RoboticsService;
-import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -21,9 +21,6 @@ public class RoboticsServiceIt {
 
     @Autowired
     private RoboticsService roboticsService;
-
-    @Autowired
-    private SubmitYourAppealToCcdCaseDataDeserializer deserializer;
 
     @Test
     public void givenSyaData_makeValidRoboticsJsonThatValidatesAgainstSchema() {
@@ -33,7 +30,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
+                .sscsCaseData(convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();
@@ -53,7 +50,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
+                .sscsCaseData(convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();
@@ -73,7 +70,7 @@ public class RoboticsServiceIt {
         RoboticsWrapper appeal =
             RoboticsWrapper
                 .builder()
-                .sscsCaseData(deserializer.convertSyaToCcdCaseData(syaCaseWrapper))
+                .sscsCaseData(convertSyaToCcdCaseData(syaCaseWrapper))
                 .ccdCaseId(1234L)
                 .evidencePresent("Yes")
                 .build();

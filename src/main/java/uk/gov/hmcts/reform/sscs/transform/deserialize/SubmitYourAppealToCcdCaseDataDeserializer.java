@@ -1,16 +1,17 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
+import uk.gov.hmcts.reform.sscs.util.Norm;
 
-@Service
 public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static final String YES = "Yes";
@@ -18,7 +19,11 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     private static final String ORAL = "oral";
     private static final String PAPER = "paper";
 
-    public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
+    private SubmitYourAppealToCcdCaseDataDeserializer() {
+        // Empty
+    }
+
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         Subscriptions subscriptions = populateSubscriptions(syaCaseWrapper);
@@ -39,9 +44,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-
-
-    public SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
 
         return caseData.toBuilder()
@@ -50,7 +53,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
 
-    private Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
+    private static Appeal getAppeal(SyaCaseWrapper syaCaseWrapper) {
 
         MrnDetails mrnDetails = getMrnDetails(syaCaseWrapper);
 
@@ -80,9 +83,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    private MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
+    private static MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
         return MrnDetails.builder()
-                .dwpIssuingOffice(syaCaseWrapper.getMrn().getDwpIssuingOffice())
+                .dwpIssuingOffice(Norm.dwpIssuingOffice(syaCaseWrapper.getMrn().getDwpIssuingOffice()))
                 .mrnDate(syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
                         null)
                 .mrnLateReason(syaCaseWrapper.getMrn().getReasonForBeingLate())
@@ -91,7 +94,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     }
 
-    private Appellant getAppellant(SyaCaseWrapper syaCaseWrapper) {
+    private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper) {
 
         SyaAppellant syaAppellant = syaCaseWrapper.getAppellant();
 
@@ -137,7 +140,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    private Appointee getAppointee(SyaCaseWrapper syaCaseWrapper) {
+    private static Appointee getAppointee(SyaCaseWrapper syaCaseWrapper) {
 
         SyaAppointee syaAppointee = syaCaseWrapper.getAppointee();
 
@@ -176,7 +179,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         }
     }
 
-    private AppealReasons getReasonsForAppealing(
+    private static AppealReasons getReasonsForAppealing(
             SyaReasonsForAppealing syaReasonsForAppealing) {
 
         List<AppealReason> appealReasons = new ArrayList<>();
@@ -198,7 +201,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    private HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {
+    private static HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {
 
         HearingOptions hearingOptions;
 
@@ -237,7 +240,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return hearingOptions;
     }
 
-    private List<ExcludeDate> getExcludedDates(String[] dates) {
+    private static List<ExcludeDate> getExcludedDates(String[] dates) {
         List<ExcludeDate> excludeDates = new ArrayList<>();
         for (String date : dates) {
             DateRange dateRange = DateRange.builder()
@@ -249,7 +252,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return excludeDates;
     }
 
-    private List<String> getArrangements(SyaArrangements syaArrangements) {
+    private static List<String> getArrangements(SyaArrangements syaArrangements) {
 
         List<String> arrangements = new ArrayList<>();
 
@@ -268,15 +271,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return arrangements;
     }
 
-    private Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
+    private static Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
 
         return Subscriptions.builder()
-                .appellantSubscription(getAppellantSubscription(syaCaseWrapper))
+                .appellantSubscription(!syaCaseWrapper.getIsAppointee() ? getAppellantSubscription(syaCaseWrapper) : null)
+                .appointeeSubscription(syaCaseWrapper.getIsAppointee() ? getAppointeeSubscription(syaCaseWrapper) : null)
                 .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
                 .build();
     }
 
-    private Subscription getAppellantSubscription(SyaCaseWrapper syaCaseWrapper) {
+    private static Subscription getAppellantSubscription(SyaCaseWrapper syaCaseWrapper) {
 
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
@@ -289,13 +293,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
+                .tya(generateAppealNumber())
                 .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
     }
 
-    private Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
+    private static Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
 
         if (syaCaseWrapper.hasRepresentative()) {
 
@@ -311,6 +316,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                             .getRepresentative().getContactDetails().getPhoneNumber()))
                     .subscribeEmail(emailAddressExists ? YES : NO)
                     .email(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress())
+                    .tya(generateAppealNumber())
                     .build();
         }
 
@@ -318,7 +324,27 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     }
 
-    private Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
+    private static Subscription getAppointeeSubscription(SyaCaseWrapper syaCaseWrapper) {
+
+        SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
+
+        String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
+
+        String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
+        String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
+
+        String mobile = syaCaseWrapper.getAppointee().getContactDetails().getPhoneNumber();
+        return Subscription.builder()
+                .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                .subscribeSms(subscribeSms)
+                .tya(generateAppealNumber())
+                .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
+                .subscribeEmail(wantEmailNotifications)
+                .email(email)
+                .build();
+    }
+
+    private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
 
         Representative representative;
 
@@ -361,12 +387,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return representative;
     }
 
-    private String getLocalDate(String dateStr) {
+    private static String getLocalDate(String dateStr) {
         LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         return localDate.toString();
     }
 
-    private List<SscsDocument> getEvidenceDocumentDetails(SyaCaseWrapper syaCaseWrapper) {
+    private static List<SscsDocument> getEvidenceDocumentDetails(SyaCaseWrapper syaCaseWrapper) {
         List<SyaEvidence> evidences = syaCaseWrapper.getReasonsForAppealing().getEvidences();
 
         if (null != evidences && !evidences.isEmpty()) {
@@ -384,14 +410,14 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return null;
     }
 
-    private String getPhoneNumberWithOutSpaces(String phoneNumber) {
+    private static String getPhoneNumberWithOutSpaces(String phoneNumber) {
         if (StringUtils.isNotBlank(phoneNumber)) {
             return phoneNumber.replaceAll("\\s", "");
         }
         return phoneNumber;
     }
 
-    private String hasEvidence(List<SscsDocument> sscsDocuments) {
+    private static String hasEvidence(List<SscsDocument> sscsDocuments) {
         return (null == sscsDocuments || sscsDocuments.isEmpty()) ? NO : YES;
     }
 }

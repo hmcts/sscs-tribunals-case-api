@@ -115,6 +115,7 @@
       "reason": null
     },
     "supporterSubscription": null,
+    "appointeeSubscription": null,
     "representativeSubscription": {
       "wantSmsNotifications":"Yes",
       "tya":null,
