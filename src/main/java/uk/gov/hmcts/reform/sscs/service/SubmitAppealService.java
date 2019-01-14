@@ -1,32 +1,19 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static java.util.Collections.singletonList;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.multipart.MultipartFile;
-import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
-import uk.gov.hmcts.reform.sscs.exception.UnsupportedDocumentTypeException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -85,8 +72,8 @@ public class SubmitAppealService {
         if (caseDetails.getId() == null) {
             log.info("caseId is empty - skipping step to update CCD with Robotics JSON");
         } else {
-            roboticsJsonUploadService.
-                    updateCaseWithRoboticsJson(roboticsService.getRoboticsJson(), caseData, caseDetails, idamTokens);
+            roboticsJsonUploadService
+                    .updateCaseWithRoboticsJson(roboticsService.getRoboticsJson(), caseData, caseDetails, idamTokens);
         }
     }
 

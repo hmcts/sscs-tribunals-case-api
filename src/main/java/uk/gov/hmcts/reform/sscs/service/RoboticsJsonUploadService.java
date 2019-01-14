@@ -105,7 +105,7 @@ public class RoboticsJsonUploadService {
 
     private List<SscsDocument> updateCaseDataDocuments(SscsCaseData caseData, SscsDocument roboticsJsonDocument) {
         List<SscsDocument> sscsDocumentList = caseData.getSscsDocument();
-        if (CollectionUtils.isEmpty( sscsDocumentList)) {
+        if (CollectionUtils.isEmpty(sscsDocumentList)) {
             sscsDocumentList = singletonList(roboticsJsonDocument);
         } else {
             sscsDocumentList.add(roboticsJsonDocument);
