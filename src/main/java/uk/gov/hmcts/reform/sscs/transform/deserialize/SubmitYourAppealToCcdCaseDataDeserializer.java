@@ -303,12 +303,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         String email = syaCaseWrapper.getContactDetails().getEmailAddress();
         String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
 
-        String mobile = syaCaseWrapper.getContactDetails().getPhoneNumber();
+        String mobile = smsNotify.isWantsSmsNotifications() && smsNotify.isUseSameNumber() ? syaCaseWrapper.getContactDetails().getPhoneNumber() : smsNotify.getSmsNumber();
         return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
                 .tya(generateAppealNumber())
-                .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
+                .mobile(getPhoneNumberWithOutSpaces(mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
@@ -347,12 +347,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
         String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
 
-        String mobile = syaCaseWrapper.getAppointee().getContactDetails().getPhoneNumber();
+        String mobile = smsNotify.isWantsSmsNotifications() && smsNotify.isUseSameNumber() ? syaCaseWrapper.getAppointee().getContactDetails().getPhoneNumber() : smsNotify.getSmsNumber();
         return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
                 .tya(generateAppealNumber())
-                .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
+                .mobile(getPhoneNumberWithOutSpaces(mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
