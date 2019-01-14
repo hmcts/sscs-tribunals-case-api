@@ -104,9 +104,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .lastName(syaAppellant.getLastName())
                 .build();
 
-        SyaContactDetails contactDetails = syaCaseWrapper.getContactDetails();
+        SyaContactDetails contactDetails = syaCaseWrapper.getAppellant().getContactDetails();
 
-        Address address = Address.builder()
+        Address address = null;
+        Contact contact = null;
+        if (null != contactDetails) {
+            address = Address.builder()
                 .line1(contactDetails.getAddressLine1())
                 .line2(contactDetails.getAddressLine2())
                 .town(contactDetails.getTownCity())
@@ -114,10 +117,11 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .postcode(contactDetails.getPostCode())
                 .build();
 
-        Contact contact = Contact.builder()
+            contact = Contact.builder()
                 .email(contactDetails.getEmailAddress())
                 .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
                 .build();
+        }
 
         Identity identity = Identity.builder()
                 .dob(syaAppellant.getDob().toString())
