@@ -305,7 +305,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
 
-        if (syaCaseWrapper.hasRepresentative()) {
+        if (syaCaseWrapper.hasRepresentative()
+                && syaCaseWrapper.getRepresentative() != null
+                && syaCaseWrapper.getRepresentative().getContactDetails() != null) {
 
             boolean emailAddressExists = StringUtils
                     .isNotBlank(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress());
