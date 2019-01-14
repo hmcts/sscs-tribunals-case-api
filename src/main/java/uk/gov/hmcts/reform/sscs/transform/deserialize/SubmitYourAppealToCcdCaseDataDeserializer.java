@@ -130,6 +130,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Appointee appointee = getAppointee(syaCaseWrapper);
 
+        if (appointee != null && syaAppellant.getIsAddressSameAsAppointee()) {
+            address = Address.builder()
+                .line1(appointee.getAddress().getLine1())
+                .line2(appointee.getAddress().getLine2())
+                .town(appointee.getAddress().getTown())
+                .county(appointee.getAddress().getCounty())
+                .postcode(appointee.getAddress().getPostcode())
+                .build();
+        }
+
         String useSameAddress = (syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee() == null || !syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee())
             ? "No"
             : "Yes";
