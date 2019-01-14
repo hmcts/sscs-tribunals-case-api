@@ -53,8 +53,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
 
-import javax.xml.parsers.DocumentBuilder;
-
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
