@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -51,6 +52,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
+
+import javax.xml.parsers.DocumentBuilder;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -115,6 +118,8 @@ public class SubmitAppealServiceTest {
 
     private EvidenceManagementService evidenceManagementService;
 
+    private RoboticsJsonUploadService roboticsJsonUploadService;
+
     @Before
     public void setUp() {
         submitYourAppealEmailTemplate = new SubmitYourAppealEmailTemplate("from", "to", "message");
@@ -133,11 +138,31 @@ public class SubmitAppealServiceTest {
         when(authTokenGenerator.generate()).thenReturn("token");
         when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
 
+        UploadResponse mockUploadResponse = mock(UploadResponse.class);
+
+        UploadResponse.Embedded mockEmbedded = mock(UploadResponse.Embedded.class);
+        when(mockUploadResponse.getEmbedded()).thenReturn(mockEmbedded);
+
+        List<Document> mockDocuments = mock(List.class);
+        when(mockEmbedded.getDocuments()).thenReturn(mockDocuments);
+
+        Document mockDocument = mock(Document.class);
+        when(mockDocuments.get(0)).thenReturn(mockDocument);
+
+        Document.Links mockLinks = mock(Document.Links.class);
+        mockDocument.links = new Document.Links();
+        mockDocument.links.binary = new Document.Link();
+        mockDocument.links.binary.href = "http://example.com/document";
+
+        when(documentUploadClientApi.upload(anyString(), anyString(), anyString(), anyList())).thenReturn(mockUploadResponse);
+
         evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi, evidenceMetadataDownloadClientApi);
+        roboticsJsonUploadService = new RoboticsJsonUploadService(documentUploadClientApi, authTokenGenerator, ccdService);
 
         submitAppealService = new SubmitAppealService(ccdService,
                 sscsPdfService, roboticsService,
-                airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService);
+                airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService,
+                roboticsJsonUploadService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
