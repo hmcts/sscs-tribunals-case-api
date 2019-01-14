@@ -199,9 +199,9 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
     public Appointee deserializeAppointeeDetailsJson(JsonNode appellantNode) {
         JsonNode appointeeNode = getNode(appellantNode, "appointee");
 
-        if (getNode(appointeeNode, "name") != null &&
-                getNode(appointeeNode, "address") != null &&
-                getNode(appointeeNode, "contact") != null) {
+        if (getNode(appointeeNode, "name") != null
+                && getNode(appointeeNode, "address") != null
+                && getNode(appointeeNode, "contact") != null) {
 
             Name name = deserializeNameJson(appointeeNode);
             Address address = deserializeAddressJson(appointeeNode);
@@ -211,8 +211,7 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
             return Appointee.builder()
                     .name(name).address(address).contact(contact).identity(identity)
                     .build();
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -220,10 +219,11 @@ public class SscsCaseDataWrapperDeserializer extends StdDeserializer<SscsCaseDat
     private Contact deserializeContactJson(JsonNode node) {
         JsonNode contactNode = getNode(node, "contact");
 
+        String phone = getField(contactNode, "phone") != null ? getField(contactNode, "phone") : getField(contactNode, "mobile");
+
         return Contact.builder()
                 .email(getField(contactNode, "email"))
-                .mobile(getField(contactNode, "mobile"))
-                .build();
+                .phone(phone).build();
     }
 
     private Identity deserializeIdentityJson(JsonNode node) {
