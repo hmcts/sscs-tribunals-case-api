@@ -84,5 +84,8 @@ To run all mutation tests execute the following command:
 
 ```
 ./gradlew pitest
-
 ```
+
+## Gotchas
+
+PRs that start with _"Bump"_ won't have a preview environment. The decision was made after we realised that most the preview environments were created by Depandabot.
