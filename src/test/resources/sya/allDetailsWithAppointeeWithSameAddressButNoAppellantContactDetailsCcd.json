@@ -36,11 +36,7 @@
         "county": "Newcastle",
         "postcode": "NE1 1AW"
       },
-      "contact": {
-        "email": "sscsappointee@greencroftconsulting.com",
-        "phone": null,
-        "mobile": "01234567810"
-      },
+      "contact": null,
       "identity": {
         "dob": "1990-02-26",
         "nino": "AB877533C"
