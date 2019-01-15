@@ -70,8 +70,10 @@ public class SubmitAppealService {
         roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
 
         if (caseDetails.getId() == null) {
-            log.info("caseId is empty - skipping step to update CCD with Robotics JSON");
+            log.info("CCD caseId is empty - skipping step to update CCD with Robotics JSON");
         } else {
+            log.info("CCD caseId is {}, proceeding to update case with Robotics JSON", caseDetails.getId());
+            caseData.setCcdCaseId(caseDetails.getId().toString());
             roboticsJsonUploadService
                     .updateCaseWithRoboticsJson(roboticsService.getRoboticsJson(), caseData, caseDetails, idamTokens);
         }
