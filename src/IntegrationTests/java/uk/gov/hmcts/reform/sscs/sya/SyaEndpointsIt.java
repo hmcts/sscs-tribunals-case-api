@@ -169,8 +169,7 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void shouldNotAddDuplicateCaseToCcdAndStillGeneratePdfAndSend() throws Exception {
-
+    public void shouldNotAddDuplicateCaseToCcdAndShouldNotGeneratePdf() throws Exception {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
@@ -180,43 +179,13 @@ public class SyaEndpointsIt {
                 .content(getCase()))
                 .andExpect(status().isCreated());
 
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
+        verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
-        verify(mailSender, times(2)).send(message);
-
-        assertNotNull(getPdfWrapper().getCcdCaseId());
     }
 
     private PdfWrapper getPdfWrapper() {
         Map<String, Object> placeHolders = captor.getAllValues().get(0);
         return (PdfWrapper) placeHolders.get("PdfWrapper");
-    }
-
-    @Test
-    public void shouldSendEmailWithPdfWhenCcdIsDown() throws Exception {
-        given(ccdClient.searchForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
-
-        given(ccdClient.startCaseForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
-
-        mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
-                .andExpect(status().isCreated());
-
-        then(mailSender).should(times(2)).send(message);
-
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
-        assertNull(getPdfWrapper().getCcdCaseId());
     }
 
     @Test
