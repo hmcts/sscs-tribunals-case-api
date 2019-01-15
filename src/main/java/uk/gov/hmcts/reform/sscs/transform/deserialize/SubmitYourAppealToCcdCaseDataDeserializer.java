@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
+import uk.gov.hmcts.reform.sscs.util.Norm;
 
 public class SubmitYourAppealToCcdCaseDataDeserializer {
 
@@ -84,7 +85,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
         return MrnDetails.builder()
-                .dwpIssuingOffice(syaCaseWrapper.getMrn().getDwpIssuingOffice())
+                .dwpIssuingOffice(Norm.dwpIssuingOffice(syaCaseWrapper.getMrn().getDwpIssuingOffice()))
                 .mrnDate(syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
                         null)
                 .mrnLateReason(syaCaseWrapper.getMrn().getReasonForBeingLate())
