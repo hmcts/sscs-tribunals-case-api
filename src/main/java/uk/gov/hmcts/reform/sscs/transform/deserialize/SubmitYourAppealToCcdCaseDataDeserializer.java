@@ -121,6 +121,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .email(contactDetails.getEmailAddress())
                 .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
                 .build();
+        } else {
+            contact = Contact.builder().build();
         }
 
         Identity identity = Identity.builder()

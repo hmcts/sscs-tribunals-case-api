@@ -36,7 +36,11 @@
         "county": "Newcastle",
         "postcode": "NE1 1AW"
       },
-      "contact": null,
+      "contact": {
+        "email": null,
+        "phone": null,
+        "mobile": null
+      },
       "identity": {
         "dob": "1990-02-26",
         "nino": "AB877533C"
