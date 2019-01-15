@@ -244,8 +244,8 @@ dependencies {
 
     compile group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
 
-    compileOnly 'org.projectlombok:lombok:1.18.2'
-    apt "org.projectlombok:lombok:1.16.20"
+    compileOnly 'org.projectlombok:lombok:1.18.4'
+    apt "org.projectlombok:lombok:1.18.4"
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.10.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.22.0'

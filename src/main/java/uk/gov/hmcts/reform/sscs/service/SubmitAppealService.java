@@ -10,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
@@ -21,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @Slf4j
 public class SubmitAppealService {
     public static final String DM_STORE_USER_ID = "sscs";
-    public static final String S2S_TOKEN = "oauth2Token";
 
     private final CcdService ccdService;
     private final SscsPdfService sscsPdfService;
@@ -53,21 +55,33 @@ public class SubmitAppealService {
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
-        String firstHalfOfPostcode =
-                regionalProcessingCenterService.getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
 
+        String firstHalfOfPostcode = regionalProcessingCenterService
+                .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
-
         IdamTokens idamTokens = idamService.getIdamTokens();
-
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
+        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails);
 
+    }
+
+    private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails) {
+        if (null != caseDetails) {
+            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
+            Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
+            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
+                    additionalEvidence);
+
+            attachRoboticsJsonToCaseInCcd(caseData, idamTokens, caseDetails);
+        }
+    }
+
+    private void attachRoboticsJsonToCaseInCcd( SscsCaseData caseData,
+                                                IdamTokens idamTokens, SscsCaseDetails caseDetails) {
         byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
-        Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-
         log.info("Sending case {} to Robotics", caseDetails.getId());
-        roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
 
         if (caseDetails.getId() == null) {
             log.info("CCD caseId is empty - skipping step to update CCD with Robotics JSON");
@@ -98,22 +112,28 @@ public class SubmitAppealService {
     }
 
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
+        SscsCaseDetails caseDetails = null;
         try {
-            SscsCaseDetails caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
             if (caseDetails == null) {
                 caseDetails = ccdService.createCase(caseData, idamTokens);
-                log.info("Appeal successfully created in CCD for Nino - {} and benefit type {}",
-                        caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
+                log.info("Case {} successfully created in CCD for Nino - {} and benefit type {}",
+                        caseDetails.getId(), caseData.getGeneratedNino(),
+                        caseData.getAppeal().getBenefitType().getCode());
                 return caseDetails;
             } else {
-                log.info("Duplicate case found for Nino {} and benefit type {} so not creating in CCD", caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
-                return caseDetails;
+                log.info("Duplicate case {} found for Nino {} and benefit type {}. "
+                                + "No need to continue with post create case processing.",
+                        caseDetails.getId(), caseData.getGeneratedNino(),
+                        caseData.getAppeal().getBenefitType().getCode());
+                return null;
             }
         } catch (Exception e) {
-            log.error("Error found in the case creation or callback process for ccd case with "
-                            + "Nino - {} and Benefit type - {} ",
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode(), e);
-            return SscsCaseDetails.builder().build();
+            throw new CcdException(
+                    String.format("Error found in the creating case process for case with Id - %s"
+                                    + " and Nino - %s and Benefit type - %s",
+                            caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
+                            caseData.getAppeal().getBenefitType().getCode()), e);
         }
     }
 
