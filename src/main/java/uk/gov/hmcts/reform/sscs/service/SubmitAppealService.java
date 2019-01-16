@@ -79,7 +79,6 @@ public class SubmitAppealService {
 
     private void attachRoboticsJsonToCaseInCcd( SscsCaseData caseData,
                                                 IdamTokens idamTokens, SscsCaseDetails caseDetails) {
-        byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
 
         log.info("Sending case {} to Robotics", caseDetails.getId());
 

@@ -76,6 +76,9 @@ public class SubmitAppealServiceTest {
     private EmailService emailService;
 
     @Mock
+    private RoboticsJsonUploadService roboticsJsonUploadService;
+
+    @Mock
     private AirLookupService airLookupService;
 
     @Mock
@@ -136,8 +139,6 @@ public class SubmitAppealServiceTest {
                 new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi,
                         evidenceMetadataDownloadClientApi);
 
-        RoboticsJsonUploadService roboticsJsonUploadService = new RoboticsJsonUploadService(documentUploadClientApi, authTokenGenerator, ccdService);
-
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
                 pdfStoreService, submitYourAppealEmailTemplate, ccdService);
 
@@ -146,26 +147,7 @@ public class SubmitAppealServiceTest {
 
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
                 roboticsJsonValidator, roboticsEmailTemplate);
-
-        UploadResponse mockUploadResponse = mock(UploadResponse.class);
-
-        UploadResponse.Embedded mockEmbedded = mock(UploadResponse.Embedded.class);
-        when(mockUploadResponse.getEmbedded()).thenReturn(mockEmbedded);
-
-        List<Document> mockDocuments = mock(List.class);
-        when(mockEmbedded.getDocuments()).thenReturn(mockDocuments);
-
-        Document mockDocument = mock(Document.class);
-        when(mockDocuments.get(0)).thenReturn(mockDocument);
-
-        Document.Links mockLinks = mock(Document.Links.class);
-        mockDocument.links = new Document.Links();
-        mockDocument.links.binary = new Document.Link();
-        mockDocument.links.binary.href = "http://example.com/document";
-
-        when(documentUploadClientApi.upload(anyString(), anyString(), anyString(), anyList())).thenReturn(mockUploadResponse);
-
-
+        
         submitAppealService = new SubmitAppealService(ccdService,
                 sscsPdfService, roboticsService,
                 airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService,
@@ -182,6 +164,33 @@ public class SubmitAppealServiceTest {
                 convertSyaToCcdCaseData(appealData)).ccdCaseId(123L).evidencePresent("No").build();
 
         given(roboticsJsonMapper.map(any())).willReturn(json);
+    }
+
+    @Test
+    public void shouldAttachRoboticsJsonToCcdCase() {
+
+        byte[] expected = {};
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(roboticsJsonUploadService, times(1))
+                .updateCaseWithRoboticsJson(any(), any(), any(), any());
+
+    }
+
+    @Test
+    public void givenDuplicateCase_shouldNotAttemptToAttachRoboticsJson() {
+
+        byte[] expected = {};
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(SscsCaseDetails.builder().build());
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(roboticsJsonUploadService, never())
+                .updateCaseWithRoboticsJson(any(), any(), any(), any());
     }
 
     @Test
