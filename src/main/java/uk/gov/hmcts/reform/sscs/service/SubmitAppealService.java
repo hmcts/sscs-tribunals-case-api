@@ -77,8 +77,8 @@ public class SubmitAppealService {
         }
     }
 
-    private void attachRoboticsJsonToCaseInCcd( SscsCaseData caseData,
-                                                IdamTokens idamTokens, SscsCaseDetails caseDetails) {
+    private void attachRoboticsJsonToCaseInCcd(SscsCaseData caseData,
+                                               IdamTokens idamTokens, SscsCaseDetails caseDetails) {
 
         log.info("Sending case {} to Robotics", caseDetails.getId());
 
