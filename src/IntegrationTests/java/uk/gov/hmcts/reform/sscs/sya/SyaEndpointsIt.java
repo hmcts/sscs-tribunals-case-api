@@ -136,11 +136,12 @@ public class SyaEndpointsIt {
         given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .willReturn(authorize);
 
-        given(authTokenGenerator.generate()).willReturn("authToken");
+        given(authTokenGenerator.generate()).willReturn(AUTH_TOKEN);
         given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId"));
 
         UploadResponse uploadResponse = createUploadResponse();
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), anyString(), any())).willReturn(uploadResponse);
+
     }
 
     @Test
@@ -245,8 +246,10 @@ public class SyaEndpointsIt {
         Document document = new Document();
         Document.Links links = new Document.Links();
         Document.Link link = new Document.Link();
+        links.binary = new Document.Link();
         link.href = "some location";
         links.self = link;
+        links.binary.href = "some location";
         document.links = links;
         return document;
     }

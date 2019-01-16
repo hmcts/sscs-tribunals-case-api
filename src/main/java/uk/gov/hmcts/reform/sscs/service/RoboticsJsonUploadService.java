@@ -60,12 +60,16 @@ public class RoboticsJsonUploadService {
         log.info("Attaching Robotics JSON to case {}", caseDetails.getId());
         SscsCaseData updatedCaseData = attachRoboticsJsonToCaseData(caseData, uploadResponse);
 
-        try {
-            ccdService.updateCase(updatedCaseData, caseDetails.getId(),
-                    "attachRoboticsJson", "", "", idamTokens);
-        } catch (Exception e) {
-            log.info("Failed to update ccd case with Robotics JSON but carrying on [" + caseDetails.getId() + "] ["
-                    + caseData.getCaseReference() + "]", e);
+        if (null == updatedCaseData) {
+            log.info("Case data for case {} was not updated with Robotics JSON document", caseDetails.getId());
+        } else {
+            try {
+                ccdService.updateCase(updatedCaseData, caseDetails.getId(),
+                        "attachRoboticsJson", "", "", idamTokens);
+            } catch (Exception e) {
+                log.info("Failed to update ccd case with Robotics JSON but carrying on [" + caseDetails.getId() + "] ["
+                        + caseData.getCaseReference() + "]", e);
+            }
         }
 
     }
@@ -73,16 +77,21 @@ public class RoboticsJsonUploadService {
     public SscsCaseData attachRoboticsJsonToCaseData(SscsCaseData caseData, UploadResponse uploadResponse) {
         DocumentLink documentLink = getDocumentLink(uploadResponse);
 
-        log.info("Robotics JSON Document for CCD Case {} uploaded to {}", caseData.getCcdCaseId(), documentLink);
+        if (null != documentLink) {
+            log.info("Robotics JSON Document for CCD Case {} uploaded to {}", caseData.getCcdCaseId(), documentLink);
 
-        SscsDocument roboticsJsonDocument = getRoboticsJsonDocument(documentLink);
+            SscsDocument roboticsJsonDocument = getRoboticsJsonDocument(documentLink);
 
-        log.info("Adding Robotics JSON document to CCD Case Id {}", caseData.getCcdCaseId());
+            log.info("Adding Robotics JSON document to CCD Case Id {}", caseData.getCcdCaseId());
 
-        List<SscsDocument> sscsDocumentList = updateCaseDataDocuments(caseData, roboticsJsonDocument);
-        caseData.setSscsDocument(sscsDocumentList);
+            List<SscsDocument> sscsDocumentList = updateCaseDataDocuments(caseData, roboticsJsonDocument);
+            caseData.setSscsDocument(sscsDocumentList);
 
-        return caseData;
+            return caseData;
+        }
+
+        return null;
+
     }
 
     private SscsDocument getRoboticsJsonDocument(DocumentLink documentLink) {
@@ -96,8 +105,15 @@ public class RoboticsJsonUploadService {
     }
 
     private DocumentLink getDocumentLink(UploadResponse uploadResponse) {
-        final String href = uploadResponse.getEmbedded().getDocuments().get(0).links.binary.href;
-        return DocumentLink.builder().documentUrl(href).build();
+        if (null != uploadResponse) {
+            final String href = uploadResponse.getEmbedded().getDocuments().get(0).links.binary.href;
+            return DocumentLink.builder().documentUrl(href).build();
+        } else {
+            log.info("No document link available - document store may be down");
+        }
+
+        return null;
+
     }
 
     private List<SscsDocument> updateCaseDataDocuments(SscsCaseData caseData, SscsDocument roboticsJsonDocument) {
@@ -118,9 +134,10 @@ public class RoboticsJsonUploadService {
             return documentUploadClientApi
                     .upload(S2S_TOKEN, serviceAuthorization, DM_STORE_USER_ID, files);
         } catch (Exception e) {
-            log.info("Doc Store service failed to upload Robotics JSON", e);
-            return null;
+            log.info("Doc Store service failed to upload Robotics JSON, but carrying on", e);
         }
+
+        return null;
     }
 
 }
