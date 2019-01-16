@@ -147,7 +147,7 @@ public class SubmitAppealServiceTest {
 
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
                 roboticsJsonValidator, roboticsEmailTemplate);
-        
+
         submitAppealService = new SubmitAppealService(ccdService,
                 sscsPdfService, roboticsService,
                 airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService,

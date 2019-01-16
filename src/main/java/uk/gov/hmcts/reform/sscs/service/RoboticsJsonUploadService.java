@@ -66,9 +66,9 @@ public class RoboticsJsonUploadService {
         try {
             ccdService.updateCase(updatedCaseData, caseDetails.getId(),
                     "attachRoboticsJson", "", "", idamTokens);
-        } catch (CcdException ccdEx) {
-            log.error("Failed to update ccd case with Robotics JSON but carrying on [" + caseDetails.getId() + "] ["
-                    + caseData.getCaseReference() + "]", ccdEx);
+        } catch (Exception e) {
+            log.info("Failed to update ccd case with Robotics JSON but carrying on [" + caseDetails.getId() + "] ["
+                    + caseData.getCaseReference() + "]", e);
         }
 
     }
@@ -120,9 +120,9 @@ public class RoboticsJsonUploadService {
         try {
             return documentUploadClientApi
                     .upload(S2S_TOKEN, serviceAuthorization, DM_STORE_USER_ID, files);
-        } catch (HttpClientErrorException httpClientErrorException) {
-            log.error("Doc Store service failed to upload Robotics JSON", httpClientErrorException);
-            throw new UnsupportedDocumentTypeException(httpClientErrorException);
+        } catch (Exception e) {
+            log.info("Doc Store service failed to upload Robotics JSON", e);
+            return null;
         }
     }
 
