@@ -32,7 +32,6 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
-    private final RoboticsJsonUploadService roboticsJsonUploadService;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -41,8 +40,7 @@ public class SubmitAppealService {
                         AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        EvidenceManagementService evidenceManagementService,
-                        RoboticsJsonUploadService roboticsJsonUploadService) {
+                        EvidenceManagementService evidenceManagementService) {
 
         this.ccdService = ccdService;
         this.sscsPdfService = sscsPdfService;
@@ -51,7 +49,6 @@ public class SubmitAppealService {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
-        this.roboticsJsonUploadService = roboticsJsonUploadService;
     }
 
     public void submitAppeal(SyaCaseWrapper appeal) {
@@ -73,22 +70,7 @@ public class SubmitAppealService {
             roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
                     additionalEvidence);
 
-            attachRoboticsJsonToCaseInCcd(caseData, idamTokens, caseDetails);
-        }
-    }
-
-    private void attachRoboticsJsonToCaseInCcd(SscsCaseData caseData,
-                                               IdamTokens idamTokens, SscsCaseDetails caseDetails) {
-
-        log.info("Sending case {} to Robotics", caseDetails.getId());
-
-        if (caseDetails.getId() == null) {
-            log.info("CCD caseId is empty - skipping step to update CCD with Robotics JSON");
-        } else {
-            log.info("CCD caseId is {}, proceeding to update case with Robotics JSON", caseDetails.getId());
-            caseData.setCcdCaseId(caseDetails.getId().toString());
-            roboticsJsonUploadService
-                    .updateCaseWithRoboticsJson(roboticsService.getRoboticsJson(), caseData, caseDetails, idamTokens);
+            roboticsService.attachRoboticsJsonToCaseInCcd(caseData, idamTokens, caseDetails);
         }
     }
 

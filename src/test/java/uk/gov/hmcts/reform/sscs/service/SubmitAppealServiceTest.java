@@ -144,12 +144,11 @@ public class SubmitAppealServiceTest {
                 new RoboticsEmailTemplate("from", "to", "message");
 
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
-                roboticsJsonValidator, roboticsEmailTemplate);
+                roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
 
         submitAppealService = new SubmitAppealService(ccdService,
                 sscsPdfService, roboticsService,
-                airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService,
-                roboticsJsonUploadService);
+                airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
