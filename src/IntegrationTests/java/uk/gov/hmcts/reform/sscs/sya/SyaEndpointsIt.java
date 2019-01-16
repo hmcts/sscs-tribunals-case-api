@@ -243,13 +243,14 @@ public class SyaEndpointsIt {
     }
 
     private Document createDocument() {
-        Document document = new Document();
         Document.Links links = new Document.Links();
         Document.Link link = new Document.Link();
         links.binary = new Document.Link();
         link.href = "some location";
         links.self = link;
         links.binary.href = "some location";
+
+        Document document = new Document();
         document.links = links;
         return document;
     }
