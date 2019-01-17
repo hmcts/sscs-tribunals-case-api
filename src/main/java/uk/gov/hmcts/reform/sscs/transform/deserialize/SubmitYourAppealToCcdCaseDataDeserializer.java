@@ -104,9 +104,12 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .lastName(syaAppellant.getLastName())
                 .build();
 
-        SyaContactDetails contactDetails = syaCaseWrapper.getContactDetails();
+        SyaContactDetails contactDetails = syaCaseWrapper.getAppellant().getContactDetails();
 
-        Address address = Address.builder()
+        Address address = null;
+        Contact contact = null;
+        if (null != contactDetails) {
+            address = Address.builder()
                 .line1(contactDetails.getAddressLine1())
                 .line2(contactDetails.getAddressLine2())
                 .town(contactDetails.getTownCity())
@@ -114,10 +117,13 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .postcode(contactDetails.getPostCode())
                 .build();
 
-        Contact contact = Contact.builder()
+            contact = Contact.builder()
                 .email(contactDetails.getEmailAddress())
                 .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
                 .build();
+        } else {
+            contact = Contact.builder().build();
+        }
 
         Identity identity = Identity.builder()
                 .dob(syaAppellant.getDob().toString())
@@ -125,6 +131,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
 
         Appointee appointee = getAppointee(syaCaseWrapper);
+
+        if (appointee != null && syaAppellant.getIsAddressSameAsAppointee()) {
+            address = Address.builder()
+                .line1(appointee.getAddress().getLine1())
+                .line2(appointee.getAddress().getLine2())
+                .town(appointee.getAddress().getTown())
+                .county(appointee.getAddress().getCounty())
+                .postcode(appointee.getAddress().getPostcode())
+                .build();
+        }
 
         String useSameAddress = (syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee() == null || !syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee())
             ? "No"
@@ -281,7 +297,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Subscription getAppellantSubscription(SyaCaseWrapper syaCaseWrapper) {
-
         SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
         String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
@@ -289,21 +304,19 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         String email = syaCaseWrapper.getContactDetails().getEmailAddress();
         String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
 
-        String mobile = syaCaseWrapper.getContactDetails().getPhoneNumber();
+        String mobile = getNotificationSmsNumber(smsNotify, syaCaseWrapper.getContactDetails());
         return Subscription.builder()
-                .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
-                .subscribeSms(subscribeSms)
-                .tya(generateAppealNumber())
-                .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
-                .subscribeEmail(wantEmailNotifications)
-                .email(email)
-                .build();
+            .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
+            .subscribeSms(subscribeSms)
+            .tya(generateAppealNumber())
+            .mobile(getPhoneNumberWithOutSpaces(mobile))
+            .subscribeEmail(wantEmailNotifications)
+            .email(email)
+            .build();
     }
 
     private static Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
-
         if (syaCaseWrapper.hasRepresentative()) {
-
             boolean emailAddressExists = StringUtils
                     .isNotBlank(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress());
             boolean phoneNumberExists =  StringUtils
@@ -325,23 +338,30 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Subscription getAppointeeSubscription(SyaCaseWrapper syaCaseWrapper) {
+        if (null != syaCaseWrapper.getAppointee()) {
+            SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-        SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
+            String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
 
-        String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
+            String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
+            String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
 
-        String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
-        String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
-
-        String mobile = syaCaseWrapper.getAppointee().getContactDetails().getPhoneNumber();
-        return Subscription.builder()
+            String mobile = getNotificationSmsNumber(smsNotify, syaCaseWrapper.getAppointee().getContactDetails());
+            return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
                 .tya(generateAppealNumber())
-                .mobile(getPhoneNumberWithOutSpaces(smsNotify.isWantsSmsNotifications() ? smsNotify.getSmsNumber() : mobile))
+                .mobile(getPhoneNumberWithOutSpaces(mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
+        } else {
+            return null;
+        }
+    }
+
+    private static String getNotificationSmsNumber(SyaSmsNotify smsNotify, SyaContactDetails contactDetails) {
+        return smsNotify.isWantsSmsNotifications() && (null == smsNotify.isUseSameNumber() || !smsNotify.isUseSameNumber()) ? smsNotify.getSmsNumber() : contactDetails.getPhoneNumber();
     }
 
     private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
