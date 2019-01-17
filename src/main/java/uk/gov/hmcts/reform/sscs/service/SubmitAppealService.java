@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -67,10 +68,10 @@ public class SubmitAppealService {
         if (null != caseDetails) {
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
-                    additionalEvidence);
+            JSONObject roboticsJson = roboticsService
+                    .sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
 
-            roboticsService.attachRoboticsJsonToCaseInCcd(caseData, idamTokens, caseDetails);
+            roboticsService.attachRoboticsJsonToCaseInCcd(roboticsJson, caseData, idamTokens, caseDetails);
         }
     }
 

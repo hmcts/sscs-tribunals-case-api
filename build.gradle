@@ -237,7 +237,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.2.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.130'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.99'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version: '0.0.9_RC2'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version: '0.1.0_RC2'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '4.0.1'
 
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.1.1'
