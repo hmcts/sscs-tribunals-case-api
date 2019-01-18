@@ -71,7 +71,17 @@ public class SubmitAppealService {
             JSONObject roboticsJson = roboticsService
                     .sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
 
+            attachRoboticJsonToCaseInCcdHandled(caseData, idamTokens, caseDetails, roboticsJson);
+        }
+    }
+
+    private void attachRoboticJsonToCaseInCcdHandled(SscsCaseData caseData, IdamTokens idamTokens,
+                                                     SscsCaseDetails caseDetails, JSONObject roboticsJson) {
+        try {
             roboticsService.attachRoboticsJsonToCaseInCcd(roboticsJson, caseData, idamTokens, caseDetails);
+        } catch (Exception e) {
+            log.info("Failed to update ccd case with Robotics JSON but carrying on [" + caseDetails.getId() + "] ["
+                    + caseData.getCaseReference() + "]", e);
         }
     }
 
