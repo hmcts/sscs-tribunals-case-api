@@ -3,9 +3,12 @@ package uk.gov.hmcts.reform.sscs.service;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
@@ -59,6 +62,8 @@ public class SubmitAppealService {
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
+
+        log.info("Proceeding to post-create process for case {}", caseDetails.getId());
         postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails);
 
     }
@@ -71,11 +76,23 @@ public class SubmitAppealService {
             JSONObject roboticsJson = roboticsService
                     .sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
 
-            attachRoboticJsonToCaseInCcdHandled(caseData, idamTokens, caseDetails, roboticsJson);
+            log.info("Retrieving newly-created case {} from CCD to attach Robotics JSON", caseDetails.getId());
+            SscsCaseDetails retrievedCaseDetails = ccdService.getByCaseId(caseDetails.getId(), idamTokens);
+
+            if (null == retrievedCaseDetails) {
+                log.info("Unable to retrieve case {} from CCD to attach Robotics JSON", caseDetails.getId());
+            } else {
+                log.info("Case {} found in CCD, proceeding to update with Robotics JSON", caseDetails.getId());
+                attachRoboticsJsonToCaseInCcdHandled(
+                        retrievedCaseDetails.getData(),
+                        idamTokens,
+                        retrievedCaseDetails,
+                        roboticsJson);
+            }
         }
     }
 
-    private void attachRoboticJsonToCaseInCcdHandled(SscsCaseData caseData, IdamTokens idamTokens,
+    private void attachRoboticsJsonToCaseInCcdHandled(SscsCaseData caseData, IdamTokens idamTokens,
                                                      SscsCaseDetails caseDetails, JSONObject roboticsJson) {
         try {
             roboticsService.attachRoboticsJsonToCaseInCcd(roboticsJson, caseData, idamTokens, caseDetails);
