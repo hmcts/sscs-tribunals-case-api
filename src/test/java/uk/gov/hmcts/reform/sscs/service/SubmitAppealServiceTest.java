@@ -169,6 +169,11 @@ public class SubmitAppealServiceTest {
         byte[] expected = {};
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
+        SscsCaseDetails caseDetails = SscsCaseDetails.builder().build();
+        caseDetails.setId(1L);
+        SscsCaseData caseData = SscsCaseData.builder().build();
+        caseDetails.setData(caseData);
+        given(ccdService.getByCaseId(any(), any())).willReturn(caseDetails);
 
         submitAppealService.submitAppeal(appealData);
 

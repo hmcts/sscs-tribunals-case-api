@@ -63,7 +63,6 @@ public class SubmitAppealService {
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
 
-        log.info("Proceeding to post-create process for case {}", caseDetails.getId());
         postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails);
 
     }
@@ -71,6 +70,7 @@ public class SubmitAppealService {
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails) {
         if (null != caseDetails) {
+            log.info("Proceeding to post-create process for case {}", caseDetails.getId());
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
             JSONObject roboticsJson = roboticsService
@@ -89,6 +89,8 @@ public class SubmitAppealService {
                         retrievedCaseDetails,
                         roboticsJson);
             }
+        } else {
+            log.info("Case id is null, skipping post-create process");
         }
     }
 
