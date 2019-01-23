@@ -35,7 +35,7 @@ public class UpdateCaseInCcdTest {
 
     @Test
     public void givenACase_shouldBeUpdatedInCcd() {
-        SscsCaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData(), idamTokens);
+        SscsCaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData(), "appealCreated", "Appeal created summary", "Appeal created description", idamTokens);
 
         assertNotNull(caseDetails);
         SscsCaseData updatedCaseRefData = CaseDataUtils.buildCaseData().toBuilder().caseReference("SC123/12/78765").build();

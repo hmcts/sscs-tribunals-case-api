@@ -15,6 +15,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
@@ -147,7 +148,7 @@ public class SubmitAppealServiceTest {
                 ccdService, sscsPdfService, roboticsService, airLookupService, regionalProcessingCenterService,
                 idamService, evidenceManagementService);
 
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
+        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
@@ -161,16 +162,43 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetails() {
+    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithAppealCreatedEvent() {
         byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any())).willReturn(expected);
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenCaseDoesNotExistInCcdAndMrnDateIsMissing_shouldCreateCaseWithAppealDetailsWithIncompleteApplicationEvent() {
+        byte[] expected = {};
+        appealData.getMrn().setDate(null);
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenCaseDoesNotExistInCcdAndMrnDateIsGreaterThan13Months_shouldCreateCaseWithAppealDetailsWithNonCompliantReceivedEvent() {
+        byte[] expected = {};
+        appealData.getMrn().setDate(LocalDate.now().minusMonths(13).minusDays(1));
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
@@ -272,7 +300,7 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
         long ccdId = 987L;
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
+        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(ccdId).build());
         SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
         List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
@@ -305,7 +333,7 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
         long ccdId = 987L;
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
+        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
                 .build());
         SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
         List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
@@ -349,7 +377,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
                 .willReturn(null);
 
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
+        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willThrow(RuntimeException.class);
 
         submitAppealService.submitAppeal(appealData);
@@ -376,6 +404,6 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
     }
 }

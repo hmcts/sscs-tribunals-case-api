@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -55,18 +58,22 @@ public class SubmitAppealService {
         String firstHalfOfPostcode = regionalProcessingCenterService
                 .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
+
+        EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseDetails caseDetails = createCaseInCcd(caseData, idamTokens);
-        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails);
+        SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
+        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event);
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
-                                            IdamTokens idamTokens, SscsCaseDetails caseDetails) {
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event) {
         if (null != caseDetails) {
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-            roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
-                    additionalEvidence);
+            if (event.equals(SYA_APPEAL_CREATED)) {
+                roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
+                        additionalEvidence);
+            }
         }
     }
 
@@ -88,15 +95,20 @@ public class SubmitAppealService {
         return "";
     }
 
-    private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
+    private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
             caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
             if (caseDetails == null) {
-                caseDetails = ccdService.createCase(caseData, idamTokens);
-                log.info("Case {} successfully created in CCD for Nino - {} and benefit type {}",
+                caseDetails = ccdService.createCase(caseData,
+                        eventType.getCcdType(),
+                        "SSCS - new case created",
+                        "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                        idamTokens);
+                log.info("Case {} successfully created in CCD for Nino - {} and benefit type {} with event {}",
                         caseDetails.getId(), caseData.getGeneratedNino(),
-                        caseData.getAppeal().getBenefitType().getCode());
+                        caseData.getAppeal().getBenefitType().getCode(),
+                        eventType);
                 return caseDetails;
             } else {
                 log.info("Duplicate case {} found for Nino {} and benefit type {}. "
@@ -111,6 +123,15 @@ public class SubmitAppealService {
                                     + " and Nino - %s and Benefit type - %s",
                             caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
                             caseData.getAppeal().getBenefitType().getCode()), e);
+        }
+    }
+
+    private EventType findEventType(SscsCaseData caseData) {
+        if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
+            LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
+            return mrnDate.plusMonths(13L).isBefore(LocalDate.now()) ? NON_COMPLIANT : SYA_APPEAL_CREATED;
+        } else {
+            return INCOMPLETE_APPLICATION_RECEIVED;
         }
     }
 
