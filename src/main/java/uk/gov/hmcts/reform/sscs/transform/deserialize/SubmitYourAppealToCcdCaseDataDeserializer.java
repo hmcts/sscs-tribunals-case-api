@@ -149,7 +149,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializer {
         return Appellant.builder()
                 .name(name)
                 .address(address)
-                .contact(contact)
+                .contact(appointee == null ? contact : Contact.builder().build())
                 .identity(identity)
                 .appointee(appointee)
                 .isAddressSameAsAppointee(useSameAddress)
