@@ -11,6 +11,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -145,7 +146,7 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void shouldGeneratePdfAndSend() throws Exception {
+    public void givenAValidAppeal_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
@@ -154,7 +155,7 @@ public class SyaEndpointsIt {
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
+                .content(getCase("json/sya.json")))
                 .andExpect(status().isCreated());
 
         verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
@@ -163,8 +164,61 @@ public class SyaEndpointsIt {
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
         assertThat(message.getSubject(), is("Bloggs_33C"));
 
+        verify(ccdClient).startCaseForCaseworker(any(), eq(SYA_APPEAL_CREATED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender, times(2)).send(message);
+
+        assertNotNull(getPdfWrapper().getCcdCaseId());
+    }
+
+    @Test
+    public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
+
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/syaWithNoMrnDate.json")))
+                .andExpect(status().isCreated());
+
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
+
+        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
+        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
+        assertThat(message.getSubject(), is("Bloggs_33C"));
+
+        verify(ccdClient).startCaseForCaseworker(any(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()));
+        verify(ccdClient).submitForCaseworker(any(), any());
+        verify(mailSender).send(message);
+
+        assertNotNull(getPdfWrapper().getCcdCaseId());
+    }
+
+    @Test
+    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
+
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/syaWithMrnDateMoreThan13Months.json")))
+                .andExpect(status().isCreated());
+
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
+
+        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
+        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
+        assertThat(message.getSubject(), is("Bloggs_33C"));
+
+        verify(ccdClient).startCaseForCaseworker(any(), eq(NON_COMPLIANT.getCcdType()));
+        verify(ccdClient).submitForCaseworker(any(), any());
+        verify(mailSender).send(message);
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
@@ -177,7 +231,7 @@ public class SyaEndpointsIt {
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
+                .content(getCase("json/sya.json")))
                 .andExpect(status().isCreated());
 
         verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
@@ -199,7 +253,7 @@ public class SyaEndpointsIt {
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
+                .content(getCase("json/sya.json")))
                 .andExpect(status().isCreated());
 
         then(mailSender).should(times(2)).send(message);
@@ -217,8 +271,8 @@ public class SyaEndpointsIt {
         return IOUtils.toByteArray(resource);
     }
 
-    private String getCase() {
-        String syaCaseJson = "json/sya.json";
+    private String getCase(String path) {
+        String syaCaseJson = path;
         URL resource = getClass().getClassLoader().getResource(syaCaseJson);
         try {
             return IOUtils.toString(resource, Charset.defaultCharset());
