@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
@@ -8,7 +10,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.json.JSONObject;
@@ -66,46 +67,32 @@ public class SubmitAppealService {
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event);
+        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails);
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
-                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event) {
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails) {
         if (null != caseDetails) {
             log.info("Proceeding to post-create process for case {}", caseDetails.getId());
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-
-            if (event.equals(SYA_APPEAL_CREATED)) {
-                JSONObject roboticsJson = roboticsService
-                        .sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
-
-                log.info("Retrieving newly-created case {} from CCD to attach Robotics JSON", caseDetails.getId());
-                SscsCaseDetails retrievedCaseDetails = ccdService.getByCaseId(caseDetails.getId(), idamTokens);
-
-                if (null == retrievedCaseDetails) {
-                    log.info("Unable to retrieve case {} from CCD to attach Robotics JSON", caseDetails.getId());
-                } else {
-                    log.info("Case {} found in CCD, proceeding to update with Robotics JSON", caseDetails.getId());
-                    attachRoboticsJsonToCaseInCcdHandled(
-                            retrievedCaseDetails.getData(),
-                            idamTokens,
-                            retrievedCaseDetails,
-                            roboticsJson);
-                }
-            }
+            JSONObject roboticsJson = roboticsService
+                    .sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
+            attachRoboticsJsonToCaseInCcdHandled(idamTokens, caseDetails.getId(), roboticsJson);
         } else {
             log.info("Case id is null, skipping post-create process");
         }
     }
 
-    private void attachRoboticsJsonToCaseInCcdHandled(SscsCaseData caseData, IdamTokens idamTokens,
-                                                     SscsCaseDetails caseDetails, JSONObject roboticsJson) {
+    private void attachRoboticsJsonToCaseInCcdHandled(IdamTokens idamTokens, Long caseDetailsId,
+                                                      JSONObject roboticsJson) {
         try {
-            roboticsService.attachRoboticsJsonToCaseInCcd(roboticsJson, caseData, idamTokens, caseDetails);
+            log.info("Retrieving newly-created case {} from CCD to attach Robotics JSON", caseDetailsId);
+            SscsCaseDetails retrievedCaseDetails = ccdService.getByCaseId(caseDetailsId, idamTokens);
+            roboticsService.attachRoboticsJsonToCaseInCcd(roboticsJson, retrievedCaseDetails.getData(), idamTokens,
+                    retrievedCaseDetails);
         } catch (Exception e) {
-            log.info("Failed to update ccd case with Robotics JSON but carrying on [" + caseDetails.getId() + "] ["
-                    + caseData.getCaseReference() + "]", e);
+            log.info("Failed to update ccd case with Robotics JSON but carrying on [" + caseDetailsId + "]", e);
         }
     }
 
