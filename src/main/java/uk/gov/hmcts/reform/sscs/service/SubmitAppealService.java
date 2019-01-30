@@ -67,18 +67,20 @@ public class SubmitAppealService {
         IdamTokens idamTokens = idamService.getIdamTokens();
 
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails);
+        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event);
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
-                                            IdamTokens idamTokens, SscsCaseDetails caseDetails) {
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event) {
         if (null != caseDetails) {
             log.info("Proceeding to post-create process for case {}", caseDetails.getId());
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens);
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-            JSONObject roboticsJson = roboticsService
-                    .sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
-            attachRoboticsJsonToCaseInCcdHandled(idamTokens, caseDetails.getId(), roboticsJson);
+            if (event.equals(SYA_APPEAL_CREATED)) {
+                JSONObject roboticsJson = roboticsService
+                        .sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
+                attachRoboticsJsonToCaseInCcdHandled(idamTokens, caseDetails.getId(), roboticsJson);
+            }
         } else {
             log.info("Case id is null, skipping post-create process");
         }
