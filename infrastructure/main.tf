@@ -78,18 +78,14 @@ data "azurerm_key_vault_secret" "idam_oauth2_client_secret" {
 }
 
 locals {
-  aseName       = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
-  app_full_name = "${var.product}-${var.component}"
+  local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
-  local_env = "${var.env}"
-  local_ase = "${local.aseName}"
+  ccdApi        = "http://ccd-data-store-api-${var.env}.service.${local.local_ase}.internal"
+  s2sCnpUrl     = "http://rpe-service-auth-provider-${var.env}.service.${local.local_ase}.internal"
+  pdfService    = "http://cmc-pdf-service-${var.env}.service.${local.local_ase}.internal"
+  documentStore = "http://dm-store-${var.env}.service.${local.local_ase}.internal"
 
-  ccdApi        = "http://ccd-data-store-api-${local.local_env}.service.${local.local_ase}.internal"
-  s2sCnpUrl     = "http://rpe-service-auth-provider-${local.local_env}.service.${local.local_ase}.internal"
-  pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_ase}.internal"
-  documentStore = "http://dm-store-${local.local_env}.service.${local.local_ase}.internal"
-
-  azureVaultName = "sscs-${local.local_env}"
+  azureVaultName = "sscs-${var.env}"
 
   shared_app_service_plan     = "${var.product}-${var.env}"
   non_shared_app_service_plan = "${var.product}-${var.component}-${var.env}"
@@ -98,7 +94,7 @@ locals {
 
 module "tribunals-case-api" {
   source       = "git@github.com:hmcts/moj-module-webapp.git?ref=master"
-  product      = "${local.app_full_name}"
+  product      = "${var.product}-${var.component}"
   location     = "${var.location}"
   env          = "${var.env}"
   ilbIp        = "${var.ilbIp}"
