@@ -54,7 +54,7 @@ public class SubmitAppealService {
         this.evidenceManagementService = evidenceManagementService;
     }
 
-    public void submitAppeal(SyaCaseWrapper appeal) {
+    public Long submitAppeal(SyaCaseWrapper appeal) {
         String firstHalfOfPostcode = regionalProcessingCenterService
                 .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
@@ -63,6 +63,7 @@ public class SubmitAppealService {
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
         postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event);
+        return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,

@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -41,7 +41,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
-        doNothing().when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class));
+        when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class))).thenReturn(1L);
 
         String json = getSyaCaseWrapperJson();
 
