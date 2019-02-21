@@ -220,7 +220,7 @@ dependencies {
     compile group: 'org.json', name: 'json', version: '20180813'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-common', version: '1.4.0'
-    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.0'
+    compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
