@@ -40,7 +40,7 @@ checkstyle {
 }
 
 pmd {
-    toolVersion = "5.8.1"
+    toolVersion = "6.5.0"
     ignoreFailures = true
     sourceSets = [sourceSets.main, sourceSets.test]
     reportsDir = file("$project.buildDir/reports/pmd")
@@ -195,7 +195,7 @@ dependencyManagement {
     dependencies {
         // checkstyle needs a certain version and so does spring fox swagger, so can't use latest
         // fun times...
-        dependencySet(group: 'com.google.guava', version: '20.0') {
+        dependencySet(group: 'com.google.guava', version: '27.0.1-jre') {
             entry 'guava'
         }
     }
@@ -207,7 +207,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
-    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
+    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind'
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names'
