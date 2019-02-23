@@ -176,7 +176,7 @@ configurations {
 def springBootVersion = '2.0.5.RELEASE'
 
 def versions = [
-        reformLogging: '4.0.1',
+        reformLogging: '5.0.1',
         springBoot: springBootVersion,
         springfoxSwagger: '2.8.0',
         pitest: '1.3.2',
