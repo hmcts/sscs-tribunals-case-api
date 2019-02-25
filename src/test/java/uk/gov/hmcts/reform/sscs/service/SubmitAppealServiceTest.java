@@ -89,9 +89,6 @@ public class SubmitAppealServiceTest {
     @Mock
     private RoboticsJsonValidator roboticsJsonValidator;
 
-    @Mock
-    private RoboticsJsonUploadService roboticsJsonUploadService;
-
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
@@ -145,7 +142,7 @@ public class SubmitAppealServiceTest {
                 new RoboticsEmailTemplate("from", "to", "message");
 
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
-                roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
+                roboticsJsonValidator, roboticsEmailTemplate);
 
         submitAppealService = new SubmitAppealService(
                 ccdService, sscsPdfService, roboticsService, airLookupService, regionalProcessingCenterService,
