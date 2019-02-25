@@ -132,9 +132,9 @@ public class SyaEndpointsIt {
         given(ccdClient.submitEventForCaseworker(any(), any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
-        given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString()))
+        given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .willReturn(authorize);
-        given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString()))
+        given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
