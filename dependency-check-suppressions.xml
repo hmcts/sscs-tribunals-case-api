@@ -42,4 +42,18 @@
         <gav regex="true">^org\.slf4j:slf4j-api:.*$</gav>
         <cve>CVE-2018-8088</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+			only relates to ssl which we don't do at the java app level
+			]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2014-3488</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+			only relates to ssl which we don't do at the java app level
+			]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2015-2156</cve>
+    </suppress>
 </suppressions>
