@@ -22,3 +22,6 @@ build
 .project
 .settings/
 bin/
+
+# VS Code
+.vscode/
