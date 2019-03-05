@@ -36,8 +36,9 @@ public class SyaController {
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
                 syaCaseWrapper.getBenefitType().getCode());
-        submitAppealService.submitAppeal(syaCaseWrapper);
-        log.info("Appeal with Nino - {} and benefit type - {} processed successfully",
+        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper);
+        log.info("Case {} with Nino - {} and benefit type - {} processed successfully",
+                caseId,
                 syaCaseWrapper.getAppellant().getNino(),
                 syaCaseWrapper.getBenefitType().getCode());
 
