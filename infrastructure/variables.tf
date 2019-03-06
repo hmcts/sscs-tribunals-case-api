@@ -66,6 +66,10 @@ variable "idam_redirect_url" {
   default = "https://sscs-case-loader-sandbox.service.core-compute-sandbox.internal"
 }
 
+variable "idam_url" {
+  default = "http://testing.test"
+}
+
 variable "robotics_email_subject" {
   type    = "string"
   default = "Robotics Data"
