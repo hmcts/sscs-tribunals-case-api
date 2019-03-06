@@ -20,11 +20,11 @@ spec:
           - containerPort: 8080
         env:
           - name: AUTH_PROVIDER_SERVICE_API_URL
-            value: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+            value: "http://rpe-service-auth-provider-saat.service.core-compute-saat.internal"
           - name: IDAM_API_URL
-            value: "http://betadevbccidamapplb.reform.hmcts.net
+            value: "http://idam-api-idam-saat.service.core-compute-idam-saat.internal"
           - name: CCD_SERVICE_API_URL
-            value: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+            value: "http://ccd-data-store-api-saat.service.core-compute-saat.internal"
           - name: EMAIL_FROM
             value: "sscs@hmcts.net"
           - name: EMAIL_TO
@@ -74,7 +74,7 @@ spec:
           - name: IDAM_OAUTH2_CLIENT_SECRET
             value: ${IDAM_OAUTH2_CLIENT_SECRET}
           - name: IDAM_OAUTH2_REDIRECT_URL
-            value: "https://sscs-case-loader-aat.service.core-compute-aat.internal"
+            value: "https://sscs-case-loader-saat.service.core-compute-saat.internal"
           - name: DOCUMENT_MANAGEMENT_URL
             value: "http://dm-store-saat.service.core-compute-saat.internal"
           - name: MAX_FILE_SIZE
