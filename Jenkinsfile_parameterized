@@ -2,18 +2,40 @@
 @Library("Infrastructure") _
 
 properties([
-  parameters([
-    string(name: 'PRODUCT_NAME', defaultValue: 'sscs', description: ''),
-    string(name: 'APP', defaultValue: 'tribunals-api', description: ''),
-    string(name: 'TYPE', defaultValue: 'java', description: ''),
-    string(name: 'ENVIRONMENT', defaultValue: 'sandbox', description: 'Environment where code should be build and deployed'),
-    choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
-  ]),
-  [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
-  pipelineTriggers([[$class: 'GitHubPushTrigger']])
+        parameters([
+                string(name: 'PRODUCT_NAME', defaultValue: 'sscs', description: ''),
+                string(name: 'APP', defaultValue: 'tribunals-api', description: ''),
+                string(name: 'TYPE', defaultValue: 'java', description: ''),
+                string(name: 'ENVIRONMENT', defaultValue: 'saat', description: 'Environment where code should be build and deployed'),
+                choice(name: 'SUBSCRIPTION', choices: 'sandbox\nnonprod\nprod', description: 'Azure subscriptions available to build in')
+        ]),
+        [$class: 'GithubProjectProperty', projectUrlStr: 'https://github.com/hmcts/tribunals-case-api'],
+        pipelineTriggers([[$class: 'GitHubPushTrigger']])
 ])
 
-withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+List<LinkedHashMap<String, Object>> secrets = [
+        secret('sscs-email-mac-secret-text', 'SUBSCRIPTIONS_MAC_SECRET'),
+        secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
+        secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
+        secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
+        secret('ccd-tid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
+        secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
+        secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
+        secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+]
 
+
+static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
+  [ $class: 'AzureKeyVaultSecret',
+    secretType: 'Secret',
+    name: secretName,
+    version: '',
+    envVariable: envVar
+  ]
+}
+
+withParameterizedPipeline(params.TYPE, params.PRODUCT_NAME, params.APP, params.ENVIRONMENT, params.SUBSCRIPTION) {
+  enableSlackNotifications('#sscs-tech')
+  loadVaultSecrets(secrets)
 }
 
