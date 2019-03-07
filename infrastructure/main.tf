@@ -106,8 +106,6 @@ module "tribunals-case-api" {
   asp_name     = "${local.app_service_plan}"
 
   app_settings = {
-    AUTH_PROVIDER_SERVICE_API_URL = "${local.s2sCnpUrl}"
-
     IDAM_API_URL = "${var.idam_url}"
 
     EMAIL_FROM    = "${data.azurerm_key_vault_secret.appeal_email_from.value}"

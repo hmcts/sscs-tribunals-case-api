@@ -19,12 +19,12 @@ spec:
         ports:
           - containerPort: 8080
         env:
-          - name: AUTH_PROVIDER_SERVICE_API_URL
+          - name: IDAM.S2S-AUTH
             value: "http://rpe-service-auth-provider-saat.service.core-compute-saat.internal"
           - name: IDAM_API_URL
             value: "http://idam-api-idam-saat.service.core-compute-idam-saat.internal"
           - name: CORE_CASE_DATA_API_URL
-            value: "${CORE_CASE_DATA_API_URL}"
+            value: "http://ccd-data-store-api-saat.service.core-compute-saat.internal"
           - name: EMAIL_FROM
             value: "sscs@hmcts.net"
           - name: EMAIL_TO
@@ -58,9 +58,7 @@ spec:
           - name: CORE_CASE_DATA_CASE_TYPE_ID
             value: "Benefit"
           - name: IDAM.S2S-AUTH.TOTP_SECRET
-            value: ${IDAM_S2S_AUTH_TOTP_SECRET}
-          - name: IDAM.S2S-AUTH
-            value: ${IDAM_S2S_AUTH}
+            value: "${IDAM.S2S-AUTH.TOTP_SECRET}"
           - name: IDAM.S2S-AUTH.MICROSERVICE
             value: ${IDAM_S2S_AUTH_MICROSERVICE}
           - name: IDAM_SSCS_SYSTEMUPDATE_USER
