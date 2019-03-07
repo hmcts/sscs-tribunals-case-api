@@ -23,7 +23,7 @@ spec:
             value: "http://rpe-service-auth-provider-saat.service.core-compute-saat.internal"
           - name: IDAM_API_URL
             value: "http://idam-api-idam-saat.service.core-compute-idam-saat.internal"
-          - name: CCD_SERVICE_API_URL
+          - name: CORE_CASE_DATA_API_URL
             value: "http://ccd-data-store-api-saat.service.core-compute-saat.internal"
           - name: EMAIL_FROM
             value: "sscs@hmcts.net"
