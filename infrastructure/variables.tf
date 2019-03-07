@@ -2,6 +2,10 @@ variable "product" {
   type = "string"
 }
 
+variable "raw_product" {
+  default = "sscs-tribunals-api" // jenkins-library overrides product for PRs and adds e.g. pr-118-rpe-...
+}
+
 variable "component" {
   type = "string"
 }
@@ -98,4 +102,13 @@ variable "max_file_size" {
 variable "max_request_size" {
   type = "string"
   default = "10MB"
+}
+
+variable "location_app" {
+  type    = "string"
+  default = "UK South"
+}
+
+variable "capacity" {
+  default = "2"
 }
