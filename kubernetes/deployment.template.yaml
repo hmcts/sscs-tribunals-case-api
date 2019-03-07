@@ -24,7 +24,7 @@ spec:
           - name: IDAM_API_URL
             value: "http://idam-api-idam-saat.service.core-compute-idam-saat.internal"
           - name: CORE_CASE_DATA_API_URL
-            value: "http://ccd-data-store-api-saat.service.core-compute-saat.internal"
+            value: "${CORE_CASE_DATA_API_URL}"
           - name: EMAIL_FROM
             value: "sscs@hmcts.net"
           - name: EMAIL_TO
@@ -53,8 +53,6 @@ spec:
             value: "http://cmc-pdf-service-saat.service.core-compute-saat.internal"
           - name: SUBSCRIPTIONS_MAC_SECRET
             value: ${SUBSCRIPTIONS_MAC_SECRET}
-          - name: CORE_CASE_DATA_API_URL
-            value: "http://ccd-data-store-api-saat.service.core-compute-saat.internal"
           - name: CORE_CASE_DATA_JURISDICTION_ID
             value: "SSCS"
           - name: CORE_CASE_DATA_CASE_TYPE_ID
