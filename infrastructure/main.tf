@@ -108,8 +108,6 @@ module "tribunals-case-api" {
   app_settings = {
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
-    CCD_SERVICE_API_URL = "${local.ccdApi}"
-
     EMAIL_FROM    = "${data.azurerm_key_vault_secret.appeal_email_from.value}"
     EMAIL_TO      = "${data.azurerm_key_vault_secret.appeal_email_to.value}"
     EMAIL_SUBJECT = "${var.appeal_email_subject}"

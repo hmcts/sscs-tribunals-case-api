@@ -21,8 +21,6 @@ spec:
         env:
           - name: IDAM_API_URL
             value: ${IDAM_API_URL}
-          - name: CCD_SERVICE_API_URL
-            value: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
           - name: EMAIL_FROM
             value: "sscs@hmcts.net"
           - name: EMAIL_TO
