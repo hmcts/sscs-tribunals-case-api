@@ -19,8 +19,6 @@ spec:
         ports:
           - containerPort: 8080
         env:
-          - name: AUTH_PROVIDER_SERVICE_API_URL
-            value: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
           - name: IDAM_API_URL
             value: ${IDAM_API_URL}
           - name: CCD_SERVICE_API_URL
