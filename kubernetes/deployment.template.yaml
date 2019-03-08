@@ -1,3 +1,19 @@
+# Example Kubernetes resource template
+#
+# All variables are replaced at deployment time with environment variables.
+#
+# The following variables are derived as follows by the pipeline. DO NOT CHANGE:
+#
+#   - NAMESPACE:    product
+#   - SERVICE_NAME: product-component-branch
+#   - IMAGE_NAME:   registry-name/hmcts/product-component:branch
+#
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${NAMESPACE}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,15 +32,7 @@ spec:
       containers:
       - image: ${IMAGE_NAME}
         name: ${SERVICE_NAME}
-        ports:
-          - containerPort: 8080
         env:
-          - name: IDAM.S2S-AUTH
-            value: "http://rpe-service-auth-provider-saat.service.core-compute-saat.internal"
-          - name: IDAM_API_URL
-            value: "http://idam-api-idam-saat.service.core-compute-idam-saat.internal"
-          - name: CORE_CASE_DATA_API_URL
-            value: "http://ccd-data-store-api-saat.service.core-compute-saat.internal"
           - name: EMAIL_FROM
             value: "sscs@hmcts.net"
           - name: EMAIL_TO
@@ -49,8 +57,6 @@ spec:
             value: "true"
           - name: EMAIL_SMTP_SSL_TRUST
             value: "*"
-          - name: PDF_API_URL
-            value: "http://cmc-pdf-service-saat.service.core-compute-saat.internal"
           - name: SUBSCRIPTIONS_MAC_SECRET
             value: ${SUBSCRIPTIONS_MAC_SECRET}
           - name: CORE_CASE_DATA_JURISDICTION_ID
@@ -69,30 +75,35 @@ spec:
             value: "sscs"
           - name: IDAM_OAUTH2_CLIENT_SECRET
             value: ${IDAM_OAUTH2_CLIENT_SECRET}
-          - name: IDAM_OAUTH2_REDIRECT_URL
-            value: "https://sscs-case-loader-saat.service.core-compute-saat.internal"
-          - name: DOCUMENT_MANAGEMENT_URL
-            value: "http://dm-store-saat.service.core-compute-saat.internal"
           - name: MAX_FILE_SIZE
             value: "10MB"
           - name: MAX_REQUEST_SIZE
             value: "10MB"
+              envFrom:
+              - configMapRef:
+                  name: ${SERVICE_NAME}-config
 
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "200m"
-          limits:
-            memory: "1024Mi"
-            cpu: "2500m"
+              resources:
+                requests:
+                  memory: "1024Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "2048Mi"
+                  cpu: "2500m"
 
-        readinessProbe:
-          timeoutSeconds: 10
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          httpGet:
-            path: /health
-            port: 8080
+              readinessProbe:
+                timeoutSeconds: 10
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                httpGet:
+                  path: /health
+                  port: 8080
+
+              # This is the port your process is listening on in the container
+              ports:
+              - containerPort: 8080
+                name: http
+              imagePullPolicy: Always
 ---
 apiVersion: v1
 kind: Service
@@ -103,9 +114,9 @@ metadata:
     app: ${SERVICE_NAME}
 spec:
   ports:
-    - name: http
-      port: 80
-      targetPort: 8080
+  - name: http
+    port: 80
+    targetPort: 8080
   selector:
     app: ${SERVICE_NAME}
 ---
