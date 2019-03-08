@@ -17,7 +17,7 @@ locals {
   documentStore = "http://dm-store-${local.local_env}.service.core-compute-${local.local_env}.internal"
   pdfService    = "http://cmc-pdf-service-${local.local_env}.service.${local.local_env}.internal"
 
-  vaultName = "sscs-scan-${local.local_env}"
+  vaultName = "sscs-${local.local_env}"
 
   # URI of vault that stores long-term secrets. It's the app's own Key Vault, except for (s)preview,
   # where vaults are short-lived and can only store secrets generated during deployment
