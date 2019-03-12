@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -196,5 +197,28 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void sysWithRepHavingALandLineWillNotReceiveSmsNotifications() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS
+                .getDeserializeMessage();
+        syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("0203 444 4432");
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertFalse("rep should be not sms subscribed",
+                caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
+    }
+
+    @Test
+    public void sysWithRepHavingAMobileNumberWillReceiveSmsNotifications() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS
+                .getDeserializeMessage();
+        syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("07404621944");
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertTrue(caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
+        assertEquals("mobile numbers should be equal","+447404621944",
+                caseData.getSubscriptions().getRepresentativeSubscription().getMobile());
     }
 }
