@@ -3,12 +3,14 @@ package uk.gov.hmcts.reform.sscs.transform.deserialize;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -19,7 +21,10 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 
 public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
+    private static final String NO = "No";
+
     private RegionalProcessingCenter regionalProcessingCenter;
+
 
     @Before
     public void setUp() {
@@ -84,11 +89,19 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void syaWithoutRepresentativeTest() {
+    public void syaWithoutRepresentativeTestShouldGenerateAnEmptySubscriptionForRep() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_REPRESENTATIVE.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertJsonEquals(WITHOUT_REPRESENTATIVE_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+        Subscription representativeSubscription = caseData.getSubscriptions().getRepresentativeSubscription();
+        assertNotNull(representativeSubscription);
+        assertTrue(StringUtils.isNotEmpty(representativeSubscription.getTya()));
+        assertEquals(Subscription.builder()
+                        .subscribeEmail(NO)
+                        .subscribeSms(NO)
+                        .wantSmsNotifications(NO)
+                        .build(),
+                removeTyaNumber(representativeSubscription));
     }
 
     @Test
