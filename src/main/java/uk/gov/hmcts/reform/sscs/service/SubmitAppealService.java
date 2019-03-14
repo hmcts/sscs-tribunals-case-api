@@ -135,22 +135,14 @@ public class SubmitAppealService {
     }
 
     private SscsCaseDetails createDraftCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = null;
-        try {
-            caseDetails = ccdService.createCase(caseData,
-                    eventType.getCcdType(),
-                    "SSCS - draft case created",
-                    "Created Draft SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
-                    idamTokens);
-            log.info("Draft Case {} successfully created in CCD",
-                    caseDetails.getId());
-            return caseDetails;
-
-        } catch (Exception e) {
-            throw new CcdException(
-                    String.format("Error found in the creating draft case process for case with Id - %s",
-                            caseDetails != null ? caseDetails.getId() : ""), e);
-        }
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData,
+                                        eventType.getCcdType(),
+                                        "SSCS - draft case created",
+                                        "Created Draft SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                                        idamTokens);
+        log.info("Draft Case {} successfully created in CCD", caseDetails.getId());
+        
+        return caseDetails;
     }
 
     private EventType findEventType(SscsCaseData caseData) {
