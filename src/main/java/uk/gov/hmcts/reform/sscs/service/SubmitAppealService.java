@@ -65,10 +65,10 @@ public class SubmitAppealService {
     }
 
     public Long submitDraftAppeal(SyaCaseWrapper appeal) {
-        SscsCaseData caseData = convertSyaToCcdCaseData(appeal);
 
-        IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseDetails caseDetails = createDraftCaseInCcd(caseData, EventType.DRAFT, idamTokens);
+        SscsCaseDetails caseDetails = createDraftCaseInCcd(convertSyaToCcdCaseData(appeal),
+                                                            EventType.DRAFT,
+                                                            idamService.getIdamTokens());
 
         // in case of duplicate case the caseDetails will be null
         return (caseDetails != null) ? caseDetails.getId() : null;
@@ -141,7 +141,7 @@ public class SubmitAppealService {
                                         "Created Draft SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
                                         idamTokens);
         log.info("Draft Case {} successfully created in CCD", caseDetails.getId());
-        
+
         return caseDetails;
     }
 
