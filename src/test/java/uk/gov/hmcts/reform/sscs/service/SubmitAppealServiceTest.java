@@ -202,6 +202,13 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
+    public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
+        submitAppealService.submitDraftAppeal(appealData);
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+    }
+
+    @Test
     public void shouldCreatePdfWithAppealDetails() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
