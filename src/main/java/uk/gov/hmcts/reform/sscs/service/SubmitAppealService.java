@@ -68,7 +68,7 @@ public class SubmitAppealService {
         SscsCaseData caseData = convertSyaToCcdCaseData(appeal);
 
         IdamTokens idamTokens = idamService.getIdamTokens();
-        SscsCaseDetails caseDetails = createCaseInCcd(caseData, EventType.DRAFT, idamTokens);
+        SscsCaseDetails caseDetails = createDraftCaseInCcd(caseData, EventType.DRAFT, idamTokens);
 
         // in case of duplicate case the caseDetails will be null
         return (caseDetails != null) ? caseDetails.getId() : null;
@@ -131,6 +131,25 @@ public class SubmitAppealService {
                                     + " and Nino - %s and Benefit type - %s",
                             caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
                             caseData.getAppeal().getBenefitType().getCode()), e);
+        }
+    }
+
+    private SscsCaseDetails createDraftCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
+        SscsCaseDetails caseDetails = null;
+        try {
+            caseDetails = ccdService.createCase(caseData,
+                    eventType.getCcdType(),
+                    "SSCS - draft case created",
+                    "Created Draft SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                    idamTokens);
+            log.info("Draft Case {} successfully created in CCD",
+                    caseDetails.getId());
+            return caseDetails;
+
+        } catch (Exception e) {
+            throw new CcdException(
+                    String.format("Error found in the creating draft case process for case with Id - %s",
+                            caseDetails != null ? caseDetails.getId() : ""), e);
         }
     }
 
