@@ -44,4 +44,23 @@ public class SyaController {
 
         return status(201).build();
     }
+
+
+    @ApiOperation(value = "submitDraftAppeal",
+            notes = "Creates a draft case from the SYA details",
+            response = String.class, responseContainer = "Appeal details")
+    @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted draft appeal successfully",
+            response = String.class)})
+    @RequestMapping(value = "/draft", method = POST, consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> createDraftAppeal(@RequestBody SyaCaseWrapper syaCaseWrapper) {
+        log.info("Draft appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
+                syaCaseWrapper.getBenefitType().getCode());
+        Long caseId = submitAppealService.submitDraftAppeal(syaCaseWrapper);
+        log.info("Draft case {} with Nino - {} and benefit type - {} processed successfully",
+                caseId,
+                syaCaseWrapper.getAppellant().getNino(),
+                syaCaseWrapper.getBenefitType().getCode());
+
+        return status(201).build();
+    }
 }

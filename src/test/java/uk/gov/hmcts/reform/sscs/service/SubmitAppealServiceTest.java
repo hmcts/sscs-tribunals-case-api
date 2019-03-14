@@ -18,7 +18,6 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
@@ -41,7 +40,6 @@ import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -116,6 +114,8 @@ public class SubmitAppealServiceTest {
 
     @Before
     public void setUp() {
+        when(airLookupService.lookupRegionalCentre("CF10")).thenReturn("Cardiff");
+
         submitYourAppealEmailTemplate =
                 new SubmitYourAppealEmailTemplate("from", "to", "message");
 
@@ -145,7 +145,7 @@ public class SubmitAppealServiceTest {
                 roboticsJsonValidator, roboticsEmailTemplate);
 
         submitAppealService = new SubmitAppealService(
-                ccdService, sscsPdfService, roboticsService, airLookupService, regionalProcessingCenterService,
+                ccdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
                 idamService, evidenceManagementService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
@@ -275,11 +275,10 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void testRegionAddedToCase() {
+    public void testPrepareCaseForCcd() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
-        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        SscsCaseData caseData = submitAppealService.transformAppealToCaseData(appealData, "Cardiff", rpc);
-        assertEquals("Cardiff", caseData.getRegion());
+        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        assertEquals("CARDIFF", caseData.getRegion());
     }
 
     @Test

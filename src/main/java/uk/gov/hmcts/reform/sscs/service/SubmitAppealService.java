@@ -31,7 +31,6 @@ public class SubmitAppealService {
     private final CcdService ccdService;
     private final SscsPdfService sscsPdfService;
     private final RoboticsService roboticsService;
-    private final AirLookupService airLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
@@ -40,7 +39,6 @@ public class SubmitAppealService {
     SubmitAppealService(CcdService ccdService,
                         SscsPdfService sscsPdfService,
                         RoboticsService roboticsService,
-                        AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         EvidenceManagementService evidenceManagementService) {
@@ -48,7 +46,6 @@ public class SubmitAppealService {
         this.ccdService = ccdService;
         this.sscsPdfService = sscsPdfService;
         this.roboticsService = roboticsService;
-        this.airLookupService = airLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
@@ -67,6 +64,16 @@ public class SubmitAppealService {
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
+    public Long submitDraftAppeal(SyaCaseWrapper appeal) {
+        SscsCaseData caseData = prepareCaseForCcd(appeal, null);
+
+        IdamTokens idamTokens = idamService.getIdamTokens();
+        SscsCaseDetails caseDetails = createCaseInCcd(caseData, EventType.DRAFT, idamTokens);
+
+        // in case of duplicate case the caseDetails will be null
+        return (caseDetails != null) ? caseDetails.getId() : null;
+    }
+
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event) {
         if (null != caseDetails) {
@@ -79,14 +86,13 @@ public class SubmitAppealService {
         }
     }
 
-    private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
-        String region = airLookupService.lookupRegionalCentre(postcode);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByName(region);
+    protected SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
 
         if (rpc == null) {
-            return transformAppealToCaseData(appeal);
+            return convertSyaToCcdCaseData(appeal);
         } else {
-            return transformAppealToCaseData(appeal, rpc.getName(), rpc);
+            return convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
         }
     }
 
@@ -135,14 +141,6 @@ public class SubmitAppealService {
         } else {
             return INCOMPLETE_APPLICATION_RECEIVED;
         }
-    }
-
-    private SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
-        return convertSyaToCcdCaseData(appeal);
-    }
-
-    SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
-        return convertSyaToCcdCaseData(appeal, region, rpc);
     }
 
     private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
