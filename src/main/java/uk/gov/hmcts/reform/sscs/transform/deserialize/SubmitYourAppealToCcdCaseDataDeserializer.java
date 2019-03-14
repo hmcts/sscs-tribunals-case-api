@@ -344,7 +344,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .build();
         }
 
-        return null;
+        return Subscription.builder()
+                .wantSmsNotifications(NO)
+                .subscribeSms(NO)
+                .subscribeEmail(NO)
+                .tya(generateAppealNumber())
+                .build();
 
     }
 
