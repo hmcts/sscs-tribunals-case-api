@@ -65,7 +65,7 @@ public class SubmitAppealService {
     }
 
     public Long submitDraftAppeal(SyaCaseWrapper appeal) {
-        SscsCaseData caseData = prepareCaseForCcd(appeal, null);
+        SscsCaseData caseData = convertSyaToCcdCaseData(appeal);
 
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, EventType.DRAFT, idamTokens);
