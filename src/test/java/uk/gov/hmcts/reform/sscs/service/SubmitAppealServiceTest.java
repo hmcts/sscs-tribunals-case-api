@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -22,7 +21,6 @@ import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -42,8 +40,6 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
@@ -65,6 +61,9 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private CcdService ccdService;
+
+    @Mock
+    private CcdPdfService ccdPdfService;
 
     @Mock
     private PDFServiceClient pdfServiceClient;
@@ -136,7 +135,7 @@ public class SubmitAppealServiceTest {
                         evidenceMetadataDownloadClientApi);
 
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
-                pdfStoreService, submitYourAppealEmailTemplate, ccdService);
+                submitYourAppealEmailTemplate, ccdPdfService);
 
         RoboticsEmailTemplate roboticsEmailTemplate =
                 new RoboticsEmailTemplate("from", "to", "message");
@@ -289,44 +288,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldStorePdfInDocumentStore() {
-        byte[] expected = {1, 2, 3};
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any(Map.class))).willReturn(expected);
-
-        submitAppealService.submitAppeal(appealData);
-
-        then(pdfStoreService).should().store(expected, "Bloggs_33C.pdf");
-    }
-
-    @Test
     public void shouldUpdateCcdWithPdf() {
-        byte[] expected = {1, 2, 3};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any(Map.class))).willReturn(expected);
-        long ccdId = 987L;
-        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().id(ccdId).build());
-        SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
-        List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
-        given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
-
-        roboticsWrapper = RoboticsWrapper.builder()
-                .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("No").build();
-
-        submitAppealService.submitAppeal(appealData);
-
-        verify(ccdService).updateCase(
-                argThat(caseData -> sscsDocuments.equals(caseData.getSscsDocument())),
-                eq(ccdId),
-                eq("uploadDocument"),
-                any(), any(), any()
-        );
-    }
-
-    @Test
-    public void shouldUpdateCcdWithPdfCombinedWithEvidence() {
         uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
         uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
@@ -341,9 +303,6 @@ public class SubmitAppealServiceTest {
         long ccdId = 987L;
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
                 .build());
-        SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
-        List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
-        given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
         SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
 
         roboticsWrapper = RoboticsWrapper.builder()
@@ -351,12 +310,12 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(ccdService).updateCase(
-                argThat(caseData -> caseData.getSscsDocument().size() == 3
-                        && caseData.getSscsDocument().get(2).equals(sscsDocuments.get(0))),
+        verify(ccdPdfService).mergeDocIntoCcd(
+                eq("Bloggs_33C.pdf"),
+                any(),
                 eq(ccdId),
-                eq("uploadDocument"),
-                any(), any(), any()
+                argThat(caseData -> caseData.getSscsDocument().size() == 2),
+                any()
         );
     }
 
