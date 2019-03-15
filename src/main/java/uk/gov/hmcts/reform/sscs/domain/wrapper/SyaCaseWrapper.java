@@ -136,8 +136,10 @@ public class SyaCaseWrapper {
     }
 
     public SyaContactDetails getContactDetails() {
-        if (null == appellant || null == appointee) {
-            return null;
+        if (null == appellant) {
+            if (null == appointee) {
+                return null;
+            }
         }
         return ((null != getAppellant().getIsAddressSameAsAppointee()) && getAppellant().getIsAddressSameAsAppointee())
                 ? getAppointee().getContactDetails()
