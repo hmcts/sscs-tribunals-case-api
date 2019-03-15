@@ -67,7 +67,7 @@ public class SubmitAppealService {
     }
 
     public Long submitDraftAppeal(SyaCaseWrapper appeal) {
-        return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamService.getIdamTokens());
+        return createDraftCaseInCcd(SscsCaseData.builder().build(), idamService.getIdamTokens());
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
