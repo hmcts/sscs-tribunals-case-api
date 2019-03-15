@@ -56,23 +56,28 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         // Empty
     }
 
+    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+
+        return caseData.toBuilder()
+                .region(region)
+                .regionalProcessingCenter(rpc).build();
+    }
+
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
-
+        boolean isDraft = isDraft(syaCaseWrapper);
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
-                .generatedSurname(syaCaseWrapper.getCaseType().equals("draft") ? null :
-                        syaCaseWrapper.getAppellant().getLastName())
-                .generatedEmail(syaCaseWrapper.getCaseType().equals("draft") ? null :
-                        syaCaseWrapper.getContactDetails().getEmailAddress())
-                .generatedMobile(syaCaseWrapper.getCaseType().equals("draft") ? null :
-                        getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber()))
-                .generatedNino(syaCaseWrapper.getCaseType().equals("draft") ? null :
-                        syaCaseWrapper.getAppellant().getNino())
-                .generatedDob(syaCaseWrapper.getCaseType().equals("draft") ? null :
-                        syaCaseWrapper.getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .generatedSurname(isDraft ? null : syaCaseWrapper.getAppellant().getLastName())
+                .generatedEmail(isDraft ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
+                .generatedMobile(isDraft ? null : getPhoneNumberWithOutSpaces(
+                        syaCaseWrapper.getContactDetails().getPhoneNumber()))
+                .generatedNino(isDraft ? null : syaCaseWrapper.getAppellant().getNino())
+                .generatedDob(isDraft ? null : syaCaseWrapper
+                        .getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .appeal(appeal)
                 .subscriptions(getSubscriptions(syaCaseWrapper))
                 .sscsDocument(sscsDocuments)
@@ -80,16 +85,15 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
-    private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
-        return syaCaseWrapper.getCaseType().equals("draft") ? null : populateSubscriptions(syaCaseWrapper);
+    private static boolean isDraft(SyaCaseWrapper syaCaseWrapper) {
+        if (syaCaseWrapper.getCaseType() == null) {
+            return false;
+        }
+        return syaCaseWrapper.getCaseType().equals("draft");
     }
 
-    public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
-
-        return caseData.toBuilder()
-                .region(region)
-                .regionalProcessingCenter(rpc).build();
+    private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
+        return isDraft(syaCaseWrapper) ? null : populateSubscriptions(syaCaseWrapper);
     }
 
 
