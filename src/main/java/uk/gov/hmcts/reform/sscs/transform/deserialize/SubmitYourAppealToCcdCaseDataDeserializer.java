@@ -8,8 +8,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasonDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppellant;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaAppointee;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaArrangements;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaContactDetails;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaHearingOptions;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaReasonsForAppealing;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaRepresentative;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaSmsNotify;
 import uk.gov.hmcts.reform.sscs.util.Norm;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
@@ -29,7 +61,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Subscriptions subscriptions = populateSubscriptions(syaCaseWrapper);
 
-        List<SscsDocument> sscsDocuments =  getEvidenceDocumentDetails(syaCaseWrapper);
+        List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
 
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
@@ -86,66 +118,91 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
         return MrnDetails.builder()
-                .dwpIssuingOffice(Norm.dwpIssuingOffice(syaCaseWrapper.getMrn().getDwpIssuingOffice()))
-                .mrnDate(syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
-                        null)
-                .mrnLateReason(syaCaseWrapper.getMrn().getReasonForBeingLate())
-                .mrnMissingReason(syaCaseWrapper.getMrn().getReasonForNoMrn())
+                .dwpIssuingOffice(getDwpIssuingOffice(syaCaseWrapper))
+                .mrnDate(getMrnDate(syaCaseWrapper))
+                .mrnLateReason(getReasonForBeingLate(syaCaseWrapper))
+                .mrnMissingReason(getReasonForNoMrn(syaCaseWrapper))
                 .build();
 
+    }
+
+    private static String getReasonForNoMrn(SyaCaseWrapper syaCaseWrapper) {
+        if (mrnIsNull(syaCaseWrapper)) return null;
+        return syaCaseWrapper.getMrn().getReasonForNoMrn();
+    }
+
+    private static boolean mrnIsNull(SyaCaseWrapper syaCaseWrapper) {
+        return null == syaCaseWrapper.getMrn();
+    }
+
+    private static String getReasonForBeingLate(SyaCaseWrapper syaCaseWrapper) {
+        if (mrnIsNull(syaCaseWrapper)) return null;
+        return syaCaseWrapper.getMrn().getReasonForBeingLate();
+    }
+
+    private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
+        return Norm.dwpIssuingOffice(
+                mrnIsNull(syaCaseWrapper) ? null : syaCaseWrapper.getMrn().getDwpIssuingOffice());
+    }
+
+    private static String getMrnDate(SyaCaseWrapper syaCaseWrapper) {
+        if (mrnIsNull(syaCaseWrapper)) return null;
+        return syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
+                null;
     }
 
     private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper) {
 
         SyaAppellant syaAppellant = syaCaseWrapper.getAppellant();
 
-        Name name = Name.builder()
-                .title(syaAppellant.getTitle())
-                .firstName(syaAppellant.getFirstName())
-                .lastName(syaAppellant.getLastName())
-                .build();
+        Name name = getName(syaAppellant);
 
-        SyaContactDetails contactDetails = syaCaseWrapper.getAppellant().getContactDetails();
+        SyaContactDetails contactDetails = (null != syaAppellant) ? syaAppellant.getContactDetails() : null;
 
         Address address = null;
         Contact contact = null;
         if (null != contactDetails) {
             address = Address.builder()
-                .line1(contactDetails.getAddressLine1())
-                .line2(contactDetails.getAddressLine2())
-                .town(contactDetails.getTownCity())
-                .county(contactDetails.getCounty())
-                .postcode(contactDetails.getPostCode())
-                .build();
+                    .line1(contactDetails.getAddressLine1())
+                    .line2(contactDetails.getAddressLine2())
+                    .town(contactDetails.getTownCity())
+                    .county(contactDetails.getCounty())
+                    .postcode(contactDetails.getPostCode())
+                    .build();
 
             contact = Contact.builder()
-                .email(contactDetails.getEmailAddress())
-                .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
-                .build();
+                    .email(contactDetails.getEmailAddress())
+                    .mobile(getPhoneNumberWithOutSpaces(contactDetails.getPhoneNumber()))
+                    .build();
         } else {
             contact = Contact.builder().build();
         }
 
-        Identity identity = Identity.builder()
-                .dob(syaAppellant.getDob().toString())
-                .nino(syaAppellant.getNino())
-                .build();
+        Identity identity = Identity.builder().build();
+        if (null != syaAppellant) {
+            identity = identity.toBuilder()
+                    .dob(syaAppellant.getDob().toString())
+                    .nino(syaAppellant.getNino())
+                    .build();
+        }
 
         Appointee appointee = getAppointee(syaCaseWrapper);
 
-        if (appointee != null && syaAppellant.getIsAddressSameAsAppointee()) {
+        if (appointee != null && null != syaAppellant && syaAppellant.getIsAddressSameAsAppointee()) {
             address = Address.builder()
-                .line1(appointee.getAddress().getLine1())
-                .line2(appointee.getAddress().getLine2())
-                .town(appointee.getAddress().getTown())
-                .county(appointee.getAddress().getCounty())
-                .postcode(appointee.getAddress().getPostcode())
-                .build();
+                    .line1(appointee.getAddress().getLine1())
+                    .line2(appointee.getAddress().getLine2())
+                    .town(appointee.getAddress().getTown())
+                    .county(appointee.getAddress().getCounty())
+                    .postcode(appointee.getAddress().getPostcode())
+                    .build();
         }
 
-        String useSameAddress = (syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee() == null || !syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee())
-            ? "No"
-            : "Yes";
+        String useSameAddress = "No";
+        if (syaAppellant != null) {
+            useSameAddress = (syaAppellant.getIsAddressSameAsAppointee() == null ||
+                    !syaAppellant.getIsAddressSameAsAppointee()) ? "No" : "Yes";
+        }
 
         return Appellant.builder()
                 .name(name)
@@ -157,40 +214,53 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
     }
 
+    private static Name getName(SyaAppellant syaAppellant) {
+        Name name = Name.builder().build();
+
+        if (null != syaAppellant) {
+            name = name.toBuilder()
+                    .title(syaAppellant.getTitle())
+                    .firstName(syaAppellant.getFirstName())
+                    .lastName(syaAppellant.getLastName())
+                    .build();
+        }
+        return name;
+    }
+
     private static Appointee getAppointee(SyaCaseWrapper syaCaseWrapper) {
 
         SyaAppointee syaAppointee = syaCaseWrapper.getAppointee();
 
         if (null != syaAppointee) {
             Name name = Name.builder()
-                .title(syaAppointee.getTitle())
-                .firstName(syaAppointee.getFirstName())
-                .lastName(syaAppointee.getLastName())
-                .build();
+                    .title(syaAppointee.getTitle())
+                    .firstName(syaAppointee.getFirstName())
+                    .lastName(syaAppointee.getLastName())
+                    .build();
 
             Address address = Address.builder()
-                .line1(syaAppointee.getContactDetails().getAddressLine1())
-                .line2(syaAppointee.getContactDetails().getAddressLine2())
-                .town(syaAppointee.getContactDetails().getTownCity())
-                .county(syaAppointee.getContactDetails().getCounty())
-                .postcode(syaAppointee.getContactDetails().getPostCode())
-                .build();
+                    .line1(syaAppointee.getContactDetails().getAddressLine1())
+                    .line2(syaAppointee.getContactDetails().getAddressLine2())
+                    .town(syaAppointee.getContactDetails().getTownCity())
+                    .county(syaAppointee.getContactDetails().getCounty())
+                    .postcode(syaAppointee.getContactDetails().getPostCode())
+                    .build();
 
             Contact contact = Contact.builder()
-                .email(syaAppointee.getContactDetails().getEmailAddress())
-                .mobile(getPhoneNumberWithOutSpaces(syaAppointee.getContactDetails().getPhoneNumber()))
-                .build();
+                    .email(syaAppointee.getContactDetails().getEmailAddress())
+                    .mobile(getPhoneNumberWithOutSpaces(syaAppointee.getContactDetails().getPhoneNumber()))
+                    .build();
 
             Identity identity = Identity.builder()
-                .dob(syaAppointee.getDob().toString())
-                .build();
+                    .dob(syaAppointee.getDob().toString())
+                    .build();
 
             return Appointee.builder()
-                .name(name)
-                .address(address)
-                .contact(contact)
-                .identity(identity)
-                .build();
+                    .name(name)
+                    .address(address)
+                    .contact(contact)
+                    .identity(identity)
+                    .build();
         } else {
             return null;
         }
@@ -365,13 +435,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     getNotificationSmsNumber(smsNotify, syaCaseWrapper.getAppointee().getContactDetails()));
 
             return Subscription.builder()
-                .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
-                .subscribeSms(subscribeSms)
-                .tya(generateAppealNumber())
-                .mobile(PhoneNumbersUtil.cleanPhoneNumber(mobile).orElse(mobile))
-                .subscribeEmail(wantEmailNotifications)
-                .email(email)
-                .build();
+                    .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                    .subscribeSms(subscribeSms)
+                    .tya(generateAppealNumber())
+                    .mobile(PhoneNumbersUtil.cleanPhoneNumber(mobile).orElse(mobile))
+                    .subscribeEmail(wantEmailNotifications)
+                    .email(email)
+                    .build();
         } else {
             return null;
         }
