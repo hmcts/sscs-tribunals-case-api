@@ -3,41 +3,39 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.stream.Collectors;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
+@RunWith(SpringRunner.class)
+@WebMvcTest(SyaController.class)
 public class SyaControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private SubmitAppealService submitAppealService;
-
-
-    @Before
-    public void setUp() {
-        initMocks(this);
-        SyaController controller = new SyaController(submitAppealService);
-        mockMvc = standaloneSetup(controller).build();
-    }
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
@@ -67,7 +65,27 @@ public class SyaControllerTest {
     private String getSyaCaseWrapperJson() throws IOException, URISyntaxException {
 
         URL resource = getClass().getClassLoader().getResource("json/sya.json");
-        return Files.readAllLines(Paths.get(resource.toURI())).stream().collect(Collectors.joining("\n"));
+        return String.join("\n", Files.readAllLines(Paths.get(resource.toURI())));
+    }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    public void givenAnDraftIsSaved_shouldReturnCreatedAndTheId() throws Exception {
+        SyaCaseWrapper syaCaseWrapper = new SyaCaseWrapper();
+        syaCaseWrapper.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+
+        mockMvc.perform(post("/drafts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(syaCaseWrapper)))
+                .andDo(print())
+                .andExpect(status().isCreated());
     }
 
 }

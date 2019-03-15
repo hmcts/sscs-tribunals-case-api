@@ -136,15 +136,18 @@ public class SyaCaseWrapper {
     }
 
     public SyaContactDetails getContactDetails() {
+        if (null == appellant || null == appointee) {
+            return null;
+        }
         return ((null != getAppellant().getIsAddressSameAsAppointee()) && getAppellant().getIsAddressSameAsAppointee())
-            ? getAppointee().getContactDetails()
-            : getAppellant().getContactDetails();
+                ? getAppointee().getContactDetails()
+                : getAppellant().getContactDetails();
     }
 
     @Override
     public String toString() {
         return "SyaCaseWrapper{"
-                +  "syaHearingOptions=" + syaHearingOptions
+                + "syaHearingOptions=" + syaHearingOptions
                 + ", reasonsForAppealing=" + reasonsForAppealing
                 + ", representative=" + representative
                 + ", benefitType='" + benefitType + '\''

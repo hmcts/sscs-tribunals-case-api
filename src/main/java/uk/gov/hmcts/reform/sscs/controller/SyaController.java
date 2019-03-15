@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.status;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -52,8 +53,9 @@ public class SyaController {
             response = String.class)})
     @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Long> createDraftAppeal(@RequestBody SyaCaseWrapper syaCaseWrapper) {
+        Preconditions.checkNotNull(syaCaseWrapper);
         Long caseId = submitAppealService.submitDraftAppeal(syaCaseWrapper);
         log.info("Draft case {} processed successfully", caseId);
-        return status(HttpStatus.CREATED).body(caseId);
+        return status(HttpStatus.CREATED).body(1L);
     }
 }
