@@ -127,7 +127,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getReasonForNoMrn(SyaCaseWrapper syaCaseWrapper) {
-        if (mrnIsNull(syaCaseWrapper)) return null;
+        if (mrnIsNull(syaCaseWrapper)) {
+            return null;
+        }
         return syaCaseWrapper.getMrn().getReasonForNoMrn();
     }
 
@@ -136,7 +138,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getReasonForBeingLate(SyaCaseWrapper syaCaseWrapper) {
-        if (mrnIsNull(syaCaseWrapper)) return null;
+        if (mrnIsNull(syaCaseWrapper)) {
+            return null;
+        }
         return syaCaseWrapper.getMrn().getReasonForBeingLate();
     }
 
@@ -146,7 +150,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getMrnDate(SyaCaseWrapper syaCaseWrapper) {
-        if (mrnIsNull(syaCaseWrapper)) return null;
+        if (mrnIsNull(syaCaseWrapper)) {
+            return null;
+        }
         return syaCaseWrapper.getMrn().getDate() != null ? syaCaseWrapper.getMrn().getDate().toString() :
                 null;
     }
@@ -154,8 +160,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static Appellant getAppellant(SyaCaseWrapper syaCaseWrapper) {
 
         SyaAppellant syaAppellant = syaCaseWrapper.getAppellant();
-
-        Name name = getName(syaAppellant);
 
         SyaContactDetails contactDetails = (null != syaAppellant) ? syaAppellant.getContactDetails() : null;
 
@@ -200,12 +204,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         String useSameAddress = "No";
         if (syaAppellant != null) {
-            useSameAddress = (syaAppellant.getIsAddressSameAsAppointee() == null ||
-                    !syaAppellant.getIsAddressSameAsAppointee()) ? "No" : "Yes";
+            useSameAddress = (syaAppellant.getIsAddressSameAsAppointee() == null
+                    || !syaAppellant.getIsAddressSameAsAppointee()) ? "No" : "Yes";
         }
 
         return Appellant.builder()
-                .name(name)
+                .name(getName(syaAppellant))
                 .address(address)
                 .contact(appointee == null ? contact : Contact.builder().build())
                 .identity(identity)
