@@ -59,22 +59,29 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
-        Subscriptions subscriptions = populateSubscriptions(syaCaseWrapper);
-
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
 
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
-                .generatedSurname(syaCaseWrapper.getAppellant().getLastName())
-                .generatedEmail(syaCaseWrapper.getContactDetails().getEmailAddress())
-                .generatedMobile(getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber()))
-                .generatedNino(syaCaseWrapper.getAppellant().getNino())
-                .generatedDob(syaCaseWrapper.getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .generatedSurname(syaCaseWrapper.getCaseType().equals("draft") ? null :
+                        syaCaseWrapper.getAppellant().getLastName())
+                .generatedEmail(syaCaseWrapper.getCaseType().equals("draft") ? null :
+                        syaCaseWrapper.getContactDetails().getEmailAddress())
+                .generatedMobile(syaCaseWrapper.getCaseType().equals("draft") ? null :
+                        getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber()))
+                .generatedNino(syaCaseWrapper.getCaseType().equals("draft") ? null :
+                        syaCaseWrapper.getAppellant().getNino())
+                .generatedDob(syaCaseWrapper.getCaseType().equals("draft") ? null :
+                        syaCaseWrapper.getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .appeal(appeal)
-                .subscriptions(subscriptions)
+                .subscriptions(getSubscriptions(syaCaseWrapper))
                 .sscsDocument(sscsDocuments)
                 .evidencePresent(hasEvidence(sscsDocuments))
                 .build();
+    }
+
+    private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
+        return syaCaseWrapper.getCaseType().equals("draft") ? null : populateSubscriptions(syaCaseWrapper);
     }
 
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
@@ -110,10 +117,17 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .hearingOptions(hearingOptions)
                 .appealReasons(appealReasons)
                 .rep(representative)
-                .signer(syaCaseWrapper.getSignAndSubmit().getSigner())
-                .hearingType(hearingOptions.getWantsToAttend().equals(YES) ? ORAL : PAPER)
+                .signer(syaCaseWrapper.getSignAndSubmit() != null ? syaCaseWrapper.getSignAndSubmit().getSigner() : null)
+                .hearingType(getHearingType(hearingOptions))
                 .receivedVia("Online")
                 .build();
+    }
+
+    private static String getHearingType(HearingOptions hearingOptions) {
+        if (hearingOptions == null) {
+            return null;
+        }
+        return YES.equals(hearingOptions.getWantsToAttend()) ? ORAL : PAPER;
     }
 
     private static MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
@@ -270,11 +284,11 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
     }
 
-    private static AppealReasons getReasonsForAppealing(
-            SyaReasonsForAppealing syaReasonsForAppealing) {
-
+    private static AppealReasons getReasonsForAppealing(SyaReasonsForAppealing syaReasonsForAppealing) {
+        if (syaReasonsForAppealing == null) {
+            return null;
+        }
         List<AppealReason> appealReasons = new ArrayList<>();
-
         for (Reason reason : syaReasonsForAppealing.getReasons()) {
             AppealReasonDetails appealReasonDetails = AppealReasonDetails.builder()
                     .reason(reason.getReasonForAppealing())
@@ -285,7 +299,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .build();
             appealReasons.add(appealReason);
         }
-
         return AppealReasons.builder()
                 .reasons(appealReasons)
                 .otherReasons(syaReasonsForAppealing.getOtherReasons())
@@ -293,9 +306,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {
-
+        if (syaHearingOptions == null) {
+            return null;
+        }
         HearingOptions hearingOptions;
-
         if (syaHearingOptions.getWantsToAttend()) {
 
             String languageInterpreter = null;
@@ -456,10 +470,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
-
         Representative representative;
 
-        if (syaCaseWrapper.hasRepresentative()) {
+        if (syaCaseWrapper.getRepresentative() != null && syaCaseWrapper.hasRepresentative()) {
 
             SyaRepresentative syaRepresentative = syaCaseWrapper.getRepresentative();
 
@@ -504,6 +517,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static List<SscsDocument> getEvidenceDocumentDetails(SyaCaseWrapper syaCaseWrapper) {
+        if (syaCaseWrapper.getReasonsForAppealing() == null
+                || syaCaseWrapper.getReasonsForAppealing().getEvidences() == null) {
+            return null;
+        }
         List<SyaEvidence> evidences = syaCaseWrapper.getReasonsForAppealing().getEvidences();
 
         if (null != evidences && !evidences.isEmpty()) {

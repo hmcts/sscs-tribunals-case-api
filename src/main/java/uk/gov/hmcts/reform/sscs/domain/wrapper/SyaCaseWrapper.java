@@ -1,13 +1,21 @@
 package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SyaCaseWrapper {
+
+    @JsonIgnore
+    @Getter
+    @Setter
+    private String caseType;
 
     @JsonProperty("hearing")
     private SyaHearingOptions syaHearingOptions;

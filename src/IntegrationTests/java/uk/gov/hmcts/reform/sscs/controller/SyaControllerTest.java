@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 @AutoConfigureMockMvc
 public class SyaControllerTest {
 
+    private final long ccdId = 1L;
     @Autowired
     private MockMvc mockMvc;
 
@@ -65,7 +66,7 @@ public class SyaControllerTest {
         given(coreCaseDataApi.submitForCaseworker(
                 anyString(), anyString(), anyString(), anyString(), anyString(), eq(true),
                 any(CaseDataContent.class)))
-                .willReturn(CaseDetails.builder().id(1L).build());
+                .willReturn(CaseDetails.builder().id(ccdId).build());
     }
 
     private void mockIdamApi() {
@@ -91,7 +92,7 @@ public class SyaControllerTest {
                 .content(asJsonString(syaCaseWrapper)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(content().string("1"));
+                .andExpect(content().string(String.valueOf(ccdId)));
     }
 
 }

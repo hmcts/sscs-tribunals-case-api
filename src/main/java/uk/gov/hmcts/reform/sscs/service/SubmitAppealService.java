@@ -67,6 +67,7 @@ public class SubmitAppealService {
     }
 
     public Long submitDraftAppeal(SyaCaseWrapper appeal) {
+        appeal.setCaseType("draft");
         return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamService.getIdamTokens());
     }
 
