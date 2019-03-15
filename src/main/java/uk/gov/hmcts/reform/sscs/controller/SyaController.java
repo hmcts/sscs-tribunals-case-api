@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ public class SyaController {
             response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
             response = String.class)})
-    @RequestMapping(value = "/appeals", method = POST, consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
                 syaCaseWrapper.getBenefitType().getCode());
@@ -50,7 +51,7 @@ public class SyaController {
             response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted draft appeal successfully",
             response = String.class)})
-    @RequestMapping(value = "/drafts", method = POST, consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createDraftAppeal(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         Long caseId = submitAppealService.submitDraftAppeal(syaCaseWrapper);
         log.info("Draft case {} processed successfully", caseId);
