@@ -56,6 +56,6 @@ public class SyaController {
         Preconditions.checkNotNull(syaCaseWrapper);
         Long caseId = submitAppealService.submitDraftAppeal(syaCaseWrapper);
         log.info("Draft case {} processed successfully", caseId);
-        return status(HttpStatus.CREATED).body(1L);
+        return status(HttpStatus.CREATED).body(caseId);
     }
 }
