@@ -46,17 +46,14 @@ public class SyaController {
     }
 
 
-    @ApiOperation(value = "submitDraftAppeal",
-            notes = "Creates a draft case from the SYA details",
+    @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft case from the SYA details",
             response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted draft appeal successfully",
             response = String.class)})
     @RequestMapping(value = "/drafts", method = POST, consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createDraftAppeal(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         Long caseId = submitAppealService.submitDraftAppeal(syaCaseWrapper);
-        log.info("Draft case {} processed successfully",
-                caseId);
-
+        log.info("Draft case {} processed successfully", caseId);
         return status(201).build();
     }
 }

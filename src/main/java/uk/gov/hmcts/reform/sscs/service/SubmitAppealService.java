@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
@@ -65,13 +67,7 @@ public class SubmitAppealService {
     }
 
     public Long submitDraftAppeal(SyaCaseWrapper appeal) {
-
-        SscsCaseDetails caseDetails = createDraftCaseInCcd(convertSyaToCcdCaseData(appeal),
-                                                            EventType.DRAFT,
-                                                            idamService.getIdamTokens());
-
-        // in case of duplicate case the caseDetails will be null
-        return (caseDetails != null) ? caseDetails.getId() : null;
+        return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamService.getIdamTokens());
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
@@ -134,15 +130,13 @@ public class SubmitAppealService {
         }
     }
 
-    private SscsCaseDetails createDraftCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData,
-                                        eventType.getCcdType(),
-                                        "SSCS - draft case created",
-                                        "Created Draft SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
-                                        idamTokens);
+    private Long createDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, EventType.DRAFT.getCcdType(),
+                "SSCS - draft case created",
+                "Created Draft SSCS case from Submit Your Appeal online with event "
+                        + EventType.DRAFT.getCcdType(), idamTokens);
         log.info("Draft Case {} successfully created in CCD", caseDetails.getId());
-
-        return caseDetails;
+        return caseDetails.getId();
     }
 
     private EventType findEventType(SscsCaseData caseData) {
