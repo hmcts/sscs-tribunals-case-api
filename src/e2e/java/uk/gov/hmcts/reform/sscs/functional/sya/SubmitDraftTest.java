@@ -10,15 +10,24 @@ import io.restassured.http.ContentType;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.util.Helper;
 
+@RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:config/application_e2e.properties")
 public class SubmitDraftTest {
+
+    @Value("${test-url}")
+    private String testUrl;
 
     @Before
     public void setUp() {
-        baseURI = "http://localhost:8080";
+        baseURI = testUrl;
         useRelaxedHTTPSValidation();
     }
 
