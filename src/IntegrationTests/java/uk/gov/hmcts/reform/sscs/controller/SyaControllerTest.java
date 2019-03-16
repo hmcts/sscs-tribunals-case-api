@@ -20,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -43,6 +44,9 @@ public class SyaControllerTest {
     private IdamApiClient idamApiClient;
 
     @MockBean
+    private AuthTokenGenerator authTokenGenerator;
+
+    @MockBean
     private CoreCaseDataApi coreCaseDataApi;
 
     public static String asJsonString(final Object obj) {
@@ -57,6 +61,11 @@ public class SyaControllerTest {
     public void setUp() {
         mockIdamApi();
         mockCcdApi();
+        mockS2sApi();
+    }
+
+    private void mockS2sApi() {
+        given(authTokenGenerator.generate()).willReturn("s2s token");
     }
 
     private void mockCcdApi() {
