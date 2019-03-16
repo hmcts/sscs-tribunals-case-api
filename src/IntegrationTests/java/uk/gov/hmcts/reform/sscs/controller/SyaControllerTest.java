@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.Draft;
+import uk.gov.hmcts.reform.sscs.util.Helper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -49,14 +49,6 @@ public class SyaControllerTest {
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Before
     public void setUp() {
@@ -99,10 +91,10 @@ public class SyaControllerTest {
 
         mockMvc.perform(post("/drafts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(syaCaseWrapper)))
+                .content(Helper.asJsonString(syaCaseWrapper)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(content().json(asJsonString(Draft.builder().id(ccdId).build())));
+                .andExpect(content().json(Helper.asJsonString(Draft.builder().id(ccdId).build())));
     }
 
 }
