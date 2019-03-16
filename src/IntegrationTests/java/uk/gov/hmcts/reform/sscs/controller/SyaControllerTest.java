@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.model.Draft;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -101,7 +102,7 @@ public class SyaControllerTest {
                 .content(asJsonString(syaCaseWrapper)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(content().string(String.valueOf(ccdId)));
+                .andExpect(content().json(asJsonString(Draft.builder().id(ccdId).build())));
     }
 
 }

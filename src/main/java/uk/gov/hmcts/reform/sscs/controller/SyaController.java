@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.model.Draft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RestController
@@ -47,15 +48,16 @@ public class SyaController {
     }
 
 
-    @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft case from the SYA details",
-            response = String.class, responseContainer = "Appeal details")
-    @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted draft appeal successfully",
-            response = String.class)})
+    @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
+    @ApiResponses(value =
+            {@ApiResponse(code = 201, message = "Submitted draft appeal successfully", response = Draft.class)})
     @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Long> createDraftAppeal(@RequestBody SyaCaseWrapper syaCaseWrapper) {
+    public ResponseEntity<Draft> createDraftAppeal(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         Preconditions.checkNotNull(syaCaseWrapper);
-        Long caseId = submitAppealService.submitDraftAppeal(syaCaseWrapper);
-        log.info("Draft case {} processed successfully", caseId);
-        return status(HttpStatus.CREATED).body(caseId);
+        Draft draft = Draft.builder()
+                .id(submitAppealService.submitDraftAppeal(syaCaseWrapper))
+                .build();
+        log.info("Draft case {} processed successfully", draft);
+        return status(HttpStatus.CREATED).body(draft);
     }
 }
