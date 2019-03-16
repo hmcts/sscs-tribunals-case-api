@@ -57,7 +57,7 @@ public class SyaController {
         Draft draft = Draft.builder()
                 .id(submitAppealService.submitDraftAppeal(syaCaseWrapper))
                 .build();
-        log.info("Draft case {} processed successfully", draft);
+        log.info("{} processed successfully", draft);
         return status(HttpStatus.CREATED).body(draft);
     }
 }
