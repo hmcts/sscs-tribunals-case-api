@@ -251,6 +251,7 @@ dependencies {
     testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.4-atlassian-1'
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.21.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.4.0'
+    testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.6'
     testApt "org.projectlombok:lombok:1.16.20"
