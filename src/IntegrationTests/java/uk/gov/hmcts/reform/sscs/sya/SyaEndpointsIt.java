@@ -11,6 +11,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -131,9 +132,9 @@ public class SyaEndpointsIt {
         given(ccdClient.submitEventForCaseworker(any(), any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
-        given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString()))
+        given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString(), anyString()))
                 .willReturn(authorize);
-        given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString()))
+        given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
                 .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
@@ -144,7 +145,7 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void shouldGeneratePdfAndSend() throws Exception {
+    public void givenAValidAppeal_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
@@ -153,7 +154,7 @@ public class SyaEndpointsIt {
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
+                .content(getCase("json/sya.json")))
                 .andExpect(status().isCreated());
 
         verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
@@ -162,6 +163,7 @@ public class SyaEndpointsIt {
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
         assertThat(message.getSubject(), is("Bloggs_33C"));
 
+        verify(ccdClient).startCaseForCaseworker(any(), eq(SYA_APPEAL_CREATED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender, times(2)).send(message);
 
@@ -169,54 +171,75 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void shouldNotAddDuplicateCaseToCcdAndStillGeneratePdfAndSend() throws Exception {
+    public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/syaWithNoMrnDate.json")))
+                .andExpect(status().isCreated());
+
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
+
+        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
+        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
+        assertThat(message.getSubject(), is("Bloggs_33C"));
+
+        verify(ccdClient).startCaseForCaseworker(any(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()));
+        verify(ccdClient).submitForCaseworker(any(), any());
+        verify(mailSender).send(message);
+
+        assertNotNull(getPdfWrapper().getCcdCaseId());
+    }
+
+    @Test
+    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
+
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/syaWithMrnDateMoreThan13Months.json")))
+                .andExpect(status().isCreated());
+
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
+
+        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
+        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
+        assertThat(message.getSubject(), is("Bloggs_33C"));
+
+        verify(ccdClient).startCaseForCaseworker(any(), eq(NON_COMPLIANT.getCcdType()));
+        verify(ccdClient).submitForCaseworker(any(), any());
+        verify(mailSender).send(message);
+
+        assertNotNull(getPdfWrapper().getCcdCaseId());
+    }
+
+    @Test
+    public void shouldNotAddDuplicateCaseToCcdAndShouldNotGeneratePdf() throws Exception {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
+                .content(getCase("json/sya.json")))
                 .andExpect(status().isCreated());
 
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
+        verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
-        verify(mailSender, times(2)).send(message);
-
-        assertNotNull(getPdfWrapper().getCcdCaseId());
     }
 
     private PdfWrapper getPdfWrapper() {
         Map<String, Object> placeHolders = captor.getAllValues().get(0);
         return (PdfWrapper) placeHolders.get("PdfWrapper");
-    }
-
-    @Test
-    public void shouldSendEmailWithPdfWhenCcdIsDown() throws Exception {
-        given(ccdClient.searchForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
-
-        given(ccdClient.startCaseForCaseworker(any(), any())).willThrow(new RuntimeException("CCD is down"));
-
-        mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
-                .andExpect(status().isCreated());
-
-        then(mailSender).should(times(2)).send(message);
-
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
-        assertNull(getPdfWrapper().getCcdCaseId());
     }
 
     @Test
@@ -229,7 +252,7 @@ public class SyaEndpointsIt {
 
         mockMvc.perform(post("/appeals")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase()))
+                .content(getCase("json/sya.json")))
                 .andExpect(status().isCreated());
 
         then(mailSender).should(times(2)).send(message);
@@ -247,8 +270,8 @@ public class SyaEndpointsIt {
         return IOUtils.toByteArray(resource);
     }
 
-    private String getCase() {
-        String syaCaseJson = "json/sya.json";
+    private String getCase(String path) {
+        String syaCaseJson = path;
         URL resource = getClass().getClassLoader().getResource(syaCaseJson);
         try {
             return IOUtils.toString(resource, Charset.defaultCharset());
