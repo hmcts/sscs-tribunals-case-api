@@ -49,14 +49,12 @@ public class SyaCaseWrapper {
     private SyaSignAndSubmit signAndSubmit;
 
     public SyaContactDetails getContactDetails() {
-        if (null == appellant) {
-            if (null == appointee) {
-                return null;
-            }
+        if (null == appellant && null == appointee) {
+            return null;
         }
         return ((null != getAppellant().getIsAddressSameAsAppointee()) && getAppellant().getIsAddressSameAsAppointee())
-                ? getAppointee().getContactDetails()
-                : getAppellant().getContactDetails();
+            ? getAppointee() != null ? getAppointee().getContactDetails() : null
+            : getAppellant().getContactDetails();
     }
 
 }

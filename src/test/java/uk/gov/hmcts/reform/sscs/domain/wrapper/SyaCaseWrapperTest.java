@@ -25,29 +25,46 @@ public class SyaCaseWrapperTest {
     private Object[] generateSyaCaseWrapperScenarios() {
         SyaCaseWrapper caseWithNullAppellantAndNullAppointee = buildCaseWithAppellantAndAppointeeAreBothNull();
         SyaCaseWrapper caseWithAppellantAndAppointee = buildCaseWithAppellantAndAppointeeNotNull();
+        SyaCaseWrapper caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee =
+            buildCaseWithAppellantAndNullAppointee();
 
         return new Object[]{
             new Object[]{caseWithNullAppellantAndNullAppointee, nullValue()},
+            new Object[]{caseWithAppellantWithSameAddressAsAppointeeAndNullAppointee, nullValue()},
             new Object[]{caseWithAppellantAndAppointee,
                 equalTo(caseWithAppellantAndAppointee.getAppellant().getContactDetails())}
         };
     }
 
+    private SyaCaseWrapper buildCaseWithAppellantAndNullAppointee() {
+        SyaCaseWrapper caseWithAppellantAndNullAppointee = new SyaCaseWrapper();
+        caseWithAppellantAndNullAppointee.setAppellant(buildSyaAppellant(true));
+        caseWithAppellantAndNullAppointee.setAppointee(null);
+        return caseWithAppellantAndNullAppointee;
+    }
+
     private SyaCaseWrapper buildCaseWithAppellantAndAppointeeNotNull() {
-        SyaCaseWrapper caseWithNullAppellantAndNullAppointee = new SyaCaseWrapper();
+        SyaCaseWrapper caseWithAppellantAndAppointeeNotNull = new SyaCaseWrapper();
+        caseWithAppellantAndAppointeeNotNull.setAppellant(buildSyaAppellant(false));
+        caseWithAppellantAndAppointeeNotNull.setAppointee(buildSyaAppointee());
+        return caseWithAppellantAndAppointeeNotNull;
+    }
 
-        SyaAppellant appellant = new SyaAppellant();
-        SyaContactDetails contactDetails = new SyaContactDetails();
-        contactDetails.setEmailAddress("appellant@test.com");
-        appellant.setContactDetails(contactDetails);
-        caseWithNullAppellantAndNullAppointee.setAppellant(appellant);
-
+    private SyaAppointee buildSyaAppointee() {
         SyaAppointee appointee = new SyaAppointee();
         SyaContactDetails appointeeContactDetails = new SyaContactDetails();
         appointeeContactDetails.setEmailAddress("appointee@test.com");
         appointee.setContactDetails(appointeeContactDetails);
-        caseWithNullAppellantAndNullAppointee.setAppointee(appointee);
-        return caseWithNullAppellantAndNullAppointee;
+        return appointee;
+    }
+
+    private SyaAppellant buildSyaAppellant(boolean isAddressSameAsAppointee) {
+        SyaAppellant appellant = new SyaAppellant();
+        SyaContactDetails contactDetails = new SyaContactDetails();
+        contactDetails.setEmailAddress("appellant@test.com");
+        appellant.setContactDetails(contactDetails);
+        appellant.setIsAddressSameAsAppointee(isAddressSameAsAppointee);
+        return appellant;
     }
 
     private SyaCaseWrapper buildCaseWithAppellantAndAppointeeAreBothNull() {
