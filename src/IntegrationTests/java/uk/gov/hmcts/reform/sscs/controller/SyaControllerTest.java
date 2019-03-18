@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.Draft;
-import uk.gov.hmcts.reform.sscs.util.Helper;
+import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -91,10 +91,10 @@ public class SyaControllerTest {
 
         mockMvc.perform(post("/drafts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(Helper.asJsonString(syaCaseWrapper)))
+                .content(SyaServiceHelper.asJsonString(syaCaseWrapper)))
                 .andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(content().json(Helper.asJsonString(Draft.builder().id(ccdId).build())));
+                .andExpect(content().json(SyaServiceHelper.asJsonString(Draft.builder().id(ccdId).build())));
     }
 
 }

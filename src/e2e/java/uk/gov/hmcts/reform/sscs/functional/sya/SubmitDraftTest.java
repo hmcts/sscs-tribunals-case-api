@@ -16,7 +16,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.util.Helper;
+import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
@@ -39,7 +39,7 @@ public class SubmitDraftTest {
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
-                .body(Helper.asJsonString(draftAppeal))
+                .body(SyaServiceHelper.asJsonString(draftAppeal))
                 .post("/drafts")
                 .then()
                 .statusCode(HttpStatus.CREATED_201)
