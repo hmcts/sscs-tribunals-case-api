@@ -9,7 +9,13 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import java.time.LocalDate;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Data
 public class SyaAppointee {
 
     private String title;
@@ -26,63 +32,9 @@ public class SyaAppointee {
     @JsonProperty("contactDetails")
     private SyaContactDetails contactDetails;
 
-    public SyaAppointee() {
-        // For JSON
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public SyaContactDetails getContactDetails() {
-        return contactDetails;
-    }
-
-    public void setContactDetails(SyaContactDetails contactDetails) {
-        this.contactDetails = contactDetails;
-    }
-
     @JsonIgnore
     public String getFullName() {
         return title + " " + firstName + " " + lastName;
     }
 
-    @Override
-    public String toString() {
-        return "SyaAppointee{"
-                + " title='" + title + '\''
-                + ", firstName='" + firstName + '\''
-                + ", lastName='" + lastName + '\''
-                + ", dob=" + dob
-                + ", contactDetails=" + contactDetails
-                + '}';
-    }
 }

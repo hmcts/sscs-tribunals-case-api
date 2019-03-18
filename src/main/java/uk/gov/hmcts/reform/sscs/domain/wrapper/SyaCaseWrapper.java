@@ -4,16 +4,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Setter
-@Getter
-@ToString
+@Data
 public class SyaCaseWrapper {
 
     @JsonIgnore
@@ -51,11 +51,6 @@ public class SyaCaseWrapper {
 
     @JsonProperty("signAndSubmit")
     private SyaSignAndSubmit signAndSubmit;
-
-
-    public SyaCaseWrapper() {
-        // For Json
-    }
 
     public SyaContactDetails getContactDetails() {
         if (null == appellant) {

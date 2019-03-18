@@ -9,7 +9,13 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 
 import java.time.LocalDate;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+@Data
 public class SyaAppellant {
 
     private String title;
@@ -31,64 +37,8 @@ public class SyaAppellant {
     @JsonProperty("isAddressSameAsAppointee")
     private Boolean isAddressSameAsAppointee;
 
-    public SyaAppellant() {
-        // For JSON
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public String getNino() {
-        return nino;
-    }
-
     public void setNino(String nino) {
         this.nino = nino.replaceAll("\\s", "");;
-    }
-
-    public SyaContactDetails getContactDetails() {
-        return contactDetails;
-    }
-
-    public void setContactDetails(SyaContactDetails contactDetails) {
-        this.contactDetails = contactDetails;
-    }
-
-    public Boolean getIsAddressSameAsAppointee() {
-        return isAddressSameAsAppointee;
-    }
-
-    public void setIsAddressSameAsAppointee(Boolean isAddressSameAsAppointee) {
-        this.isAddressSameAsAppointee = isAddressSameAsAppointee;
     }
 
     @JsonIgnore
@@ -96,16 +46,4 @@ public class SyaAppellant {
         return title + " " + firstName + " " + lastName;
     }
 
-    @Override
-    public String toString() {
-        return "SyaAppellant{"
-                + " title='" + title + '\''
-                + ", firstName='" + firstName + '\''
-                + ", lastName='" + lastName + '\''
-                + ", dob=" + dob
-                + ", nino='" + nino + '\''
-                + ", contactDetails=" + contactDetails
-                + ", isAddressSameAsAppointee=" + isAddressSameAsAppointee
-                + '}';
-    }
 }
