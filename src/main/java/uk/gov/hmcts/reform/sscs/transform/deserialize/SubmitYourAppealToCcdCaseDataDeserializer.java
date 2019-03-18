@@ -412,7 +412,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
 
-        if (syaCaseWrapper.hasRepresentative()
+        if (syaCaseWrapper.getHasRepresentative()
                 && syaCaseWrapper.getRepresentative() != null
                 && syaCaseWrapper.getRepresentative().getContactDetails() != null) {
 
@@ -476,7 +476,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
         Representative representative;
 
-        if (syaCaseWrapper.getRepresentative() != null && syaCaseWrapper.hasRepresentative()) {
+        if (syaCaseWrapper.getRepresentative() != null && syaCaseWrapper.getHasRepresentative()) {
 
             SyaRepresentative syaRepresentative = syaCaseWrapper.getRepresentative();
 

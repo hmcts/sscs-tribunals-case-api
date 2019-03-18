@@ -6,15 +6,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Setter
+@Getter
+@ToString
 public class SyaCaseWrapper {
 
     @JsonIgnore
-    @Getter
-    @Setter
     private String caseType;
 
     @JsonProperty("hearing")
@@ -55,94 +57,6 @@ public class SyaCaseWrapper {
         // For Json
     }
 
-    public SyaHearingOptions getSyaHearingOptions() {
-        return syaHearingOptions;
-    }
-
-    public void setSyaHearingOptions(SyaHearingOptions syaHearingOptions) {
-        this.syaHearingOptions = syaHearingOptions;
-    }
-
-    public SyaReasonsForAppealing getReasonsForAppealing() {
-        return reasonsForAppealing;
-    }
-
-    public void setReasonsForAppealing(SyaReasonsForAppealing syaReasonsForAppealing) {
-        this.reasonsForAppealing = syaReasonsForAppealing;
-    }
-
-    public Boolean hasRepresentative() {
-        return hasRepresentative;
-    }
-
-    public void setHasRepresentative(Boolean hasRepresentative) {
-        this.hasRepresentative = hasRepresentative;
-    }
-
-    public SyaRepresentative getRepresentative() {
-        return representative;
-    }
-
-    public void setRepresentative(SyaRepresentative syaRepresentative) {
-        this.representative = syaRepresentative;
-    }
-
-    public SyaBenefitType getBenefitType() {
-        return benefitType;
-    }
-
-    public void setBenefitType(SyaBenefitType benefitType) {
-        this.benefitType = benefitType;
-    }
-
-    public SyaSmsNotify getSmsNotify() {
-        return smsNotify;
-    }
-
-    public void setSmsNotify(SyaSmsNotify syaSmsNotify) {
-        this.smsNotify = syaSmsNotify;
-    }
-
-    public SyaMrn getMrn() {
-        return mrn;
-    }
-
-    public void setMrn(SyaMrn syaMrn) {
-        this.mrn = syaMrn;
-    }
-
-    public Boolean getIsAppointee() {
-        return isAppointee;
-    }
-
-    public void setIsAppointee(Boolean isAppointee) {
-        this.isAppointee = isAppointee;
-    }
-
-    public SyaAppellant getAppellant() {
-        return appellant;
-    }
-
-    public void setAppellant(SyaAppellant syaAppellant) {
-        this.appellant = syaAppellant;
-    }
-
-    public SyaAppointee getAppointee() {
-        return appointee;
-    }
-
-    public void setAppointee(SyaAppointee syaAppointee) {
-        this.appointee = syaAppointee;
-    }
-
-    public SyaSignAndSubmit getSignAndSubmit() {
-        return signAndSubmit;
-    }
-
-    public void setSignAndSubmit(SyaSignAndSubmit signAndSubmit) {
-        this.signAndSubmit = signAndSubmit;
-    }
-
     public SyaContactDetails getContactDetails() {
         if (null == appellant) {
             if (null == appointee) {
@@ -154,18 +68,4 @@ public class SyaCaseWrapper {
                 : getAppellant().getContactDetails();
     }
 
-    @Override
-    public String toString() {
-        return "SyaCaseWrapper{"
-                + "syaHearingOptions=" + syaHearingOptions
-                + ", reasonsForAppealing=" + reasonsForAppealing
-                + ", representative=" + representative
-                + ", benefitType='" + benefitType + '\''
-                + ", smsNotify=" + smsNotify
-                + ", mrn=" + mrn
-                + ", isAppointee=" + isAppointee
-                + ", appellant=" + appellant
-                + ", signAndSubmit=" + signAndSubmit
-                + '}';
-    }
 }
