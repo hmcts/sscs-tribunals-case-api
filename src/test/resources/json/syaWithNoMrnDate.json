@@ -4,8 +4,8 @@
     "code": "PIP"
   },
   "mrn": {
-    "dwpIssuingOffice": "1",
-    "date": "01-02-2018",
+    "dwpIssuingOffice": "DWP PIP (1)",
+    "date": null,
     "reasonForBeingLate": "Lost my paperwork"
   },
   "isAppointee": false,
@@ -60,21 +60,7 @@
         "reasonForAppealing": "cccccccccc"
       }
     ],
-    "otherReasons": "Another reason",
-
-    "evidences":
-    [
-      {
-        "url":"http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49",
-        "fileName":"filename1.doc",
-        "uploadedDate" : "2010-10-25"
-      },
-      {
-        "url":"http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49",
-        "fileName":"filename2.jpg",
-        "uploadedDate" : "2010-10-25"
-      }
-    ]
+    "otherReasons": "Another reason"
   },
   "hearing": {
     "wantsToAttend": true,

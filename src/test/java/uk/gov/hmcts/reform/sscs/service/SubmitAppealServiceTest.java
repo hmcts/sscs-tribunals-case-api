@@ -1,24 +1,28 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +38,10 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
@@ -42,7 +49,6 @@ import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
-import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.domain.robotics.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
@@ -50,17 +56,16 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
 
     @Mock
-    private AppealNumberGenerator appealNumberGenerator;
+    private CcdService ccdService;
 
     @Mock
-    private CcdService ccdService;
+    private CcdPdfService ccdPdfService;
 
     @Mock
     private PDFServiceClient pdfServiceClient;
@@ -91,23 +96,13 @@ public class SubmitAppealServiceTest {
 
     private SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
 
-    private RoboticsEmailTemplate roboticsEmailTemplate;
-
-    private SscsPdfService sscsPdfService;
-
-    private RoboticsService roboticsService;
-
     private SubmitAppealService submitAppealService;
-
-    private RegionalProcessingCenterService regionalProcessingCenterService;
 
     private SyaCaseWrapper appealData = getSyaCaseWrapper();
 
     private RoboticsWrapper roboticsWrapper;
 
     private JSONObject json = new JSONObject();
-
-    private SubmitYourAppealToCcdCaseDataDeserializer deserializer;
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -118,109 +113,98 @@ public class SubmitAppealServiceTest {
     @Mock
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
 
-    private EvidenceManagementService evidenceManagementService;
-
     @Before
     public void setUp() {
-        submitYourAppealEmailTemplate = new SubmitYourAppealEmailTemplate("from", "to", "message");
-        roboticsEmailTemplate = new RoboticsEmailTemplate("from", "to", "message");
+        submitYourAppealEmailTemplate =
+                new SubmitYourAppealEmailTemplate("from", "to", "message");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService, pdfStoreService, submitYourAppealEmailTemplate, ccdService);
-        roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper, roboticsJsonValidator, roboticsEmailTemplate);
-
-        regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
+        RegionalProcessingCenterService regionalProcessingCenterService =
+                new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
 
-        deserializer = new SubmitYourAppealToCcdCaseDataDeserializer();
-
         ResponseEntity<Resource> mockResponseEntity = mock(ResponseEntity.class);
-        ByteArrayResource stubbedResource = new ByteArrayResource(new byte[] {});
+        ByteArrayResource stubbedResource = new ByteArrayResource(new byte[]{});
         when(mockResponseEntity.getBody()).thenReturn(stubbedResource);
 
         when(authTokenGenerator.generate()).thenReturn("token");
-        when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(mockResponseEntity);
+        when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString()))
+                .thenReturn(mockResponseEntity);
 
-        evidenceManagementService = new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi, evidenceMetadataDownloadClientApi);
+        EvidenceManagementService evidenceManagementService =
+                new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi,
+                        evidenceMetadataDownloadClientApi);
 
-        submitAppealService = new SubmitAppealService(appealNumberGenerator,
-                deserializer, ccdService,
-                sscsPdfService, roboticsService,
-                airLookupService, regionalProcessingCenterService, idamService, evidenceManagementService);
+        SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
+                submitYourAppealEmailTemplate, ccdPdfService);
 
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class)))
-            .willReturn(SscsCaseDetails.builder().id(123L).build());
+        RoboticsEmailTemplate roboticsEmailTemplate =
+                new RoboticsEmailTemplate("from", "to", "message");
+
+        RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
+                roboticsJsonValidator, roboticsEmailTemplate);
+
+        submitAppealService = new SubmitAppealService(
+                ccdService, sscsPdfService, roboticsService, airLookupService, regionalProcessingCenterService,
+                idamService, evidenceManagementService);
+
+        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().id(123L).build());
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
         roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(123L).evidencePresent("No").build();
+                convertSyaToCcdCaseData(appealData)).ccdCaseId(123L).evidencePresent("No").build();
 
         given(roboticsJsonMapper.map(any())).willReturn(json);
     }
 
     @Test
-    public void shouldSendPdfByEmailWhenCcdIsDown() {
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).willThrow(new CcdException(
-            "Error while creating case in CCD"));
-
+    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithAppealCreatedEvent() {
         byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), captor.capture()))
-            .willReturn(expected);
-
-        roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
-
-        submitAppealService.submitAppeal(appealData);
-
-        verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
-        verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(emailService, times(2)).sendEmail(any(Email.class));
-
-        assertNull(getPdfWrapper().getCcdCaseId());
-    }
-
-    private PdfWrapper getPdfWrapper() {
-        Map<String, Object> placeHolders = captor.getAllValues().get(0);
-        return (PdfWrapper) placeHolders.get("PdfWrapper");
-    }
-
-    @Test
-    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetails() {
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-            any())).willReturn(expected);
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(appealNumberGenerator, times(2)).generateAppealNumber();
-        verify(ccdService).createCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
-    public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
+    public void givenCaseDoesNotExistInCcdAndMrnDateIsMissing_shouldCreateCaseWithAppealDetailsWithIncompleteApplicationEvent() {
         byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any())).willReturn(expected);
+        appealData.getMrn().setDate(null);
 
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(SscsCaseDetails.builder().build());
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenCaseDoesNotExistInCcdAndMrnDateIsGreaterThan13Months_shouldCreateCaseWithAppealDetailsWithNonCompliantReceivedEvent() {
+        byte[] expected = {};
+        appealData.getMrn().setDate(LocalDate.now().minusMonths(13).minusDays(1));
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
     public void shouldCreatePdfWithAppealDetails() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
-            any())).willReturn(expected);
+                any())).willReturn(expected);
 
         submitAppealService.submitAppeal(appealData);
 
@@ -293,48 +277,12 @@ public class SubmitAppealServiceTest {
     public void testRegionAddedToCase() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        SscsCaseData caseData = submitAppealService.transformAppealToCaseData(appealData,"Cardiff", rpc);
+        SscsCaseData caseData = submitAppealService.transformAppealToCaseData(appealData, "Cardiff", rpc);
         assertEquals("Cardiff", caseData.getRegion());
     }
 
     @Test
-    public void shouldStorePdfInDocumentStore() {
-        byte[] expected = {1, 2, 3};
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any(Map.class))).willReturn(expected);
-
-        submitAppealService.submitAppeal(appealData);
-
-        then(pdfStoreService).should().store(expected, "Bloggs_33C.pdf");
-    }
-
-    @Test
     public void shouldUpdateCcdWithPdf() {
-        byte[] expected = {1, 2, 3};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-                any(Map.class))).willReturn(expected);
-        long ccdId = 987L;
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId).build());
-        SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
-        List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
-        given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
-
-        roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("No").build();
-
-        submitAppealService.submitAppeal(appealData);
-
-        verify(ccdService).updateCase(
-                argThat(caseData ->  sscsDocuments.equals(caseData.getSscsDocument())),
-                eq(ccdId),
-                eq("uploadDocument"),
-                any(), any(), any()
-        );
-    }
-
-    @Test
-    public void shouldUpdateCcdWithPdfCombinedWithEvidence() {
         uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
         uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
@@ -347,24 +295,21 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
                 any(Map.class))).willReturn(expected);
         long ccdId = 987L;
-        given(ccdService.createCase(any(SscsCaseData.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
+        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
                 .build());
-        SscsDocument pdfDocument = new SscsDocument(SscsDocumentDetails.builder().build());
-        List<SscsDocument> sscsDocuments = singletonList(pdfDocument);
-        given(pdfStoreService.store(expected, "Bloggs_33C.pdf")).willReturn(sscsDocuments);
         SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
 
-        roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-                deserializer.convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
+        roboticsWrapper = RoboticsWrapper.builder()
+                .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
 
         submitAppealService.submitAppeal(appealData);
 
-        verify(ccdService).updateCase(
-                argThat(caseData -> caseData.getSscsDocument().size() == 3
-                        && caseData.getSscsDocument().get(2).equals(sscsDocuments.get(0))),
+        verify(ccdPdfService).mergeDocIntoCcd(
+                eq("Bloggs_33C.pdf"),
+                any(),
                 eq(ccdId),
-                eq("uploadDocument"),
-                any(), any(), any()
+                argThat(caseData -> caseData.getSscsDocument().size() == 2),
+                any()
         );
     }
 
@@ -376,5 +321,48 @@ public class SubmitAppealServiceTest {
         appealDataWithEvidence.getReasonsForAppealing()
                 .setEvidences(Arrays.asList(evidence1, evidence2, evidence3));
         return appealDataWithEvidence;
+    }
+
+    @Test(expected = CcdException.class)
+    public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willThrow(RuntimeException.class);
+
+        submitAppealService.submitAppeal(appealData);
+    }
+
+    @Test(expected = CcdException.class)
+    public void givenCaseDoesNotExistInCcdAndGivenExceptionWhenCreatingCaseInCcd_shouldThrowException() {
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willReturn(null);
+
+        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
+                .willThrow(RuntimeException.class);
+
+        submitAppealService.submitAppeal(appealData);
+    }
+
+    @Test
+    public void givenCaseIsADuplicate_shouldNotResendEmails() {
+        SscsCaseDetails duplicateCase = SscsCaseDetails.builder().build();
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willReturn(duplicateCase);
+
+        submitAppealService.submitAppeal(appealData);
+
+        then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
+    }
+
+    @Test
+    public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
+                .willReturn(SscsCaseDetails.builder().build());
+
+        roboticsWrapper = RoboticsWrapper.builder()
+                .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
+
+        submitAppealService.submitAppeal(appealData);
+
+        verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
     }
 }

@@ -30,6 +30,7 @@ public class SyaCaseWrapper {
     @JsonProperty("mrn")
     private SyaMrn mrn;
 
+    @JsonProperty("isAppointee")
     private Boolean isAppointee;
 
     @JsonProperty("appellant")

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static org.junit.Assert.*;
+import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
@@ -23,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
-import uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -53,7 +53,7 @@ public class CreateCaseInCcdTest {
 
     @Test
     public void givenACaseShouldBeSavedIntoCcd() {
-        SscsCaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData(), idamTokens);
+        SscsCaseDetails caseDetails = ccdService.createCase(CaseDataUtils.buildCaseData(), "appealCreated", "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
     }
 
@@ -61,9 +61,8 @@ public class CreateCaseInCcdTest {
     public void givenASyaCaseShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
-                rpc.getName(), rpc);
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated", "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
     }
 
@@ -83,8 +82,8 @@ public class CreateCaseInCcdTest {
     public void givenASyaCaseWithoutAMatchingRpcShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
 
-        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper);
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated", "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
     }
 
@@ -92,9 +91,8 @@ public class CreateCaseInCcdTest {
     public void givenASyaCaseWithAppointeeDetailsWithSameAddressShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
-            rpc.getName(), rpc);
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated", "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
         assertTrue(syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee());
         assertEquals("Yes", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
@@ -104,9 +102,8 @@ public class CreateCaseInCcdTest {
     public void givenASyaCaseWithAppointeeDetailsWithDifferentAddressShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
-            rpc.getName(), rpc);
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated", "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
         assertFalse(syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee());
         assertEquals("No", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
@@ -116,9 +113,9 @@ public class CreateCaseInCcdTest {
     public void givenASyaCaseWithAppointeeDetailsWithSameAddressButNoAppellantContactDetailsShouldBeSavedIntoCcd() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        SscsCaseData caseData = new SubmitYourAppealToCcdCaseDataDeserializer().convertSyaToCcdCaseData(syaCaseWrapper,
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             rpc.getName(), rpc);
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, idamTokens);
+        SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated", "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
         assertTrue(syaCaseWrapper.getAppellant().getIsAddressSameAsAppointee());
         assertEquals("Yes", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());

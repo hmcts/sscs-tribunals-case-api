@@ -38,9 +38,9 @@
         "postcode": "TN32 6PL"
       },
       "contact": {
-        "email": "sscsappointee@greencroftconsulting.com",
+        "email": null,
         "phone": null,
-        "mobile": "07411222221"
+        "mobile": null
       },
       "identity": {
         "dob": "1990-02-26",
@@ -157,11 +157,12 @@
     "receivedVia": "Online"
   },
   "subscriptions": {
-    "appellantSubscription": {
+    "appellantSubscription": null,
+    "appointeeSubscription": {
       "wantSmsNotifications": "Yes",
       "tya": null,
       "email": "sscsappointee@greencroftconsulting.com",
-      "mobile": "07398785050",
+      "mobile": "+447398785050",
       "subscribeEmail": "Yes",
       "subscribeSms": "Yes",
       "reason": null
@@ -171,7 +172,7 @@
       "wantSmsNotifications":"Yes",
       "tya":null,
       "email":"harry.potter@wizards.com",
-      "mobile":"07411999999",
+      "mobile":"+447411999999",
       "subscribeEmail":"Yes",
       "subscribeSms":"Yes",
       "reason":null
