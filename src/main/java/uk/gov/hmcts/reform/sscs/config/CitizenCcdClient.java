@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import com.google.common.collect.ImmutableMap;
-import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,55 +44,6 @@ public class CitizenCcdClient {
                 ccdRequestDetails.getCaseTypeId(),
                 true,
                 caseDataContent
-        );
-    }
-
-    public StartEventResponse startEvent(IdamTokens idamTokens, Long caseId, String eventType) {
-        log.info("Starting CCD event for caseworker");
-
-        return coreCaseDataApi.startEventForCitizen(
-                idamTokens.getIdamOauth2Token(),
-                idamTokens.getServiceAuthorization(),
-                idamTokens.getUserId(),
-                ccdRequestDetails.getJurisdictionId(),
-                ccdRequestDetails.getCaseTypeId(),
-                caseId.toString(),
-                eventType);
-    }
-
-    public CaseDetails submitEventForCitizen(IdamTokens idamTokens, Long caseId, CaseDataContent caseDataContent) {
-
-        return coreCaseDataApi.submitEventForCitizen(
-                idamTokens.getIdamOauth2Token(),
-                idamTokens.getServiceAuthorization(),
-                idamTokens.getUserId(),
-                ccdRequestDetails.getJurisdictionId(),
-                ccdRequestDetails.getCaseTypeId(),
-                caseId.toString(),
-                true,
-                caseDataContent);
-    }
-
-    public List<CaseDetails> searchForCitizen(IdamTokens idamTokens, Map<String, String> searchCriteria) {
-        return coreCaseDataApi.searchForCitizen(
-                idamTokens.getIdamOauth2Token(),
-                idamTokens.getServiceAuthorization(),
-                idamTokens.getUserId(),
-                ccdRequestDetails.getJurisdictionId(),
-                ccdRequestDetails.getCaseTypeId(),
-                new ImmutableMap.Builder<String, String>()
-                        .putAll(searchCriteria)
-                        .build());
-    }
-
-    public CaseDetails readForCitizen(IdamTokens idamTokens, Long caseId) {
-        return coreCaseDataApi.readForCitizen(
-                idamTokens.getIdamOauth2Token(),
-                idamTokens.getServiceAuthorization(),
-                idamTokens.getUserId(),
-                ccdRequestDetails.getJurisdictionId(),
-                ccdRequestDetails.getCaseTypeId(),
-                caseId.toString()
         );
     }
 }

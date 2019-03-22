@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,7 @@ public class SyaControllerTest {
     }
 
     @Test
+    @Ignore
     public void givenAnDraftIsSaved_shouldReturnCreatedAndTheId() throws Exception {
         SyaCaseWrapper syaCaseWrapper = new SyaCaseWrapper();
         syaCaseWrapper.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
