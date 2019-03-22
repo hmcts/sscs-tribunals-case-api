@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.status;
 
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.Draft;
@@ -52,10 +54,12 @@ public class SyaController {
     @ApiResponses(value =
             {@ApiResponse(code = 201, message = "Submitted draft appeal successfully", response = Draft.class)})
     @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Draft> createDraftAppeal(@RequestBody SyaCaseWrapper syaCaseWrapper) {
+    public ResponseEntity<Draft> createDraftAppeal(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestBody SyaCaseWrapper syaCaseWrapper) {
         Preconditions.checkNotNull(syaCaseWrapper);
         Draft draft = Draft.builder()
-                .id(submitAppealService.submitDraftAppeal(syaCaseWrapper))
+                .id(submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper))
                 .build();
         log.info("{} processed successfully", draft);
         return status(HttpStatus.CREATED).body(draft);

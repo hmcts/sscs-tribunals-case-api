@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -36,6 +37,9 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
+
+    @Autowired
+    private CitizenCcdService citizenCcdService;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -66,9 +70,17 @@ public class SubmitAppealService {
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
-    public Long submitDraftAppeal(SyaCaseWrapper appeal) {
+    public Long submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
-        return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamService.getIdamTokens());
+        return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
+    }
+
+    private IdamTokens getUserTokens(String oauth2Token) {
+        return IdamTokens.builder()
+                .idamOauth2Token(oauth2Token)
+                .serviceAuthorization(idamService.generateServiceAuthorization())
+                .userId(idamService.getUserId(oauth2Token))
+                .build();
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
@@ -132,7 +144,7 @@ public class SubmitAppealService {
     }
 
     private Long createDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = ccdService.createCase(caseData, EventType.DRAFT.getCcdType(),
+        SscsCaseDetails caseDetails = citizenCcdService.createCase(caseData, EventType.DRAFT.getCcdType(),
                 "SSCS - draft case created",
                 "Created Draft SSCS case from Submit Your Appeal online with event "
                         + EventType.DRAFT.getCcdType(), idamTokens);
