@@ -82,8 +82,8 @@ task functional(type: Test) {
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
     setClasspath(sourceSets.e2e.runtimeClasspath)
-    include "uk/gov/hmcts/sscs/functional/**"
-    exclude "uk/gov/hmcts/sscs/smoke/**"
+    include "uk/gov/hmcts/reform/sscs/functional/**"
+    exclude "uk/gov/hmcts/reform/sscs/smoke/**"
 }
 
 jacoco {

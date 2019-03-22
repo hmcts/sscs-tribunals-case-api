@@ -137,9 +137,9 @@ public class SubmitAppealService {
         } catch (Exception e) {
             throw new CcdException(
                     String.format("Error found in the creating case process for case with Id - %s"
-                                    + " and Nino - %s and Benefit type - %s",
+                                    + " and Nino - %s and Benefit type - %s and exception: %s",
                             caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
-                            caseData.getAppeal().getBenefitType().getCode()), e);
+                            caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
     }
 
