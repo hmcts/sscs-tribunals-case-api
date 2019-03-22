@@ -11,7 +11,6 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.TestPropertySource;
@@ -28,7 +27,9 @@ public class SubmitDraftTest {
     private String testUrl;
 
     @Value("${test-oauth2Token}")
-    String oauth2Token;
+    private String oauth2Token;
+
+    // TODO make this configurable for AAT
 
     @Before
     public void setUp() {
@@ -36,7 +37,6 @@ public class SubmitDraftTest {
         useRelaxedHTTPSValidation();
     }
 
-    @Test
     public void givenDraft_shouldBeStoredInCcd() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));

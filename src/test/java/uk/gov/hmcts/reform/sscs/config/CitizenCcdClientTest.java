@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 public class CitizenCcdClientTest {
 
-    CitizenCcdClient citizenCcdClient;
+    private CitizenCcdClient citizenCcdClient;
 
     @Mock
     private CcdRequestDetails ccdRequestDetails;

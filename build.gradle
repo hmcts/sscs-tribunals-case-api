@@ -156,11 +156,11 @@ sonarqube {
         property "sonar.projectKey", "SSCSTCA"
         property "sonar.jacoco.reportPath", "${project.buildDir}/jacoco/test.exec"
         property "sonar.jacoco.itReportPath", "${project.buildDir}/jacoco/integration.exec"
-        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/model/**"
+        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/sscs/domain/**," +
+                "src/main/java/uk/gov/hmcts/sscs/TribunalsCaseApiApplication.java," +
+                "src/main/java/uk/gov/hmcts/sscs/email/Email.java," +
+                "src/main/java/uk/gov/hmcts/sscs/config/*," +
+                "src/main/java/uk/gov/hmcts/sscs/model/**"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
