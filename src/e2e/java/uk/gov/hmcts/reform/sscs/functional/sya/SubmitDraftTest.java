@@ -4,9 +4,11 @@ import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.http.Header;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +27,9 @@ public class SubmitDraftTest {
     @Value("${test-url}")
     private String testUrl;
 
+    @Value("${test-oauth2Token}")
+    String oauth2Token;
+
     @Before
     public void setUp() {
         baseURI = testUrl;
@@ -39,6 +44,7 @@ public class SubmitDraftTest {
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, oauth2Token))
                 .body(SyaServiceHelper.asJsonString(draftAppeal))
                 .post("/drafts")
                 .then()
