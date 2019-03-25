@@ -3,8 +3,8 @@ java:
   ingressHost: ${SERVICE_FQDN}
   applicationPort: 8080
   keyVaults:
-    "sscs":
-      resourceGroup: sscs
+    "sscs-aat":
+      resourceGroup: sscs-aat
       secrets:
         - idam-api
         - sscs-email-mac-secret-text
