@@ -1,5 +1,4 @@
-apiVersion: v1
-name: sscs-tribunals-case-api
+name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
 version: 0.0.1
 description: SSCS Tribunals Case API
