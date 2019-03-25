@@ -82,8 +82,8 @@ task functional(type: Test) {
     description = 'Executes non-destructive functional tests in AAT against a running CCD and notification service'
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
     setClasspath(sourceSets.e2e.runtimeClasspath)
-    include "uk/gov/hmcts/sscs/functional/**"
-    exclude "uk/gov/hmcts/sscs/smoke/**"
+    include "uk/gov/hmcts/reform/sscs/functional/**"
+    exclude "uk/gov/hmcts/reform/sscs/smoke/**"
 }
 
 jacoco {
@@ -235,8 +235,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '1.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.5.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.145'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.106'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.148'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.108'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version: '0.0.8-PATCH'
 
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.2.0'
