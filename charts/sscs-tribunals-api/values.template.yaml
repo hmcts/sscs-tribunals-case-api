@@ -2,12 +2,6 @@ java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
   applicationPort: 8080
-  secrets:
-  keyVaults:
-    "sscs":
-      resourceGroup: sscs
-      secrets:
-
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
