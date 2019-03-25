@@ -237,9 +237,9 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.5.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.148'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.108'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version: '0.0.8-PATCH'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version: '0.1.2'
     compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.3'
-    
+
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.2.0'
 
     compile group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
