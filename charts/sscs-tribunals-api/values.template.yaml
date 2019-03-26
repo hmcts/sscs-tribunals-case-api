@@ -22,7 +22,7 @@ java:
   environment:
     SERVER_PORT: 8080
     REFORM_TEAM: sscs
-    REFORM_SERVICE_NAME: sscs-tribunals-case-api
+    REFORM_SERVICE_NAME: sscs-tribunals-api
     REFORM_SERVICE_TYPE: java
     REFORM_ENVIRONMENT: preview
     EMAIL_FROM: "sscs@hmcts.net"
