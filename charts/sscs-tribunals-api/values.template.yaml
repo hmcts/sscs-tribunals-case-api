@@ -3,7 +3,7 @@ java:
   ingressHost: ${SERVICE_FQDN}
   applicationPort: 8080
   keyVaults:
-    "sscs":
+    sscs:
       resourceGroup: sscs
       secrets:
         - idam-api
