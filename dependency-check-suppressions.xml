@@ -16,6 +16,20 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
+            only relates to ssl which we don't do at the java app level
+            ]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2014-3488</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+            only relates to ssl which we don't do at the java app level
+            ]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2015-2156</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
    file name: groovy-json-2.4.15.jar
    ]]></notes>
         <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
