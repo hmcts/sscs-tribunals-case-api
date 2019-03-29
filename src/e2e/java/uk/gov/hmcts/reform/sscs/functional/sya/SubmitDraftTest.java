@@ -11,32 +11,40 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
+@SpringBootTest
 public class SubmitDraftTest {
 
     @Value("${test-url}")
     private String testUrl;
 
-    @Value("${test-oauth2Token}")
-    private String oauth2Token;
+    private IdamTokens idamTokens;
 
-    // TODO make this configurable for AAT
+    @Autowired
+    private IdamService idamService;
 
     @Before
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
+        idamTokens = idamService.getIdamTokens();
     }
 
+    @Test
     public void givenDraft_shouldBeStoredInCcd() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
@@ -44,7 +52,7 @@ public class SubmitDraftTest {
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, oauth2Token))
+                .header(new Header(AUTHORIZATION, idamTokens.getIdamOauth2Token()))
                 .body(SyaServiceHelper.asJsonString(draftAppeal))
                 .post("/drafts")
                 .then()

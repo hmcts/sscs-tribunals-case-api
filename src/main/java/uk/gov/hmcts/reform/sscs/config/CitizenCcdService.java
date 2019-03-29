@@ -25,10 +25,6 @@ public class CitizenCcdService {
     }
 
     public SscsCaseDetails createCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {
-        return createCaseInCcd(caseData, eventType, summary, description, idamTokens);
-    }
-
-    private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {
         StartEventResponse startEventResponse = citizenCcdClient.startCaseForCitizen(idamTokens, eventType);
 
         CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(caseData, startEventResponse, summary, description);
