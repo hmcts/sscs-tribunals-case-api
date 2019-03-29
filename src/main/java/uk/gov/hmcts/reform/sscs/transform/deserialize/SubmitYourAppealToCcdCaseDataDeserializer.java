@@ -540,7 +540,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         return SscsDocument.builder().value(sscsDocumentDetails).build();
                     }).collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 
     private static String getPhoneNumberWithOutSpaces(String phoneNumber) {
