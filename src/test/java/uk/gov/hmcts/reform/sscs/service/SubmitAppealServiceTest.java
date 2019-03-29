@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.json.JSONObject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -48,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
@@ -60,7 +60,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.service.RoboticsJsonUploadService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -68,6 +67,9 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private CcdService ccdService;
+
+    @Mock
+    private CitizenCcdService citizenCcdService;
 
     @Mock
     private CcdPdfService ccdPdfService;
@@ -154,10 +156,13 @@ public class SubmitAppealServiceTest {
                 roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
 
         submitAppealService = new SubmitAppealService(
-                ccdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
+                ccdService, citizenCcdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
                 idamService, evidenceManagementService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().id(123L).build());
+
+        given(citizenCcdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
@@ -211,11 +216,10 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    @Ignore
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         submitAppealService.submitDraftAppeal("authorisation", appealData);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).createCase(any(SscsCaseData.class), eq(DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test

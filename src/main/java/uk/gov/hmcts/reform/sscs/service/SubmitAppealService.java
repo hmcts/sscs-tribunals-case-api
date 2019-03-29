@@ -32,6 +32,7 @@ public class SubmitAppealService {
     public static final String DM_STORE_USER_ID = "sscs";
 
     private final CcdService ccdService;
+    private final CitizenCcdService citizenCcdService;
     private final SscsPdfService sscsPdfService;
     private final RoboticsService roboticsService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
@@ -39,10 +40,8 @@ public class SubmitAppealService {
     private final EvidenceManagementService evidenceManagementService;
 
     @Autowired
-    private CitizenCcdService citizenCcdService;
-
-    @Autowired
     SubmitAppealService(CcdService ccdService,
+                        CitizenCcdService citizenCcdService,
                         SscsPdfService sscsPdfService,
                         RoboticsService roboticsService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
@@ -50,6 +49,7 @@ public class SubmitAppealService {
                         EvidenceManagementService evidenceManagementService) {
 
         this.ccdService = ccdService;
+        this.citizenCcdService = citizenCcdService;
         this.sscsPdfService = sscsPdfService;
         this.roboticsService = roboticsService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;

@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateApp
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
@@ -80,7 +81,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .appeal(appeal)
                 .subscriptions(getSubscriptions(syaCaseWrapper))
-                .sscsDocument(sscsDocuments)
+                .sscsDocument(sscsDocuments.isEmpty() ? null : sscsDocuments)
                 .evidencePresent(hasEvidence(sscsDocuments))
                 .build();
     }
@@ -523,7 +524,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static List<SscsDocument> getEvidenceDocumentDetails(SyaCaseWrapper syaCaseWrapper) {
         if (syaCaseWrapper.getReasonsForAppealing() == null
                 || syaCaseWrapper.getReasonsForAppealing().getEvidences() == null) {
-            return null;
+            return Collections.emptyList();
         }
         List<SyaEvidence> evidences = syaCaseWrapper.getReasonsForAppealing().getEvidences();
 
