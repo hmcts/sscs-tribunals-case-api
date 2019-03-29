@@ -41,9 +41,8 @@ public class SyaController {
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
                 syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealService.submitAppeal(syaCaseWrapper);
-        log.info("Case {} with Nino - {} and benefit type - {} processed successfully",
+        log.info("Case {} with benefit type - {} processed successfully",
                 caseId,
-                syaCaseWrapper.getAppellant().getNino(),
                 syaCaseWrapper.getBenefitType().getCode());
 
         return status(201).build();

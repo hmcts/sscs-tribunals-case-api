@@ -122,8 +122,8 @@ public class SubmitAppealService {
                         "SSCS - new case created",
                         "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
                         idamTokens);
-                log.info("Case {} successfully created in CCD for Nino - {} and benefit type {} with event {}",
-                        caseDetails.getId(), caseData.getGeneratedNino(),
+                log.info("Case {} successfully created in CCD for benefit type {} with event {}",
+                        caseDetails.getId(),
                         caseData.getAppeal().getBenefitType().getCode(),
                         eventType);
                 return caseDetails;
