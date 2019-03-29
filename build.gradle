@@ -236,7 +236,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.6.2'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '0.0.152'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.0.112'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version: '0.1.3'
 
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
