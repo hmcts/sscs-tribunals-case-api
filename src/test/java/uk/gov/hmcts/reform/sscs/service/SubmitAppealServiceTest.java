@@ -60,7 +60,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.service.RoboticsJsonUploadService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -95,9 +94,6 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private RoboticsJsonUploadService roboticsJsonUploadService;
-
-    @Captor
-    private ArgumentCaptor<Map<String, Object>> captor;
 
     @Captor
     private ArgumentCaptor<Email> emailCaptor;
