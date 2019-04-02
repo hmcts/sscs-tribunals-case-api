@@ -70,7 +70,7 @@ public class SubmitDraftTest {
             .post("/drafts")
             .then()
             .statusCode(HttpStatus.CREATED_201)
-            .assertThat().body("id", not(isEmptyOrNullString()));
+            .assertThat().body("id", not(isEmptyOrNullString())).log().all(true);
     }
 
     public String getIdamOauth2Token(String username, String password) {
