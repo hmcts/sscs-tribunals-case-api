@@ -25,7 +25,6 @@ import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
-
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;

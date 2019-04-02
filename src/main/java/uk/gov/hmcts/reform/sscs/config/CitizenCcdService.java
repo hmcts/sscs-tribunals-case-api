@@ -19,7 +19,7 @@ public class CitizenCcdService {
     private SscsCcdConvertService sscsCcdConvertService;
 
     @Autowired
-    public CitizenCcdService(CitizenCcdClient citizenCcdClient, SscsCcdConvertService sscsCcdConvertService) {
+    CitizenCcdService(CitizenCcdClient citizenCcdClient, SscsCcdConvertService sscsCcdConvertService) {
         this.citizenCcdClient = citizenCcdClient;
         this.sscsCcdConvertService = sscsCcdConvertService;
     }

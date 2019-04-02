@@ -24,8 +24,7 @@ public class CitizenCcdClient {
         this.coreCaseDataApi = coreCaseDataApi;
     }
 
-    public StartEventResponse startCaseForCitizen(IdamTokens idamTokens, String eventId) {
-        log.info("Starting CCD case for caseworker");
+    StartEventResponse startCaseForCitizen(IdamTokens idamTokens, String eventId) {
         return coreCaseDataApi.startForCitizen(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
