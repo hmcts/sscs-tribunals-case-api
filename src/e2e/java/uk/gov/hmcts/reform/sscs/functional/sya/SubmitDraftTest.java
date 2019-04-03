@@ -57,7 +57,7 @@ public class SubmitDraftTest {
 
     @Before
     public void setUp() {
-        baseURI = testUrl;
+        baseURI = "http://localhost:8080";
         useRelaxedHTTPSValidation();
         userToken = getIdamOauth2Token(username, password);
     }
@@ -75,7 +75,7 @@ public class SubmitDraftTest {
             .post("/drafts")
             .then()
             .statusCode(HttpStatus.CREATED_201)
-            .assertThat().body("id", not(isEmptyOrNullString())).log().all(true);
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
     }
 
     public String getIdamOauth2Token(String username, String password) {
