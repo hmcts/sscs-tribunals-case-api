@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -29,26 +32,26 @@ public class SubmitAppealService {
     public static final String DM_STORE_USER_ID = "sscs";
 
     private final CcdService ccdService;
+    private final CitizenCcdService citizenCcdService;
     private final SscsPdfService sscsPdfService;
     private final RoboticsService roboticsService;
-    private final AirLookupService airLookupService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
+                        CitizenCcdService citizenCcdService,
                         SscsPdfService sscsPdfService,
                         RoboticsService roboticsService,
-                        AirLookupService airLookupService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         EvidenceManagementService evidenceManagementService) {
 
         this.ccdService = ccdService;
+        this.citizenCcdService = citizenCcdService;
         this.sscsPdfService = sscsPdfService;
         this.roboticsService = roboticsService;
-        this.airLookupService = airLookupService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
@@ -67,6 +70,19 @@ public class SubmitAppealService {
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
+    public Long submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
+        appeal.setCaseType("draft");
+        return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
+    }
+
+    private IdamTokens getUserTokens(String oauth2Token) {
+        return IdamTokens.builder()
+                .idamOauth2Token(oauth2Token)
+                .serviceAuthorization(idamService.generateServiceAuthorization())
+                .userId(idamService.getUserId(oauth2Token))
+                .build();
+    }
+
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event) {
         if (null != caseDetails) {
@@ -79,14 +95,13 @@ public class SubmitAppealService {
         }
     }
 
-    private SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
-        String region = airLookupService.lookupRegionalCentre(postcode);
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByName(region);
+    protected SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
 
         if (rpc == null) {
-            return transformAppealToCaseData(appeal);
+            return convertSyaToCcdCaseData(appeal);
         } else {
-            return transformAppealToCaseData(appeal, rpc.getName(), rpc);
+            return convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
         }
     }
 
@@ -128,6 +143,15 @@ public class SubmitAppealService {
         }
     }
 
+    private Long createDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
+        SscsCaseDetails caseDetails = citizenCcdService.createCase(caseData, EventType.DRAFT.getCcdType(),
+                "SSCS - draft case created",
+                "Created Draft SSCS case from Submit Your Appeal online with event "
+                        + EventType.DRAFT.getCcdType(), idamTokens);
+        log.info("Draft Case {} successfully created in CCD", caseDetails.getId());
+        return caseDetails.getId();
+    }
+
     private EventType findEventType(SscsCaseData caseData) {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
@@ -135,14 +159,6 @@ public class SubmitAppealService {
         } else {
             return INCOMPLETE_APPLICATION_RECEIVED;
         }
-    }
-
-    private SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal) {
-        return convertSyaToCcdCaseData(appeal);
-    }
-
-    SscsCaseData transformAppealToCaseData(SyaCaseWrapper appeal, String region, RegionalProcessingCenter rpc) {
-        return convertSyaToCcdCaseData(appeal, region, rpc);
     }
 
     private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {

@@ -40,4 +40,12 @@ public final class SyaServiceHelper {
             throw new RuntimeException(e);
         }
     }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            return mapper.writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
