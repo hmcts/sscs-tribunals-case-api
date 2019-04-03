@@ -30,7 +30,11 @@ import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 @SpringBootTest
 public class SubmitDraftTest {
 
-    public static final String CLIENT_ID = "sscs";
+    private static final String CLIENT_ID = "sscs";
+    private static final String BASIC_AUTHORIZATION = "Basic ";
+    private static final String AUTHORIZATION_CODE = "authorization_code";
+    private static final String RESPONSE_TYPE = "code";
+
     @Value("${test-url}")
     private String testUrl;
 
@@ -79,8 +83,8 @@ public class SubmitDraftTest {
         String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
 
         Authorize authorize = idamApiClient.authorizeCodeType(
-            "Basic " + base64Authorisation,
-            "code",
+            BASIC_AUTHORIZATION + base64Authorisation,
+            RESPONSE_TYPE,
             CLIENT_ID,
             idamOauth2RedirectUrl,
             " "
@@ -88,7 +92,7 @@ public class SubmitDraftTest {
 
         Authorize authorizeToken = idamApiClient.authorizeToken(
             authorize.getCode(),
-            "authorization_code",
+            AUTHORIZATION_CODE,
             idamOauth2RedirectUrl,
             CLIENT_ID,
             idamOauth2ClientSecret,
