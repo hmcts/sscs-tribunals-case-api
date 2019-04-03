@@ -45,7 +45,7 @@ public class SyaController {
                 caseId,
                 syaCaseWrapper.getBenefitType().getCode());
 
-        return status(201).build();
+        return status(HttpStatus.CREATED).build();
     }
 
 
