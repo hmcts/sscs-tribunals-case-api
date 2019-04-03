@@ -57,7 +57,7 @@ public class SubmitDraftTest {
 
     @Before
     public void setUp() {
-        baseURI = "http://localhost:8080";
+        baseURI = testUrl;
         useRelaxedHTTPSValidation();
         userToken = getIdamOauth2Token(username, password);
     }
