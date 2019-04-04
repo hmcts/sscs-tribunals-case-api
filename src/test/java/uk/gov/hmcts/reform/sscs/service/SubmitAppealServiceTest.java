@@ -97,9 +97,6 @@ public class SubmitAppealServiceTest {
     private RoboticsJsonUploadService roboticsJsonUploadService;
 
     @Captor
-    private ArgumentCaptor<Map<String, Object>> captor;
-
-    @Captor
     private ArgumentCaptor<Email> emailCaptor;
 
     private SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
