@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -24,7 +26,10 @@ import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
+
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -215,6 +220,20 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), eq(DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+    }
+
+    @Test
+    public void shouldGetADraftIfItExists() {
+        when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
+        Optional<SscsCaseData> optionalSscsCaseData = submitAppealService.getDraftAppeal("authorisation");
+        assertTrue(optionalSscsCaseData.isPresent());
+    }
+
+    @Test
+    public void shouldGetNoDraftIfNoneExists() {
+        when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
+        Optional<SscsCaseData> optionalSscsCaseData = submitAppealService.getDraftAppeal("authorisation");
+        assertFalse(optionalSscsCaseData.isPresent());
     }
 
     @Test
