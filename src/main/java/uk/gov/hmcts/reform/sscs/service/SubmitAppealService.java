@@ -76,7 +76,7 @@ public class SubmitAppealService {
 
     public Optional<SscsCaseData> getDraftAppeal(String oauth2Token) {
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
-        if (caseDetailsList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(caseDetailsList)) {
             return Optional.ofNullable(caseDetailsList.get(0));
         }
         return Optional.empty();
