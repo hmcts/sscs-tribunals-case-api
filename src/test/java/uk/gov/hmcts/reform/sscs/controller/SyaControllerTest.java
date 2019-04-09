@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
@@ -41,6 +42,19 @@ public class SyaControllerTest {
         String json = getSyaCaseWrapperJson();
 
         mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
+        when(submitAppealService.submitDraftAppeal(any(), any())).thenReturn(1L);
+
+        String json = getSyaCaseWrapperJson();
+
+        mockMvc.perform(put("/drafts")
+                .header("Authorization", "Bearer myToken")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isCreated());

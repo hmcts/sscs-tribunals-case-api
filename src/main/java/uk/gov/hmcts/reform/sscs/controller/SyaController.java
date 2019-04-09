@@ -13,10 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.Draft;
@@ -54,7 +51,7 @@ public class SyaController {
     @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
     @ApiResponses(value =
         {@ApiResponse(code = 201, message = "Submitted draft appeal successfully", response = Draft.class)})
-    @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Draft> createDraftAppeal(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestBody SyaCaseWrapper syaCaseWrapper) {
