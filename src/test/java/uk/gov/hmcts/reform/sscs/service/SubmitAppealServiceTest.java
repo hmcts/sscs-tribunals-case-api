@@ -157,7 +157,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
 
-        given(citizenCcdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
+        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
@@ -214,7 +214,7 @@ public class SubmitAppealServiceTest {
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         submitAppealService.submitDraftAppeal("authorisation", appealData);
 
-        verify(citizenCcdService).createCase(any(SscsCaseData.class), eq(DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).saveCase(any(SscsCaseData.class), eq(DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test

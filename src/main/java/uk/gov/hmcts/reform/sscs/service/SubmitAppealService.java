@@ -7,9 +7,8 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,6 +72,14 @@ public class SubmitAppealService {
     public Long submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
         return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
+    }
+
+    public Optional<SscsCaseData> getDraftAppeal(String oauth2Token) {
+        List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
+        if (caseDetailsList.size() > 0) {
+            return Optional.ofNullable(caseDetailsList.get(0));
+        }
+        return Optional.empty();
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {
@@ -144,7 +151,7 @@ public class SubmitAppealService {
     }
 
     private Long createDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = citizenCcdService.createCase(caseData, EventType.DRAFT.getCcdType(),
+        SscsCaseDetails caseDetails = citizenCcdService.saveCase(caseData, EventType.DRAFT.getCcdType(),
                 "SSCS - draft case created",
                 "Created Draft SSCS case from Submit Your Appeal online with event "
                         + EventType.DRAFT.getCcdType(), idamTokens);
