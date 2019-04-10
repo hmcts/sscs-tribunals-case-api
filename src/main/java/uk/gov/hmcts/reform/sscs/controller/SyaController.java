@@ -1,19 +1,25 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.status;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.model.Draft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RestController
@@ -28,20 +34,37 @@ public class SyaController {
     }
 
     @ApiOperation(value = "submitAppeal",
-            notes = "Creates a case from the SYA details",
-            response = String.class, responseContainer = "Appeal details")
+        notes = "Creates a case from the SYA details",
+        response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
-            response = String.class)})
-    @RequestMapping(value = "/appeals", method = POST, consumes = APPLICATION_JSON_VALUE)
+        response = String.class)})
+    @PostMapping(value = "/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
-                syaCaseWrapper.getBenefitType().getCode());
+            syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealService.submitAppeal(syaCaseWrapper);
-        log.info("Case {} with Nino - {} and benefit type - {} processed successfully",
-                caseId,
-                syaCaseWrapper.getAppellant().getNino(),
-                syaCaseWrapper.getBenefitType().getCode());
+        log.info("Case {} with benefit type - {} processed successfully",
+            caseId,
+            syaCaseWrapper.getBenefitType().getCode());
 
-        return status(201).build();
+        return status(HttpStatus.CREATED).build();
+    }
+
+
+    @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
+    @ApiResponses(value =
+        {@ApiResponse(code = 201, message = "Submitted draft appeal successfully", response = Draft.class)})
+    @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Draft> createDraftAppeal(
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @RequestBody SyaCaseWrapper syaCaseWrapper) {
+        Preconditions.checkNotNull(syaCaseWrapper);
+        Draft draft = Draft.builder()
+            .id(submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper))
+            .build();
+        log.info("{} processed successfully", draft);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+            .buildAndExpand(draft.getId()).toUri();
+        return ResponseEntity.created(location).build();
     }
 }
