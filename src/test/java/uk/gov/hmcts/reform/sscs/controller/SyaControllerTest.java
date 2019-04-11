@@ -4,8 +4,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
@@ -71,6 +74,30 @@ public class SyaControllerTest {
                 .content(json)
                 .accept(APPLICATION_PDF_VALUE))
                 .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void getDraftWillReturn200AndTheDraftWhenItExists() throws Exception {
+        SscsCaseData sscsCaseData = SscsCaseData.builder().ccdCaseId("1").build();
+        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sscsCaseData));
+
+        String expectedJson = "{}";
+        mockMvc.perform(get("/drafts")
+                .header("Authorization", "Bearer myToken")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedJson));
+    }
+
+    @Test
+    public void getDraftWillReturn404WhenNoneExistForTheUser() throws Exception {
+        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.empty());
+
+        String expectedJson = "{}";
+        mockMvc.perform(get("/drafts")
+                .header("Authorization", "Bearer myToken")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     private String getSyaCaseWrapperJson() throws IOException, URISyntaxException {

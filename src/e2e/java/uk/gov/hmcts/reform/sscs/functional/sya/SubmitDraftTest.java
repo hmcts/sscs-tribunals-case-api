@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -77,22 +78,48 @@ public class SubmitDraftTest {
 
     @Test
     public void givenDraft_shouldBeStoredInCcd() {
-        SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+        SyaCaseWrapper draftAppeal = getDraftAppeal();
 
         saveDraft(draftAppeal);
     }
 
     @Test
     public void savingMultipleDrafts_thereShouldOnlyEverBeOneDraftForTheUser() {
-        SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+        SyaCaseWrapper draftAppeal = getDraftAppeal();
 
         saveDraft(draftAppeal);
         saveDraft(draftAppeal);
 
         List<SscsCaseData> sscsCaseDataList = citizenCcdService.findCase(getIdamTokens());
         assertEquals(1, sscsCaseDataList.size());
+    }
+
+    @Test
+    public void getDrafts_willReturnTheDraftAfterSaved() {
+        SyaCaseWrapper draftAppeal = getDraftAppeal();
+
+        saveDraft(draftAppeal);
+        RestAssured.given()
+                .header(new Header(AUTHORIZATION, userToken))
+                .get("/drafts")
+                .then()
+                .statusCode(HttpStatus.OK_200)
+                .assertThat().body("appeal.benefitType.code", equalTo("pip benefit"));
+    }
+
+    @Test
+    public void getDrafts_willReturn500IfUnauthorised() {
+        RestAssured.given()
+                .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
+                .get("/drafts")
+                .then()
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR_500);
+    }
+
+    private SyaCaseWrapper getDraftAppeal() {
+        SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
+        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+        return draftAppeal;
     }
 
     private void saveDraft(SyaCaseWrapper draftAppeal) {
