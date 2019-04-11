@@ -3,13 +3,57 @@ package uk.gov.hmcts.reform.sscs.builder;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.ADJOURNED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_CREATED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_HEARING_TYPE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_HEARING_TYPE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_NO_HEARING_OPTIONS;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_WANTS_TO_ATTEND_NO;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_WANTS_TO_ATTEND_YES;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.CLOSED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.CLOSED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DORMANT;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DORMANT_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_OVERDUE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_OVERDUE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.EMPTY_EVENT_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_BOOKED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_BOOKED_PAPER_CASE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_BOOKED_PAPER_CASE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.LAPSED_REVISED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.LAPSED_REVISED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.MISSING_HEARING;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.MISSING_HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NEW_HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NEW_HEARING_BOOKED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_PAST_HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NOT_PAST_HEARING_BOOKED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.NO_EVENTS_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.PAST_HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.PAST_HEARING_BOOKED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.POSTPONED;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.POSTPONED_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.WITHDRAWN;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.WITHDRAWN_CCD;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -90,11 +134,11 @@ public class TrackYourAppealJsonBuilderTest {
 
         Instant instant = Instant.now();
 
-        LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneOffset.UTC).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS);
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS);
 
         String dwpResponseDateCcd = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS).toString();
-        String dwpResponseDateUtc = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate).toString();
-        String hearingContactDate = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS)).toString();
+        String dwpResponseDateUtc = DateTimeUtils.convertLocalDateTimetoUtc(localDateTime);
+        String hearingContactDate = DateTimeUtils.convertLocalDateTimetoUtc(localDateTime.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS));
 
         SscsCaseData caseData = buildHearingBookedEvent(PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
 
@@ -115,8 +159,8 @@ public class TrackYourAppealJsonBuilderTest {
         LocalDateTime localUtcDate = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/London")).minusHours(2).minusWeeks(PAST_HEARING_BOOKED_IN_WEEKS - 1);
 
         String dwpResponseDateCcd = localUtcDate.toString();
-        String dwpResponseDateUtc = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate).toString();
-        String hearingContactDate = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS)).toString();
+        String dwpResponseDateUtc = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate);
+        String hearingContactDate = DateTimeUtils.convertLocalDateTimetoUtc(localUtcDate.plusWeeks(DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS));
 
         SscsCaseData caseData = buildHearingBookedEvent(NOT_PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
 
