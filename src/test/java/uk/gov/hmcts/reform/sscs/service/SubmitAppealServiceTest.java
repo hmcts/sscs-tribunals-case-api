@@ -14,7 +14,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_DRAFT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
@@ -214,7 +214,7 @@ public class SubmitAppealServiceTest {
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         submitAppealService.submitDraftAppeal("authorisation", appealData);
 
-        verify(citizenCcdService).createCase(any(SscsCaseData.class), eq(DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).createCase(any(SscsCaseData.class), eq(CREATE_DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
