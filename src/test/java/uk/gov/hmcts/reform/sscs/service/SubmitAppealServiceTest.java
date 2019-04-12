@@ -14,18 +14,17 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_DRAFT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
-
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,17 +36,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
@@ -60,7 +58,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.service.RoboticsJsonUploadService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -68,6 +65,9 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private CcdService ccdService;
+
+    @Mock
+    private CitizenCcdService citizenCcdService;
 
     @Mock
     private CcdPdfService ccdPdfService;
@@ -97,9 +97,6 @@ public class SubmitAppealServiceTest {
     private RoboticsJsonUploadService roboticsJsonUploadService;
 
     @Captor
-    private ArgumentCaptor<Map<String, Object>> captor;
-
-    @Captor
     private ArgumentCaptor<Email> emailCaptor;
 
     private SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
@@ -123,6 +120,8 @@ public class SubmitAppealServiceTest {
 
     @Before
     public void setUp() {
+        when(airLookupService.lookupRegionalCentre("CF10")).thenReturn("Cardiff");
+
         submitYourAppealEmailTemplate =
                 new SubmitYourAppealEmailTemplate("from", "to", "message");
 
@@ -152,10 +151,13 @@ public class SubmitAppealServiceTest {
                 roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
 
         submitAppealService = new SubmitAppealService(
-                ccdService, sscsPdfService, roboticsService, airLookupService, regionalProcessingCenterService,
+                ccdService, citizenCcdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
                 idamService, evidenceManagementService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().id(123L).build());
+
+        given(citizenCcdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().id(123L).build());
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
@@ -206,6 +208,13 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+    }
+
+    @Test
+    public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
+        submitAppealService.submitDraftAppeal("authorisation", appealData);
+
+        verify(citizenCcdService).createCase(any(SscsCaseData.class), eq(CREATE_DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
@@ -282,11 +291,10 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void testRegionAddedToCase() {
+    public void testPrepareCaseForCcd() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
-        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        SscsCaseData caseData = submitAppealService.transformAppealToCaseData(appealData, "Cardiff", rpc);
-        assertEquals("Cardiff", caseData.getRegion());
+        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        assertEquals("CARDIFF", caseData.getRegion());
     }
 
     @Test
