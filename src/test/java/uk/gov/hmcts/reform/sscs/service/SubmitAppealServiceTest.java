@@ -219,7 +219,7 @@ public class SubmitAppealServiceTest {
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         submitAppealService.submitDraftAppeal("authorisation", appealData);
 
-        verify(citizenCcdService).createCase(any(SscsCaseData.class), eq(CREATE_DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).saveCase(any(SscsCaseData.class), eq(CREATE_DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test

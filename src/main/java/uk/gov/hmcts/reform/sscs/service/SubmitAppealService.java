@@ -151,7 +151,7 @@ public class SubmitAppealService {
     }
 
     private Long createDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = citizenCcdService.createCase(caseData, EventType.CREATE_DRAFT.getCcdType(),
+        SscsCaseDetails caseDetails = citizenCcdService.saveCase(caseData, EventType.CREATE_DRAFT.getCcdType(),
             "SSCS - draft case created",
             "Created Draft SSCS case from Submit Your Appeal online with event "
                 + EventType.CREATE_DRAFT.getCcdType(), idamTokens);
