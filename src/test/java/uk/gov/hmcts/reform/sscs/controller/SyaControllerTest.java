@@ -5,6 +5,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.io.IOException;
@@ -22,6 +23,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
@@ -41,22 +44,39 @@ public class SyaControllerTest {
         String json = getSyaCaseWrapperJson();
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+            .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
+        when(submitAppealService.submitDraftAppeal(any(), any()))
+            .thenReturn(SaveCaseResult.builder()
+                .caseDetailsId(1L)
+                .saveCaseOperation(SaveCaseOperation.CREATE)
+                .build());
+
+        String json = getSyaCaseWrapperJson();
+
+        mockMvc.perform(put("/drafts")
+            .header("Authorization", "Bearer myToken")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json))
+            .andExpect(status().isCreated());
     }
 
     @Test
     public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
         doThrow(new PdfGenerationException("malformed html template", new Exception()))
-                .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class));
+            .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class));
         String json = getSyaCaseWrapperJson();
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json)
-                .accept(APPLICATION_PDF_VALUE))
-                .andExpect(status().is5xxServerError());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(APPLICATION_PDF_VALUE))
+            .andExpect(status().is5xxServerError());
     }
 
     private String getSyaCaseWrapperJson() throws IOException, URISyntaxException {

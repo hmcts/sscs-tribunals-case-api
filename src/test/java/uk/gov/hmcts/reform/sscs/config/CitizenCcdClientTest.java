@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -24,28 +25,50 @@ public class CitizenCcdClientTest {
     private CoreCaseDataApi coreCaseDataApi;
 
     @Mock
-    private IdamTokens idamTockents;
+    private IdamTokens idamTokens;
 
     @Before
     public void setup() {
         initMocks(this);
         citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi);
-        when(idamTockents.getIdamOauth2Token()).thenReturn("token");
-        when(idamTockents.getServiceAuthorization()).thenReturn("s2s");
-        when(idamTockents.getUserId()).thenReturn("1");
+        when(idamTokens.getIdamOauth2Token()).thenReturn("token");
+        when(idamTokens.getServiceAuthorization()).thenReturn("s2s");
+        when(idamTokens.getUserId()).thenReturn("1");
         when(ccdRequestDetails.getCaseTypeId()).thenReturn("Benefit");
         when(ccdRequestDetails.getJurisdictionId()).thenReturn("SSCS");
     }
 
     @Test
-    public void shouldInvokeCoreCaseDataApi() {
-        citizenCcdClient.startCaseForCitizen(idamTockents, "draft");
-        citizenCcdClient.submitForCitizen(idamTockents, null);
+    public void shouldInvokeCoreCaseDataApiWhenCreatingADraft() {
+        citizenCcdClient.startCaseForCitizen(idamTokens, "draft");
+        citizenCcdClient.submitForCitizen(idamTokens, null);
 
         verify(coreCaseDataApi)
             .startForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq("draft"));
 
         verify(coreCaseDataApi)
             .submitForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(true), isNull());
+    }
+
+    @Test
+    public void shouldInvokeCoreCaseDataApiWhenUpdatingADraft() {
+        String caseId = "1";
+        citizenCcdClient.startEventForCitizen(idamTokens,  caseId, "draft");
+        citizenCcdClient.submitEventForCitizen(idamTokens, caseId,null);
+
+        verify(coreCaseDataApi)
+                .startEventForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(caseId), eq("draft"));
+
+        verify(coreCaseDataApi)
+                .submitEventForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(caseId), eq(true), isNull());
+    }
+
+    @Test
+    public void shouldInvokeCoreCaseDataApiWhenSearchingForADraft() {
+        citizenCcdClient.searchForCitizen(idamTokens);
+
+        verify(coreCaseDataApi)
+                .searchForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(new HashMap<>()));
+
     }
 }
