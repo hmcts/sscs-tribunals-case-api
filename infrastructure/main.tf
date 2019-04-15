@@ -105,6 +105,9 @@ module "tribunals-case-api" {
   asp_rg       = "${local.app_service_plan}"
   asp_name     = "${local.app_service_plan}"
 
+  appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
+
+
   app_settings = {
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
 
