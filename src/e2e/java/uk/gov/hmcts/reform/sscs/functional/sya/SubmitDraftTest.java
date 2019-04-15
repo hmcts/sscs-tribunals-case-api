@@ -10,9 +10,9 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import io.restassured.response.Response;
 import java.util.Base64;
 import java.util.List;
-
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,44 +76,56 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenDraft_shouldBeStoredInCcd() {
+    public void givenDraftDoesExist_shouldBeUpdatedInCcd() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
 
-        saveDraft(draftAppeal);
+        Response response = saveDraft(draftAppeal);
+
+        response.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
     }
 
     @Test
-    public void savingMultipleDrafts_thereShouldOnlyEverBeOneDraftForTheUser() {
+    public void givenMultipleDraftsAreSavedByTheSameUser_thereShouldOnlyEverBeOneDraftForTheUser() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
 
-        saveDraft(draftAppeal);
-        saveDraft(draftAppeal);
+        Response response = saveDraft(draftAppeal);
+        response.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+        String responseHeader = response.getHeader("location");
+
+        Response response2 = saveDraft(draftAppeal);
+        response2.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+        String response2Header = response.getHeader("location");
+
+        assertEquals(responseHeader, response2Header);
 
         List<SscsCaseData> sscsCaseDataList = citizenCcdService.findCase(getIdamTokens());
         assertEquals(1, sscsCaseDataList.size());
     }
 
-    private void saveDraft(SyaCaseWrapper draftAppeal) {
-        RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(SyaServiceHelper.asJsonString(draftAppeal))
-                .put("/drafts")
-                .then()
-                .statusCode(HttpStatus.CREATED_201)
-                .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+    private Response saveDraft(SyaCaseWrapper draftAppeal) {
+        return RestAssured.given()
+            .log().method().log().headers().log().uri().log().body(true)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(SyaServiceHelper.asJsonString(draftAppeal))
+            .put("/drafts");
     }
 
 
     private IdamTokens getIdamTokens() {
         return IdamTokens.builder()
-                .idamOauth2Token(userToken)
-                .serviceAuthorization(idamService.generateServiceAuthorization())
-                .userId(idamService.getUserId(userToken))
-                .build();
+            .idamOauth2Token(userToken)
+            .serviceAuthorization(idamService.generateServiceAuthorization())
+            .userId(idamService.getUserId(userToken))
+            .build();
     }
 
     public String getIdamOauth2Token(String username, String password) {
