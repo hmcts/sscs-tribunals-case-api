@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Value;
 
 @Value
-@Builder(toBuilder = true)
+@Builder
 public class Draft {
     long id;
 }

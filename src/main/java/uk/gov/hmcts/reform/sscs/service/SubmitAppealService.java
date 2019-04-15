@@ -7,8 +7,11 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.*;
-
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 
 @Service
 @Slf4j
@@ -69,9 +73,9 @@ public class SubmitAppealService {
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
-    public Long submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
+    public SaveCaseResult submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
-        return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
+        return saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
     }
 
     public Optional<SscsCaseData> getDraftAppeal(String oauth2Token) {
@@ -150,13 +154,10 @@ public class SubmitAppealService {
         }
     }
 
-    private Long createDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = citizenCcdService.saveCase(caseData, EventType.CREATE_DRAFT.getCcdType(),
-            "SSCS - draft case created",
-            "Created Draft SSCS case from Submit Your Appeal online with event "
-                + EventType.CREATE_DRAFT.getCcdType(), idamTokens);
-        log.info("Draft Case {} successfully created in CCD", caseDetails.getId());
-        return caseDetails.getId();
+    private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
+        SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
+        log.info("Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
+        return result;
     }
 
     private EventType findEventType(SscsCaseData caseData) {

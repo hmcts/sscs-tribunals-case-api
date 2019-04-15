@@ -16,7 +16,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_DRAFT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
@@ -29,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,6 +61,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -162,9 +162,6 @@ public class SubmitAppealServiceTest {
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
 
-        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
-            .willReturn(SscsCaseDetails.builder().id(123L).build());
-
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
@@ -217,9 +214,15 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
+        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
+            .willReturn(SaveCaseResult.builder()
+                .caseDetailsId(123L)
+                .saveCaseOperation(SaveCaseOperation.CREATE)
+                .build());
+
         submitAppealService.submitDraftAppeal("authorisation", appealData);
 
-        verify(citizenCcdService).saveCase(any(SscsCaseData.class), eq(CREATE_DRAFT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 
     @Test
