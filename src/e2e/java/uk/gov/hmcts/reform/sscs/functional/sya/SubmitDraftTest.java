@@ -12,7 +12,6 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
 import java.util.Base64;
-import java.util.List;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +21,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -88,7 +86,7 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenMultipleDraftsAreSavedByTheSameUser_thereShouldOnlyEverBeOneDraftForTheUser() {
+    public void givenAnUserSaveADraftMultipleTimes_ShouldOnlyUpdateTheSameDraftForTheUser() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
 
@@ -104,10 +102,7 @@ public class SubmitDraftTest {
             .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
         String response2Header = response.getHeader("location");
 
-        assertEquals(responseHeader, response2Header);
-
-        List<SscsCaseData> sscsCaseDataList = citizenCcdService.findCase(getIdamTokens());
-        assertEquals(1, sscsCaseDataList.size());
+        assertEquals("the draft updated is not the same", responseHeader, response2Header);
     }
 
     private Response saveDraft(SyaCaseWrapper draftAppeal) {
