@@ -15,11 +15,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.Draft;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RestController
@@ -62,7 +69,8 @@ public class SyaController {
         if (!draftAppeal.isPresent()) {
             log.info("Did not find any draft appeals for the requested user.");
         }
-        return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        ResponseEntity<SscsCaseData> sscsCaseDataResponseEntity = draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return sscsCaseDataResponseEntity;
     }
 
     @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
@@ -73,12 +81,17 @@ public class SyaController {
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestBody SyaCaseWrapper syaCaseWrapper) {
         Preconditions.checkNotNull(syaCaseWrapper);
+        SaveCaseResult submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
         Draft draft = Draft.builder()
-            .id(submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper))
+            .id(submitDraftResult.getCaseDetailsId())
             .build();
-        log.info("{} processed successfully", draft);
+        log.info("{} {} successfully", draft, submitDraftResult.getSaveCaseOperation().name());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(draft.getId()).toUri();
-        return ResponseEntity.created(location).build();
+        if (submitDraftResult.getSaveCaseOperation().equals(SaveCaseOperation.CREATE)) {
+            return ResponseEntity.created(location).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).location(location).build();
+        }
     }
 }

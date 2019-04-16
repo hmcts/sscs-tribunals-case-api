@@ -7,8 +7,11 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.*;
-
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 
 @Service
 @Slf4j
@@ -58,7 +62,7 @@ public class SubmitAppealService {
 
     public Long submitAppeal(SyaCaseWrapper appeal) {
         String firstHalfOfPostcode = regionalProcessingCenterService
-                .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
+            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
 
         EventType event = findEventType(caseData);
@@ -69,9 +73,9 @@ public class SubmitAppealService {
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
-    public Long submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
+    public SaveCaseResult submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
-        return createDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
+        return saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
     }
 
     public Optional<SscsCaseData> getDraftAppeal(String oauth2Token) {
@@ -84,10 +88,10 @@ public class SubmitAppealService {
 
     private IdamTokens getUserTokens(String oauth2Token) {
         return IdamTokens.builder()
-                .idamOauth2Token(oauth2Token)
-                .serviceAuthorization(idamService.generateServiceAuthorization())
-                .userId(idamService.getUserId(oauth2Token))
-                .build();
+            .idamOauth2Token(oauth2Token)
+            .serviceAuthorization(idamService.generateServiceAuthorization())
+            .userId(idamService.getUserId(oauth2Token))
+            .build();
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
@@ -97,12 +101,12 @@ public class SubmitAppealService {
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
             if (event.equals(SYA_APPEAL_CREATED)) {
                 roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
-                        additionalEvidence);
+                    additionalEvidence);
             }
         }
     }
 
-    protected SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
+    SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
 
         if (rpc == null) {
@@ -125,38 +129,35 @@ public class SubmitAppealService {
             caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
             if (caseDetails == null) {
                 caseDetails = ccdService.createCase(caseData,
-                        eventType.getCcdType(),
-                        "SSCS - new case created",
-                        "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
-                        idamTokens);
+                    eventType.getCcdType(),
+                    "SSCS - new case created",
+                    "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
+                    idamTokens);
                 log.info("Case {} successfully created in CCD for benefit type {} with event {}",
-                        caseDetails.getId(),
-                        caseData.getAppeal().getBenefitType().getCode(),
-                        eventType);
+                    caseDetails.getId(),
+                    caseData.getAppeal().getBenefitType().getCode(),
+                    eventType);
                 return caseDetails;
             } else {
                 log.info("Duplicate case {} found for Nino {} and benefit type {}. "
-                                + "No need to continue with post create case processing.",
-                        caseDetails.getId(), caseData.getGeneratedNino(),
-                        caseData.getAppeal().getBenefitType().getCode());
+                        + "No need to continue with post create case processing.",
+                    caseDetails.getId(), caseData.getGeneratedNino(),
+                    caseData.getAppeal().getBenefitType().getCode());
                 return null;
             }
         } catch (Exception e) {
             throw new CcdException(
-                    String.format("Error found in the creating case process for case with Id - %s"
-                                    + " and Nino - %s and Benefit type - %s and exception: %s",
-                            caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
-                            caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
+                String.format("Error found in the creating case process for case with Id - %s"
+                        + " and Nino - %s and Benefit type - %s and exception: %s",
+                    caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
+                    caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
     }
 
-    private Long createDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
-        SscsCaseDetails caseDetails = citizenCcdService.saveCase(caseData, EventType.DRAFT.getCcdType(),
-                "SSCS - draft case created",
-                "Created Draft SSCS case from Submit Your Appeal online with event "
-                        + EventType.DRAFT.getCcdType(), idamTokens);
-        log.info("Draft Case {} successfully created in CCD", caseDetails.getId());
-        return caseDetails.getId();
+    private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
+        SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
+        log.info("Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
+        return result;
     }
 
     private EventType findEventType(SscsCaseData caseData) {

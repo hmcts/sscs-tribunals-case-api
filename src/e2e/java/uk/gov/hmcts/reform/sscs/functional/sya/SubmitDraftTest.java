@@ -11,9 +11,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import io.restassured.response.Response;
 import java.util.Base64;
-import java.util.List;
-
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +22,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -77,43 +75,12 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenDraft_shouldBeStoredInCcd() {
+    public void givenDraftDoesExist_shouldBeUpdatedInCcd() {
         SyaCaseWrapper draftAppeal = getDraftAppeal();
-
-        saveDraft(draftAppeal);
-    }
-
-    @Test
-    public void savingMultipleDrafts_thereShouldOnlyEverBeOneDraftForTheUser() {
-        SyaCaseWrapper draftAppeal = getDraftAppeal();
-
-        saveDraft(draftAppeal);
-        saveDraft(draftAppeal);
-
-        List<SscsCaseData> sscsCaseDataList = citizenCcdService.findCase(getIdamTokens());
-        assertEquals(1, sscsCaseDataList.size());
-    }
-
-    @Test
-    public void getDrafts_willReturnTheDraftAfterSaved() {
-        SyaCaseWrapper draftAppeal = getDraftAppeal();
-
-        saveDraft(draftAppeal);
-        RestAssured.given()
-                .header(new Header(AUTHORIZATION, userToken))
-                .get("/drafts")
-                .then()
-                .statusCode(HttpStatus.OK_200)
-                .assertThat().body("appeal.benefitType.code", equalTo("pip benefit"));
-    }
-
-    @Test
-    public void getDrafts_willReturn500IfUnauthorised() {
-        RestAssured.given()
-                .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
-                .get("/drafts")
-                .then()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR_500);
+        Response response = saveDraft(draftAppeal);
+        response.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
     }
 
     private SyaCaseWrapper getDraftAppeal() {
@@ -122,25 +89,63 @@ public class SubmitDraftTest {
         return draftAppeal;
     }
 
-    private void saveDraft(SyaCaseWrapper draftAppeal) {
+    @Test
+    public void givenAnUserSaveADraftMultipleTimes_ShouldOnlyUpdateTheSameDraftForTheUser() {
+        SyaCaseWrapper draftAppeal = getDraftAppeal();
+        Response response = saveDraft(draftAppeal);
+        response.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+        String responseHeader = response.getHeader("location");
+
+        Response response2 = saveDraft(draftAppeal);
+        response2.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+        String response2Header = response.getHeader("location");
+
+        assertEquals("the draft updated is not the same", responseHeader, response2Header);
+    }
+
+    @Test
+    public void getDrafts_willReturnTheDraftAfterSaved() {
+        SyaCaseWrapper draftAppeal = getDraftAppeal();
+
+        saveDraft(draftAppeal);
         RestAssured.given()
-                .log().method().log().headers().log().uri().log().body(true)
-                .contentType(ContentType.JSON)
-                .header(new Header(AUTHORIZATION, userToken))
-                .body(SyaServiceHelper.asJsonString(draftAppeal))
-                .put("/drafts")
-                .then()
-                .statusCode(HttpStatus.CREATED_201)
-                .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+            .header(new Header(AUTHORIZATION, userToken))
+            .get("/drafts")
+            .then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().body("appeal.benefitType.code", equalTo("pip benefit"));
+    }
+
+    @Test
+    public void getDrafts_willReturn500IfUnauthorised() {
+        RestAssured.given()
+            .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
+            .get("/drafts")
+            .then()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR_500);
+    }
+
+
+    private Response saveDraft(SyaCaseWrapper draftAppeal) {
+        return RestAssured.given()
+            .log().method().log().headers().log().uri().log().body(true)
+            .contentType(ContentType.JSON)
+            .header(new Header(AUTHORIZATION, userToken))
+            .body(SyaServiceHelper.asJsonString(draftAppeal))
+            .put("/drafts");
     }
 
 
     private IdamTokens getIdamTokens() {
         return IdamTokens.builder()
-                .idamOauth2Token(userToken)
-                .serviceAuthorization(idamService.generateServiceAuthorization())
-                .userId(idamService.getUserId(userToken))
-                .build();
+            .idamOauth2Token(userToken)
+            .serviceAuthorization(idamService.generateServiceAuthorization())
+            .userId(idamService.getUserId(userToken))
+            .build();
     }
 
     public String getIdamOauth2Token(String username, String password) {
