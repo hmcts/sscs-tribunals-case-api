@@ -30,8 +30,6 @@ compileTestJava {
 
 mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 
-check.dependsOn dependencyCheckAnalyze
-
 checkstyle {
     maxWarnings = 0
     toolVersion = '8.7'
