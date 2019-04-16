@@ -69,8 +69,7 @@ public class SyaController {
         if (!draftAppeal.isPresent()) {
             log.info("Did not find any draft appeals for the requested user.");
         }
-        ResponseEntity<SscsCaseData> sscsCaseDataResponseEntity = draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-        return sscsCaseDataResponseEntity;
+        return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)

@@ -75,14 +75,14 @@ public class SubmitDraftTest {
 
     @Test
     public void givenDraftDoesExist_shouldBeUpdatedInCcd() {
-        SyaCaseWrapper draftAppeal = getDraftAppeal();
+        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(HttpStatus.OK_200)
             .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
     }
 
-    private SyaCaseWrapper getDraftAppeal() {
+    private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
         return draftAppeal;
@@ -90,7 +90,7 @@ public class SubmitDraftTest {
 
     @Test
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
-        SyaCaseWrapper draftAppeal = getDraftAppeal();
+        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(HttpStatus.OK_200)
@@ -108,7 +108,7 @@ public class SubmitDraftTest {
 
     @Test
     public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
-        SyaCaseWrapper draftAppeal = getDraftAppeal();
+        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         saveDraft(draftAppeal);
         RestAssured.given()
             .header(new Header(AUTHORIZATION, userToken))
