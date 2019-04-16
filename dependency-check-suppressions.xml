@@ -16,6 +16,20 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
+            only relates to ssl which we don't do at the java app level
+            ]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2014-3488</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+            only relates to ssl which we don't do at the java app level
+            ]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2015-2156</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
    file name: groovy-json-2.4.15.jar
    ]]></notes>
         <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
@@ -53,9 +67,9 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-crypto-5.0.8.RELEASE.jar
+   file name: spring-security-crypto-5.0.12.RELEASE.jar
    ]]></notes>
-        <gav regex="true">^org\.springframework\.security:spring-security-crypto:5\.0\.8\.RELEASE$</gav>
-        <cve>CVE-2018-1258</cve>
+        <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     </suppress>
 </suppressions>

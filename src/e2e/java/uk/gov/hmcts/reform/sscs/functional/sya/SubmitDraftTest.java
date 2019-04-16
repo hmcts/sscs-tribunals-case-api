@@ -4,11 +4,13 @@ import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import io.restassured.response.Response;
 import java.util.Base64;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
@@ -19,10 +21,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @RunWith(SpringRunner.class)
@@ -40,6 +45,12 @@ public class SubmitDraftTest {
 
     @Autowired
     private IdamApiClient idamApiClient;
+
+    @Autowired
+    private CitizenCcdService citizenCcdService;
+
+    @Autowired
+    private IdamService idamService;
 
     @Value("${idam.oauth2.client.secret}")
     private String idamOauth2ClientSecret;
@@ -63,19 +74,53 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenDraft_shouldBeStoredInCcd() {
+    public void givenDraftDoesExist_shouldBeUpdatedInCcd() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
 
-        RestAssured.given()
+        Response response = saveDraft(draftAppeal);
+
+        response.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+    }
+
+    @Test
+    public void givenAnUserSaveADraftMultipleTimes_ShouldOnlyUpdateTheSameDraftForTheUser() {
+        SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
+        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+
+        Response response = saveDraft(draftAppeal);
+        response.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+        String responseHeader = response.getHeader("location");
+
+        Response response2 = saveDraft(draftAppeal);
+        response2.then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+        String response2Header = response.getHeader("location");
+
+        assertEquals("the draft updated is not the same", responseHeader, response2Header);
+    }
+
+    private Response saveDraft(SyaCaseWrapper draftAppeal) {
+        return RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, userToken))
             .body(SyaServiceHelper.asJsonString(draftAppeal))
-            .post("/drafts")
-            .then()
-            .statusCode(HttpStatus.CREATED_201)
-            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+            .put("/drafts");
+    }
+
+
+    private IdamTokens getIdamTokens() {
+        return IdamTokens.builder()
+            .idamOauth2Token(userToken)
+            .serviceAuthorization(idamService.generateServiceAuthorization())
+            .userId(idamService.getUserId(userToken))
+            .build();
     }
 
     public String getIdamOauth2Token(String username, String password) {
