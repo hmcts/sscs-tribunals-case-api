@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
@@ -8,8 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.model.NotificationEventType.CREATE_APPEAL_PDF;
-import static uk.gov.hmcts.reform.sscs.model.NotificationEventType.DO_NOT_SEND;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,10 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mail.javamail.JavaMailSender;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -91,17 +86,6 @@ public class EventServiceTest {
         assertTrue(handled);
 
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens));
-    }
-
-    @Test
-    public void shouldNotHandleEvent() throws CcdException {
-
-        boolean handled = eventService.handleEvent(DO_NOT_SEND, null);
-
-        verify(sscsPdfService, never()).generateAndSendPdf(any(), any(), any());
-
-        assertFalse(handled);
-
     }
 
     private SscsCaseData buildCaseDataWithoutPdf() {

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.model.NotificationEventType.CREATE_APPEAL_PDF;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
@@ -9,11 +9,11 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.model.NotificationEventType;
 
 @Service
 @Slf4j
@@ -41,7 +41,7 @@ public class EventService {
         this.emailService = emailService;
     }
 
-    public boolean handleEvent(NotificationEventType eventType, SscsCaseData caseData) {
+    public boolean handleEvent(EventType eventType, SscsCaseData caseData) {
 
         if (CREATE_APPEAL_PDF == eventType) {
             createAppealPdfAndSendToRobotics(caseData);
@@ -74,7 +74,7 @@ public class EventService {
         }
     }
 
-    public boolean sendEvent(NotificationEventType eventType, SscsCaseData caseData) {
+    public boolean sendEvent(EventType eventType, SscsCaseData caseData) {
 
         if (CREATE_APPEAL_PDF == eventType) {
             handleEvent(eventHandler(eventType, caseData));
@@ -84,7 +84,7 @@ public class EventService {
         return false;
     }
 
-    private Runnable eventHandler(NotificationEventType eventType, SscsCaseData caseData) {
+    private Runnable eventHandler(EventType eventType, SscsCaseData caseData) {
         return () -> handleEvent(eventType, caseData);
     }
 
