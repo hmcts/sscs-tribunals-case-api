@@ -28,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @RunWith(SpringRunner.class)
@@ -90,7 +89,7 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenAnUserSaveADraftMultipleTimes_ShouldOnlyUpdateTheSameDraftForTheUser() {
+    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
         SyaCaseWrapper draftAppeal = getDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
@@ -108,9 +107,8 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void getDrafts_willReturnTheDraftAfterSaved() {
+    public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
         SyaCaseWrapper draftAppeal = getDraftAppeal();
-
         saveDraft(draftAppeal);
         RestAssured.given()
             .header(new Header(AUTHORIZATION, userToken))
@@ -121,7 +119,7 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void getDrafts_willReturn500IfUnauthorised() {
+    public void givenGetDraftsIsCalledWithWrongCredentials_shouldReturn500Unauthorised() {
         RestAssured.given()
             .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
             .get("/drafts")
@@ -137,15 +135,6 @@ public class SubmitDraftTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(SyaServiceHelper.asJsonString(draftAppeal))
             .put("/drafts");
-    }
-
-
-    private IdamTokens getIdamTokens() {
-        return IdamTokens.builder()
-            .idamOauth2Token(userToken)
-            .serviceAuthorization(idamService.generateServiceAuthorization())
-            .userId(idamService.getUserId(userToken))
-            .build();
     }
 
     public String getIdamOauth2Token(String username, String password) {
