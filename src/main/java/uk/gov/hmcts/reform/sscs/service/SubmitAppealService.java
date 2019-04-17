@@ -106,7 +106,7 @@ public class SubmitAppealService {
         }
     }
 
-    protected SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
+    SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
 
         if (rpc == null) {

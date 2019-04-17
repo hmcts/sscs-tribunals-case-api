@@ -74,9 +74,16 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: spring-security-crypto-5.0.12.RELEASE.jar
+   file name: tomcat-embed-websocket-8.5.39.jar
    ]]></notes>
-        <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
-        <cve>CVE-2018-1258</cve>
+        <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-websocket:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-8.5.39.jar
+   ]]></notes>
+        <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
     </suppress>
 </suppressions>
