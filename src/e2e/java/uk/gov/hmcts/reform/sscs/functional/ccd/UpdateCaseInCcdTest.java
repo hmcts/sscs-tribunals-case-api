@@ -38,19 +38,20 @@ public class UpdateCaseInCcdTest {
 
     @Test
     public void givenACase_shouldBeUpdatedInCcd() {
-        SscsCaseData testCaseData = buildSscsCaseDataForTesting();
+        SscsCaseData testCaseData = buildSscsCaseDataForTestingWithValidMobileNumbers();
         SscsCaseDetails caseDetails = ccdService.createCase(testCaseData, "appealCreated",
             "Appeal created summary", "Appeal created description",
             idamTokens);
 
         assertNotNull(caseDetails);
         testCaseData.setCaseReference("SC123/12/78765");
+        System.out.println("**** testCaseData ****" + testCaseData);
         SscsCaseDetails updatedCaseDetails = ccdService.updateCase(testCaseData, caseDetails.getId(),
             "appealReceived", "", "", idamTokens);
         assertEquals("SC123/12/78765", updatedCaseDetails.getData().getCaseReference());
     }
 
-    public static SscsCaseData buildSscsCaseDataForTesting() {
+    public static SscsCaseData buildSscsCaseDataForTestingWithValidMobileNumbers() {
         SscsCaseData testCaseData = CaseDataUtils.buildCaseData();
 
         Subscription appellantSubscription = Subscription.builder()
