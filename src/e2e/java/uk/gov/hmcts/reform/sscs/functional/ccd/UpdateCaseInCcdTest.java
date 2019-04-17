@@ -45,7 +45,6 @@ public class UpdateCaseInCcdTest {
 
         assertNotNull(caseDetails);
         testCaseData.setCaseReference("SC123/12/78765");
-        System.out.println("**** testCaseData ****" + testCaseData);
         SscsCaseDetails updatedCaseDetails = ccdService.updateCase(testCaseData, caseDetails.getId(),
             "appealReceived", "", "", idamTokens);
         assertEquals("SC123/12/78765", updatedCaseDetails.getData().getCaseReference());
@@ -57,7 +56,7 @@ public class UpdateCaseInCcdTest {
         Subscription appellantSubscription = Subscription.builder()
             .tya("app-appeal-number")
             .email("appellant@email.com")
-            .mobile("07777777777")
+            .mobile("07700 900555")
             .subscribeEmail(YES)
             .subscribeSms(YES)
             .reason("")
@@ -73,7 +72,7 @@ public class UpdateCaseInCcdTest {
         Subscription supporterSubscription = Subscription.builder()
             .tya("")
             .email("supporter@email.com")
-            .mobile("07777777777")
+            .mobile("07700 900555")
             .subscribeEmail("")
             .subscribeSms("")
             .reason("")
@@ -81,7 +80,7 @@ public class UpdateCaseInCcdTest {
         Subscription representativeSubscription = Subscription.builder()
             .tya("rep-appeal-number")
             .email("representative@email.com")
-            .mobile("07777777777")
+            .mobile("07700 900555")
             .subscribeEmail(YES)
             .subscribeSms(YES)
             .build();
