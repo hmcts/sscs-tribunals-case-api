@@ -85,5 +85,5 @@
    ]]></notes>
         <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
         <cpe>cpe:/a:apache:tomcat</cpe>
-    </suppress>
+    <suppress>
 </suppressions>
