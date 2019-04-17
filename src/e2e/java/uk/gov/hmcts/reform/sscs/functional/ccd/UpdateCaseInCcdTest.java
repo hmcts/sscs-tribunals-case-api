@@ -38,13 +38,14 @@ public class UpdateCaseInCcdTest {
 
     @Test
     public void givenACase_shouldBeUpdatedInCcd() {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting(), "appealCreated",
+        SscsCaseData testCaseData = buildSscsCaseDataForTesting();
+        SscsCaseDetails caseDetails = ccdService.createCase(testCaseData, "appealCreated",
             "Appeal created summary", "Appeal created description",
             idamTokens);
 
         assertNotNull(caseDetails);
-        SscsCaseData updatedCaseRefData = CaseDataUtils.buildCaseData().toBuilder().caseReference("SC123/12/78765").build();
-        SscsCaseDetails updatedCaseDetails = ccdService.updateCase(updatedCaseRefData, caseDetails.getId(),
+        testCaseData.setCaseReference("SC123/12/78765");
+        SscsCaseDetails updatedCaseDetails = ccdService.updateCase(testCaseData, caseDetails.getId(),
             "appealReceived", "", "", idamTokens);
         assertEquals("SC123/12/78765", updatedCaseDetails.getData().getCaseReference());
     }
