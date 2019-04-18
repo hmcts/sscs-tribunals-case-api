@@ -5,6 +5,9 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +50,8 @@ public class EventControllerTest {
         CaseDetails<SscsCaseData> caseDataCaseDetails = mock(CaseDetails.class);
         SscsCaseData sscsCaseData = mock(SscsCaseData.class);
 
-        String content = "{\n"
-                + "  \"case_id\": \"1546942528346226\",\n"
-                + "  \"online_hearing_id\":\"13f8480c-fca4-4549-b4e4-17bef753d3ef\",\n"
-                + "  \"event_type\":\"createAppealPDF\",\n"
-                + "  \"expiry_date\":\"2018-08-12T23:59:59Z\",\n"
-                + "  \"reason\":\"foo\"\n"
-                + "}";
+        String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
+        String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         when(deserializer.deserialize(content)).thenReturn(caseDataCallback);
         when(caseDataCallback.getCaseDetails()).thenReturn(caseDataCaseDetails);

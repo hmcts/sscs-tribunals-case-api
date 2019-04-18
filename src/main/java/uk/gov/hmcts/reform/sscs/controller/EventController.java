@@ -45,8 +45,7 @@ public class EventController {
         CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
 
         SscsCaseDataWrapper sscsCaseDataWrapper = buildSscsCaseDataWrapper(callback.getCaseDetails().getCaseData(),
-                caseDetailsBefore != null ? caseDetailsBefore.getCaseData() : null,
-                EventType.getEventTypeByCcdType(String.valueOf(callback.getEvent())));
+                caseDetailsBefore != null ? caseDetailsBefore.getCaseData() : null, callback.getEvent());
 
         log.info("Event received for case id: {}, {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
                 sscsCaseDataWrapper.getNotificationEventType());
