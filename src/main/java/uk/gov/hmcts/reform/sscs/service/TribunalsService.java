@@ -28,6 +28,9 @@ public class TribunalsService {
     @Value("${idam.oauth2.client.secret}")
     private String idamOauth2ClientSecret;
 
+    @Value("${idam.oauth2.redirectUrl}")
+    private String idamOauth2RedirectUrl;
+
 
     @Autowired
     TribunalsService(CcdService ccdService,
@@ -42,6 +45,7 @@ public class TribunalsService {
 
     public ObjectNode findAppeal(String appealNumber) {
         log.info("idamOauth2ClientSecret:" + idamOauth2ClientSecret);
+        log.info("idamOauth2RedirectUrl:" + idamOauth2RedirectUrl);
         SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(appealNumber, idamService.getIdamTokens());
         if (caseByAppealNumber == null) {
             log.info("Appeal does not exist for appeal number: " + appealNumber);
