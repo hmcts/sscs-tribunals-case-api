@@ -84,7 +84,7 @@ public class SubmitDraftTest {
 
     private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+        draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment (PIP)", "PIP"));
         return draftAppeal;
     }
 
@@ -115,7 +115,7 @@ public class SubmitDraftTest {
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().body("appeal.benefitType.code", equalTo("pip benefit"));
+            .assertThat().body("BenefitType.benefitType", equalTo("Personal Independence Payment (PIP)"));
     }
 
     @Test
