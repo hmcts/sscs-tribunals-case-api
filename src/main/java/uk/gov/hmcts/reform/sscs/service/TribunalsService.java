@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import uk.gov.hmcts.reform.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -23,6 +24,10 @@ public class TribunalsService {
     private TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
     private IdamService idamService;
 
+    @Value("${idam.oauth2.client.secret}")
+    private String idamOauth2ClientSecret;
+
+
     @Autowired
     TribunalsService(CcdService ccdService,
                      RegionalProcessingCenterService regionalProcessingCenterService,
@@ -35,6 +40,7 @@ public class TribunalsService {
     }
 
     public ObjectNode findAppeal(String appealNumber) {
+        log.info("idamOauth2ClientSecret:" + idamOauth2ClientSecret);
         SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(appealNumber, idamService.getIdamTokens());
         if (caseByAppealNumber == null) {
             log.info("Appeal does not exist for appeal number: " + appealNumber);
