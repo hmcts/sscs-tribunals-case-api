@@ -48,3 +48,6 @@ java:
     MAX_REQUEST_SIZE: "10MB"
     ROOT_LOGGING_LEVEL: INFO
     LOG_OUTPUT: single
+  # Don't modify below here.
+  image: ${IMAGE_NAME}
+  ingressHost: ${SERVICE_FQDN}
