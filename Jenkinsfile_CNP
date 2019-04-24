@@ -29,6 +29,8 @@ def secrets = [
         ]
 ]
 
+
+
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
   [ $class: 'AzureKeyVaultSecret',
     secretType: 'Secret',
@@ -39,12 +41,11 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-    loadVaultSecrets(secrets)
     if (env.CHANGE_TITLE && !env.CHANGE_TITLE.startsWith('Bump')) {
         enableDockerBuild()
         installCharts()
     }
+    loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
-    setVaultName('sscs')
 }
 
