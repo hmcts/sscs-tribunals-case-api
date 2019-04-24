@@ -28,6 +28,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 
 @Service
 @Slf4j
@@ -78,10 +80,12 @@ public class SubmitAppealService {
         return saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
     }
 
-    public Optional<SscsCaseData> getDraftAppeal(String oauth2Token) {
+    public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
-            return Optional.ofNullable(caseDetailsList.get(0));
+            //TODO transform sscsCaseData into the sessionDraft
+            SessionDraft sessionDraft = new SessionDraft(new SessionBenefitType("Personal Independence Payment (PIP)"));
+            return Optional.of(sessionDraft);
         }
         return Optional.empty();
     }

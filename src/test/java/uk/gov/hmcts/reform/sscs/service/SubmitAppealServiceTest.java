@@ -63,6 +63,7 @@ import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -228,15 +229,15 @@ public class SubmitAppealServiceTest {
     @Test
     public void shouldGetADraftIfItExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
-        Optional<SscsCaseData> optionalSscsCaseData = submitAppealService.getDraftAppeal("authorisation");
-        assertTrue(optionalSscsCaseData.isPresent());
+        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
+        assertTrue(optionalSessionDraft.isPresent());
     }
 
     @Test
     public void shouldGetNoDraftIfNoneExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
-        Optional<SscsCaseData> optionalSscsCaseData = submitAppealService.getDraftAppeal("authorisation");
-        assertFalse(optionalSscsCaseData.isPresent());
+        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
+        assertFalse(optionalSessionDraft.isPresent());
     }
 
     @Test

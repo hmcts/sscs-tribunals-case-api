@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.model;
+package uk.gov.hmcts.reform.sscs.model.draft;
 
 import lombok.Builder;
 import lombok.Value;

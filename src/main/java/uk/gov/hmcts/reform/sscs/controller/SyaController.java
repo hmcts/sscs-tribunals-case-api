@@ -10,7 +10,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.net.URI;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,9 +23,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.model.Draft;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.Draft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RestController
@@ -63,9 +63,9 @@ public class SyaController {
                 @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
                 @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
     @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<SscsCaseData> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
+    public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
-        Optional<SscsCaseData> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
+        Optional<SessionDraft> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
         if (!draftAppeal.isPresent()) {
             log.info("Did not find any draft appeals for the requested user.");
         }

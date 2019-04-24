@@ -24,11 +24,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
@@ -85,15 +86,15 @@ public class SyaControllerTest {
 
     @Test
     public void givenGetDraftIsCalled_shouldReturn200AndTheDraft() throws Exception {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().caseReference("123").build();
-        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sscsCaseData));
+        SessionDraft sessionDraft = new SessionDraft(new SessionBenefitType("PIP"));
+        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
 
         mockMvc.perform(
             get("/drafts")
                 .header("Authorization", "Bearer myToken")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.caseReference").value("123"));
+            .andExpect(jsonPath("$.BenefitType.benefitType").value("PIP"));
     }
 
     @Test
