@@ -30,7 +30,8 @@ public class CitizenCcdService {
 
 
     public List<SscsCaseData> findCase(IdamTokens idamTokens) {
-        return citizenCcdClient.searchForCitizen(idamTokens).stream().map(f -> sscsCcdConvertService.getCaseData(f.getData())).collect(Collectors.toList());
+        return citizenCcdClient.searchForCitizen(idamTokens)
+            .stream().map(f -> sscsCcdConvertService.getCaseData(f.getData())).collect(Collectors.toList());
     }
 
     public SaveCaseResult saveCase(SscsCaseData caseData, IdamTokens idamTokens) {
@@ -72,4 +73,5 @@ public class CitizenCcdService {
         caseDetails = citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
         return caseDetails;
     }
+
 }
