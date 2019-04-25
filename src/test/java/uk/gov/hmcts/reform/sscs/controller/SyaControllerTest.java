@@ -113,7 +113,7 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.BenefitType.benefitType").value("Personal Independence Payment (PIP)"))
             .andExpect(jsonPath("$.PostcodeChecker.postcode").value("AP1 4NT"))
             .andExpect(jsonPath("$.CreateAccount.createAccount").value("yes"))
-            .andExpect(jsonPath("$.HaveAMRN.haveAMrn").value("yes"))
+            .andExpect(jsonPath("$.HaveAMRN.haveAMRN").value("yes"))
             .andExpect(jsonPath("$.MRNDate.mrnDate.day").value("01"))
             .andExpect(jsonPath("$.MRNDate.mrnDate.month").value("02"))
             .andExpect(jsonPath("$.MRNDate.mrnDate.year").value("2017"));
