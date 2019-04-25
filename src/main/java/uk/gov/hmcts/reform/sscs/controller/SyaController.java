@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
@@ -59,7 +58,7 @@ public class SyaController {
 
     @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)
     @ApiResponses(value =
-            {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SscsCaseData.class),
+            {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SessionDraft.class),
                 @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
                 @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
     @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)

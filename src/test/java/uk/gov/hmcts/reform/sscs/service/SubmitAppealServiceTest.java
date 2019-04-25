@@ -20,6 +20,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATI
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
+import static uk.gov.hmcts.reform.sscs.model.draft.SessionDraftTest.TEST_APPELLANT_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.model.draft.SessionDraftTest.TEST_BENEFIT_TYPE;
+import static uk.gov.hmcts.reform.sscs.model.draft.SessionDraftTest.TEST_MRN_DETAILS_WITH_DATE;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
@@ -43,9 +46,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -227,10 +228,26 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldGetADraftIfItExists() {
-        when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
+    public void givenCaseWithMrnDetails_shouldTransformCaseDataToSessionDraft() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .appellant(Appellant.builder()
+                    .address(TEST_APPELLANT_ADDRESS)
+                    .build()
+                )
+                .mrnDetails(TEST_MRN_DETAILS_WITH_DATE)
+                .benefitType(TEST_BENEFIT_TYPE)
+                .build()
+            )
+            .build();
+        when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(caseData));
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertTrue(optionalSessionDraft.isPresent());
+    }
+
+    @Test
+    public void givenCaseWithoutMrnDetails_shouldTransformCaseDataToSessionDraft() {
+        // TODO
     }
 
     @Test

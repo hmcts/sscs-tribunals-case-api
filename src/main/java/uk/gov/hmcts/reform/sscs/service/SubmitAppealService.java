@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate.mrnOverThirteenMonthsLate;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
@@ -14,12 +15,10 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -28,8 +27,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 
 @Service
 @Slf4j
@@ -83,9 +81,7 @@ public class SubmitAppealService {
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
-            //TODO transform sscsCaseData into the sessionDraft
-            SessionDraft sessionDraft = new SessionDraft(new SessionBenefitType("Personal Independence Payment (PIP)"));
-            return Optional.of(sessionDraft);
+            return transformCaseDataToSessionDraft(caseDetailsList.get(0));
         }
         return Optional.empty();
     }
@@ -190,7 +186,28 @@ public class SubmitAppealService {
     }
 
     private byte[] downloadBinary(SyaEvidence evidence) {
-
         return evidenceManagementService.download(URI.create(evidence.getUrl()), DM_STORE_USER_ID);
+    }
+
+    protected static Optional<SessionDraft> transformCaseDataToSessionDraft(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+
+        if (appeal != null) {
+            MrnDetails mrnDetails = appeal.getMrnDetails();
+
+            Boolean hasMrnDetails = mrnDetails.getMrnDate() == null || StringUtils.isEmpty(mrnDetails.getMrnDate());
+
+            return Optional.of(new SessionDraft(
+                new SessionBenefitType(appeal.getBenefitType()),
+                new SessionPostcodeChecker(appeal.getAppellant().getAddress()),
+                new SessionCreateAccount(),
+                new SessionHaveAMrn(mrnDetails),
+                hasMrnDetails ? null : new SessionMrnDate(mrnDetails),
+                new SessionCheckMrn(mrnDetails),
+                mrnOverThirteenMonthsLate(mrnDetails) ? new SessionMrnOverThirteenMonthsLate(mrnDetails) : null
+            ));
+        }
+
+        return Optional.empty();
     }
 }
