@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.builder.TrackYourAppealJsonBuilder;
@@ -23,7 +22,6 @@ public class TribunalsService {
     private RegionalProcessingCenterService regionalProcessingCenterService;
     private TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
     private IdamService idamService;
-
 
     @Autowired
     TribunalsService(CcdService ccdService,
