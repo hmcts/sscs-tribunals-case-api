@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -115,7 +115,8 @@ public class SubmitDraftTest {
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().body("BenefitType.benefitType", equalTo("Personal Independence Payment (PIP)"));
+            .assertThat().body("BenefitType.benefitType",
+            containsString("Personal Independence Payment (PIP)"));
     }
 
     @Test
