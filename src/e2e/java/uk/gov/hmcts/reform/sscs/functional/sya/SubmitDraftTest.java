@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -84,7 +84,7 @@ public class SubmitDraftTest {
 
     private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+        draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
         return draftAppeal;
     }
 
@@ -115,7 +115,8 @@ public class SubmitDraftTest {
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().body("appeal.benefitType.code", equalTo("pip benefit"));
+            .assertThat().body("BenefitType.benefitType",
+            containsString("PIP"));
     }
 
     @Test
