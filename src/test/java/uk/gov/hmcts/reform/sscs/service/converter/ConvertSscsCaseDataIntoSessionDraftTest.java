@@ -56,6 +56,41 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getCheckMrn().getCheckedMrn());
         assertEquals("Forgot to send it", actual.getMrnOverThirteenMonthsLate().getReasonForBeingLate());
         assertEquals("1", actual.getDwpIssuingOffice().getPipNumber());
+        assertEquals("no", actual.getAppointee().getIsAppointee());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWithAppointee() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .address(Address.builder()
+                        .postcode("AP1 14NT")
+                        .build()
+                    )
+                    .appointee(Appointee.builder()
+                        .name(Name.builder().firstName("Ap").lastName("Pointee").build())
+                        .build()
+                    )
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("01-02-2010")
+                    .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
+                    .build()
+                )
+                .build()
+            )
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("yes", actual.getAppointee().getIsAppointee());
     }
 
     @Test
@@ -82,9 +117,6 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .build();
 
         SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
-        assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
-        assertEquals("AP1 14NT", actual.getPostcode().getPostcode());
-        assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("no", actual.getHaveAMrn().getHaveAMrn());
         assertNull(actual.getMrnDate());
         assertEquals("no", actual.getCheckMrn().getCheckedMrn());

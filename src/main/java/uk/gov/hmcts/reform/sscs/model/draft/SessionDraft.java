@@ -30,4 +30,7 @@ public class SessionDraft {
 
     @JsonProperty("DWPIssuingOffice")
     SessionDwpIssuingOffice dwpIssuingOffice;
+
+    @JsonProperty("Appointee")
+    SessionAppointee appointee;
 }

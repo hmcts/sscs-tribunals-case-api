@@ -30,6 +30,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .checkMrn(buildCheckMrn(appeal))
             .mrnOverThirteenMonthsLate(buildMrnOverThirteenMonthsLate(appeal))
             .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
+            .appointee(buildAppointee(appeal))
             .build();
     }
 
@@ -96,5 +97,15 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         } else {
             return null;
         }
+    }
+
+    private SessionAppointee buildAppointee(Appeal appeal) {
+        if (appeal.getAppellant() == null
+            || appeal.getAppellant().getAppointee() == null
+            || appeal.getAppellant().getAppointee().getName() == null) {
+            return new SessionAppointee("no");
+        }
+
+        return new SessionAppointee("yes");
     }
 }

@@ -94,6 +94,7 @@ public class SyaControllerTest {
             .checkMrn(new SessionCheckMrn("yes"))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
+            .appointee(new SessionAppointee("no"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -111,7 +112,32 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.MRNDate.mrnDate.month").value("02"))
             .andExpect(jsonPath("$.MRNDate.mrnDate.year").value("2017"))
             .andExpect(jsonPath("$.MRNOverThirteenMonthsLate.reasonForBeingLate").value("Just forgot to do it"))
-            .andExpect(jsonPath("$.DWPIssuingOffice.pipNumber").value("1"));
+            .andExpect(jsonPath("$.DWPIssuingOffice.pipNumber").value("1"))
+            .andExpect(jsonPath("$.Appointee.isAppointee").value("no"));
+    }
+
+    @Test
+    public void givenGetDraftWithAppointeeIsCalled_shouldReturn200AndTheDraft() throws Exception {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+            .postcode(new SessionPostcodeChecker("AP1 4NT"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
+            .checkMrn(new SessionCheckMrn("yes"))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
+            .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
+            .appointee(new SessionAppointee("yes"))
+            .build();
+
+        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
+
+        mockMvc.perform(
+            get("/drafts")
+                .header("Authorization", "Bearer myToken")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.Appointee.isAppointee").value("yes"));
     }
 
     @Test
