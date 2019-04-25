@@ -64,7 +64,9 @@ import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -124,6 +126,8 @@ public class SubmitAppealServiceTest {
     private EvidenceDownloadClientApi evidenceDownloadClientApi;
     @Mock
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
+    @Mock
+    private ConvertAintoBService convertAintoBService;
 
     @Before
     public void setUp() {
@@ -159,7 +163,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
-            idamService, evidenceManagementService);
+            idamService, evidenceManagementService, convertAintoBService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -227,7 +231,12 @@ public class SubmitAppealServiceTest {
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
+    public void shouldGetADraftIfItExists() {
+        when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
+        when(convertAintoBService.convert(any(SscsCaseData.class)))
+            .thenReturn(new SessionDraft(new SessionBenefitType("PIP")));
     public void givenCaseWithMrnDetails_shouldTransformCaseDataToSessionDraft() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()

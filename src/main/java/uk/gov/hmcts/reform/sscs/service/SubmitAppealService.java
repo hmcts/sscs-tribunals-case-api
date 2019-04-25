@@ -27,6 +27,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
 import uk.gov.hmcts.reform.sscs.model.draft.*;
 
 @Service
@@ -41,6 +43,7 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
+    private final ConvertAintoBService convertAintoBService;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -49,7 +52,8 @@ public class SubmitAppealService {
                         RoboticsService roboticsService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        EvidenceManagementService evidenceManagementService) {
+                        EvidenceManagementService evidenceManagementService,
+                        ConvertAintoBService convertAintoBService) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -58,6 +62,7 @@ public class SubmitAppealService {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
+        this.convertAintoBService = convertAintoBService;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal) {
@@ -78,9 +83,12 @@ public class SubmitAppealService {
         return saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
     }
 
+    @SuppressWarnings("unchecked")
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
+            SessionDraft sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetailsList.get(0));
+            return Optional.of(sessionDraft);
             return transformCaseDataToSessionDraft(caseDetailsList.get(0));
         }
         return Optional.empty();
