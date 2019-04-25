@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -27,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @RunWith(SpringRunner.class)
@@ -75,21 +75,22 @@ public class SubmitDraftTest {
 
     @Test
     public void givenDraftDoesExist_shouldBeUpdatedInCcd() {
-        SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
-
+        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
-
         response.then()
             .statusCode(HttpStatus.OK_200)
             .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
     }
 
-    @Test
-    public void givenAnUserSaveADraftMultipleTimes_ShouldOnlyUpdateTheSameDraftForTheUser() {
+    private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
         draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+        return draftAppeal;
+    }
 
+    @Test
+    public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
+        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(HttpStatus.OK_200)
@@ -105,6 +106,28 @@ public class SubmitDraftTest {
         assertEquals("the draft updated is not the same", responseHeader, response2Header);
     }
 
+    @Test
+    public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
+        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
+        saveDraft(draftAppeal);
+        RestAssured.given()
+            .header(new Header(AUTHORIZATION, userToken))
+            .get("/drafts")
+            .then()
+            .statusCode(HttpStatus.OK_200)
+            .assertThat().body("appeal.benefitType.code", equalTo("pip benefit"));
+    }
+
+    @Test
+    public void givenGetDraftsIsCalledWithWrongCredentials_shouldReturn500Unauthorised() {
+        RestAssured.given()
+            .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
+            .get("/drafts")
+            .then()
+            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR_500);
+    }
+
+
     private Response saveDraft(SyaCaseWrapper draftAppeal) {
         return RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
@@ -112,15 +135,6 @@ public class SubmitDraftTest {
             .header(new Header(AUTHORIZATION, userToken))
             .body(SyaServiceHelper.asJsonString(draftAppeal))
             .put("/drafts");
-    }
-
-
-    private IdamTokens getIdamTokens() {
-        return IdamTokens.builder()
-            .idamOauth2Token(userToken)
-            .serviceAuthorization(idamService.generateServiceAuthorization())
-            .userId(idamService.getUserId(userToken))
-            .build();
     }
 
     public String getIdamOauth2Token(String username, String password) {

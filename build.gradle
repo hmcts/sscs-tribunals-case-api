@@ -230,11 +230,10 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'java-logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'core-case-data-store-client', version: '4.6.2'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '1.4.0_RC1_SSCS3936_APPINSIGHTS'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '0.1.4_RC1_SSCS3936_APPINSIGHTS'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '0.2.1_RC1_SSCS3936_APPINSIGHTS'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '2.0.6'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.3'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.2'
 
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 

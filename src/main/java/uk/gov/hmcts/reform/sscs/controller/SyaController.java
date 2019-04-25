@@ -9,16 +9,20 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.net.URI;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.Draft;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -53,6 +57,20 @@ public class SyaController {
         return status(HttpStatus.CREATED).build();
     }
 
+    @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)
+    @ApiResponses(value =
+            {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SscsCaseData.class),
+                @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
+                @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
+    @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<SscsCaseData> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
+        Preconditions.checkNotNull(authorisation);
+        Optional<SscsCaseData> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
+        if (!draftAppeal.isPresent()) {
+            log.info("Did not find any draft appeals for the requested user.");
+        }
+        return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
 
     @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
     @ApiResponses(value =
