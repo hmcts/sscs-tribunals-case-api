@@ -5,8 +5,4 @@ import lombok.Value;
 @Value
 public class SessionCreateAccount {
     private String createAccount;
-
-    public SessionCreateAccount() {
-        this.createAccount = "yes";
-    }
 }

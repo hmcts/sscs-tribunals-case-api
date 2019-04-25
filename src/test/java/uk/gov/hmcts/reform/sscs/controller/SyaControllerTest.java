@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.sscs.model.draft.SessionDraftTest.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,12 +24,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDateDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
@@ -87,16 +93,16 @@ public class SyaControllerTest {
 
     @Test
     public void givenGetDraftIsCalled_shouldReturn200AndTheDraft() throws Exception {
-        MrnDetails mrnDetails = TEST_MRN_DETAILS_WITH_DATE;
-        SessionDraft sessionDraft = new SessionDraft(
-            new SessionBenefitType(TEST_BENEFIT_TYPE),
-            new SessionPostcodeChecker(TEST_APPELLANT_ADDRESS),
-            new SessionCreateAccount(),
-            new SessionHaveAMrn(mrnDetails),
-            new SessionMrnDate(mrnDetails),
-            new SessionCheckMrn(mrnDetails),
-            new SessionMrnOverThirteenMonthsLate(mrnDetails)
-        );
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+            .postcode(new SessionPostcodeChecker("AP1 4NT"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
+            .checkMrn(new SessionCheckMrn("yes"))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
+            .build();
+
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
 
         mockMvc.perform(
@@ -105,7 +111,7 @@ public class SyaControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.BenefitType.benefitType").value("Personal Independence Payment (PIP)"))
-            .andExpect(jsonPath("$.PostcodeChecker.postcode").value(TEST_APPELLANT_ADDRESS.getPostcode()))
+            .andExpect(jsonPath("$.PostcodeChecker.postcode").value("AP1 4NT"))
             .andExpect(jsonPath("$.CreateAccount.createAccount").value("yes"))
             .andExpect(jsonPath("$.HaveAMRN.haveAMrn").value("yes"))
             .andExpect(jsonPath("$.MRNDate.mrnDate.day").value("01"))
