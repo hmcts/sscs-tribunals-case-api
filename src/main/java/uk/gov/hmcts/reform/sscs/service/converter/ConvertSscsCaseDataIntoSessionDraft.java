@@ -21,12 +21,13 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
 
 @Service
 public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService<SscsCaseData, SessionDraft> {
-
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
     public SessionDraft convert(SscsCaseData caseData) {
         Preconditions.checkNotNull(caseData);
+        Preconditions.checkNotNull(caseData.getAppeal());
+
         Appeal appeal = caseData.getAppeal();
         return SessionDraft.builder()
             .benefitType(buildSessionBenefitType(appeal.getBenefitType()))
@@ -47,8 +48,12 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean mrnOverThirteenMonthsLate(MrnDetails mrnDetails) {
-        LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate(), DATE_FORMATTER);
-        return mrnDate.plusMonths(13L).isBefore(LocalDate.now());
+        if (mrnDetails.getMrnDate() != null) {
+            LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate(), DATE_FORMATTER);
+            return mrnDate.plusMonths(13L).isBefore(LocalDate.now());
+        } else {
+            return false;
+        }
     }
 
     private SessionCheckMrn buildCheckMrn(Appeal appeal) {
