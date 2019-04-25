@@ -45,6 +45,7 @@ public class TyaController {
     @RequestMapping(value = "/appeals/{appealNumber}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<String> getAppeal(
             @PathVariable(value = "appealNumber") String appealNumber) {
+        log.info("Received request for appealNumber {}", appealNumber);
         return ok(tribunalsService.findAppeal(appealNumber).toString());
     }
 }
