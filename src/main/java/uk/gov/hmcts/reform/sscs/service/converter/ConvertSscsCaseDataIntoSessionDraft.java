@@ -9,15 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDateDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 
 @Service
 public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService<SscsCaseData, SessionDraft> {
@@ -37,6 +29,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .mrnDate(buildMrnDate(appeal))
             .checkMrn(buildCheckMrn(appeal))
             .mrnOverThirteenMonthsLate(buildMrnOverThirteenMonthsLate(appeal))
+            .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
             .build();
     }
 
@@ -91,4 +84,17 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionBenefitType(benefitType.getDescription() + " (" + benefitType.getCode() + ")");
     }
 
+    private SessionDwpIssuingOffice buildDwpIssuingOffice(Appeal appeal) {
+        if (appeal.getMrnDetails().getDwpIssuingOffice() != null
+            && StringUtils.isNotEmpty(appeal.getMrnDetails().getDwpIssuingOffice())
+        ) {
+            int firstBracket = appeal.getMrnDetails().getDwpIssuingOffice().indexOf("(") + 1;
+            int secondBracket = appeal.getMrnDetails().getDwpIssuingOffice().lastIndexOf(")");
+            return new SessionDwpIssuingOffice(
+                appeal.getMrnDetails().getDwpIssuingOffice().substring(firstBracket, secondBracket)
+            );
+        } else {
+            return null;
+        }
+    }
 }

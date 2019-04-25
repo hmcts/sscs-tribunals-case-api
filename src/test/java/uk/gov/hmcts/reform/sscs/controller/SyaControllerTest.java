@@ -28,15 +28,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDateDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
@@ -101,6 +93,7 @@ public class SyaControllerTest {
             .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
             .checkMrn(new SessionCheckMrn("yes"))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
+            .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -116,7 +109,9 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.HaveAMRN.haveAMrn").value("yes"))
             .andExpect(jsonPath("$.MRNDate.mrnDate.day").value("01"))
             .andExpect(jsonPath("$.MRNDate.mrnDate.month").value("02"))
-            .andExpect(jsonPath("$.MRNDate.mrnDate.year").value("2017"));
+            .andExpect(jsonPath("$.MRNDate.mrnDate.year").value("2017"))
+            .andExpect(jsonPath("$.MRNOverThirteenMonthsLate.reasonForBeingLate").value("Just forgot to do it"))
+            .andExpect(jsonPath("$.DWPIssuingOffice.pipNumber").value("1"));
     }
 
     @Test

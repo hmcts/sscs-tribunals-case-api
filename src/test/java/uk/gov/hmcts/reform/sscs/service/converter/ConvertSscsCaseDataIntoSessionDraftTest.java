@@ -38,6 +38,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .mrnDetails(MrnDetails.builder()
                     .mrnDate("01-02-2010")
                     .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
                     .build()
                 )
                 .build()
@@ -54,6 +55,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("2010", actual.getMrnDate().getMrnDateDetails().getYear());
         assertEquals("yes", actual.getCheckMrn().getCheckedMrn());
         assertEquals("Forgot to send it", actual.getMrnOverThirteenMonthsLate().getReasonForBeingLate());
+        assertEquals("1", actual.getDwpIssuingOffice().getPipNumber());
     }
 
     @Test

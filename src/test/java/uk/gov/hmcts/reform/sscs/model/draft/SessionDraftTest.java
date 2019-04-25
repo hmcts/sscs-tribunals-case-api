@@ -16,6 +16,7 @@ public class SessionDraftTest {
             .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
             .checkMrn(new SessionCheckMrn("yes"))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
+            .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
