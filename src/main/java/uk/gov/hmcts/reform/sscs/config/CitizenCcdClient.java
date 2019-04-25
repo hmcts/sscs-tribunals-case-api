@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.config;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,14 +15,14 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
-public class CitizenCcdClient {
+class CitizenCcdClient {
 
     private final CcdRequestDetails ccdRequestDetails;
     private final CoreCaseDataApi coreCaseDataApi;
 
     @Autowired
-    public CitizenCcdClient(CcdRequestDetails ccdRequestDetails,
-                            CoreCaseDataApi coreCaseDataApi) {
+    CitizenCcdClient(CcdRequestDetails ccdRequestDetails,
+                     CoreCaseDataApi coreCaseDataApi) {
         this.ccdRequestDetails = ccdRequestDetails;
         this.coreCaseDataApi = coreCaseDataApi;
     }
@@ -38,7 +37,7 @@ public class CitizenCcdClient {
             eventId);
     }
 
-    public CaseDetails submitForCitizen(IdamTokens idamTokens, CaseDataContent caseDataContent) {
+    CaseDetails submitForCitizen(IdamTokens idamTokens, CaseDataContent caseDataContent) {
         return coreCaseDataApi.submitForCitizen(
             idamTokens.getIdamOauth2Token(),
             idamTokens.getServiceAuthorization(),
@@ -53,7 +52,7 @@ public class CitizenCcdClient {
     List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("sortDirection", "desc");
-        List<CaseDetails> caseDetailsList = coreCaseDataApi.searchForCitizen(
+        return coreCaseDataApi.searchForCitizen(
             idamTokens.getIdamOauth2Token(),
             idamTokens.getServiceAuthorization(),
             idamTokens.getUserId(),
@@ -62,13 +61,6 @@ public class CitizenCcdClient {
             searchCriteria
         );
 
-        try {
-            caseDetailsList.sort(Comparator.comparing(CaseDetails::getLastModified));
-        } catch (NullPointerException e) {
-            log.warn("Found a null in the lastModified date of a draft", e);
-        }
-
-        return caseDetailsList;
     }
 
     CaseDetails submitEventForCitizen(IdamTokens idamTokens, String caseId, CaseDataContent caseDataContent) {
