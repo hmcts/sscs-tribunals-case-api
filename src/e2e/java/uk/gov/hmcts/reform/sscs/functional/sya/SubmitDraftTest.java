@@ -84,7 +84,7 @@ public class SubmitDraftTest {
 
     private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment (PIP)", "PIP"));
+        draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
         return draftAppeal;
     }
 

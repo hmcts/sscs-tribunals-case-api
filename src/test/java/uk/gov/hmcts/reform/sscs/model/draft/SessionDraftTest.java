@@ -1,27 +1,29 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
+
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.Test;
 
 public class SessionDraftTest {
 
     @Test
-    public void shouldSerializeSessionDraftAsExpected() throws JsonProcessingException {
+    public void shouldSerializeSessionDraftAsExpected() {
         SessionDraft sessionDraft = SessionDraft.builder()
             .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
-            .postcode(new SessionPostcodeChecker("AP1 4NT"))
+            .postcode(new SessionPostcodeChecker("n29ed"))
             .createAccount(new SessionCreateAccount("yes"))
             .haveAMrn(new SessionHaveAMrn("yes"))
-            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
+            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("10", "10", "1990")))
             .checkMrn(new SessionCheckMrn("yes"))
-            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        assertThatJson(SESSION_SAMPLE.getSerializedMessage())
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo(sessionDraft);
 
-        String actual = objectMapper.writeValueAsString(sessionDraft);
-        System.out.println(actual);
     }
 
 }
