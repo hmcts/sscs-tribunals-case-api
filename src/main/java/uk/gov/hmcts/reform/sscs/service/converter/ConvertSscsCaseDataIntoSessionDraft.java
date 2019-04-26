@@ -9,11 +9,19 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDateDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
 
 @Service
 public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService<SscsCaseData, SessionDraft> {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
     public SessionDraft convert(SscsCaseData caseData) {
@@ -46,9 +54,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         if (mrnDetails.getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate(), DATE_FORMATTER);
             return mrnDate.plusMonths(13L).isBefore(LocalDate.now());
-        } else {
-            return false;
         }
+        return false;
     }
 
     private SessionCheckMrn buildCheckMrn(Appeal appeal) {
@@ -59,14 +66,14 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private SessionMrnDate buildMrnDate(Appeal appeal) {
         MrnDetails mrnDetails = appeal.getMrnDetails();
         if (StringUtils.isNotBlank(mrnDetails.getMrnDate())) {
-            String day = mrnDetails.getMrnDate().substring(0, 2);
-            String month = mrnDetails.getMrnDate().substring(3, 5);
-            String year = mrnDetails.getMrnDate().substring(6, 10);
+            LocalDate mrdDetailsDate = LocalDate.parse(mrnDetails.getMrnDate());
+            String day = String.valueOf(mrdDetailsDate.getDayOfMonth());
+            String month = String.valueOf(mrdDetailsDate.getMonthValue());
+            String year = String.valueOf(mrdDetailsDate.getYear());
             SessionMrnDateDetails mrnDateDetails = new SessionMrnDateDetails(day, month, year);
             return new SessionMrnDate(mrnDateDetails);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private SessionHaveAMrn buildHaveAMrn(Appeal appeal) {
