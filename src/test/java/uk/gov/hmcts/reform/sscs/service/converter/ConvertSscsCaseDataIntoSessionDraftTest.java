@@ -89,7 +89,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
-                    .mrnDate("01-02-2010")
+                    .mrnDate("2010-02-01")
                     .mrnLateReason("Forgot to send it")
                     .dwpIssuingOffice("DWP PIP (1)")
                     .build()
