@@ -31,9 +31,9 @@
     "isAppointee": "no"
   },
   "AppellantName": {
-    "title": "Mr.",
-    "firstName": "Sample",
-    "lastName": "Test"
+    "title": "Mrs.",
+    "firstName": "Ap",
+    "lastName": "Pellant"
   },
   "AppellantDOB": {
     "date": {
@@ -47,12 +47,12 @@
   },
   "invalidPostcode": false,
   "AppellantContactDetails": {
-    "addressLine1": "Phillips Ave",
-    "townCity": "Wolverhampton",
-    "county": "Wolverhampton",
-    "postCode": "WV112HE",
+    "addressLine1": "1 Appellant Close",
+    "townCity": "Appellant-town",
+    "county": "Appellant-county",
+    "postCode": "TS1 1ST",
     "phoneNumber": "07911123456",
-    "emailAddress": "sample-test@gmail.com"
+    "emailAddress": "appellant@gmail.com"
   },
   "TextReminders": {
     "doYouWantTextMsgReminders": "yes"

@@ -95,6 +95,7 @@ public class SyaControllerTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
+            .appellantName(new SessionAppellantName("Mrs.","Ap","Pellant"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -113,7 +114,10 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.MRNDate.mrnDate.year").value("2017"))
             .andExpect(jsonPath("$.MRNOverThirteenMonthsLate.reasonForBeingLate").value("Just forgot to do it"))
             .andExpect(jsonPath("$.DWPIssuingOffice.pipNumber").value("1"))
-            .andExpect(jsonPath("$.Appointee.isAppointee").value("no"));
+            .andExpect(jsonPath("$.Appointee.isAppointee").value("no"))
+            .andExpect(jsonPath("$.AppellantName.title").value("Mrs."))
+            .andExpect(jsonPath("$.AppellantName.firstName").value("Ap"))
+            .andExpect(jsonPath("$.AppellantName.lastName").value("Pellant"));
     }
 
     @Test

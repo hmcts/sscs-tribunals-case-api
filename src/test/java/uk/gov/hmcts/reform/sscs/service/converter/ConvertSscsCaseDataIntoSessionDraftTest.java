@@ -29,6 +29,12 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                     .build()
                 )
                 .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mrs.")
+                        .firstName("Ap")
+                        .lastName("Pellant")
+                        .build()
+                    )
                     .address(Address.builder()
                         .postcode("AP1 14NT")
                         .build()
@@ -57,6 +63,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("Forgot to send it", actual.getMrnOverThirteenMonthsLate().getReasonForBeingLate());
         assertEquals("1", actual.getDwpIssuingOffice().getPipNumber());
         assertEquals("no", actual.getAppointee().getIsAppointee());
+        assertEquals("Mrs.", actual.getAppellantName().getTitle());
+        assertEquals("Ap", actual.getAppellantName().getFirstName());
+        assertEquals("Pellant", actual.getAppellantName().getLastName());
     }
 
     @Test
