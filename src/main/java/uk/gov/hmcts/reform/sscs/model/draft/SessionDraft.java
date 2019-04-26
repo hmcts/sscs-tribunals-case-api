@@ -36,4 +36,10 @@ public class SessionDraft {
 
     @JsonProperty("AppellantName")
     SessionAppellantName appellantName;
+
+    @JsonProperty("AppellantDOB")
+    SessionAppellantDOB appellantDOB;
+
+    @JsonProperty("AppellantNINO")
+    SessionAppellantNino appellantNino;
 }

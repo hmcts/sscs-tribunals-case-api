@@ -28,18 +28,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDateDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
@@ -101,12 +90,14 @@ public class SyaControllerTest {
             .postcode(new SessionPostcodeChecker("AP1 4NT"))
             .createAccount(new SessionCreateAccount("yes"))
             .haveAMrn(new SessionHaveAMrn("yes"))
-            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
+            .mrnDate(new SessionMrnDate(new SessionDate("01", "02", "2017")))
             .checkMrn(new SessionCheckMrn("yes"))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
             .appellantName(new SessionAppellantName("Mrs.","Ap","Pellant"))
+            .appellantDOB(new SessionAppellantDOB(new SessionDate("31", "12", "1998")))
+            .appellantNino(new SessionAppellantNino("AB123456C"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -128,7 +119,11 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.Appointee.isAppointee").value("no"))
             .andExpect(jsonPath("$.AppellantName.title").value("Mrs."))
             .andExpect(jsonPath("$.AppellantName.firstName").value("Ap"))
-            .andExpect(jsonPath("$.AppellantName.lastName").value("Pellant"));
+            .andExpect(jsonPath("$.AppellantName.lastName").value("Pellant"))
+            .andExpect(jsonPath("$.AppellantDOB.date.day").value("31"))
+            .andExpect(jsonPath("$.AppellantDOB.date.month").value("12"))
+            .andExpect(jsonPath("$.AppellantDOB.date.year").value("1998"))
+            .andExpect(jsonPath("$.AppellantNINO.nino").value("AB123456C"));
     }
 
     @Test
@@ -138,7 +133,7 @@ public class SyaControllerTest {
             .postcode(new SessionPostcodeChecker("AP1 4NT"))
             .createAccount(new SessionCreateAccount("yes"))
             .haveAMrn(new SessionHaveAMrn("yes"))
-            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
+            .mrnDate(new SessionMrnDate(new SessionDate("01", "02", "2017")))
             .checkMrn(new SessionCheckMrn("yes"))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))

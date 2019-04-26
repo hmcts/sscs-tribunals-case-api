@@ -15,12 +15,14 @@ public class SessionDraftTest {
             .postcode(new SessionPostcodeChecker("n29ed"))
             .createAccount(new SessionCreateAccount("yes"))
             .haveAMrn(new SessionHaveAMrn("yes"))
-            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("10", "10", "1990")))
+            .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
             .checkMrn(new SessionCheckMrn("yes"))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
             .appellantName(new SessionAppellantName("Mrs.", "Ap", "Pellant"))
+            .appellantDOB(new SessionAppellantDOB(new SessionDate("31", "12", "1998")))
+            .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
             .build();
 
         assertThatJson(SESSION_SAMPLE.getSerializedMessage())

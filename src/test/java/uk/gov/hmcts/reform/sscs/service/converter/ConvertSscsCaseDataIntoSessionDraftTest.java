@@ -35,6 +35,11 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .lastName("Pellant")
                         .build()
                     )
+                    .identity(Identity.builder()
+                        .dob("1998-12-31")
+                        .nino("SC 94 27 06 A")
+                        .build()
+                    )
                     .address(Address.builder()
                         .postcode("AP1 14NT")
                         .build()
@@ -66,6 +71,10 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("Mrs.", actual.getAppellantName().getTitle());
         assertEquals("Ap", actual.getAppellantName().getFirstName());
         assertEquals("Pellant", actual.getAppellantName().getLastName());
+        assertEquals("31", actual.getAppellantDOB().getDate().getDay());
+        assertEquals("12", actual.getAppellantDOB().getDate().getMonth());
+        assertEquals("1998", actual.getAppellantDOB().getDate().getYear());
+        assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
     }
 
     @Test
