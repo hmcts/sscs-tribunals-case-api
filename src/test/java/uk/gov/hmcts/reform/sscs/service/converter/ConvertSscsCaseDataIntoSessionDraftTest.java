@@ -41,7 +41,15 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .build()
                     )
                     .address(Address.builder()
-                        .postcode("AP1 14NT")
+                        .line1("1 Appellant Close")
+                        .town("Appellant-town")
+                        .county("Appellant-county")
+                        .postcode("TS1 1ST")
+                        .build()
+                    )
+                    .contact(Contact.builder()
+                        .mobile("07911123456")
+                        .email("appellant@gmail.com")
                         .build()
                     )
                     .build()
@@ -74,6 +82,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("12", actual.getAppellantDOB().getDate().getMonth());
         assertEquals("1998", actual.getAppellantDOB().getDate().getYear());
         assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
+        assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
+        assertEquals(null, actual.getAppellantContactDetails().getAddressLine2());
+        assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
+        assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
+        assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
+        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
+        assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
     }
 
     @Test

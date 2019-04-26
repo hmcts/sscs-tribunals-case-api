@@ -23,6 +23,17 @@ public class SessionDraftTest {
             .appellantName(new SessionAppellantName("Mrs.", "Ap", "Pellant"))
             .appellantDOB(new SessionAppellantDOB(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
+            .appellantContactDetails(
+                new SessionAppellantContactDetails(
+                    "1 Appellant Close",
+                    null,
+                    "Appellant-town",
+                    "Appellant-county",
+                    "TS1 1ST",
+                    "07911123456",
+                    "appellant@gmail.com"
+                )
+            )
             .build();
 
         assertThatJson(SESSION_SAMPLE.getSerializedMessage())

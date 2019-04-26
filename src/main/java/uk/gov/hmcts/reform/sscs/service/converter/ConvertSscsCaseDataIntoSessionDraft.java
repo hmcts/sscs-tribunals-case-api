@@ -5,10 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.draft.*;
 
 @Service
@@ -34,6 +31,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .appellantName(buildAppellantName(appeal))
             .appellantDOB(buildAppellantDob(appeal))
             .appellantNino(buildAppellantNino(appeal))
+            .appellantContactDetails(buildAppellantContactDetails(appeal))
             .build();
     }
 
@@ -147,5 +145,25 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         }
 
         return new SessionAppellantNino(appeal.getAppellant().getIdentity().getNino());
+    }
+
+    private SessionAppellantContactDetails buildAppellantContactDetails(Appeal appeal) {
+        if (appeal.getAppellant() == null
+            || (appeal.getAppellant().getAddress() == null && appeal.getAppellant().getContact() == null)) {
+            return null;
+        }
+
+        Address address = appeal.getAppellant().getAddress();
+        Contact contact = appeal.getAppellant().getContact();
+
+        return new SessionAppellantContactDetails(
+            address == null ? null : address.getLine1(),
+            address == null ? null : address.getLine2(),
+            address == null ? null : address.getTown(),
+            address == null ? null : address.getCounty(),
+            address == null ? null : address.getPostcode(),
+            contact == null ? null : contact.getMobile(),
+            contact == null ? null : contact.getEmail()
+        );
     }
 }

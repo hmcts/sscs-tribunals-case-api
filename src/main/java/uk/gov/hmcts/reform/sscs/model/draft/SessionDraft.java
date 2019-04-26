@@ -42,4 +42,7 @@ public class SessionDraft {
 
     @JsonProperty("AppellantNINO")
     SessionAppellantNino appellantNino;
+
+    @JsonProperty("AppellantContactDetails")
+    SessionAppellantContactDetails appellantContactDetails;
 }

@@ -98,6 +98,17 @@ public class SyaControllerTest {
             .appellantName(new SessionAppellantName("Mrs.","Ap","Pellant"))
             .appellantDOB(new SessionAppellantDOB(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("AB123456C"))
+            .appellantContactDetails(
+                new SessionAppellantContactDetails(
+                    "line1",
+                    "line2",
+                    "town-city",
+                    "county",
+                    "AP1 4NT",
+                    "07000000000",
+                    "appointee@test.com"
+                )
+            )
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -123,7 +134,14 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.AppellantDOB.date.day").value("31"))
             .andExpect(jsonPath("$.AppellantDOB.date.month").value("12"))
             .andExpect(jsonPath("$.AppellantDOB.date.year").value("1998"))
-            .andExpect(jsonPath("$.AppellantNINO.nino").value("AB123456C"));
+            .andExpect(jsonPath("$.AppellantNINO.nino").value("AB123456C"))
+            .andExpect(jsonPath("$.AppellantContactDetails.addressLine1").value("line1"))
+            .andExpect(jsonPath("$.AppellantContactDetails.addressLine2").value("line2"))
+            .andExpect(jsonPath("$.AppellantContactDetails.townCity").value("town-city"))
+            .andExpect(jsonPath("$.AppellantContactDetails.county").value("county"))
+            .andExpect(jsonPath("$.AppellantContactDetails.postCode").value("AP1 4NT"))
+            .andExpect(jsonPath("$.AppellantContactDetails.phoneNumber").value("07000000000"))
+            .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appointee@test.com"));
     }
 
     @Test
