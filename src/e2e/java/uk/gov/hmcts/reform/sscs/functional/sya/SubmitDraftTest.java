@@ -39,6 +39,7 @@ public class SubmitDraftTest {
     private static final String BASIC_AUTHORIZATION = "Basic ";
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String RESPONSE_TYPE = "code";
+    private static final String LOCATION_HEADER_NAME = "Location";
 
     @Value("${test-url}")
     private String testUrl;
@@ -79,12 +80,12 @@ public class SubmitDraftTest {
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
+            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
-        draftAppeal.setBenefitType(new SyaBenefitType("PIP", "pip benefit"));
+        draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
         return draftAppeal;
     }
 
@@ -94,14 +95,14 @@ public class SubmitDraftTest {
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
-        String responseHeader = response.getHeader("location");
+            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
+        String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
         response2.then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().header("location", not(isEmptyOrNullString())).log().all(true);
-        String response2Header = response.getHeader("location");
+            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
+        String response2Header = response.getHeader(LOCATION_HEADER_NAME);
 
         assertEquals("the draft updated is not the same", responseHeader, response2Header);
     }
@@ -115,7 +116,8 @@ public class SubmitDraftTest {
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().body("appeal.benefitType.code", equalTo("pip benefit"));
+            .assertThat().body("BenefitType.benefitType",
+            equalTo("Personal Independence Payment (PIP)"));
     }
 
     @Test
