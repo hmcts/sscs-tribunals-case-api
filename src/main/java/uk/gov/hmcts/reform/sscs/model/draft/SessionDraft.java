@@ -45,4 +45,7 @@ public class SessionDraft {
 
     @JsonProperty("AppellantContactDetails")
     SessionAppellantContactDetails appellantContactDetails;
+
+    @JsonProperty("TextReminders")
+    SessionTextReminders textReminders;
 }

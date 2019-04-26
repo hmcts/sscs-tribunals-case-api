@@ -34,6 +34,7 @@ public class SessionDraftTest {
                     "appellant@gmail.com"
                 )
             )
+            .textReminders(new SessionTextReminders("yes"))
             .build();
 
         assertThatJson(SESSION_SAMPLE.getSerializedMessage())

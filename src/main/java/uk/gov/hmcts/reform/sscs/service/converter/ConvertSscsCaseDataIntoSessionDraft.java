@@ -32,6 +32,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .appellantDob(buildAppellantDob(appeal))
             .appellantNino(buildAppellantNino(appeal))
             .appellantContactDetails(buildAppellantContactDetails(appeal))
+            .textReminders(buildTextReminders(caseData.getSubscriptions()))
             .build();
     }
 
@@ -165,5 +166,16 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             contact == null ? null : contact.getMobile(),
             contact == null ? null : contact.getEmail()
         );
+    }
+
+    private SessionTextReminders buildTextReminders(Subscriptions subscriptions) {
+        if (subscriptions == null
+            || subscriptions.getAppellantSubscription() == null
+            || subscriptions.getAppellantSubscription().getSubscribeSms() == null
+            || "No".equalsIgnoreCase(subscriptions.getAppellantSubscription().getSubscribeSms())) {
+            return new SessionTextReminders("no");
+        }
+
+        return new SessionTextReminders("yes");
     }
 }

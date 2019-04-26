@@ -62,6 +62,16 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(Subscription.builder()
+                    .subscribeEmail("Yes")
+                    .email("appellant@gmail.com")
+                    .subscribeSms("Yes")
+                    .mobile("07911123456")
+                    .build()
+                )
+                .build()
+            )
             .build();
 
         SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
@@ -89,6 +99,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+        assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
     }
 
     @Test
