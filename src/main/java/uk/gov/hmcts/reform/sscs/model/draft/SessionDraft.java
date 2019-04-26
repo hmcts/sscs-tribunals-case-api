@@ -48,4 +48,7 @@ public class SessionDraft {
 
     @JsonProperty("TextReminders")
     SessionTextReminders textReminders;
+
+    @JsonProperty("SendToNumber")
+    SessionSendToNumber sendToNumber;
 }

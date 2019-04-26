@@ -33,6 +33,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .appellantNino(buildAppellantNino(appeal))
             .appellantContactDetails(buildAppellantContactDetails(appeal))
             .textReminders(buildTextReminders(caseData.getSubscriptions()))
+            .sendToNumber(buildSendToNumber(caseData))
             .build();
     }
 
@@ -177,5 +178,28 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         }
 
         return new SessionTextReminders("yes");
+    }
+
+    private SessionSendToNumber buildSendToNumber(SscsCaseData caseData) {
+        if (caseData == null
+            || caseData.getAppeal() == null
+            || caseData.getAppeal().getAppellant() == null
+            || caseData.getAppeal().getAppellant().getContact() == null) {
+            return new SessionSendToNumber("no");
+        }
+
+        Subscriptions subscriptions = caseData.getSubscriptions();
+        if (subscriptions == null
+            || subscriptions.getAppellantSubscription() == null
+            || subscriptions.getAppellantSubscription().getSubscribeSms() == null
+            || "No".equalsIgnoreCase(subscriptions.getAppellantSubscription().getSubscribeSms())) {
+            return new SessionSendToNumber("no");
+        }
+
+
+        Contact contact = caseData.getAppeal().getAppellant().getContact();
+        String result = contact.getMobile().equals(subscriptions.getAppellantSubscription().getMobile()) ? "yes" : "no";
+
+        return new SessionSendToNumber(result);
     }
 }

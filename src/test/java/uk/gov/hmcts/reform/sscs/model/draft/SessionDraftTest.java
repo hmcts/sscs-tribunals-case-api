@@ -35,6 +35,7 @@ public class SessionDraftTest {
                 )
             )
             .textReminders(new SessionTextReminders("yes"))
+            .sendToNumber(new SessionSendToNumber("yes"))
             .build();
 
         assertThatJson(SESSION_SAMPLE.getSerializedMessage())

@@ -110,6 +110,7 @@ public class SyaControllerTest {
                 )
             )
             .textReminders(new SessionTextReminders("yes"))
+            .sendToNumber(new SessionSendToNumber("yes"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -143,7 +144,8 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.AppellantContactDetails.postCode").value("AP1 4NT"))
             .andExpect(jsonPath("$.AppellantContactDetails.phoneNumber").value("07000000000"))
             .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appointee@test.com"))
-            .andExpect(jsonPath("$.TextReminders.doYouWantTextMsgReminders").value("yes"));
+            .andExpect(jsonPath("$.TextReminders.doYouWantTextMsgReminders").value("yes"))
+            .andExpect(jsonPath("$.SendToNumber.useSameNumber").value("yes"));
     }
 
     @Test

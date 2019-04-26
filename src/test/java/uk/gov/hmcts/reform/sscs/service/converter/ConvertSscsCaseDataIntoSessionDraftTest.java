@@ -100,6 +100,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
+        assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
     }
 
     @Test
