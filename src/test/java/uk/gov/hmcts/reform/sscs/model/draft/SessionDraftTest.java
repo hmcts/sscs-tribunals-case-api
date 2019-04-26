@@ -18,7 +18,6 @@ public class SessionDraftTest {
             .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("10", "10", "1990")))
             .checkMrn(new SessionCheckMrn("yes"))
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
-            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
             .build();

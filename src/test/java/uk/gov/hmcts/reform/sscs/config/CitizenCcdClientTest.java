@@ -1,12 +1,12 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
-import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -68,7 +68,7 @@ public class CitizenCcdClientTest {
         citizenCcdClient.searchForCitizen(idamTokens);
 
         verify(coreCaseDataApi)
-                .searchForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), eq(new HashMap<>()));
+                .searchForCitizen(eq("token"), eq("s2s"), eq("1"), eq("SSCS"), eq("Benefit"), anyMap());
 
     }
 }
