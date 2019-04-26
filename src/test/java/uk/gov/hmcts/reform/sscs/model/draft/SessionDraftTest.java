@@ -21,7 +21,7 @@ public class SessionDraftTest {
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
             .appellantName(new SessionAppellantName("Mrs.", "Ap", "Pellant"))
-            .appellantDOB(new SessionAppellantDOB(new SessionDate("31", "12", "1998")))
+            .appellantDob(new SessionAppellantDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
             .appellantContactDetails(
                 new SessionAppellantContactDetails(

@@ -78,9 +78,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("Mrs.", actual.getAppellantName().getTitle());
         assertEquals("Ap", actual.getAppellantName().getFirstName());
         assertEquals("Pellant", actual.getAppellantName().getLastName());
-        assertEquals("31", actual.getAppellantDOB().getDate().getDay());
-        assertEquals("12", actual.getAppellantDOB().getDate().getMonth());
-        assertEquals("1998", actual.getAppellantDOB().getDate().getYear());
+        assertEquals("31", actual.getAppellantDob().getDate().getDay());
+        assertEquals("12", actual.getAppellantDob().getDate().getMonth());
+        assertEquals("1998", actual.getAppellantDob().getDate().getYear());
         assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
         assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
         assertEquals(null, actual.getAppellantContactDetails().getAddressLine2());

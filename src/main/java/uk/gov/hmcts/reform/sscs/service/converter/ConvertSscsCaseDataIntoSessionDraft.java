@@ -29,7 +29,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
             .appointee(buildAppointee(appeal))
             .appellantName(buildAppellantName(appeal))
-            .appellantDOB(buildAppellantDob(appeal))
+            .appellantDob(buildAppellantDob(appeal))
             .appellantNino(buildAppellantNino(appeal))
             .appellantContactDetails(buildAppellantContactDetails(appeal))
             .build();
@@ -122,7 +122,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         );
     }
 
-    private SessionAppellantDOB buildAppellantDob(Appeal appeal) {
+    private SessionAppellantDob buildAppellantDob(Appeal appeal) {
         if (appeal.getAppellant() == null
             || appeal.getAppellant().getIdentity() == null
             || appeal.getAppellant().getIdentity().getDob() == null) {
@@ -135,7 +135,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         String year = String.valueOf(mrdDetailsDate.getYear());
         SessionDate mrnDateDetails = new SessionDate(day, month, year);
 
-        return new SessionAppellantDOB(mrnDateDetails);
+        return new SessionAppellantDob(mrnDateDetails);
     }
 
     private SessionAppellantNino buildAppellantNino(Appeal appeal) {

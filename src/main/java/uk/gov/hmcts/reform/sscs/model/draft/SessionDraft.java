@@ -38,7 +38,7 @@ public class SessionDraft {
     SessionAppellantName appellantName;
 
     @JsonProperty("AppellantDOB")
-    SessionAppellantDOB appellantDOB;
+    SessionAppellantDob appellantDob;
 
     @JsonProperty("AppellantNINO")
     SessionAppellantNino appellantNino;
