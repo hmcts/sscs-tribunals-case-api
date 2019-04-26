@@ -58,7 +58,6 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
         SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
-        assertEquals("AP1 14NT", actual.getPostcode().getPostcode());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
         assertEquals("1", actual.getMrnDate().getMrnDateDetails().getDay());
