@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
@@ -36,20 +35,11 @@ public class TribunalsService {
     }
 
     public ObjectNode findAppeal(String appealNumber) {
-        log.info("In findAppeal method for appeal {}", appealNumber);
-        IdamTokens tokens = idamService.getIdamTokens();
-
-        log.info("Obtained Idam Tokens");
-
-        SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(appealNumber, tokens);
-
-        log.info("Found case {} by appeal number {} ", caseByAppealNumber, appealNumber);
-
+        SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(appealNumber, idamService.getIdamTokens());
         if (caseByAppealNumber == null) {
             log.info("Appeal does not exist for appeal number: " + appealNumber);
             throw new AppealNotFoundException(appealNumber);
         }
-        log.info("In findAppeal method for appealk {}", appealNumber);
 
         return trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()), caseByAppealNumber.getId());
     }
