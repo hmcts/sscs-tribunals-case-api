@@ -64,7 +64,21 @@
 
   },
   "Representative": {
-    "hasRepresentative": "no"
+    "hasRepresentative": "yes"
+  },
+  "RepresentativeDetails": {
+    "name": {
+      "title": "Mr.",
+      "first": "Re",
+      "last": "Presentative"
+    },
+    "addressLine1": "rep-line1",
+    "addressLine2": "rep-line2",
+    "townCity": "rep-town-city",
+    "county": "rep-county",
+    "postCode": "RE7 7ES",
+    "emailAddress": "representative@gmail.com",
+    "phoneNumber": "07222222222"
   },
   "ReasonForAppealing": {
     "items": [

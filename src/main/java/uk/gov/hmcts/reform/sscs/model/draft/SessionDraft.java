@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Value;
 
 @Value
 @Builder
+@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 public class SessionDraft {
     @JsonProperty("BenefitType")
     SessionBenefitType benefitType;
@@ -51,4 +53,14 @@ public class SessionDraft {
 
     @JsonProperty("SendToNumber")
     SessionSendToNumber sendToNumber;
+
+    // Reintroduce when we know the contents
+    //    @JsonProperty("SmsConfirmation")
+    //    SessionSmsConfirmation smsConfirmation;
+
+    @JsonProperty("Representative")
+    SessionRepresentative representative;
+
+    @JsonProperty("RepresentativeDetails")
+    SessionRepresentativeDetails representativeDetails;
 }

@@ -34,6 +34,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .appellantContactDetails(buildAppellantContactDetails(appeal))
             .textReminders(buildTextReminders(caseData.getSubscriptions()))
             .sendToNumber(buildSendToNumber(caseData))
+            .representative(buildRepresentative(appeal))
+            .representativeDetails(buildRepresentativeDetails(appeal))
             .build();
     }
 
@@ -201,5 +203,38 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         String result = contact.getMobile().equals(subscriptions.getAppellantSubscription().getMobile()) ? "yes" : "no";
 
         return new SessionSendToNumber(result);
+    }
+
+    private SessionRepresentative buildRepresentative(Appeal appeal) {
+        if (appeal == null
+            || appeal.getRep() == null
+            || appeal.getRep().getName() == null) {
+            return new SessionRepresentative("no");
+        }
+
+        return new SessionRepresentative("yes");
+    }
+
+    private SessionRepresentativeDetails buildRepresentativeDetails(Appeal appeal) {
+        if (appeal == null
+            || appeal.getRep() == null
+            || appeal.getRep().getName() == null) {
+            return null;
+        }
+
+        return new SessionRepresentativeDetails(
+            new SessionRepName(
+                appeal.getRep().getName().getTitle(),
+                appeal.getRep().getName().getFirstName(),
+                appeal.getRep().getName().getLastName()
+            ),
+            appeal.getRep().getAddress().getLine1(),
+            appeal.getRep().getAddress().getLine2(),
+            appeal.getRep().getAddress().getTown(),
+            appeal.getRep().getAddress().getCounty(),
+            appeal.getRep().getAddress().getPostcode(),
+            appeal.getRep().getContact().getMobile(),
+            appeal.getRep().getContact().getEmail()
+        );
     }
 }

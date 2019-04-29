@@ -111,6 +111,7 @@ public class SyaControllerTest {
             )
             .textReminders(new SessionTextReminders("yes"))
             .sendToNumber(new SessionSendToNumber("yes"))
+            .representative(new SessionRepresentative("no"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -145,7 +146,103 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.AppellantContactDetails.phoneNumber").value("07000000000"))
             .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appointee@test.com"))
             .andExpect(jsonPath("$.TextReminders.doYouWantTextMsgReminders").value("yes"))
-            .andExpect(jsonPath("$.SendToNumber.useSameNumber").value("yes"));
+            .andExpect(jsonPath("$.SendToNumber.useSameNumber").value("yes"))
+            .andExpect(jsonPath("$.Representative.hasRepresentative").value("no"))
+        ;
+    }
+
+    @Test
+    public void givenGetDraftWithRepIsCalled_shouldReturn200AndTheDraft() throws Exception {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+            .postcode(new SessionPostcodeChecker("AP1 4NT"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionDate("01", "02", "2017")))
+            .checkMrn(new SessionCheckMrn("yes"))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
+            .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
+            .appointee(new SessionAppointee("no"))
+            .appellantName(new SessionAppellantName("Mrs.","Ap","Pellant"))
+            .appellantDob(new SessionAppellantDob(new SessionDate("31", "12", "1998")))
+            .appellantNino(new SessionAppellantNino("AB123456C"))
+            .appellantContactDetails(
+                new SessionAppellantContactDetails(
+                    "line1",
+                    "line2",
+                    "town-city",
+                    "county",
+                    "AP1 4NT",
+                    "07000000000",
+                    "appointee@test.com"
+                )
+            )
+            .textReminders(new SessionTextReminders("yes"))
+            .sendToNumber(new SessionSendToNumber("yes"))
+            .representative(new SessionRepresentative("yes"))
+            .representativeDetails(
+                new SessionRepresentativeDetails(
+                    new SessionRepName(
+                        "Mr.",
+                        "Re",
+                        "Presentative"
+                    ),
+                    "rep-line1",
+                    "rep-line2",
+                    "rep-town-city",
+                    "rep-county",
+                    "RE7 7ES",
+                    "07222222222",
+                    "representative@test.com"
+                )
+            )
+            .build();
+
+        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
+
+        mockMvc.perform(
+            get("/drafts")
+                .header("Authorization", "Bearer myToken")
+                .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.BenefitType.benefitType").value("Personal Independence Payment (PIP)"))
+            .andExpect(jsonPath("$.PostcodeChecker.postcode").value("AP1 4NT"))
+            .andExpect(jsonPath("$.CreateAccount.createAccount").value("yes"))
+            .andExpect(jsonPath("$.HaveAMRN.haveAMRN").value("yes"))
+            .andExpect(jsonPath("$.MRNDate.mrnDate.day").value("01"))
+            .andExpect(jsonPath("$.MRNDate.mrnDate.month").value("02"))
+            .andExpect(jsonPath("$.MRNDate.mrnDate.year").value("2017"))
+            .andExpect(jsonPath("$.MRNOverThirteenMonthsLate.reasonForBeingLate").value("Just forgot to do it"))
+            .andExpect(jsonPath("$.DWPIssuingOffice.pipNumber").value("1"))
+            .andExpect(jsonPath("$.Appointee.isAppointee").value("no"))
+            .andExpect(jsonPath("$.AppellantName.title").value("Mrs."))
+            .andExpect(jsonPath("$.AppellantName.firstName").value("Ap"))
+            .andExpect(jsonPath("$.AppellantName.lastName").value("Pellant"))
+            .andExpect(jsonPath("$.AppellantDOB.date.day").value("31"))
+            .andExpect(jsonPath("$.AppellantDOB.date.month").value("12"))
+            .andExpect(jsonPath("$.AppellantDOB.date.year").value("1998"))
+            .andExpect(jsonPath("$.AppellantNINO.nino").value("AB123456C"))
+            .andExpect(jsonPath("$.AppellantContactDetails.addressLine1").value("line1"))
+            .andExpect(jsonPath("$.AppellantContactDetails.addressLine2").value("line2"))
+            .andExpect(jsonPath("$.AppellantContactDetails.townCity").value("town-city"))
+            .andExpect(jsonPath("$.AppellantContactDetails.county").value("county"))
+            .andExpect(jsonPath("$.AppellantContactDetails.postCode").value("AP1 4NT"))
+            .andExpect(jsonPath("$.AppellantContactDetails.phoneNumber").value("07000000000"))
+            .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appointee@test.com"))
+            .andExpect(jsonPath("$.TextReminders.doYouWantTextMsgReminders").value("yes"))
+            .andExpect(jsonPath("$.SendToNumber.useSameNumber").value("yes"))
+            .andExpect(jsonPath("$.Representative.hasRepresentative").value("yes"))
+            .andExpect(jsonPath("$.RepresentativeDetails.name.title").value("Mr."))
+            .andExpect(jsonPath("$.RepresentativeDetails.name.first").value("Re"))
+            .andExpect(jsonPath("$.RepresentativeDetails.name.last").value("Presentative"))
+            .andExpect(jsonPath("$.RepresentativeDetails.addressLine1").value("rep-line1"))
+            .andExpect(jsonPath("$.RepresentativeDetails.addressLine2").value("rep-line2"))
+            .andExpect(jsonPath("$.RepresentativeDetails.townCity").value("rep-town-city"))
+            .andExpect(jsonPath("$.RepresentativeDetails.county").value("rep-county"))
+            .andExpect(jsonPath("$.RepresentativeDetails.postCode").value("RE7 7ES"))
+            .andExpect(jsonPath("$.RepresentativeDetails.phoneNumber").value("07222222222"))
+            .andExpect(jsonPath("$.RepresentativeDetails.emailAddress").value("representative@test.com"))
+        ;
     }
 
     @Test
