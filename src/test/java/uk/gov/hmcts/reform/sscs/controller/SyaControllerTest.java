@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -15,6 +16,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Optional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -112,6 +114,19 @@ public class SyaControllerTest {
             .textReminders(new SessionTextReminders("yes"))
             .sendToNumber(new SessionSendToNumber("yes"))
             .representative(new SessionRepresentative("no"))
+            .reasonForAppealing(
+                new SessionReasonForAppealing(
+                    Collections.singletonList(
+                        new SessionReasonForAppealingItem(
+                            "Underpayment",
+                            "I think I should get more")
+                    )
+                )
+            )
+            .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
+            .evidenceProvide(new SessionEvidenceProvide("no"))
+            .theHearing(new SessionTheHearing("yes"))
+            .hearingSupport(new SessionHearingSupport("yes"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -148,6 +163,13 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.TextReminders.doYouWantTextMsgReminders").value("yes"))
             .andExpect(jsonPath("$.SendToNumber.useSameNumber").value("yes"))
             .andExpect(jsonPath("$.Representative.hasRepresentative").value("no"))
+            .andExpect(jsonPath("$.ReasonForAppealing.items", hasSize(1)))
+            .andExpect(jsonPath("$.ReasonForAppealing.items[0].whatYouDisagreeWith").value("Underpayment"))
+            .andExpect(jsonPath("$.ReasonForAppealing.items[0].reasonForAppealing").value("I think I should get more"))
+            .andExpect(jsonPath("$.OtherReasonForAppealing.otherReasonForAppealing").value("I can't think of anything else"))
+            .andExpect(jsonPath("$.EvidenceProvide.evidenceProvide").value("no"))
+            .andExpect(jsonPath("$.TheHearing.attendHearing").value("yes"))
+            .andExpect(jsonPath("$.HearingSupport.arrangements").value("yes"))
         ;
     }
 

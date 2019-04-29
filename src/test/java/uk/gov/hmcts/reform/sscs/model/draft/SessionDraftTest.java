@@ -4,6 +4,7 @@ import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_REP;
 
+import java.util.Collections;
 import net.javacrumbs.jsonunit.core.Option;
 import org.junit.Test;
 
@@ -38,6 +39,19 @@ public class SessionDraftTest {
             .textReminders(new SessionTextReminders("yes"))
             .sendToNumber(new SessionSendToNumber("yes"))
             .representative(new SessionRepresentative("no"))
+            .reasonForAppealing(
+                new SessionReasonForAppealing(
+                    Collections.singletonList(
+                        new SessionReasonForAppealingItem(
+                            "Underpayment",
+                            "I think I should get more")
+                    )
+                )
+            )
+            .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
+            .evidenceProvide(new SessionEvidenceProvide("no"))
+            .theHearing(new SessionTheHearing("yes"))
+            .hearingSupport(new SessionHearingSupport("yes"))
             .build();
 
         assertThatJson(SESSION_SAMPLE.getSerializedMessage())

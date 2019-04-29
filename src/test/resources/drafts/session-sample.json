@@ -69,13 +69,13 @@
   "ReasonForAppealing": {
     "items": [
       {
-        "whatYouDisagreeWith": "disagree with",
-        "reasonForAppealing": "disagree with disagree with"
+        "whatYouDisagreeWith": "Underpayment",
+        "reasonForAppealing": "I think I should get more"
       }
     ]
   },
   "OtherReasonForAppealing": {
-    "otherReasonForAppealing": "disagree with disagree with"
+    "otherReasonForAppealing": "I can't think of anything else"
   },
   "EvidenceProvide": {
     "evidenceProvide": "no"

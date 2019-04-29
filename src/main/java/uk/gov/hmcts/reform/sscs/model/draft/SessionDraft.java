@@ -63,4 +63,19 @@ public class SessionDraft {
 
     @JsonProperty("RepresentativeDetails")
     SessionRepresentativeDetails representativeDetails;
+
+    @JsonProperty("ReasonForAppealing")
+    SessionReasonForAppealing reasonForAppealing;
+
+    @JsonProperty("OtherReasonForAppealing")
+    SessionOtherReasonForAppealing otherReasonForAppealing;
+
+    @JsonProperty("EvidenceProvide")
+    SessionEvidenceProvide evidenceProvide;
+
+    @JsonProperty("TheHearing")
+    SessionTheHearing theHearing;
+
+    @JsonProperty("HearingSupport")
+    SessionHearingSupport hearingSupport;
 }

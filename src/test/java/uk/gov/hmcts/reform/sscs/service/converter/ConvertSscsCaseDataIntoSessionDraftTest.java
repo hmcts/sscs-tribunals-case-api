@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.converter;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -60,6 +61,28 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                     .dwpIssuingOffice("DWP PIP (1)")
                     .build()
                 )
+                .appealReasons(
+                    AppealReasons.builder()
+                        .reasons(
+                            Collections.singletonList(
+                                AppealReason.builder()
+                                    .value(AppealReasonDetails.builder()
+                                        .reason("Underpayment")
+                                        .description("I think I should get more")
+                                        .build()
+                                    )
+                                    .build()
+                            )
+                        )
+                        .otherReasons("I can't think of anything else")
+                        .build()
+                )
+                .hearingOptions(
+                    HearingOptions.builder()
+                        .wantsToAttend("yes")
+                        .wantsSupport("yes")
+                        .build()
+                )
                 .build()
             )
             .subscriptions(Subscriptions.builder()
@@ -72,6 +95,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 )
                 .build()
             )
+            .evidencePresent("no")
             .build();
 
         SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
@@ -102,7 +126,18 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
         assertEquals("no", actual.getRepresentative().getHasRepresentative());
+        assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
+        assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
+        assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
+        assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
+        assertEquals("yes", actual.getTheHearing().getAttendHearing());
+        assertEquals("yes", actual.getHearingSupport().getArrangements());
         assertNull(actual.getRepresentativeDetails());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWithEvidence() {
+        // TODO
     }
 
     @Test

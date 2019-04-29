@@ -3,6 +3,9 @@ package uk.gov.hmcts.reform.sscs.service.converter;
 import com.google.common.base.Preconditions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -36,6 +39,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .sendToNumber(buildSendToNumber(caseData))
             .representative(buildRepresentative(appeal))
             .representativeDetails(buildRepresentativeDetails(appeal))
+            .reasonForAppealing(buildReasonForAppealing(appeal))
+            .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
+            .evidenceProvide(buildEvidenceProvide(caseData))
+            .theHearing(buildTheHearing(appeal))
+            .hearingSupport(buildHearingSupport(appeal))
             .build();
     }
 
@@ -236,5 +244,70 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             appeal.getRep().getContact().getMobile(),
             appeal.getRep().getContact().getEmail()
         );
+    }
+
+    private SessionReasonForAppealing buildReasonForAppealing(Appeal appeal) {
+        if (appeal == null
+            || appeal.getAppealReasons() == null) {
+            return null;
+        }
+
+        return new SessionReasonForAppealing(buildReasonForAppealingItems(appeal.getAppealReasons().getReasons()));
+    }
+
+    private List<SessionReasonForAppealingItem> buildReasonForAppealingItems(List<AppealReason> appealReasons) {
+        if (appealReasons == null
+            || appealReasons.size() == 0) {
+            return null;
+        }
+
+        List<SessionReasonForAppealingItem> items = new ArrayList<>();
+        for (AppealReason appealReason : appealReasons) {
+            items.add(
+                new SessionReasonForAppealingItem(
+                    appealReason.getValue().getReason(),
+                    appealReason.getValue().getDescription()
+                )
+            );
+        }
+
+        return items;
+    }
+
+    private SessionOtherReasonForAppealing buildOtherReasonForAppealing(Appeal appeal) {
+        if (appeal == null
+            || appeal.getAppealReasons() == null) {
+            return null;
+        }
+
+        return new SessionOtherReasonForAppealing(appeal.getAppealReasons().getOtherReasons());
+    }
+
+    private SessionEvidenceProvide buildEvidenceProvide(SscsCaseData caseData) {
+        if (caseData == null) {
+            return new SessionEvidenceProvide("no");
+        }
+
+        return new SessionEvidenceProvide(caseData.getEvidencePresent());
+    }
+
+    private SessionTheHearing buildTheHearing(Appeal appeal) {
+        if (appeal == null
+            || appeal.getHearingOptions() == null
+        ) {
+            return new SessionTheHearing("no");
+        }
+
+        return new SessionTheHearing(appeal.getHearingOptions().getWantsToAttend());
+    }
+
+    private SessionHearingSupport buildHearingSupport(Appeal appeal) {
+        if (appeal == null
+            || appeal.getHearingOptions() == null
+        ) {
+            return new SessionHearingSupport("no");
+        }
+
+        return new SessionHearingSupport(appeal.getHearingOptions().getWantsSupport());
     }
 }
