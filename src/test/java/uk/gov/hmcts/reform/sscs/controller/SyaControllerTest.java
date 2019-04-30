@@ -24,11 +24,19 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDateDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
@@ -85,15 +93,30 @@ public class SyaControllerTest {
 
     @Test
     public void givenGetDraftIsCalled_shouldReturn200AndTheDraft() throws Exception {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().caseReference("123").build();
-        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sscsCaseData));
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+            .postcode(new SessionPostcodeChecker("AP1 4NT"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionMrnDateDetails("01", "02", "2017")))
+            .checkMrn(new SessionCheckMrn("yes"))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
+            .build();
+
+        when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
 
         mockMvc.perform(
             get("/drafts")
                 .header("Authorization", "Bearer myToken")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.caseReference").value("123"));
+            .andExpect(jsonPath("$.BenefitType.benefitType").value("Personal Independence Payment (PIP)"))
+            .andExpect(jsonPath("$.PostcodeChecker.postcode").value("AP1 4NT"))
+            .andExpect(jsonPath("$.CreateAccount.createAccount").value("yes"))
+            .andExpect(jsonPath("$.HaveAMRN.haveAMRN").value("yes"))
+            .andExpect(jsonPath("$.MRNDate.mrnDate.day").value("01"))
+            .andExpect(jsonPath("$.MRNDate.mrnDate.month").value("02"))
+            .andExpect(jsonPath("$.MRNDate.mrnDate.year").value("2017"));
     }
 
     @Test
