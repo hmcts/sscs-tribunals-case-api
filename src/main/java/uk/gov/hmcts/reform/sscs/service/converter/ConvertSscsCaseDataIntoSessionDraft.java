@@ -31,7 +31,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         Appeal appeal = caseData.getAppeal();
         return SessionDraft.builder()
             .benefitType(buildSessionBenefitType(appeal.getBenefitType()))
-            .postcode(buildSessionPostcode(appeal))
+            .postcode(buildSessionPostcode())
             .createAccount(buildSessionCreateAccount())
             .haveAMrn(buildHaveAMrn(appeal))
             .mrnDate(buildMrnDate(appeal))
@@ -82,8 +82,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionCreateAccount("yes");
     }
 
-    private SessionPostcodeChecker buildSessionPostcode(Appeal appeal) {
-        return new SessionPostcodeChecker(appeal.getAppellant().getAddress().getPostcode());
+    private SessionPostcodeChecker buildSessionPostcode() {
+        return new SessionPostcodeChecker("n29ed");
     }
 
     private SessionBenefitType buildSessionBenefitType(BenefitType benefitType) {
