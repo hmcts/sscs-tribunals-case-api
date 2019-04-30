@@ -64,18 +64,32 @@
 
   },
   "Representative": {
-    "hasRepresentative": "no"
+    "hasRepresentative": "yes"
+  },
+  "RepresentativeDetails": {
+    "name": {
+      "title": "Mr.",
+      "first": "Re",
+      "last": "Presentative"
+    },
+    "addressLine1": "rep-line1",
+    "addressLine2": "rep-line2",
+    "townCity": "rep-town-city",
+    "county": "rep-county",
+    "postCode": "RE7 7ES",
+    "emailAddress": "representative@gmail.com",
+    "phoneNumber": "07222222222"
   },
   "ReasonForAppealing": {
     "items": [
       {
-        "whatYouDisagreeWith": "Underpayment",
-        "reasonForAppealing": "I think I should get more"
+        "whatYouDisagreeWith": "disagree with",
+        "reasonForAppealing": "disagree with disagree with"
       }
     ]
   },
   "OtherReasonForAppealing": {
-    "otherReasonForAppealing": "I can't think of anything else"
+    "otherReasonForAppealing": "disagree with disagree with"
   },
   "EvidenceProvide": {
     "evidenceProvide": "no"
@@ -94,7 +108,7 @@
       },
       "signLanguage": {
         "requested": true,
-        "language": "British Sign Language (BSL)"
+        "language": "American Sign Language (ASL)"
       },
       "anythingElse": {
         "requested": true,

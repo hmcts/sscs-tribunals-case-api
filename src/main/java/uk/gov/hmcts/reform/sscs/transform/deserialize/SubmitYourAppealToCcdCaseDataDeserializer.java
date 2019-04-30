@@ -156,6 +156,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return null == syaCaseWrapper.getMrn();
     }
 
+    private static boolean mrnIsNotProvided(SyaCaseWrapper syaCaseWrapper) {
+        if (mrnIsNull(syaCaseWrapper)) {
+            return true;
+        }
+
+        if ("DWP PIP (undefined)".equalsIgnoreCase(syaCaseWrapper.getMrn().getDwpIssuingOffice())) {
+            return true;
+        }
+
+        return false;
+    }
+
     private static String getReasonForBeingLate(SyaCaseWrapper syaCaseWrapper) {
         if (mrnIsNull(syaCaseWrapper)) {
             return null;
@@ -164,8 +176,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
+        String value = mrnIsNotProvided(syaCaseWrapper) ? null : syaCaseWrapper.getMrn().getDwpIssuingOffice();
         return Norm.dwpIssuingOffice(
-                mrnIsNull(syaCaseWrapper) ? null : syaCaseWrapper.getMrn().getDwpIssuingOffice());
+                value);
     }
 
     private static String getMrnDate(SyaCaseWrapper syaCaseWrapper) {
@@ -204,9 +217,16 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         Identity identity = Identity.builder().build();
         if (null != syaAppellant) {
             identity = identity.toBuilder()
-                    .dob(syaAppellant.getDob().toString())
+                    .dob(syaAppellant.getDob() == null ? null : syaAppellant.getDob().toString())
                     .nino(syaAppellant.getNino())
                     .build();
+        }
+
+        String isAppointee = null;
+        if (syaCaseWrapper.getIsAppointee() != null && syaCaseWrapper.getIsAppointee()) {
+            isAppointee = "Yes";
+        } else {
+            isAppointee = "No";
         }
 
         Appointee appointee = getAppointee(syaCaseWrapper);
@@ -232,6 +252,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .address(address)
                 .contact(appointee == null ? contact : Contact.builder().build())
                 .identity(identity)
+                .isAppointee(isAppointee)
                 .appointee(appointee)
                 .isAddressSameAsAppointee(useSameAddress)
                 .build();
@@ -255,31 +276,39 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         SyaAppointee syaAppointee = syaCaseWrapper.getAppointee();
 
         if (null != syaAppointee) {
-            Name name = Name.builder()
-                    .title(syaAppointee.getTitle())
-                    .firstName(syaAppointee.getFirstName())
-                    .lastName(syaAppointee.getLastName())
-                    .build();
-
-            Address address = Address.builder()
+            Address address = null;
+            if (null != syaAppointee.getContactDetails()) {
+                address = Address.builder()
                     .line1(syaAppointee.getContactDetails().getAddressLine1())
                     .line2(syaAppointee.getContactDetails().getAddressLine2())
                     .town(syaAppointee.getContactDetails().getTownCity())
                     .county(syaAppointee.getContactDetails().getCounty())
                     .postcode(syaAppointee.getContactDetails().getPostCode())
                     .build();
+            }
 
-            Contact contact = Contact.builder()
+            Contact contact = null;
+            if (null != syaAppointee.getContactDetails()) {
+                contact = Contact.builder()
                     .email(syaAppointee.getContactDetails().getEmailAddress())
                     .mobile(getPhoneNumberWithOutSpaces(syaAppointee.getContactDetails().getPhoneNumber()))
                     .build();
+            }
 
-            Identity identity = Identity.builder()
+            Identity identity = null;
+            if (null != syaAppointee.getDob()) {
+                identity = Identity.builder()
                     .dob(syaAppointee.getDob().toString())
                     .build();
+            }
 
             return Appointee.builder()
-                    .name(name)
+                    .name(Name.builder()
+                        .title(syaAppointee.getTitle())
+                        .firstName(syaAppointee.getFirstName())
+                        .lastName(syaAppointee.getLastName())
+                        .build()
+                    )
                     .address(address)
                     .contact(contact)
                     .identity(identity)

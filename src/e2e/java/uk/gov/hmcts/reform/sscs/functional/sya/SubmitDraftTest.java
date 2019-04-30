@@ -116,8 +116,7 @@ public class SubmitDraftTest {
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.OK_200)
-            .assertThat().body("BenefitType.benefitType",
-            equalTo("Personal Independence Payment (PIP)"));
+            .assertThat().body("BenefitType.benefitType", equalTo("Personal Independence Payment (PIP)"));
     }
 
     @Test
