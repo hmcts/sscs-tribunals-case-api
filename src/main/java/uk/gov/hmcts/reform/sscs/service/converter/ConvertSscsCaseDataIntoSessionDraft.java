@@ -231,9 +231,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionRepresentativeDetails buildRepresentativeDetails(Appeal appeal) {
+        SessionRepresentative sessionRepresentative = buildRepresentative(appeal);
         if (appeal == null
             || appeal.getRep() == null
-            || "no".equalsIgnoreCase(buildRepresentative(appeal).getHasRepresentative())) {
+            || sessionRepresentative == null
+            || "no".equalsIgnoreCase(sessionRepresentative.getHasRepresentative())) {
             return null;
         }
 
