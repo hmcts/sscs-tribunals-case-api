@@ -127,6 +127,16 @@ public class SyaControllerTest {
             .evidenceProvide(new SessionEvidenceProvide("no"))
             .theHearing(new SessionTheHearing("yes"))
             .hearingSupport(new SessionHearingSupport("yes"))
+            .hearingArrangements(
+                new SessionHearingArrangements(
+                    new SessionHearingArrangementsSelection(
+                        new SessionHearingArrangement(true, "Spanish"),
+                        new SessionHearingArrangement(true, "British Sign Language (BSL)"),
+                        new SessionHearingArrangement(true),
+                        new SessionHearingArrangement(true)
+                    )
+                )
+            )
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -170,6 +180,12 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.EvidenceProvide.evidenceProvide").value("no"))
             .andExpect(jsonPath("$.TheHearing.attendHearing").value("yes"))
             .andExpect(jsonPath("$.HearingSupport.arrangements").value("yes"))
+            .andExpect(jsonPath("$.HearingArrangements.selection.interpreterLanguage.requested").value(true))
+            .andExpect(jsonPath("$.HearingArrangements.selection.interpreterLanguage.language").value("Spanish"))
+            .andExpect(jsonPath("$.HearingArrangements.selection.signLanguage.requested").value(true))
+            .andExpect(jsonPath("$.HearingArrangements.selection.signLanguage.language").value("British Sign Language (BSL)"))
+            .andExpect(jsonPath("$.HearingArrangements.selection.hearingLoop.requested").value(true))
+            .andExpect(jsonPath("$.HearingArrangements.selection.accessibleHearingRoom.requested").value(true))
         ;
     }
 

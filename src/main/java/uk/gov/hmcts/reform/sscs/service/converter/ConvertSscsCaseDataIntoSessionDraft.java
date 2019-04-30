@@ -81,6 +81,12 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionHaveAMrn buildHaveAMrn(Appeal appeal) {
+        if (appeal == null
+            || appeal.getMrnDetails() == null
+            || appeal.getMrnDetails().getMrnDate() == null) {
+            return null;
+        }
+
         String haveAMrn = StringUtils.isBlank(appeal.getMrnDetails().getMrnDate()) ? "no" : "yes";
         return new SessionHaveAMrn(haveAMrn);
     }
@@ -98,9 +104,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionDwpIssuingOffice buildDwpIssuingOffice(Appeal appeal) {
-        if (appeal.getMrnDetails().getDwpIssuingOffice() != null
-            && StringUtils.isNotEmpty(appeal.getMrnDetails().getDwpIssuingOffice())
-        ) {
+        if (StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())) {
             int firstBracket = appeal.getMrnDetails().getDwpIssuingOffice().indexOf("(") + 1;
             int secondBracket = appeal.getMrnDetails().getDwpIssuingOffice().lastIndexOf(")");
             return new SessionDwpIssuingOffice(
@@ -112,13 +116,13 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionAppointee buildAppointee(Appeal appeal) {
-        if (appeal.getAppellant() == null
-            || appeal.getAppellant().getAppointee() == null
-            || appeal.getAppellant().getAppointee().getName() == null) {
-            return new SessionAppointee("no");
+        if (appeal == null
+            || appeal.getAppellant() == null
+            || appeal.getAppellant().getIsAppointee() == null) {
+            return null;
         }
 
-        return new SessionAppointee("yes");
+        return new SessionAppointee(appeal.getAppellant().getIsAppointee().toLowerCase());
     }
 
     private SessionAppellantName buildAppellantName(Appeal appeal) {
@@ -182,12 +186,13 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private SessionTextReminders buildTextReminders(Subscriptions subscriptions) {
         if (subscriptions == null
             || subscriptions.getAppellantSubscription() == null
-            || subscriptions.getAppellantSubscription().getSubscribeSms() == null
-            || "No".equalsIgnoreCase(subscriptions.getAppellantSubscription().getSubscribeSms())) {
-            return new SessionTextReminders("no");
+            || subscriptions.getAppellantSubscription().getSubscribeSms() == null) {
+            return null;
         }
 
-        return new SessionTextReminders("yes");
+        return "no".equalsIgnoreCase(subscriptions.getAppellantSubscription().getSubscribeSms())
+            ? new SessionTextReminders("no")
+            : new SessionTextReminders("yes");
     }
 
     private SessionSendToNumber buildSendToNumber(SscsCaseData caseData) {
@@ -216,26 +221,33 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private SessionRepresentative buildRepresentative(Appeal appeal) {
         if (appeal == null
             || appeal.getRep() == null
-            || appeal.getRep().getName() == null) {
-            return new SessionRepresentative("no");
+            || appeal.getRep().getHasRepresentative() == null) {
+            return null;
         }
 
-        return new SessionRepresentative("yes");
+        return appeal.getRep().getHasRepresentative().equalsIgnoreCase("no")
+            ? new SessionRepresentative("no")
+            : new SessionRepresentative("yes");
     }
 
     private SessionRepresentativeDetails buildRepresentativeDetails(Appeal appeal) {
         if (appeal == null
             || appeal.getRep() == null
-            || appeal.getRep().getName() == null) {
+            || "no".equalsIgnoreCase(buildRepresentative(appeal).getHasRepresentative())) {
             return null;
         }
 
-        return new SessionRepresentativeDetails(
-            new SessionRepName(
+        SessionRepName repName = null;
+        if (appeal.getRep().getName() != null) {
+            repName = new SessionRepName(
                 appeal.getRep().getName().getTitle(),
                 appeal.getRep().getName().getFirstName(),
                 appeal.getRep().getName().getLastName()
-            ),
+            );
+        }
+
+        return new SessionRepresentativeDetails(
+            repName,
             appeal.getRep().getAddress().getLine1(),
             appeal.getRep().getAddress().getLine2(),
             appeal.getRep().getAddress().getTown(),
@@ -284,11 +296,14 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionEvidenceProvide buildEvidenceProvide(SscsCaseData caseData) {
-        if (caseData == null) {
-            return new SessionEvidenceProvide("no");
+        if (caseData == null
+            || caseData.getEvidencePresent() == null) {
+            return null;
         }
 
-        return new SessionEvidenceProvide(caseData.getEvidencePresent());
+        return "no".equalsIgnoreCase(caseData.getEvidencePresent())
+            ? new SessionEvidenceProvide("no")
+            : new SessionEvidenceProvide(caseData.getEvidencePresent());
     }
 
     private SessionTheHearing buildTheHearing(Appeal appeal) {

@@ -53,6 +53,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
+                    .isAppointee("No")
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -81,6 +82,8 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                     HearingOptions.builder()
                         .wantsToAttend("yes")
                         .wantsSupport("yes")
+                        .languageInterpreter("Spanish")
+                        .signLanguageType("British Sign Language (BSL)")
                         .build()
                 )
                 .build()
@@ -125,7 +128,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
-        assertEquals("no", actual.getRepresentative().getHasRepresentative());
+        assertNull("no", actual.getRepresentative());
         assertEquals("I think I should get more", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getReasonForAppealing());
         assertEquals("Underpayment", actual.getReasonForAppealing().getReasonForAppealingItems().get(0).getWhatYouDisagreeWith());
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
@@ -173,6 +176,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .email("appellant@gmail.com")
                         .build()
                     )
+                    .isAppointee("No")
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -276,6 +280,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .name(Name.builder().firstName("Ap").lastName("Pointee").build())
                         .build()
                     )
+                    .isAppointee("Yes")
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -316,7 +321,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .build();
 
         SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
-        assertEquals("no", actual.getHaveAMrn().getHaveAMrn());
+        assertNull(actual.getHaveAMrn());
         assertNull(actual.getMrnDate());
         assertEquals("no", actual.getCheckMrn().getCheckedMrn());
         assertNull(actual.getMrnOverThirteenMonthsLate());
