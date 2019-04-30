@@ -59,7 +59,8 @@ public enum SerializeJsonMessageManager {
     APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD("tya/appealWithNoHearingOptionsInCcd.json"),
     HEARING_BOOKED_PAPER_CASE("tya/hearingBookedPaperCase.json"),
     HEARING_BOOKED_PAPER_CASE_CCD("tya/hearingBookedPaperCaseCcd.json"),
-    SESSION_SAMPLE("drafts/session-sample.json");
+    SESSION_SAMPLE("drafts/session-sample.json"),
+    SESSION_SAMPLE_WITH_REP("drafts/session-sample-with-rep.json");
 
     private final String serializedMessage;
 
