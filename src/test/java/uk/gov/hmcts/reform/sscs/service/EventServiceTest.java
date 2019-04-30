@@ -73,7 +73,7 @@ public class EventServiceTest {
 
         assertTrue(handled);
 
-        verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens));
+        verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
     }
 
     @Test
@@ -85,7 +85,7 @@ public class EventServiceTest {
 
         assertTrue(handled);
 
-        verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens));
+        verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
     }
 
     private SscsCaseData buildCaseDataWithoutPdf() {

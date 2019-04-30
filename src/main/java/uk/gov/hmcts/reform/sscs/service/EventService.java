@@ -65,7 +65,8 @@ public class EventService {
 
             IdamTokens idamTokens = idamService.getIdamTokens();
 
-            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()), idamTokens);
+            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),
+                    idamTokens,"appellantEvidence");
 
             Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
 
