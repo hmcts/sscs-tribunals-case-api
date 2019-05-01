@@ -79,7 +79,7 @@ public class EventServiceTest {
     @Test
     public void shouldNotCallPdfService() throws CcdException {
 
-        SscsCaseData caseData = buildCaseDataWithPdf();
+        SscsCaseData caseData = null;
 
         boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 

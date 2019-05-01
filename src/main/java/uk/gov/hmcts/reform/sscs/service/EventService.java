@@ -57,21 +57,24 @@ public class EventService {
 
     private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
 
-        if (!hasDocument(caseData)) {
-
-            caseData.setEvidencePresent(hasEvidence(caseData));
-            String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
-                    caseData.getAppeal().getAppellant().getAddress().getPostcode());
-
+        if (null != caseData) {
             IdamTokens idamTokens = idamService.getIdamTokens();
 
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),
-                    idamTokens,"appellantEvidence");
+                    idamTokens, "appellantEvidence");
 
-            Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
+            if (!hasDocument(caseData)) {
 
-            roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()),
-                    firstHalfOfPostcode, pdf, additionalEvidence);
+                caseData.setEvidencePresent(hasEvidence(caseData));
+                String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
+                        caseData.getAppeal().getAppellant().getAddress().getPostcode());
+
+
+                Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
+
+                roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()),
+                        firstHalfOfPostcode, pdf, additionalEvidence);
+            }
         }
     }
 
