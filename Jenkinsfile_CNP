@@ -43,10 +43,8 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-    if (env.CHANGE_TITLE && !env.CHANGE_TITLE.startsWith('Bump')) {
-        enableDockerBuild()
-        installCharts()
-    }
+    enableDockerBuild()
+    installCharts()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
 }
