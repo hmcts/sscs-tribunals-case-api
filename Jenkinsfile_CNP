@@ -10,7 +10,7 @@ def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 
-List<LinkedHashMap<String, Object>> secrets = [
+def secrets = [
     'sscs-${env}'      : [
         secret('idam-api', 'IDAM_API_URL'),
         secret('sscs-email-mac-secret-text', 'SUBSCRIPTIONS_MAC_SECRET'),
