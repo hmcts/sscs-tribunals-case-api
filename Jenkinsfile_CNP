@@ -11,6 +11,7 @@ def product = "sscs"
 def component = "tribunals-api"
 
 List<LinkedHashMap<String, Object>> secrets = [
+    'sscs-${env}'      : [
         secret('idam-api', 'IDAM_API_URL'),
         secret('sscs-email-mac-secret-text', 'SUBSCRIPTIONS_MAC_SECRET'),
         secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
@@ -29,7 +30,7 @@ List<LinkedHashMap<String, Object>> secrets = [
         secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
         secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
-
+    ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
