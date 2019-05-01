@@ -104,7 +104,7 @@ public class SubmitAppealService {
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event) {
         if (null != caseDetails) {
-            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "appellantEvidence");
+            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
             if (event.equals(SYA_APPEAL_CREATED)) {
                 roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
