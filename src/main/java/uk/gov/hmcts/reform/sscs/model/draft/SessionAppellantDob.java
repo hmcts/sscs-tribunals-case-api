@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
-public class SessionMrnDate {
-    @JsonProperty("mrnDate")
-    private SessionDate mrnDateDetails;
+public class SessionAppellantDob {
+    @JsonProperty("date")
+    private SessionDate date;
+
 }

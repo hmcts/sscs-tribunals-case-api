@@ -61,6 +61,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
+import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -130,6 +131,7 @@ public class SubmitAppealServiceTest {
     @Before
     public void setUp() {
         when(airLookupService.lookupRegionalCentre("CF10")).thenReturn("Cardiff");
+        when(airLookupService.lookupAirVenueNameByPostCode("TN32")).thenReturn(AirlookupBenefitToVenue.builder().pipVenue("Ashford").esaVenue("Ashford").build());
 
         submitYourAppealEmailTemplate =
             new SubmitYourAppealEmailTemplate("from", "to", "message");
@@ -354,7 +356,7 @@ public class SubmitAppealServiceTest {
             eq(ccdId),
             argThat(caseData -> caseData.getSscsDocument().size() == 2),
             any(),
-            eq("appellantEvidence")
+            eq("sscs1")
         );
     }
 
