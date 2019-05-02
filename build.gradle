@@ -7,7 +7,7 @@ plugins {
     id 'org.springframework.boot' version '2.1.4.RELEASE'
     id 'org.owasp.dependencycheck' version '3.2.1'
     id 'com.github.ben-manes.versions' version '0.21.0'
-    id 'net.ltgt.apt' version '0.13'
+    id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.4.0'
 }
 
