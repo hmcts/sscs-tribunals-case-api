@@ -4,10 +4,10 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '2.7'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.0.9.RELEASE'
+    id 'org.springframework.boot' version '2.1.4.RELEASE'
     id 'org.owasp.dependencycheck' version '3.2.1'
     id 'com.github.ben-manes.versions' version '0.21.0'
-    id 'net.ltgt.apt' version '0.13'
+    id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.4.0'
 }
 
@@ -244,8 +244,8 @@ dependencies {
     compile group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
     compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.9.12'
 
-    compileOnly 'org.projectlombok:lombok:1.18.6'
-    apt "org.projectlombok:lombok:1.18.4"
+    compile 'org.projectlombok:lombok:1.18.6'
+    annotationProcessor 'org.projectlombok:lombok:1.18.6'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.4.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.27.0'
@@ -257,7 +257,7 @@ dependencies {
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.6'
-    testApt "org.projectlombok:lombok:1.16.20"
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.6"
 
     runtime "org.springframework.boot:spring-boot-properties-migrator"
     compile group: 'org.pitest', name: 'pitest', version: '1.4.7'
