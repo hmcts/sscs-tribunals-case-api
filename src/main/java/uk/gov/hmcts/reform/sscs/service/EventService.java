@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -57,23 +58,29 @@ public class EventService {
 
     private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
 
-        if (null != caseData) {
+        if (!hasPdfDocument(caseData)) {
+            updateAppointeeNullIfNotPresent(caseData);
+            caseData.setEvidencePresent(hasEvidence(caseData));
+            String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
+                    caseData.getAppeal().getAppellant().getAddress().getPostcode());
+
             IdamTokens idamTokens = idamService.getIdamTokens();
 
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),
-                    idamTokens, "appellantEvidence");
+                    idamTokens,"appellantEvidence");
 
-            if (!hasDocument(caseData)) {
+            Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
 
-                caseData.setEvidencePresent(hasEvidence(caseData));
-                String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
-                        caseData.getAppeal().getAppellant().getAddress().getPostcode());
+            roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()),
+                    firstHalfOfPostcode, pdf, additionalEvidence);
+        }
+    }
 
-
-                Map<String, byte[]> additionalEvidence = downloadEvidence(caseData);
-
-                roboticsService.sendCaseToRobotics(caseData, Long.parseLong(caseData.getCcdCaseId()),
-                        firstHalfOfPostcode, pdf, additionalEvidence);
+    private void updateAppointeeNullIfNotPresent(SscsCaseData caseData) {
+        if (caseData != null && caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null) {
+            Appointee appointee = caseData.getAppeal().getAppellant().getAppointee();
+            if (appointee != null && appointee.getName() == null) {
+                caseData.getAppeal().getAppellant().setAppointee(null);
             }
         }
     }
@@ -92,7 +99,7 @@ public class EventService {
         return () -> handleEvent(eventType, caseData);
     }
 
-    private boolean hasDocument(SscsCaseData caseData) {
+    private boolean hasPdfDocument(SscsCaseData caseData) {
         String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
         for (SscsDocument document : caseData.getSscsDocument()) {
             if (document != null && fileName.equals(document.getValue().getDocumentFileName())) {
