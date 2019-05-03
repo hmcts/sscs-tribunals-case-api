@@ -456,7 +456,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             );
 
             return Subscription.builder()
-                .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                .wantSmsNotifications(
+                    smsNotify != null
+                    && smsNotify.isWantsSmsNotifications() != null
+                    && smsNotify.isWantsSmsNotifications()
+                        ? YES
+                        : NO)
                 .subscribeSms(subscribeSms)
                 .tya(generateAppealNumber())
                 .mobile(cleanPhoneNumber(mobile).orElse(mobile))
@@ -528,7 +533,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getNotificationSmsNumber(SyaSmsNotify smsNotify, SyaContactDetails contactDetails) {
-        return smsNotify.isWantsSmsNotifications() && (null == smsNotify.isUseSameNumber() || !smsNotify.isUseSameNumber()) ? smsNotify.getSmsNumber() : contactDetails.getPhoneNumber();
+        return smsNotify != null
+            && smsNotify.isWantsSmsNotifications() != null
+            && smsNotify.isWantsSmsNotifications()
+            && (null == smsNotify.isUseSameNumber() || !smsNotify.isUseSameNumber())
+            ? smsNotify.getSmsNumber()
+            : contactDetails.getPhoneNumber();
     }
 
     private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {

@@ -309,8 +309,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private List<SessionReasonForAppealingItem> buildReasonForAppealingItems(List<AppealReason> appealReasons) {
-        if (appealReasons == null
-            || appealReasons.size() == 0) {
+        if (appealReasons == null || appealReasons.isEmpty()) {
             return null;
         }
 
