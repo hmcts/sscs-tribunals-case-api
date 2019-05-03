@@ -71,7 +71,6 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private SessionMrnDate buildMrnDate(Appeal appeal) {
         MrnDetails mrnDetails = appeal.getMrnDetails();
         if (mrnDetails != null && mrnDetails.getMrnDate() != null && StringUtils.isNotBlank(mrnDetails.getMrnDate())) {
-
             LocalDate mrdDetailsDate = LocalDate.parse(mrnDetails.getMrnDate());
             String day = String.valueOf(mrdDetailsDate.getDayOfMonth());
             String month = String.valueOf(mrdDetailsDate.getMonthValue());
