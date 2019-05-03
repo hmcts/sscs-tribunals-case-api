@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class SessionDraft {
     @JsonProperty("BenefitType")
     SessionBenefitType benefitType;
