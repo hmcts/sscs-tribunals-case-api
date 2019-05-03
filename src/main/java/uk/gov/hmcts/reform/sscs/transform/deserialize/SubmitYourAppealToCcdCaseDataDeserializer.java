@@ -77,8 +77,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .generatedEmail(isDraft ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
                 .generatedMobile(isDraft
                     ? null
-                    : cleanPhoneNumber(syaCaseWrapper.getContactDetails().getPhoneNumber())
-                        .orElse(syaCaseWrapper.getContactDetails().getPhoneNumber()))
+                    : getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber())
+                )
                 .generatedNino(isDraft ? null : syaCaseWrapper.getAppellant().getNino())
                 .generatedDob(isDraft ? null : syaCaseWrapper
                         .getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
