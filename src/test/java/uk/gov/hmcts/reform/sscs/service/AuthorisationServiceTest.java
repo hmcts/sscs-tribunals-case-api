@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
 import feign.FeignException;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,8 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.authorisation.ServiceAuthorisationApi;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AuthorisationServiceTest {
