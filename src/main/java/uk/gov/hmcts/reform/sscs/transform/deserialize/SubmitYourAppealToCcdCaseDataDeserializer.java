@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
+import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -74,8 +75,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .caseCreated(LocalDate.now().toString())
                 .generatedSurname(isDraft ? null : syaCaseWrapper.getAppellant().getLastName())
                 .generatedEmail(isDraft ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
-                .generatedMobile(isDraft ? null : getPhoneNumberWithOutSpaces(
-                        syaCaseWrapper.getContactDetails().getPhoneNumber()))
+                .generatedMobile(isDraft
+                    ? null
+                    : cleanPhoneNumber(syaCaseWrapper.getContactDetails().getPhoneNumber())
+                        .orElse(syaCaseWrapper.getContactDetails().getPhoneNumber()))
                 .generatedNino(isDraft ? null : syaCaseWrapper.getAppellant().getNino())
                 .generatedDob(isDraft ? null : syaCaseWrapper
                         .getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
@@ -94,7 +97,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
-        return isDraft(syaCaseWrapper) ? null : populateSubscriptions(syaCaseWrapper);
+        return populateSubscriptions(syaCaseWrapper);
     }
 
 
@@ -214,20 +217,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             contact = Contact.builder().build();
         }
 
-        Identity identity = Identity.builder().build();
-        if (null != syaAppellant) {
-            identity = identity.toBuilder()
-                    .dob(syaAppellant.getDob() == null ? null : syaAppellant.getDob().toString())
-                    .nino(syaAppellant.getNino())
-                    .build();
-        }
+        Identity identity = buildAppellantIdentity(syaAppellant);
 
-        String isAppointee = null;
-        if (syaCaseWrapper.getIsAppointee() != null && syaCaseWrapper.getIsAppointee()) {
-            isAppointee = "Yes";
-        } else {
-            isAppointee = "No";
-        }
+        String isAppointee = buildAppellantIsAppointee(syaCaseWrapper);
+
 
         Appointee appointee = getAppointee(syaCaseWrapper);
 
@@ -256,6 +249,26 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .appointee(appointee)
                 .isAddressSameAsAppointee(useSameAddress)
                 .build();
+    }
+
+    private static Identity buildAppellantIdentity(SyaAppellant syaAppellant) {
+        Identity identity = Identity.builder().build();
+        if (null != syaAppellant) {
+            identity = identity.toBuilder()
+                .dob(syaAppellant.getDob() == null ? null : syaAppellant.getDob().toString())
+                .nino(syaAppellant.getNino())
+                .build();
+        }
+
+        return identity;
+    }
+
+    private static String buildAppellantIsAppointee(SyaCaseWrapper syaCaseWrapper) {
+        if (syaCaseWrapper.getIsAppointee() == null) {
+            return null;
+        }
+
+        return syaCaseWrapper.getIsAppointee() ? "Yes" : "No";
     }
 
     private static Name getName(SyaAppellant syaAppellant) {
@@ -413,38 +426,54 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
 
         return Subscriptions.builder()
-                .appellantSubscription(!syaCaseWrapper.getIsAppointee() ? getAppellantSubscription(syaCaseWrapper) : null)
-                .appointeeSubscription(syaCaseWrapper.getIsAppointee() ? getAppointeeSubscription(syaCaseWrapper) : null)
+                .appellantSubscription(
+                    syaCaseWrapper.getIsAppointee() != null && !syaCaseWrapper.getIsAppointee()
+                        ? getAppellantSubscription(syaCaseWrapper)
+                        : null
+                )
+                .appointeeSubscription(
+                    syaCaseWrapper.getIsAppointee() != null && syaCaseWrapper.getIsAppointee()
+                        ? getAppointeeSubscription(syaCaseWrapper)
+                        : null
+                )
                 .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
                 .build();
     }
 
     private static Subscription getAppellantSubscription(SyaCaseWrapper syaCaseWrapper) {
-        final SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
+        if (syaCaseWrapper.getContactDetails() != null) {
+            final SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-        final String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
+            final String subscribeSms = smsNotify != null
+                && smsNotify.isWantsSmsNotifications() != null
+                && smsNotify.isWantsSmsNotifications() ? YES : NO;
 
-        final String email = syaCaseWrapper.getContactDetails().getEmailAddress();
-        final String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
+            final String email = syaCaseWrapper.getContactDetails().getEmailAddress();
+            final String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
 
-        final String mobile = getPhoneNumberWithOutSpaces(
-                getNotificationSmsNumber(smsNotify, syaCaseWrapper.getContactDetails()));
+            final String mobile = getPhoneNumberWithOutSpaces(
+                getNotificationSmsNumber(smsNotify, syaCaseWrapper.getContactDetails())
+            );
 
-        return Subscription.builder()
+            return Subscription.builder()
                 .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                 .subscribeSms(subscribeSms)
                 .tya(generateAppealNumber())
-                .mobile(PhoneNumbersUtil.cleanPhoneNumber(mobile).orElse(mobile))
+                .mobile(cleanPhoneNumber(mobile).orElse(mobile))
                 .subscribeEmail(wantEmailNotifications)
                 .email(email)
                 .build();
+        }
+
+        return null;
     }
 
     private static Subscription getRepresentativeSubscription(SyaCaseWrapper syaCaseWrapper) {
 
-        if (syaCaseWrapper.getHasRepresentative()
-                && syaCaseWrapper.getRepresentative() != null
-                && syaCaseWrapper.getRepresentative().getContactDetails() != null) {
+        if (syaCaseWrapper.getHasRepresentative() != null
+            && syaCaseWrapper.getHasRepresentative()
+            && syaCaseWrapper.getRepresentative() != null
+            && syaCaseWrapper.getRepresentative().getContactDetails() != null) {
 
             boolean emailAddressExists = StringUtils
                     .isNotBlank(syaCaseWrapper.getRepresentative().getContactDetails().getEmailAddress());
@@ -454,7 +483,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             final String mobileNumber = getPhoneNumberWithOutSpaces(syaCaseWrapper
                     .getRepresentative().getContactDetails().getPhoneNumber());
 
-            final String cleanedMobileNumber = PhoneNumbersUtil.cleanPhoneNumber(mobileNumber).orElse(mobileNumber);
+            final String cleanedMobileNumber = cleanPhoneNumber(mobileNumber).orElse(mobileNumber);
 
             return Subscription.builder()
                     .wantSmsNotifications(isMobileNumber ? YES : NO)
@@ -472,7 +501,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .subscribeEmail(NO)
                 .tya(generateAppealNumber())
                 .build();
-
     }
 
     private static Subscription getAppointeeSubscription(SyaCaseWrapper syaCaseWrapper) {
@@ -490,7 +518,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
                     .subscribeSms(subscribeSms)
                     .tya(generateAppealNumber())
-                    .mobile(PhoneNumbersUtil.cleanPhoneNumber(mobile).orElse(mobile))
+                    .mobile(cleanPhoneNumber(mobile).orElse(mobile))
                     .subscribeEmail(wantEmailNotifications)
                     .email(email)
                     .build();

@@ -33,6 +33,9 @@ public class SessionDraft {
     @JsonProperty("DWPIssuingOffice")
     SessionDwpIssuingOffice dwpIssuingOffice;
 
+    @JsonProperty("DWPIssuingOfficeEsa")
+    SessionDwpIssuingOfficeEsa dwpIssuingOfficeEsa;
+
     @JsonProperty("Appointee")
     SessionAppointee appointee;
 
@@ -54,9 +57,8 @@ public class SessionDraft {
     @JsonProperty("SendToNumber")
     SessionSendToNumber sendToNumber;
 
-    // Reintroduce when we know the contents
-    //    @JsonProperty("SmsConfirmation")
-    //    SessionSmsConfirmation smsConfirmation;
+    @JsonProperty("SmsConfirmation")
+    SessionSmsConfirmation smsConfirmation;
 
     @JsonProperty("Representative")
     SessionRepresentative representative;
@@ -81,4 +83,7 @@ public class SessionDraft {
 
     @JsonProperty("HearingArrangements")
     SessionHearingArrangements hearingArrangements;
+
+    @JsonProperty("NotAttendingHearing")
+    SessionNotAttendingHearing notAttendingHearing;
 }
