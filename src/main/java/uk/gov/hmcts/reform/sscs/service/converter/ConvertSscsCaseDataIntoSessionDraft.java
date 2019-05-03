@@ -70,7 +70,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
 
     private SessionMrnDate buildMrnDate(Appeal appeal) {
         MrnDetails mrnDetails = appeal.getMrnDetails();
-        if (StringUtils.isNotBlank(mrnDetails.getMrnDate())) {
+        if (
+            mrnDetails != null
+            && mrnDetails.getMrnDate() != null
+            && StringUtils.isNotBlank(mrnDetails.getMrnDate())
+        ) {
             LocalDate mrdDetailsDate = LocalDate.parse(mrnDetails.getMrnDate());
             String day = String.valueOf(mrdDetailsDate.getDayOfMonth());
             String month = String.valueOf(mrdDetailsDate.getMonthValue());
@@ -105,7 +109,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionDwpIssuingOffice buildDwpIssuingOffice(Appeal appeal) {
-        if (StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
+        if (appeal != null
+            && appeal.getMrnDetails() != null
+            && StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
             && "PIP".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
             int firstBracket = appeal.getMrnDetails().getDwpIssuingOffice().indexOf('(') + 1;
             int secondBracket = appeal.getMrnDetails().getDwpIssuingOffice().lastIndexOf(')');

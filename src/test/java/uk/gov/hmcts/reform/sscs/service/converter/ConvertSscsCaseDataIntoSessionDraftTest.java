@@ -181,5 +181,4 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getAppointee().getIsAppointee());
     }
 
-
 }
