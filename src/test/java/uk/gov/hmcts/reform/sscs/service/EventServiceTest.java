@@ -79,7 +79,7 @@ public class EventServiceTest {
     }
 
     @Test
-    public void shouldNotCallPdfServiceIfEventIsDifferent(){
+    public void shouldNotCallPdfServiceIfEventIsDifferent() {
         SscsCaseData caseData = buildCaseDataWithoutPdf();
 
         boolean handled = eventService.handleEvent(APPEAL_RECEIVED, caseData);
