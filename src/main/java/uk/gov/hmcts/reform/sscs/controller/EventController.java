@@ -36,7 +36,7 @@ public class EventController {
     }
 
     @PostMapping(value = "/send", produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    void sendEvent(
+    public void sendEvent(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestBody String message) {
 

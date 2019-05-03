@@ -103,6 +103,7 @@ public class EventServiceTest {
 
         assertTrue(handled);
         assertEquals("No", caseData.getEvidencePresent());
+        assertNotNull(caseData.getAppeal().getAppellant().getAppointee());
 
         verify(emailService, times(3)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService,times(1)).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
@@ -123,6 +124,7 @@ public class EventServiceTest {
 
         assertTrue(handled);
         assertEquals("No", caseData.getEvidencePresent());
+        assertNull(caseData.getAppeal().getAppellant().getAppointee());
 
         verify(emailService, times(3)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
