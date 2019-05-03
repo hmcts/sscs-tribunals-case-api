@@ -356,7 +356,7 @@ public class SubmitAppealServiceTest {
             eq(ccdId),
             argThat(caseData -> caseData.getSscsDocument().size() == 2),
             any(),
-            eq("appellantEvidence")
+            eq("sscs1")
         );
     }
 

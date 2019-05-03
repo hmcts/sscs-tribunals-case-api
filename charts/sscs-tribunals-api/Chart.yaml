@@ -1,0 +1,6 @@
+name: sscs-tribunals-api
+home: https://github.com/hmcts/sscs-tribunals-case-api
+version: 0.0.2
+description: SSCS Tribunals Case API
+maintainers:
+  - name: HMCTS SSCS Team
