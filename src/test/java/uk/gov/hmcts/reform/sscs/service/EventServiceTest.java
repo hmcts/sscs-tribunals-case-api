@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
 
 import java.util.ArrayList;
@@ -64,6 +63,36 @@ public class EventServiceTest {
     }
 
     @Test
+    public void shouldReturnFalseSendEventIfDifferent() {
+        SscsCaseData caseData = null;
+        boolean validEvent = eventService.sendEvent(APPEAL_RECEIVED, caseData);
+
+        assertFalse(validEvent);
+    }
+
+    @Test
+    public void shouldReturnTrueSendEvent() {
+        SscsCaseData caseData = null;
+        boolean validEvent = eventService.sendEvent(CREATE_APPEAL_PDF, caseData);
+
+        assertTrue(validEvent);
+    }
+
+    @Test
+    public void shouldNotCallPdfServiceIfEventIsDifferent(){
+        SscsCaseData caseData = buildCaseDataWithoutPdf();
+
+        boolean handled = eventService.handleEvent(APPEAL_RECEIVED, caseData);
+
+        assertFalse(handled);
+
+        verify(emailService, never()).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
+        verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
+        verify(evidenceManagementService, never()).download(any(), anyString());
+        verify(roboticsService, never()).sendCaseToRobotics(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any(), any(), any());
+    }
+
+    @Test
     public void shouldCallPdfService() throws CcdException {
 
         SscsCaseData caseData = buildCaseDataWithoutPdf();
@@ -76,7 +105,7 @@ public class EventServiceTest {
         assertEquals("No", caseData.getEvidencePresent());
 
         verify(emailService, times(3)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
-        verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
+        verify(sscsPdfService,times(1)).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
         verify(evidenceManagementService, never()).download(any(), anyString());
         verify(roboticsService, times(1)).sendCaseToRobotics(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any(), any(), any());
     }
