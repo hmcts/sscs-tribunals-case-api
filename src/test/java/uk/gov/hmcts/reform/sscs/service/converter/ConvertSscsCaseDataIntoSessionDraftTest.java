@@ -298,38 +298,6 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
-    public void convertPopulatedEsaCaseData() {
-        SscsCaseData caseData = SscsCaseData.builder()
-            .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder()
-                    .code("ESA")
-                    .description("Personal Independence Payment")
-                    .build()
-                )
-                .appellant(Appellant.builder()
-                    .address(Address.builder()
-                        .postcode("AP1 14NT")
-                        .build()
-                    )
-                    .isAppointee("No")
-                    .build()
-                )
-                .mrnDetails(MrnDetails.builder()
-                    .mrnDate("2010-02-01")
-                    .mrnLateReason("Forgot to send it")
-                    .dwpIssuingOffice("DWP PIP (1)")
-                    .build()
-                )
-                .build()
-            )
-            .build();
-
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
-        assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
-        assertEquals("1", actual.getDwpIssuingOfficeEsa().getDwpIssuingOffice());
-    }
-
-    @Test
     public void convertPopulatedCaseDataWithoutMrnDetails() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()

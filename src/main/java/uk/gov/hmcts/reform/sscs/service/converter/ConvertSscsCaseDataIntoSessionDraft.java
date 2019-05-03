@@ -78,8 +78,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
 
     private SessionMrnDate buildMrnDate(Appeal appeal) {
         MrnDetails mrnDetails = appeal.getMrnDetails();
-        if (
-            mrnDetails != null
+        if (mrnDetails != null
             && mrnDetails.getMrnDate() != null
             && StringUtils.isNotBlank(mrnDetails.getMrnDate())
         ) {
