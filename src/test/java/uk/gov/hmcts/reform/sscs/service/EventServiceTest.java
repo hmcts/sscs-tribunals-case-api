@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
 
 import java.util.ArrayList;
@@ -17,7 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.mail.javamail.JavaMailSender;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
@@ -29,6 +26,7 @@ public class EventServiceTest {
 
     public static final Long CCD_CASE_ID = 1234567890L;
     public static final String DOCUMENT_URL = "http://dm-store:4506/documents/35d53efc-a30d-4b0d-b5a9-312d52bb1a4d";
+    public static final String EVIDENCE_URL = "http://dm-store:4506/documents/35d53efc-a45c-a30d-b5a9-412d52bb1a4d";
     @Mock
     private SscsPdfService sscsPdfService;
 
@@ -46,6 +44,7 @@ public class EventServiceTest {
 
     private IdamTokens idamTokens;
 
+    @Mock
     private EmailService emailService;
 
     private EventService eventService;
@@ -55,7 +54,7 @@ public class EventServiceTest {
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        emailService = new EmailService(mock(JavaMailSender.class));
+        //emailService = new EmailService(mock(JavaMailSender.class));
         eventService = new EventService(sscsPdfService,
                 roboticsService,
                 regionalProcessingCenterService,
@@ -69,11 +68,37 @@ public class EventServiceTest {
 
         SscsCaseData caseData = buildCaseDataWithoutPdf();
 
+        when(emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant())).thenReturn("Test");
+
         boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
         assertTrue(handled);
+        assertEquals("No", caseData.getEvidencePresent());
 
+        verify(emailService, times(3)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
+        verify(evidenceManagementService, never()).download(any(), anyString());
+        verify(roboticsService, times(1)).sendCaseToRobotics(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any(), any(), any());
+    }
+
+    @Test
+    public void shouldCallPdfServiceWhenNoAppointee() throws CcdException {
+
+        SscsCaseData caseData = buildCaseDataWithoutPdf();
+
+        when(emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant())).thenReturn("Test");
+
+        caseData.getAppeal().getAppellant().getAppointee().setName(null);
+
+        boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
+
+        assertTrue(handled);
+        assertEquals("No", caseData.getEvidencePresent());
+
+        verify(emailService, times(3)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
+        verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
+        verify(evidenceManagementService, never()).download(any(), anyString());
+        verify(roboticsService, times(1)).sendCaseToRobotics(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any(), any(), any());
     }
 
     @Test
@@ -81,11 +106,17 @@ public class EventServiceTest {
 
         SscsCaseData caseData = buildCaseDataWithPdf();
 
+        when(emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant())).thenReturn("Test");
+
         boolean handled = eventService.handleEvent(CREATE_APPEAL_PDF, caseData);
 
         assertTrue(handled);
+        assertNull(caseData.getEvidencePresent());
 
+        verify(emailService, times(1)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
+        verify(evidenceManagementService, never()).download(any(), anyString());
+        verify(roboticsService, never()).sendCaseToRobotics(eq(caseData), any(), any(), any(), any());
     }
 
     private SscsCaseData buildCaseDataWithoutPdf() {
@@ -104,7 +135,8 @@ public class EventServiceTest {
     private List<SscsDocument> buildDocuments(SscsCaseData caseData) {
         List<SscsDocument> list = new ArrayList<>();
 
-        String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        String fileName = "Test.pdf";
+        String evidenceName = "Test.jpg";
 
         list.add(SscsDocument.builder()
                 .value(
@@ -116,6 +148,22 @@ public class EventServiceTest {
                                                 .documentUrl(DOCUMENT_URL)
                                                 .documentBinaryUrl(DOCUMENT_URL + "/binary")
                                                 .documentFilename(fileName)
+                                                .build()
+                                )
+                                .build()
+                )
+                .build()
+        );
+        list.add(SscsDocument.builder()
+                .value(
+                        SscsDocumentDetails.builder()
+                                .documentDateAdded("2018-12-05")
+                                .documentFileName(evidenceName)
+                                .documentLink(
+                                        DocumentLink.builder()
+                                                .documentUrl(EVIDENCE_URL)
+                                                .documentBinaryUrl(EVIDENCE_URL + "/binary")
+                                                .documentFilename(evidenceName)
                                                 .build()
                                 )
                                 .build()
