@@ -59,7 +59,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean mrnOverThirteenMonthsLate(MrnDetails mrnDetails) {
-        if (mrnDetails.getMrnDate() != null) {
+        if (mrnDetails != null && mrnDetails.getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate(), DATE_FORMATTER);
             return mrnDate.plusMonths(13L).isBefore(LocalDate.now());
         }
@@ -67,13 +67,22 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionCheckMrn buildCheckMrn(Appeal appeal) {
-        return StringUtils.isBlank(appeal.getMrnDetails().getMrnDate()) ? new SessionCheckMrn("no")
+        if (appeal == null || appeal.getMrnDetails() == null) {
+            return null;
+        }
+
+        return StringUtils.isBlank(appeal.getMrnDetails().getMrnDate())
+            ? new SessionCheckMrn("no")
             : new SessionCheckMrn("yes");
     }
 
     private SessionMrnDate buildMrnDate(Appeal appeal) {
         MrnDetails mrnDetails = appeal.getMrnDetails();
-        if (StringUtils.isNotBlank(mrnDetails.getMrnDate())) {
+        if (
+            mrnDetails != null
+            && mrnDetails.getMrnDate() != null
+            && StringUtils.isNotBlank(mrnDetails.getMrnDate())
+        ) {
             LocalDate mrdDetailsDate = LocalDate.parse(mrnDetails.getMrnDate());
             String day = String.valueOf(mrdDetailsDate.getDayOfMonth());
             String month = String.valueOf(mrdDetailsDate.getMonthValue());
@@ -108,7 +117,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionDwpIssuingOffice buildDwpIssuingOffice(Appeal appeal) {
-        if (StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
+        if (appeal != null
+            && appeal.getMrnDetails() != null
+            && StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
             && "PIP".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
             int firstBracket = appeal.getMrnDetails().getDwpIssuingOffice().indexOf('(') + 1;
             int secondBracket = appeal.getMrnDetails().getDwpIssuingOffice().lastIndexOf(')');
@@ -121,7 +132,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionDwpIssuingOfficeEsa buildDwpIssuingOfficeEsa(Appeal appeal) {
-        if (StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
+        if (appeal != null
+            && appeal.getMrnDetails() != null
+            && StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
             && "ESA".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
             return new SessionDwpIssuingOfficeEsa(appeal.getMrnDetails().getDwpIssuingOffice());
         } else {
