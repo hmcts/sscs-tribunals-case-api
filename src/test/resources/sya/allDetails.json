@@ -26,7 +26,8 @@
   },
   "smsNotify": {
     "wantsSMSNotifications": true,
-    "smsNumber": "07398785050"
+    "smsNumber": "07398785050",
+    "useSameNumber": "false"
   },
   "hasRepresentative": true,
   "representative": {

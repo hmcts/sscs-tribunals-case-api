@@ -26,7 +26,8 @@
   },
   "smsNotify": {
     "wantsSMSNotifications": true,
-    "smsNumber": "0741 1333 333"
+    "smsNumber": "0741 1333 333",
+    "useSameNumber": "false"
   },
   "hasRepresentative": true,
   "representative": {

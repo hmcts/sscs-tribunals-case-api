@@ -25,7 +25,8 @@
   },
   "smsNotify": {
     "wantsSMSNotifications": false,
-    "smsNumber": "07411222222"
+    "smsNumber": "07411222222",
+    "useSameNumber": "true"
   },
   "hasRepresentative": true,
   "representative": {
