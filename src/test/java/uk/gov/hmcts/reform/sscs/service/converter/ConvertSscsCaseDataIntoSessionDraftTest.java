@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
@@ -93,6 +94,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .build()
                 )
                 .hearingOptions(null)
+                .rep(Representative.builder().build())
                 .build()
             )
             .subscriptions(Subscriptions.builder()
@@ -142,11 +144,6 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
-    public void convertPopulatedCaseDataWithEvidence() {
-        // TODO
-    }
-
-    @Test
     public void convertPopulatedCaseDataWithAppointee() {
         SscsCaseData caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -173,6 +170,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                     .dwpIssuingOffice("DWP PIP (1)")
                     .build()
                 )
+                .rep(Representative.builder().build())
                 .build()
             )
             .build();

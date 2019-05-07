@@ -49,8 +49,8 @@ import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
-    private static final String YES = "Yes";
-    private static final String NO = "No";
+    public static final String YES = "Yes";
+    public static final String NO = "No";
     private static final String ORAL = "oral";
     private static final String PAPER = "paper";
 
@@ -546,45 +546,45 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Representative getRepresentative(SyaCaseWrapper syaCaseWrapper) {
-        Representative representative;
+        if (syaCaseWrapper.getHasRepresentative() != null) {
 
-        if (syaCaseWrapper.getRepresentative() != null && syaCaseWrapper.getHasRepresentative()) {
+            if (syaCaseWrapper.getHasRepresentative()) {
 
-            SyaRepresentative syaRepresentative = syaCaseWrapper.getRepresentative();
+                SyaRepresentative syaRepresentative = syaCaseWrapper.getRepresentative();
 
-            Name name = Name.builder()
-                .title(syaRepresentative.getTitle())
-                .firstName(syaRepresentative.getFirstName())
-                .lastName(syaRepresentative.getLastName())
-                .build();
+                Name name = Name.builder()
+                    .title(syaRepresentative.getTitle())
+                    .firstName(syaRepresentative.getFirstName())
+                    .lastName(syaRepresentative.getLastName())
+                    .build();
 
-            Address address = Address.builder()
-                .line1(syaRepresentative.getContactDetails().getAddressLine1())
-                .line2(syaRepresentative.getContactDetails().getAddressLine2())
-                .town(syaRepresentative.getContactDetails().getTownCity())
-                .county(syaRepresentative.getContactDetails().getCounty())
-                .postcode(syaRepresentative.getContactDetails().getPostCode())
-                .build();
+                Address address = Address.builder()
+                    .line1(syaRepresentative.getContactDetails().getAddressLine1())
+                    .line2(syaRepresentative.getContactDetails().getAddressLine2())
+                    .town(syaRepresentative.getContactDetails().getTownCity())
+                    .county(syaRepresentative.getContactDetails().getCounty())
+                    .postcode(syaRepresentative.getContactDetails().getPostCode())
+                    .build();
 
-            Contact contact = Contact.builder()
-                .email(syaRepresentative.getContactDetails().getEmailAddress())
-                .mobile(getPhoneNumberWithOutSpaces(syaRepresentative.getContactDetails().getPhoneNumber()))
-                .build();
+                Contact contact = Contact.builder()
+                    .email(syaRepresentative.getContactDetails().getEmailAddress())
+                    .mobile(getPhoneNumberWithOutSpaces(syaRepresentative.getContactDetails().getPhoneNumber()))
+                    .build();
 
-            representative = Representative.builder()
-                .hasRepresentative(YES)
-                .organisation(syaRepresentative.getOrganisation())
-                .name(name)
-                .address(address)
-                .contact(contact)
-                .build();
-        } else {
-            representative = Representative.builder()
-                .hasRepresentative(NO)
-                .build();
+                return Representative.builder()
+                    .hasRepresentative(YES)
+                    .organisation(syaRepresentative.getOrganisation())
+                    .name(name)
+                    .address(address)
+                    .contact(contact)
+                    .build();
+            } else {
+                return Representative.builder()
+                    .hasRepresentative(NO)
+                    .build();
+            }
         }
-
-        return representative;
+        return Representative.builder().hasRepresentative(null).build();
     }
 
     private static String getLocalDate(String dateStr) {

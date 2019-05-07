@@ -32,6 +32,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
@@ -61,11 +62,19 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .textReminders(buildTextReminders(caseData.getSubscriptions()))
             .sendToNumber(buildSendToNumber(caseData))
             .smsConfirmation(buildSmsConfirmation(caseData))
+            .representative(buildRepresentative(caseData.getAppeal().getRep().getHasRepresentative()))
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
             .evidenceProvide(buildEvidenceProvide(caseData))
             .notAttendingHearing(buildNotAttendingHearing(appeal))
             .build();
+    }
+
+    private SessionRepresentative buildRepresentative(String hasRepresentative) {
+        if (hasRepresentative == null) {
+            return null;
+        }
+        return new SessionRepresentative(StringUtils.lowerCase(hasRepresentative));
     }
 
     private SessionMrnDate buildMrnDate(Appeal appeal) {
