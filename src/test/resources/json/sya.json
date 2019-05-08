@@ -9,6 +9,7 @@
     "reasonForBeingLate": "Lost my paperwork"
   },
   "isAppointee": false,
+  "evidenceProvide": "false",
   "appellant": {
     "title": "Mr",
     "firstName": "Joe",

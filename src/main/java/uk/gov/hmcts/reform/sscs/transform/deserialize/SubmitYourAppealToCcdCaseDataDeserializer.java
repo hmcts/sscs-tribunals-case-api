@@ -49,8 +49,8 @@ import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
-    public static final String YES = "Yes";
-    public static final String NO = "No";
+    private static final String YES = "Yes";
+    private static final String NO = "No";
     private static final String ORAL = "oral";
     private static final String PAPER = "paper";
 
@@ -85,7 +85,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .appeal(appeal)
             .subscriptions(getSubscriptions(syaCaseWrapper))
             .sscsDocument(sscsDocuments.isEmpty() ? null : sscsDocuments)
-            .evidencePresent(hasEvidence(sscsDocuments))
+            .evidencePresent(hasEvidence(syaCaseWrapper.getEvidenceProvide()))
             .build();
     }
 
@@ -622,7 +622,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return phoneNumber;
     }
 
-    private static String hasEvidence(List<SscsDocument> sscsDocuments) {
-        return (null == sscsDocuments || sscsDocuments.isEmpty()) ? NO : YES;
+    private static String hasEvidence(String evidenceProvide) {
+        if (StringUtils.isEmpty(evidenceProvide)) {
+            return StringUtils.EMPTY;
+        }
+        return Boolean.TRUE.toString().equals(evidenceProvide) ? YES : NO;
     }
 }

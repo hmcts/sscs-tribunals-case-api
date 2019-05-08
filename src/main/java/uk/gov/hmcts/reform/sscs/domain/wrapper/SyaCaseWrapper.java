@@ -48,6 +48,8 @@ public class SyaCaseWrapper {
     @JsonProperty("signAndSubmit")
     private SyaSignAndSubmit signAndSubmit;
 
+    private String evidenceProvide;
+
     public SyaContactDetails getContactDetails() {
         if (null == appellant && null == appointee) {
             return null;

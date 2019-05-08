@@ -65,7 +65,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .representative(buildRepresentative(caseData.getAppeal().getRep().getHasRepresentative()))
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
-            .evidenceProvide(buildEvidenceProvide(caseData))
+            .evidenceProvide(buildEvidenceProvide(caseData.getEvidencePresent()))
             .notAttendingHearing(buildNotAttendingHearing(appeal))
             .build();
     }
@@ -288,13 +288,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionOtherReasonForAppealing(appeal.getAppealReasons().getOtherReasons());
     }
 
-    private SessionEvidenceProvide buildEvidenceProvide(SscsCaseData caseData) {
-        if (caseData == null || caseData.getSscsDocument() == null) {
+    private SessionEvidenceProvide buildEvidenceProvide(String evidenceProvide) {
+        if (StringUtils.isEmpty(evidenceProvide)) {
             return null;
         }
-
-        return caseData.getSscsDocument().isEmpty() ? new SessionEvidenceProvide("no")
-            : new SessionEvidenceProvide(caseData.getEvidencePresent());
+        return new SessionEvidenceProvide(StringUtils.lowerCase(evidenceProvide));
     }
 
     private SessionNotAttendingHearing buildNotAttendingHearing(Appeal appeal) {

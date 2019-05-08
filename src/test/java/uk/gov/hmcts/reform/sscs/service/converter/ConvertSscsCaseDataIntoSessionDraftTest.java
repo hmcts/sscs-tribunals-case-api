@@ -108,6 +108,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .build()
             )
             .sscsDocument(Collections.emptyList())
+            .evidencePresent("no")
             .build();
 
         SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
@@ -127,7 +128,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("1998", actual.getAppellantDob().getDate().getYear());
         assertEquals("SC 94 27 06 A", actual.getAppellantNino().getNino());
         assertEquals("1 Appellant Close", actual.getAppellantContactDetails().getAddressLine1());
-        assertEquals(null, actual.getAppellantContactDetails().getAddressLine2());
+        assertNull(actual.getAppellantContactDetails().getAddressLine2());
         assertEquals("Appellant-town", actual.getAppellantContactDetails().getTownCity());
         assertEquals("Appellant-county", actual.getAppellantContactDetails().getCounty());
         assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
