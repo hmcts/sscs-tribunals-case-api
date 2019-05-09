@@ -11,10 +11,32 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantContactDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantDob;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantName;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -46,9 +68,17 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .representative(buildRepresentative(caseData.getAppeal().getRep().getHasRepresentative()))
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
-            .evidenceProvide(buildEvidenceProvide(caseData))
-            .notAttendingHearing(buildNotAttendingHearing(appeal))
+            .evidenceProvide(buildEvidenceProvide(caseData.getEvidencePresent()))
+            .theHearing(buildTheHearing(caseData.getAppeal().getHearingOptions()))
             .build();
+    }
+
+    private SessionTheHearing buildTheHearing(HearingOptions hearingOptions) {
+        if (hearingOptions == null || hearingOptions.getWantsToAttend() == null) {
+            return null;
+        } else {
+            return new SessionTheHearing(StringUtils.lowerCase(hearingOptions.getWantsToAttend()));
+        }
     }
 
     private SessionRepresentative buildRepresentative(String hasRepresentative) {
@@ -290,23 +320,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionOtherReasonForAppealing(appeal.getAppealReasons().getOtherReasons());
     }
 
-    private SessionEvidenceProvide buildEvidenceProvide(SscsCaseData caseData) {
-        if (caseData == null || caseData.getSscsDocument() == null) {
+    private SessionEvidenceProvide buildEvidenceProvide(String evidenceProvide) {
+        if (StringUtils.isEmpty(evidenceProvide)) {
             return null;
         }
-
-        return caseData.getSscsDocument().isEmpty() ? new SessionEvidenceProvide("no")
-            : new SessionEvidenceProvide(caseData.getEvidencePresent());
+        return new SessionEvidenceProvide(StringUtils.lowerCase(evidenceProvide));
     }
 
-    private SessionNotAttendingHearing buildNotAttendingHearing(Appeal appeal) {
-        if (appeal == null
-            || appeal.getHearingOptions() == null
-            || appeal.getHearingOptions().getWantsToAttend() == null
-            || "yes".equalsIgnoreCase(appeal.getHearingOptions().getWantsToAttend())) {
-            return null;
-        }
-
-        return new SessionNotAttendingHearing();
-    }
 }

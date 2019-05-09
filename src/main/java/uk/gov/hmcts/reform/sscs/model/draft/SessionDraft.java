@@ -83,13 +83,4 @@ public class SessionDraft {
 
     @JsonProperty("TheHearing")
     SessionTheHearing theHearing;
-
-    @JsonProperty("HearingSupport")
-    SessionHearingSupport hearingSupport;
-
-    @JsonProperty("HearingArrangements")
-    SessionHearingArrangements hearingArrangements;
-
-    @JsonProperty("NotAttendingHearing")
-    SessionNotAttendingHearing notAttendingHearing;
 }
