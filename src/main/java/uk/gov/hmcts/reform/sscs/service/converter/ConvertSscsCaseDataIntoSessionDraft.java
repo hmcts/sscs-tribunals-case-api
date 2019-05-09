@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
@@ -27,7 +28,6 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionNotAttendingHearing;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
@@ -36,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -66,8 +67,16 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
             .evidenceProvide(buildEvidenceProvide(caseData.getEvidencePresent()))
-            .notAttendingHearing(buildNotAttendingHearing(appeal))
+            .theHearing(buildTheHearing(caseData.getAppeal().getHearingOptions()))
             .build();
+    }
+
+    private SessionTheHearing buildTheHearing(HearingOptions hearingOptions) {
+        if (hearingOptions == null || hearingOptions.getWantsToAttend() == null) {
+            return null;
+        } else {
+            return new SessionTheHearing(StringUtils.lowerCase(hearingOptions.getWantsToAttend()));
+        }
     }
 
     private SessionRepresentative buildRepresentative(String hasRepresentative) {
@@ -295,14 +304,4 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionEvidenceProvide(StringUtils.lowerCase(evidenceProvide));
     }
 
-    private SessionNotAttendingHearing buildNotAttendingHearing(Appeal appeal) {
-        if (appeal == null
-            || appeal.getHearingOptions() == null
-            || appeal.getHearingOptions().getWantsToAttend() == null
-            || "yes".equalsIgnoreCase(appeal.getHearingOptions().getWantsToAttend())) {
-            return null;
-        }
-
-        return new SessionNotAttendingHearing();
-    }
 }

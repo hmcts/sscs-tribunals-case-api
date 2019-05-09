@@ -51,17 +51,6 @@ public class SessionDraftTest {
             .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
             .evidenceProvide(new SessionEvidenceProvide("no"))
             .theHearing(new SessionTheHearing("yes"))
-            .hearingSupport(new SessionHearingSupport("yes"))
-            .hearingArrangements(
-                new SessionHearingArrangements(
-                    new SessionHearingArrangementsSelection(
-                        new SessionHearingArrangement(true, "Spanish"),
-                        new SessionHearingArrangement(true, "British Sign Language (BSL)"),
-                        new SessionHearingArrangement(true),
-                        new SessionHearingArrangement(true)
-                    )
-                )
-            )
             .build();
 
         assertThatJson(SESSION_SAMPLE.getSerializedMessage())

@@ -356,7 +356,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (syaHearingOptions == null) {
             return null;
         }
-        HearingOptions hearingOptions;
+        if (syaHearingOptions.getWantsToAttend() == null) {
+            return HearingOptions.builder().wantsToAttend(null).build();
+        }
         if (syaHearingOptions.getWantsToAttend()) {
 
             String languageInterpreter = null;
@@ -373,7 +375,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 excludedDates = getExcludedDates(syaHearingOptions.getDatesCantAttend());
             }
 
-            hearingOptions = HearingOptions.builder()
+            return HearingOptions.builder()
                 .wantsToAttend(YES)
                 .wantsSupport(wantsSupport)
                 .languageInterpreter(languageInterpreter)
@@ -385,11 +387,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .other(syaHearingOptions.getAnythingElse())
                 .build();
         } else {
-            hearingOptions = HearingOptions.builder()
+            return HearingOptions.builder()
                 .wantsToAttend(NO)
                 .build();
         }
-        return hearingOptions;
     }
 
     private static List<ExcludeDate> getExcludedDates(String[] dates) {
