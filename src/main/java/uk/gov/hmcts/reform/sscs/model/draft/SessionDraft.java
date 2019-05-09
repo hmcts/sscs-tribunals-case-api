@@ -7,7 +7,7 @@ import lombok.Value;
 
 @Value
 @Builder
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class SessionDraft {
     @JsonProperty("BenefitType")
     SessionBenefitType benefitType;
@@ -33,6 +33,9 @@ public class SessionDraft {
     @JsonProperty("DWPIssuingOffice")
     SessionDwpIssuingOffice dwpIssuingOffice;
 
+    @JsonProperty("DWPIssuingOfficeEsa")
+    SessionDwpIssuingOfficeEsa dwpIssuingOfficeEsa;
+
     @JsonProperty("Appointee")
     SessionAppointee appointee;
 
@@ -54,9 +57,8 @@ public class SessionDraft {
     @JsonProperty("SendToNumber")
     SessionSendToNumber sendToNumber;
 
-    // Reintroduce when we know the contents
-    //    @JsonProperty("SmsConfirmation")
-    //    SessionSmsConfirmation smsConfirmation;
+    @JsonProperty("SmsConfirmation")
+    SessionSmsConfirmation smsConfirmation;
 
     @JsonProperty("Representative")
     SessionRepresentative representative;
@@ -75,10 +77,4 @@ public class SessionDraft {
 
     @JsonProperty("TheHearing")
     SessionTheHearing theHearing;
-
-    @JsonProperty("HearingSupport")
-    SessionHearingSupport hearingSupport;
-
-    @JsonProperty("HearingArrangements")
-    SessionHearingArrangements hearingArrangements;
 }
