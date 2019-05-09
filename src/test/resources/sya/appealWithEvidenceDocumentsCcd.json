@@ -46,6 +46,7 @@
         "dob": "1990-02-26",
         "nino": "AB877533C"
       },
+      "isAppointee": "No",
       "isAddressSameAsAppointee": "No",
       "appointee": null
     },
@@ -163,7 +164,8 @@
           "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
         },
         "documentDateAdded" : "2010-10-25",
-        "documentFileName" : "filename1"
+        "documentFileName" : "filename1",
+        "documentType" : "appellantEvidence"
       }
     },
     {
@@ -172,7 +174,8 @@
           "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
         },
         "documentDateAdded" : "2010-10-25",
-        "documentFileName" : "filename2"
+        "documentFileName" : "filename2",
+        "documentType" : "appellantEvidence"
       }
     }
   ],

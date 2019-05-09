@@ -32,7 +32,7 @@ public class SwaggerDocumentationConfig {
     public Docket customImplementation() {
         return new Docket(SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("uk.gov.hmcts.sscs.controller"))
+                .apis(RequestHandlerSelectors.basePackage("uk.gov.hmcts.reform.sscs.controller"))
                 .build()
                 .apiInfo(apiInfo());
     }
