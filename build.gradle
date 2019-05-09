@@ -171,6 +171,15 @@ configurations {
     e2eRuntime.extendsFrom(testRuntime)
 }
 
+distributions {
+    main {
+        contents {
+            from(file("$projectDir/lib/AI-Agent.xml")) {
+                into "lib"
+            }
+        }
+    }
+}
 
 def versions = [
         reformLogging: '5.0.1',

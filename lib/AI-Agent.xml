@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationInsightsAgent>
+    <AgentLogger>INFO</AgentLogger>
+    <Instrumentation>
+        <BuiltIn enabled="true">
+            <HTTP enabled="true" W3C="true" enableW3CBackCompat="true"/>
+        </BuiltIn>
+        <Class name="uk.gov.hmcts.reform.sscs.service.SubmitAppealService">
+            <Method name="ccdCallbackHandler" reportCaughtExceptions="true" reportExecutionTime="true"/>
+        </Class>
+    </Instrumentation>
+</ApplicationInsightsAgent>
+
