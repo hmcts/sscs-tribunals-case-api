@@ -24,6 +24,12 @@ public class SessionDraft {
     @JsonProperty("MRNDate")
     SessionMrnDate mrnDate;
 
+    @JsonProperty("HaveContactedDWP")
+    SessionHaveContactedDwp haveContactedDwp;
+
+    @JsonProperty("NoMRN")
+    SessionNoMrn noMrn;
+
     @JsonProperty("CheckMRN")
     SessionCheckMrn checkMrn;
 
