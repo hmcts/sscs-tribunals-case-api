@@ -8,6 +8,7 @@
     "date": "01-02-2018"
   },
   "isAppointee": false,
+  "evidenceProvide": "false",
   "appellant": {
     "title": "Mr",
     "firstName": "Joe",
@@ -26,7 +27,8 @@
   },
   "smsNotify": {
     "wantsSMSNotifications": true,
-    "smsNumber": "07398785050"
+    "smsNumber": "07398785050",
+    "useSameNumber": false
   },
   "hasRepresentative": true,
   "representative": {

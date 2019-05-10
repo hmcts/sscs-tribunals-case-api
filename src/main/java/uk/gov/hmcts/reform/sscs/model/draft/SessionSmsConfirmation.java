@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
-@Value
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class SessionSmsConfirmation {
 
 }
