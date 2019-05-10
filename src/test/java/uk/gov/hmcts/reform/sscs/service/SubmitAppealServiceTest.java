@@ -103,7 +103,7 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private RoboticsJsonValidator roboticsJsonValidator;
-    
+
     @Captor
     private ArgumentCaptor<Email> emailCaptor;
 
@@ -161,9 +161,9 @@ public class SubmitAppealServiceTest {
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
             roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
 
-            submitAppealService = new SubmitAppealService(
-                        ccdService, citizenCcdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
-                        idamService, evidenceManagementService, convertAintoBService);
+        submitAppealService = new SubmitAppealService(
+                ccdService, citizenCcdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
+                idamService, evidenceManagementService, convertAintoBService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
