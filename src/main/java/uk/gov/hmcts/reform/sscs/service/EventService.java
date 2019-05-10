@@ -107,7 +107,7 @@ public class EventService {
 
     private boolean hasPdfDocument(SscsCaseData caseData) {
         String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
-        LOG.info("Case does has document {} and Pdf file name to check {} ",
+        LOG.info("Case does have document {} and Pdf file name to check {} ",
                 CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
 
         for (SscsDocument document : caseData.getSscsDocument()) {
