@@ -62,8 +62,15 @@ public class EventService {
     }
 
     private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
+        boolean hasPdf = false;
+        try {
+            hasPdf = hasPdfDocument(caseData);
+        } catch (Exception e) {
+            LOG.error("Exception during checking the existing pdf document {}", e);
+        }
 
-        if (!hasPdfDocument(caseData)) {
+        LOG.info("Does case have pdf {}", hasPdf);
+        if (!hasPdf) {
             LOG.info("Existing pdf document not found, start generating pdf ");
             updateAppointeeNullIfNotPresent(caseData);
             caseData.setEvidencePresent(hasEvidence(caseData));
@@ -108,13 +115,13 @@ public class EventService {
     private boolean hasPdfDocument(SscsCaseData caseData) {
         String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
         LOG.info("Case does have document {} and Pdf file name to check {} ",
-                CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
+                !CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
 
         for (SscsDocument document : caseData.getSscsDocument()) {
             LOG.info("Existing document {} for case {} ",
                     document != null ? document.getValue().getDocumentFileName() : null,
                     caseData.getCcdCaseId());
-            if (document != null && fileName.equals(document.getValue().getDocumentFileName())) {
+            if (document != null && fileName.equalsIgnoreCase(document.getValue().getDocumentFileName())) {
                 return true;
             }
         }
