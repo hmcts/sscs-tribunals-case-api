@@ -103,10 +103,7 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private RoboticsJsonValidator roboticsJsonValidator;
-
-    @Mock
-    private RoboticsJsonUploadService roboticsJsonUploadService;
-
+    
     @Captor
     private ArgumentCaptor<Email> emailCaptor;
 
