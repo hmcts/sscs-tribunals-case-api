@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
 
 import java.net.URI;
@@ -7,8 +8,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -19,6 +22,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @Service
 @Slf4j
 public class EventService {
+
+    private static final Logger LOG = getLogger(EventService.class);
 
     private final SscsPdfService sscsPdfService;
     private final RoboticsService roboticsService;
@@ -59,6 +64,7 @@ public class EventService {
     private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
 
         if (!hasPdfDocument(caseData)) {
+            LOG.info("Existing pdf document not found, start generating pdf ");
             updateAppointeeNullIfNotPresent(caseData);
             caseData.setEvidencePresent(hasEvidence(caseData));
             String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
@@ -101,7 +107,13 @@ public class EventService {
 
     private boolean hasPdfDocument(SscsCaseData caseData) {
         String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+        LOG.info("Case does has document {} and Pdf file name to check {} ",
+                CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
+
         for (SscsDocument document : caseData.getSscsDocument()) {
+            LOG.info("Existing document {} for case {} ",
+                    document != null ? document.getValue().getDocumentFileName() : null,
+                    caseData.getCcdCaseId());
             if (document != null && fileName.equals(document.getValue().getDocumentFileName())) {
                 return true;
             }
