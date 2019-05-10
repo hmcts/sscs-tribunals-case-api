@@ -1,19 +1,31 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.status;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+import com.google.common.base.Preconditions;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.net.URI;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
+import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
+import uk.gov.hmcts.reform.sscs.model.draft.Draft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RestController
@@ -28,19 +40,56 @@ public class SyaController {
     }
 
     @ApiOperation(value = "submitAppeal",
-            notes = "Creates a case from the SYA details",
-            response = String.class, responseContainer = "Appeal details")
+        notes = "Creates a case from the SYA details",
+        response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
-            response = String.class)})
-    @RequestMapping(value = "/appeals", method = POST, consumes = APPLICATION_JSON_VALUE)
+        response = String.class)})
+    @PostMapping(value = "/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
-                syaCaseWrapper.getBenefitType().getCode());
-        submitAppealService.submitAppeal(syaCaseWrapper);
-        log.info("Appeal with Nino - {} and benefit type - {} processed successfully",
-                syaCaseWrapper.getAppellant().getNino(),
-                syaCaseWrapper.getBenefitType().getCode());
+            syaCaseWrapper.getBenefitType().getCode());
+        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper);
+        log.info("Case {} with benefit type - {} processed successfully",
+            caseId,
+            syaCaseWrapper.getBenefitType().getCode());
 
-        return status(201).build();
+        return status(HttpStatus.CREATED).build();
+    }
+
+    @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)
+    @ApiResponses(value =
+            {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SessionDraft.class),
+                @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
+                @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
+    @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
+        Preconditions.checkNotNull(authorisation);
+        Optional<SessionDraft> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
+        if (!draftAppeal.isPresent()) {
+            log.info("Did not find any draft appeals for the requested user.");
+        }
+        return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
+    @ApiResponses(value =
+        {@ApiResponse(code = 201, message = "Submitted draft appeal successfully", response = Draft.class)})
+    @PutMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Draft> createDraftAppeal(
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @RequestBody SyaCaseWrapper syaCaseWrapper) {
+        Preconditions.checkNotNull(syaCaseWrapper);
+        SaveCaseResult submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
+        Draft draft = Draft.builder()
+            .id(submitDraftResult.getCaseDetailsId())
+            .build();
+        log.info("{} {} successfully", draft, submitDraftResult.getSaveCaseOperation().name());
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+            .buildAndExpand(draft.getId()).toUri();
+        if (submitDraftResult.getSaveCaseOperation().equals(SaveCaseOperation.CREATE)) {
+            return ResponseEntity.created(location).build();
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).location(location).build();
+        }
     }
 }

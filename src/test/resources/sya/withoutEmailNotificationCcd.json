@@ -45,6 +45,7 @@
         "dob": "1990-02-26",
         "nino": "AB877533C"
       },
+      "isAppointee": "No",
       "isAddressSameAsAppointee": "No",
       "appointee": null
     },
@@ -138,7 +139,7 @@
       "wantSmsNotifications": "No",
       "tya": null,
       "email": null,
-      "mobile": "07411222222",
+      "mobile": "+447411222222",
       "subscribeEmail": "No",
       "subscribeSms": "No",
       "reason": null
@@ -149,7 +150,7 @@
       "wantSmsNotifications":"Yes",
       "tya":null,
       "email":"harry.potter@wizards.com",
-      "mobile":"07411999999",
+      "mobile":"+447411999999",
       "subscribeEmail":"Yes",
       "subscribeSms":"Yes",
       "reason":null

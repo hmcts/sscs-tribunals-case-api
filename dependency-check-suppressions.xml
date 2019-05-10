@@ -16,6 +16,20 @@
     </suppress>
     <suppress>
         <notes><![CDATA[
+            only relates to ssl which we don't do at the java app level
+            ]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2014-3488</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+            only relates to ssl which we don't do at the java app level
+            ]]></notes>
+        <gav regex="true">.*</gav>
+        <cve>CVE-2015-2156</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
    file name: groovy-json-2.4.15.jar
    ]]></notes>
         <gav regex="true">^org\.codehaus\.groovy:groovy-json:.*$</gav>
@@ -41,5 +55,35 @@
    ]]></notes>
         <gav regex="true">^org\.slf4j:slf4j-api:.*$</gav>
         <cve>CVE-2018-8088</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: feign-form-spring-3.3.0.jar
+   ]]></notes>
+        <gav regex="true">^io\.github\.openfeign\.form:feign-form-spring:3\.3\.0$</gav>
+        <cve>CVE-2018-1270</cve>
+        <cve>CVE-2018-1271</cve>
+        <cve>CVE-2018-1272</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-security-crypto-5.0.12.RELEASE.jar
+   ]]></notes>
+        <gav regex="true">^org\.springframework\.security:spring-security-crypto:.*$</gav>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-8.5.39.jar
+   ]]></notes>
+        <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-websocket:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: tomcat-embed-core-8.5.39.jar
+   ]]></notes>
+        <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
+        <cpe>cpe:/a:apache:tomcat</cpe>
     </suppress>
 </suppressions>
