@@ -90,7 +90,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionHearingSupport buildHearingSupport(Appeal appeal) {
-        if (appeal == null || appeal.getHearingOptions() == null) {
+        if (appeal == null
+            || appeal.getHearingOptions() == null
+            || appeal.getHearingOptions().getWantsSupport() == null) {
             return null;
         }
 
@@ -159,7 +161,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionHaveContactedDwp buildHaveContactedDwp(Appeal appeal) {
-        if (!mrnDetailsPresent(appeal) || StringUtils.isBlank(appeal.getMrnDetails().getMrnMissingReason())) {
+        if (!mrnDetailsPresent(appeal)) {
             return null;
         }
 

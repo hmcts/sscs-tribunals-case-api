@@ -1,0 +1,104 @@
+{
+  "BenefitType": {
+    "benefitType": "Personal Independence Payment (PIP)"
+  },
+  "PostcodeChecker": {
+    "postcode": "n29ed"
+  },
+  "CreateAccount": {
+    "createAccount": "yes"
+  },
+  "HaveAMRN": {
+    "haveAMRN": "no"
+  },
+  "HaveContactedDWP": {
+    "haveContactedDWP": "yes"
+  },
+  "NoMRN": {
+    "reasonForNoMRN": "I can't find my letter."
+  },
+  "DWPIssuingOffice": {
+    "pipNumber": "1"
+  },
+  "Appointee": {
+    "isAppointee": "no"
+  },
+  "AppellantName": {
+    "title": "Mrs.",
+    "firstName": "Ap",
+    "lastName": "Pellant"
+  },
+  "AppellantDOB": {
+    "date": {
+      "day": "31",
+      "month": "12",
+      "year": "1998"
+    }
+  },
+  "AppellantNINO": {
+    "nino": "SC 94 27 06 A"
+  },
+  "invalidPostcode": false,
+  "AppellantContactDetails": {
+    "addressLine1": "1 Appellant Close",
+    "townCity": "Appellant-town",
+    "county": "Appellant-county",
+    "postCode": "TS1 1ST",
+    "phoneNumber": "07911123456",
+    "emailAddress": "appellant@gmail.com"
+  },
+  "TextReminders": {
+    "doYouWantTextMsgReminders": "yes"
+  },
+  "SendToNumber": {
+    "useSameNumber": "yes"
+  },
+  "SmsConfirmation": {
+
+  },
+  "Representative": {
+    "hasRepresentative": "no"
+  },
+  "ReasonForAppealing": {
+    "items": [
+      {
+        "whatYouDisagreeWith": "Underpayment",
+        "reasonForAppealing": "I think I should get more"
+      }
+    ]
+  },
+  "OtherReasonForAppealing": {
+    "otherReasonForAppealing": "I can't think of anything else"
+  },
+  "EvidenceProvide": {
+    "evidenceProvide": "no"
+  },
+  "TheHearing": {
+    "attendHearing": "yes"
+  },
+  "HearingSupport": {
+    "arrangements": "yes"
+  },
+  "HearingArrangements": {
+    "selection": {
+      "interpreterLanguage": {
+        "requested": true,
+        "language": "Spanish"
+      },
+      "signLanguage": {
+        "requested": true,
+        "language": "British Sign Language (BSL)"
+      },
+      "anythingElse": {
+        "requested": true,
+        "language": "aaaaa aaaa"
+      },
+      "hearingLoop": {
+        "requested": true
+      },
+      "accessibleHearingRoom": {
+        "requested": true
+      }
+    }
+  }
+}
