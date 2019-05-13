@@ -36,6 +36,9 @@ public class SessionDraft {
     @JsonProperty("MRNOverThirteenMonthsLate")
     SessionMrnOverThirteenMonthsLate mrnOverThirteenMonthsLate;
 
+    @JsonProperty("MRNOverOneMonthLate")
+    SessionMrnOverOneMonthLate mrnOverOneMonthLate;
+
     @JsonProperty("DWPIssuingOffice")
     SessionDwpIssuingOffice dwpIssuingOffice;
 

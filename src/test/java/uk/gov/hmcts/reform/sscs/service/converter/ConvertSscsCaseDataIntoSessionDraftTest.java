@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.converter;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -43,6 +44,60 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     public void attemptToConvertNullAppeal() {
         SscsCaseData caseData = SscsCaseData.builder().build();
         new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+    }
+
+
+    @Test
+    @Parameters(method = "generateMrnLateScenarios")
+    public void givenMrnIsLate_shouldResponseWithCorrectMrnLateResponse(
+        MrnDetails mrnDetails, String expectedReason) {
+
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .mrnDetails(mrnDetails)
+                .build())
+            .build();
+
+        SessionDraft actualSessionDraft = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+
+        if (actualSessionDraft.getMrnOverThirteenMonthsLate() != null) {
+            assertEquals(expectedReason, actualSessionDraft.getMrnOverThirteenMonthsLate().getReasonForBeingLate());
+            assertNull(actualSessionDraft.getMrnOverOneMonthLate());
+        }
+        if (actualSessionDraft.getMrnOverOneMonthLate() != null) {
+            assertEquals(expectedReason, actualSessionDraft.getMrnOverOneMonthLate().getReasonForBeingLate());
+            assertNull(actualSessionDraft.getMrnOverThirteenMonthsLate());
+        }
+    }
+
+    @SuppressWarnings({"unused"})
+    private Object[] generateMrnLateScenarios() {
+        MrnDetails mrnDetailsOverThirteenMonthsLate = MrnDetails.builder()
+            .mrnLateReason("thirteen late reasons")
+            .mrnDate("2017-03-01")
+            .dwpIssuingOffice(null)
+            .mrnMissingReason("")
+            .build();
+
+        MrnDetails mrnDetailsIsOverOneMonthsLate = MrnDetails.builder()
+            .mrnLateReason("one month late reason")
+            .mrnDate(LocalDate.now().minusMonths(2L).toString())
+            .dwpIssuingOffice(null)
+            .mrnMissingReason("")
+            .build();
+
+        MrnDetails mrnDetailsIsNull = MrnDetails.builder()
+            .mrnLateReason(null)
+            .mrnDate(null)
+            .dwpIssuingOffice(null)
+            .mrnMissingReason(null)
+            .build();
+
+        return new Object[]{
+            new Object[]{mrnDetailsOverThirteenMonthsLate, mrnDetailsOverThirteenMonthsLate.getMrnLateReason()},
+            new Object[]{mrnDetailsIsOverOneMonthsLate, mrnDetailsIsOverOneMonthsLate.getMrnLateReason()},
+            new Object[]{mrnDetailsIsNull, null}
+        };
     }
 
     @Test

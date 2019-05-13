@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantContactDetails;
@@ -32,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
@@ -65,6 +65,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .mrnDate(buildMrnDate(appeal))
             .checkMrn(buildCheckMrn(appeal))
             .mrnOverThirteenMonthsLate(buildMrnOverThirteenMonthsLate(appeal))
+            .mrnOverOneMonthLate(buildMrnOverOneMonthLate(appeal))
             .haveContactedDwp(buildHaveContactedDwp(appeal))
             .noMrn(buildNoMrn(appeal))
             .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
@@ -86,9 +87,17 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .build();
     }
 
-    private boolean isMrnOverThirteenMonthsLate(MrnDetails mrnDetails) {
-        LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate(), DATE_FORMATTER);
-        return mrnDate.plusMonths(13L).isBefore(LocalDate.now());
+    private SessionMrnOverOneMonthLate buildMrnOverOneMonthLate(Appeal appeal) {
+        if (mrnDatePresent(appeal) && isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 1L)
+            && !isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 13L)
+            && appeal.getMrnDetails().getMrnLateReason() != null)
+            return new SessionMrnOverOneMonthLate(appeal.getMrnDetails().getMrnLateReason());
+        return null;
+    }
+
+    private boolean isMrnOverPlusMonthsLate(String mrnDate, long plusMonths) {
+        LocalDate mrnDateParsed = LocalDate.parse(mrnDate, DATE_FORMATTER);
+        return mrnDateParsed.plusMonths(plusMonths).isBefore(LocalDate.now());
     }
 
     private boolean mrnDetailsPresent(Appeal appeal) {
@@ -100,13 +109,10 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionMrnOverThirteenMonthsLate buildMrnOverThirteenMonthsLate(Appeal appeal) {
-        if (!mrnDatePresent(appeal)
-            || !isMrnOverThirteenMonthsLate(appeal.getMrnDetails())
-            || appeal.getMrnDetails().getMrnLateReason() == null) {
-            return null;
-        }
-
-        return new SessionMrnOverThirteenMonthsLate(appeal.getMrnDetails().getMrnLateReason());
+        if (mrnDatePresent(appeal) && isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 13L)
+            && appeal.getMrnDetails().getMrnLateReason() != null)
+            return new SessionMrnOverThirteenMonthsLate(appeal.getMrnDetails().getMrnLateReason());
+        return null;
     }
 
     private SessionTheHearing buildTheHearing(HearingOptions hearingOptions) {
