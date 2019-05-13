@@ -284,4 +284,39 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("yes", actual.getAppointee().getIsAppointee());
     }
 
+    @Test
+    public void convertPopulatedCaseDataWithAppointeeNotSpecified() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .address(Address.builder()
+                        .postcode("AP1 14NT")
+                        .build()
+                    )
+                    .appointee(Appointee.builder()
+                        .name(Name.builder().firstName("Ap").lastName("Pointee").build())
+                        .build()
+                    )
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2010-02-01")
+                    .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
+                    .build()
+                )
+                .rep(Representative.builder().build())
+                .build()
+            )
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertNull(actual.getAppointee());
+    }
+
 }
