@@ -181,10 +181,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionCheckMrn buildCheckMrn(Appeal appeal) {
-        if (!mrnDatePresent(appeal)) {
+        if (appeal.getMrnDetails() == null || appeal.getMrnDetails().getMrnLateReason() == null) {
             return null;
         }
-
         return new SessionCheckMrn("yes");
     }
 
