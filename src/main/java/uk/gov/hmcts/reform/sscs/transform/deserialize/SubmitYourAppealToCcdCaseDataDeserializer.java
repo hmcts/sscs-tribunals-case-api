@@ -224,11 +224,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Appointee appointee = getAppointee(syaCaseWrapper);
 
-        if (null != appointee
-            && null != syaAppellant
-            && null != syaAppellant.getIsAddressSameAsAppointee()
-            && syaAppellant.getIsAddressSameAsAppointee()
-        ) {
+        if (appointee != null && null != syaAppellant && syaAppellant.getIsAddressSameAsAppointee()) {
             address = Address.builder()
                 .line1(appointee.getAddress().getLine1())
                 .line2(appointee.getAddress().getLine2())
@@ -238,9 +234,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .build();
         }
 
-        String useSameAddress = null;
-        if (syaAppellant != null && syaAppellant.getIsAddressSameAsAppointee() != null) {
-            useSameAddress = !syaAppellant.getIsAddressSameAsAppointee() ? "No" : "Yes";
+        String useSameAddress = "No";
+        if (syaAppellant != null) {
+            useSameAddress = (syaAppellant.getIsAddressSameAsAppointee() == null
+                || !syaAppellant.getIsAddressSameAsAppointee()) ? "No" : "Yes";
         }
 
         return Appellant.builder()
@@ -518,7 +515,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static Subscription getAppointeeSubscription(SyaCaseWrapper syaCaseWrapper) {
-        if (null != syaCaseWrapper.getAppointee() && null != syaCaseWrapper.getSmsNotify()) {
+        if (null != syaCaseWrapper.getAppointee()) {
             SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
             String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;

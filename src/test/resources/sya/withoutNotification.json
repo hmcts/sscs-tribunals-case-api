@@ -21,8 +21,7 @@
       "townCity": "Hairyfield",
       "county": "Kent",
       "postCode": "TN32 6PL"
-    },
-    "isAddressSameAsAppointee": false
+    }
   },
   "smsNotify": {
     "wantsSMSNotifications": false

@@ -60,8 +60,6 @@ public enum SerializeJsonMessageManager {
     HEARING_BOOKED_PAPER_CASE("tya/hearingBookedPaperCase.json"),
     HEARING_BOOKED_PAPER_CASE_CCD("tya/hearingBookedPaperCaseCcd.json"),
     SESSION_SAMPLE("drafts/session-sample.json"),
-    SESSION_SAMPLE_WITH_APPOINTEE("drafts/session-sample-with-appointee.json"),
-    SESSION_SAMPLE_WITH_APPOINTEE_AT_SAME_ADDRESS("drafts/session-sample-with-appointee-at-same-address.json"),
     SESSION_SAMPLE_WITH_NO_MRN("drafts/session-sample-with-no-mrn.json"),
     SESSION_SAMPLE_WITH_REP("drafts/session-sample-with-rep.json");
 

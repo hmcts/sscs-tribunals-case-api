@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Value;
 
 @Value
-public class SessionDob {
+public class SessionAppellantDob {
     @JsonProperty("date")
     private SessionDate date;
 

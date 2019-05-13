@@ -22,8 +22,7 @@
       "county": "Kent",
       "postCode": "TN32 6PL",
       "phoneNumber": "07411222222"
-    },
-    "isAddressSameAsAppointee": false
+    }
   },
   "smsNotify": {
     "wantsSMSNotifications": false,

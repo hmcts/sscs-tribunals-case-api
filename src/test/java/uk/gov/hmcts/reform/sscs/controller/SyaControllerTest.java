@@ -97,21 +97,20 @@ public class SyaControllerTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
-            .appellantName(new SessionName("Mrs.","Ap","Pellant"))
-            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
+            .appellantName(new SessionAppellantName("Mrs.","Ap","Pellant"))
+            .appellantDob(new SessionAppellantDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("AB123456C"))
             .appellantContactDetails(
-                new SessionContactDetails(
+                new SessionAppellantContactDetails(
                     "line1",
                     "line2",
                     "town-city",
                     "county",
                     "AP1 4NT",
                     "07000000000",
-                    "appellant@test.com"
+                    "appointee@test.com"
                 )
             )
-            .sameAddress(new SessionSameAddress("no"))
             .textReminders(new SessionTextReminders("yes"))
             .sendToNumber(new SessionSendToNumber("yes"))
             .representative(new SessionRepresentative("no"))
@@ -159,8 +158,7 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.AppellantContactDetails.county").value("county"))
             .andExpect(jsonPath("$.AppellantContactDetails.postCode").value("AP1 4NT"))
             .andExpect(jsonPath("$.AppellantContactDetails.phoneNumber").value("07000000000"))
-            .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appellant@test.com"))
-            .andExpect(jsonPath("$.SameAddress.isAddressSameAsAppointee").value("no"))
+            .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appointee@test.com"))
             .andExpect(jsonPath("$.TextReminders.doYouWantTextMsgReminders").value("yes"))
             .andExpect(jsonPath("$.SendToNumber.useSameNumber").value("yes"))
             .andExpect(jsonPath("$.Representative.hasRepresentative").value("no"))
@@ -185,18 +183,18 @@ public class SyaControllerTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
-            .appellantName(new SessionName("Mrs.","Ap","Pellant"))
-            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
+            .appellantName(new SessionAppellantName("Mrs.","Ap","Pellant"))
+            .appellantDob(new SessionAppellantDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("AB123456C"))
             .appellantContactDetails(
-                new SessionContactDetails(
+                new SessionAppellantContactDetails(
                     "line1",
                     "line2",
                     "town-city",
                     "county",
                     "AP1 4NT",
                     "07000000000",
-                    "appellant@test.com"
+                    "appointee@test.com"
                 )
             )
             .textReminders(new SessionTextReminders("yes"))
@@ -250,7 +248,7 @@ public class SyaControllerTest {
             .andExpect(jsonPath("$.AppellantContactDetails.county").value("county"))
             .andExpect(jsonPath("$.AppellantContactDetails.postCode").value("AP1 4NT"))
             .andExpect(jsonPath("$.AppellantContactDetails.phoneNumber").value("07000000000"))
-            .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appellant@test.com"))
+            .andExpect(jsonPath("$.AppellantContactDetails.emailAddress").value("appointee@test.com"))
             .andExpect(jsonPath("$.TextReminders.doYouWantTextMsgReminders").value("yes"))
             .andExpect(jsonPath("$.SendToNumber.useSameNumber").value("yes"))
             .andExpect(jsonPath("$.Representative.hasRepresentative").value("yes"))
@@ -279,20 +277,6 @@ public class SyaControllerTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("yes"))
-            .appointeeName(new SessionName("Mr.","Ap","Pointee"))
-            .appointeeDob(new SessionDob(new SessionDate("1", "1", "1999")))
-            .appointeeContactDetails(
-                new SessionContactDetails(
-                    "tee-line1",
-                    "tee-line2",
-                    "tee-town-city",
-                    "tee-county",
-                    "AP1 33T",
-                    "07111111111",
-                    "appointee@test.com"
-                )
-            )
-            .sameAddress(new SessionSameAddress("no"))
             .build();
 
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.of(sessionDraft));
@@ -302,22 +286,7 @@ public class SyaControllerTest {
                 .header("Authorization", "Bearer myToken")
                 .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.Appointee.isAppointee").value("yes"))
-            .andExpect(jsonPath("$.AppointeeName.title").value("Mr."))
-            .andExpect(jsonPath("$.AppointeeName.firstName").value("Ap"))
-            .andExpect(jsonPath("$.AppointeeName.lastName").value("Pointee"))
-            .andExpect(jsonPath("$.AppointeeDOB.date.day").value("1"))
-            .andExpect(jsonPath("$.AppointeeDOB.date.month").value("1"))
-            .andExpect(jsonPath("$.AppointeeDOB.date.year").value("1999"))
-            .andExpect(jsonPath("$.AppointeeContactDetails.addressLine1").value("tee-line1"))
-            .andExpect(jsonPath("$.AppointeeContactDetails.addressLine2").value("tee-line2"))
-            .andExpect(jsonPath("$.AppointeeContactDetails.townCity").value("tee-town-city"))
-            .andExpect(jsonPath("$.AppointeeContactDetails.county").value("tee-county"))
-            .andExpect(jsonPath("$.AppointeeContactDetails.postCode").value("AP1 33T"))
-            .andExpect(jsonPath("$.AppointeeContactDetails.phoneNumber").value("07111111111"))
-            .andExpect(jsonPath("$.AppointeeContactDetails.emailAddress").value("appointee@test.com"))
-            .andExpect(jsonPath("$.SameAddress.isAddressSameAsAppointee").value("no"))
-        ;
+            .andExpect(jsonPath("$.Appointee.isAppointee").value("yes"));
     }
 
     @Test

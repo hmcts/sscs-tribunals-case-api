@@ -23,8 +23,7 @@
       "postCode": "TN32 6PL",
       "phoneNumber": "0741 122 2222",
       "emailAddress": "joe@bloggs.com"
-    },
-    "isAddressSameAsAppointee": false
+    }
   },
   "smsNotify": {
     "wantsSMSNotifications": true,

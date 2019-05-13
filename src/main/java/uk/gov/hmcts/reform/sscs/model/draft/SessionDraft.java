@@ -42,32 +42,20 @@ public class SessionDraft {
     @JsonProperty("DWPIssuingOfficeEsa")
     SessionDwpIssuingOfficeEsa dwpIssuingOfficeEsa;
 
-    @JsonProperty("AppointeeName")
-    SessionName appointeeName;
-
-    @JsonProperty("AppointeeDOB")
-    SessionDob appointeeDob;
-
-    @JsonProperty("AppointeeContactDetails")
-    SessionContactDetails appointeeContactDetails;
-
     @JsonProperty("Appointee")
     SessionAppointee appointee;
 
     @JsonProperty("AppellantName")
-    SessionName appellantName;
+    SessionAppellantName appellantName;
 
     @JsonProperty("AppellantDOB")
-    SessionDob appellantDob;
+    SessionAppellantDob appellantDob;
 
     @JsonProperty("AppellantNINO")
     SessionAppellantNino appellantNino;
 
     @JsonProperty("AppellantContactDetails")
-    SessionContactDetails appellantContactDetails;
-
-    @JsonProperty("SameAddress")
-    SessionSameAddress sameAddress;
+    SessionAppellantContactDetails appellantContactDetails;
 
     @JsonProperty("TextReminders")
     SessionTextReminders textReminders;

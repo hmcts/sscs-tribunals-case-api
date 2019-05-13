@@ -54,9 +54,6 @@
     "phoneNumber": "07911123456",
     "emailAddress": "appellant@gmail.com"
   },
-  "SameAddress": {
-    "isAddressSameAsAppointee": "no"
-  },
   "TextReminders": {
     "doYouWantTextMsgReminders": "yes"
   },
