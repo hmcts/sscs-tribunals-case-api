@@ -23,7 +23,8 @@
       "postCode": "TN32 6PL",
       "phoneNumber": "07411222222",
       "emailAddress": "sscstest@greencroftconsulting.com"
-    }
+    },
+    "isAddressSameAsAppointee": false
   },
   "smsNotify": {
     "wantsSMSNotifications": true,

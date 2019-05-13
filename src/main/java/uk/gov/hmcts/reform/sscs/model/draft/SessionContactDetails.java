@@ -5,7 +5,7 @@ import lombok.Value;
 
 @Value
 @JsonInclude(value = JsonInclude.Include.NON_NULL)
-public class SessionAppellantContactDetails {
+public class SessionContactDetails {
     private String addressLine1;
     private String addressLine2;
     private String townCity;
