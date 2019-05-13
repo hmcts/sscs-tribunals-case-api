@@ -100,11 +100,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean hasRep(Appeal appeal) {
-        return appeal == null || appeal.getRep() == null;
+        return appeal != null && appeal.getRep() != null;
     }
 
     private SessionRepresentative buildRepresentative(Appeal appeal) {
-        if (hasRep(appeal) || StringUtils.isBlank(appeal.getRep().getHasRepresentative())) {
+        if (!hasRep(appeal) || StringUtils.isBlank(appeal.getRep().getHasRepresentative())) {
             return null;
         }
         return new SessionRepresentative(StringUtils.lowerCase(appeal.getRep().getHasRepresentative()));
@@ -127,15 +127,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             );
         }
 
+        boolean hasAddress = appeal.getRep().getAddress() == null ? false : true;
+        boolean hasContact = appeal.getRep().getContact() == null ? false : true;
+
         return new SessionRepresentativeDetails(
             repName,
-            appeal.getRep().getAddress().getLine1(),
-            appeal.getRep().getAddress().getLine2(),
-            appeal.getRep().getAddress().getTown(),
-            appeal.getRep().getAddress().getCounty(),
-            appeal.getRep().getAddress().getPostcode(),
-            appeal.getRep().getContact().getMobile(),
-            appeal.getRep().getContact().getEmail()
+            hasAddress ? appeal.getRep().getAddress().getLine1() : null,
+            hasAddress ? appeal.getRep().getAddress().getLine2() : null,
+            hasAddress ? appeal.getRep().getAddress().getTown() : null,
+            hasAddress ? appeal.getRep().getAddress().getCounty() : null,
+            hasAddress ? appeal.getRep().getAddress().getPostcode() : null,
+            hasContact ? appeal.getRep().getContact().getMobile() : null,
+            hasContact ? appeal.getRep().getContact().getEmail() : null
         );
     }
 
