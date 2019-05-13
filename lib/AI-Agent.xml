@@ -6,7 +6,13 @@
             <HTTP enabled="true" W3C="true" enableW3CBackCompat="true"/>
         </BuiltIn>
         <Class name="uk.gov.hmcts.reform.sscs.service.SubmitAppealService">
-            <Method name="ccdCallbackHandler" reportCaughtExceptions="true" reportExecutionTime="true"/>
+            <Method name="submitAppeal" reportCaughtExceptions="true" reportExecutionTime="true"/>
+        </Class>
+        <Class name="uk.gov.hmcts.reform.sscs.service.SubmitAppealService">
+            <Method name="submitDraftAppeal" reportCaughtExceptions="true" reportExecutionTime="true"/>
+        </Class>
+        <Class name="uk.gov.hmcts.reform.sscs.service.SubmitAppealService">
+            <Method name="getDraftAppeal" reportCaughtExceptions="true" reportExecutionTime="true"/>
         </Class>
     </Instrumentation>
 </ApplicationInsightsAgent>
