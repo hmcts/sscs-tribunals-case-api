@@ -155,8 +155,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             );
         }
 
-        boolean hasAddress = appeal.getRep().getAddress() == null ? false : true;
-        boolean hasContact = appeal.getRep().getContact() == null ? false : true;
+        boolean hasAddress = appeal.getRep().getAddress() != null;
+        boolean hasContact = appeal.getRep().getContact() != null;
 
         return new SessionRepresentativeDetails(
             repName,
