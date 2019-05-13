@@ -4,7 +4,10 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
@@ -22,8 +25,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
 
+@RunWith(JUnitParamsRunner.class)
 public class ConvertSscsCaseDataIntoSessionDraftTest {
+
+    private SscsCaseData caseData;
+
     @Test(expected = NullPointerException.class)
     public void attemptToConvertNull() {
         new ConvertSscsCaseDataIntoSessionDraft().convert(null);
@@ -36,8 +46,65 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
+    @Parameters(method = "generateMrnPossibleScenarios")
+    public void givenMrnPathIsCompleted_shouldBuildHaveMrnSessionObjectCorrectly(MrnDetails mrnDetails,
+                                                                                 SessionDraft expectedSessionDraft) {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .mrnDetails(mrnDetails)
+                .build())
+            .build();
+
+        SessionDraft actualSessionDraft = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals(actualSessionDraft.getMrnDate(), expectedSessionDraft.getMrnDate());
+        assertEquals(actualSessionDraft.getNoMrn(), expectedSessionDraft.getNoMrn());
+        assertEquals(actualSessionDraft.getHaveAMrn(), expectedSessionDraft.getHaveAMrn());
+        assertEquals(actualSessionDraft.getHaveContactedDwp(), expectedSessionDraft.getHaveContactedDwp());
+
+        System.out.println(actualSessionDraft);
+
+    }
+
+    @SuppressWarnings({"unused"})
+    private Object[] generateMrnPossibleScenarios() {
+        MrnDetails mrnDetailsIsNull = MrnDetails.builder()
+            .mrnLateReason(null)
+            .mrnDate(null)
+            .dwpIssuingOffice(null)
+            .mrnMissingReason(null)
+            .build();
+
+        SessionDraft sessionDraftExpectedWhenMrnDetailsIsNull = SessionDraft.builder()
+            .mrnDate(null)
+            .haveAMrn(null)
+            .noMrn(null)
+            .haveContactedDwp(null)
+            .build();
+
+
+        MrnDetails mrnDetailsWithMissionReason = MrnDetails.builder()
+            .mrnLateReason(null)
+            .mrnDate(null)
+            .dwpIssuingOffice(null)
+            .mrnMissingReason("reason for no Mrn")
+            .build();
+
+        SessionDraft sessionDraftExpectedWhenHaveNoMrnAndHaveContactedDwp = SessionDraft.builder()
+            .mrnDate(null)
+            .haveAMrn(new SessionHaveAMrn("no"))
+            .noMrn(new SessionNoMrn("reason for no Mrn"))
+            .haveContactedDwp(new SessionHaveContactedDwp("yes"))
+            .build();
+
+        return new Object[]{
+            new Object[]{mrnDetailsIsNull, sessionDraftExpectedWhenMrnDetailsIsNull},
+            new Object[]{mrnDetailsWithMissionReason, sessionDraftExpectedWhenHaveNoMrnAndHaveContactedDwp}
+        };
+    }
+
+    @Test
     public void convertPopulatedCaseData() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
