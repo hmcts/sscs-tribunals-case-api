@@ -7,8 +7,44 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantContactDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantDob;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantName;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepName;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentativeDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -29,6 +65,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .mrnDate(buildMrnDate(appeal))
             .checkMrn(buildCheckMrn(appeal))
             .mrnOverThirteenMonthsLate(buildMrnOverThirteenMonthsLate(appeal))
+            .mrnOverOneMonthLate(buildMrnOverOneMonthLate(appeal))
             .haveContactedDwp(buildHaveContactedDwp(appeal))
             .noMrn(buildNoMrn(appeal))
             .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
@@ -54,9 +91,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .build();
     }
 
-    private boolean isMrnOverThirteenMonthsLate(MrnDetails mrnDetails) {
-        LocalDate mrnDate = LocalDate.parse(mrnDetails.getMrnDate(), DATE_FORMATTER);
-        return mrnDate.plusMonths(13L).isBefore(LocalDate.now());
+    private SessionMrnOverOneMonthLate buildMrnOverOneMonthLate(Appeal appeal) {
+        if (mrnDatePresent(appeal) && isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 1L)
+            && !isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 13L)
+            && appeal.getMrnDetails().getMrnLateReason() != null) {
+            return new SessionMrnOverOneMonthLate(appeal.getMrnDetails().getMrnLateReason());
+        }
+        return null;
+    }
+
+    private boolean isMrnOverPlusMonthsLate(String mrnDate, long plusMonths) {
+        LocalDate mrnDateParsed = LocalDate.parse(mrnDate, DATE_FORMATTER);
+        return mrnDateParsed.plusMonths(plusMonths).isBefore(LocalDate.now());
     }
 
     private boolean mrnDetailsPresent(Appeal appeal) {
@@ -68,13 +114,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionMrnOverThirteenMonthsLate buildMrnOverThirteenMonthsLate(Appeal appeal) {
-        if (!mrnDatePresent(appeal)
-            || !isMrnOverThirteenMonthsLate(appeal.getMrnDetails())
-            || appeal.getMrnDetails().getMrnLateReason() == null) {
-            return null;
+        if (mrnDatePresent(appeal) && isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 13L)
+            && appeal.getMrnDetails().getMrnLateReason() != null) {
+            return new SessionMrnOverThirteenMonthsLate(appeal.getMrnDetails().getMrnLateReason());
         }
-
-        return new SessionMrnOverThirteenMonthsLate(appeal.getMrnDetails().getMrnLateReason());
+        return null;
     }
 
     private SessionTheHearing buildTheHearing(HearingOptions hearingOptions) {
@@ -96,11 +140,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean hasRep(Appeal appeal) {
-        return appeal == null || appeal.getRep() == null;
+        return appeal != null && appeal.getRep() != null;
     }
 
     private SessionRepresentative buildRepresentative(Appeal appeal) {
-        if (hasRep(appeal) || StringUtils.isBlank(appeal.getRep().getHasRepresentative())) {
+        if (!hasRep(appeal) || StringUtils.isBlank(appeal.getRep().getHasRepresentative())) {
             return null;
         }
         return new SessionRepresentative(StringUtils.lowerCase(appeal.getRep().getHasRepresentative()));
@@ -123,15 +167,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             );
         }
 
+        boolean hasAddress = appeal.getRep().getAddress() != null;
+        boolean hasContact = appeal.getRep().getContact() != null;
+
         return new SessionRepresentativeDetails(
             repName,
-            appeal.getRep().getAddress().getLine1(),
-            appeal.getRep().getAddress().getLine2(),
-            appeal.getRep().getAddress().getTown(),
-            appeal.getRep().getAddress().getCounty(),
-            appeal.getRep().getAddress().getPostcode(),
-            appeal.getRep().getContact().getMobile(),
-            appeal.getRep().getContact().getEmail()
+            hasAddress ? appeal.getRep().getAddress().getLine1() : null,
+            hasAddress ? appeal.getRep().getAddress().getLine2() : null,
+            hasAddress ? appeal.getRep().getAddress().getTown() : null,
+            hasAddress ? appeal.getRep().getAddress().getCounty() : null,
+            hasAddress ? appeal.getRep().getAddress().getPostcode() : null,
+            hasContact ? appeal.getRep().getContact().getMobile() : null,
+            hasContact ? appeal.getRep().getContact().getEmail() : null
         );
     }
 
@@ -140,24 +187,23 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             return null;
         }
 
-        LocalDate mrdDetailsDate = LocalDate.parse(appeal.getMrnDetails().getMrnDate());
-        String day = String.valueOf(mrdDetailsDate.getDayOfMonth());
-        String month = String.valueOf(mrdDetailsDate.getMonthValue());
-        String year = String.valueOf(mrdDetailsDate.getYear());
+        LocalDate mrnDetailsDate = LocalDate.parse(appeal.getMrnDetails().getMrnDate());
+        String day = String.valueOf(mrnDetailsDate.getDayOfMonth());
+        String month = String.valueOf(mrnDetailsDate.getMonthValue());
+        String year = String.valueOf(mrnDetailsDate.getYear());
 
         return new SessionMrnDate(new SessionDate(day, month, year));
     }
 
     private SessionCheckMrn buildCheckMrn(Appeal appeal) {
-        if (!mrnDatePresent(appeal)) {
+        if (appeal.getMrnDetails() == null || appeal.getMrnDetails().getMrnLateReason() == null) {
             return null;
         }
-
         return new SessionCheckMrn("yes");
     }
 
     private SessionHaveContactedDwp buildHaveContactedDwp(Appeal appeal) {
-        if (!mrnDetailsPresent(appeal)) {
+        if (!mrnDetailsPresent(appeal) || StringUtils.isBlank(appeal.getMrnDetails().getMrnMissingReason())) {
             return null;
         }
 
@@ -172,8 +218,20 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionNoMrn(appeal.getMrnDetails().getMrnMissingReason());
     }
 
+        return new SessionHaveContactedDwp("yes");
+    }
+
+    private SessionNoMrn buildNoMrn(Appeal appeal) {
+        if (!mrnDetailsPresent(appeal) || StringUtils.isBlank(appeal.getMrnDetails().getMrnMissingReason())) {
+            return null;
+        }
+
+        return new SessionNoMrn(appeal.getMrnDetails().getMrnMissingReason());
+    }
+
     private SessionHaveAMrn buildHaveAMrn(Appeal appeal) {
-        if (!mrnDetailsPresent(appeal)) {
+        if (!mrnDetailsPresent(appeal)
+            || (!mrnDatePresent(appeal) && StringUtils.isBlank(appeal.getMrnDetails().getMrnMissingReason()))) {
             return null;
         }
 
@@ -189,6 +247,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionBenefitType buildSessionBenefitType(BenefitType benefitType) {
+        if (benefitType == null) {
+            return null;
+        }
         return new SessionBenefitType(benefitType.getDescription() + " (" + benefitType.getCode() + ")");
     }
 
