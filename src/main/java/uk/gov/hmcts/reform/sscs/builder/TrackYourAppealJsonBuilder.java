@@ -41,7 +41,7 @@ public class TrackYourAppealJsonBuilder {
             if (caseData.getCaseCreated() != null) {
                 caseData = createAppealReceivedEventTypeForAppealCreatedEvent(caseData);
             } else {
-                String message = "No events exist for this appeal";
+                String message = "No events exist for this appeal with case id: " + caseId;
                 CcdException ccdException = new CcdException(message);
                 LOG.error(message, ccdException);
                 throw ccdException;
