@@ -93,7 +93,6 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             && appeal.getMrnDetails().getMrnLateReason() != null) {
             return new SessionMrnOverOneMonthLate(appeal.getMrnDetails().getMrnLateReason());
         }
-
         return null;
     }
 
@@ -115,7 +114,6 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             && appeal.getMrnDetails().getMrnLateReason() != null) {
             return new SessionMrnOverThirteenMonthsLate(appeal.getMrnDetails().getMrnLateReason());
         }
-
         return null;
     }
 
@@ -185,10 +183,10 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             return null;
         }
 
-        LocalDate mrdDetailsDate = LocalDate.parse(appeal.getMrnDetails().getMrnDate());
-        String day = String.valueOf(mrdDetailsDate.getDayOfMonth());
-        String month = String.valueOf(mrdDetailsDate.getMonthValue());
-        String year = String.valueOf(mrdDetailsDate.getYear());
+        LocalDate mrnDetailsDate = LocalDate.parse(appeal.getMrnDetails().getMrnDate());
+        String day = String.valueOf(mrnDetailsDate.getDayOfMonth());
+        String month = String.valueOf(mrnDetailsDate.getMonthValue());
+        String year = String.valueOf(mrnDetailsDate.getYear());
 
         return new SessionMrnDate(new SessionDate(day, month, year));
     }
