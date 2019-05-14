@@ -7,8 +7,48 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionContactDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDob;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionName;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepName;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentativeDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSameAddress;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -360,11 +400,17 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionTextReminders buildTextReminders(Subscriptions subscriptions) {
-        if (subscribeSmsInSubscriptionIsNull(subscriptions)) {
+        if (subscribeSmsInSubscriptionsIsNull(subscriptions)) {
             return null;
         }
+        if (!subscribeSmsIsNull(subscriptions.getAppellantSubscription())) {
+            return getSessionTextReminders(subscriptions.getAppellantSubscription());
+        }
+        return getSessionTextReminders(subscriptions.getAppointeeSubscription());
+    }
 
-        return "no".equalsIgnoreCase(subscriptions.getAppellantSubscription().getSubscribeSms())
+    private SessionTextReminders getSessionTextReminders(Subscription subscription) {
+        return "no".equalsIgnoreCase(subscription.getSubscribeSms())
             ? new SessionTextReminders("no")
             : new SessionTextReminders("yes");
     }
@@ -401,10 +447,17 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             || caseData.getAppeal().getAppellant().getContact() == null;
     }
 
-    private boolean subscribeSmsInSubscriptionIsNull(Subscriptions subscriptions) {
-        return subscriptions == null
-            || subscriptions.getAppellantSubscription() == null
-            || subscriptions.getAppellantSubscription().getSubscribeSms() == null;
+    private boolean subscribeSmsInSubscriptionsIsNull(Subscriptions subscriptions) {
+        if (subscriptions != null) {
+            boolean appellantSubscribeSmsIsNull = subscribeSmsIsNull(subscriptions.getAppellantSubscription());
+            boolean appointeeSubscribeSmsIsNull = subscribeSmsIsNull(subscriptions.getAppointeeSubscription());
+            return appellantSubscribeSmsIsNull && appointeeSubscribeSmsIsNull;
+        }
+        return true;
+    }
+
+    private boolean subscribeSmsIsNull(Subscription subscription) {
+        return subscription == null || subscription.getSubscribeSms() == null;
     }
 
     private boolean mobileInSubscriptionIsNull(Subscriptions subscriptions) {

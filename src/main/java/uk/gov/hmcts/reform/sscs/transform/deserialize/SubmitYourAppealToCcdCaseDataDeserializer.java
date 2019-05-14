@@ -227,8 +227,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (null != appointee
             && null != syaAppellant
             && null != syaAppellant.getIsAddressSameAsAppointee()
-            && syaAppellant.getIsAddressSameAsAppointee()
-        ) {
+            && syaAppellant.getIsAddressSameAsAppointee()) {
             address = Address.builder()
                 .line1(appointee.getAddress().getLine1())
                 .line2(appointee.getAddress().getLine2())
@@ -430,16 +429,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static Subscriptions populateSubscriptions(SyaCaseWrapper syaCaseWrapper) {
 
         return Subscriptions.builder()
-            .appellantSubscription(
-                syaCaseWrapper.getIsAppointee() != null && !syaCaseWrapper.getIsAppointee()
-                    ? getAppellantSubscription(syaCaseWrapper)
-                    : null
-            )
-            .appointeeSubscription(
-                syaCaseWrapper.getIsAppointee() != null && syaCaseWrapper.getIsAppointee()
-                    ? getAppointeeSubscription(syaCaseWrapper)
-                    : null
-            )
+            .appellantSubscription(syaCaseWrapper.getIsAppointee() != null && !syaCaseWrapper.getIsAppointee()
+                    ? getAppellantSubscription(syaCaseWrapper) : null)
+            .appointeeSubscription(syaCaseWrapper.getIsAppointee() != null && syaCaseWrapper.getIsAppointee()
+                    ? getAppointeeSubscription(syaCaseWrapper) : null)
             .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
             .build();
     }
@@ -521,7 +514,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (null != syaCaseWrapper.getAppointee() && null != syaCaseWrapper.getSmsNotify()) {
             SyaSmsNotify smsNotify = syaCaseWrapper.getSmsNotify();
 
-            String subscribeSms = smsNotify.isWantsSmsNotifications() ? YES : NO;
+            String subscribeSms = getSubscribeSms(smsNotify);
 
             String email = syaCaseWrapper.getAppointee().getContactDetails().getEmailAddress();
             String wantEmailNotifications = StringUtils.isNotBlank(email) ? YES : NO;
@@ -529,7 +522,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 getNotificationSmsNumber(smsNotify, syaCaseWrapper.getAppointee().getContactDetails()));
 
             return Subscription.builder()
-                .wantSmsNotifications(smsNotify.isWantsSmsNotifications() ? YES : NO)
+                .wantSmsNotifications(subscribeSms)
                 .subscribeSms(subscribeSms)
                 .tya(generateAppealNumber())
                 .mobile(cleanPhoneNumber(mobile).orElse(mobile))
