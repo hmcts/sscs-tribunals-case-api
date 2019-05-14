@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_NO_MRN;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_REP;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
 
 import java.util.Collections;
 import net.javacrumbs.jsonunit.core.Option;
@@ -71,11 +69,11 @@ public class SessionDraftTest {
             .noMrn(new SessionNoMrn("I can't find my letter."))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
-            .appellantName(new SessionAppellantName("Mrs.", "Ap", "Pellant"))
-            .appellantDob(new SessionAppellantDob(new SessionDate("31", "12", "1998")))
+            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
             .appellantContactDetails(
-                new SessionAppellantContactDetails(
+                new SessionContactDetails(
                     "1 Appellant Close",
                     null,
                     "Appellant-town",
