@@ -90,8 +90,10 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private SessionMrnOverOneMonthLate buildMrnOverOneMonthLate(Appeal appeal) {
         if (mrnDatePresent(appeal) && isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 1L)
             && !isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 13L)
-            && appeal.getMrnDetails().getMrnLateReason() != null)
+            && appeal.getMrnDetails().getMrnLateReason() != null) {
             return new SessionMrnOverOneMonthLate(appeal.getMrnDetails().getMrnLateReason());
+        }
+
         return null;
     }
 
@@ -110,8 +112,10 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
 
     private SessionMrnOverThirteenMonthsLate buildMrnOverThirteenMonthsLate(Appeal appeal) {
         if (mrnDatePresent(appeal) && isMrnOverPlusMonthsLate(appeal.getMrnDetails().getMrnDate(), 13L)
-            && appeal.getMrnDetails().getMrnLateReason() != null)
+            && appeal.getMrnDetails().getMrnLateReason() != null) {
             return new SessionMrnOverThirteenMonthsLate(appeal.getMrnDetails().getMrnLateReason());
+        }
+
         return null;
     }
 
