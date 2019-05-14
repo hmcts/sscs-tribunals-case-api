@@ -24,11 +24,20 @@ public class SessionDraft {
     @JsonProperty("MRNDate")
     SessionMrnDate mrnDate;
 
+    @JsonProperty("HaveContactedDWP")
+    SessionHaveContactedDwp haveContactedDwp;
+
+    @JsonProperty("NoMRN")
+    SessionNoMrn noMrn;
+
     @JsonProperty("CheckMRN")
     SessionCheckMrn checkMrn;
 
     @JsonProperty("MRNOverThirteenMonthsLate")
     SessionMrnOverThirteenMonthsLate mrnOverThirteenMonthsLate;
+
+    @JsonProperty("MRNOverOneMonthLate")
+    SessionMrnOverOneMonthLate mrnOverOneMonthLate;
 
     @JsonProperty("DWPIssuingOffice")
     SessionDwpIssuingOffice dwpIssuingOffice;
@@ -77,4 +86,10 @@ public class SessionDraft {
 
     @JsonProperty("TheHearing")
     SessionTheHearing theHearing;
+
+    @JsonProperty("HearingSupport")
+    SessionHearingSupport hearingSupport;
+
+    @JsonProperty("HearingArrangements")
+    SessionHearingArrangements hearingArrangements;
 }

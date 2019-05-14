@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.model.draft;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_NO_MRN;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_REP;
 
 import java.util.Collections;
@@ -59,6 +60,53 @@ public class SessionDraftTest {
 
     }
 
+    @Test
+    public void shouldSerializeSessionDraftWithNoMrnAsExpected() {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+            .postcode(new SessionPostcodeChecker("n29ed"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("no"))
+            .haveContactedDwp(new SessionHaveContactedDwp("yes"))
+            .noMrn(new SessionNoMrn("I can't find my letter."))
+            .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
+            .appointee(new SessionAppointee("no"))
+            .appellantName(new SessionAppellantName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionAppellantDob(new SessionDate("31", "12", "1998")))
+            .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
+            .appellantContactDetails(
+                new SessionAppellantContactDetails(
+                    "1 Appellant Close",
+                    null,
+                    "Appellant-town",
+                    "Appellant-county",
+                    "TS1 1ST",
+                    "07911123456",
+                    "appellant@gmail.com"
+                )
+            )
+            .textReminders(new SessionTextReminders("yes"))
+            .sendToNumber(new SessionSendToNumber("yes"))
+            .representative(new SessionRepresentative("no"))
+            .reasonForAppealing(
+                new SessionReasonForAppealing(
+                    Collections.singletonList(
+                        new SessionReasonForAppealingItem(
+                            "Underpayment",
+                            "I think I should get more")
+                    )
+                )
+            )
+            .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
+            .evidenceProvide(new SessionEvidenceProvide("no"))
+            .theHearing(new SessionTheHearing("yes"))
+            .build();
+
+        assertThatJson(SESSION_SAMPLE_WITH_NO_MRN.getSerializedMessage())
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo(sessionDraft);
+
+    }
 
     @Test
     public void shouldSerializeSessionDraftWithRepAsExpected() {
