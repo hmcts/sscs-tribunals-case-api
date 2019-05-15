@@ -1,16 +1,9 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static uk.gov.hmcts.reform.sscs.functional.ccd.UpdateCaseInCcdTest.buildSscsCaseDataForTestingWithValidMobileNumbers;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import org.junit.Before;
@@ -67,25 +60,31 @@ public class CreateCaseInCcdTest {
     }
 
     @Test
-    public void givenASyaCaseShouldBeSavedIntoCcd() {
+    public void givenASyaCase_shouldBeSavedIntoCcdInCorrectState() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(), rpc);
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated",
-            "Appeal created summary", "Appeal created description", idamTokens);
+                "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
     }
 
     @Test
     public void givenASyaCaseShouldBeSavedIntoCcdViaSubmitAppealService() {
+        Long id = null;
         try {
-            submitAppealService.submitAppeal(ALL_DETAILS.getDeserializeMessage());
+            id = submitAppealService.submitAppeal(ALL_DETAILS.getDeserializeMessage());
+            assertEquals("withDwp", findStateOfCaseInCcd(id));
         } catch (EmailSendFailedException | PdfGenerationException ep) {
             assertTrue(true);
         } catch (Exception ex) {
+            System.out.println(ex);
             fail();
         }
+    }
 
+    private String findStateOfCaseInCcd(Long id) {
+        return ccdService.getByCaseId(id, idamTokens).getState();
     }
 
     @Test

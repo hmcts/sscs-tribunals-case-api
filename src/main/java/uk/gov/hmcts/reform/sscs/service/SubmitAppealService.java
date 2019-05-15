@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
@@ -15,6 +13,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -44,6 +43,9 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
     private final ConvertAintoBService convertAintoBService;
+
+    @Value("${feature.send_to_dwp}")
+    private Boolean sendToDwpFeature;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -109,6 +111,12 @@ public class SubmitAppealService {
             if (event.equals(SYA_APPEAL_CREATED)) {
                 roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
                     additionalEvidence);
+
+                if (sendToDwpFeature) {
+                    log.info("About to update case with sentToDwp event for id {}", caseDetails.getId());
+                    ccdService.updateCase(caseData, caseDetails.getId(), SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP by Robotics", idamTokens);
+                    log.info("Case updated with sentToDwp event for id {}", caseDetails.getId());
+                }
             }
         }
     }
