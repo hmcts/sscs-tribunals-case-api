@@ -84,6 +84,12 @@ public class SessionDraft {
     @JsonProperty("EvidenceProvide")
     SessionEvidenceProvide evidenceProvide;
 
+    @JsonProperty("EvidenceUpload")
+    SessionEvidenceUpload evidenceUpload;
+
+    @JsonProperty("EvidenceDescription")
+    SessionEvidenceDescription evidenceDescription;
+
     @JsonProperty("TheHearing")
     SessionTheHearing theHearing;
 

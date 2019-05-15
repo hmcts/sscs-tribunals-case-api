@@ -4,47 +4,14 @@ import com.google.common.base.Preconditions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
-import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantContactDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantDob;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentativeDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -82,6 +49,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
             .evidenceProvide(buildEvidenceProvide(caseData.getEvidencePresent()))
+            .evidenceUpload(buildEvidenceUpload(caseData))
+            .evidenceDescription(buildEvidenceDescription(caseData))
             .theHearing(buildTheHearing(caseData.getAppeal().getHearingOptions()))
             .hearingSupport(buildHearingSupport(appeal))
             .build();
@@ -419,4 +388,33 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionEvidenceProvide(StringUtils.lowerCase(evidenceProvide));
     }
 
+    private SessionEvidenceUpload buildEvidenceUpload(SscsCaseData caseData) {
+        // TODO: Remove frigged values
+        Document friggedDocument = new Document(new DocumentDetails(
+            "2019-05-14",
+            "WhatsApp Image 2019-05-13 at 21.55.05.jpeg",
+            "http://dm-store:4506/documents/c9151e22-e803-47b0-ae03-8bb3cc7617d9"
+        ));
+        List<Document> friggedDocuments = Collections.singletonList(friggedDocument);
+        Evidence friggedEvidence = new Evidence(friggedDocuments);
+        caseData.setEvidence(friggedEvidence);
+
+        if (caseData == null
+            || caseData.getEvidence() == null
+            || caseData.getEvidence().getDocuments().isEmpty()) {
+            return null;
+        }
+
+        List<SessionEvidence> sessionEvidences = caseData.getEvidence().getDocuments()
+            .stream()
+            .map(f -> new SessionEvidence(f.getValue()))
+            .collect(Collectors.toList());
+
+        return new SessionEvidenceUpload(sessionEvidences);
+    }
+
+    private SessionEvidenceDescription buildEvidenceDescription(SscsCaseData caseData) {
+        caseData.getEvidence();
+        return null;
+    }
 }
