@@ -416,11 +416,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionSendToNumber buildSendToNumber(SscsCaseData caseData) {
-        if (!appellantContactIsNull(caseData) && !mobileInSubscriptionIsNull(caseData.getSubscriptions())) {
+        if (!contactIsNull(caseData) && !mobileInSubscriptionIsNull(caseData.getSubscriptions())) {
             Contact contact = caseData.getAppeal().getAppellant().getContact();
+            if (contact.getMobile() == null) {
+                contact = caseData.getAppeal().getAppellant().getAppointee().getContact();
+            }
             String cleanNumber = PhoneNumbersUtil.cleanPhoneNumber(contact.getMobile()).orElse(contact.getMobile());
-            String result = contact.getMobile().equals(caseData.getSubscriptions().getAppellantSubscription().getMobile())
-                || cleanNumber.equals(caseData.getSubscriptions().getAppellantSubscription().getMobile()) ? "yes" : "no";
+            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription();
+            if (subscriptionIsNull(subscription)) {
+                subscription = caseData.getSubscriptions().getAppointeeSubscription();
+            }
+            String result = contact.getMobile().equals(subscription.getMobile())
+                || cleanNumber.equals(subscription.getMobile()) ? "yes" : "no";
             return new SessionSendToNumber(result);
         }
         return null;
@@ -428,23 +435,22 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionSmsConfirmation buildSmsConfirmation(SscsCaseData caseData) {
-        if (!appellantContactIsNull(caseData) && !mobileInSubscriptionIsNull(caseData.getSubscriptions())) {
-            Contact contact = caseData.getAppeal().getAppellant().getContact();
-            String cleanNumber = PhoneNumbersUtil.cleanPhoneNumber(contact.getMobile()).orElse(contact.getMobile());
-            boolean result = contact.getMobile().equals(caseData.getSubscriptions().getAppellantSubscription().getMobile())
-                || cleanNumber.equals(caseData.getSubscriptions().getAppellantSubscription().getMobile());
-            if (result) {
-                return new SessionSmsConfirmation();
-            }
+        SessionSendToNumber sessionSendToNumber = buildSendToNumber(caseData);
+        if (sessionSendToNumber != null && StringUtils.isNotBlank(sessionSendToNumber.getUseSameNumber())) {
+            return new SessionSmsConfirmation();
         }
         return null;
     }
 
-    private boolean appellantContactIsNull(SscsCaseData caseData) {
-        return caseData == null
-            || caseData.getAppeal() == null
-            || caseData.getAppeal().getAppellant() == null
-            || caseData.getAppeal().getAppellant().getContact() == null;
+    private boolean contactIsNull(SscsCaseData caseData) {
+        if (caseData == null || caseData.getAppeal() == null || caseData.getAppeal().getAppellant() == null) {
+            return true;
+        }
+        if (caseData.getAppeal().getAppellant().getContact() != null) {
+            return false;
+        }
+        return caseData.getAppeal().getAppellant().getAppointee() == null
+            || caseData.getAppeal().getAppellant().getAppointee().getContact() == null;
     }
 
     private boolean subscribeSmsInSubscriptionsIsNull(Subscriptions subscriptions) {
@@ -461,10 +467,15 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean mobileInSubscriptionIsNull(Subscriptions subscriptions) {
-        return subscriptions == null
-            || subscriptions.getAppellantSubscription() == null
-            || subscriptions.getAppellantSubscription().getSubscribeSms() == null
-            || subscriptions.getAppellantSubscription().getMobile() == null;
+        if (subscriptions == null) {
+            return true;
+        }
+        return subscriptionIsNull(subscriptions.getAppellantSubscription())
+            && subscriptionIsNull(subscriptions.getAppointeeSubscription());
+    }
+
+    private boolean subscriptionIsNull(Subscription subscription) {
+        return subscription == null || subscription.getSubscribeSms() == null || subscription.getMobile() == null;
     }
 
     private SessionReasonForAppealing buildReasonForAppealing(Appeal appeal) {
