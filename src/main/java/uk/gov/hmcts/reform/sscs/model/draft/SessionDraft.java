@@ -78,6 +78,9 @@ public class SessionDraft {
     @JsonProperty("SendToNumber")
     SessionSendToNumber sendToNumber;
 
+    @JsonProperty("EnterMobile")
+    SessionEnterMobile enterMobile;
+
     @JsonProperty("SmsConfirmation")
     SessionSmsConfirmation smsConfirmation;
 

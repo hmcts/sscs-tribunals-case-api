@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDob;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionEnterMobile;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
@@ -84,6 +85,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .sameAddress(buildSameAddress(appeal))
             .textReminders(buildTextReminders(caseData.getSubscriptions()))
             .sendToNumber(buildSendToNumber(caseData))
+            .enterMobile(buildEnterMobile(caseData))
             .smsConfirmation(buildSmsConfirmation(caseData))
             .representative(buildRepresentative(appeal))
             .representativeDetails(buildRepresentativeDetails(appeal))
@@ -93,6 +95,19 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .theHearing(buildTheHearing(caseData.getAppeal().getHearingOptions()))
             .hearingSupport(buildHearingSupport(appeal))
             .build();
+    }
+
+    private SessionEnterMobile buildEnterMobile(SscsCaseData caseData) {
+        SessionSendToNumber sendToNumber = buildSendToNumber(caseData);
+        if (sendToNumber != null && StringUtils.isNotBlank(sendToNumber.getUseSameNumber())
+            && "no".equals(sendToNumber.getUseSameNumber())) {
+            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription();
+            if (subscriptionIsNull(subscription)) {
+                subscription = caseData.getSubscriptions().getAppointeeSubscription();
+            }
+            return new SessionEnterMobile(subscription.getMobile());
+        }
+        return null;
     }
 
     private SessionMrnOverOneMonthLate buildMrnOverOneMonthLate(Appeal appeal) {
