@@ -1,7 +1,10 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_ESA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_NO_MRN;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_REP;
 
 import java.util.Collections;
 import net.javacrumbs.jsonunit.core.Option;

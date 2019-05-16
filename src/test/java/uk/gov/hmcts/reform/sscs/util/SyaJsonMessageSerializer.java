@@ -56,7 +56,7 @@ public enum SyaJsonMessageSerializer {
             return new String(Files.readAllBytes(Paths.get("src/test/resources/sya/" + fileName)));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

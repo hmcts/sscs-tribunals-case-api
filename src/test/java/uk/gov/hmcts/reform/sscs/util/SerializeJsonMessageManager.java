@@ -79,7 +79,7 @@ public enum SerializeJsonMessageManager {
 
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
