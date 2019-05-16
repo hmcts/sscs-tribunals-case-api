@@ -15,36 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantContactDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantDob;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentativeDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -69,6 +40,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .haveContactedDwp(buildHaveContactedDwp(appeal))
             .noMrn(buildNoMrn(appeal))
             .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
+            .dwpIssuingOfficeEsa(buildDwpIssuingOfficeEsa(appeal))
             .appointee(buildAppointee(appeal))
             .appellantName(buildAppellantName(appeal))
             .appellantDob(buildAppellantDob(appeal))
@@ -246,6 +218,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             int secondBracket = appeal.getMrnDetails().getDwpIssuingOffice().lastIndexOf(')');
             return new SessionDwpIssuingOffice(
                 appeal.getMrnDetails().getDwpIssuingOffice().substring(firstBracket, secondBracket)
+            );
+        } else {
+            return null;
+        }
+    }
+
+    private SessionDwpIssuingOfficeEsa buildDwpIssuingOfficeEsa(Appeal appeal) {
+        if (mrnDatePresent(appeal)
+            && StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
+            && "ESA".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
+            return new SessionDwpIssuingOfficeEsa(
+                appeal.getMrnDetails().getDwpIssuingOffice()
             );
         } else {
             return null;
