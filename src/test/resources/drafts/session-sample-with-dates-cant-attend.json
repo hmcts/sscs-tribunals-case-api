@@ -80,7 +80,7 @@
     "attendHearing": "yes"
   },
   "HearingAvailability": {
-    "scheduleHearing": "no"
+    "scheduleHearing": "yes"
   },
   "HearingSupport": {
     "arrangements": "yes"
@@ -106,5 +106,19 @@
         "requested": true
       }
     }
+  },
+  "DatesCantAttend": {
+    "items": [
+      {
+        "day": "11",
+        "month": "7",
+        "year": "2099"
+      },
+      {
+        "day": "12",
+        "month": "7",
+        "year": "2099"
+      }
+    ]
   }
 }
