@@ -13,6 +13,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
@@ -30,6 +34,8 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
+@ContextConfiguration(initializers = CreateCaseInCcdTest.Initializer.class)
+
 @SpringBootTest
 public class CreateCaseInCcdTest {
 
@@ -84,9 +90,6 @@ public class CreateCaseInCcdTest {
             assertEquals("withDwp", findStateOfCaseInCcd(id));
         } catch (EmailSendFailedException | PdfGenerationException ep) {
             assertTrue(true);
-        } catch (Exception ex) {
-            System.out.println(ex);
-            fail();
         }
     }
 
@@ -137,4 +140,15 @@ public class CreateCaseInCcdTest {
         assertEquals("Yes", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
     }
 
+    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+
+        private final String env = System.getenv("ENV");
+
+        @Override
+        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+            if (env != null && env.equals("LOCAL")) {
+                TestPropertyValues.of("pdf.api.url=http://localhost:5500");
+            }
+        }
+    }
 }
