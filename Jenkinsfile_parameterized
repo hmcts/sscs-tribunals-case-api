@@ -29,6 +29,7 @@ List<LinkedHashMap<String, Object>> secrets = [
         secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
         secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
+        secret('pdf-api-url', 'PDF_API_URL'),
 
 ]
 

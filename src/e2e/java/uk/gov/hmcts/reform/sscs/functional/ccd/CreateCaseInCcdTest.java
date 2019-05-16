@@ -6,11 +6,14 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
+import java.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
@@ -26,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
 public class CreateCaseInCcdTest {
 
@@ -71,9 +75,12 @@ public class CreateCaseInCcdTest {
 
     @Test
     public void givenASyaCaseShouldBeSavedIntoCcdViaSubmitAppealService() {
-        Long id = null;
         try {
-            id = submitAppealService.submitAppeal(ALL_DETAILS.getDeserializeMessage());
+            SyaCaseWrapper wrapper = ALL_DETAILS.getDeserializeMessage();
+            wrapper.getAppellant().setNino(RandomStringUtils.random(9, true, true).toUpperCase());
+            wrapper.getMrn().setDate(LocalDate.now());
+
+            Long id = submitAppealService.submitAppeal(wrapper);
             assertEquals("withDwp", findStateOfCaseInCcd(id));
         } catch (EmailSendFailedException | PdfGenerationException ep) {
             assertTrue(true);
