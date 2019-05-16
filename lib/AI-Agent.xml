@@ -4,6 +4,7 @@
     <Instrumentation>
         <BuiltIn enabled="true">
             <HTTP enabled="true" W3C="true" enableW3CBackCompat="true"/>
+            <MaxStatementQueryLimitInMS>1000</MaxStatementQueryLimitInMS>
         </BuiltIn>
         <Class name="uk.gov.hmcts.reform.sscs.service.SubmitAppealService">
             <Method name="submitAppeal" reportCaughtExceptions="true" reportExecutionTime="true"/>

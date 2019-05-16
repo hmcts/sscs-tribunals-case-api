@@ -300,6 +300,7 @@ pitest {
 }
 
 task smoke(type: Test) {
+    environment("AZURE_APPLICATIONINSIGHTS_INSTRUMENTATIONKEY", "some-key")
     group = 'verification'
     description = 'Executes non-destructive smoke tests against a running Tribual Case API'
     setTestClassesDirs(sourceSets.e2e.output.classesDirs)
