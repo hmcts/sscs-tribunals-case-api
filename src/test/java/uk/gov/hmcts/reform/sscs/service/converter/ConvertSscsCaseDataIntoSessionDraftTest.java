@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -738,7 +737,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         );
     }
 
-    @Ignore
+    @Test
     public void convertPopulatedCaseDataWhenAttendingHearingButCantAttendOnSomeDates() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -801,6 +800,26 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .wantsToAttend("Yes")
                         .scheduleHearing("Yes")
                         .wantsSupport("No")
+                        .excludeDates(
+                            Arrays.asList(
+                                ExcludeDate.builder()
+                                    .value(
+                                        DateRange.builder()
+                                            .start("2099-05-01")
+                                            .end("2099-05-03")
+                                            .build()
+                                    )
+                                    .build(),
+                                ExcludeDate.builder()
+                                    .value(
+                                        DateRange.builder()
+                                            .start("2099-05-12")
+                                            .end("2099-05-12")
+                                            .build()
+                                    )
+                                    .build()
+                            )
+                        )
                         .build()
                 )
                 .build()
@@ -815,5 +834,11 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertNotNull(actual.getDatesCantAttend());
         assertNotNull(actual.getDatesCantAttend().getDatesCantAttend());
         assertEquals(2, actual.getDatesCantAttend().getDatesCantAttend().size());
+        assertEquals("1", actual.getDatesCantAttend().getDatesCantAttend().get(0).getDay());
+        assertEquals("5", actual.getDatesCantAttend().getDatesCantAttend().get(0).getMonth());
+        assertEquals("2099", actual.getDatesCantAttend().getDatesCantAttend().get(0).getYear());
+        assertEquals("12", actual.getDatesCantAttend().getDatesCantAttend().get(1).getDay());
+        assertEquals("5", actual.getDatesCantAttend().getDatesCantAttend().get(1).getMonth());
+        assertEquals("2099", actual.getDatesCantAttend().getDatesCantAttend().get(1).getYear());
     }
 }
