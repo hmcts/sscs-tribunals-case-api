@@ -117,6 +117,8 @@ public class SubmitAppealServiceTest {
 
     private JSONObject json = new JSONObject();
 
+    private final String userToken = null;
+
     @Mock
     private AuthTokenGenerator authTokenGenerator;
     @Mock
@@ -185,7 +187,7 @@ public class SubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
@@ -199,7 +201,7 @@ public class SubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
@@ -213,7 +215,7 @@ public class SubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(NON_COMPLIANT.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
@@ -253,7 +255,7 @@ public class SubmitAppealServiceTest {
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
             any())).willReturn(expected);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         Email expectedEmail = submitYourAppealEmailTemplate.generateEmail(
             "Bloggs_33C",
@@ -269,7 +271,7 @@ public class SubmitAppealServiceTest {
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(emailService, times(2)).sendEmail(emailCaptor.capture());
         Email roboticsEmail = emailCaptor.getAllValues().get(1);
@@ -283,15 +285,15 @@ public class SubmitAppealServiceTest {
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
 
-        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
-        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        Document stubbedDocument = new Document();
+        Document.Link stubbedLink = new Document.Link();
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
-        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
         given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
 
-        submitAppealService.submitAppeal(appealDataWithEvidence());
+        submitAppealService.submitAppeal(appealDataWithEvidence(), userToken);
 
         verify(emailService, times(2)).sendEmail(emailCaptor.capture());
         Email roboticsEmail = emailCaptor.getAllValues().get(1);
@@ -329,10 +331,10 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void shouldUpdateCcdWithPdf() {
-        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
-        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        Document stubbedDocument = new Document();
+        Document.Link stubbedLink = new Document.Link();
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
-        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
         given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
@@ -348,7 +350,7 @@ public class SubmitAppealServiceTest {
         roboticsWrapper = RoboticsWrapper.builder()
             .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, null);
 
         verify(ccdPdfService).mergeDocIntoCcd(
             eq("Bloggs_33C.pdf"),
@@ -375,7 +377,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
             .willThrow(RuntimeException.class);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
     }
 
     @Test(expected = CcdException.class)
@@ -386,7 +388,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willThrow(RuntimeException.class);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
     }
 
     @Test
@@ -395,7 +397,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
             .willReturn(duplicateCase);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
     }
@@ -408,8 +410,24 @@ public class SubmitAppealServiceTest {
         roboticsWrapper = RoboticsWrapper.builder()
             .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
+    }
+
+    @Test
+    public void willArchiveADraftOnceAppealIsSubmitted() {
+        String userToken = "MyCitizenToken";
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).draftArchived(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
+
+
     }
 }

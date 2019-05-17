@@ -79,7 +79,7 @@ public class CreateCaseInCcdTest {
     @Test
     public void givenASyaCaseShouldBeSavedIntoCcdViaSubmitAppealService() {
         try {
-            submitAppealService.submitAppeal(ALL_DETAILS.getDeserializeMessage());
+            submitAppealService.submitAppeal(ALL_DETAILS.getDeserializeMessage(), "");
         } catch (EmailSendFailedException | PdfGenerationException ep) {
             assertTrue(true);
         } catch (Exception ex) {

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.status;
 
 import com.google.common.base.Preconditions;
@@ -45,10 +46,11 @@ public class SyaController {
     @ApiResponses(value = {@ApiResponse(code = 201, message = "Submitted appeal successfully",
         response = String.class)})
     @PostMapping(value = "/appeals", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createAppeals(@RequestBody SyaCaseWrapper syaCaseWrapper) {
+    public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
+                                                            String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
-        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper);
+        Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,
             syaCaseWrapper.getBenefitType().getCode());
@@ -87,9 +89,9 @@ public class SyaController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(draft.getId()).toUri();
         if (submitDraftResult.getSaveCaseOperation().equals(SaveCaseOperation.CREATE)) {
-            return ResponseEntity.created(location).build();
+            return created(location).build();
         } else {
-            return ResponseEntity.status(HttpStatus.OK).location(location).build();
+            return status(HttpStatus.OK).location(location).build();
         }
     }
 }
