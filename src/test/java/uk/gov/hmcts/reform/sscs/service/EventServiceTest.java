@@ -3,8 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,8 +13,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -36,10 +39,16 @@ public class EventServiceTest {
     private RoboticsService roboticsService;
 
     @Mock
+    private CcdService ccdService;
+
+    @Mock
     private EvidenceManagementService evidenceManagementService;
 
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
+
+    @Mock
+    private SendToDwpService sendToDwpService;
 
     private IdamTokens idamTokens;
 
@@ -53,29 +62,37 @@ public class EventServiceTest {
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        //emailService = new EmailService(mock(JavaMailSender.class));
         eventService = new EventService(sscsPdfService,
                 roboticsService,
                 regionalProcessingCenterService,
                 idamService,
                 evidenceManagementService,
-                emailService);
+                emailService,
+                sendToDwpService);
     }
 
     @Test
-    public void shouldReturnFalseSendEventIfDifferent() {
-        SscsCaseData caseData = null;
-        boolean validEvent = eventService.sendEvent(APPEAL_RECEIVED, caseData);
+    public void givenAValidAppealEvent_thenShouldSendToDwp() throws CcdException {
 
-        assertFalse(validEvent);
+        SscsCaseData caseData = buildCaseDataWithoutPdf();
+
+        boolean handled = eventService.handleEvent(VALID_APPEAL, caseData);
+
+        assertTrue(handled);
+
+        verify(sendToDwpService).sendToDwp(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any());
     }
 
     @Test
-    public void shouldReturnTrueSendEvent() {
-        SscsCaseData caseData = null;
-        boolean validEvent = eventService.sendEvent(CREATE_APPEAL_PDF, caseData);
+    public void givenAnInterlocValidAppealEvent_thenShouldSendToDwp() throws CcdException {
 
-        assertTrue(validEvent);
+        SscsCaseData caseData = buildCaseDataWithoutPdf();
+
+        boolean handled = eventService.handleEvent(INTERLOC_VALID_APPEAL, caseData);
+
+        assertTrue(handled);
+
+        verify(sendToDwpService).sendToDwp(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any());
     }
 
     @Test

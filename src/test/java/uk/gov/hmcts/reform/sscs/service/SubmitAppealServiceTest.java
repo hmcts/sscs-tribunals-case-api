@@ -150,11 +150,13 @@ public class SubmitAppealServiceTest {
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
             roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
 
+        SendToDwpService sendToDwpService = new SendToDwpService(ccdService);
+
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
-            idamService, evidenceManagementService, convertAintoBService);
+            idamService, evidenceManagementService, convertAintoBService, sendToDwpService);
 
-        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", true);
+        ReflectionTestUtils.setField(sendToDwpService, "sendToDwpFeature", true);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -180,21 +182,6 @@ public class SubmitAppealServiceTest {
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP by Robotics"), any(IdamTokens.class));
-    }
-
-    @Test
-    public void givenCaseDoesNotExistInCcdAndSendToDwpFeatureFlagOff_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndNoSentToDwpEvent() {
-        byte[] expected = {};
-        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
-
-        submitAppealService.submitAppeal(appealData);
-
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SENT_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test

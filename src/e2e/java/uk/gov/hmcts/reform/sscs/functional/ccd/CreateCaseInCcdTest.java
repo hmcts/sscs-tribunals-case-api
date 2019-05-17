@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static org.junit.Assert.*;
-import static uk.gov.hmcts.reform.sscs.functional.ccd.UpdateCaseInCcdTest.buildSscsCaseDataForTestingWithValidMobileNumbers;
+import static uk.gov.hmcts.reform.sscs.functional.TestHelper.buildSscsCaseDataForTesting;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @ContextConfiguration(initializers = CreateCaseInCcdTest.Initializer.class)
-
 @SpringBootTest
 public class CreateCaseInCcdTest {
 
@@ -63,7 +62,7 @@ public class CreateCaseInCcdTest {
 
     @Test
     public void givenACaseShouldBeSavedIntoCcd() {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
+        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting(),
             "appealCreated", "Appeal created summary", "Appeal created description",
             idamTokens);
         assertNotNull(caseDetails);

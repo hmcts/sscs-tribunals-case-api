@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +30,7 @@ public class EventService {
     private final EmailService emailService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
+    private final SendToDwpService sendToDwpService;
 
     @Autowired
     EventService(SscsPdfService sscsPdfService,
@@ -38,30 +38,32 @@ public class EventService {
                  RegionalProcessingCenterService regionalProcessingCenterService,
                  IdamService idamService,
                  EvidenceManagementService evidenceManagementService,
-                 EmailService emailService) {
+                 EmailService emailService,
+                 SendToDwpService sendToDwpService) {
         this.sscsPdfService = sscsPdfService;
         this.roboticsService = roboticsService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
         this.emailService = emailService;
+        this.sendToDwpService = sendToDwpService;
     }
 
     public boolean handleEvent(EventType eventType, SscsCaseData caseData) {
 
+        IdamTokens idamTokens = idamService.getIdamTokens();
         if (CREATE_APPEAL_PDF == eventType) {
-            createAppealPdfAndSendToRobotics(caseData);
+            createAppealPdfAndSendToRobotics(caseData, idamTokens);
+            return true;
+        } else if (VALID_APPEAL == eventType || INTERLOC_VALID_APPEAL == eventType) {
+            sendToDwpService.sendToDwp(caseData, Long.valueOf(caseData.getCcdCaseId()), idamTokens);
             return true;
         }
 
         return false;
     }
 
-    private void handleEvent(Runnable eventHandler) {
-        Executors.newSingleThreadExecutor().submit(eventHandler);
-    }
-
-    private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
+    private void createAppealPdfAndSendToRobotics(SscsCaseData caseData, IdamTokens idamTokens) {
         boolean hasPdf = false;
         try {
             hasPdf = hasPdfDocument(caseData);
@@ -76,8 +78,6 @@ public class EventService {
             caseData.setEvidencePresent(hasEvidence(caseData));
             String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(
                     caseData.getAppeal().getAppellant().getAddress().getPostcode());
-
-            IdamTokens idamTokens = idamService.getIdamTokens();
 
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),
                     idamTokens,"appellantEvidence");
@@ -96,20 +96,6 @@ public class EventService {
                 caseData.getAppeal().getAppellant().setAppointee(null);
             }
         }
-    }
-
-    public boolean sendEvent(EventType eventType, SscsCaseData caseData) {
-
-        if (CREATE_APPEAL_PDF == eventType) {
-            handleEvent(eventHandler(eventType, caseData));
-            return true;
-        }
-
-        return false;
-    }
-
-    private Runnable eventHandler(EventType eventType, SscsCaseData caseData) {
-        return () -> handleEvent(eventType, caseData);
     }
 
     private boolean hasPdfDocument(SscsCaseData caseData) {

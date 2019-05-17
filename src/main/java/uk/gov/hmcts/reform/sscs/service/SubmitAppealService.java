@@ -5,15 +5,10 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -43,9 +38,7 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
     private final ConvertAintoBService convertAintoBService;
-
-    @Value("${feature.send_to_dwp}")
-    private Boolean sendToDwpFeature;
+    private final SendToDwpService sendToDwpService;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -55,7 +48,8 @@ public class SubmitAppealService {
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         EvidenceManagementService evidenceManagementService,
-                        ConvertAintoBService convertAintoBService) {
+                        ConvertAintoBService convertAintoBService,
+                        SendToDwpService sendToDwpService) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -65,6 +59,7 @@ public class SubmitAppealService {
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
         this.convertAintoBService = convertAintoBService;
+        this.sendToDwpService = sendToDwpService;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal) {
@@ -111,13 +106,7 @@ public class SubmitAppealService {
             if (event.equals(SYA_APPEAL_CREATED)) {
                 roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
                     additionalEvidence);
-
-                if (sendToDwpFeature) {
-                    log.info("About to update case with sentToDwp event for id {}", caseDetails.getId());
-                    caseData.setDateSentToDwp(LocalDate.now().toString());
-                    ccdService.updateCase(caseData, caseDetails.getId(), SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP by Robotics", idamTokens);
-                    log.info("Case updated with sentToDwp event for id {}", caseDetails.getId());
-                }
+                sendToDwpService.sendToDwp(caseData, caseDetails.getId(), idamTokens);
             }
         }
     }

@@ -51,7 +51,7 @@ public class EventController {
                 sscsCaseDataWrapper.getNotificationEventType());
 
         authorisationService.authorise(serviceAuthHeader);
-        eventService.sendEvent(sscsCaseDataWrapper.getNotificationEventType(),
+        eventService.handleEvent(sscsCaseDataWrapper.getNotificationEventType(),
                 sscsCaseDataWrapper.getNewSscsCaseData());
 
         log.info("Event handled for case {}, {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
