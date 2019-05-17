@@ -175,6 +175,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .build()
                     )
                     .isAppointee("No")
+                    .isAddressSameAsAppointee("No")
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -240,6 +241,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("TS1 1ST", actual.getAppellantContactDetails().getPostCode());
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("appellant@gmail.com", actual.getAppellantContactDetails().getEmailAddress());
+        assertEquals("no", actual.getSameAddress().getIsAddressSameAsAppointee());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("yes", actual.getSendToNumber().getUseSameNumber());
         assertNull("no", actual.getRepresentative());
@@ -369,10 +371,19 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .build()
                     )
                     .appointee(Appointee.builder()
-                        .name(Name.builder().firstName("Ap").lastName("Pointee").build())
+                        .name(Name.builder().title("Mr.").firstName("Ap").lastName("Pointee").build())
+                        .identity(Identity.builder().dob("1999-01-01").build())
+                        .contact(Contact.builder().mobile("07111111111").email("appointee@test.com").build())
+                        .address(Address.builder()
+                            .line1("1 Appointee Drive")
+                            .town("Appointee-town")
+                            .county("Appointee-county")
+                            .postcode("TS2 2ST")
+                            .build())
                         .build()
                     )
                     .isAppointee("Yes")
+                    .isAddressSameAsAppointee("No")
                     .build()
                 )
                 .mrnDetails(MrnDetails.builder()
@@ -388,6 +399,78 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
         SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
         assertEquals("yes", actual.getAppointee().getIsAppointee());
+        assertEquals("Mr.", actual.getAppointeeName().getTitle());
+        assertEquals("Ap", actual.getAppointeeName().getFirstName());
+        assertEquals("Pointee", actual.getAppointeeName().getLastName());
+        assertEquals("1", actual.getAppointeeDob().getDate().getDay());
+        assertEquals("1", actual.getAppointeeDob().getDate().getMonth());
+        assertEquals("1999", actual.getAppointeeDob().getDate().getYear());
+        assertEquals("1 Appointee Drive", actual.getAppointeeContactDetails().getAddressLine1());
+        assertNull(actual.getAppointeeContactDetails().getAddressLine2());
+        assertEquals("Appointee-town", actual.getAppointeeContactDetails().getTownCity());
+        assertEquals("Appointee-county", actual.getAppointeeContactDetails().getCounty());
+        assertEquals("TS2 2ST", actual.getAppointeeContactDetails().getPostCode());
+        assertEquals("07111111111", actual.getAppointeeContactDetails().getPhoneNumber());
+        assertEquals("appointee@test.com", actual.getAppointeeContactDetails().getEmailAddress());
+        assertEquals("no", actual.getSameAddress().getIsAddressSameAsAppointee());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWithAppointeeAtSameAddress() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .address(Address.builder()
+                        .build()
+                    )
+                    .appointee(Appointee.builder()
+                        .name(Name.builder().title("Mr.").firstName("Ap").lastName("Pointee").build())
+                        .identity(Identity.builder().dob("1999-01-01").build())
+                        .contact(Contact.builder().mobile("07111111111").email("appointee@test.com").build())
+                        .address(Address.builder()
+                            .line1("1 Appointee Drive")
+                            .town("Appointee-town")
+                            .county("Appointee-county")
+                            .postcode("TS2 2ST")
+                            .build())
+                        .build()
+                    )
+                    .isAppointee("Yes")
+                    .isAddressSameAsAppointee("Yes")
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2010-02-01")
+                    .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
+                    .build()
+                )
+                .rep(Representative.builder().build())
+                .build()
+            )
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("yes", actual.getAppointee().getIsAppointee());
+        assertEquals("Mr.", actual.getAppointeeName().getTitle());
+        assertEquals("Ap", actual.getAppointeeName().getFirstName());
+        assertEquals("Pointee", actual.getAppointeeName().getLastName());
+        assertEquals("1", actual.getAppointeeDob().getDate().getDay());
+        assertEquals("1", actual.getAppointeeDob().getDate().getMonth());
+        assertEquals("1999", actual.getAppointeeDob().getDate().getYear());
+        assertEquals("1 Appointee Drive", actual.getAppointeeContactDetails().getAddressLine1());
+        assertNull(actual.getAppointeeContactDetails().getAddressLine2());
+        assertEquals("Appointee-town", actual.getAppointeeContactDetails().getTownCity());
+        assertEquals("Appointee-county", actual.getAppointeeContactDetails().getCounty());
+        assertEquals("TS2 2ST", actual.getAppointeeContactDetails().getPostCode());
+        assertEquals("07111111111", actual.getAppointeeContactDetails().getPhoneNumber());
+        assertEquals("appointee@test.com", actual.getAppointeeContactDetails().getEmailAddress());
+        assertEquals("yes", actual.getSameAddress().getIsAddressSameAsAppointee());
     }
 
     @Test
