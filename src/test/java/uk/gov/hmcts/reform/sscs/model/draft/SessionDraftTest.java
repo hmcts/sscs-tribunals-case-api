@@ -305,11 +305,11 @@ public class SessionDraftTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
-            .appellantName(new SessionAppellantName("Mrs.", "Ap", "Pellant"))
-            .appellantDob(new SessionAppellantDob(new SessionDate("31", "12", "1998")))
+            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
             .appellantContactDetails(
-                new SessionAppellantContactDetails(
+                new SessionContactDetails(
                     "1 Appellant Close",
                     null,
                     "Appellant-town",
