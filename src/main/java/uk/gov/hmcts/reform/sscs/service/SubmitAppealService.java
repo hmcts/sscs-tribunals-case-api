@@ -114,6 +114,7 @@ public class SubmitAppealService {
 
                 if (sendToDwpFeature) {
                     log.info("About to update case with sentToDwp event for id {}", caseDetails.getId());
+                    caseData.setDateSentToDwp(LocalDate.now().toString());
                     ccdService.updateCase(caseData, caseDetails.getId(), SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP by Robotics", idamTokens);
                     log.info("Case updated with sentToDwp event for id {}", caseDetails.getId());
                 }
