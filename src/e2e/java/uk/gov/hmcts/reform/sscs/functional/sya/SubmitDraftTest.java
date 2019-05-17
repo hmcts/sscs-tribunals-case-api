@@ -16,6 +16,7 @@ import io.restassured.response.Response;
 import java.util.Base64;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -159,9 +160,9 @@ public class SubmitDraftTest {
 
         saveDraft(draftAppeal);
 
-        List<SscsCaseData> savedDraft = citizenCcdService.findCase(citizenIdamTokens);
-        assertEquals(1, savedDraft.size());
-        SscsCaseData caseData = savedDraft.get(0);
+        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        assertTrue(CollectionUtils.isNotEmpty(savedDrafts));
+        SscsCaseData caseData = savedDrafts.get(0);
 
         archiveDraft(caseData);
 
