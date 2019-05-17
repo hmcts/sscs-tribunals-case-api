@@ -166,7 +166,16 @@ public class SubmitDraftTest {
 
         archiveDraft(caseData);
 
-        assertTrue(citizenCcdService.findCase(citizenIdamTokens).isEmpty());
+        assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
+
+    @Test
+    public void archiveAllDraftsDeleteMeOnceItIsRunOnAAT() {
+        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        for (SscsCaseData caseData : savedDrafts) {
+            archiveDraft(caseData);
+        }
+        assertTrue("This is to remove records in AAT. It is not a test.",true);
     }
 
     private Response saveDraft(SyaCaseWrapper draftAppeal) {
