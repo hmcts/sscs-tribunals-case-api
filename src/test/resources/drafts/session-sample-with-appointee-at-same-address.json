@@ -27,8 +27,29 @@
   "DWPIssuingOffice": {
     "pipNumber": "1"
   },
+  "AppointeeName": {
+    "title": "Mr.",
+    "firstName": "Ap",
+    "lastName": "Pointee"
+  },
+  "AppointeeDOB": {
+    "date": {
+      "day": "1",
+      "month": "1",
+      "year": "1999"
+    }
+  },
+  "AppointeeContactDetails": {
+    "addressLine1": "1 Appointee Street",
+    "addressLine2": "",
+    "townCity": "Appointee-town",
+    "county": "Appointee-county",
+    "postCode": "TS2 2ST",
+    "phoneNumber": "07111111111",
+    "emailAddress": "appointee@test.com"
+  },
   "Appointee": {
-    "isAppointee": "no"
+    "isAppointee": "yes"
   },
   "AppellantName": {
     "title": "Mrs.",
@@ -46,16 +67,8 @@
     "nino": "SC 94 27 06 A"
   },
   "invalidPostcode": false,
-  "AppellantContactDetails": {
-    "addressLine1": "1 Appellant Close",
-    "townCity": "Appellant-town",
-    "county": "Appellant-county",
-    "postCode": "TS1 1ST",
-    "phoneNumber": "07911123456",
-    "emailAddress": "appellant@gmail.com"
-  },
   "SameAddress": {
-    "isAddressSameAsAppointee": "no"
+    "isAddressSameAsAppointee": "yes"
   },
   "TextReminders": {
     "doYouWantTextMsgReminders": "yes"
