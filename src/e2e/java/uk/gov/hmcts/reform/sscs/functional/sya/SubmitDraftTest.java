@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -120,7 +122,7 @@ public class SubmitDraftTest {
         SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
-            .statusCode(HttpStatus.SC_OK)
+            .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
