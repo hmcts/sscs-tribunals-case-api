@@ -169,15 +169,6 @@ public class SubmitDraftTest {
         assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
     }
 
-    @Test
-    public void archiveAllDraftsDeleteMeOnceItIsRunOnAat() {
-        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
-        for (SscsCaseData caseData : savedDrafts) {
-            archiveDraft(caseData);
-        }
-        assertTrue("This is to remove records in AAT. It is not a test.",true);
-    }
-
     private Response saveDraft(SyaCaseWrapper draftAppeal) {
         return RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
