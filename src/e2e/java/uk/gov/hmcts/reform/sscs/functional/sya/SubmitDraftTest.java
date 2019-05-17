@@ -170,7 +170,7 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void archiveAllDraftsDeleteMeOnceItIsRunOnAAT() {
+    public void archiveAllDraftsDeleteMeOnceItIsRunOnAat() {
         List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
         for (SscsCaseData caseData : savedDrafts) {
             archiveDraft(caseData);
