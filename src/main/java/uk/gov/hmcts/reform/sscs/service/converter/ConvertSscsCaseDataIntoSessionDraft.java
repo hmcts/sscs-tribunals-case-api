@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -200,7 +199,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionHearingArrangements buildHearingArrangements(Appeal appeal) {
-        if (!hasHearingOptions(appeal)) {
+        if (!hasHearingOptions(appeal) || hasNoArrangements(appeal)) {
             return null;
         }
 
@@ -242,6 +241,15 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
                 anythingElse
             )
         );
+    }
+
+    private boolean hasNoArrangements(Appeal appeal) {
+        return appeal.getHearingOptions().getLanguageInterpreter() == null
+        && appeal.getHearingOptions().getSignLanguageType() == null
+        && (appeal.getHearingOptions().getArrangements() == null
+        || !appeal.getHearingOptions().getArrangements().contains("signLanguageInterpreter")
+        || !appeal.getHearingOptions().getArrangements().contains("hearingLoop")
+        || !appeal.getHearingOptions().getArrangements().contains("disabledAccess"));
     }
 
     private SessionHearingAvailability buildHearingAvailability(Appeal appeal) {
