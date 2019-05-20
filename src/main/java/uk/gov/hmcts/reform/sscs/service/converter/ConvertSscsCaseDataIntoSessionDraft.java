@@ -245,11 +245,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
 
     private boolean hasNoArrangements(Appeal appeal) {
         return appeal.getHearingOptions().getLanguageInterpreter() == null
-        && appeal.getHearingOptions().getSignLanguageType() == null
-        && (appeal.getHearingOptions().getArrangements() == null
-        || !appeal.getHearingOptions().getArrangements().contains("signLanguageInterpreter")
-        || !appeal.getHearingOptions().getArrangements().contains("hearingLoop")
-        || !appeal.getHearingOptions().getArrangements().contains("disabledAccess"));
+            && appeal.getHearingOptions().getSignLanguageType() == null
+            && (appeal.getHearingOptions().getArrangements() == null
+            || !appeal.getHearingOptions().getArrangements().contains("signLanguageInterpreter")
+            || !appeal.getHearingOptions().getArrangements().contains("hearingLoop")
+            || !appeal.getHearingOptions().getArrangements().contains("disabledAccess"));
     }
 
     private SessionHearingAvailability buildHearingAvailability(Appeal appeal) {
