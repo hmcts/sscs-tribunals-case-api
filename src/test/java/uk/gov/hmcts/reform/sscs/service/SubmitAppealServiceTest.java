@@ -193,7 +193,7 @@ public class SubmitAppealServiceTest {
 
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
 
-        submitAppealService.submitAppeal(appealData);
+        submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SENT_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
