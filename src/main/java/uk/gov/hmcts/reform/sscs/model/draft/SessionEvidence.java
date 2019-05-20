@@ -17,11 +17,11 @@ public class SessionEvidence {
         this.size = size;
     }
 
-    public SessionEvidence(SscsDocumentDetails documentDetails) {
+    public SessionEvidence(Long size, SscsDocumentDetails documentDetails) {
         // TODO: set the right values
         this.uploadEv = documentDetails.getDocumentFileName();
         this.link = documentDetails.getDocumentLink().getDocumentUrl();
-        this.size = "Not sure";
+        this.size = size.toString();
 //        this.size = documentDetails.;
     }
 }

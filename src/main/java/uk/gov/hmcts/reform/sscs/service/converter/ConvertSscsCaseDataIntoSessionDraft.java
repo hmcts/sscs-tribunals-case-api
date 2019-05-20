@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
@@ -45,11 +46,15 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
+import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
 public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService<SscsCaseData, SessionDraft> {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @Autowired
+    private DocumentDownloadService documentDownloadService;
 
     @Override
     public SessionDraft convert(SscsCaseData caseData) {
@@ -540,7 +545,10 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
 
         List<SessionEvidence> sessionEvidences = caseData.getSscsDocument()
             .stream()
-            .map(f -> new SessionEvidence(f.getValue()))
+            .map(f -> new SessionEvidence(
+                documentDownloadService.getFileSize(f.getValue().getDocumentLink().getDocumentBinaryUrl()),
+                f.getValue())
+            )
             .collect(Collectors.toList());
 
         return new SessionEvidenceUpload(sessionEvidences);
