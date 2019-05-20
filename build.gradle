@@ -4,7 +4,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '2.7.1'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.1.4.RELEASE'
+    id 'org.springframework.boot' version '2.1.5.RELEASE'
     id 'org.owasp.dependencycheck' version '3.2.1'
     id 'com.github.ben-manes.versions' version '0.21.0'
     id 'net.ltgt.apt' version '0.21'
@@ -235,7 +235,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '2.0.9'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '2.0.11'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.3'
 
