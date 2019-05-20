@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.model.draft;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Value;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
 @Value
 public class SessionEvidence {
@@ -17,10 +17,11 @@ public class SessionEvidence {
         this.size = size;
     }
 
-    public SessionEvidence(DocumentDetails documentDetails) {
+    public SessionEvidence(SscsDocumentDetails documentDetails) {
         // TODO: set the right values
-        this.uploadEv = documentDetails.getEvidenceType();
-        this.link = documentDetails.getEvidenceProvidedBy();
-        this.size = documentDetails.getDateReceived();
+        this.uploadEv = documentDetails.getDocumentFileName();
+        this.link = documentDetails.getDocumentLink().getDocumentUrl();
+        this.size = "Not sure";
+//        this.size = documentDetails.;
     }
 }

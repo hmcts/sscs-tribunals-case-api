@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,7 +87,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
             .evidenceProvide(buildEvidenceProvide(caseData.getEvidencePresent()))
-            .evidenceUpload(buildEvidenceUpload(caseData))
+            .evidenceUpload(buildSscsDocument(caseData))
             .evidenceDescription(buildEvidenceDescription(caseData))
             .theHearing(buildTheHearing(caseData.getAppeal().getHearingOptions()))
             .hearingSupport(buildHearingSupport(appeal))
@@ -532,24 +531,14 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionEvidenceProvide(StringUtils.lowerCase(evidenceProvide));
     }
 
-    private SessionEvidenceUpload buildEvidenceUpload(SscsCaseData caseData) {
-        // TODO: Remove frigged values
-        Document friggedDocument = new Document(new DocumentDetails(
-            "2019-05-14",
-            "WhatsApp Image 2019-05-13 at 21.55.05.jpeg",
-            "http://dm-store:4506/documents/c9151e22-e803-47b0-ae03-8bb3cc7617d9"
-        ));
-        List<Document> friggedDocuments = Collections.singletonList(friggedDocument);
-        Evidence friggedEvidence = new Evidence(friggedDocuments);
-        caseData.setEvidence(friggedEvidence);
-
+    private SessionEvidenceUpload buildSscsDocument(SscsCaseData caseData) {
         if (caseData == null
-            || caseData.getEvidence() == null
-            || caseData.getEvidence().getDocuments().isEmpty()) {
+            || caseData.getSscsDocument() == null
+            || caseData.getSscsDocument().isEmpty()) {
             return null;
         }
 
-        List<SessionEvidence> sessionEvidences = caseData.getEvidence().getDocuments()
+        List<SessionEvidence> sessionEvidences = caseData.getSscsDocument()
             .stream()
             .map(f -> new SessionEvidence(f.getValue()))
             .collect(Collectors.toList());
