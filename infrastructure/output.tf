@@ -9,3 +9,7 @@ output "vaultName" {
 output "sscs-output" {
   value = "sscs-output"
 }
+
+output "send_to_dwp_enabled" {
+  value = "${var.send_to_dwp_enabled}"
+}
