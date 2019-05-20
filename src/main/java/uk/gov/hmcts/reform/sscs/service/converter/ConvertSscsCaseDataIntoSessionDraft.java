@@ -10,8 +10,49 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionContactDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDob;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionEnterMobile;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionName;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepName;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentativeDetails;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSameAddress;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -36,13 +77,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .haveContactedDwp(buildHaveContactedDwp(appeal))
             .noMrn(buildNoMrn(appeal))
             .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
+            .appointeeName(buildName(getAppointeeName(appeal)))
+            .appointeeDob(buildDob(getAppointeeIdentity(appeal)))
+            .appointeeContactDetails(buildContactDetails(getAppointeeAddress(appeal), getAppointeeContact(appeal)))
             .appointee(buildAppointee(appeal))
-            .appellantName(buildAppellantName(appeal))
-            .appellantDob(buildAppellantDob(appeal))
+            .appellantName(buildName(getAppellantName(appeal)))
+            .appellantDob(buildDob(getAppellantIdentity(appeal)))
             .appellantNino(buildAppellantNino(appeal))
-            .appellantContactDetails(buildAppellantContactDetails(appeal))
+            .appellantContactDetails(buildContactDetails(getAppellantAddress(appeal), getAppellantContact(appeal)))
+            .sameAddress(buildSameAddress(appeal))
             .textReminders(buildTextReminders(caseData.getSubscriptions()))
             .sendToNumber(buildSendToNumber(caseData))
+            .enterMobile(buildEnterMobile(caseData))
             .smsConfirmation(buildSmsConfirmation(caseData))
             .representative(buildRepresentative(appeal))
             .representativeDetails(buildRepresentativeDetails(appeal))
@@ -54,6 +100,19 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .theHearing(buildTheHearing(caseData.getAppeal().getHearingOptions()))
             .hearingSupport(buildHearingSupport(appeal))
             .build();
+    }
+
+    private SessionEnterMobile buildEnterMobile(SscsCaseData caseData) {
+        SessionSendToNumber sendToNumber = buildSendToNumber(caseData);
+        if (sendToNumber != null && StringUtils.isNotBlank(sendToNumber.getUseSameNumber())
+            && "no".equals(sendToNumber.getUseSameNumber())) {
+            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription();
+            if (subscriptionIsNull(subscription)) {
+                subscription = caseData.getSubscriptions().getAppointeeSubscription();
+            }
+            return new SessionEnterMobile(subscription.getMobile());
+        }
+        return null;
     }
 
     private SessionMrnOverOneMonthLate buildMrnOverOneMonthLate(Appeal appeal) {
@@ -231,34 +290,63 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionAppointee(appeal.getAppellant().getIsAppointee().toLowerCase());
     }
 
-    private SessionAppellantName buildAppellantName(Appeal appeal) {
-        if (appeal.getAppellant() == null
-            || appeal.getAppellant().getName() == null
-            || appeal.getAppellant().getName().getTitle() == null) {
+    private Name getAppellantName(Appeal appeal) {
+        if (appeal.getAppellant() == null) {
             return null;
         }
 
-        return new SessionAppellantName(
-            appeal.getAppellant().getName().getTitle(),
-            appeal.getAppellant().getName().getFirstName(),
-            appeal.getAppellant().getName().getLastName()
+        return appeal.getAppellant().getName();
+    }
+
+    private Name getAppointeeName(Appeal appeal) {
+        if (appeal.getAppellant() == null
+            || appeal.getAppellant().getAppointee() == null) {
+            return null;
+        }
+
+        return appeal.getAppellant().getAppointee().getName();
+    }
+
+    private SessionName buildName(Name name) {
+        if (name == null || name.getTitle() == null) {
+            return null;
+        }
+
+        return new SessionName(
+            name.getTitle(),
+            name.getFirstName(),
+            name.getLastName()
         );
     }
 
-    private SessionAppellantDob buildAppellantDob(Appeal appeal) {
-        if (appeal.getAppellant() == null
-            || appeal.getAppellant().getIdentity() == null
-            || appeal.getAppellant().getIdentity().getDob() == null) {
+    private Identity getAppellantIdentity(Appeal appeal) {
+        if (appeal == null || appeal.getAppellant() == null) {
             return null;
         }
 
-        LocalDate mrdDetailsDate = LocalDate.parse(appeal.getAppellant().getIdentity().getDob());
+        return appeal.getAppellant().getIdentity();
+    }
+
+    private Identity getAppointeeIdentity(Appeal appeal) {
+        if (appeal.getAppellant() == null || appeal.getAppellant().getAppointee() == null) {
+            return null;
+        }
+
+        return appeal.getAppellant().getAppointee().getIdentity();
+    }
+
+    private SessionDob buildDob(Identity identity) {
+        if (identity == null || identity.getDob() == null) {
+            return null;
+        }
+
+        LocalDate mrdDetailsDate = LocalDate.parse(identity.getDob());
         String day = String.valueOf(mrdDetailsDate.getDayOfMonth());
         String month = String.valueOf(mrdDetailsDate.getMonthValue());
         String year = String.valueOf(mrdDetailsDate.getYear());
         SessionDate mrnDateDetails = new SessionDate(day, month, year);
 
-        return new SessionAppellantDob(mrnDateDetails);
+        return new SessionDob(mrnDateDetails);
     }
 
     private SessionAppellantNino buildAppellantNino(Appeal appeal) {
@@ -271,17 +359,44 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return new SessionAppellantNino(appeal.getAppellant().getIdentity().getNino());
     }
 
-    private SessionAppellantContactDetails buildAppellantContactDetails(Appeal appeal) {
-        if (appeal.getAppellant() == null
-            || appeal.getAppellant().getAddress() == null
-            || appeal.getAppellant().getAddress().getLine1() == null) {
+    private Address getAppellantAddress(Appeal appeal) {
+        if (appeal.getAppellant() == null) {
             return null;
         }
 
-        Address address = appeal.getAppellant().getAddress();
-        Contact contact = appeal.getAppellant().getContact();
+        return appeal.getAppellant().getAddress();
+    }
 
-        return new SessionAppellantContactDetails(
+    private Address getAppointeeAddress(Appeal appeal) {
+        if (appeal.getAppellant() == null || appeal.getAppellant().getAppointee() == null) {
+            return null;
+        }
+
+        return appeal.getAppellant().getAppointee().getAddress();
+    }
+
+    private Contact getAppellantContact(Appeal appeal) {
+        if (appeal.getAppellant() == null) {
+            return null;
+        }
+
+        return appeal.getAppellant().getContact();
+    }
+
+    private Contact getAppointeeContact(Appeal appeal) {
+        if (appeal.getAppellant() == null || appeal.getAppellant().getAppointee() == null) {
+            return null;
+        }
+
+        return appeal.getAppellant().getAppointee().getContact();
+    }
+
+    private SessionContactDetails buildContactDetails(Address address, Contact contact) {
+        if (address == null || address.getLine1() == null) {
+            return null;
+        }
+
+        return new SessionContactDetails(
             address.getLine1(),
             address.getLine2(),
             address.getTown(),
@@ -292,22 +407,47 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         );
     }
 
-    private SessionTextReminders buildTextReminders(Subscriptions subscriptions) {
-        if (subscribeSmsInSubscriptionIsNull(subscriptions)) {
+    private SessionSameAddress buildSameAddress(Appeal appeal) {
+        if (appeal == null
+            || appeal.getAppellant() == null
+            || appeal.getAppellant().getIsAddressSameAsAppointee() == null
+            || (getAppellantAddress(appeal) == null && getAppointeeAddress(appeal) == null)
+        ) {
             return null;
         }
 
-        return "no".equalsIgnoreCase(subscriptions.getAppellantSubscription().getSubscribeSms())
+        return new SessionSameAddress(appeal.getAppellant().getIsAddressSameAsAppointee().toLowerCase());
+    }
+
+    private SessionTextReminders buildTextReminders(Subscriptions subscriptions) {
+        if (subscribeSmsInSubscriptionsIsNull(subscriptions)) {
+            return null;
+        }
+        if (!subscribeSmsIsNull(subscriptions.getAppellantSubscription())) {
+            return getSessionTextReminders(subscriptions.getAppellantSubscription());
+        }
+        return getSessionTextReminders(subscriptions.getAppointeeSubscription());
+    }
+
+    private SessionTextReminders getSessionTextReminders(Subscription subscription) {
+        return "no".equalsIgnoreCase(subscription.getSubscribeSms())
             ? new SessionTextReminders("no")
             : new SessionTextReminders("yes");
     }
 
     private SessionSendToNumber buildSendToNumber(SscsCaseData caseData) {
-        if (!appellantContactIsNull(caseData) && !mobileInSubscriptionIsNull(caseData.getSubscriptions())) {
+        if (!contactIsNull(caseData) && !mobileInSubscriptionIsNull(caseData.getSubscriptions())) {
             Contact contact = caseData.getAppeal().getAppellant().getContact();
+            if (contact.getMobile() == null) {
+                contact = caseData.getAppeal().getAppellant().getAppointee().getContact();
+            }
             String cleanNumber = PhoneNumbersUtil.cleanPhoneNumber(contact.getMobile()).orElse(contact.getMobile());
-            String result = contact.getMobile().equals(caseData.getSubscriptions().getAppellantSubscription().getMobile())
-                || cleanNumber.equals(caseData.getSubscriptions().getAppellantSubscription().getMobile()) ? "yes" : "no";
+            Subscription subscription = caseData.getSubscriptions().getAppellantSubscription();
+            if (subscriptionIsNull(subscription)) {
+                subscription = caseData.getSubscriptions().getAppointeeSubscription();
+            }
+            String result = contact.getMobile().equals(subscription.getMobile())
+                || cleanNumber.equals(subscription.getMobile()) ? "yes" : "no";
             return new SessionSendToNumber(result);
         }
         return null;
@@ -315,36 +455,47 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionSmsConfirmation buildSmsConfirmation(SscsCaseData caseData) {
-        if (!appellantContactIsNull(caseData) && !mobileInSubscriptionIsNull(caseData.getSubscriptions())) {
-            Contact contact = caseData.getAppeal().getAppellant().getContact();
-            String cleanNumber = PhoneNumbersUtil.cleanPhoneNumber(contact.getMobile()).orElse(contact.getMobile());
-            boolean result = contact.getMobile().equals(caseData.getSubscriptions().getAppellantSubscription().getMobile())
-                || cleanNumber.equals(caseData.getSubscriptions().getAppellantSubscription().getMobile());
-            if (result) {
-                return new SessionSmsConfirmation();
-            }
+        SessionSendToNumber sessionSendToNumber = buildSendToNumber(caseData);
+        if (sessionSendToNumber != null && StringUtils.isNotBlank(sessionSendToNumber.getUseSameNumber())) {
+            return new SessionSmsConfirmation();
         }
         return null;
     }
 
-    private boolean appellantContactIsNull(SscsCaseData caseData) {
-        return caseData == null
-            || caseData.getAppeal() == null
-            || caseData.getAppeal().getAppellant() == null
-            || caseData.getAppeal().getAppellant().getContact() == null;
+    private boolean contactIsNull(SscsCaseData caseData) {
+        if (caseData == null || caseData.getAppeal() == null || caseData.getAppeal().getAppellant() == null) {
+            return true;
+        }
+        if (caseData.getAppeal().getAppellant().getContact() != null) {
+            return false;
+        }
+        return caseData.getAppeal().getAppellant().getAppointee() == null
+            || caseData.getAppeal().getAppellant().getAppointee().getContact() == null;
     }
 
-    private boolean subscribeSmsInSubscriptionIsNull(Subscriptions subscriptions) {
-        return subscriptions == null
-            || subscriptions.getAppellantSubscription() == null
-            || subscriptions.getAppellantSubscription().getSubscribeSms() == null;
+    private boolean subscribeSmsInSubscriptionsIsNull(Subscriptions subscriptions) {
+        if (subscriptions != null) {
+            boolean appellantSubscribeSmsIsNull = subscribeSmsIsNull(subscriptions.getAppellantSubscription());
+            boolean appointeeSubscribeSmsIsNull = subscribeSmsIsNull(subscriptions.getAppointeeSubscription());
+            return appellantSubscribeSmsIsNull && appointeeSubscribeSmsIsNull;
+        }
+        return true;
+    }
+
+    private boolean subscribeSmsIsNull(Subscription subscription) {
+        return subscription == null || subscription.getSubscribeSms() == null;
     }
 
     private boolean mobileInSubscriptionIsNull(Subscriptions subscriptions) {
-        return subscriptions == null
-            || subscriptions.getAppellantSubscription() == null
-            || subscriptions.getAppellantSubscription().getSubscribeSms() == null
-            || subscriptions.getAppellantSubscription().getMobile() == null;
+        if (subscriptions == null) {
+            return true;
+        }
+        return subscriptionIsNull(subscriptions.getAppellantSubscription())
+            && subscriptionIsNull(subscriptions.getAppointeeSubscription());
+    }
+
+    private boolean subscriptionIsNull(Subscription subscription) {
+        return subscription == null || subscription.getSubscribeSms() == null || subscription.getMobile() == null;
     }
 
     private SessionReasonForAppealing buildReasonForAppealing(Appeal appeal) {
