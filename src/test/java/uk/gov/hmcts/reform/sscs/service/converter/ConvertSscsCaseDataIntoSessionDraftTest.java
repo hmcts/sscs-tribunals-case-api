@@ -33,6 +33,30 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
+    public void givenDwpIssuingOfficeEsa_shouldReturnResponseWithDwpIssuingOfficeEsa() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("ESA")
+                    .description("Employment and Support Allowance")
+                    .build())
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2019-05-01")
+                    .dwpIssuingOffice("any office")
+                    .build())
+                .build())
+            .build();
+
+        SessionDraft actualSessionDraft = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("any office", actualSessionDraft.getDwpIssuingOfficeEsa().getDwpIssuingOffice());
+        assertEquals("Employment and Support Allowance (ESA)",
+            actualSessionDraft.getBenefitType().getBenefitType());
+        assertEquals("1", actualSessionDraft.getMrnDate().getMrnDateDetails().getDay());
+        assertEquals("5", actualSessionDraft.getMrnDate().getMrnDateDetails().getMonth());
+        assertEquals("2019", actualSessionDraft.getMrnDate().getMrnDateDetails().getYear());
+    }
+
+    @Test
     @Parameters(method = "generateMrnLateScenarios")
     public void givenMrnIsLate_shouldResponseWithCorrectMrnLateResponse(
         MrnDetails mrnDetails, String expectedReason) {
@@ -100,8 +124,6 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals(actualSessionDraft.getNoMrn(), expectedSessionDraft.getNoMrn());
         assertEquals(actualSessionDraft.getHaveAMrn(), expectedSessionDraft.getHaveAMrn());
         assertEquals(actualSessionDraft.getHaveContactedDwp(), expectedSessionDraft.getHaveContactedDwp());
-
-        System.out.println(actualSessionDraft);
 
     }
 

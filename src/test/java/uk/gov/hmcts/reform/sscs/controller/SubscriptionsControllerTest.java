@@ -19,7 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -62,7 +61,7 @@ public class SubscriptionsControllerTest {
         given(macService.decryptMacToken("token123")).willReturn(tokenDetails);
 
         mockMvc.perform(get("/tokens/token123")
-            .contentType(MediaType.APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .content(CONTENT)
             .accept(APPLICATION_JSON))
             .andExpect(status().isOk())

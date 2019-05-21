@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionDatesCantAttend;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDob;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOfficeEsa;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionEnterMobile;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
@@ -79,6 +80,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .haveContactedDwp(buildHaveContactedDwp(appeal))
             .noMrn(buildNoMrn(appeal))
             .dwpIssuingOffice(buildDwpIssuingOffice(appeal))
+            .dwpIssuingOfficeEsa(buildDwpIssuingOfficeEsa(appeal))
             .appointeeName(buildName(getAppointeeName(appeal)))
             .appointeeDob(buildDob(getAppointeeIdentity(appeal)))
             .appointeeContactDetails(buildContactDetails(getAppointeeAddress(appeal), getAppointeeContact(appeal)))
@@ -384,11 +386,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             int firstBracket = appeal.getMrnDetails().getDwpIssuingOffice().indexOf('(') + 1;
             int secondBracket = appeal.getMrnDetails().getDwpIssuingOffice().lastIndexOf(')');
             return new SessionDwpIssuingOffice(
-                appeal.getMrnDetails().getDwpIssuingOffice().substring(firstBracket, secondBracket)
-            );
-        } else {
-            return null;
+                appeal.getMrnDetails().getDwpIssuingOffice().substring(firstBracket, secondBracket));
         }
+        return null;
+    }
+
+    private SessionDwpIssuingOfficeEsa buildDwpIssuingOfficeEsa(Appeal appeal) {
+        if (mrnDatePresent(appeal)
+            && StringUtils.isNotBlank(appeal.getMrnDetails().getDwpIssuingOffice())
+            && "ESA".equalsIgnoreCase(appeal.getBenefitType().getCode())) {
+            return new SessionDwpIssuingOfficeEsa(appeal.getMrnDetails().getDwpIssuingOffice());
+        }
+        return null;
     }
 
     private SessionAppointee buildAppointee(Appeal appeal) {
