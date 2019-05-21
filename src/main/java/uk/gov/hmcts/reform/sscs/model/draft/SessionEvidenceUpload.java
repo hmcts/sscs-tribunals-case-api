@@ -1,11 +1,8 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Value;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentDetails;
-
 import java.util.List;
+import lombok.Value;
 
 @Value
 public class SessionEvidenceUpload {

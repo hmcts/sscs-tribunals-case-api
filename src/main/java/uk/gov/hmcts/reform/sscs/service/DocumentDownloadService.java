@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -7,10 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 @Service
 public class DocumentDownloadService {
@@ -43,12 +42,12 @@ public class DocumentDownloadService {
             try {
                 return response.getBody().contentLength();
             } catch (IOException ioe) {
-                throw new IllegalStateException("Cannot download document to get size that is stored in CCD got " +
-                    "[" + response.getStatusCode() + "] " + response.getBody());
+                throw new IllegalStateException("Cannot download document to get size that is stored in CCD got "
+                    + "[" + response.getStatusCode() + "] " + response.getBody());
             }
         } else {
-            throw new IllegalStateException("Cannot download document that is stored in CCD got " +
-                "[" + response.getStatusCode() + "] " + response.getBody());
+            throw new IllegalStateException("Cannot download document that is stored in CCD got "
+                + "[" + response.getStatusCode() + "] " + response.getBody());
         }
     }
 
