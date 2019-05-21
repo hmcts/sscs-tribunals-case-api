@@ -84,7 +84,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
             .appeal(appeal)
             .subscriptions(getSubscriptions(syaCaseWrapper))
-            .sscsDocument(sscsDocuments.isEmpty() ? null : sscsDocuments)
+            .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
             .evidencePresent(hasEvidence(syaCaseWrapper.getEvidenceProvide()))
             .build();
     }

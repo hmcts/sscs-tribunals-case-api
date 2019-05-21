@@ -40,7 +40,7 @@ public class CitizenCcdService {
         List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(idamTokens);
 
         CaseDetails caseDetails;
-        if (caseDetailsList.size() > 0) {
+        if (!caseDetailsList.isEmpty()) {
             String caseId = caseDetailsList.get(0).getId().toString();
             caseDetails = updateCase(caseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                 "Update draft in CCD", idamTokens, caseId);
