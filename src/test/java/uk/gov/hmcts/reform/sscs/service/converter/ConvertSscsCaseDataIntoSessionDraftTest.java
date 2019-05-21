@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service.converter;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
@@ -141,6 +142,20 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         };
     }
 
+    @Test(expected = NullPointerException.class)
+    public void convertNullCaseData() {
+        new ConvertSscsCaseDataIntoSessionDraft().convert(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void convertCaseDataWithNullAppeal() {
+        caseData = SscsCaseData.builder()
+            .appeal(null)
+            .build();
+
+        new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+    }
+
     @Test
     public void convertPopulatedCaseData() {
         caseData = SscsCaseData.builder()
@@ -250,6 +265,89 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("I can't think of anything else", actual.getOtherReasonForAppealing().getOtherReasonForAppealing());
         assertEquals("no", actual.getEvidenceProvide().getEvidenceProvide());
         assertNull(actual.getRepresentativeDetails());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWithDifferentMobileNumber() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mrs.")
+                        .firstName("Ap")
+                        .lastName("Pellant")
+                        .build()
+                    )
+                    .identity(Identity.builder()
+                        .dob("1998-12-31")
+                        .nino("SC 94 27 06 A")
+                        .build()
+                    )
+                    .address(Address.builder()
+                        .line1("1 Appellant Close")
+                        .town("Appellant-town")
+                        .county("Appellant-county")
+                        .postcode("TS1 1ST")
+                        .build()
+                    )
+                    .contact(Contact.builder()
+                        .mobile("07911123456")
+                        .email("appellant@gmail.com")
+                        .build()
+                    )
+                    .isAppointee("No")
+                    .isAddressSameAsAppointee("No")
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2010-02-01")
+                    .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
+                    .build()
+                )
+                .appealReasons(
+                    AppealReasons.builder()
+                        .reasons(
+                            Collections.singletonList(
+                                AppealReason.builder()
+                                    .value(AppealReasonDetails.builder()
+                                        .reason("Underpayment")
+                                        .description("I think I should get more")
+                                        .build()
+                                    )
+                                    .build()
+                            )
+                        )
+                        .otherReasons("I can't think of anything else")
+                        .build()
+                )
+                .hearingOptions(null)
+                .rep(Representative.builder().build())
+                .build()
+            )
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(Subscription.builder()
+                    .subscribeEmail("Yes")
+                    .email("appellant@gmail.com")
+                    .subscribeSms("Yes")
+                    .mobile("07911123999")
+                    .build()
+                )
+                .build()
+            )
+            .sscsDocument(Collections.emptyList())
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
+        assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
+        assertEquals("no", actual.getSendToNumber().getUseSameNumber());
     }
 
     @Test
@@ -640,6 +738,186 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
+    public void convertPopulatedCaseDataWithRepNoAddress() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mrs.")
+                        .firstName("Ap")
+                        .lastName("Pellant")
+                        .build()
+                    )
+                    .identity(Identity.builder()
+                        .dob("1998-12-31")
+                        .nino("SC 94 27 06 A")
+                        .build()
+                    )
+                    .address(Address.builder()
+                        .line1("1 Appellant Close")
+                        .town("Appellant-town")
+                        .county("Appellant-county")
+                        .postcode("TS1 1ST")
+                        .build()
+                    )
+                    .contact(Contact.builder()
+                        .mobile("07911123456")
+                        .email("appellant@gmail.com")
+                        .build()
+                    )
+                    .isAppointee("No")
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2010-02-01")
+                    .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
+                    .build()
+                )
+                .appealReasons(
+                    AppealReasons.builder()
+                        .reasons(
+                            Collections.singletonList(
+                                AppealReason.builder()
+                                    .value(AppealReasonDetails.builder()
+                                        .reason("Underpayment")
+                                        .description("I think I should get more")
+                                        .build()
+                                    )
+                                    .build()
+                            )
+                        )
+                        .otherReasons("I can't think of anything else")
+                        .build()
+                )
+                .hearingOptions(null)
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .name(Name.builder().title("Miss.").firstName("Re").lastName("Presentative").build())
+                    .contact(Contact.builder().mobile("07333333333").email("rep@gmail.com").build())
+                    .address(null)
+                    .build())
+                .build()
+            )
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(Subscription.builder()
+                    .subscribeEmail("Yes")
+                    .email("appellant@gmail.com")
+                    .subscribeSms("Yes")
+                    .mobile("07911123456")
+                    .build()
+                )
+                .build()
+            )
+            .sscsDocument(Collections.emptyList())
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertNull(actual.getRepresentativeDetails().getAddressLine1());
+        assertNull(actual.getRepresentativeDetails().getAddressLine2());
+        assertNull(actual.getRepresentativeDetails().getTownCity());
+        assertNull(actual.getRepresentativeDetails().getCounty());
+        assertNull(actual.getRepresentativeDetails().getPostCode());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWithRepNoContact() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mrs.")
+                        .firstName("Ap")
+                        .lastName("Pellant")
+                        .build()
+                    )
+                    .identity(Identity.builder()
+                        .dob("1998-12-31")
+                        .nino("SC 94 27 06 A")
+                        .build()
+                    )
+                    .address(Address.builder()
+                        .line1("1 Appellant Close")
+                        .town("Appellant-town")
+                        .county("Appellant-county")
+                        .postcode("TS1 1ST")
+                        .build()
+                    )
+                    .contact(Contact.builder()
+                        .mobile("07911123456")
+                        .email("appellant@gmail.com")
+                        .build()
+                    )
+                    .isAppointee("No")
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2010-02-01")
+                    .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
+                    .build()
+                )
+                .appealReasons(
+                    AppealReasons.builder()
+                        .reasons(
+                            Collections.singletonList(
+                                AppealReason.builder()
+                                    .value(AppealReasonDetails.builder()
+                                        .reason("Underpayment")
+                                        .description("I think I should get more")
+                                        .build()
+                                    )
+                                    .build()
+                            )
+                        )
+                        .otherReasons("I can't think of anything else")
+                        .build()
+                )
+                .hearingOptions(null)
+                .rep(Representative.builder()
+                    .hasRepresentative("Yes")
+                    .name(Name.builder().title("Miss.").firstName("Re").lastName("Presentative").build())
+                    .contact(null)
+                    .address(Address.builder()
+                        .line1("1 Rep Cres")
+                        .town("Rep-town")
+                        .county("Rep-county")
+                        .postcode("TS3 3ST")
+                        .build())
+                    .build())
+                .build()
+            )
+            .subscriptions(Subscriptions.builder()
+                .appellantSubscription(Subscription.builder()
+                    .subscribeEmail("Yes")
+                    .email("appellant@gmail.com")
+                    .subscribeSms("Yes")
+                    .mobile("07911123456")
+                    .build()
+                )
+                .build()
+            )
+            .sscsDocument(Collections.emptyList())
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertNull(actual.getRepresentativeDetails().getPhoneNumber());
+        assertNull(actual.getRepresentativeDetails().getEmailAddress());
+    }
+
+    @Test
     public void convertPopulatedCaseDataWhenAttendingHearing() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -818,6 +1096,230 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             "Help with stairs",
             actual.getHearingArrangements().getSelection().getAnythingElse().getLanguage()
         );
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNoInterpreter() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder()
+                    .code("PIP")
+                    .description("Personal Independence Payment")
+                    .build()
+                )
+                .appellant(Appellant.builder()
+                    .name(Name.builder()
+                        .title("Mrs.")
+                        .firstName("Ap")
+                        .lastName("Pellant")
+                        .build()
+                    )
+                    .identity(Identity.builder()
+                        .dob("1998-12-31")
+                        .nino("SC 94 27 06 A")
+                        .build()
+                    )
+                    .address(Address.builder()
+                        .line1("1 Appellant Close")
+                        .town("Appellant-town")
+                        .county("Appellant-county")
+                        .postcode("TS1 1ST")
+                        .build()
+                    )
+                    .contact(Contact.builder()
+                        .mobile("07911123456")
+                        .email("appellant@gmail.com")
+                        .build()
+                    )
+                    .isAppointee("No")
+                    .build()
+                )
+                .mrnDetails(MrnDetails.builder()
+                    .mrnDate("2010-02-01")
+                    .mrnLateReason("Forgot to send it")
+                    .dwpIssuingOffice("DWP PIP (1)")
+                    .build()
+                )
+                .appealReasons(
+                    AppealReasons.builder()
+                        .reasons(
+                            Collections.singletonList(
+                                AppealReason.builder()
+                                    .value(AppealReasonDetails.builder()
+                                        .reason("Underpayment")
+                                        .description("I think I should get more")
+                                        .build()
+                                    )
+                                    .build()
+                            )
+                        )
+                        .otherReasons("I can't think of anything else")
+                        .build()
+                )
+                .hearingOptions(
+                    HearingOptions.builder()
+                        .wantsToAttend("Yes")
+                        .scheduleHearing("Yes")
+                        .wantsSupport("Yes")
+                        .languageInterpreter("No")
+                        .signLanguageType("British Sign Language (BSL)")
+                        .other("Help with stairs")
+                        .arrangements(
+                            Arrays.asList(
+                                "hearingLoop",
+                                "accessibleHearingRoom",
+                                "signLanguageInterpreter",
+                                "disabledAccess"
+                            )
+                        )
+                        .build()
+                )
+                .build()
+            )
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("yes", actual.getTheHearing().getAttendHearing());
+        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
+        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertFalse(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getRequested());
+        assertNull(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getLanguage());
+        assertTrue(actual.getHearingArrangements().getSelection().getSignLanguage().getRequested());
+        assertEquals(
+            "British Sign Language (BSL)",
+            actual.getHearingArrangements().getSelection().getSignLanguage().getLanguage()
+        );
+        assertTrue(actual.getHearingArrangements().getSelection().getHearingLoop().getRequested());
+        assertTrue(actual.getHearingArrangements().getSelection().getAccessibleHearingRoom().getRequested());
+        assertTrue(actual.getHearingArrangements().getSelection().getAnythingElse().getRequested());
+        assertEquals(
+            "Help with stairs",
+            actual.getHearingArrangements().getSelection().getAnythingElse().getLanguage()
+        );
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNoArrangements() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .hearingOptions(
+                    HearingOptions.builder()
+                        .wantsToAttend("Yes")
+                        .scheduleHearing("Yes")
+                        .wantsSupport("Yes")
+                        .languageInterpreter("No")
+                        .signLanguageType("British Sign Language (BSL)")
+                        .other("Help with stairs")
+                        .arrangements(
+                            Arrays.asList(
+                            )
+                        )
+                        .build()
+                )
+                .build()
+            )
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("yes", actual.getTheHearing().getAttendHearing());
+        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
+        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertFalse(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getRequested());
+        assertNull(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getLanguage());
+        assertFalse(actual.getHearingArrangements().getSelection().getSignLanguage().getRequested());
+        assertFalse(actual.getHearingArrangements().getSelection().getHearingLoop().getRequested());
+        assertFalse(actual.getHearingArrangements().getSelection().getAccessibleHearingRoom().getRequested());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNullObjectsArrangements() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .hearingOptions(
+                    HearingOptions.builder()
+                        .wantsToAttend("Yes")
+                        .scheduleHearing("Yes")
+                        .wantsSupport("Yes")
+                        .languageInterpreter(null)
+                        .signLanguageType(null)
+                        .other("Help with stairs")
+                        .arrangements(null)
+                        .build()
+                )
+                .build()
+            )
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("yes", actual.getTheHearing().getAttendHearing());
+        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
+        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertNull(actual.getHearingArrangements());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNotListedArrangements() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .hearingOptions(
+                    HearingOptions.builder()
+                        .wantsToAttend("Yes")
+                        .scheduleHearing("Yes")
+                        .wantsSupport("Yes")
+                        .languageInterpreter(null)
+                        .signLanguageType(null)
+                        .other("Help with stairs")
+                        .arrangements(
+                            Collections.singletonList(
+                                ""
+                            )
+                        )
+                        .build()
+                )
+                .build()
+            )
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("yes", actual.getTheHearing().getAttendHearing());
+        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
+        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertNull(actual.getHearingArrangements());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNullArrangements() {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .hearingOptions(
+                    HearingOptions.builder()
+                        .wantsToAttend("Yes")
+                        .scheduleHearing("Yes")
+                        .wantsSupport("Yes")
+                        .languageInterpreter("No")
+                        .signLanguageType("British Sign Language (BSL)")
+                        .other("Help with stairs")
+                        .arrangements(null)
+                        .build()
+                )
+                .build()
+            )
+            .evidencePresent("no")
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        assertEquals("yes", actual.getTheHearing().getAttendHearing());
+        assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
+        assertEquals("yes", actual.getHearingSupport().getArrangements());
+        assertFalse(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getRequested());
+        assertNull(actual.getHearingArrangements().getSelection().getInterpreterLanguage().getLanguage());
+        assertFalse(actual.getHearingArrangements().getSelection().getSignLanguage().getRequested());
+        assertFalse(actual.getHearingArrangements().getSelection().getHearingLoop().getRequested());
+        assertFalse(actual.getHearingArrangements().getSelection().getAccessibleHearingRoom().getRequested());
     }
 
     @Test

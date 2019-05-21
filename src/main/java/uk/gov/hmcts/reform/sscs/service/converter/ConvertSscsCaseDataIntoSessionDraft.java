@@ -133,7 +133,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean mrnDetailsPresent(Appeal appeal) {
-        return appeal != null && appeal.getMrnDetails() != null;
+        return appeal.getMrnDetails() != null;
     }
 
     private boolean mrnDatePresent(Appeal appeal) {
@@ -149,7 +149,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private Boolean hasHearingOptions(Appeal appeal) {
-        return appeal != null && appeal.getHearingOptions() != null;
+        return appeal.getHearingOptions() != null;
     }
 
     private SessionTheHearing buildTheHearing(Appeal appeal) {
@@ -171,7 +171,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private SessionHearingArrangement getArrangement(String requested, String matchValue, String language) {
         SessionHearingArrangement arrangement = null;
         if (StringUtils.isNotBlank(requested)) {
-            if (matchValue.equalsIgnoreCase(matchValue)) {
+            if (requested.equalsIgnoreCase(matchValue)) {
                 arrangement = new SessionHearingArrangement(true, language);
             } else {
                 arrangement = new SessionHearingArrangement(false);
@@ -275,7 +275,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean hasRep(Appeal appeal) {
-        return appeal != null && appeal.getRep() != null;
+        return appeal.getRep() != null;
     }
 
     private SessionRepresentative buildRepresentative(Appeal appeal) {
