@@ -32,9 +32,11 @@ public class EventControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     @MockBean
     private EventService eventService;
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     @MockBean
     private AuthorisationService authorisationService;
 
