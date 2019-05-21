@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.builder.TrackYourAppealJsonBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -49,6 +48,7 @@ public class TribunalsServiceTest {
     @Mock
     private SubscriptionRequest subscriptionRequest;
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     @Captor
     private ArgumentCaptor<SscsCaseData> captor;
 
@@ -100,7 +100,7 @@ public class TribunalsServiceTest {
 
     @Test
     public void shouldAddRegionalProcessingCenterFromCcdIfItsPresent() {
-        Mockito.when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetailsWithRpc());
+        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetailsWithRpc());
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
@@ -111,7 +111,7 @@ public class TribunalsServiceTest {
     @Test
     public void shouldGetRpcfromRegionalProcessingServiceIfItsNotPresentInCcdCase() {
 
-        Mockito.when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetails());
+        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetails());
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
@@ -141,18 +141,17 @@ public class TribunalsServiceTest {
     }
 
     private RegionalProcessingCenter getRegionalProcessingCenter() {
-        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
-                .name("CARDIFF")
-                .address1("HM Courts & Tribunals Service")
-                .address2("Social Security & Child Support Appeals")
-                .address3("Eastgate House")
-                .address4("Newport Road")
-                .city("CARDIFF")
-                .postcode("CF24 0AB")
-                .phoneNumber("0300 123 1142")
-                .faxNumber("0870 739 4438")
-                .build();
-        return rpc;
+        return RegionalProcessingCenter.builder()
+            .name("CARDIFF")
+            .address1("HM Courts & Tribunals Service")
+            .address2("Social Security & Child Support Appeals")
+            .address3("Eastgate House")
+            .address4("Newport Road")
+            .city("CARDIFF")
+            .postcode("CF24 0AB")
+            .phoneNumber("0300 123 1142")
+            .faxNumber("0870 739 4438")
+            .build();
     }
 
 }

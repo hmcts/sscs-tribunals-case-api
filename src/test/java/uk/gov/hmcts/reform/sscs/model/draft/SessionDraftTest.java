@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.sscs.model.draft;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.*;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_ESA;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_APPOINTEE;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_APPOINTEE_AT_SAME_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_NO_MRN;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.SESSION_SAMPLE_WITH_REP;
 
 import java.util.Collections;
 import net.javacrumbs.jsonunit.core.Option;
@@ -272,4 +277,53 @@ public class SessionDraftTest {
             .isEqualTo(sessionDraft);
 
     }
+
+    @Test
+    public void shouldSerializeSessionEsaDraftAsExpected() {
+        SessionDraft sessionDraft = SessionDraft.builder()
+            .benefitType(new SessionBenefitType("Employment and Support Allowance (ESA)"))
+            .postcode(new SessionPostcodeChecker("n29ed"))
+            .createAccount(new SessionCreateAccount("yes"))
+            .haveAMrn(new SessionHaveAMrn("yes"))
+            .mrnDate(new SessionMrnDate(new SessionDate("10", "10", "1990")))
+            .checkMrn(new SessionCheckMrn("yes"))
+            .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("aassas dasdsa dasdasda das"))
+            .dwpIssuingOfficeEsa(new SessionDwpIssuingOfficeEsa("Chesterfield DRT"))
+            .appointee(new SessionAppointee("no"))
+            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
+            .appellantNino(new SessionAppellantNino("SC 94 27 06 A"))
+            .appellantContactDetails(
+                new SessionContactDetails(
+                    "1 Appellant Close",
+                    null,
+                    "Appellant-town",
+                    "Appellant-county",
+                    "TS1 1ST",
+                    "07911123456",
+                    "appellant@gmail.com"
+                )
+            )
+            .textReminders(new SessionTextReminders("yes"))
+            .sendToNumber(new SessionSendToNumber("yes"))
+            .representative(new SessionRepresentative("no"))
+            .reasonForAppealing(
+                new SessionReasonForAppealing(
+                    Collections.singletonList(
+                        new SessionReasonForAppealingItem(
+                            "Underpayment",
+                            "I think I should get more")
+                    )
+                )
+            )
+            .otherReasonForAppealing(new SessionOtherReasonForAppealing("I can't think of anything else"))
+            .evidenceProvide(new SessionEvidenceProvide("no"))
+            .theHearing(new SessionTheHearing("yes"))
+            .build();
+
+        assertThatJson(SESSION_SAMPLE_ESA.getSerializedMessage())
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .isEqualTo(sessionDraft);
+    }
+
 }

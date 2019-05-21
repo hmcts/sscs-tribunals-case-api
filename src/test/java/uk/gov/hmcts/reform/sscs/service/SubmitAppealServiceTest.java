@@ -78,6 +78,7 @@ public class SubmitAppealServiceTest {
     @Mock
     private AirLookupService airLookupService;
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     @Mock
     private PdfStoreService pdfStoreService;
 
@@ -100,11 +101,12 @@ public class SubmitAppealServiceTest {
 
     private SubmitAppealService submitAppealService;
 
-    private SyaCaseWrapper appealData = getSyaCaseWrapper();
+    private final SyaCaseWrapper appealData = getSyaCaseWrapper();
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private RoboticsWrapper roboticsWrapper;
 
-    private JSONObject json = new JSONObject();
+    private final JSONObject json = new JSONObject();
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -291,10 +293,10 @@ public class SubmitAppealServiceTest {
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
 
-        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
-        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        Document stubbedDocument = new Document();
+        Document.Link stubbedLink = new Document.Link();
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
-        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
         given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
@@ -337,10 +339,10 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void shouldUpdateCcdWithPdf() {
-        uk.gov.hmcts.reform.document.domain.Document stubbedDocument = new uk.gov.hmcts.reform.document.domain.Document();
-        uk.gov.hmcts.reform.document.domain.Document.Link stubbedLink = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        Document stubbedDocument = new Document();
+        Document.Link stubbedLink = new Document.Link();
         stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
-        uk.gov.hmcts.reform.document.domain.Document.Links stubbedLinks = new Document.Links();
+        Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
         given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
