@@ -166,6 +166,9 @@ public class SyaEndpointsIt {
         verify(ccdClient).startCaseForCaseworker(any(), eq(SYA_APPEAL_CREATED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender, times(2)).send(message);
+        verify(ccdClient).startEvent(any(), any(), eq("uploadDocument"));
+        verify(ccdClient).startEvent(any(), any(), eq(SENT_TO_DWP.getCcdType()));
+        verify(ccdClient, times(2)).submitEventForCaseworker(any(), any(), any());
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
@@ -192,6 +195,7 @@ public class SyaEndpointsIt {
         verify(ccdClient).startCaseForCaseworker(any(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender).send(message);
+        verify(ccdClient, times(0)).startEvent(any(), any(), eq(SENT_TO_DWP.getCcdType()));
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
@@ -218,6 +222,7 @@ public class SyaEndpointsIt {
         verify(ccdClient).startCaseForCaseworker(any(), eq(NON_COMPLIANT.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender).send(message);
+        verify(ccdClient, times(0)).startEvent(any(), any(), eq(SENT_TO_DWP.getCcdType()));
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
