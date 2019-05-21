@@ -20,11 +20,9 @@ public class DocumentDownloadService {
     private static final String OAUTH2_TOKEN = "oauth2Token";
     private static final String USER_ID = "sscs";
 
-    public DocumentDownloadService(
-        DocumentDownloadClientApi documentDownloadClientApi,
-        AuthTokenGenerator authTokenGenerator,
-        @Value("${document_management.url}") String documentManagementUrl
-    ) {
+    public DocumentDownloadService(DocumentDownloadClientApi documentDownloadClientApi,
+                                   AuthTokenGenerator authTokenGenerator,
+                                   @Value("${document_management.url}") String documentManagementUrl) {
         this.documentDownloadClientApi = documentDownloadClientApi;
         this.authTokenGenerator = authTokenGenerator;
         this.documentManagementUrl = documentManagementUrl;
