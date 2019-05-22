@@ -579,12 +579,12 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private SessionEvidenceDescription buildEvidenceDescription(SscsCaseData caseData) {
-        if (caseData == null
-            || caseData.getSscsDocument() == null
-            || caseData.getSscsDocument().isEmpty()) {
-            return null;
+        if (caseData != null
+            && caseData.getSscsDocument() != null
+            && !caseData.getSscsDocument().isEmpty()
+            && caseData.getSscsDocument().get(0).getValue().getDocumentComment() != null) {
+            return new SessionEvidenceDescription(caseData.getSscsDocument().get(0).getValue().getDocumentComment());
         }
-
-        return new SessionEvidenceDescription("Briefly describe the evidence you've just uploaded");
+        return null;
     }
 }

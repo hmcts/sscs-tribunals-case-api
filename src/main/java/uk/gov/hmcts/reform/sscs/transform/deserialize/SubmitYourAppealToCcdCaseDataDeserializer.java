@@ -605,6 +605,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .documentDateAdded(syaEvidence.getUploadedDate().format(DateTimeFormatter.ISO_DATE))
                         .documentLink(documentLink)
                         .documentType("appellantEvidence")
+                        .documentComment(syaCaseWrapper.getReasonsForAppealing().getEvidenceDescription())
                         .build();
                     return SscsDocument.builder().value(sscsDocumentDetails).build();
                 }).collect(Collectors.toList());
