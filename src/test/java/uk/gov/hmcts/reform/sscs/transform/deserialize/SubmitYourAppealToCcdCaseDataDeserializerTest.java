@@ -117,8 +117,32 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutHearingTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(WITHOUT_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void syaWithoutWantsSupportTest() {
+        SyaCaseWrapper syaCaseWrapper = WITHOUT_WANTS_SUPPORT.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(WITHOUT_WANTS_SUPPORT_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void syaWantsSupportWithoutArrangementsTest() {
+        SyaCaseWrapper syaCaseWrapper = WANTS_SUPPORT_WITHOUT_ARRANGEMENTS.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void syaWantsSupportWithoutScheduleTest() {
+        SyaCaseWrapper syaCaseWrapper = WANTS_SUPPORT_WITHOUT_SCHEDULE.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
     @Test

@@ -396,6 +396,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .languages(languageInterpreter != null && languageInterpreter.equals(YES)
                         ? syaHearingOptions.getInterpreterLanguageType() : null)
                     .scheduleHearing(null)
+                    .signLanguageType(syaHearingOptions.getSignLanguageType())
+                    .other(syaHearingOptions.getAnythingElse())
                     .build();
             }
 

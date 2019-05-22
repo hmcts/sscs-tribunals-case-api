@@ -25,6 +25,8 @@ public enum SyaJsonMessageSerializer {
     WITHOUT_REPRESENTATIVE_CCD("withoutRepresentativeCcd.json"),
     WITHOUT_HEARING("withoutHearing.json"),
     WITHOUT_HEARING_CCD("withoutHearingCcd.json"),
+    WITHOUT_WANTS_SUPPORT("withoutWantsSupport.json"),
+    WITHOUT_WANTS_SUPPORT_CCD("withoutWantsSupportCcd.json"),
     HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING("hearingWithoutSupportAndScheduleHearing.json"),
     HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING_CCD("hearingWithoutSupportAndScheduleHearingCcd.json"),
     HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING("hearingWithoutSupportWithScheduleHearing.json"),
@@ -47,7 +49,11 @@ public enum SyaJsonMessageSerializer {
     ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS("allDetailsWithAppointeeWithDifferentAddress.json"),
     ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD("allDetailsWithAppointeeWithDifferentAddressCcd.json"),
     APPELLANT_NO_CONTACT_DETAILS("appellantNoContactDetails.json"),
-    APPELLANT_NO_CONTACT_DETAILS_CCD("appellantNoContactDetailsCcd.json");
+    APPELLANT_NO_CONTACT_DETAILS_CCD("appellantNoContactDetailsCcd.json"),
+    WANTS_SUPPORT_WITHOUT_ARRANGEMENTS("wantsSupportWithoutArrangements.json"),
+    WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD("wantsSupportWithoutArrangementsCcd.json"),
+    WANTS_SUPPORT_WITHOUT_SCHEDULE("wantsSupportWithoutSchedule.json"),
+    WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD("wantsSupportWithoutScheduleCcd.json");
 
     private final String serializedMessage;
 
