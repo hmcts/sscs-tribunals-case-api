@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -12,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
-import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionContactDetails;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDatesCantAttend;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDob;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
@@ -33,6 +34,10 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionEnterMobile;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangement;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangements;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangementsSelection;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingAvailability;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
@@ -94,8 +99,11 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             .reasonForAppealing(buildReasonForAppealing(appeal))
             .otherReasonForAppealing(buildOtherReasonForAppealing(appeal))
             .evidenceProvide(buildEvidenceProvide(caseData.getEvidencePresent()))
-            .theHearing(buildTheHearing(caseData.getAppeal().getHearingOptions()))
+            .theHearing(buildTheHearing(appeal))
             .hearingSupport(buildHearingSupport(appeal))
+            .hearingArrangements(buildHearingArrangements(appeal))
+            .hearingAvailability(buildHearingAvailability(appeal))
+            .datesCantAttend(buildDatesCantAttend(appeal))
             .build();
     }
 
@@ -127,7 +135,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     }
 
     private boolean mrnDetailsPresent(Appeal appeal) {
-        return appeal != null && appeal.getMrnDetails() != null;
+        return appeal.getMrnDetails() != null;
     }
 
     private boolean mrnDatePresent(Appeal appeal) {
@@ -142,26 +150,134 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         return null;
     }
 
-    private SessionTheHearing buildTheHearing(HearingOptions hearingOptions) {
-        if (hearingOptions == null || hearingOptions.getWantsToAttend() == null) {
+    private Boolean hasHearingOptions(Appeal appeal) {
+        return appeal.getHearingOptions() != null;
+    }
+
+    private SessionTheHearing buildTheHearing(Appeal appeal) {
+        if (!hasHearingOptions(appeal) || appeal.getHearingOptions().getWantsToAttend() == null) {
             return null;
         } else {
-            return new SessionTheHearing(StringUtils.lowerCase(hearingOptions.getWantsToAttend()));
+            return new SessionTheHearing(appeal.getHearingOptions().getWantsToAttend().toLowerCase());
         }
     }
 
     private SessionHearingSupport buildHearingSupport(Appeal appeal) {
-        if (appeal == null
-            || appeal.getHearingOptions() == null
-            || appeal.getHearingOptions().getWantsSupport() == null) {
+        if (!hasHearingOptions(appeal) || appeal.getHearingOptions().getWantsSupport() == null) {
             return null;
         }
 
         return new SessionHearingSupport(appeal.getHearingOptions().getWantsSupport().toLowerCase());
     }
 
+    private SessionHearingArrangement getArrangement(String requested, String matchValue, String language) {
+        SessionHearingArrangement arrangement = null;
+        if (StringUtils.isNotBlank(requested)) {
+            if (requested.equalsIgnoreCase(matchValue)) {
+                arrangement = new SessionHearingArrangement(true, language);
+            } else {
+                arrangement = new SessionHearingArrangement(false);
+            }
+        }
+
+        return arrangement;
+    }
+
+    private SessionHearingArrangement getArrangement(String requested, List<String> list, String matchValue, String language) {
+        SessionHearingArrangement arrangement = null;
+        if (StringUtils.isNotBlank(requested)) {
+            if (list != null && !list.isEmpty() && list.contains(matchValue)) {
+                arrangement = new SessionHearingArrangement(true, language);
+            } else {
+                arrangement = new SessionHearingArrangement(false);
+            }
+        }
+
+        return arrangement;
+    }
+
+    private SessionHearingArrangement getArrangement(List<String> list, String matchValue) {
+        return new SessionHearingArrangement(list != null && !list.isEmpty() && list.contains(matchValue));
+    }
+
+    private SessionHearingArrangements buildHearingArrangements(Appeal appeal) {
+        if (!hasHearingOptions(appeal) || hasNoArrangements(appeal)) {
+            return null;
+        }
+
+        SessionHearingArrangement languageInterpreter = getArrangement(
+            appeal.getHearingOptions().getLanguageInterpreter(),
+            "yes",
+            appeal.getHearingOptions().getLanguages()
+        );
+
+        SessionHearingArrangement signLanguage = getArrangement(
+            appeal.getHearingOptions().getSignLanguageType(),
+            appeal.getHearingOptions().getArrangements(),
+            "signLanguageInterpreter",
+            appeal.getHearingOptions().getSignLanguageType()
+        );
+
+        SessionHearingArrangement hearingLoop = getArrangement(
+            appeal.getHearingOptions().getArrangements(),
+            ("hearingLoop")
+        );
+
+        SessionHearingArrangement disabledAccess = getArrangement(
+            appeal.getHearingOptions().getArrangements(),
+            ("disabledAccess")
+        );
+
+        SessionHearingArrangement anythingElse = getArrangement(
+            appeal.getHearingOptions().getOther(),
+            appeal.getHearingOptions().getOther(),
+            appeal.getHearingOptions().getOther()
+        );
+
+        return new SessionHearingArrangements(
+            new SessionHearingArrangementsSelection(
+                languageInterpreter,
+                signLanguage,
+                hearingLoop,
+                disabledAccess,
+                anythingElse
+            )
+        );
+    }
+
+    private boolean hasNoArrangements(Appeal appeal) {
+        return appeal.getHearingOptions().getLanguageInterpreter() == null
+            && appeal.getHearingOptions().getSignLanguageType() == null
+            && (appeal.getHearingOptions().getArrangements() == null
+            || !appeal.getHearingOptions().getArrangements().contains("signLanguageInterpreter")
+            || !appeal.getHearingOptions().getArrangements().contains("hearingLoop")
+            || !appeal.getHearingOptions().getArrangements().contains("disabledAccess"));
+    }
+
+    private SessionHearingAvailability buildHearingAvailability(Appeal appeal) {
+        if (!hasHearingOptions(appeal) || StringUtils.isBlank(appeal.getHearingOptions().getScheduleHearing())) {
+            return null;
+        }
+
+        return new SessionHearingAvailability(appeal.getHearingOptions().getScheduleHearing().toLowerCase());
+    }
+
+    private SessionDatesCantAttend buildDatesCantAttend(Appeal appeal) {
+        if (!hasHearingOptions(appeal)
+            || appeal.getHearingOptions().getExcludeDates() == null
+            || appeal.getHearingOptions().getExcludeDates().isEmpty()) {
+            return null;
+        }
+
+        List<SessionDate> dates = appeal.getHearingOptions().getExcludeDates()
+            .stream()
+            .map(f -> new SessionDate(f.getValue()))
+            .collect(Collectors.toList());
+        return new SessionDatesCantAttend(dates);
+    }
+
     private boolean hasRep(Appeal appeal) {
-        return appeal != null && appeal.getRep() != null;
+        return appeal.getRep() != null;
     }
 
     private SessionRepresentative buildRepresentative(Appeal appeal) {
