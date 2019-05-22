@@ -69,13 +69,15 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
+        boolean hasContactDetails = syaCaseWrapper.getContactDetails() != null;
+
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         boolean isDraft = isDraft(syaCaseWrapper);
         return SscsCaseData.builder()
             .caseCreated(LocalDate.now().toString())
             .generatedSurname(isDraft ? null : syaCaseWrapper.getAppellant().getLastName())
-            .generatedEmail(isDraft ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
-            .generatedMobile(isDraft
+            .generatedEmail(isDraft || !hasContactDetails ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
+            .generatedMobile(isDraft || !hasContactDetails
                 ? null
                 : getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber())
             )
@@ -132,7 +134,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getHearingType(HearingOptions hearingOptions) {
-        if (hearingOptions == null) {
+        if (hearingOptions == null || hearingOptions.getWantsToAttend() == null) {
             return null;
         }
         return YES.equals(hearingOptions.getWantsToAttend()) ? ORAL : PAPER;
