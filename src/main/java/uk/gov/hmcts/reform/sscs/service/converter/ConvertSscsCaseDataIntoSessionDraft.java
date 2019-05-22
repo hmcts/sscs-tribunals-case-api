@@ -453,7 +453,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private SessionSendToNumber buildSendToNumber(SscsCaseData caseData) {
         if (!contactIsNull(caseData) && !mobileInSubscriptionIsNull(caseData.getSubscriptions())) {
             Contact contact = caseData.getAppeal().getAppellant().getContact();
-            if (contact.getMobile() == null) {
+            if (appellantContactMobileIsNullPickAppointee(caseData, contact)) {
                 contact = caseData.getAppeal().getAppellant().getAppointee().getContact();
             }
             String cleanNumber = PhoneNumbersUtil.cleanPhoneNumber(contact.getMobile()).orElse(contact.getMobile());
@@ -461,12 +461,18 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             if (subscriptionIsNull(subscription)) {
                 subscription = caseData.getSubscriptions().getAppointeeSubscription();
             }
-            String result = contact.getMobile().equals(subscription.getMobile())
-                || cleanNumber.equals(subscription.getMobile()) ? "yes" : "no";
+            String result = subscription.getMobile().equals(contact.getMobile())
+                || subscription.getMobile().equals(cleanNumber) ? "yes" : "no";
             return new SessionSendToNumber(result);
         }
         return null;
 
+    }
+
+    private boolean appellantContactMobileIsNullPickAppointee(SscsCaseData caseData, Contact contact) {
+        return contact.getMobile() == null
+            && caseData.getAppeal().getAppellant().getAppointee().getContact() != null
+            && caseData.getAppeal().getAppellant().getAppointee().getContact().getMobile() != null;
     }
 
     private SessionSmsConfirmation buildSmsConfirmation(SscsCaseData caseData) {
