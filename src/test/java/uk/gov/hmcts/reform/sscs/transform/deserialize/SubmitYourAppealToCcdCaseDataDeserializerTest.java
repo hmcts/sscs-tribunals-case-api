@@ -74,6 +74,18 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void syaMissingMrnTest() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.setMrn(null);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnMissingReason());
+    }
+
+    @Test
     public void syaWithoutNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
