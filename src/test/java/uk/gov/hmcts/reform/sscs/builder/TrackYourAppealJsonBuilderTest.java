@@ -316,7 +316,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
-        RegionalProcessingCenter rpc = RegionalProcessingCenter.builder()
+        return RegionalProcessingCenter.builder()
                 .name("LIVERPOOL")
                 .address1("HM Courts & Tribunals Service")
                 .address2("Social Security & Child Support Appeals")
@@ -327,7 +327,6 @@ public class TrackYourAppealJsonBuilderTest {
                 .phoneNumber("0300 123 1142")
                 .faxNumber("0870 324 0109")
                 .build();
-        return rpc;
     }
     
 }

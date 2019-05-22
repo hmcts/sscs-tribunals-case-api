@@ -105,6 +105,12 @@ public class SessionDraft {
     @JsonProperty("HearingSupport")
     SessionHearingSupport hearingSupport;
 
+    @JsonProperty("HearingAvailability")
+    SessionHearingAvailability hearingAvailability;
+
+    @JsonProperty("DatesCantAttend")
+    SessionDatesCantAttend datesCantAttend;
+
     @JsonProperty("HearingArrangements")
     SessionHearingArrangements hearingArrangements;
 }

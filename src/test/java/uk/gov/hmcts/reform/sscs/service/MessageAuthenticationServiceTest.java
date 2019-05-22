@@ -27,7 +27,7 @@ public class MessageAuthenticationServiceTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    private String macString = "our-big-secret";
+    private static final String macString = "our-big-secret";
 
     private MessageAuthenticationService service;
 

@@ -23,9 +23,9 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @RunWith(MockitoJUnitRunner.class)
 public class EventServiceTest {
 
-    public static final Long CCD_CASE_ID = 1234567890L;
-    public static final String DOCUMENT_URL = "http://dm-store:4506/documents/35d53efc-a30d-4b0d-b5a9-312d52bb1a4d";
-    public static final String EVIDENCE_URL = "http://dm-store:4506/documents/35d53efc-a45c-a30d-b5a9-412d52bb1a4d";
+    private static final Long CCD_CASE_ID = 1234567890L;
+    private static final String DOCUMENT_URL = "http://dm-store:4506/documents/35d53efc-a30d-4b0d-b5a9-312d52bb1a4d";
+    private static final String EVIDENCE_URL = "http://dm-store:4506/documents/35d53efc-a45c-a30d-b5a9-412d52bb1a4d";
     @Mock
     private SscsPdfService sscsPdfService;
 
@@ -159,11 +159,11 @@ public class EventServiceTest {
 
     private SscsCaseData buildCaseDataWithPdf() {
         SscsCaseData caseData = buildCaseDataWithoutPdf();
-        caseData.setSscsDocument(buildDocuments(caseData));
+        caseData.setSscsDocument(buildDocuments());
         return caseData;
     }
 
-    private List<SscsDocument> buildDocuments(SscsCaseData caseData) {
+    private List<SscsDocument> buildDocuments() {
         List<SscsDocument> list = new ArrayList<>();
 
         String fileName = "Test.pdf";

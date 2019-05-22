@@ -9,13 +9,20 @@
     "createAccount": "yes"
   },
   "HaveAMRN": {
-    "haveAMRN": "no"
+    "haveAMRN": "yes"
   },
-  "HaveContactedDWP": {
-    "haveContactedDWP": "yes"
+  "MRNDate": {
+    "mrnDate": {
+      "day": "10",
+      "month": "10",
+      "year": "1990"
+    }
   },
-  "NoMRN": {
-    "reasonForNoMRN": "I can't find my letter."
+  "CheckMRN": {
+    "checkedMRN": "yes"
+  },
+  "MRNOverThirteenMonthsLate": {
+    "reasonForBeingLate": "aassas dasdsa dasdasda das"
   },
   "DWPIssuingOffice": {
     "pipNumber": "1"
@@ -72,6 +79,9 @@
   "TheHearing": {
     "attendHearing": "yes"
   },
+  "HearingAvailability": {
+    "scheduleHearing": "yes"
+  },
   "HearingSupport": {
     "arrangements": "yes"
   },
@@ -96,5 +106,19 @@
         "requested": true
       }
     }
+  },
+  "DatesCantAttend": {
+    "items": [
+      {
+        "day": "11",
+        "month": "7",
+        "year": "2099"
+      },
+      {
+        "day": "12",
+        "month": "7",
+        "year": "2099"
+      }
+    ]
   }
 }

@@ -10,4 +10,5 @@ public class SessionHearingArrangementsSelection {
     private SessionHearingArrangement signLanguage;
     private SessionHearingArrangement hearingLoop;
     private SessionHearingArrangement accessibleHearingRoom;
+    private SessionHearingArrangement anythingElse;
 }

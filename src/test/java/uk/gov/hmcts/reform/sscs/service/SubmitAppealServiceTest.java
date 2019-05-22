@@ -78,6 +78,7 @@ public class SubmitAppealServiceTest {
     @Mock
     private AirLookupService airLookupService;
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     @Mock
     private PdfStoreService pdfStoreService;
 
@@ -100,11 +101,12 @@ public class SubmitAppealServiceTest {
 
     private SubmitAppealService submitAppealService;
 
-    private SyaCaseWrapper appealData = getSyaCaseWrapper();
+    private final SyaCaseWrapper appealData = getSyaCaseWrapper();
 
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private RoboticsWrapper roboticsWrapper;
 
-    private JSONObject json = new JSONObject();
+    private final JSONObject json = new JSONObject();
 
     private final String userToken = null;
 
