@@ -249,7 +249,6 @@ dependencies {
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.27.0'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '2.1'
     testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.23.2'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.6.1'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.6.1'

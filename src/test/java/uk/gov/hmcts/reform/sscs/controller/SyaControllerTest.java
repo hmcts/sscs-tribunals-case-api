@@ -45,7 +45,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
-        when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class))).thenReturn(1L);
+        when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(1L);
 
         String json = getSyaCaseWrapperJson();
 
@@ -75,7 +75,7 @@ public class SyaControllerTest {
     @Test
     public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
         doThrow(new PdfGenerationException("malformed html template", new Exception()))
-            .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class));
+            .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class), any());
         String json = getSyaCaseWrapperJson();
 
         mockMvc.perform(post("/appeals")

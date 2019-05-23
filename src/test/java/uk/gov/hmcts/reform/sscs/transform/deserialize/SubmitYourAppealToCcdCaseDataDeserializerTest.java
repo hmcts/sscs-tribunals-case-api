@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static junit.framework.TestCase.assertNull;
 import static net.javacrumbs.jsonunit.JsonAssert.assertJsonEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,36 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_PHONE_WITHOUT_SPACES_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_PHONE_WITH_SPACES;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.EVIDENCE_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.EVIDENCE_DOCUMENT_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.NINO_WITHOUT_SPACES_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.NINO_WITH_SPACES;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_EMAIL_NOTIFICATION;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_EMAIL_NOTIFICATION_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_HEARING;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_HEARING_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_NOTIFICATION;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_NOTIFICATION_CCD;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_REGIONAL_PROCESSING_CENTER;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_REPRESENTATIVE;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_SMS_NOTIFICATION;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_SMS_NOTIFICATION_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -85,12 +57,32 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
+    public void syaAppellantNoContactDetailsTest() {
+        SyaCaseWrapper syaCaseWrapper = APPELLANT_NO_CONTACT_DETAILS.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(APPELLANT_NO_CONTACT_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
     public void syaDwpIssuingOfficeTest() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getMrn().setDwpIssuingOffice("DWP PIP ( 10)");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertEquals("DWP PIP (10)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Test
+    public void syaMissingMrnTest() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.setMrn(null);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertNull(caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnDate());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnLateReason());
+        assertNull(caseData.getAppeal().getMrnDetails().getMrnMissingReason());
     }
 
     @Test
@@ -137,8 +129,32 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutHearingTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(WITHOUT_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void syaWithoutWantsSupportTest() {
+        SyaCaseWrapper syaCaseWrapper = WITHOUT_WANTS_SUPPORT.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(WITHOUT_WANTS_SUPPORT_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void syaWantsSupportWithoutArrangementsTest() {
+        SyaCaseWrapper syaCaseWrapper = WANTS_SUPPORT_WITHOUT_ARRANGEMENTS.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void syaWantsSupportWithoutScheduleTest() {
+        SyaCaseWrapper syaCaseWrapper = WANTS_SUPPORT_WITHOUT_SCHEDULE.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
     @Test
@@ -163,6 +179,23 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
+    }
+
+    @Test
+    public void syaWithNullHearingOptions() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.setSyaHearingOptions(null);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertNull(caseData.getAppeal().getHearingOptions());
+    }
+
+    @Test
+    public void syaWithEmptyHearing() {
+        SyaCaseWrapper syaCaseWrapper = HEARING_WITH_SUPPORT_EMPTY.getDeserializeMessage();
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertJsonEquals(HEARING_WITH_SUPPORT_EMPTY_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
     @Test

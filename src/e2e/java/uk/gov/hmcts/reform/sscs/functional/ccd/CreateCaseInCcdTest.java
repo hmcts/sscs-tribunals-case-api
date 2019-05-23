@@ -86,7 +86,7 @@ public class CreateCaseInCcdTest {
             wrapper.getAppellant().setNino(RandomStringUtils.random(9, true, true).toUpperCase());
             wrapper.getMrn().setDate(LocalDate.now());
 
-            Long id = submitAppealService.submitAppeal(wrapper);
+            Long id = submitAppealService.submitAppeal(wrapper, "");
             assertEquals("withDwp", findStateOfCaseInCcd(id));
         } catch (EmailSendFailedException | PdfGenerationException ep) {
             assertTrue(true);

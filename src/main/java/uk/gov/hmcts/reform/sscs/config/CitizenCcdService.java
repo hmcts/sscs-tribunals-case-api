@@ -1,8 +1,12 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
@@ -10,6 +14,8 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -19,13 +25,17 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 @Slf4j
 public class CitizenCcdService {
 
-    private CitizenCcdClient citizenCcdClient;
-    private SscsCcdConvertService sscsCcdConvertService;
+    private final CitizenCcdClient citizenCcdClient;
+    private final SscsCcdConvertService sscsCcdConvertService;
+    private final CcdService ccdService;
 
     @Autowired
-    CitizenCcdService(CitizenCcdClient citizenCcdClient, SscsCcdConvertService sscsCcdConvertService) {
+    CitizenCcdService(CitizenCcdClient citizenCcdClient,
+                      SscsCcdConvertService sscsCcdConvertService,
+                      CcdService ccdService) {
         this.citizenCcdClient = citizenCcdClient;
         this.sscsCcdConvertService = sscsCcdConvertService;
+        this.ccdService = ccdService;
     }
 
 
@@ -40,7 +50,7 @@ public class CitizenCcdService {
         List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(idamTokens);
 
         CaseDetails caseDetails;
-        if (!caseDetailsList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(caseDetailsList)) {
             String caseId = caseDetailsList.get(0).getId().toString();
             caseDetails = updateCase(caseData, EventType.UPDATE_DRAFT.getCcdType(), "Update draft",
                 "Update draft in CCD", idamTokens, caseId);
@@ -56,6 +66,21 @@ public class CitizenCcdService {
                 .saveCaseOperation(SaveCaseOperation.CREATE)
                 .build();
         }
+    }
+
+    public Optional<SscsCaseDetails> draftArchived(SscsCaseData caseData, IdamTokens citizenIdamTokens,
+                                                   IdamTokens userIdamTokens) {
+        List<CaseDetails> caseDetailsList = citizenCcdClient.searchForCitizen(citizenIdamTokens);
+
+        if (!caseDetailsList.isEmpty()) {
+            Long caseId = caseDetailsList.get(0).getId();
+
+            SscsCaseDetails sscsCaseDetails = ccdService.updateCase(caseData, caseId, DRAFT_ARCHIVED.getCcdType(),
+                    "SSCS - draft archived", "SSCS - draft archived", userIdamTokens);
+
+            return Optional.of(sscsCaseDetails);
+        }
+        return Optional.empty();
     }
 
     private CaseDetails newCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens) {

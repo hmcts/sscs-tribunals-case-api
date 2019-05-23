@@ -64,7 +64,8 @@ public enum SerializeJsonMessageManager {
     SESSION_SAMPLE_WITH_APPOINTEE("drafts/session-sample-with-appointee.json"),
     SESSION_SAMPLE_WITH_APPOINTEE_AT_SAME_ADDRESS("drafts/session-sample-with-appointee-at-same-address.json"),
     SESSION_SAMPLE_WITH_NO_MRN("drafts/session-sample-with-no-mrn.json"),
-    SESSION_SAMPLE_WITH_REP("drafts/session-sample-with-rep.json");
+    SESSION_SAMPLE_WITH_REP("drafts/session-sample-with-rep.json"),
+    SESSION_SAMPLE_WITH_DATES_CANT_ATTEND("drafts/session-sample-with-dates-cant-attend.json");
 
     private final String serializedMessage;
 

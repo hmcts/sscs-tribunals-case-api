@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,7 @@ public class SubmitAppealService {
         this.convertAintoBService = convertAintoBService;
     }
 
-    public Long submitAppeal(SyaCaseWrapper appeal) {
+    public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
         String firstHalfOfPostcode = regionalProcessingCenterService
             .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
@@ -75,7 +76,7 @@ public class SubmitAppealService {
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event);
+        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event, userToken);
         // in case of duplicate case the caseDetails will be null
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
@@ -104,7 +105,8 @@ public class SubmitAppealService {
     }
 
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
-                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event) {
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
+                                            String userToken) {
         if (null != caseDetails) {
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
@@ -118,6 +120,9 @@ public class SubmitAppealService {
                     ccdService.updateCase(caseData, caseDetails.getId(), SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP by Robotics", idamTokens);
                     log.info("Case updated with sentToDwp event for id {}", caseDetails.getId());
                 }
+            }
+            if (StringUtils.isNotEmpty(userToken)) {
+                citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
             }
         }
     }

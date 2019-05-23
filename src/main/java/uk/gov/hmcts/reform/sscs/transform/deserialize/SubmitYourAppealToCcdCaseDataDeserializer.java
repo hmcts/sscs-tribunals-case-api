@@ -69,13 +69,15 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
+        boolean hasContactDetails = syaCaseWrapper.getContactDetails() != null;
+
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         boolean isDraft = isDraft(syaCaseWrapper);
         return SscsCaseData.builder()
             .caseCreated(LocalDate.now().toString())
             .generatedSurname(isDraft ? null : syaCaseWrapper.getAppellant().getLastName())
-            .generatedEmail(isDraft ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
-            .generatedMobile(isDraft
+            .generatedEmail(isDraft || !hasContactDetails ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
+            .generatedMobile(isDraft || !hasContactDetails
                 ? null
                 : getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber())
             )
@@ -132,7 +134,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getHearingType(HearingOptions hearingOptions) {
-        if (hearingOptions == null) {
+        if (hearingOptions == null || hearingOptions.getWantsToAttend() == null) {
             return null;
         }
         return YES.equals(hearingOptions.getWantsToAttend()) ? ORAL : PAPER;
@@ -363,12 +365,40 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
         if (syaHearingOptions.getWantsToAttend()) {
 
+            if (syaHearingOptions.getWantsSupport() == null) {
+                return HearingOptions.builder()
+                    .wantsToAttend(YES)
+                    .wantsSupport(null)
+                    .build();
+            }
+
             String languageInterpreter = null;
             List<String> arrangements = null;
             String wantsSupport = syaHearingOptions.getWantsSupport() ? YES : NO;
             if (syaHearingOptions.getWantsSupport()) {
-                languageInterpreter = syaHearingOptions.getArrangements().getLanguageInterpreter() ? YES : NO;
+                if (syaHearingOptions.getArrangements() == null) {
+                    return HearingOptions.builder()
+                        .wantsToAttend(YES)
+                        .wantsSupport(wantsSupport)
+                        .arrangements(null)
+                        .build();
+                }
                 arrangements = getArrangements(syaHearingOptions.getArrangements());
+                languageInterpreter = getLanguageInterpreter(syaHearingOptions.getArrangements().getLanguageInterpreter());
+            }
+
+            if (syaHearingOptions.getScheduleHearing() == null) {
+                return HearingOptions.builder()
+                    .wantsToAttend(YES)
+                    .wantsSupport(wantsSupport)
+                    .arrangements(arrangements)
+                    .languageInterpreter(languageInterpreter)
+                    .languages(languageInterpreter != null && languageInterpreter.equals(YES)
+                        ? syaHearingOptions.getInterpreterLanguageType() : null)
+                    .scheduleHearing(null)
+                    .signLanguageType(syaHearingOptions.getSignLanguageType())
+                    .other(syaHearingOptions.getAnythingElse())
+                    .build();
             }
 
             String scheduleHearing = syaHearingOptions.getScheduleHearing() ? YES : NO;
@@ -395,7 +425,17 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         }
     }
 
+    private static String getLanguageInterpreter(Boolean languageInterpreter) {
+        if (languageInterpreter == null) {
+            return null;
+        }
+        return languageInterpreter ? YES : NO;
+    }
+
     private static List<ExcludeDate> getExcludedDates(String[] dates) {
+        if (dates == null) {
+            return null;
+        }
         List<ExcludeDate> excludeDates = new ArrayList<>();
         for (String date : dates) {
             DateRange dateRange = DateRange.builder()
@@ -411,15 +451,15 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         List<String> arrangements = new ArrayList<>();
 
-        if (syaArrangements.getSignLanguageInterpreter()) {
+        if (syaArrangements.getSignLanguageInterpreter() != null && syaArrangements.getSignLanguageInterpreter()) {
             arrangements.add("signLanguageInterpreter");
         }
 
-        if (syaArrangements.getHearingLoop()) {
+        if (syaArrangements.getHearingLoop() != null && syaArrangements.getHearingLoop()) {
             arrangements.add("hearingLoop");
         }
 
-        if (syaArrangements.getAccessibleHearingRoom()) {
+        if (syaArrangements.getAccessibleHearingRoom() != null && syaArrangements.getAccessibleHearingRoom()) {
             arrangements.add("disabledAccess");
         }
 
@@ -430,9 +470,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return Subscriptions.builder()
             .appellantSubscription(syaCaseWrapper.getIsAppointee() != null && !syaCaseWrapper.getIsAppointee()
-                    ? getAppellantSubscription(syaCaseWrapper) : null)
+                ? getAppellantSubscription(syaCaseWrapper) : null)
             .appointeeSubscription(syaCaseWrapper.getIsAppointee() != null && syaCaseWrapper.getIsAppointee()
-                    ? getAppointeeSubscription(syaCaseWrapper) : null)
+                ? getAppointeeSubscription(syaCaseWrapper) : null)
             .representativeSubscription(getRepresentativeSubscription(syaCaseWrapper))
             .build();
     }
