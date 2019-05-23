@@ -53,4 +53,13 @@ public class DocumentDownloadServiceTest {
             "oauth2Token", null, "", "sscs",
             "/documents/19cd94a8-4280-406b-92c7-090b735159ca");
     }
+
+    @Test
+    public void givenErrorWhenDownloadingBinaryFile_shouldReturnZeroSizeByDefault() {
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+            .willThrow(RuntimeException.class);
+        long size = documentDownloadService
+            .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
+        assertEquals(0L, size);
+    }
 }
