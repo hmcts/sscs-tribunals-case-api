@@ -45,7 +45,6 @@
   "AppellantNINO": {
     "nino": "SC 94 27 06 A"
   },
-  "invalidPostcode": false,
   "AppellantContactDetails": {
     "addressLine1": "1 Appellant Close",
     "townCity": "Appellant-town",
@@ -62,9 +61,6 @@
   },
   "SendToNumber": {
     "useSameNumber": "yes"
-  },
-  "SmsConfirmation": {
-
   },
   "Representative": {
     "hasRepresentative": "no"
@@ -86,6 +82,9 @@
   "TheHearing": {
     "attendHearing": "yes"
   },
+  "HearingAvailability": {
+    "scheduleHearing": "no"
+  },
   "HearingSupport": {
     "arrangements": "yes"
   },
@@ -101,7 +100,7 @@
       },
       "anythingElse": {
         "requested": true,
-        "language": "aaaaa aaaa"
+        "language": "Help with stairs"
       },
       "hearingLoop": {
         "requested": true

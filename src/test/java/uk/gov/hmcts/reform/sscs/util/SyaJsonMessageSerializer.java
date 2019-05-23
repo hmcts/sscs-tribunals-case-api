@@ -25,12 +25,16 @@ public enum SyaJsonMessageSerializer {
     WITHOUT_REPRESENTATIVE_CCD("withoutRepresentativeCcd.json"),
     WITHOUT_HEARING("withoutHearing.json"),
     WITHOUT_HEARING_CCD("withoutHearingCcd.json"),
+    WITHOUT_WANTS_SUPPORT("withoutWantsSupport.json"),
+    WITHOUT_WANTS_SUPPORT_CCD("withoutWantsSupportCcd.json"),
     HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING("hearingWithoutSupportAndScheduleHearing.json"),
     HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING_CCD("hearingWithoutSupportAndScheduleHearingCcd.json"),
     HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING("hearingWithoutSupportWithScheduleHearing.json"),
     HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING_CCD("hearingWithoutSupportWithScheduleHearingCcd.json"),
     HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING("hearingWithSupportWithoutScheduleHearing.json"),
     HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD("hearingWithSupportWithoutScheduleHearingCcd.json"),
+    HEARING_WITH_SUPPORT_EMPTY("hearingWithSupportEmpty.json"),
+    HEARING_WITH_SUPPORT_EMPTY_CCD("hearingWithSupportEmptyCcd.json"),
     EVIDENCE_DOCUMENT("appealWithEvidenceDocuments.json"),
     EVIDENCE_DOCUMENT_CCD("appealWithEvidenceDocumentsCcd.json"),
     APPELLANT_PHONE_WITH_SPACES("appellantPhoneNumbersWithSpaces.json"),
@@ -43,7 +47,13 @@ public enum SyaJsonMessageSerializer {
     ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS("allDetailsWithAppointeeWithSameAddressButNoAppellantContactDetails.json"),
     ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS_CCD("allDetailsWithAppointeeWithSameAddressButNoAppellantContactDetailsCcd.json"),
     ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS("allDetailsWithAppointeeWithDifferentAddress.json"),
-    ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD("allDetailsWithAppointeeWithDifferentAddressCcd.json");
+    ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD("allDetailsWithAppointeeWithDifferentAddressCcd.json"),
+    APPELLANT_NO_CONTACT_DETAILS("appellantNoContactDetails.json"),
+    APPELLANT_NO_CONTACT_DETAILS_CCD("appellantNoContactDetailsCcd.json"),
+    WANTS_SUPPORT_WITHOUT_ARRANGEMENTS("wantsSupportWithoutArrangements.json"),
+    WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD("wantsSupportWithoutArrangementsCcd.json"),
+    WANTS_SUPPORT_WITHOUT_SCHEDULE("wantsSupportWithoutSchedule.json"),
+    WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD("wantsSupportWithoutScheduleCcd.json");
 
     private final String serializedMessage;
 
@@ -56,7 +66,7 @@ public enum SyaJsonMessageSerializer {
             return new String(Files.readAllBytes(Paths.get("src/test/resources/sya/" + fileName)));
         } catch (IOException e) {
             e.printStackTrace();
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 

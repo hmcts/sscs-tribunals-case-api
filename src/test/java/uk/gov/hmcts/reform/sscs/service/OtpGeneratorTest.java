@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class OtpGeneratorTest {
-    private OtpGenerator otpGenerator = new OtpGenerator();
+    private final OtpGenerator otpGenerator = new OtpGenerator();
 
     @Test
     public void shouldGenerate6DigitOtp() throws Exception {

@@ -1,20 +1,27 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.Collections;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -34,10 +41,13 @@ public class CitizenCcdServiceTest {
     @Mock
     private SscsCcdConvertService sscsCcdConvertService;
 
+    @Mock
+    private CcdService ccdService;
+
     @Before
     public void setup() {
         initMocks(this);
-        citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService);
+        citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService);
     }
 
     @Test
@@ -77,5 +87,20 @@ public class CitizenCcdServiceTest {
         verify(citizenCcdClient).startEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), eq(UPDATE_DRAFT));
         verify(citizenCcdClient).submitEventForCitizen(eq(IDAM_TOKENS), eq(caseId.toString()), eq(caseDataContent));
         verifyNoMoreInteractions(citizenCcdClient);
+    }
+
+    @Test
+    public void shouldArchiveADraftCase() {
+        SscsCaseData caseData = SscsCaseData.builder().build();
+        Long caseId = 123L;
+        when(citizenCcdClient.searchForCitizen(eq(IDAM_TOKENS))).thenReturn(Collections.singletonList(CaseDetails.builder().id(caseId).build()));
+
+        when(ccdService.updateCase(eq(caseData), eq(caseId), eq(DRAFT_ARCHIVED.getCcdType()),
+                eq("SSCS - draft archived"), eq("SSCS - draft archived"), eq(IDAM_TOKENS)))
+                .thenReturn(SscsCaseDetails.builder().build());
+        Optional<SscsCaseDetails> sscsCaseDetails = citizenCcdService.draftArchived(caseData, IDAM_TOKENS, IDAM_TOKENS);
+
+        assertNotNull(sscsCaseDetails);
+        assertTrue(sscsCaseDetails.isPresent());
     }
 }

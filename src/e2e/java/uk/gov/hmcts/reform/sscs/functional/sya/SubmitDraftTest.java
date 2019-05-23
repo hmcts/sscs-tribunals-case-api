@@ -2,10 +2,13 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import io.restassured.RestAssured;
@@ -13,7 +16,10 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
 import java.util.Base64;
-import org.eclipse.jetty.http.HttpStatus;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,12 +28,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @RunWith(SpringRunner.class)
@@ -50,9 +59,6 @@ public class SubmitDraftTest {
     @Autowired
     private CitizenCcdService citizenCcdService;
 
-    @Autowired
-    private IdamService idamService;
-
     @Value("${idam.oauth2.client.secret}")
     private String idamOauth2ClientSecret;
 
@@ -65,13 +71,34 @@ public class SubmitDraftTest {
     @Value("${idam.oauth2.citizen.password}")
     private String password;
 
-    private String userToken;
+    @Autowired
+    private AuthTokenGenerator authTokenGenerator;
+
+    @Autowired
+    private IdamService idamService;
+
+    private String citizenToken;
+
+    private IdamTokens citizenIdamTokens;
+
+    private IdamTokens userIdamTokens;
 
     @Before
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
-        userToken = getIdamOauth2Token(username, password);
+        citizenToken = getIdamOauth2Token(username, password);
+        citizenIdamTokens = IdamTokens.builder()
+                .idamOauth2Token(citizenToken)
+                .serviceAuthorization(authTokenGenerator.generate())
+                .userId(getUserId(citizenToken))
+                .build();
+
+        userIdamTokens = idamService.getIdamTokens();
+    }
+
+    private String getUserId(String userToken) {
+        return idamApiClient.getUserDetails(userToken).getId();
     }
 
     @Test
@@ -79,12 +106,13 @@ public class SubmitDraftTest {
         SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
-            .statusCode(HttpStatus.OK_200)
+            .statusCode(HttpStatus.SC_OK)
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
         SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
+        draftAppeal.setCaseType("draft");
         draftAppeal.setBenefitType(new SyaBenefitType("Personal Independence Payment", "PIP"));
         return draftAppeal;
     }
@@ -94,13 +122,13 @@ public class SubmitDraftTest {
         SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
-            .statusCode(HttpStatus.OK_200)
+            .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
         response2.then()
-            .statusCode(HttpStatus.OK_200)
+            .statusCode(HttpStatus.SC_OK)
             .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String response2Header = response.getHeader(LOCATION_HEADER_NAME);
 
@@ -112,10 +140,10 @@ public class SubmitDraftTest {
         SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         saveDraft(draftAppeal);
         RestAssured.given()
-            .header(new Header(AUTHORIZATION, userToken))
+            .header(new Header(AUTHORIZATION, citizenToken))
             .get("/drafts")
             .then()
-            .statusCode(HttpStatus.OK_200)
+            .statusCode(HttpStatus.SC_OK)
             .assertThat().body("BenefitType.benefitType", equalTo("Personal Independence Payment (PIP)"));
     }
 
@@ -125,17 +153,35 @@ public class SubmitDraftTest {
             .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
             .get("/drafts")
             .then()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR_500);
+            .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
+    @Test
+    public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() {
+        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
+
+        saveDraft(draftAppeal);
+
+        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+        assertTrue(CollectionUtils.isNotEmpty(savedDrafts));
+        SscsCaseData caseData = savedDrafts.get(0);
+
+        archiveDraft(caseData);
+
+        assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
 
     private Response saveDraft(SyaCaseWrapper draftAppeal) {
         return RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
+            .header(new Header(AUTHORIZATION, citizenToken))
             .body(SyaServiceHelper.asJsonString(draftAppeal))
             .put("/drafts");
+    }
+
+    private void archiveDraft(SscsCaseData draftAppeal) {
+        citizenCcdService.draftArchived(draftAppeal, citizenIdamTokens, userIdamTokens);
     }
 
     public String getIdamOauth2Token(String username, String password) {
