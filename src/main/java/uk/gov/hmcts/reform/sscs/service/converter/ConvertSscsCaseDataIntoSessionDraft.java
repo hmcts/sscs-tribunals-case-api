@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
@@ -61,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionSmsConfirmation;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
+import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
 @Service
@@ -218,31 +220,26 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         SessionHearingArrangement languageInterpreter = getArrangement(
             appeal.getHearingOptions().getLanguageInterpreter(),
             "yes",
-            appeal.getHearingOptions().getLanguages()
-        );
+            appeal.getHearingOptions().getLanguages());
 
         SessionHearingArrangement signLanguage = getArrangement(
             appeal.getHearingOptions().getSignLanguageType(),
             appeal.getHearingOptions().getArrangements(),
-            "signLanguageInterpreter",
-            appeal.getHearingOptions().getSignLanguageType()
-        );
+            HearingOptionArrangements.SIGN_LANGUAGE_INTERPRETER.getValue(),
+            appeal.getHearingOptions().getSignLanguageType());
 
         SessionHearingArrangement hearingLoop = getArrangement(
             appeal.getHearingOptions().getArrangements(),
-            ("hearingLoop")
-        );
+            (HearingOptionArrangements.HEARING_LOOP.getValue()));
 
         SessionHearingArrangement disabledAccess = getArrangement(
             appeal.getHearingOptions().getArrangements(),
-            ("disabledAccess")
-        );
+            (HearingOptionArrangements.DISABLE_ACCESS.getValue()));
 
         SessionHearingArrangement anythingElse = getArrangement(
             appeal.getHearingOptions().getOther(),
             appeal.getHearingOptions().getOther(),
-            appeal.getHearingOptions().getOther()
-        );
+            appeal.getHearingOptions().getOther());
 
         return new SessionHearingArrangements(
             new SessionHearingArrangementsSelection(
@@ -258,10 +255,19 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
     private boolean hasNoArrangements(Appeal appeal) {
         return appeal.getHearingOptions().getLanguageInterpreter() == null
             && appeal.getHearingOptions().getSignLanguageType() == null
-            && (appeal.getHearingOptions().getArrangements() == null
-            || !appeal.getHearingOptions().getArrangements().contains("signLanguageInterpreter")
-            || !appeal.getHearingOptions().getArrangements().contains("hearingLoop")
-            || !appeal.getHearingOptions().getArrangements().contains("disabledAccess"));
+            && !validArrangement(appeal.getHearingOptions().getArrangements());
+    }
+
+    private boolean validArrangement(List<String> arrangements) {
+        if (arrangements == null) {
+            return false;
+        }
+        return arrangements.stream().anyMatch(this::isArrangementPresent);
+    }
+
+    private boolean isArrangementPresent(String arrangement) {
+        return Arrays.stream(HearingOptionArrangements.values())
+            .anyMatch(e -> e.getValue().equals(arrangement));
     }
 
     private SessionHearingAvailability buildHearingAvailability(Appeal appeal) {
