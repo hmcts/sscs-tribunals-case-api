@@ -6,17 +6,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -82,26 +83,37 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
-    public void givenEvidenceDescriptionIsProvided_shouldReturnSessionEvidenceDescription() {
+    @Parameters(method = "getSscsDocumentScenarios")
+    public void givenEvidenceDescriptionIsProvided_shouldReturnSessionEvidenceDescription(
+        List<SscsDocument> sscsDocumentList) {
+
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder().build())
-            .sscsDocument(Collections.singletonList(SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                    .documentComment("my evidence description")
-                    .documentLink(DocumentLink.builder()
-                        .documentBinaryUrl("https://documentLink")
-                        .build())
-                    .build())
-                .build()))
+            .sscsDocument(sscsDocumentList)
             .build();
 
-
-        BDDMockito.given(documentDownloadService.getFileSize(anyString())).willReturn(1L);
+        given(documentDownloadService.getFileSize(anyString())).willReturn(1L);
 
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
 
         assertEquals("my evidence description", actual.getEvidenceDescription().getDescribeTheEvidence());
     }
+
+    private Object[] getSscsDocumentScenarios() {
+        List<SscsDocument> sscsDocumentList = Collections.singletonList(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentComment("my evidence description")
+                .documentLink(DocumentLink.builder()
+                    .documentBinaryUrl("https://documentLink")
+                    .build())
+                .build())
+            .build());
+
+        return new Object[]{
+            new Object[]{sscsDocumentList}
+        };
+    }
+
 
     @Test
     public void givenDwpIssuingOfficeEsa_shouldReturnResponseWithDwpIssuingOfficeEsa() {
