@@ -13,8 +13,31 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasonDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangements;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
+import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 
 @RunWith(JUnitParamsRunner.class)
 public class ConvertSscsCaseDataIntoSessionDraftTest {
@@ -1186,14 +1209,10 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .languageInterpreter("No")
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
-                        .arrangements(
-                            Arrays.asList(
-                                "hearingLoop",
-                                "accessibleHearingRoom",
-                                "signLanguageInterpreter",
-                                "disabledAccess"
-                            )
-                        )
+                        .arrangements(Arrays.asList(
+                            HearingOptionArrangements.SIGN_LANGUAGE_INTERPRETER.getValue(),
+                            HearingOptionArrangements.HEARING_LOOP.getValue(),
+                            HearingOptionArrangements.DISABLE_ACCESS.getValue()))
                         .build()
                 )
                 .build()
@@ -1233,14 +1252,9 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .languageInterpreter("No")
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
-                        .arrangements(
-                            Arrays.asList(
-                            )
-                        )
-                        .build()
-                )
-                .build()
-            )
+                        .arrangements(Collections.emptyList())
+                        .build())
+                .build())
             .evidencePresent("no")
             .build();
 
@@ -1283,6 +1297,49 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
+    @Parameters(method = "getHearingOptionsScenarios")
+    public void givenHearingWithSupportAndNoArrangement_shouldReturnNullSessionHearingArrangements(
+        HearingOptions hearingOptions, SessionHearingArrangements expected) {
+
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .hearingOptions(hearingOptions)
+                .build())
+            .build();
+
+        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+
+        assertEquals(expected, actual.getHearingArrangements());
+    }
+
+    @SuppressWarnings("unused")
+    private Object[] getHearingOptionsScenarios() {
+        HearingOptions hearingOptionsWithNullArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .build();
+
+        HearingOptions hearingOptionsWithEmptyArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .arrangements(Collections.emptyList())
+            .build();
+
+        HearingOptions hearingOptionsWithNoValidArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .arrangements(Collections.singletonList("any invalid arrangement"))
+            .build();
+
+        return new Object[]{
+            new Object[]{hearingOptionsWithNullArrangement, null},
+            new Object[]{hearingOptionsWithEmptyArrangement, null},
+            new Object[]{hearingOptionsWithNoValidArrangement, null}
+        };
+    }
+
+
+    @Test
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNotListedArrangements() {
         caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
@@ -1294,11 +1351,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .languageInterpreter(null)
                         .signLanguageType(null)
                         .other("Help with stairs")
-                        .arrangements(
-                            Collections.singletonList(
-                                ""
-                            )
-                        )
+                        .arrangements(Collections.singletonList(""))
                         .build()
                 )
                 .build()

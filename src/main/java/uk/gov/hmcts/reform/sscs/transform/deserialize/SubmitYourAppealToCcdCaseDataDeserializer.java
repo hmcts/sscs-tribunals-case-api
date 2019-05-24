@@ -452,15 +452,15 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         List<String> arrangements = new ArrayList<>();
 
         if (syaArrangements.getSignLanguageInterpreter() != null && syaArrangements.getSignLanguageInterpreter()) {
-            arrangements.add("signLanguageInterpreter");
+            arrangements.add(HearingOptionArrangements.SIGN_LANGUAGE_INTERPRETER.getValue());
         }
 
         if (syaArrangements.getHearingLoop() != null && syaArrangements.getHearingLoop()) {
-            arrangements.add("hearingLoop");
+            arrangements.add(HearingOptionArrangements.HEARING_LOOP.getValue());
         }
 
         if (syaArrangements.getAccessibleHearingRoom() != null && syaArrangements.getAccessibleHearingRoom()) {
-            arrangements.add("disabledAccess");
+            arrangements.add(HearingOptionArrangements.DISABLE_ACCESS.getValue());
         }
 
         return arrangements;
