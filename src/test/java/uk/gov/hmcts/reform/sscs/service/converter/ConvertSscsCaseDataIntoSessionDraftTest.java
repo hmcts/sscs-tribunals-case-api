@@ -35,7 +35,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangement;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangements;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangementsSelection;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
 import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 
@@ -1331,10 +1333,28 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .arrangements(Collections.singletonList("any invalid arrangement"))
             .build();
 
+        HearingOptions hearingOptionsWithValidArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .arrangements(Arrays.asList(
+                HearingOptionArrangements.HEARING_LOOP.getValue(),
+                HearingOptionArrangements.DISABLE_ACCESS.getValue()))
+            .build();
+
+        SessionHearingArrangements expected = new SessionHearingArrangements(
+            new SessionHearingArrangementsSelection(
+                null,
+                null,
+                new SessionHearingArrangement(true, null),
+                new SessionHearingArrangement(true, null),
+                null)
+        );
+
         return new Object[]{
             new Object[]{hearingOptionsWithNullArrangement, null},
             new Object[]{hearingOptionsWithEmptyArrangement, null},
-            new Object[]{hearingOptionsWithNoValidArrangement, null}
+            new Object[]{hearingOptionsWithNoValidArrangement, null},
+            new Object[]{hearingOptionsWithValidArrangement, expected}
         };
     }
 
