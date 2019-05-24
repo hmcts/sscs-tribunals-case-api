@@ -86,7 +86,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
             .appeal(appeal)
             .subscriptions(getSubscriptions(syaCaseWrapper))
-            .sscsDocument(sscsDocuments.isEmpty() ? null : sscsDocuments)
+            .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
             .evidencePresent(hasEvidence(syaCaseWrapper.getEvidenceProvide()))
             .build();
     }
@@ -452,15 +452,15 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         List<String> arrangements = new ArrayList<>();
 
         if (syaArrangements.getSignLanguageInterpreter() != null && syaArrangements.getSignLanguageInterpreter()) {
-            arrangements.add("signLanguageInterpreter");
+            arrangements.add(HearingOptionArrangements.SIGN_LANGUAGE_INTERPRETER.getValue());
         }
 
         if (syaArrangements.getHearingLoop() != null && syaArrangements.getHearingLoop()) {
-            arrangements.add("hearingLoop");
+            arrangements.add(HearingOptionArrangements.HEARING_LOOP.getValue());
         }
 
         if (syaArrangements.getAccessibleHearingRoom() != null && syaArrangements.getAccessibleHearingRoom()) {
-            arrangements.add("disabledAccess");
+            arrangements.add(HearingOptionArrangements.DISABLE_ACCESS.getValue());
         }
 
         return arrangements;
@@ -645,6 +645,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         .documentDateAdded(syaEvidence.getUploadedDate().format(DateTimeFormatter.ISO_DATE))
                         .documentLink(documentLink)
                         .documentType("appellantEvidence")
+                        .documentComment(syaCaseWrapper.getReasonsForAppealing().getEvidenceDescription())
                         .build();
                     return SscsDocument.builder().value(sscsDocumentDetails).build();
                 }).collect(Collectors.toList());
