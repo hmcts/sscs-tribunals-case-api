@@ -539,8 +539,8 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             address.getPostcode(),
             contact.getMobile(),
             contact.getEmail(),
-            "n29ed",
-            "200205923"
+            address.getPostcodeLookup(),
+            address.getPostcodeAddress()
         );
     }
 
