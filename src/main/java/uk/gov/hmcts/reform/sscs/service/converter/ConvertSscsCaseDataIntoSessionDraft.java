@@ -531,7 +531,6 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         if (address == null || address.getLine1() == null) {
             return null;
         }
-
         return new SessionContactDetails(
             address.getLine1(),
             address.getLine2(),
@@ -539,7 +538,9 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             address.getCounty(),
             address.getPostcode(),
             contact.getMobile(),
-            contact.getEmail()
+            contact.getEmail(),
+            "n29ed",
+            "200205923"
         );
     }
 

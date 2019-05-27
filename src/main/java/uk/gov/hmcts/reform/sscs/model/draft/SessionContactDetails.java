@@ -13,4 +13,6 @@ public class SessionContactDetails {
     private String postCode;
     private String phoneNumber;
     private String emailAddress;
+    private String postcodeLookup;
+    private String postcodeAddress;
 }

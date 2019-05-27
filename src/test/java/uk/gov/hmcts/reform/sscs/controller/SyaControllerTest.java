@@ -108,7 +108,9 @@ public class SyaControllerTest {
                     "county",
                     "AP1 4NT",
                     "07000000000",
-                    "appellant@test.com"
+                    "appellant@test.com",
+                    null,
+                    null
                 )
             )
             .sameAddress(new SessionSameAddress("no"))
@@ -196,7 +198,9 @@ public class SyaControllerTest {
                     "county",
                     "AP1 4NT",
                     "07000000000",
-                    "appellant@test.com"
+                    "appellant@test.com",
+                    null,
+                    null
                 )
             )
             .textReminders(new SessionTextReminders("yes"))
@@ -289,7 +293,9 @@ public class SyaControllerTest {
                     "tee-county",
                     "AP1 33T",
                     "07111111111",
-                    "appointee@test.com"
+                    "appointee@test.com",
+                    null,
+                    null
                 )
             )
             .sameAddress(new SessionSameAddress("no"))
