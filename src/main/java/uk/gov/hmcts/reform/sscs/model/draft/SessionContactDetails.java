@@ -15,4 +15,5 @@ public class SessionContactDetails {
     private String emailAddress;
     private String postcodeLookup;
     private String postcodeAddress;
+    private String type;
 }

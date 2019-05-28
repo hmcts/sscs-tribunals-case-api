@@ -539,8 +539,10 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             address.getPostcode(),
             contact.getMobile(),
             contact.getEmail(),
-            address.getPostcodeLookup(),
-            address.getPostcodeAddress()
+            StringUtils.isEmpty(address.getPostcodeLookup()) ? null : address.getPostcodeLookup(),
+            StringUtils.isEmpty(address.getPostcodeAddress()) ? null : address.getPostcodeAddress(),
+            (StringUtils.isEmpty(address.getPostcodeAddress())
+                && StringUtils.isEmpty(address.getPostcodeLookup())) ? "manual" : null
         );
     }
 
