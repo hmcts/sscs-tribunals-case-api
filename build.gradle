@@ -235,7 +235,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '2.0.12'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '2.0.14-RC'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.3'
 
