@@ -110,6 +110,7 @@ public class SyaControllerTest {
                     "07000000000",
                     "appellant@test.com",
                     null,
+                    null,
                     null
                 )
             )
@@ -199,6 +200,7 @@ public class SyaControllerTest {
                     "AP1 4NT",
                     "07000000000",
                     "appellant@test.com",
+                    null,
                     null,
                     null
                 )
@@ -294,6 +296,7 @@ public class SyaControllerTest {
                     "AP1 33T",
                     "07111111111",
                     "appointee@test.com",
+                    null,
                     null,
                     null
                 )

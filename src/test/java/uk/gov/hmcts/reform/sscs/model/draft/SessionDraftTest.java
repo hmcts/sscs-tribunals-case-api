@@ -40,6 +40,7 @@ public class SessionDraftTest {
                     "07911123456",
                     "appellant@gmail.com",
                     null,
+                    null,
                     null
                 )
             )
@@ -101,6 +102,7 @@ public class SessionDraftTest {
                     "07911123456",
                     "appellant@gmail.com",
                     null,
+                    null,
                     null
                 )
             )
@@ -161,6 +163,7 @@ public class SessionDraftTest {
                     "07911123456",
                     "appellant@gmail.com",
                     null,
+                    null,
                     null
                 )
             )
@@ -214,6 +217,7 @@ public class SessionDraftTest {
                     "07111111111",
                     "appointee@test.com",
                     null,
+                    null,
                     null
                 )
             )
@@ -229,6 +233,7 @@ public class SessionDraftTest {
                     "TS1 1ST",
                     "07911123456",
                     "appellant@gmail.com",
+                    null,
                     null,
                     null
                 )
@@ -280,6 +285,7 @@ public class SessionDraftTest {
                     "TS2 2ST",
                     "07111111111",
                     "appointee@test.com",
+                    null,
                     null,
                     null
                 )
@@ -336,6 +342,7 @@ public class SessionDraftTest {
                     "07911123456",
                     "appellant@gmail.com",
                     null,
+                    null,
                     null
                 )
             )
@@ -385,6 +392,7 @@ public class SessionDraftTest {
                     "TS1 1ST",
                     "07911123456",
                     "appellant@gmail.com",
+                    null,
                     null,
                     null
                 )
