@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @ContextConfiguration(initializers = CreateCaseInCcdTest.Initializer.class)
-
 @SpringBootTest
 public class CreateCaseInCcdTest {
 

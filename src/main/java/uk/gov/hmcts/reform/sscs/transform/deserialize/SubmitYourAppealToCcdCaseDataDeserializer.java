@@ -201,7 +201,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         SyaContactDetails contactDetails = (null != syaAppellant) ? syaAppellant.getContactDetails() : null;
 
         Address address = null;
-        Contact contact = null;
+        Contact contact;
         if (null != contactDetails) {
             address = Address.builder()
                 .line1(contactDetails.getAddressLine1())
