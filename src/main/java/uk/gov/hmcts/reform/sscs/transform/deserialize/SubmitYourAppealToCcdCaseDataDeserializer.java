@@ -594,6 +594,11 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             if (syaCaseWrapper.getHasRepresentative()) {
 
                 SyaRepresentative syaRepresentative = syaCaseWrapper.getRepresentative();
+                if (syaRepresentative == null) {
+                    return Representative.builder()
+                        .hasRepresentative(YES)
+                        .build();
+                }
 
                 Name name = Name.builder()
                     .title(syaRepresentative.getTitle())

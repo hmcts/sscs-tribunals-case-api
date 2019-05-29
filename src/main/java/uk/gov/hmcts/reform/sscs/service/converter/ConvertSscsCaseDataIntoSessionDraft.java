@@ -312,7 +312,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
         }
 
         SessionRepName repName = null;
-        if (appeal.getRep().getName() != null) {
+        if (appeal.getRep().getName() != null && appeal.getRep().getName().getFirstName() != null) {
             repName = new SessionRepName(
                 appeal.getRep().getName().getTitle(),
                 appeal.getRep().getName().getFirstName(),
@@ -331,8 +331,38 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAintoBService
             hasAddress ? appeal.getRep().getAddress().getCounty() : null,
             hasAddress ? appeal.getRep().getAddress().getPostcode() : null,
             hasContact ? appeal.getRep().getContact().getMobile() : null,
-            hasContact ? appeal.getRep().getContact().getEmail() : null
+            hasContact ? appeal.getRep().getContact().getEmail() : null,
+            getPostcodeLookup(appeal.getRep().getAddress()),
+            getPostcodeAddress(appeal.getRep().getAddress()),
+            getType(appeal.getRep().getAddress())
         );
+    }
+
+    private String getType(Address address) {
+        if (address == null || address.getPostcodeAddress() == null) {
+            return null;
+        }
+
+        if (StringUtils.isEmpty(address.getPostcodeAddress())
+            && StringUtils.isEmpty(address.getPostcodeLookup())) {
+            return "manual";
+        }
+
+        return null;
+    }
+
+    private String getPostcodeAddress(Address address) {
+        if (address == null || StringUtils.isEmpty(address.getPostcodeAddress())) {
+            return null;
+        }
+        return address.getPostcodeAddress();
+    }
+
+    private String getPostcodeLookup(Address address) {
+        if (address == null || StringUtils.isEmpty(address.getPostcodeLookup())) {
+            return null;
+        }
+        return address.getPostcodeLookup();
     }
 
     private SessionMrnDate buildMrnDate(Appeal appeal) {
