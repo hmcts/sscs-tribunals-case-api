@@ -221,7 +221,10 @@ public class SyaControllerTest {
                     "rep-county",
                     "RE7 7ES",
                     "07222222222",
-                    "representative@test.com"
+                    "representative@test.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .build();

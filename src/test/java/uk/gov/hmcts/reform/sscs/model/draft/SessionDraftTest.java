@@ -183,7 +183,10 @@ public class SessionDraftTest {
                     "rep-county",
                     "RE7 7ES",
                     "07222222222",
-                    "representative@gmail.com"
+                    "representative@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .build();
