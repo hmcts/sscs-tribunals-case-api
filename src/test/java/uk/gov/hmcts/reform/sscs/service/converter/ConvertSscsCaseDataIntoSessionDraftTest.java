@@ -729,8 +729,6 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals(expectedPostcodeLookup, actual.getRepresentativeDetails().getPostcodeLookup());
         assertEquals(expectedPostcodeAddress, actual.getRepresentativeDetails().getPostcodeAddress());
         assertEquals(expectedType, actual.getRepresentativeDetails().getType());
-
-        System.out.println(actual);
     }
 
     private Object[] getDifferentRepsScenarios() {
