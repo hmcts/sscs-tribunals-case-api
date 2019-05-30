@@ -70,6 +70,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     private DocumentDownloadService documentDownloadService;
     @Autowired
     private ConvertSscsCaseDataIntoSessionDraft convertSscsCaseDataIntoSessionDraft;
+    private SessionDraft actual;
 
     @Test(expected = NullPointerException.class)
     public void attemptToConvertNull() {
@@ -707,13 +708,101 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .build();
 
-        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertNull(actual.getAppointee());
     }
 
     @Test
+    @Parameters(method = "getDifferentRepsScenarios")
+    public void givenRepsWithPostcodeLookUp_shouldReturnCorrectJson(Representative rep,
+                                                                    String expectedPostcodeLookup,
+                                                                    String expectedPostcodeAddress,
+                                                                    String expectedType) {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .rep(rep)
+                .build())
+            .build();
+
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+
+        assertEquals(expectedPostcodeLookup, actual.getRepresentativeDetails().getPostcodeLookup());
+        assertEquals(expectedPostcodeAddress, actual.getRepresentativeDetails().getPostcodeAddress());
+        assertEquals(expectedType, actual.getRepresentativeDetails().getType());
+    }
+
+    private Object[] getDifferentRepsScenarios() {
+        Representative repWithNoLookupData = Representative.builder()
+            .hasRepresentative("Yes")
+            .name(Name.builder()
+                .title("Miss.")
+                .firstName("Re")
+                .lastName("Presentative")
+                .build())
+            .contact(Contact.builder()
+                .mobile("07333333333")
+                .email("rep@gmail.com")
+                .build())
+            .address(Address.builder()
+                .line1("1 Rep Cres")
+                .town("Rep-town")
+                .county("Rep-county")
+                .postcode("TS3 3ST")
+                .build())
+            .build();
+
+        Representative repWithAutoLookupData = Representative.builder()
+            .hasRepresentative("Yes")
+            .name(Name.builder()
+                .title("Miss.")
+                .firstName("Re")
+                .lastName("Presentative")
+                .build())
+            .contact(Contact.builder()
+                .mobile("07333333333")
+                .email("rep@gmail.com")
+                .build())
+            .address(Address.builder()
+                .line1("1 Rep Cres")
+                .town("Rep-town")
+                .county("Rep-county")
+                .postcode("TS3 3ST")
+                .postcodeAddress("234354")
+                .postcodeLookup("TS3 3ST")
+                .build())
+            .build();
+
+        Representative repWithManualLookupData = Representative.builder()
+            .hasRepresentative("Yes")
+            .name(Name.builder()
+                .title("Miss.")
+                .firstName("Re")
+                .lastName("Presentative")
+                .build())
+            .contact(Contact.builder()
+                .mobile("07333333333")
+                .email("rep@gmail.com")
+                .build())
+            .address(Address.builder()
+                .line1("1 Rep Cres")
+                .town("Rep-town")
+                .county("Rep-county")
+                .postcode("TS3 3ST")
+                .postcodeAddress("")
+                .postcodeLookup("")
+                .build())
+            .build();
+
+        return new Object[]{
+            new Object[]{repWithNoLookupData, null, null, null},
+            new Object[]{repWithAutoLookupData, "TS3 3ST", "234354", null},
+            new Object[]{repWithManualLookupData, null, null, "manual"}
+        };
+    }
+
+    @Test
     public void convertPopulatedCaseDataWithRep() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")

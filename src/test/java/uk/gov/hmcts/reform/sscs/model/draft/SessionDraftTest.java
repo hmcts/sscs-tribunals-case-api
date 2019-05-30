@@ -38,7 +38,10 @@ public class SessionDraftTest {
                     "Appellant-county",
                     "TS1 1ST",
                     "07911123456",
-                    "appellant@gmail.com"
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .sameAddress(new SessionSameAddress("no"))
@@ -97,7 +100,10 @@ public class SessionDraftTest {
                     "Appellant-county",
                     "TS1 1ST",
                     "07911123456",
-                    "appellant@gmail.com"
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .textReminders(new SessionTextReminders("yes"))
@@ -155,7 +161,10 @@ public class SessionDraftTest {
                     "Appellant-county",
                     "TS1 1ST",
                     "07911123456",
-                    "appellant@gmail.com"
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .textReminders(new SessionTextReminders("yes"))
@@ -174,7 +183,10 @@ public class SessionDraftTest {
                     "rep-county",
                     "RE7 7ES",
                     "07222222222",
-                    "representative@gmail.com"
+                    "representative@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .build();
@@ -206,7 +218,10 @@ public class SessionDraftTest {
                     "Appointee-county",
                     "TS2 2ST",
                     "07111111111",
-                    "appointee@test.com"
+                    "appointee@test.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
@@ -220,7 +235,10 @@ public class SessionDraftTest {
                     "Appellant-county",
                     "TS1 1ST",
                     "07911123456",
-                    "appellant@gmail.com"
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .sameAddress(new SessionSameAddress("no"))
@@ -269,7 +287,10 @@ public class SessionDraftTest {
                     "Appointee-county",
                     "TS2 2ST",
                     "07111111111",
-                    "appointee@test.com"
+                    "appointee@test.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
@@ -322,7 +343,10 @@ public class SessionDraftTest {
                     "Appellant-county",
                     "TS1 1ST",
                     "07911123456",
-                    "appellant@gmail.com"
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .textReminders(new SessionTextReminders("yes"))
@@ -370,7 +394,10 @@ public class SessionDraftTest {
                     "Appellant-county",
                     "TS1 1ST",
                     "07911123456",
-                    "appellant@gmail.com"
+                    "appellant@gmail.com",
+                    null,
+                    null,
+                    null
                 )
             )
             .textReminders(new SessionTextReminders("yes"))

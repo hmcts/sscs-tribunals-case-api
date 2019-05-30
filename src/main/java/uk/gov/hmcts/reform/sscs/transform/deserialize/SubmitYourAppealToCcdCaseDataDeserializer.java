@@ -201,7 +201,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         SyaContactDetails contactDetails = (null != syaAppellant) ? syaAppellant.getContactDetails() : null;
 
         Address address = null;
-        Contact contact = null;
+        Contact contact;
         if (null != contactDetails) {
             address = Address.builder()
                 .line1(contactDetails.getAddressLine1())
@@ -209,6 +209,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .town(contactDetails.getTownCity())
                 .county(contactDetails.getCounty())
                 .postcode(contactDetails.getPostCode())
+                .postcodeLookup(contactDetails.getPostcodeLookup())
+                .postcodeAddress(contactDetails.getPostcodeAddress())
                 .build();
 
             contact = Contact.builder()
@@ -236,6 +238,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .town(appointee.getAddress().getTown())
                 .county(appointee.getAddress().getCounty())
                 .postcode(appointee.getAddress().getPostcode())
+                .postcodeLookup(appointee.getAddress().getPostcodeLookup())
+                .postcodeAddress(appointee.getAddress().getPostcodeAddress())
                 .build();
         }
 
@@ -301,6 +305,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .town(syaAppointee.getContactDetails().getTownCity())
                     .county(syaAppointee.getContactDetails().getCounty())
                     .postcode(syaAppointee.getContactDetails().getPostCode())
+                    .postcodeLookup(syaAppointee.getContactDetails().getPostcodeLookup())
+                    .postcodeAddress(syaAppointee.getContactDetails().getPostcodeAddress())
                     .build();
             }
 
@@ -588,6 +594,11 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             if (syaCaseWrapper.getHasRepresentative()) {
 
                 SyaRepresentative syaRepresentative = syaCaseWrapper.getRepresentative();
+                if (syaRepresentative == null) {
+                    return Representative.builder()
+                        .hasRepresentative(YES)
+                        .build();
+                }
 
                 Name name = Name.builder()
                     .title(syaRepresentative.getTitle())
@@ -601,6 +612,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .town(syaRepresentative.getContactDetails().getTownCity())
                     .county(syaRepresentative.getContactDetails().getCounty())
                     .postcode(syaRepresentative.getContactDetails().getPostCode())
+                    .postcodeLookup(syaRepresentative.getContactDetails().getPostcodeLookup())
+                    .postcodeAddress(syaRepresentative.getContactDetails().getPostcodeAddress())
                     .build();
 
                 Contact contact = Contact.builder()
