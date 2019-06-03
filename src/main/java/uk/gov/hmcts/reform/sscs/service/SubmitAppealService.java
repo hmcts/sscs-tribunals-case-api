@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.net.URI;
@@ -77,8 +80,7 @@ public class SubmitAppealService {
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
         postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event, userToken);
-        // in case of duplicate case the caseDetails will be null
-        return (caseDetails != null) ? caseDetails.getId() : null;
+        return caseDetails.getId();
     }
 
     public SaveCaseResult submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
@@ -107,7 +109,7 @@ public class SubmitAppealService {
     private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
                                             String userToken) {
-        if (null != caseDetails) {
+        if (null != caseDetails.getData()) {
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
             if (event.equals(SYA_APPEAL_CREATED)) {
@@ -164,7 +166,10 @@ public class SubmitAppealService {
                         + "No need to continue with post create case processing.",
                     caseDetails.getId(), caseData.getGeneratedNino(),
                     caseData.getAppeal().getBenefitType().getCode());
-                return null;
+                return SscsCaseDetails.builder()
+                    .id(caseDetails.getId())
+                    .data(null)
+                    .build();
             }
         } catch (Exception e) {
             throw new CcdException(

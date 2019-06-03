@@ -2,16 +2,25 @@ package uk.gov.hmcts.reform.sscs.sya;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SENT_TO_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -20,6 +29,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import javax.mail.MessagingException;
@@ -125,17 +135,27 @@ public class SyaEndpointsIt {
         when(mailSender.createMimeMessage()).thenReturn(message);
 
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
-                .willReturn(PDF.getBytes());
+            .willReturn(PDF.getBytes());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(null);
         given(ccdClient.startEvent(any(), any(), anyString())).willReturn(StartEventResponse.builder().eventId("12345").build());
-        given(ccdClient.submitEventForCaseworker(any(), any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+        given(ccdClient.submitEventForCaseworker(any(), any(), any()))
+            .willReturn(CaseDetails.builder().id(123456789876L).build());
+
+        String caseReference = "caseRef";
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("caseReference", caseReference);
+        given(ccdClient.submitForCaseworker(any(), any()))
+            .willReturn(CaseDetails.builder()
+                .id(123456789876L)
+                .data(data)
+                .build());
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
         given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .willReturn(authorize);
+            .willReturn(authorize);
         given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-                .willReturn(authorize);
+            .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
         given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId"));
@@ -147,15 +167,12 @@ public class SyaEndpointsIt {
     @Test
     public void givenAValidAppeal_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
-
-        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
-
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/sya.json")))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getCase("json/sya.json")))
+            .andExpect(status().isCreated());
 
         verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
 
@@ -176,15 +193,12 @@ public class SyaEndpointsIt {
     @Test
     public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
-
-        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
-
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/syaWithNoMrnDate.json")))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getCase("json/syaWithNoMrnDate.json")))
+            .andExpect(status().isCreated());
 
         verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
 
@@ -203,15 +217,12 @@ public class SyaEndpointsIt {
     @Test
     public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
-
-        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
-
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/syaWithMrnDateMoreThan13Months.json")))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getCase("json/syaWithMrnDateMoreThan13Months.json")))
+            .andExpect(status().isCreated());
 
         verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
 
@@ -234,9 +245,9 @@ public class SyaEndpointsIt {
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/sya.json")))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getCase("json/sya.json")))
+            .andExpect(status().isCreated());
 
         verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
@@ -250,15 +261,13 @@ public class SyaEndpointsIt {
     @Test
     public void shouldSendEmailWithPdfWhenDocumentStoreIsDown() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
-        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
-
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), anyString(), any()))
-                .willThrow(new RestClientException("Document store is down"));
+            .willThrow(new RestClientException("Document store is down"));
 
         mockMvc.perform(post("/appeals")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCase("json/sya.json")))
-                .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(getCase("json/sya.json")))
+            .andExpect(status().isCreated());
 
         then(mailSender).should(times(2)).send(message);
     }

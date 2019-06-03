@@ -47,22 +47,21 @@ public class SyaController {
         response = String.class)})
     @PostMapping(value = "/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
-                                                            String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
+                                                    String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
         log.info("Case {} with benefit type - {} processed successfully",
-            caseId,
-            syaCaseWrapper.getBenefitType().getCode());
+            caseId, syaCaseWrapper.getBenefitType().getCode());
 
         return status(HttpStatus.CREATED).build();
     }
 
     @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)
     @ApiResponses(value =
-            {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SessionDraft.class),
-                @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
-                @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
+        {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SessionDraft.class),
+            @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
+            @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
     @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
