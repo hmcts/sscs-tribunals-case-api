@@ -199,7 +199,7 @@ public class SyaEndpointsIt {
         assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
         assertThat(message.getSubject(), is("Bloggs_33C"));
 
-        verify(ccdClient).startCaseForCaseworker(any(), eq(SYA_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).startCaseForCaseworker(any(), eq(VALID_APPEAL_CREATED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender, times(1)).send(message);
         verify(ccdClient).startEvent(any(), any(), eq("uploadDocument"));
