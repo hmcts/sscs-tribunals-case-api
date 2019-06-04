@@ -259,7 +259,7 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:1.18.6"
 
     runtime "org.springframework.boot:spring-boot-properties-migrator"
-    compile group: 'org.pitest', name: 'pitest', version: '1.4.7'
+    compile group: 'org.pitest', name: 'pitest', version: '1.4.8'
     compile 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
     compile 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 }
