@@ -111,14 +111,13 @@ public class SubmitAppealService {
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
             if (event.equals(SYA_APPEAL_CREATED)) {
-                roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf,
-                    additionalEvidence);
-
                 if (sendToDwpFeature) {
-                    log.info("About to update case with sentToDwp event for id {}", caseDetails.getId());
+                    log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
                     caseData.setDateSentToDwp(LocalDate.now().toString());
-                    ccdService.updateCase(caseData, caseDetails.getId(), SENT_TO_DWP.getCcdType(), "Sent to DWP", "Case has been sent to the DWP by Robotics", idamTokens);
-                    log.info("Case updated with sentToDwp event for id {}", caseDetails.getId());
+                    ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
+                    log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
+                } else {
+                    roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
                 }
             }
             if (StringUtils.isNotEmpty(userToken)) {

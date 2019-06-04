@@ -43,6 +43,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestClientException;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -59,6 +60,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -94,6 +96,9 @@ public class SyaEndpointsIt {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private SubmitAppealService submitAppealService;
 
     private ObjectMapper mapper;
 
@@ -142,10 +147,13 @@ public class SyaEndpointsIt {
 
         UploadResponse uploadResponse = createUploadResponse();
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), anyString(), any())).willReturn(uploadResponse);
+
     }
 
     @Test
-    public void givenAValidAppeal_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
+    public void givenAValidAppealWithDwpFeatureFlagOff_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
+        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
+
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
@@ -166,8 +174,36 @@ public class SyaEndpointsIt {
         verify(ccdClient).startCaseForCaseworker(any(), eq(SYA_APPEAL_CREATED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender, times(2)).send(message);
+
+        assertNotNull(getPdfWrapper().getCcdCaseId());
+    }
+
+    @Test
+    public void givenAValidAppealWithDwpFeatureFlagOn_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
+        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", true);
+
+        given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
+
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya.json")))
+                .andExpect(status().isCreated());
+
+        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
+
+        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
+        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
+        assertThat(message.getSubject(), is("Bloggs_33C"));
+
+        verify(ccdClient).startCaseForCaseworker(any(), eq(SYA_APPEAL_CREATED.getCcdType()));
+        verify(ccdClient).submitForCaseworker(any(), any());
+        verify(mailSender, times(1)).send(message);
         verify(ccdClient).startEvent(any(), any(), eq("uploadDocument"));
-        verify(ccdClient).startEvent(any(), any(), eq(SENT_TO_DWP.getCcdType()));
+        verify(ccdClient).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
         verify(ccdClient, times(2)).submitEventForCaseworker(any(), any(), any());
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
@@ -195,7 +231,7 @@ public class SyaEndpointsIt {
         verify(ccdClient).startCaseForCaseworker(any(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender).send(message);
-        verify(ccdClient, times(0)).startEvent(any(), any(), eq(SENT_TO_DWP.getCcdType()));
+        verify(ccdClient, times(0)).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
@@ -222,7 +258,7 @@ public class SyaEndpointsIt {
         verify(ccdClient).startCaseForCaseworker(any(), eq(NON_COMPLIANT.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
         verify(mailSender).send(message);
-        verify(ccdClient, times(0)).startEvent(any(), any(), eq(SENT_TO_DWP.getCcdType()));
+        verify(ccdClient, times(0)).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
@@ -249,6 +285,8 @@ public class SyaEndpointsIt {
 
     @Test
     public void shouldSendEmailWithPdfWhenDocumentStoreIsDown() throws Exception {
+        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
+
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
         given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
 
