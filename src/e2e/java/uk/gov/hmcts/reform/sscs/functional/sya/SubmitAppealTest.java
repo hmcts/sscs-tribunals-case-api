@@ -79,7 +79,9 @@ public class SubmitAppealTest {
     }
 
     @Test
-    @Parameters({"ALL_DETAILS, incompleteApplication", "ALL_DETAILS, interlocutoryReviewState", "ALL_DETAILS, appealCreated",
+    @Parameters({"ALL_DETAILS, incompleteApplication",
+            "ALL_DETAILS, interlocutoryReviewState",
+            "ALL_DETAILS, appealCreated",
             "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, appealCreated"})
     public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
         String body = syaJsonMessageSerializer.getSerializedMessage();
