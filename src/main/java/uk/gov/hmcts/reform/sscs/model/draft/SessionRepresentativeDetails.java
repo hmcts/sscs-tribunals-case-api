@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Value;
 
 @Value
-@JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class SessionRepresentativeDetails {
     private SessionRepName name;
     private String addressLine1;
@@ -14,4 +14,7 @@ public class SessionRepresentativeDetails {
     private String postCode;
     private String phoneNumber;
     private String emailAddress;
+    private String postcodeLookup;
+    private String postcodeAddress;
+    private String type;
 }

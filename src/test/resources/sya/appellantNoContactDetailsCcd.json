@@ -141,5 +141,6 @@
       "reason":null
     }
   },
-  "evidencePresent" : "No"
+  "evidencePresent" : "No",
+  "sscsDocument":[]
 }

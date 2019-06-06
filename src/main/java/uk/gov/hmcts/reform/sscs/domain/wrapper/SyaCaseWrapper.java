@@ -54,9 +54,10 @@ public class SyaCaseWrapper {
         if (null == appellant && null == appointee) {
             return null;
         }
-        return ((null != getAppellant().getIsAddressSameAsAppointee()) && getAppellant().getIsAddressSameAsAppointee())
-            ? getAppointee() != null ? getAppointee().getContactDetails() : null
-            : getAppellant().getContactDetails();
+        return (null != appellant && null != appellant.getIsAddressSameAsAppointee()
+            && appellant.getIsAddressSameAsAppointee())
+            ? appointee != null ? appointee.getContactDetails() : null
+            : appellant != null ? appellant.getContactDetails() : null;
     }
 
 }

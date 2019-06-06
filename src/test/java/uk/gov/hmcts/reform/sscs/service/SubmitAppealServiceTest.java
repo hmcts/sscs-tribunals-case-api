@@ -183,7 +183,7 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SENT_TO_DWP.getCcdType()), eq("Sent to DWP"), eq("Case has been sent to the DWP by Robotics"), any(IdamTokens.class));
+        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
     }
 
     @Test
@@ -198,7 +198,7 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SENT_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
@@ -213,7 +213,7 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SENT_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
@@ -275,7 +275,8 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldSendRoboticsByEmailPdfOnly() {
+    public void shouldSendRoboticsByEmailPdfOnly_whenFeatureFlagOff() {
+        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
 
         byte[] expected = {};
 
@@ -289,7 +290,28 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldSendRoboticsByEmailWithEvidence() {
+    public void shouldNotSendRoboticsByEmailWithEvidence_whenFeatureFlagOn() {
+
+        byte[] expected = {};
+
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
+
+        Document stubbedDocument = new Document();
+        Document.Link stubbedLink = new Document.Link();
+        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
+        Document.Links stubbedLinks = new Document.Links();
+        stubbedLinks.binary = stubbedLink;
+        stubbedDocument.links = stubbedLinks;
+        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
+
+        submitAppealService.submitAppeal(appealDataWithEvidence(), userToken);
+
+        verify(emailService, times(1)).sendEmail(emailCaptor.capture());
+    }
+
+    @Test
+    public void shouldSendRoboticsByEmailWithEvidence_whenFeatureFlagOff() {
+        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
 
         byte[] expected = {};
 

@@ -5,32 +5,116 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.model.draft.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasonDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReasons;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Contact;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveContactedDwp;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangement;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangements;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangementsSelection;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
+import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
+import uk.gov.hmcts.reform.sscs.transform.deserialize.HearingOptionArrangements;
 
 @RunWith(JUnitParamsRunner.class)
+@SpringBootTest(classes = ConvertSscsCaseDataIntoSessionDraft.class)
 public class ConvertSscsCaseDataIntoSessionDraftTest {
+    @ClassRule
+    public static final SpringClassRule SCR = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     private SscsCaseData caseData;
 
+    @MockBean
+    private DocumentDownloadService documentDownloadService;
+    @Autowired
+    private ConvertSscsCaseDataIntoSessionDraft convertSscsCaseDataIntoSessionDraft;
+    private SessionDraft actual;
+
     @Test(expected = NullPointerException.class)
     public void attemptToConvertNull() {
-        new ConvertSscsCaseDataIntoSessionDraft().convert(null);
+        convertSscsCaseDataIntoSessionDraft.convert(null);
     }
 
     @Test(expected = NullPointerException.class)
     public void attemptToConvertNullAppeal() {
         SscsCaseData caseData = SscsCaseData.builder().build();
-        new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        convertSscsCaseDataIntoSessionDraft.convert(caseData);
     }
+
+    @Test
+    @Parameters(method = "getSscsDocumentScenarios")
+    public void givenEvidenceDescriptionIsProvided_shouldReturnSessionEvidenceDescription(
+        List<SscsDocument> sscsDocumentList) {
+
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder().build())
+            .sscsDocument(sscsDocumentList)
+            .build();
+
+        given(documentDownloadService.getFileSize(anyString())).willReturn(1L);
+
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+
+        assertEquals("my evidence description", actual.getEvidenceDescription().getDescribeTheEvidence());
+    }
+
+    private Object[] getSscsDocumentScenarios() {
+        List<SscsDocument> sscsDocumentList = Collections.singletonList(SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentComment("my evidence description")
+                .documentLink(DocumentLink.builder()
+                    .documentBinaryUrl("https://documentLink")
+                    .build())
+                .build())
+            .build());
+
+        return new Object[]{
+            new Object[]{sscsDocumentList}
+        };
+    }
+
 
     @Test
     public void givenDwpIssuingOfficeEsa_shouldReturnResponseWithDwpIssuingOfficeEsa() {
@@ -47,7 +131,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .build())
             .build();
 
-        SessionDraft actualSessionDraft = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actualSessionDraft = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("any office", actualSessionDraft.getDwpIssuingOfficeEsa().getDwpIssuingOffice());
         assertEquals("Employment and Support Allowance (ESA)",
             actualSessionDraft.getBenefitType().getBenefitType());
@@ -67,7 +151,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .build())
             .build();
 
-        SessionDraft actualSessionDraft = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actualSessionDraft = convertSscsCaseDataIntoSessionDraft.convert(caseData);
 
         if (actualSessionDraft.getMrnOverThirteenMonthsLate() != null) {
             assertEquals(expectedReason, actualSessionDraft.getMrnOverThirteenMonthsLate().getReasonForBeingLate());
@@ -119,7 +203,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .build())
             .build();
 
-        SessionDraft actualSessionDraft = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actualSessionDraft = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals(actualSessionDraft.getMrnDate(), expectedSessionDraft.getMrnDate());
         assertEquals(actualSessionDraft.getNoMrn(), expectedSessionDraft.getNoMrn());
         assertEquals(actualSessionDraft.getHaveAMrn(), expectedSessionDraft.getHaveAMrn());
@@ -166,7 +250,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
 
     @Test(expected = NullPointerException.class)
     public void convertNullCaseData() {
-        new ConvertSscsCaseDataIntoSessionDraft().convert(null);
+        convertSscsCaseDataIntoSessionDraft.convert(null);
     }
 
     @Test(expected = NullPointerException.class)
@@ -175,7 +259,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .appeal(null)
             .build();
 
-        new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        convertSscsCaseDataIntoSessionDraft.convert(caseData);
     }
 
     @Test
@@ -255,7 +339,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
@@ -366,7 +450,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("07911123456", actual.getAppellantContactDetails().getPhoneNumber());
         assertEquals("yes", actual.getTextReminders().getDoYouWantTextMsgReminders());
         assertEquals("no", actual.getSendToNumber().getUseSameNumber());
@@ -446,7 +530,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("no", actual.getHaveAMrn().getHaveAMrn());
@@ -517,7 +601,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getAppointee().getIsAppointee());
         assertEquals("Mr.", actual.getAppointeeName().getTitle());
         assertEquals("Ap", actual.getAppointeeName().getFirstName());
@@ -575,7 +659,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getAppointee().getIsAppointee());
         assertEquals("Mr.", actual.getAppointeeName().getTitle());
         assertEquals("Ap", actual.getAppointeeName().getFirstName());
@@ -624,13 +708,101 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             )
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertNull(actual.getAppointee());
     }
 
     @Test
+    @Parameters(method = "getDifferentRepsScenarios")
+    public void givenRepsWithPostcodeLookUp_shouldReturnCorrectJson(Representative rep,
+                                                                    String expectedPostcodeLookup,
+                                                                    String expectedPostcodeAddress,
+                                                                    String expectedType) {
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .rep(rep)
+                .build())
+            .build();
+
+        actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+
+        assertEquals(expectedPostcodeLookup, actual.getRepresentativeDetails().getPostcodeLookup());
+        assertEquals(expectedPostcodeAddress, actual.getRepresentativeDetails().getPostcodeAddress());
+        assertEquals(expectedType, actual.getRepresentativeDetails().getType());
+    }
+
+    private Object[] getDifferentRepsScenarios() {
+        Representative repWithNoLookupData = Representative.builder()
+            .hasRepresentative("Yes")
+            .name(Name.builder()
+                .title("Miss.")
+                .firstName("Re")
+                .lastName("Presentative")
+                .build())
+            .contact(Contact.builder()
+                .mobile("07333333333")
+                .email("rep@gmail.com")
+                .build())
+            .address(Address.builder()
+                .line1("1 Rep Cres")
+                .town("Rep-town")
+                .county("Rep-county")
+                .postcode("TS3 3ST")
+                .build())
+            .build();
+
+        Representative repWithAutoLookupData = Representative.builder()
+            .hasRepresentative("Yes")
+            .name(Name.builder()
+                .title("Miss.")
+                .firstName("Re")
+                .lastName("Presentative")
+                .build())
+            .contact(Contact.builder()
+                .mobile("07333333333")
+                .email("rep@gmail.com")
+                .build())
+            .address(Address.builder()
+                .line1("1 Rep Cres")
+                .town("Rep-town")
+                .county("Rep-county")
+                .postcode("TS3 3ST")
+                .postcodeAddress("234354")
+                .postcodeLookup("TS3 3ST")
+                .build())
+            .build();
+
+        Representative repWithManualLookupData = Representative.builder()
+            .hasRepresentative("Yes")
+            .name(Name.builder()
+                .title("Miss.")
+                .firstName("Re")
+                .lastName("Presentative")
+                .build())
+            .contact(Contact.builder()
+                .mobile("07333333333")
+                .email("rep@gmail.com")
+                .build())
+            .address(Address.builder()
+                .line1("1 Rep Cres")
+                .town("Rep-town")
+                .county("Rep-county")
+                .postcode("TS3 3ST")
+                .postcodeAddress("")
+                .postcodeLookup("")
+                .build())
+            .build();
+
+        return new Object[]{
+            new Object[]{repWithNoLookupData, null, null, null},
+            new Object[]{repWithAutoLookupData, "TS3 3ST", "234354", null},
+            new Object[]{repWithManualLookupData, null, null, "manual"}
+        };
+    }
+
+    @Test
     public void convertPopulatedCaseDataWithRep() {
-        SscsCaseData caseData = SscsCaseData.builder()
+        caseData = SscsCaseData.builder()
             .appeal(Appeal.builder()
                 .benefitType(BenefitType.builder()
                     .code("PIP")
@@ -714,7 +886,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("Personal Independence Payment (PIP)", actual.getBenefitType().getBenefitType());
         assertEquals("yes", actual.getCreateAccount().getCreateAccount());
         assertEquals("yes", actual.getHaveAMrn().getHaveAMrn());
@@ -840,7 +1012,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertNull(actual.getRepresentativeDetails().getAddressLine1());
         assertNull(actual.getRepresentativeDetails().getAddressLine2());
         assertNull(actual.getRepresentativeDetails().getTownCity());
@@ -934,7 +1106,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertNull(actual.getRepresentativeDetails().getPhoneNumber());
         assertNull(actual.getRepresentativeDetails().getEmailAddress());
     }
@@ -1009,7 +1181,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("no", actual.getHearingSupport().getArrangements());
@@ -1097,7 +1269,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1186,14 +1358,10 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .languageInterpreter("No")
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
-                        .arrangements(
-                            Arrays.asList(
-                                "hearingLoop",
-                                "accessibleHearingRoom",
-                                "signLanguageInterpreter",
-                                "disabledAccess"
-                            )
-                        )
+                        .arrangements(Arrays.asList(
+                            HearingOptionArrangements.SIGN_LANGUAGE_INTERPRETER.getValue(),
+                            HearingOptionArrangements.HEARING_LOOP.getValue(),
+                            HearingOptionArrangements.DISABLE_ACCESS.getValue()))
                         .build()
                 )
                 .build()
@@ -1201,7 +1369,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1233,18 +1401,13 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .languageInterpreter("No")
                         .signLanguageType("British Sign Language (BSL)")
                         .other("Help with stairs")
-                        .arrangements(
-                            Arrays.asList(
-                            )
-                        )
-                        .build()
-                )
-                .build()
-            )
+                        .arrangements(Collections.emptyList())
+                        .build())
+                .build())
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1275,12 +1438,73 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
         assertNull(actual.getHearingArrangements());
     }
+
+    @Test
+    @Parameters(method = "getHearingOptionsScenarios")
+    public void givenHearingWithSupportAndNoArrangement_shouldReturnNullSessionHearingArrangements(
+        HearingOptions hearingOptions, SessionHearingArrangements expected) {
+
+        caseData = SscsCaseData.builder()
+            .appeal(Appeal.builder()
+                .hearingOptions(hearingOptions)
+                .build())
+            .build();
+
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+
+        assertEquals(expected, actual.getHearingArrangements());
+    }
+
+    @SuppressWarnings("unused")
+    private Object[] getHearingOptionsScenarios() {
+        HearingOptions hearingOptionsWithNullArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .build();
+
+        HearingOptions hearingOptionsWithEmptyArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .arrangements(Collections.emptyList())
+            .build();
+
+        HearingOptions hearingOptionsWithNoValidArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .arrangements(Collections.singletonList("any invalid arrangement"))
+            .build();
+
+        HearingOptions hearingOptionsWithValidArrangement = HearingOptions.builder()
+            .wantsToAttend("Yes")
+            .wantsSupport("Yes")
+            .arrangements(Arrays.asList(
+                HearingOptionArrangements.HEARING_LOOP.getValue(),
+                HearingOptionArrangements.DISABLE_ACCESS.getValue()))
+            .build();
+
+        SessionHearingArrangements expected = new SessionHearingArrangements(
+            new SessionHearingArrangementsSelection(
+                null,
+                null,
+                new SessionHearingArrangement(true, null),
+                new SessionHearingArrangement(true, null),
+                null)
+        );
+
+        return new Object[]{
+            new Object[]{hearingOptionsWithNullArrangement, null},
+            new Object[]{hearingOptionsWithEmptyArrangement, null},
+            new Object[]{hearingOptionsWithNoValidArrangement, null},
+            new Object[]{hearingOptionsWithValidArrangement, expected}
+        };
+    }
+
 
     @Test
     public void convertPopulatedCaseDataWhenAttendingHearingWithSupportNotListedArrangements() {
@@ -1294,11 +1518,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                         .languageInterpreter(null)
                         .signLanguageType(null)
                         .other("Help with stairs")
-                        .arrangements(
-                            Collections.singletonList(
-                                ""
-                            )
-                        )
+                        .arrangements(Collections.singletonList(""))
                         .build()
                 )
                 .build()
@@ -1306,7 +1526,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1333,7 +1553,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("yes", actual.getHearingSupport().getArrangements());
@@ -1434,7 +1654,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
             .evidencePresent("no")
             .build();
 
-        SessionDraft actual = new ConvertSscsCaseDataIntoSessionDraft().convert(caseData);
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("yes", actual.getTheHearing().getAttendHearing());
         assertEquals("yes", actual.getHearingAvailability().getScheduleHearing());
         assertEquals("no", actual.getHearingSupport().getArrangements());
