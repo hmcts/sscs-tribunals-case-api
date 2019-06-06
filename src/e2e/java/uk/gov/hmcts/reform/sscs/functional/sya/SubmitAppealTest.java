@@ -62,8 +62,8 @@ public class SubmitAppealTest {
         idamTokens = idamService.getIdamTokens();
     }
 
-    private String setLatestMrnDate(String body) {
-        return body.replaceAll("01-02-2018", formatter.format(LocalDate.now()));
+    private String setLatestMrnDate(String body, LocalDate localDate) {
+        return body.replaceAll("01-02-2018", localDate == null ? "" : formatter.format(localDate));
     }
 
     private String setNino(String body, String nino) {
@@ -79,15 +79,20 @@ public class SubmitAppealTest {
     }
 
     @Test
-    @Parameters({"ALL_DETAILS", "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS"})
-    public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer) {
+    @Parameters({"ALL_DETAILS, incompleteApplication", "ALL_DETAILS, interlocutoryReviewState", "ALL_DETAILS, appealCreated",
+            "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, appealCreated"})
+    public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = getRandomNino();
         body = setNino(body, nino);
-        body = setLatestMrnDate(body);
+        LocalDate now = LocalDate.now();
+        LocalDate interlocutoryReviewDate = now.minusMonths(13).minusDays(1);
+        LocalDate mrnDate = expectedState.equals("interlocutoryReviewState") ? interlocutoryReviewDate :
+                expectedState.equals("incompleteApplication") ? null : now;
+        body = setLatestMrnDate(body, mrnDate);
         SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
         wrapper.getAppellant().setNino(nino);
-        wrapper.getMrn().setDate(LocalDate.now());
+        wrapper.getMrn().setDate(mrnDate);
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
         Appeal expected = convertSyaToCcdCaseData(wrapper, rpc.getName(),  rpc).getAppeal();
 
@@ -106,8 +111,7 @@ public class SubmitAppealTest {
             expected.setAppellant(expected.getAppellant().toBuilder().appointee(Appointee.builder().build()).build());
         }
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
-        assertEquals("appealCreated", sscsCaseDetails.getState());
+        assertEquals(expectedState, sscsCaseDetails.getState());
     }
-
 
 }
