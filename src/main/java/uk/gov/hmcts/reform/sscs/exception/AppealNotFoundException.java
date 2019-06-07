@@ -11,4 +11,8 @@ public class AppealNotFoundException extends RuntimeException {
         super(String.format("Appeal not found for appeal number: %s ", appealNumber));
     }
 
+    public AppealNotFoundException(Long caseId) {
+        super(String.format("Appeal not found for case id: %s ", caseId));
+    }
+
 }

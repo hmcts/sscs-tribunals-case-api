@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.builder.TrackYourAppealJsonBuilder;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
@@ -18,20 +21,26 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 @Service
 @Slf4j
 public class TribunalsService {
-    private CcdService ccdService;
-    private RegionalProcessingCenterService regionalProcessingCenterService;
-    private TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
-    private IdamService idamService;
+    private final CcdService ccdService;
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
+    private final TrackYourAppealJsonBuilder trackYourAppealJsonBuilder;
+    private final IdamService idamService;
+    private final CcdClient ccdClient;
+    private final SscsCcdConvertService sscsCcdConvertService;
 
     @Autowired
     TribunalsService(CcdService ccdService,
                      RegionalProcessingCenterService regionalProcessingCenterService,
                      TrackYourAppealJsonBuilder trackYourAppealJsonBuilder,
-                     IdamService idamService) {
+                     IdamService idamService,
+                     CcdClient ccdClient,
+                     SscsCcdConvertService sscsCcdConvertService) {
         this.ccdService = ccdService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.trackYourAppealJsonBuilder = trackYourAppealJsonBuilder;
         this.idamService = idamService;
+        this.ccdClient = ccdClient;
+        this.sscsCcdConvertService = sscsCcdConvertService;
     }
 
     public ObjectNode findAppeal(String appealNumber) {
@@ -42,6 +51,18 @@ public class TribunalsService {
         }
 
         return trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()), caseByAppealNumber.getId());
+    }
+
+    public ObjectNode findAppeal(Long caseId) {
+        CaseDetails caseDetails = ccdClient.readForCaseworker(idamService.getIdamTokens(), caseId);
+        SscsCaseDetails sscsCaseDetails = sscsCcdConvertService.getCaseDetails(caseDetails);
+
+        if (sscsCaseDetails == null) {
+            log.info("Appeal does not exist for case id: " + caseId);
+            throw new AppealNotFoundException(caseId);
+        }
+
+        return trackYourAppealJsonBuilder.build(sscsCaseDetails.getData(), getRegionalProcessingCenter(sscsCaseDetails.getData()), sscsCaseDetails.getId());
     }
 
     private RegionalProcessingCenter getRegionalProcessingCenter(SscsCaseData caseByAppealNumber) {

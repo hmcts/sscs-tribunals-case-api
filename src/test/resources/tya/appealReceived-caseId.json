@@ -1,0 +1,30 @@
+{
+  "appeal": {
+    "caseId": "123456789",
+    "caseReference": null,
+    "status": "APPEAL_RECEIVED",
+    "benefitType": "pip",
+    "hearingType": "oral",
+    "latestEvents": [
+      {
+        "date": "2019-06-06T00:00:00.000Z",
+        "type": "APPEAL_RECEIVED",
+        "contentKey": "status.appealReceived",
+        "dwpResponseDate": "2019-07-11T00:00:00.000Z"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name": "BIRMINGHAM",
+      "addressLines": [
+        "HM Courts & Tribunals Service",
+        "Social Security & Child Support Appeals",
+        "Administrative Support Centre",
+        "PO Box 14620"
+      ],
+      "city": "BIRMINGHAM",
+      "postcode": "B16 6FR",
+      "phoneNumber": "0300 123 1142",
+      "faxNumber": "0126 434 7983"
+    }
+  }
+}
