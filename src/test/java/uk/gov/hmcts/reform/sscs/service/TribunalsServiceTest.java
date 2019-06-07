@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -7,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,10 +16,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.builder.TrackYourAppealJsonBuilder;
+import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -31,6 +36,7 @@ public class TribunalsServiceTest {
     private static final String APPEAL_NUMBER = "asfefsdf3223";
     private static final String SURNAME = "surname";
     public static final String CCD_CASE_ID = "1";
+    public static final long CASE_ID = 123456789L;
     private TribunalsService tribunalsService;
 
     @Mock
@@ -48,6 +54,12 @@ public class TribunalsServiceTest {
     @Mock
     private SubscriptionRequest subscriptionRequest;
 
+    @Mock
+    private CcdClient ccdClient;
+
+    @Mock
+    private SscsCcdConvertService sscsCcdConvertService;
+
     @SuppressWarnings("PMD.UnusedPrivateField")
     @Captor
     private ArgumentCaptor<SscsCaseData> captor;
@@ -63,7 +75,7 @@ public class TribunalsServiceTest {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         tribunalsService = new TribunalsService(ccdService, regionalProcessingCenterService,
-                trackYourAppealJsonBuilder, idamService);
+                trackYourAppealJsonBuilder, idamService, ccdClient, sscsCcdConvertService);
     }
 
     @Test(expected = AppealNotFoundException.class)
@@ -71,6 +83,26 @@ public class TribunalsServiceTest {
         given(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).willReturn(null);
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
+    }
+
+    @Test(expected = AppealNotFoundException.class)
+    public void shouldThrowExceptionIfCaseIdNotFound() throws CcdException {
+        given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(null);
+
+        tribunalsService.findAppeal(CASE_ID);
+    }
+
+    @Test
+    public void shouldLoadCaseForCaseId() throws CcdException {
+        CaseDetails caseDetails = CaseDetails.builder().build();
+        given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(caseDetails);
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(CASE_ID).data(getCaseData()).build();
+        given(sscsCcdConvertService.getCaseDetails(caseDetails)).willReturn(sscsCaseDetails);
+        ObjectNode objectNode = mock(ObjectNode.class);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID))).willReturn(objectNode);
+
+        ObjectNode appeal = tribunalsService.findAppeal(CASE_ID);
+        assertThat(appeal, is(objectNode));
     }
 
     @Test(expected = InvalidSurnameException.class)
