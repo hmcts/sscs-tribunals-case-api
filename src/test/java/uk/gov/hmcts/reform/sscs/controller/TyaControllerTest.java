@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 public class TyaControllerTest {
 
     private static final String APPEAL_ID = "appeal-id";
+    private static final Long CASE_ID = 123456789L;
     private static final String SURNAME = "surname";
     private static final String NOT_FOUND_APPEAL_ID = "not-found-appeal-id";
     public static final String CCD_CASE_ID = "ccd-case-id";
@@ -58,6 +59,20 @@ public class TyaControllerTest {
 
         //When
         ResponseEntity<String> receivedAppeal = controller.getAppeal(APPEAL_ID);
+
+        //Then
+        assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));
+        assertThat(receivedAppeal.getBody(), equalTo(node.toString()));
+    }
+
+    @Test
+    public void testToReturnAppealForGivenCaseReference() throws CcdException {
+        ObjectNode node = JsonNodeFactory.instance.objectNode();
+        //Given
+        when(tribunalsService.findAppeal(CASE_ID)).thenReturn(node);
+
+        //When
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID);
 
         //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));

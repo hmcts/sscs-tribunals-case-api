@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
@@ -46,5 +47,15 @@ public class TyaController {
     public ResponseEntity<String> getAppeal(
             @PathVariable(value = "appealNumber") String appealNumber) {
         return ok(tribunalsService.findAppeal(appealNumber).toString());
+    }
+
+    @ApiOperation(value = "getAppeal",
+            notes = "Returns an appeal given the CCD case id",
+            response = String.class, responseContainer = "Appeal details")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
+    @RequestMapping(value = "/appeals", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<String> getAppealByCaseId(
+            @RequestParam(value = "caseId") Long caseId) {
+        return ok(tribunalsService.findAppeal(caseId).toString());
     }
 }
