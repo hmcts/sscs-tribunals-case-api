@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -35,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer;
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
 @RunWith(JUnitParamsRunner.class)
+@Slf4j
 public class SubmitAppealTest {
 
     @ClassRule
@@ -112,6 +114,7 @@ public class SubmitAppealTest {
         if (expected.getAppellant().getAppointee() == null) {
             expected.setAppellant(expected.getAppellant().toBuilder().appointee(Appointee.builder().build()).build());
         }
+        log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
