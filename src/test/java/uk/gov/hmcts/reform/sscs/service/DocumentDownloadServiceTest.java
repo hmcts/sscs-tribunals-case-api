@@ -56,7 +56,7 @@ public class DocumentDownloadServiceTest {
             .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
 
         then(documentDownloadClientApi).should().downloadBinary(
-            "oauth2Token", null, "caseworker", "sscs",
+            "oauth2Token", null, "", "sscs",
             "/documents/19cd94a8-4280-406b-92c7-090b735159ca");
     }
 
