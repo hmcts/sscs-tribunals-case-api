@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public enum SerializeJsonMessageManager {
 
     APPEAL_RECEIVED("tya/appealReceived.json"),
+    APPEAL_RECEIVED_CASE_ID("tya/appealReceived-caseId.json"),
     APPEAL_RECEIVED_CCD("tya/appealReceivedCcd.json"),
     DWP_RESPOND("tya/dwpRespond.json"),
     DWP_RESPOND_CCD("tya/dwpRespondCcd.json"),

@@ -64,7 +64,10 @@ public class TrackYourAppealJsonBuilder {
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
         caseNode.put("caseReference", caseData.getCaseReference());
-        caseNode.put("appealNumber", caseData.getSubscriptions().getAppellantSubscription().getTya());
+        Subscription appellantSubscription = caseData.getSubscriptions().getAppellantSubscription();
+        if (appellantSubscription != null) {
+            caseNode.put("appealNumber", appellantSubscription.getTya());
+        }
         caseNode.put("status", getAppealStatus(caseData.getEvents()));
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
