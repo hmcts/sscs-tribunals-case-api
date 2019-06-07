@@ -110,7 +110,7 @@ public class SubmitAppealService {
         if (null != caseDetails) {
             byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-            if (event.equals(SYA_APPEAL_CREATED)) {
+            if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
                 if (sendToDwpFeature) {
                     log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
                     caseData.setDateSentToDwp(LocalDate.now().toString());
@@ -183,7 +183,13 @@ public class SubmitAppealService {
     private EventType findEventType(SscsCaseData caseData) {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
-            return mrnDate.plusMonths(13L).isBefore(LocalDate.now()) ? NON_COMPLIANT : SYA_APPEAL_CREATED;
+            if (mrnDate.plusMonths(13L).isBefore(LocalDate.now())) {
+                return NON_COMPLIANT;
+            } else if (sendToDwpFeature) {
+                return VALID_APPEAL_CREATED;
+            } else {
+                return SYA_APPEAL_CREATED;
+            }
         } else {
             return INCOMPLETE_APPLICATION_RECEIVED;
         }
