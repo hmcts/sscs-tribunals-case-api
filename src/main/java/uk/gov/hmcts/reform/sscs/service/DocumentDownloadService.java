@@ -8,34 +8,35 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
 public class DocumentDownloadService {
     private final DocumentDownloadClientApi documentDownloadClientApi;
-    private final IdamService idamService;
+    private final AuthTokenGenerator authTokenGenerator;
     private final String documentManagementUrl;
 
+    private static final String OAUTH2_TOKEN = "oauth2Token";
+    private static final String USER_ID = "sscs";
+
     DocumentDownloadService(DocumentDownloadClientApi documentDownloadClientApi,
-                            IdamService idamService,
+                            AuthTokenGenerator authTokenGenerator,
                             @Value("${document_management.url}") String documentManagementUrl) {
         this.documentDownloadClientApi = documentDownloadClientApi;
-        this.idamService = idamService;
+        this.authTokenGenerator = authTokenGenerator;
         this.documentManagementUrl = documentManagementUrl;
     }
 
     public Long getFileSize(String urlString) {
         ResponseEntity<Resource> response;
         try {
-            IdamTokens idamTokens = idamService.getIdamTokens();
             response = documentDownloadClientApi.downloadBinary(
-                idamTokens.getIdamOauth2Token(),
-                idamTokens.getServiceAuthorization(),
+                OAUTH2_TOKEN,
+                authTokenGenerator.generate(),
                 "",
-                idamTokens.getUserId(),
+                USER_ID,
                 getDownloadUrl(urlString)
             );
             if (response != null && response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {

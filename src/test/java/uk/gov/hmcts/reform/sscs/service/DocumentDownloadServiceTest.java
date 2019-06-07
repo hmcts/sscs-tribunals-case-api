@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -18,9 +17,8 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
 public class DocumentDownloadServiceTest {
@@ -28,19 +26,16 @@ public class DocumentDownloadServiceTest {
     @Mock
     private DocumentDownloadClientApi documentDownloadClientApi;
     @Mock
+    private AuthTokenGenerator authTokenGenerator;
     private DocumentDownloadService documentDownloadService;
-    @Mock
-    private IdamService idamService;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {
-        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi, idamService,
-            "http://dm-store:4506");
-
-        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+        documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
+            authTokenGenerator, "http://dm-store:4506");
 
         //noinspection unchecked
         ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
@@ -61,7 +56,8 @@ public class DocumentDownloadServiceTest {
             .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
 
         then(documentDownloadClientApi).should().downloadBinary(
-            any(), any(), any(), any(), eq("/documents/19cd94a8-4280-406b-92c7-090b735159ca"));
+            "oauth2Token", null, "", "sscs",
+            "/documents/19cd94a8-4280-406b-92c7-090b735159ca");
     }
 
     @Test
