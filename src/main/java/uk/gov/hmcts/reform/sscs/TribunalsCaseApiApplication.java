@@ -8,6 +8,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
                 "uk.gov.hmcts.reform.sscs.idam",
                 "uk.gov.hmcts.reform.sscs.document"
         })
+@EnableScheduling
 public class TribunalsCaseApiApplication {
 
     @Value("${appeal.email.host}")
