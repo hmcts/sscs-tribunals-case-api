@@ -178,6 +178,7 @@ public class SyaEndpointsIt {
         assertNotNull(getPdfWrapper().getCcdCaseId());
     }
 
+
     @Test
     public void givenAValidAppealWithDwpFeatureFlagOn_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
         ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", true);
