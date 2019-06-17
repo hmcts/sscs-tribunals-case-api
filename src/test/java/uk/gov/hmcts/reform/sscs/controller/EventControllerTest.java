@@ -1,17 +1,12 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static java.util.Collections.singletonMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,10 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EventService;
-import uk.gov.hmcts.reform.sscs.service.InterlocService;
 
 
 @RunWith(SpringRunner.class)
@@ -52,12 +45,6 @@ public class EventControllerTest {
 
     @MockBean
     private Callback<SscsCaseData> caseDataCallback;
-
-    @MockBean
-    private InterlocService interlocService;
-
-    @MockBean
-    private SscsCaseDataSerializer sscsCaseDataSerializer;
 
     @Test
     public void checkCreatePdfEvent() throws Exception {

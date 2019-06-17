@@ -4,14 +4,11 @@ import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTH
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.hmcts.reform.ccd.client.model.AboutToStartOrSubmitCallbackResponse;
-import uk.gov.hmcts.reform.ccd.client.model.CallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -20,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.model.SscsCaseDataWrapper;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EventService;
-import uk.gov.hmcts.reform.sscs.service.InterlocService;
 
 @RestController
 @Slf4j
@@ -29,21 +25,14 @@ public class EventController {
     private final EventService eventService;
     private final AuthorisationService authorisationService;
     private final SscsCaseCallbackDeserializer deserializer;
-    private final InterlocService interlocService;
-    private final SscsCaseDataSerializer sscsCaseDataSerializer;
 
     @Autowired
     public EventController(EventService eventService,
                            AuthorisationService authorisationService,
-                           SscsCaseCallbackDeserializer deserializer,
-                           InterlocService interlocService,
-                           SscsCaseDataSerializer sscsCaseDataSerializer
-    ) {
+                           SscsCaseCallbackDeserializer deserializer) {
         this.eventService = eventService;
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
-        this.interlocService = interlocService;
-        this.sscsCaseDataSerializer = sscsCaseDataSerializer;
     }
 
     @PostMapping(value = "/send", produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
