@@ -1,13 +1,13 @@
 package uk.gov.hmcts.reform.sscs.functional.evidence;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.document.domain.UploadResponse.Embedded;
 
+import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +24,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
+import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 
@@ -66,21 +67,23 @@ public class EvidenceDocumentUploadEndpointIt {
 
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload"))
-                .andExpect(status().is(404));
+            .andExpect(status().is(404));
 
     }
 
     @Test
     public void shouldStoreTheEvidenceDocumentAndReturnMetadata() throws Exception {
-        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), anyString(), any())).willReturn(uploadResponse);
+        given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), eq("sscs"),
+            eq(Arrays.asList("caseworker", "citizen")), eq(Classification.RESTRICTED), any()))
+            .willReturn(uploadResponse);
         Embedded embedded = new Embedded();
         when(uploadResponse.getEmbedded()).thenReturn(embedded);
 
         MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload")
-                .file("file", "data".getBytes())
-                .characterEncoding("UTF-8"))
-                .andExpect(status().is(200));
+            .file("file", "data".getBytes())
+            .characterEncoding("UTF-8"))
+            .andExpect(status().is(200));
 
     }
 }
