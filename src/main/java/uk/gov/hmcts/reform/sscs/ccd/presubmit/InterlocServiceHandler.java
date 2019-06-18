@@ -35,12 +35,7 @@ public class InterlocServiceHandler implements PreSubmitCallbackHandler<SscsCase
     public boolean canHandle(Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
 
-        for (EventType eventType : eventTypeToSecondaryStatus.keySet()) {
-            if (eventType.equals(callback.getEvent())) {
-                return true;
-            }
-        }
-        return false;
+        return eventTypeToSecondaryStatus.containsKey(callback.getEvent());
     }
 
     public PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback) {
@@ -57,10 +52,8 @@ public class InterlocServiceHandler implements PreSubmitCallbackHandler<SscsCase
     }
 
     private SscsCaseData setInterlocReviewState(EventType notificationEventType, SscsCaseData newSscsCaseData) {
-        if (eventTypeToSecondaryStatus.containsKey(notificationEventType)) {
-            String interlocSecondaryStatus = eventTypeToSecondaryStatus.get(notificationEventType);
-            newSscsCaseData.setInterlocReviewState(interlocSecondaryStatus);
-        }
+        String interlocSecondaryStatus = eventTypeToSecondaryStatus.get(notificationEventType);
+        newSscsCaseData.setInterlocReviewState(interlocSecondaryStatus);
 
         return newSscsCaseData;
     }

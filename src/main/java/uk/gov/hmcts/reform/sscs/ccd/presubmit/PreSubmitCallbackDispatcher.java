@@ -47,9 +47,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
                 callbackResponse.setData(callbackResponseFromHandler.getData());
 
-                if (!callbackResponseFromHandler.getErrors().isEmpty()) {
-                    callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
-                }
+                callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
             }
         }
     }

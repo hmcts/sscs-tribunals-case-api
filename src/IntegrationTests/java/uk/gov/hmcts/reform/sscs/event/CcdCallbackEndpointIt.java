@@ -1,14 +1,10 @@
 package uk.gov.hmcts.reform.sscs.event;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
-import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -29,7 +25,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -78,26 +73,18 @@ public class CcdCallbackEndpointIt {
     @Autowired
     private PreSubmitCallbackDispatcher dispatcher;
 
+    @Autowired
     private ObjectMapper mapper;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-
-        Jackson2ObjectMapperBuilder objectMapperBuilder =
-                new Jackson2ObjectMapperBuilder()
-                        .featuresToEnable(READ_ENUMS_USING_TO_STRING)
-                        .featuresToEnable(READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
-                        .featuresToEnable(WRITE_ENUMS_USING_TO_STRING)
-                        .serializationInclusion(JsonInclude.Include.NON_ABSENT);
-
-        mapper = objectMapperBuilder.createXmlMapper(false).build();
         mapper.registerModule(new JavaTimeModule());
     }
 
     @Test
-    public void shouldActionFurtherEvidenceEventCallback() throws Exception {
+    public void shouldHandleActionFurtherEvidenceEventCallback() throws Exception {
         String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -114,6 +101,20 @@ public class CcdCallbackEndpointIt {
         assertEquals("3", documentList.get(0).getValue().getControlNumber());
         assertEquals("scanned.pdf", documentList.get(0).getValue().getDocumentFileName());
         assertEquals("http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    public void shouldHandleInterlocEventEventCallback() throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/interlocEventCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertEquals("reviewByTcw", result.getData().getInterlocReviewState());
     }
 
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
@@ -134,6 +135,4 @@ public class CcdCallbackEndpointIt {
             throw new IllegalArgumentException("Could not deserialize object", e);
         }
     }
-
-
 }
