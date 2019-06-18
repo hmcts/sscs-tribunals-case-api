@@ -51,7 +51,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 @SpringBootTest
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
-public class EventEndpointIt {
+public class CcdCallbackEndpointIt {
     // Below rules are needed to use the junitParamsRunner together with SpringRunner
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
@@ -97,8 +97,8 @@ public class EventEndpointIt {
     }
 
     @Test
-    public void shouldHandleEvidenceReceivedEventCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/handleEvidenceCallback.json").getFile();
+    public void shouldActionFurtherEvidenceEventCallback() throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));

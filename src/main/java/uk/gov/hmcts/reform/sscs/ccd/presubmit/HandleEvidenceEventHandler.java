@@ -17,7 +17,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
     public boolean canHandle(Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
 
-        return callback.getEvent() == EventType.HANDLE_EVIDENCE;
+        return callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE;
     }
 
     public PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback) {
@@ -27,6 +27,12 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+
+        if (sscsCaseData.getScannedDocuments() == null) {
+            PreSubmitCallbackResponse preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+            preSubmitCallbackResponse.addError("No further evidence to process");
+            return preSubmitCallbackResponse;
+        }
 
         buildSscsDocumentFromScan(sscsCaseData);
 

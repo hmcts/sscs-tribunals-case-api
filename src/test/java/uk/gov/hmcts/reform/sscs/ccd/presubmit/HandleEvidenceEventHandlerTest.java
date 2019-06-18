@@ -32,16 +32,16 @@ public class HandleEvidenceEventHandlerTest {
         initMocks(this);
         handler = new HandleEvidenceEventHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.HANDLE_EVIDENCE);
+        when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .fileName("bla.pdf")
-                        .subtype("sscs1")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .scannedDate("2019-06-12T00:00:00.000")
-                        .controlNumber("123")
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                    .fileName("bla.pdf")
+                    .subtype("sscs1")
+                    .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                    .scannedDate("2019-06-12T00:00:00.000")
+                    .controlNumber("123")
+                    .build()).build();
 
         scannedDocumentList.add(scannedDocument);
         sscsCaseData = SscsCaseData.builder().scannedDocuments(scannedDocumentList).build();
@@ -90,6 +90,20 @@ public class HandleEvidenceEventHandlerTest {
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertNull(response.getData().getScannedDocuments());
+    }
+
+    @Test
+    public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
+        sscsCaseData = SscsCaseData.builder().build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("No further evidence to process", error);
+        }
     }
 
 }
