@@ -255,8 +255,10 @@ dependencies {
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.6'
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.6"
+    testCompileOnly 'org.projectlombok:lombok:1.18.8'
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.8"
+    e2eCompile 'org.projectlombok:lombok:1.18.8'
+    e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
 
     runtime "org.springframework.boot:spring-boot-properties-migrator"
     compile group: 'org.pitest', name: 'pitest', version: '1.4.8'
