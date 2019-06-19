@@ -104,7 +104,6 @@ public class EventService {
             handleEvent(eventHandler(eventType, caseData));
             return true;
         }
-
         return false;
     }
 
@@ -157,5 +156,4 @@ public class EventService {
         return evidenceManagementService.download(URI.create(document.getValue().getDocumentLink().getDocumentUrl()),
                 SubmitAppealService.DM_STORE_USER_ID);
     }
-
 }

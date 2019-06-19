@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,6 +69,8 @@ public class TribunalsServiceTest {
 
     IdamTokens idamTokens;
 
+    private ObjectNode rootObjectNode;
+
     @Before
     public void setUp() {
         idamTokens = IdamTokens.builder().build();
@@ -76,6 +79,12 @@ public class TribunalsServiceTest {
 
         tribunalsService = new TribunalsService(ccdService, regionalProcessingCenterService,
                 trackYourAppealJsonBuilder, idamService, ccdClient, sscsCcdConvertService);
+
+
+        ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
+        caseNode.put("appealNumber", APPEAL_NUMBER);
+        rootObjectNode = JsonNodeFactory.instance.objectNode();
+        rootObjectNode.set("appeal", caseNode);
     }
 
     @Test(expected = AppealNotFoundException.class)
@@ -132,7 +141,9 @@ public class TribunalsServiceTest {
 
     @Test
     public void shouldAddRegionalProcessingCenterFromCcdIfItsPresent() {
-        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetailsWithRpc());
+        SscsCaseDetails caseDetailsWithRpc = getCaseDetailsWithRpc();
+        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(caseDetailsWithRpc);
+        given(trackYourAppealJsonBuilder.build(eq(caseDetailsWithRpc.getData()), any(), eq(caseDetailsWithRpc.getId()))).willReturn(rootObjectNode);
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
@@ -143,11 +154,25 @@ public class TribunalsServiceTest {
     @Test
     public void shouldGetRpcfromRegionalProcessingServiceIfItsNotPresentInCcdCase() {
 
-        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(getCaseDetails());
+        SscsCaseDetails caseDetails = getCaseDetails();
+        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(caseDetails);
+        given(trackYourAppealJsonBuilder.build(eq(caseDetails.getData()), any(), eq(caseDetails.getId()))).willReturn(rootObjectNode);
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
         verify(regionalProcessingCenterService, times(1)).getByScReferenceCode(eq(null));
+    }
+
+    @Test
+    public void findAppealWillReturnTheCalledAppealNumberInResponse() {
+
+        final String appealNumber = "MyAppealNumber";
+        when(ccdService.findCaseByAppealNumber(appealNumber, idamTokens)).thenReturn(sscsCaseDetails);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(sscsCaseDetails.getId()))).willReturn(rootObjectNode);
+
+        ObjectNode objectNode = tribunalsService.findAppeal(appealNumber);
+        assertEquals(appealNumber, objectNode.findValue("appeal").get("appealNumber").asText());
+
     }
 
     @Test
