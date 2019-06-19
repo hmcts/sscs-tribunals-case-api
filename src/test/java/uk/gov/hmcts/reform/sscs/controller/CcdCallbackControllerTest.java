@@ -1,12 +1,16 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,24 +21,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.service.EventService;
-
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(EventController.class)
-public class EventControllerTest {
+@WebMvcTest(CcdCallbackController.class)
+public class CcdCallbackControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    @MockBean
-    private EventService eventService;
 
     @SuppressWarnings("PMD.UnusedPrivateField")
     @MockBean
@@ -46,22 +46,31 @@ public class EventControllerTest {
     @MockBean
     private Callback<SscsCaseData> caseDataCallback;
 
+    @MockBean
+    private PreSubmitCallbackDispatcher dispatcher;
+
+
     @Test
-    public void checkCreatePdfEvent() throws Exception {
-
-        CaseDetails<SscsCaseData> caseDataCaseDetails = mock(CaseDetails.class);
-        SscsCaseData sscsCaseData = mock(SscsCaseData.class);
-
+    public void handleCcdAboutToSubmitCallbackAndUpdateCaseData() throws Exception {
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        when(deserializer.deserialize(content)).thenReturn(caseDataCallback);
-        when(caseDataCallback.getCaseDetails()).thenReturn(caseDataCaseDetails);
-        when(caseDataCaseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(caseDataCallback.getEvent()).thenReturn(EventType.CREATE_APPEAL_PDF);
-        mockMvc.perform(post("/send")
+        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+        when(deserializer.deserialize(content)).thenReturn(new Callback<>(
+                new CaseDetails<>(1234L, "SSCS", State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+                Optional.empty(),
+                INTERLOC_INFORMATION_RECEIVED));
+
+        PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
+        when(dispatcher.handle(any()))
+                .thenReturn(response);
+
+        mockMvc.perform(post("/ccdAboutToSubmit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("ServiceAuthorization", "")
-                .content(content)).andExpect(status().isOk());
+                .content(content))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
     }
+
 }
