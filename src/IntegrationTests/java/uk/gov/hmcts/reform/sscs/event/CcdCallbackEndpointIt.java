@@ -124,9 +124,9 @@ public class CcdCallbackEndpointIt {
     public PreSubmitCallbackResponse deserialize(String source) {
         try {
             PreSubmitCallbackResponse callback = mapper.readValue(
-                source,
-                new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
-                }
+                    source,
+                    new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
+                    }
             );
 
             return callback;
