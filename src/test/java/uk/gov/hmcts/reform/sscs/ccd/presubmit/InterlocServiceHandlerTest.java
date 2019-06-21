@@ -118,6 +118,13 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
+    public void givenAnUploadFurtherEvidenceEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
+
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
     public void setsCorrectInterlocReviewStatus() {
         when(callback.getEvent()).thenReturn(EventType.TCW_DIRECTION_ISSUED);
 
@@ -134,6 +141,16 @@ public class InterlocServiceHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
     }
+
+    @Test
+    public void setsCorrectInterlocReviewStatusForUploadFurtherEvidence() {
+        when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertThat(response.getData().getInterlocReviewState(), is("interlocutoryReview"));
+    }
+
 
     @Test(expected = IllegalStateException.class)
     public void throwExceptionIfCannotHandleEventType() {
