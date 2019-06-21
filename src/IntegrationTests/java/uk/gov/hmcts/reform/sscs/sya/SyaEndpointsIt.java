@@ -2,8 +2,10 @@ package uk.gov.hmcts.reform.sscs.sya;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -37,8 +39,14 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.apache.commons.io.IOUtils;
+import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -49,11 +57,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.RestClientException;
@@ -66,19 +76,28 @@ import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
-import uk.gov.hmcts.reform.sscs.controller.SyaController;
 import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
+import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
+import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
-@RunWith(SpringRunner.class)
+@RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
 public class SyaEndpointsIt {
+
+    // being: it needed to run springRunner and junitParamsRunner
+    @ClassRule
+    public static final SpringClassRule SCR = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
+    // end
 
     private static final String PDF = "abc";
     private static final String AUTH_TOKEN = "authToken";
@@ -110,14 +129,16 @@ public class SyaEndpointsIt {
     private MockMvc mockMvc;
 
     @Autowired
+    private RoboticsJsonMapper roboticsJsonMapper;
+    @SpyBean
+    private RoboticsJsonValidator jsonValidator;
+
+    @Autowired
     private SubmitAppealService submitAppealService;
 
     private ObjectMapper mapper;
 
     private Session session = Session.getInstance(new Properties());
-
-    @Autowired
-    SyaController controller;
 
     @Value("${appellant.appeal.html.template.path}")
     private String templateName;
@@ -164,8 +185,12 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppealWithDwpFeatureFlagOff_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
+    @Parameters({"true,Birmingham-SYA-Receipts@justice.gov.uk", "false,null", "null,null"})
+    public void givenAValidAppealWithDwpFeatureFlagOff_createAppealCreatedCaseAndGeneratePdfAndSendAndWithRpcEmailPresent(
+        @Nullable Boolean rpcEmailRoboticsFeatureValue, String expectedRpcEmail) throws Exception {
+
         ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
+        ReflectionTestUtils.setField(roboticsJsonMapper, "rpcEmailRoboticsFeature", rpcEmailRoboticsFeatureValue);
 
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
@@ -189,6 +214,20 @@ public class SyaEndpointsIt {
         verify(mailSender, times(2)).send(message);
 
         assertNotNull(getPdfWrapper().getCcdCaseId());
+
+        assertRpcEmail(rpcEmailRoboticsFeatureValue, expectedRpcEmail);
+    }
+
+    private void assertRpcEmail(@Nullable Boolean rpcEmailRoboticsFeatureValue, String expectedRpcEmail) {
+        ArgumentCaptor<JSONObject> roboticsAppealCaptor = ArgumentCaptor.forClass(JSONObject.class);
+        then(jsonValidator).should().validate(roboticsAppealCaptor.capture());
+
+        if (rpcEmailRoboticsFeatureValue != null && rpcEmailRoboticsFeatureValue) {
+            assertTrue(roboticsAppealCaptor.getValue().has("rpcEmail"));
+            assertThat(roboticsAppealCaptor.getValue().get("rpcEmail"), is(expectedRpcEmail));
+        } else {
+            assertFalse(roboticsAppealCaptor.getValue().has("rpcEmail"));
+        }
     }
 
     @Test
