@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -16,14 +17,14 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
         this.eventFieldMappings = eventFieldMappings;
     }
 
-    public boolean canHandle(Callback<SscsCaseData> callback) {
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
 
         return eventFieldMappings.containsKey(callback.getEvent());
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback) {
-        if (!canHandle(callback)) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
 
