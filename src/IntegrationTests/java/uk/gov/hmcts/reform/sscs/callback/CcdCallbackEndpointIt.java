@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.event;
+package uk.gov.hmcts.reform.sscs.callback;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -101,6 +101,21 @@ public class CcdCallbackEndpointIt {
         assertEquals("3", documentList.get(0).getValue().getControlNumber());
         assertEquals("scanned.pdf", documentList.get(0).getValue().getDocumentFileName());
         assertEquals("http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    public void actionFurtherEvidenceDropdownAboutToStartCallback() throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertEquals(2, result.getData().getOriginalSender().getListItems().size());
+        assertEquals(2, result.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     @Test
