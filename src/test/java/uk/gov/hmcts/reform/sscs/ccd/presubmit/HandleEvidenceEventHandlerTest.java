@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,20 +53,20 @@ public class HandleEvidenceEventHandlerTest {
 
     @Test
     public void givenAHandleEvidenceEvent_thenReturnTrue() {
-        assertTrue(handler.canHandle(callback));
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenANonHandleEvidenceEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handler.canHandle(callback));
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenACaseWithScannedDocuments_thenMoveToSscsDocuments() {
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("sscs1", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
@@ -85,7 +86,7 @@ public class HandleEvidenceEventHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
@@ -97,7 +98,7 @@ public class HandleEvidenceEventHandlerTest {
         sscsCaseData = SscsCaseData.builder().build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals(1, response.getErrors().size());
 

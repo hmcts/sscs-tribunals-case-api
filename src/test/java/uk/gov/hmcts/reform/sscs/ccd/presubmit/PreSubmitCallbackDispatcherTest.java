@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -58,14 +59,14 @@ public class PreSubmitCallbackDispatcherTest {
         when(response2.getData()).thenReturn(caseDataMutation2);
         when(response2.getErrors()).thenReturn(ImmutableSet.of("error2", "error3"));
 
-        when(handler1.canHandle(any(Callback.class))).thenReturn(true);
-        when(handler1.handle(any(Callback.class))).thenReturn(response1);
+        when(handler1.canHandle(any(CallbackType.class), any(Callback.class))).thenReturn(true);
+        when(handler1.handle(any(CallbackType.class), any(Callback.class))).thenReturn(response1);
 
-        when(handler2.canHandle(any(Callback.class))).thenReturn(true);
-        when(handler2.handle(any(Callback.class))).thenReturn(response2);
+        when(handler2.canHandle(any(CallbackType.class), any(Callback.class))).thenReturn(true);
+        when(handler2.handle(any(CallbackType.class), any(Callback.class))).thenReturn(response2);
 
         PreSubmitCallbackResponse<CaseData> callbackResponse =
-            preSubmitCallbackDispatcher.handle(callback);
+            preSubmitCallbackDispatcher.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
 
         assertNotNull(callbackResponse);
         assertEquals(caseDataMutation2, callbackResponse.getData());
@@ -73,11 +74,11 @@ public class PreSubmitCallbackDispatcherTest {
 
         assertThat(callbackResponse.getErrors(), is(expectedErrors));
 
-        verify(handler1).canHandle(any(Callback.class));
-        verify(handler1).handle(any(Callback.class));
+        verify(handler1).canHandle(any(CallbackType.class), any(Callback.class));
+        verify(handler1).handle(any(CallbackType.class), any(Callback.class));
 
-        verify(handler2).canHandle(any(Callback.class));
-        verify(handler2).handle(any(Callback.class));
+        verify(handler2).canHandle(any(CallbackType.class), any(Callback.class));
+        verify(handler2).handle(any(CallbackType.class), any(Callback.class));
     }
 
     @Test
@@ -86,22 +87,22 @@ public class PreSubmitCallbackDispatcherTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(caseData);
 
-        when(handler1.canHandle(any(Callback.class))).thenReturn(false);
+        when(handler1.canHandle(any(CallbackType.class), any(Callback.class))).thenReturn(false);
 
-        when(handler2.canHandle(any(Callback.class))).thenReturn(false);
+        when(handler2.canHandle(any(CallbackType.class), any(Callback.class))).thenReturn(false);
 
         PreSubmitCallbackResponse<CaseData> callbackResponse =
-            preSubmitCallbackDispatcher.handle(callback);
+            preSubmitCallbackDispatcher.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
 
         assertNotNull(callbackResponse);
         assertEquals(caseData, callbackResponse.getData());
         assertTrue(callbackResponse.getErrors().isEmpty());
 
-        verify(handler1).canHandle(any(Callback.class));
-        verify(handler1, times(0)).handle(any(Callback.class));
+        verify(handler1).canHandle(any(CallbackType.class), any(Callback.class));
+        verify(handler1, times(0)).handle(any(CallbackType.class), any(Callback.class));
 
-        verify(handler2).canHandle(any(Callback.class));
-        verify(handler2, times(0)).handle(any(Callback.class));
+        verify(handler2).canHandle(any(CallbackType.class), any(Callback.class));
+        verify(handler2, times(0)).handle(any(CallbackType.class), any(Callback.class));
     }
 
     @Test
@@ -117,7 +118,7 @@ public class PreSubmitCallbackDispatcherTest {
 
             PreSubmitCallbackResponse<CaseData> callbackResponse =
                 preSubmitCallbackDispatcher
-                    .handle(callback);
+                    .handle(CallbackType.ABOUT_TO_SUBMIT, callback);
 
             assertNotNull(callbackResponse);
             assertEquals(caseData, callbackResponse.getData());
@@ -130,7 +131,7 @@ public class PreSubmitCallbackDispatcherTest {
     @Test
     public void should_not_allow_null_arguments() {
 
-        assertThatThrownBy(() -> preSubmitCallbackDispatcher.handle(null))
+        assertThatThrownBy(() -> preSubmitCallbackDispatcher.handle(CallbackType.ABOUT_TO_SUBMIT, null))
             .hasMessage("callback must not be null")
             .isExactlyInstanceOf(NullPointerException.class);
     }

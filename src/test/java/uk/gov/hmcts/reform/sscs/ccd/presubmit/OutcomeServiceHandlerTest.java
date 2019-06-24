@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -42,35 +43,35 @@ public class OutcomeServiceHandlerTest {
     public void givenTcwDecisionStrikeOut_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_STRIKE_OUT);
 
-        assertTrue(handler.canHandle(callback));
+        assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenJudgeDecisionStrikeoutEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_STRIKEOUT);
 
-        assertTrue(handler.canHandle(callback));
+        assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenReinstateAppealEvent_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.REINSTATE_APPEAL);
 
-        assertTrue(handler.canHandle(callback));
+        assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenCohDecisionIssued_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.COH_DECISION_ISSUED);
 
-        assertTrue(handler.canHandle(callback));
+        assertTrue(handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void setsOutcomeForTcwDecisionStrikeOut() {
         when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_STRIKE_OUT);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
 
         assertThat(response.getData().getOutcome(), is("nonCompliantAppealStruckout"));
     }
@@ -79,7 +80,7 @@ public class OutcomeServiceHandlerTest {
     public void setsOutcomeForJudgeDecisionStrikeout() {
         when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_STRIKEOUT);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
 
         assertThat(response.getData().getOutcome(), is("nonCompliantAppealStruckout"));
     }
@@ -88,7 +89,7 @@ public class OutcomeServiceHandlerTest {
     public void setsOutcomeForReinstateAppeal() {
         when(callback.getEvent()).thenReturn(EventType.REINSTATE_APPEAL);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
 
         assertThat(response.getData().getOutcome(), is("reinstated"));
     }
@@ -97,7 +98,7 @@ public class OutcomeServiceHandlerTest {
     public void setsOutcomeForCohDecisionIssued() {
         when(callback.getEvent()).thenReturn(EventType.COH_DECISION_ISSUED);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
 
         assertThat(response.getData().getOutcome(), is("decisionUpheld"));
     }
@@ -109,6 +110,6 @@ public class OutcomeServiceHandlerTest {
         sscsCaseData = SscsCaseData.builder().interlocReviewState("someValue").build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        handler.handle(callback);
+        handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
     }
 }
