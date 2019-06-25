@@ -96,5 +96,4 @@ public class CcdCallbackControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
     }
-
 }
