@@ -5,6 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 
@@ -20,7 +21,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
         this.callbackHandlers = callbackHandlers;
     }
 
-    public PreSubmitCallbackResponse<T> handle(Callback<T> callback) {
+    public PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback) {
         requireNonNull(callback, "callback must not be null");
 
         T caseData = callback.getCaseDetails().getCaseData();
@@ -28,22 +29,22 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
         PreSubmitCallbackResponse<T> callbackResponse =
                 new PreSubmitCallbackResponse<>(caseData);
 
-        dispatchToHandlers(callback, callbackHandlers, callbackResponse);
+        dispatchToHandlers(callbackType, callback, callbackHandlers, callbackResponse);
 
         return callbackResponse;
     }
 
     private void dispatchToHandlers(
-        Callback<T> callback,
-        List<PreSubmitCallbackHandler<T>> callbackHandlers,
-        PreSubmitCallbackResponse<T> callbackResponse
+            CallbackType callbackType, Callback<T> callback,
+            List<PreSubmitCallbackHandler<T>> callbackHandlers,
+            PreSubmitCallbackResponse<T> callbackResponse
     ) {
 
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
 
-            if (callbackHandler.canHandle(callback)) {
+            if (callbackHandler.canHandle(callbackType, callback)) {
 
-                PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callback);
+                PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback);
 
                 callbackResponse.setData(callbackResponseFromHandler.getData());
 

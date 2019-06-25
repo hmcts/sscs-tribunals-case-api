@@ -235,9 +235,9 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.11'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.6'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.4'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.18'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.0.8'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-robotics-common', version:  '1.0.5'
 
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
@@ -255,8 +255,10 @@ dependencies {
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.6'
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.6"
+    testCompileOnly 'org.projectlombok:lombok:1.18.8'
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.8"
+    e2eCompile 'org.projectlombok:lombok:1.18.8'
+    e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
 
     runtime "org.springframework.boot:spring-boot-properties-migrator"
     compile group: 'org.pitest', name: 'pitest', version: '1.4.8'

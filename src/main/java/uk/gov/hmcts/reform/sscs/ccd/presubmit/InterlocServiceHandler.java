@@ -1,24 +1,22 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static java.util.Objects.requireNonNull;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Service
-public class InterlocServiceHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private final Map<EventType, String> eventTypeToSecondaryStatus;
+public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler {
 
     @Autowired
     public InterlocServiceHandler() {
-        eventTypeToSecondaryStatus = new HashMap<>();
+        super(createMappings());
+    }
+
+    private static Map<EventType, String> createMappings() {
+        Map<EventType, String> eventTypeToSecondaryStatus = new HashMap<>();
         eventTypeToSecondaryStatus.put(EventType.INTERLOC_SEND_TO_TCW, "reviewByTcw");
         eventTypeToSecondaryStatus.put(EventType.TCW_DIRECTION_ISSUED, "awaitingInformation");
         eventTypeToSecondaryStatus.put(EventType.INTERLOC_INFORMATION_RECEIVED, "interlocutoryReview");
@@ -28,32 +26,15 @@ public class InterlocServiceHandler implements PreSubmitCallbackHandler<SscsCase
         eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT, "interlocutoryReview");
         eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT_SEND_TO_INTERLOC, "interlocutoryReview");
         eventTypeToSecondaryStatus.put(EventType.REINSTATE_APPEAL, "interlocutoryReview");
-        eventTypeToSecondaryStatus.put(EventType.TCW_DECISION_APPEAL_TO_PROCEED, null);
-        eventTypeToSecondaryStatus.put(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED, null);
+        eventTypeToSecondaryStatus.put(EventType.UPLOAD_FURTHER_EVIDENCE, "interlocutoryReview");
+        eventTypeToSecondaryStatus.put(EventType.TCW_DECISION_APPEAL_TO_PROCEED, "none");
+        eventTypeToSecondaryStatus.put(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED, "none");
+
+        return eventTypeToSecondaryStatus;
     }
 
-    public boolean canHandle(Callback<SscsCaseData> callback) {
-        requireNonNull(callback, "callback must not be null");
-
-        return eventTypeToSecondaryStatus.containsKey(callback.getEvent());
-    }
-
-    public PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback) {
-        if (!canHandle(callback)) {
-            throw new IllegalStateException("Cannot handle callback");
-        }
-
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
-        final SscsCaseData updatedInterlocCaseData = setInterlocReviewState(callback.getEvent(), sscsCaseData);
-
-        return new PreSubmitCallbackResponse<>(updatedInterlocCaseData);
-    }
-
-    private SscsCaseData setInterlocReviewState(EventType notificationEventType, SscsCaseData newSscsCaseData) {
-        String interlocSecondaryStatus = eventTypeToSecondaryStatus.get(notificationEventType);
-        newSscsCaseData.setInterlocReviewState(interlocSecondaryStatus);
+    protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue) {
+        newSscsCaseData.setInterlocReviewState(newValue);
 
         return newSscsCaseData;
     }

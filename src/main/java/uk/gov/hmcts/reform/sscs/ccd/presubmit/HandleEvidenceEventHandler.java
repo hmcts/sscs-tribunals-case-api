@@ -8,20 +8,23 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @Component
 public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    public boolean canHandle(Callback<SscsCaseData> callback) {
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
+        requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE;
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+                && callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> handle(Callback<SscsCaseData> callback) {
-        if (!canHandle(callback)) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
 
