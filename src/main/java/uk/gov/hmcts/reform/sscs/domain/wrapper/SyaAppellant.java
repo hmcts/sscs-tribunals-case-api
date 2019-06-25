@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.domain.wrapper;
 
+import static uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService.normaliseNino;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -33,7 +35,7 @@ public class SyaAppellant {
     private Boolean isAddressSameAsAppointee;
 
     public void setNino(String nino) {
-        this.nino = nino.replaceAll("\\s", "");;
+        this.nino = normaliseNino(nino);
     }
 
     @JsonIgnore
