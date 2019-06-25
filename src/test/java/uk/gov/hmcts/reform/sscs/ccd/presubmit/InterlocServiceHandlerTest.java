@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -134,12 +133,21 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
-    public void resetsInterlocReviewStatus() {
+    public void resetsInterlocReviewStatusJudgeDecisionAppealToProceed() {
         when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
-        assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
+        assertThat(response.getData().getInterlocReviewState(), is("none"));
+    }
+
+    @Test
+    public void resetsInterlocReviewStatusTcwDecisionAppealToProceed() {
+        when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_APPEAL_TO_PROCEED);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertThat(response.getData().getInterlocReviewState(), is("none"));
     }
 
     @Test
@@ -150,7 +158,6 @@ public class InterlocServiceHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is("interlocutoryReview"));
     }
-
 
     @Test(expected = IllegalStateException.class)
     public void throwExceptionIfCannotHandleEventType() {
