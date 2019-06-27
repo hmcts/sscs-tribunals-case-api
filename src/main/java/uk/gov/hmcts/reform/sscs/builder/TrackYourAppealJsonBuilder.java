@@ -37,7 +37,7 @@ public class TrackYourAppealJsonBuilder {
 
         // Create appealReceived eventType for appealCreated CCD event
         List<Event> eventList = caseData.getEvents();
-        if (eventList == null || eventList.isEmpty()) {
+        if (eventList == null) {
             if (caseData.getCaseCreated() != null) {
                 caseData = createAppealReceivedEventTypeForAppealCreatedEvent(caseData);
             } else {
