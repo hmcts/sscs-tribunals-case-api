@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DateRange;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.MrnDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
@@ -51,8 +52,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static final String YES = "Yes";
     private static final String NO = "No";
-    private static final String ORAL = "oral";
-    private static final String PAPER = "paper";
 
     private SubmitYourAppealToCcdCaseDataDeserializer() {
         // Empty
@@ -137,7 +136,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (hearingOptions == null || hearingOptions.getWantsToAttend() == null) {
             return null;
         }
-        return YES.equals(hearingOptions.getWantsToAttend()) ? ORAL : PAPER;
+        return YES.equals(hearingOptions.getWantsToAttend()) ? HearingType.ORAL.getValue() :
+            HearingType.PAPER.getValue();
     }
 
     private static MrnDetails getMrnDetails(SyaCaseWrapper syaCaseWrapper) {
