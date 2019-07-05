@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -71,17 +72,26 @@ public class CcdCallbackController {
     public void ccdSubmittedEvent(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestBody String message) {
+        validateRequest(serviceAuthHeader, message);
+        processCcdSubmittedEvent(serviceAuthHeader, message);
+    }
 
+    private void validateRequest(String serviceAuthHeader, String message) {
+        Preconditions.checkNotNull(message);
+        Preconditions.checkNotNull(serviceAuthHeader);
+    }
+
+    private void processCcdSubmittedEvent(String serviceAuthHeader, String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("processing SubmittedEvent callback for`{}` event and Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
-
         updateToGivenEvent(callback, EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType());
     }
 
     private void updateToGivenEvent(Callback<SscsCaseData> callback, String eventType) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setInterlocReviewState("interlocutoryReview");
         ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
             eventType, "update to Information received event",
             "update to Information received event", idamService.getIdamTokens());
