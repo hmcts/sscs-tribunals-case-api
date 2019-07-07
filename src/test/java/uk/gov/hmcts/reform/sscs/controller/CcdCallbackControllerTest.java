@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,11 +23,13 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
@@ -144,7 +148,8 @@ public class CcdCallbackControllerTest {
     */
     @Test
     public void givenSubmittedEventAndInterlocOption_shouldTriggerEventAndUpdateField() throws Exception {
-        Callback<SscsCaseData> callback = buildCallbackForTestScenario();
+        Callback<SscsCaseData> callback = buildCallbackForTestScenarioForGivenEvent(
+            ACTION_FURTHER_EVIDENCE, "informationReceivedForInterloc");
         given(deserializer.deserialize(anyString())).willReturn(callback);
         assertNull(callback.getCaseDetails().getCaseData().getInterlocReviewState());
 
@@ -157,21 +162,49 @@ public class CcdCallbackControllerTest {
             .content("something"))
             .andExpect(status().isOk());
 
-        then(ccdService).should(times(1)).updateCase(any(SscsCaseData.class),
-            eq(1234L), eq("interlocInformationReceived"), anyString(), anyString(), any(IdamTokens.class));
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+        then(ccdService).should(times(1)).updateCase(captor.capture(), eq(1234L),
+            eq("interlocInformationReceived"), anyString(), anyString(), any(IdamTokens.class));
+        assertEquals("interlocutoryReview", captor.getValue().getInterlocReviewState());
     }
 
-    private Callback<SscsCaseData> buildCallbackForTestScenario() {
+    /*  Given actionFurtherEvidence event
+        And user selects a option different to "Information received for Interloc" option
+        When the submitted callback is triggered
+        Then the callback ends
+    */
+    @Test
+    @Parameters({"otherDocumentManual", "null"})
+    public void givenSubmittedEventAndNoInterlocOption_shouldDoNothing(@Nullable String itemCode) throws Exception {
+        Callback<SscsCaseData> callback = buildCallbackForTestScenarioForGivenEvent(
+            ACTION_FURTHER_EVIDENCE, itemCode);
+
+        given(deserializer.deserialize(anyString())).willReturn(callback);
+        assertNull(callback.getCaseDetails().getCaseData().getInterlocReviewState());
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+
+        mockMvc.perform(post("/ccdSubmittedEvent")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("ServiceAuthorization", "s2s")
+            .content("something"))
+            .andExpect(status().isOk());
+
+        then(ccdService).shouldHaveZeroInteractions();
+        then(idamService).shouldHaveZeroInteractions();
+    }
+
+    private Callback<SscsCaseData> buildCallbackForTestScenarioForGivenEvent(EventType eventType, String listItemCode) {
         List<DynamicListItem> furtherActionOptions = Collections.singletonList(
-            new DynamicListItem("informationReceivedForInterloc",
-                "Information received for interlocutory review"));
+            new DynamicListItem(listItemCode, null));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .furtherEvidenceAction(new DynamicList(furtherActionOptions.get(0), furtherActionOptions))
             .build();
 
         CaseDetails<SscsCaseData> caseDetail = new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE,
             sscsCaseData, LocalDateTime.now());
-        return new Callback<>(caseDetail, Optional.empty(), ACTION_FURTHER_EVIDENCE);
+        return new Callback<>(caseDetail, Optional.empty(), eventType);
     }
 
     @Test

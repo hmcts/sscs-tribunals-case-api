@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTH
 
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -86,7 +87,17 @@ public class CcdCallbackController {
         log.info("processing SubmittedEvent callback for`{}` event and Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
-        updateToGivenEvent(callback, EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType());
+        if (isInformationReceivedForInterloc(
+            callback.getCaseDetails().getCaseData().getFurtherEvidenceAction().getValue().getCode())) {
+            updateToGivenEvent(callback, EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType());
+        }
+    }
+
+    private boolean isInformationReceivedForInterloc(String code) {
+        if (StringUtils.isNotBlank(code)) {
+            return code.equalsIgnoreCase("informationReceivedForInterloc");
+        }
+        return false;
     }
 
     private void updateToGivenEvent(Callback<SscsCaseData> callback, String eventType) {
