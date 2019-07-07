@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -12,6 +17,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -40,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -49,6 +57,8 @@ public class CcdCallbackControllerTest {
     // begin: needed to use spring runner and junitparamsRunner together
     @ClassRule
     public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
+    public static final String JURISDICTION = "SSCS";
+    public static final long ID = 1234L;
 
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
@@ -84,7 +94,7 @@ public class CcdCallbackControllerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(1234L, "SSCS", State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
             Optional.empty(),
             ACTION_FURTHER_EVIDENCE));
 
@@ -109,7 +119,7 @@ public class CcdCallbackControllerTest {
 
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
-            new CaseDetails<>(1234L, "SSCS", State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
+            new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
             Optional.empty(),
             INTERLOC_INFORMATION_RECEIVED));
 
@@ -123,6 +133,45 @@ public class CcdCallbackControllerTest {
             .content(content))
             .andExpect(status().isOk())
             .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
+    }
+
+
+    /*  Given actionFurtherEvidence event
+        And user selects the "Information received for Interloc" options
+        When the submitted callback is triggered
+        Then the "interlocInformationReceived" event is triggered
+        And the "interlocutoryReview" field is updated to "interlocutoryReview"
+    */
+    @Test
+    public void givenSubmittedEventAndInterlocOption_shouldTriggerEventAndUpdateField() throws Exception {
+        Callback<SscsCaseData> callback = buildCallbackForTestScenario();
+        given(deserializer.deserialize(anyString())).willReturn(callback);
+        assertNull(callback.getCaseDetails().getCaseData().getInterlocReviewState());
+
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
+
+
+        mockMvc.perform(post("/ccdSubmittedEvent")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("ServiceAuthorization", "s2s")
+            .content("something"))
+            .andExpect(status().isOk());
+
+        then(ccdService).should(times(1)).updateCase(any(SscsCaseData.class),
+            eq(1234L), eq("interlocInformationReceived"), anyString(), anyString(), any(IdamTokens.class));
+    }
+
+    private Callback<SscsCaseData> buildCallbackForTestScenario() {
+        List<DynamicListItem> furtherActionOptions = Collections.singletonList(
+            new DynamicListItem("informationReceivedForInterloc",
+                "Information received for interlocutory review"));
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .furtherEvidenceAction(new DynamicList(furtherActionOptions.get(0), furtherActionOptions))
+            .build();
+
+        CaseDetails<SscsCaseData> caseDetail = new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE,
+            sscsCaseData, LocalDateTime.now());
+        return new Callback<>(caseDetail, Optional.empty(), ACTION_FURTHER_EVIDENCE);
     }
 
     @Test
