@@ -13,7 +13,6 @@ public class GetSavedCase {
     private final String tcaInstance = System.getenv("TEST_URL");
 
     @Test
-    @Ignore
     public void retrievecasefromCcd() {
         RestAssured.baseURI = tcaInstance;
         RestAssured.useRelaxedHTTPSValidation();
