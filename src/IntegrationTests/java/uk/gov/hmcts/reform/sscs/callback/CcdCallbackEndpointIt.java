@@ -70,8 +70,7 @@ public class CcdCallbackEndpointIt {
 
     @Before
     public void setup() {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher,
-            ccdService, idamService);
+        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
     }
