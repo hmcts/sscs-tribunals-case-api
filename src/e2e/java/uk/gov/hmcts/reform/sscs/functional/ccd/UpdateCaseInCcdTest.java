@@ -4,12 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
@@ -53,6 +56,8 @@ public class UpdateCaseInCcdTest {
     public static SscsCaseData buildSscsCaseDataForTestingWithValidMobileNumbers() {
         SscsCaseData testCaseData = CaseDataUtils.buildCaseData();
 
+        addFurtherEvidenceActionData(testCaseData);
+
         Subscription appellantSubscription = Subscription.builder()
             .tya("app-appeal-number")
             .email("appellant@email.com")
@@ -93,5 +98,12 @@ public class UpdateCaseInCcdTest {
 
         testCaseData.setSubscriptions(subscriptions);
         return testCaseData;
+    }
+
+    private static void addFurtherEvidenceActionData(SscsCaseData testCaseData) {
+        testCaseData.setInterlocReviewState(null);
+        DynamicListItem value = new DynamicListItem("informationReceivedForInterloc", "any");
+        DynamicList furtherEvidenceActionList = new DynamicList(value, Collections.singletonList(value));
+        testCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
     }
 }
