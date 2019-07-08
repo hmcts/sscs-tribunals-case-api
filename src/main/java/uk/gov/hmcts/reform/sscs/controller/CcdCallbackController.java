@@ -61,8 +61,6 @@ public class CcdCallbackController {
         return performRequest(ABOUT_TO_SUBMIT, callback);
     }
 
-
-    //todo add integration and e2e test for this
     @PostMapping(path = "/ccdSubmittedEvent")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdSubmittedEvent(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,

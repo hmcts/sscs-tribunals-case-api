@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -23,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -33,13 +33,10 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @SpringBootTest
-@ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class CcdCallbackEndpointIt {
 
@@ -52,13 +49,7 @@ public class CcdCallbackEndpointIt {
     private AuthorisationService authorisationService;
 
     @Autowired
-    private CcdService ccdService;
-
-    @Autowired
     private SscsCaseCallbackDeserializer deserializer;
-
-    @MockBean
-    private IdamService idamService;
 
     private String json;
 
@@ -77,7 +68,8 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void shouldHandleActionFurtherEvidenceEventCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceCallback.json").getFile();
+        String path = Objects.requireNonNull(getClass().getClassLoader().
+            getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
@@ -108,6 +100,11 @@ public class CcdCallbackEndpointIt {
 
         assertEquals(2, result.getData().getOriginalSender().getListItems().size());
         assertEquals(2, result.getData().getFurtherEvidenceAction().getListItems().size());
+    }
+
+    @Test
+    public void givenSubmittedCallbackForActionFurtherEvidecne_shouldUpdateFieldAndTriggerEvent() {
+        //todo
     }
 
     @Test
