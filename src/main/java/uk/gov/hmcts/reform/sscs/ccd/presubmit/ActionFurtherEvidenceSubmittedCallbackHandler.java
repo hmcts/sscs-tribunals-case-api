@@ -30,6 +30,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
         return (callbackType.equals(CallbackType.SUBMITTED)
+            && callback.getEvent().equals(EventType.ACTION_FURTHER_EVIDENCE)
             && isInformationReceivedForInterloc(
             callback.getCaseDetails().getCaseData().getFurtherEvidenceAction().getValue().getCode()));
     }
