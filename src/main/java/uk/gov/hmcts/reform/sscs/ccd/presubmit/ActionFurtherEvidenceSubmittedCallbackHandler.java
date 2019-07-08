@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
     private boolean isInformationReceivedForInterloc(String code) {
         if (StringUtils.isNotBlank(code)) {
-            return code.equalsIgnoreCase("informationReceivedForInterloc");
+            return code.equalsIgnoreCase(INFORMATION_RECEIVED_FOR_INTERLOC.getCode());
         }
         return false;
     }
