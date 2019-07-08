@@ -68,8 +68,8 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void shouldHandleActionFurtherEvidenceEventCallback() throws Exception {
-        String path = Objects.requireNonNull(getClass().getClassLoader().
-            getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
+        String path = Objects.requireNonNull(getClass().getClassLoader()
+            .getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
@@ -104,8 +104,8 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
-        String path = Objects.requireNonNull(getClass().getClassLoader().
-            getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
+        String path = Objects.requireNonNull(getClass().getClassLoader()
+            .getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
