@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.smoke;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 
@@ -12,6 +13,7 @@ public class GetSavedCase {
     private final String tcaInstance = System.getenv("TEST_URL");
 
     @Test
+    @Ignore
     public void retrievecasefromCcd() {
         RestAssured.baseURI = tcaInstance;
         RestAssured.useRelaxedHTTPSValidation();
