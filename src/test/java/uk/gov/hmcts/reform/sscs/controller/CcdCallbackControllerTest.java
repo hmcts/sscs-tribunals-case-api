@@ -133,7 +133,7 @@ public class CcdCallbackControllerTest {
     }
 
     @Test
-    public void givenSubmittedCallbackForActionFurtherEvidenceEvent_shouldReturnOK() throws Exception {
+    public void givenSubmittedCallbackForActionFurtherEvidenceEvent_shouldReturnOk() throws Exception {
         Callback<SscsCaseData> callback = buildCallbackForTestScenarioForGivenEvent();
         given(deserializer.deserialize(anyString())).willReturn(callback);
 
