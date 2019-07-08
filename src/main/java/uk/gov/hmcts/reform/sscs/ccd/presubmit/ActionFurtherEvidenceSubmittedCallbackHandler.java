@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -50,11 +51,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setInterlocReviewState("interlocutoryReview");
-        ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+        SscsCaseDetails sscsCaseDetails = ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
             EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType(), "update to Information received event",
             "update to Information received event", idamService.getIdamTokens());
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
     }
 
 }
