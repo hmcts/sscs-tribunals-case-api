@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -11,7 +15,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
@@ -28,12 +34,20 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
+import uk.gov.hmcts.reform.sscs.idam.Authorize;
+import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @SpringBootTest
@@ -58,6 +72,13 @@ public class CcdCallbackEndpointIt {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @MockBean
+    private CoreCaseDataApi coreCaseDataApi;
+    @MockBean
+    private IdamApiClient idamApiClient;
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
 
     @Before
     public void setup() {
@@ -104,6 +125,35 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
+        given(idamApiClient.authorizeCodeType(anyString(), eq("code"), eq("sscs"),
+            eq("https://localhost:3000/authenticated"), eq(" ")))
+            .willReturn(Authorize.builder().code("code").build());
+
+        given(idamApiClient.authorizeToken(anyString(), eq("authorization_code"),
+            eq("https://localhost:3000/authenticated"), eq("sscs"), anyString(), eq(" ")))
+            .willReturn(Authorize.builder().accessToken("authToken").build());
+
+        given(idamApiClient.getUserDetails("Bearer authToken"))
+            .willReturn(UserDetails.builder().id("userId").build());
+
+        given(authTokenGenerator.generate()).willReturn("s2s token");
+
+        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+            eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+            eq("interlocInformationReceived")))
+            .willReturn(StartEventResponse.builder().build());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("interlocReviewState", "interlocutoryReview");
+        given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+            eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+            eq(true), any(CaseDataContent.class)))
+            .willReturn(CaseDetails.builder()
+                .id(123L)
+                .data(data)
+                .build());
+
+
         String path = Objects.requireNonNull(getClass().getClassLoader()
             .getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -112,9 +162,8 @@ public class CcdCallbackEndpointIt {
 
         assertHttpStatus(response, HttpStatus.OK);
 
-        PreSubmitCallbackResponse result = deserialize(response.getContentAsString());
-
-        System.out.println(result.getData());
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertEquals("interlocutoryReview", result.getData().getInterlocReviewState());
     }
 
     @Test
