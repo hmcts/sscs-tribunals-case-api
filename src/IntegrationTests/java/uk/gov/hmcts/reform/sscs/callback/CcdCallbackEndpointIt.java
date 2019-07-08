@@ -125,19 +125,22 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
-        given(idamApiClient.authorizeCodeType(anyString(), eq("code"), eq("sscs"),
-            eq("https://localhost:3000/authenticated"), eq(" ")))
-            .willReturn(Authorize.builder().code("code").build());
+        mockIdam();
+        mockCcd();
 
-        given(idamApiClient.authorizeToken(anyString(), eq("authorization_code"),
-            eq("https://localhost:3000/authenticated"), eq("sscs"), anyString(), eq(" ")))
-            .willReturn(Authorize.builder().accessToken("authToken").build());
+        String path = Objects.requireNonNull(getClass().getClassLoader()
+            .getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        given(idamApiClient.getUserDetails("Bearer authToken"))
-            .willReturn(UserDetails.builder().id("userId").build());
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
 
-        given(authTokenGenerator.generate()).willReturn("s2s token");
+        assertHttpStatus(response, HttpStatus.OK);
 
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertEquals("interlocutoryReview", result.getData().getInterlocReviewState());
+    }
+
+    private void mockCcd() {
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
             eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
             eq("interlocInformationReceived")))
@@ -152,18 +155,21 @@ public class CcdCallbackEndpointIt {
                 .id(123L)
                 .data(data)
                 .build());
+    }
 
+    private void mockIdam() {
+        given(idamApiClient.authorizeCodeType(anyString(), eq("code"), eq("sscs"),
+            eq("https://localhost:3000/authenticated"), eq(" ")))
+            .willReturn(Authorize.builder().code("code").build());
 
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        given(idamApiClient.authorizeToken(anyString(), eq("authorization_code"),
+            eq("https://localhost:3000/authenticated"), eq("sscs"), anyString(), eq(" ")))
+            .willReturn(Authorize.builder().accessToken("authToken").build());
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
+        given(idamApiClient.getUserDetails("Bearer authToken"))
+            .willReturn(UserDetails.builder().id("userId").build());
 
-        assertHttpStatus(response, HttpStatus.OK);
-
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertEquals("interlocutoryReview", result.getData().getInterlocReviewState());
+        given(authTokenGenerator.generate()).willReturn("s2s token");
     }
 
     @Test
