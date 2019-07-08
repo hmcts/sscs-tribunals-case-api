@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -15,8 +14,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -135,19 +132,10 @@ public class CcdCallbackControllerTest {
             .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
     }
 
-
-    /*  Given actionFurtherEvidence event
-        And user selects the "Information received for Interloc" options
-        When the submitted callback is triggered
-        Then the "interlocInformationReceived" event is triggered
-        And the "interlocutoryReview" field is updated to "interlocutoryReview"
-    */
     @Test
-    public void givenSubmittedEventAndInterlocOption_shouldTriggerEventAndUpdateField() throws Exception {
-        Callback<SscsCaseData> callback = buildCallbackForTestScenarioForGivenEvent(
-            ACTION_FURTHER_EVIDENCE, "informationReceivedForInterloc");
+    public void givenSubmittedCallbackForActionFurtherEvidenceEvent_shouldReturnOK() throws Exception {
+        Callback<SscsCaseData> callback = buildCallbackForTestScenarioForGivenEvent();
         given(deserializer.deserialize(anyString())).willReturn(callback);
-        assertNull(callback.getCaseDetails().getCaseData().getInterlocReviewState());
 
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
 
@@ -164,43 +152,10 @@ public class CcdCallbackControllerTest {
             .andExpect(content().json("{'data': {'interlocReviewState': 'interlocutoryReview'}}"));
     }
 
-    /*  Given actionFurtherEvidence event
-        And user selects a option different to "Information received for Interloc" option
-        When the submitted callback is triggered
-        Then the callback ends
-    */
-    //    @Test
-    //    @Parameters({"otherDocumentManual", "null"})
-    //    public void givenSubmittedEventAndNoInterlocOption_shouldDoNothing(@Nullable String itemCode) throws Exception {
-    //        Callback<SscsCaseData> callback = buildCallbackForTestScenarioForGivenEvent(
-    //            ACTION_FURTHER_EVIDENCE, itemCode);
-    //
-    //        given(deserializer.deserialize(anyString())).willReturn(callback);
-    //        assertNull(callback.getCaseDetails().getCaseData().getInterlocReviewState());
-    //
-    //        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
-    //
-    //
-    //        mockMvc.perform(post("/ccdSubmittedEvent")
-    //            .contentType(MediaType.APPLICATION_JSON)
-    //            .header("ServiceAuthorization", "s2s")
-    //            .content("something"))
-    //            .andExpect(status().isOk());
-    //
-    //        then(ccdService).shouldHaveZeroInteractions();
-    //        then(idamService).shouldHaveZeroInteractions();
-    //    }
-
-    private Callback<SscsCaseData> buildCallbackForTestScenarioForGivenEvent(EventType eventType, String listItemCode) {
-        List<DynamicListItem> furtherActionOptions = Collections.singletonList(
-            new DynamicListItem(listItemCode, null));
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .furtherEvidenceAction(new DynamicList(furtherActionOptions.get(0), furtherActionOptions))
-            .build();
-
+    private Callback<SscsCaseData> buildCallbackForTestScenarioForGivenEvent() {
         CaseDetails<SscsCaseData> caseDetail = new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE,
-            sscsCaseData, LocalDateTime.now());
-        return new Callback<>(caseDetail, Optional.empty(), eventType);
+            SscsCaseData.builder().build(), LocalDateTime.now());
+        return new Callback<>(caseDetail, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE);
     }
 
     @Test
