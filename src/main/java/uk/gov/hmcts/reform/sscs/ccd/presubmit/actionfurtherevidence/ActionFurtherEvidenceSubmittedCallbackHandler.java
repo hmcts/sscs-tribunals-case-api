@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -33,13 +34,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         requireNonNull(callbackType, "callbackType must not be null");
         return (callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent().equals(EventType.ACTION_FURTHER_EVIDENCE)
-            && isInformationReceivedForInterloc(
-            callback.getCaseDetails().getCaseData().getFurtherEvidenceAction().getValue().getCode()));
+            && isInformationReceivedForInterloc(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction()));
     }
 
-    private boolean isInformationReceivedForInterloc(String code) {
-        if (StringUtils.isNotBlank(code)) {
-            return code.equalsIgnoreCase(INFORMATION_RECEIVED_FOR_INTERLOC.getCode());
+    private boolean isInformationReceivedForInterloc(DynamicList dynamicList) {
+        if (dynamicList != null && dynamicList.getValue() != null
+            && StringUtils.isNotBlank(dynamicList.getValue().getCode())) {
+            return dynamicList.getValue().getCode().equalsIgnoreCase(INFORMATION_RECEIVED_FOR_INTERLOC.getCode());
         }
         return false;
     }

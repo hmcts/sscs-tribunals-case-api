@@ -103,8 +103,18 @@ public class CcdCallbackEndpointIt {
     }
 
     @Test
-    public void givenSubmittedCallbackForActionFurtherEvidecne_shouldUpdateFieldAndTriggerEvent() {
-        //todo
+    public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
+        String path = Objects.requireNonNull(getClass().getClassLoader().
+            getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse result = deserialize(response.getContentAsString());
+
+        System.out.println(result.getData());
     }
 
     @Test
@@ -142,9 +152,9 @@ public class CcdCallbackEndpointIt {
     public PreSubmitCallbackResponse deserialize(String source) {
         try {
             PreSubmitCallbackResponse callback = mapper.readValue(
-                    source,
-                    new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
-                    }
+                source,
+                new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
+                }
             );
 
             return callback;

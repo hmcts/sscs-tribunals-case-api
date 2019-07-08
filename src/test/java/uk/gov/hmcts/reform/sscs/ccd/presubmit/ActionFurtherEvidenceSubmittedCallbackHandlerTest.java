@@ -6,7 +6,10 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -53,18 +56,36 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
 
     @Test
-    @Parameters({
-        "SUBMITTED,informationReceivedForInterloc,ACTION_FURTHER_EVIDENCE,true",
-        "ABOUT_TO_SUBMIT,informationReceivedForInterloc,ACTION_FURTHER_EVIDENCE,false",
-        "SUBMITTED,otherDocumentManual,ACTION_FURTHER_EVIDENCE,false",
-        "SUBMITTED,informationReceivedForInterloc,APPEAL_RECEIVED,false"
-    })
-    public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType, String dynamicListItemCode,
-                                                                 EventType eventType, boolean expectedResult) {
-        boolean actualResult = handler.canHandle(callbackType,
-            buildCallback(dynamicListItemCode, eventType));
+    @Parameters(method = "generateCanHandleScenarios")
+    public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
+                                                                 Callback<SscsCaseData> callback,
+                                                                 boolean expectedResult) {
+        boolean actualResult = handler.canHandle(callbackType, callback);
 
         assertEquals(expectedResult, actualResult);
+    }
+
+    private Object[] generateCanHandleScenarios() {
+        Callback<SscsCaseData> callbacWithRightEventAndRightField =
+            buildCallback("informationReceivedForInterloc", ACTION_FURTHER_EVIDENCE);
+        Callback<SscsCaseData> callbacWithRightEventAndWrongField =
+            buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
+        Callback<SscsCaseData> callbacWithWrongEventAndRightField =
+            buildCallback("informationReceivedForInterloc", APPEAL_RECEIVED);
+
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
+            State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
+
+        Callback<SscsCaseData> callbacWithRightEventAndNullField = new Callback<>(caseDetails, Optional.empty(),
+            ACTION_FURTHER_EVIDENCE);
+
+        return new Object[]{
+            new Object[]{SUBMITTED, callbacWithRightEventAndRightField, true},
+            new Object[]{ABOUT_TO_SUBMIT, callbacWithRightEventAndRightField, false},
+            new Object[]{SUBMITTED, callbacWithRightEventAndWrongField, false},
+            new Object[]{SUBMITTED, callbacWithWrongEventAndRightField, false},
+            new Object[]{SUBMITTED, callbacWithRightEventAndNullField, false}
+        };
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
@@ -91,7 +112,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             anyString(), anyString(), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(CallbackType.SUBMITTED, callback);
+        handler.handle(SUBMITTED, callback);
 
         assertEquals("interlocutoryReview", captor.getValue().getInterlocReviewState());
     }
