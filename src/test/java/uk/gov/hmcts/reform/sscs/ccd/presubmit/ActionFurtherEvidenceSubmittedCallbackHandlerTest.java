@@ -76,7 +76,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
 
-        Callback<SscsCaseData> callbacWithRightEventAndNullField = new Callback<>(caseDetails, Optional.empty(),
+        Callback<SscsCaseData> callbackWithRightEventAndNullField = new Callback<>(caseDetails, Optional.empty(),
             ACTION_FURTHER_EVIDENCE);
 
         return new Object[]{
@@ -84,7 +84,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             new Object[]{ABOUT_TO_SUBMIT, callbacWithRightEventAndRightField, false},
             new Object[]{SUBMITTED, callbacWithRightEventAndWrongField, false},
             new Object[]{SUBMITTED, callbacWithWrongEventAndRightField, false},
-            new Object[]{SUBMITTED, callbacWithRightEventAndNullField, false}
+            new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false}
         };
     }
 
