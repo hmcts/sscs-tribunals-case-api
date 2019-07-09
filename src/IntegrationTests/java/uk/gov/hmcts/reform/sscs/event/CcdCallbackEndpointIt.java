@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.callback;
+package uk.gov.hmcts.reform.sscs.event;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
@@ -13,10 +13,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,6 +27,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -38,10 +42,14 @@ import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
+@RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 @ActiveProfiles("integration")
 @AutoConfigureMockMvc
 public class CcdCallbackEndpointIt {
+    // Below rules are needed to use the junitParamsRunner together with SpringRunner
+    @ClassRule
+    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
 
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
@@ -96,22 +104,7 @@ public class CcdCallbackEndpointIt {
     }
 
     @Test
-    public void actionFurtherEvidenceDropdownAboutToStartCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-
-        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
-
-        assertHttpStatus(response, HttpStatus.OK);
-
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
-
-        assertEquals(2, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(2, result.getData().getFurtherEvidenceAction().getListItems().size());
-    }
-
-    @Test
-    public void shouldHandleInterlocEventEventCallback() throws Exception {
+    public void shouldHandleInterlocEventCallback() throws Exception {
         String path = getClass().getClassLoader().getResource("callback/interlocEventCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
@@ -145,9 +138,9 @@ public class CcdCallbackEndpointIt {
     public PreSubmitCallbackResponse deserialize(String source) {
         try {
             PreSubmitCallbackResponse callback = mapper.readValue(
-                    source,
-                    new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
-                    }
+                source,
+                new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
+                }
             );
 
             return callback;
