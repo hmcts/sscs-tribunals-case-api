@@ -46,8 +46,8 @@ public class CcdCallbackControllerTest {
     public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
-        ccdCaseId = createCaseInCcdInterlocutoryReviewState().getId();
         idamTokens = idamService.getIdamTokens();
+        ccdCaseId = createCaseInCcdInterlocutoryReviewState().getId();
     }
 
     private SscsCaseDetails createCaseInCcdInterlocutoryReviewState() {
