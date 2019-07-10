@@ -128,8 +128,6 @@ module "tribunals-case-api" {
     ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
     ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
 
-    SEND_TO_DWP_ENABLED    = "${var.send_to_dwp_enabled}"
-
     EMAIL_SERVER_HOST      = "${data.azurerm_key_vault_secret.smtp_host.value}"
     EMAIL_SERVER_PORT      = "${data.azurerm_key_vault_secret.smtp_port.value}"
     EMAIL_SMTP_TLS_ENABLED = "${var.appeal_email_smtp_tls_enabled}"
