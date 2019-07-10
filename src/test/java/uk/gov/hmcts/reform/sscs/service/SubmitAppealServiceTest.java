@@ -149,7 +149,7 @@ public class SubmitAppealServiceTest {
             submitYourAppealEmailTemplate, ccdPdfService);
 
         RoboticsEmailTemplate roboticsEmailTemplate =
-            new RoboticsEmailTemplate("from", "to", "message");
+            new RoboticsEmailTemplate("from", "to", "scottishTo", "message");
 
         RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
             roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
@@ -287,6 +287,7 @@ public class SubmitAppealServiceTest {
         verify(emailService, times(2)).sendEmail(emailCaptor.capture());
         Email roboticsEmail = emailCaptor.getAllValues().get(1);
         assertEquals("Expecting 2 attachments", 2, roboticsEmail.getAttachments().size());
+        assertEquals("to", roboticsEmail.getTo());
     }
 
     @Test
