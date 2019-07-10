@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -12,6 +13,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @Service
 public class ActionFurtherEvidenceDropdownHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Value("${feature.issue_further_evidence}")
+    private Boolean issueFurtherEvidenceFeature;
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -38,7 +42,9 @@ public class ActionFurtherEvidenceDropdownHandler implements PreSubmitCallbackHa
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listCostOptions  = new ArrayList<>();
 
-        listCostOptions.add(new DynamicListItem("issueFurtherEvidence", "Issue further evidence to all parties"));
+        if (issueFurtherEvidenceFeature) {
+            listCostOptions.add(new DynamicListItem("issueFurtherEvidence", "Issue further evidence to all parties"));
+        }
         listCostOptions.add(new DynamicListItem("otherDocumentManual", "Other document type - action manually"));
 
         if (sscsCaseData.getInterlocReviewState() != null) {
