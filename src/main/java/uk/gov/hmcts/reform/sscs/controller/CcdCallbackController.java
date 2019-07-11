@@ -3,8 +3,10 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +31,7 @@ public class CcdCallbackController {
     private final SscsCaseCallbackDeserializer deserializer;
 
     @Autowired
-    public CcdCallbackController(AuthorisationService authorisationService,
-                                 SscsCaseCallbackDeserializer deserializer,
+    public CcdCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
                                  PreSubmitCallbackDispatcher dispatcher) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
@@ -42,7 +43,7 @@ public class CcdCallbackController {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("About to start sscs case CCD callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("About to start sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
 
@@ -54,9 +55,27 @@ public class CcdCallbackController {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("About to submit sscs case CCD callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+
         authorisationService.authorise(serviceAuthHeader);
         return performRequest(ABOUT_TO_SUBMIT, callback);
+    }
+
+    @PostMapping(path = "/ccdSubmittedEvent")
+    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdSubmittedEvent(
+        @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+        @RequestBody String message) {
+        validateRequest(serviceAuthHeader, message);
+        Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        log.info("processing SubmittedEvent callback for`{}` event and Case ID `{}`", callback.getEvent(),
+            callback.getCaseDetails().getId());
+        authorisationService.authorise(serviceAuthHeader);
+        return performRequest(SUBMITTED, callback);
+    }
+
+    private void validateRequest(String serviceAuthHeader, String message) {
+        Preconditions.checkNotNull(message);
+        Preconditions.checkNotNull(serviceAuthHeader);
     }
 
     private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> performRequest(CallbackType callbackType, Callback<SscsCaseData> callback) {
