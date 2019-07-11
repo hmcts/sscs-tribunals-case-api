@@ -2,15 +2,15 @@
   "appeal": {
     "caseId": "123456789",
     "caseReference": null,
-    "status": "APPEAL_RECEIVED",
+    "status": "DWP_RESPOND_OVERDUE",
     "benefitType": "pip",
     "hearingType": "oral",
     "latestEvents": [
       {
-        "date": "2019-07-06T00:00:00.000Z",
-        "type": "APPEAL_RECEIVED",
-        "contentKey": "status.appealReceived",
-        "dwpResponseDate": "2019-08-10T00:00:00.000Z"
+        "date": "2019-06-06T00:00:00.000Z",
+        "type": "DWP_RESPOND_OVERDUE",
+        "contentKey": "status.dwpRespondOverdue",
+        "dwpResponseDate": "2019-07-11T00:00:00.000Z"
       }
     ],
     "regionalProcessingCenter": {
