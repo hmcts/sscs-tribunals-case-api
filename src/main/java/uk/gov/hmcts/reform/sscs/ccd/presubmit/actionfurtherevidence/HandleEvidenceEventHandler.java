@@ -88,7 +88,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
     private String getSubtype(ScannedDocument scannedDocument, String code) {
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(code)) {
-            return "Other Document";
+            return DocumentType.OTHER_DOCUMENT.getValue();
         }
         return scannedDocument.getValue().getSubtype() != null ? scannedDocument.getValue().getSubtype() : "appellantEvidence";
     }
