@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public enum SerializeJsonMessageManager {
 
     APPEAL_RECEIVED("tya/appealReceived.json"),
-    APPEAL_RECEIVED_CASE_ID("tya/appealReceived-caseId.json"),
     APPEAL_RECEIVED_CCD("tya/appealReceivedCcd.json"),
     DWP_RESPOND("tya/dwpRespond.json"),
     DWP_RESPOND_CCD("tya/dwpRespondCcd.json"),
@@ -34,6 +33,7 @@ public enum SerializeJsonMessageManager {
     PAST_HEARING_BOOKED_CCD("tya/pastHearingBookedCcd.json"),
     DWP_RESPOND_OVERDUE("tya/dwpRespondOverdue.json"),
     DWP_RESPOND_OVERDUE_CCD("tya/dwpRespondOverdueCcd.json"),
+    DWP_RESPOND_OVERDUE_CASE_ID("tya/dwpRespondOverdue-caseId.json"),
     POSTPONED("tya/postponed.json"),
     POSTPONED_CCD("tya/postponedCcd.json"),
     WITHDRAWN("tya/withdrawn.json"),
