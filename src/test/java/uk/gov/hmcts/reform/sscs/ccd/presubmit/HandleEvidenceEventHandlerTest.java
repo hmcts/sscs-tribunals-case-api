@@ -85,7 +85,8 @@ public class HandleEvidenceEventHandlerTest {
 
     @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
-    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(DynamicList furtherEvidenceActionList) {
+    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(DynamicList furtherEvidenceActionList,
+                                                                         String expected) {
         sscsCaseData = SscsCaseData.builder()
             .furtherEvidenceAction(furtherEvidenceActionList)
             .scannedDocuments(scannedDocumentList)
@@ -97,7 +98,7 @@ public class HandleEvidenceEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("Other Document", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(expected, response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("www.test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("123", response.getData().getSscsDocument().get(0).getValue().getControlNumber());
@@ -105,13 +106,20 @@ public class HandleEvidenceEventHandlerTest {
     }
 
     private Object[] generateFurtherEvidenceActionListScenarios() {
-        DynamicListItem selectedOption = new DynamicListItem(
-            "otherDocumentManual", "Other document type - action manually");
-        DynamicList furtherEvidenceActionList = new DynamicList(selectedOption,
-            Collections.singletonList(selectedOption));
+        DynamicList furtherEvidenceActionListOtherDocuments = buildDynamicListWithGivenOption("otherDocumentManual",
+            "Other document type - action manually");
+        DynamicList furtherEvidenceActionListIssueParties = buildDynamicListWithGivenOption("issueFurtherEvidence",
+            "Issue further evidence to all parties");
         return new Object[]{
-            new Object[]{furtherEvidenceActionList}
+            new Object[]{furtherEvidenceActionListOtherDocuments, "Other Document"},
+            new Object[]{furtherEvidenceActionListIssueParties, "appellantEvidence"}
         };
+    }
+
+    private DynamicList buildDynamicListWithGivenOption(String code, String label) {
+        DynamicListItem selectedOption = new DynamicListItem(code, label);
+        return new DynamicList(selectedOption,
+            Collections.singletonList(selectedOption));
     }
 
     @Test
@@ -125,10 +133,7 @@ public class HandleEvidenceEventHandlerTest {
             .build();
         sscsDocuments.add(doc);
 
-        DynamicListItem selectedOption = new DynamicListItem(
-            "otherDocumentManual", "Other document type - action manually");
-        DynamicList furtherEvidenceActionList = new DynamicList(selectedOption,
-            Collections.singletonList(selectedOption));
+        DynamicList furtherEvidenceActionList = buildDynamicListWithGivenOption("otherDocumentManual", "Other document type - action manually");
 
         sscsCaseData = SscsCaseData.builder()
             .scannedDocuments(scannedDocumentList)

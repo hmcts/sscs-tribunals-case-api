@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
@@ -89,6 +90,9 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
     private String getSubtype(ScannedDocument scannedDocument, String code) {
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(code)) {
             return DocumentType.OTHER_DOCUMENT.getValue();
+        }
+        if (ISSUE_FURTHER_EVIDENCE.getCode().equals(code)) {
+            return "appellantEvidence";
         }
         return scannedDocument.getValue().getSubtype() != null ? scannedDocument.getValue().getSubtype() : "appellantEvidence";
     }
