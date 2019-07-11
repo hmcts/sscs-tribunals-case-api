@@ -11,8 +11,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -28,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.HandleEvidenceEventHandler;
 
+@RunWith(JUnitParamsRunner.class)
 public class HandleEvidenceEventHandlerTest {
 
     private HandleEvidenceEventHandler handler;
@@ -80,11 +84,8 @@ public class HandleEvidenceEventHandlerTest {
     // todo: cover scenario when furtherEvidenceAction in sscsCasedata is null
 
     @Test
-    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments() {
-        DynamicListItem selectedOption = new DynamicListItem(
-            "otherDocumentManual", "Other document type - action manually");
-        DynamicList furtherEvidenceActionList = new DynamicList(selectedOption,
-            Collections.singletonList(selectedOption));
+    @Parameters(method = "generateFurtherEvidenceActionListScenarios")
+    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(DynamicList furtherEvidenceActionList) {
         sscsCaseData = SscsCaseData.builder()
             .furtherEvidenceAction(furtherEvidenceActionList)
             .scannedDocuments(scannedDocumentList)
@@ -101,8 +102,16 @@ public class HandleEvidenceEventHandlerTest {
         assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("123", response.getData().getSscsDocument().get(0).getValue().getControlNumber());
         assertNull(response.getData().getScannedDocuments());
+    }
 
-
+    private Object[] generateFurtherEvidenceActionListScenarios() {
+        DynamicListItem selectedOption = new DynamicListItem(
+            "otherDocumentManual", "Other document type - action manually");
+        DynamicList furtherEvidenceActionList = new DynamicList(selectedOption,
+            Collections.singletonList(selectedOption));
+        return new Object[]{
+            new Object[]{furtherEvidenceActionList}
+        };
     }
 
     @Test
