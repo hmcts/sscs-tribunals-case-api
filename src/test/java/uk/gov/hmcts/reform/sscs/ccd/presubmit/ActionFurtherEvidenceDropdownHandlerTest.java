@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -36,6 +37,7 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", false);
     }
 
     @Test
@@ -51,9 +53,10 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
     }
 
     @Test
-    public void populateFurtherEvidenceDropdown_whenCaseInInterloc() {
+    public void populateFurtherEvidenceDropdownWithIssueFurtherEvidenceFeatureFlagTrue_whenCaseInInterloc() {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).interlocReviewState("any").build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
@@ -64,15 +67,41 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
     }
 
     @Test
-    public void populateFurtherEvidenceDropdown_whenCaseNotInInterloc() {
+    public void populateFurtherEvidenceDropdownWithIssueFurtherEvidenceFeatureFlagFalse_whenCaseInInterloc() {
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).interlocReviewState("any").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+
+        assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
+        assertEquals("informationReceivedForInterloc", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+        assertEquals(2, response.getData().getFurtherEvidenceAction().getListItems().size());
+    }
+
+    @Test
+    public void populateFurtherEvidenceDropdownWithIssueFurtherEvidenceFeatureFlagTrue_whenCaseNotInInterloc() {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", true);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
         assertEquals("issueFurtherEvidence", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
         assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
         assertEquals(2, response.getData().getFurtherEvidenceAction().getListItems().size());
+    }
+
+    @Test
+    public void populateFurtherEvidenceDropdownWithIssueFurtherEvidenceFeatureFlagFalse_whenCaseNotInInterloc() {
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", false);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+
+        assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
+        assertEquals(1, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     @Test

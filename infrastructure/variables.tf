@@ -101,7 +101,7 @@ variable "appinsights_instrumentation_key" {
   default     = ""
 }
 
-variable "send_to_dwp_enabled" {
+variable "issue_further_evidence_enabled" {
   type    = "string"
   default = "false"
 }

@@ -120,7 +120,7 @@ public class CcdCallbackEndpointIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertEquals(2, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(2, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(1, result.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     @Test
