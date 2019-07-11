@@ -51,9 +51,9 @@ public class ActionFurtherEvidenceDropdownHandler implements PreSubmitCallbackHa
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
         if (issueFurtherEvidenceFeature) {
-            listCostOptions.add(new DynamicListItem("issueFurtherEvidence", "Issue further evidence to all parties"));
+            listCostOptions.add(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.getCode(), ISSUE_FURTHER_EVIDENCE.getLabel()));
         }
-        listCostOptions.add(new DynamicListItem("otherDocumentManual", "Other document type - action manually"));
+        listCostOptions.add(new DynamicListItem(OTHER_DOCUMENT_MANUAL.getCode(), OTHER_DOCUMENT_MANUAL.getLabel()));
 
         if (sscsCaseData.getInterlocReviewState() != null) {
             listCostOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC.getCode(),
