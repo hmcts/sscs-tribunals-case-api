@@ -1,18 +1,31 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.HandleEvidenceEventHandler;
 
 public class HandleEvidenceEventHandlerTest {
@@ -27,7 +40,7 @@ public class HandleEvidenceEventHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    List<ScannedDocument> scannedDocumentList = new ArrayList<>();
+    private List<ScannedDocument> scannedDocumentList = new ArrayList<>();
 
     @Before
     public void setUp() {
@@ -38,12 +51,12 @@ public class HandleEvidenceEventHandlerTest {
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
-                    .fileName("bla.pdf")
-                    .subtype("sscs1")
-                    .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                    .scannedDate("2019-06-12T00:00:00.000")
-                    .controlNumber("123")
-                    .build()).build();
+                .fileName("bla.pdf")
+                .subtype("sscs1")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .scannedDate("2019-06-12T00:00:00.000")
+                .controlNumber("123")
+                .build()).build();
 
         scannedDocumentList.add(scannedDocument);
         sscsCaseData = SscsCaseData.builder().scannedDocuments(scannedDocumentList).build();
@@ -75,6 +88,32 @@ public class HandleEvidenceEventHandlerTest {
         assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("123", response.getData().getSscsDocument().get(0).getValue().getControlNumber());
         assertNull(response.getData().getScannedDocuments());
+    }
+
+    @Test
+    public void givenACaseWithScannedDocumentsAndOtherDocumentTypeOption_shouldSetDocumentTypeCorrectly() {
+        DynamicListItem selectedOption = new DynamicListItem(
+            "otherDocumentManual", "Other document type - action manually");
+        DynamicList furtherEvidenceActionList = new DynamicList(selectedOption,
+            Collections.singletonList(selectedOption));
+        sscsCaseData = SscsCaseData.builder()
+            .furtherEvidenceAction(furtherEvidenceActionList)
+            .scannedDocuments(scannedDocumentList)
+            .build();
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals("bla.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Other Document", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("www.test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("123", response.getData().getSscsDocument().get(0).getValue().getControlNumber());
+        assertNull(response.getData().getScannedDocuments());
+
+
     }
 
     @Test
