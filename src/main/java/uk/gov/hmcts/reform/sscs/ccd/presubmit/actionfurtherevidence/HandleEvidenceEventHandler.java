@@ -107,6 +107,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
             .documentLink(url)
             .documentDateAdded(scannedDate)
             .controlNumber(controlNumber)
+            .evidenceIssued("No")
             .build()).build();
     }
 
