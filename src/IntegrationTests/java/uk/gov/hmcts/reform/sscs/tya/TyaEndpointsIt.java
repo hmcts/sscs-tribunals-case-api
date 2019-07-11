@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED_CASE_ID;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_OVERDUE_CASE_ID;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -91,7 +91,7 @@ public class TyaEndpointsIt {
                 .andExpect(status().isOk())
                 .andReturn();
         String result = mvcResult.getResponse().getContentAsString();
-        assertJsonEquals(APPEAL_RECEIVED_CASE_ID.getSerializedMessage(), result);
+        assertJsonEquals(DWP_RESPOND_OVERDUE_CASE_ID.getSerializedMessage(), result);
     }
 
     @Test
