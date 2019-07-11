@@ -40,7 +40,8 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         if (sscsCaseData.getScannedDocuments() == null) {
-            PreSubmitCallbackResponse preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
+                new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("No further evidence to process");
             return preSubmitCallbackResponse;
         }

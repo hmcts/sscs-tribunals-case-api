@@ -77,21 +77,10 @@ public class HandleEvidenceEventHandlerTest {
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    @Test
-    public void givenACaseWithScannedDocuments_thenMoveToSscsDocuments() {
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
-
-        assertEquals("bla.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("sscs1", response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("www.test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("123", response.getData().getSscsDocument().get(0).getValue().getControlNumber());
-        assertNull(response.getData().getScannedDocuments());
-    }
+    // todo: cover scenario when furtherEvidenceAction in sscsCasedata is null
 
     @Test
-    public void givenACaseWithScannedDocumentsAndOtherDocumentTypeOption_shouldSetDocumentTypeCorrectly() {
+    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments() {
         DynamicListItem selectedOption = new DynamicListItem(
             "otherDocumentManual", "Other document type - action manually");
         DynamicList furtherEvidenceActionList = new DynamicList(selectedOption,
@@ -119,10 +108,24 @@ public class HandleEvidenceEventHandlerTest {
     @Test
     public void givenACaseWithScannedDocumentsAndSscsCaseDocuments_thenAppendNewDocumentsToSscsDocumentsList() {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
-        SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType("appellantEvidence").documentFileName("exist.pdf").build()).build();
+        SscsDocument doc = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType("appellantEvidence")
+                .documentFileName("exist.pdf")
+                .build())
+            .build();
         sscsDocuments.add(doc);
 
-        sscsCaseData = SscsCaseData.builder().scannedDocuments(scannedDocumentList).sscsDocument(sscsDocuments).build();
+        DynamicListItem selectedOption = new DynamicListItem(
+            "otherDocumentManual", "Other document type - action manually");
+        DynamicList furtherEvidenceActionList = new DynamicList(selectedOption,
+            Collections.singletonList(selectedOption));
+
+        sscsCaseData = SscsCaseData.builder()
+            .scannedDocuments(scannedDocumentList)
+            .sscsDocument(sscsDocuments)
+            .furtherEvidenceAction(furtherEvidenceActionList)
+            .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
