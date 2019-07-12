@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -89,12 +92,13 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
             .build()).build();
     }
 
-    private String getSubtype(String code, String originalSender) {
-        if (OTHER_DOCUMENT_MANUAL.getCode().equals(code)) {
-            return DocumentType.OTHER_DOCUMENT.getValue();
+    private String getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {
+        if (OTHER_DOCUMENT_MANUAL.getCode().equals(furtherEvidenceActionItemCode)) {
+            return OTHER_DOCUMENT.getValue();
         }
-        if (ISSUE_FURTHER_EVIDENCE.getCode().equals(code) && "appellant".equals(originalSender)) {
-            return "appellantEvidence";
+        if (ISSUE_FURTHER_EVIDENCE.getCode().equals(furtherEvidenceActionItemCode)
+            && APPELLANT.getCode().equals(originalSenderCode)) {
+            return APPELLANT_EVIDENCE.getValue();
         }
         throw new RuntimeException("document Type could not be worked out");
     }

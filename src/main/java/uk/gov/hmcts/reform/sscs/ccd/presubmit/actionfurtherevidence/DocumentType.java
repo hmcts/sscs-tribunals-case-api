@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
-public enum DocumentType {
-    OTHER_DOCUMENT("Other Document");
-    private String value;
+import lombok.Getter;
 
-    public String getValue() {
-        return value;
-    }
+@Getter
+public enum DocumentType {
+    OTHER_DOCUMENT("Other Document"), APPELLANT_EVIDENCE("appellantEvidence");
+    private String value;
 
     DocumentType(String value) {
         this.value = value;
