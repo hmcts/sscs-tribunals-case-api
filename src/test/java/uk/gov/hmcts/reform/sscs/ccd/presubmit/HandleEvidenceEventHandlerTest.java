@@ -82,6 +82,7 @@ public class HandleEvidenceEventHandlerTest {
     }
 
     // todo: cover scenario when furtherEvidenceAction in sscsCasedata is null
+    // todo: add canHandle scenario to include furtherEvidenceAction and originalSender not null
 
     @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
