@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,7 +64,17 @@ public class HandleEvidenceEventHandlerTest {
                 .build()).build();
 
         scannedDocumentList.add(scannedDocument);
-        sscsCaseData = SscsCaseData.builder().scannedDocuments(scannedDocumentList).build();
+        DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
+            "Other document type - action manually");
+
+        DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
+
+        sscsCaseData = SscsCaseData.builder()
+            .scannedDocuments(scannedDocumentList)
+            .furtherEvidenceAction(furtherEvidenceActionList)
+            .originalSender(originalSender)
+            .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -81,26 +92,31 @@ public class HandleEvidenceEventHandlerTest {
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
-    // todo: cover scenario when furtherEvidenceAction in sscsCasedata is null
-    // todo: add canHandle scenario to include furtherEvidenceAction and originalSender not null
-
     @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
-    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(DynamicList furtherEvidenceActionList,
-                                                                         DynamicList originalSender, String expected) {
-        sscsCaseData = SscsCaseData.builder()
-            .furtherEvidenceAction(furtherEvidenceActionList)
-            .scannedDocuments(scannedDocumentList)
-            .originalSender(originalSender)
-            .build();
+    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
+                                                                         @Nullable DynamicList originalSender,
+                                                                         String expectedDocumentType) {
+        sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
+        sscsCaseData.setOriginalSender(originalSender);
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = null;
+        try {
+            response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        } catch (IllegalStateException e) {
+            assertTrue(furtherEvidenceActionList == null || originalSender == null);
+        }
+        if (null != furtherEvidenceActionList && null != originalSender) {
+            assertHappyPaths(expectedDocumentType, response);
+        }
+    }
 
+    private void assertHappyPaths(String expectedDocumentType, PreSubmitCallbackResponse<SscsCaseData> response) {
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals(expected, response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(expectedDocumentType, response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("www.test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("123", response.getData().getSscsDocument().get(0).getValue().getControlNumber());
@@ -124,7 +140,9 @@ public class HandleEvidenceEventHandlerTest {
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Other Document"},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Other Document"},
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "appellantEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "representativeEvidence"}
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "representativeEvidence"},
+            new Object[]{null, representativeOriginalSender, ""}, //edge case: furtherEvidenceActionOption is null
+            new Object[]{furtherEvidenceActionListIssueParties, null, ""} //edge case: originalSender is null
         };
     }
 
@@ -150,18 +168,8 @@ public class HandleEvidenceEventHandlerTest {
             .build();
         sscsDocuments.add(doc);
 
-        DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-            "Other document type - action manually");
-
-        DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
-        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
-
-        sscsCaseData = SscsCaseData.builder()
-            .scannedDocuments(scannedDocumentList)
-            .sscsDocument(sscsDocuments)
-            .furtherEvidenceAction(furtherEvidenceActionList)
-            .originalSender(originalSender)
-            .build();
+        sscsCaseData.setScannedDocuments(scannedDocumentList);
+        sscsCaseData.setSscsDocument(sscsDocuments);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -174,7 +182,8 @@ public class HandleEvidenceEventHandlerTest {
 
     @Test
     public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
-        sscsCaseData = SscsCaseData.builder().build();
+        sscsCaseData.setScannedDocuments(null);
+
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);

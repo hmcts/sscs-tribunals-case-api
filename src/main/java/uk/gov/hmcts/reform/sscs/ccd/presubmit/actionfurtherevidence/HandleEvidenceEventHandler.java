@@ -33,8 +33,11 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE;
+            && callback.getEvent() == EventType.ACTION_FURTHER_EVIDENCE
+            && caseData.getFurtherEvidenceAction() != null
+            && caseData.getOriginalSender() != null;
     }
 
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -106,7 +109,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
             && REPRESENTATIVE.getCode().equals(originalSenderCode)) {
             return REPRESENTATIVE_EVIDENCE.getValue();
         }
-        throw new RuntimeException("document Type could not be worked out");
+        throw new IllegalStateException("document Type could not be worked out");
     }
 
 }
