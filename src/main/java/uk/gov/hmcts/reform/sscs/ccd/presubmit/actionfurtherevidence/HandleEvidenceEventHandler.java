@@ -57,34 +57,36 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
-                    String controlNumber = scannedDocument.getValue().getControlNumber();
-                    String fileName = scannedDocument.getValue().getFileName();
-
-                    LocalDateTime localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate());
-
-                    String scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
-                    DocumentLink url = scannedDocument.getValue().getUrl();
-
-                    SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                        .documentType(getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
-                            sscsCaseData.getOriginalSender().getValue().getCode()))
-                        .documentFileName(fileName)
-                        .documentLink(url)
-                        .documentDateAdded(scannedDate)
-                        .controlNumber(controlNumber)
-                        .build()).build();
-
                     List<SscsDocument> documents = new ArrayList<>();
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents = sscsCaseData.getSscsDocument();
                     }
-                    documents.add(doc);
+                    documents.add(buildSscsDocument(sscsCaseData, scannedDocument));
                     sscsCaseData.setSscsDocument(documents);
                 }
             }
         }
         sscsCaseData.setScannedDocuments(null);
 
+    }
+
+    private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
+        String controlNumber = scannedDocument.getValue().getControlNumber();
+        String fileName = scannedDocument.getValue().getFileName();
+
+        LocalDateTime localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate());
+
+        String scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
+        DocumentLink url = scannedDocument.getValue().getUrl();
+
+        return SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentType(getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
+                sscsCaseData.getOriginalSender().getValue().getCode()))
+            .documentFileName(fileName)
+            .documentLink(url)
+            .documentDateAdded(scannedDate)
+            .controlNumber(controlNumber)
+            .build()).build();
     }
 
     private String getSubtype(String code, String originalSender) {
