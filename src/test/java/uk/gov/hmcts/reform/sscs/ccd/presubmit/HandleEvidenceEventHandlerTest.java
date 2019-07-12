@@ -87,9 +87,7 @@ public class HandleEvidenceEventHandlerTest {
     @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(DynamicList furtherEvidenceActionList,
-                                                                         String expected) {
-        DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
-        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
+                                                                         DynamicList originalSender, String expected) {
         sscsCaseData = SscsCaseData.builder()
             .furtherEvidenceAction(furtherEvidenceActionList)
             .scannedDocuments(scannedDocumentList)
@@ -110,17 +108,30 @@ public class HandleEvidenceEventHandlerTest {
     }
 
     private Object[] generateFurtherEvidenceActionListScenarios() {
-        DynamicList furtherEvidenceActionListOtherDocuments = buildDynamicListWithGivenOption("otherDocumentManual",
-            "Other document type - action manually");
-        DynamicList furtherEvidenceActionListIssueParties = buildDynamicListWithGivenOption("issueFurtherEvidence",
+        DynamicList furtherEvidenceActionListOtherDocuments =
+            buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
+                "Other document type - action manually");
+        DynamicList appellantOriginalSender = buildOriginalSenderItemListForGivenOption("appellant",
+            "Appellant (or Appointee)");
+        DynamicList representativeOriginalSender = buildOriginalSenderItemListForGivenOption("representative",
+            "Representative");
+
+
+        DynamicList furtherEvidenceActionListIssueParties = buildFurtherEvidenceActionItemListForGivenOption("issueFurtherEvidence",
             "Issue further evidence to all parties");
         return new Object[]{
-            new Object[]{furtherEvidenceActionListOtherDocuments, "Other Document"},
-            new Object[]{furtherEvidenceActionListIssueParties, "appellantEvidence"}
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Other Document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Other Document"},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "appellantEvidence"}
         };
     }
 
-    private DynamicList buildDynamicListWithGivenOption(String code, String label) {
+    private DynamicList buildOriginalSenderItemListForGivenOption(String code, String label) {
+        DynamicListItem value = new DynamicListItem(code, label);
+        return new DynamicList(value, Collections.singletonList(value));
+    }
+
+    private DynamicList buildFurtherEvidenceActionItemListForGivenOption(String code, String label) {
         DynamicListItem selectedOption = new DynamicListItem(code, label);
         return new DynamicList(selectedOption,
             Collections.singletonList(selectedOption));
@@ -137,7 +148,7 @@ public class HandleEvidenceEventHandlerTest {
             .build();
         sscsDocuments.add(doc);
 
-        DynamicList furtherEvidenceActionList = buildDynamicListWithGivenOption("otherDocumentManual",
+        DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
             "Other document type - action manually");
 
         DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
