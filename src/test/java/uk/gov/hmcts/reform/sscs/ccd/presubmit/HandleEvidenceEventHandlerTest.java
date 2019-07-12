@@ -111,18 +111,20 @@ public class HandleEvidenceEventHandlerTest {
         DynamicList furtherEvidenceActionListOtherDocuments =
             buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
                 "Other document type - action manually");
+
+        DynamicList furtherEvidenceActionListIssueParties = buildFurtherEvidenceActionItemListForGivenOption("issueFurtherEvidence",
+            "Issue further evidence to all parties");
+
         DynamicList appellantOriginalSender = buildOriginalSenderItemListForGivenOption("appellant",
             "Appellant (or Appointee)");
         DynamicList representativeOriginalSender = buildOriginalSenderItemListForGivenOption("representative",
             "Representative");
 
-
-        DynamicList furtherEvidenceActionListIssueParties = buildFurtherEvidenceActionItemListForGivenOption("issueFurtherEvidence",
-            "Issue further evidence to all parties");
         return new Object[]{
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Other Document"},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Other Document"},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "appellantEvidence"}
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "appellantEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "representativeEvidence"}
         };
     }
 
