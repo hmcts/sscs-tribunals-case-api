@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -69,13 +70,25 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents = sscsCaseData.getSscsDocument();
                     }
-                    documents.add(buildSscsDocument(sscsCaseData, scannedDocument));
+                    SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument);
+                    documents.add(sscsDocument);
                     sscsCaseData.setSscsDocument(documents);
+                    sscsCaseData.setEvidenceHandled(workOutEvidenceHandled(sscsCaseData.getEvidenceHandled(),
+                        sscsDocument.getValue().getDocumentType()));
                 }
             }
         }
         sscsCaseData.setScannedDocuments(null);
 
+    }
+
+    private String workOutEvidenceHandled(String evidenceHandled, String documentType) {
+        if ((StringUtils.isBlank(evidenceHandled) || "No".equalsIgnoreCase(evidenceHandled))
+            && (documentType.equals(APPELLANT_EVIDENCE.getValue())
+            || documentType.equals(REPRESENTATIVE_EVIDENCE.getValue()))) {
+            return "Yes";
+        }
+        return evidenceHandled;
     }
 
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {

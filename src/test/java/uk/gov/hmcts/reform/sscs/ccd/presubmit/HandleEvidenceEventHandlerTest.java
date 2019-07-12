@@ -63,7 +63,18 @@ public class HandleEvidenceEventHandlerTest {
                 .controlNumber("123")
                 .build()).build();
 
+        ScannedDocument scannedDocument2 = ScannedDocument.builder()
+            .value(ScannedDocumentDetails.builder()
+                .fileName("bla2.pdf")
+                .subtype("sscs2")
+                .url(DocumentLink.builder().documentUrl("www.test2.com").build())
+                .scannedDate("2019-06-12T00:00:00.000")
+                .controlNumber("124")
+                .build())
+            .build();
+
         scannedDocumentList.add(scannedDocument);
+        scannedDocumentList.add(scannedDocument2);
         DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
             "Other document type - action manually");
 
@@ -96,13 +107,12 @@ public class HandleEvidenceEventHandlerTest {
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
                                                                          @Nullable DynamicList originalSender,
+                                                                         @Nullable String evidenceHandle,
                                                                          String expectedDocumentType,
                                                                          @Nullable String expectedEvidenceHandled) {
         sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
         sscsCaseData.setOriginalSender(originalSender);
-
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setEvidenceHandled(evidenceHandle);
 
         PreSubmitCallbackResponse<SscsCaseData> response = null;
         try {
@@ -124,8 +134,7 @@ public class HandleEvidenceEventHandlerTest {
         assertEquals("2019-06-12", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
         assertNull(response.getData().getScannedDocuments());
-        assertEquals(expectedEvidenceHandled, response.getData().getEvidenceHandle());
-
+        assertEquals(expectedEvidenceHandled, response.getData().getEvidenceHandled());
     }
 
     private Object[] generateFurtherEvidenceActionListScenarios() {
@@ -142,12 +151,12 @@ public class HandleEvidenceEventHandlerTest {
             "Representative");
 
         return new Object[]{
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Other Document", null},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Other Document", null},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "appellantEvidence", null},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "representativeEvidence", null},
-            new Object[]{null, representativeOriginalSender, "", null}, //edge case: furtherEvidenceActionOption is null
-            new Object[]{furtherEvidenceActionListIssueParties, null, "", null} //edge case: originalSender is null
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other Document", null},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other Document", "No"},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, "appellantEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", "representativeEvidence", "Yes"},
+            new Object[]{null, representativeOriginalSender, "", "", null}, //edge case: furtherEvidenceActionOption is null
+            new Object[]{furtherEvidenceActionListIssueParties, null, null, "", null} //edge case: originalSender is null
         };
     }
 
@@ -176,8 +185,6 @@ public class HandleEvidenceEventHandlerTest {
         sscsCaseData.setScannedDocuments(scannedDocumentList);
         sscsCaseData.setSscsDocument(sscsDocuments);
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
@@ -188,8 +195,6 @@ public class HandleEvidenceEventHandlerTest {
     @Test
     public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
         sscsCaseData.setScannedDocuments(null);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
