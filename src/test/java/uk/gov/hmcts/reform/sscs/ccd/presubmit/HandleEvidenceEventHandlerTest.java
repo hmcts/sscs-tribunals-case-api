@@ -87,9 +87,12 @@ public class HandleEvidenceEventHandlerTest {
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(DynamicList furtherEvidenceActionList,
                                                                          String expected) {
+        DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
         sscsCaseData = SscsCaseData.builder()
             .furtherEvidenceAction(furtherEvidenceActionList)
             .scannedDocuments(scannedDocumentList)
+            .originalSender(originalSender)
             .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -133,12 +136,17 @@ public class HandleEvidenceEventHandlerTest {
             .build();
         sscsDocuments.add(doc);
 
-        DynamicList furtherEvidenceActionList = buildDynamicListWithGivenOption("otherDocumentManual", "Other document type - action manually");
+        DynamicList furtherEvidenceActionList = buildDynamicListWithGivenOption("otherDocumentManual",
+            "Other document type - action manually");
+
+        DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
+        DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
 
         sscsCaseData = SscsCaseData.builder()
             .scannedDocuments(scannedDocumentList)
             .sscsDocument(sscsDocuments)
             .furtherEvidenceAction(furtherEvidenceActionList)
+            .originalSender(originalSender)
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

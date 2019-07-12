@@ -66,8 +66,8 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
                     DocumentLink url = scannedDocument.getValue().getUrl();
 
                     SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                        .documentType(getSubtype(scannedDocument,
-                            sscsCaseData.getFurtherEvidenceAction().getValue().getCode()))
+                        .documentType(getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
+                            sscsCaseData.getOriginalSender().getValue().getCode()))
                         .documentFileName(fileName)
                         .documentLink(url)
                         .documentDateAdded(scannedDate)
@@ -87,14 +87,14 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
     }
 
-    private String getSubtype(ScannedDocument scannedDocument, String code) {
+    private String getSubtype(String code, String originalSender) {
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(code)) {
             return DocumentType.OTHER_DOCUMENT.getValue();
         }
-        if (ISSUE_FURTHER_EVIDENCE.getCode().equals(code)) {
+        if (ISSUE_FURTHER_EVIDENCE.getCode().equals(code) && "appellant".equals(originalSender)) {
             return "appellantEvidence";
         }
-        return scannedDocument.getValue().getSubtype() != null ? scannedDocument.getValue().getSubtype() : "appellantEvidence";
+        throw new RuntimeException("document Type could not be worked out");
     }
 
 }
