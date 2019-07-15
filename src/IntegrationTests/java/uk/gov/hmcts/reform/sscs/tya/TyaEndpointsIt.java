@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.APPEAL_RECEIVED_CASE_ID;
+import static uk.gov.hmcts.reform.sscs.util.SerializeJsonMessageManager.DWP_RESPOND_OVERDUE_CASE_ID;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class TyaEndpointsIt {
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
         when(ccdService.findCaseByAppealNumber("abcde12345", idamTokens))
-                .thenReturn(SscsCaseDetails.builder().id(1L).data(SerializeJsonMessageManager.APPEAL_RECEIVED_CCD.getDeserializeMessage()).build());
+            .thenReturn(SscsCaseDetails.builder().id(1L).data(SerializeJsonMessageManager.APPEAL_RECEIVED_CCD.getDeserializeMessage()).build());
 
         MvcResult mvcResult = mockMvc.perform(get("/appeals/abcde12345"))
             .andExpect(status().isOk())
@@ -80,18 +80,17 @@ public class TyaEndpointsIt {
 
         Map<String, Object> data = new HashMap<>();
         data.put("caseCreated", "2019-06-06");
-        data.put("appeal", Collections.singletonMap(
-                "benefitType", Collections.singletonMap("code", "PIP")
-        ));
+        data.put("appeal", Collections.singletonMap("benefitType", Collections.singletonMap("code", "PIP")));
 
         when(ccdClient.readForCaseworker(idamTokens, CASE_ID))
-                .thenReturn(CaseDetails.builder().data(data).id(CASE_ID).build());
+            .thenReturn(CaseDetails.builder().data(data).id(CASE_ID).build());
 
         MvcResult mvcResult = mockMvc.perform(get("/appeals?caseId=" + CASE_ID))
-                .andExpect(status().isOk())
-                .andReturn();
+            .andExpect(status().isOk())
+            .andReturn();
+
         String result = mvcResult.getResponse().getContentAsString();
-        assertJsonEquals(APPEAL_RECEIVED_CASE_ID.getSerializedMessage(), result);
+        assertJsonEquals(DWP_RESPOND_OVERDUE_CASE_ID.getSerializedMessage(), result);
     }
 
     @Test
@@ -115,18 +114,18 @@ public class TyaEndpointsIt {
         Map<String, Object> macResponseMap = getValidTokenResponseMap();
 
         when(macService.decryptMacToken("abcde12345"))
-                .thenReturn(macResponseMap);
+            .thenReturn(macResponseMap);
 
         MvcResult mvcResult = mockMvc.perform(get("/tokens/abcde12345"))
-                .andExpect(status().isOk())
-                .andReturn();
+            .andExpect(status().isOk())
+            .andReturn();
 
         String result = mvcResult.getResponse().getContentAsString();
 
         assertThat(result, equalTo("{\"token\":"
-                +  "{\"decryptedToken\":\"de-crypted-token\",\"benefitType\":\"002\","
-                +  "\"subscriptionId\":\"subscriptionId\","
-                +  "\"appealId\":\"dfdsf435345\"}}"));
+            + "{\"decryptedToken\":\"de-crypted-token\",\"benefitType\":\"002\","
+            + "\"subscriptionId\":\"subscriptionId\","
+            + "\"appealId\":\"dfdsf435345\"}}"));
     }
 
 
