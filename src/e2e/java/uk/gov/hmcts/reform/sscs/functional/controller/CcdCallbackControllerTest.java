@@ -59,6 +59,7 @@ public class CcdCallbackControllerTest {
     }
 
     @Test
+    @Ignore
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
