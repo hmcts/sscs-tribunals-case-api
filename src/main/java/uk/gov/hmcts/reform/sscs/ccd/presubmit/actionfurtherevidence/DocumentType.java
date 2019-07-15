@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum DocumentType {
-    OTHER_DOCUMENT("otherDocument"), APPELLANT_EVIDENCE("appellantEvidence"),
+    OTHER_DOCUMENT("Other document"), APPELLANT_EVIDENCE("appellantEvidence"),
     REPRESENTATIVE_EVIDENCE("representativeEvidence");
     private String value;
 
