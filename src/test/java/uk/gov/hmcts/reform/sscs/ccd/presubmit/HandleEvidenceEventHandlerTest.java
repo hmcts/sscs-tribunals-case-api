@@ -151,8 +151,8 @@ public class HandleEvidenceEventHandlerTest {
             "Representative");
 
         return new Object[]{
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other Document", null},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other Document", "No"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other document", null},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other document", "No"},
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, "appellantEvidence", "Yes"},
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", "representativeEvidence", "Yes"},
             new Object[]{null, representativeOriginalSender, "", "", null}, //edge case: furtherEvidenceActionOption is null
