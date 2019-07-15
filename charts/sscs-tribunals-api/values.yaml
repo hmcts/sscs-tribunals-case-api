@@ -32,6 +32,7 @@ java:
     EMAIL_MESSAGE: "Your appeal has been created. Please do not respond to this email"
     ROBOTICS_EMAIL_FROM: "sscs@hmcts.net"
     ROBOTICS_EMAIL_TO: "fake"
+    ROBOTICS_EMAIL_SCOTTISH_TO: "fake"
     ROBOTICS_EMAIL_SUBJECT: "Robotics Data"
     ROBOTICS_EMAIL_MESSAGE: "Please find attached the robotics json file \nPlease do not respond to this email"
     EMAIL_SERVER_HOST: "mta.reform.hmcts.net"
