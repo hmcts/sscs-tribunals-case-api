@@ -15,7 +15,6 @@ import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,6 @@ public class CcdCallbackControllerTest {
     }
 
     @Test
-    @Ignore
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
