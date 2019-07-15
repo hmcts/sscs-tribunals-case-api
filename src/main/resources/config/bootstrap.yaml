@@ -17,3 +17,6 @@ spring:
         idam-s2s-api: IDAM_S2S_AUTH
         sscs-s2s-secret: IDAM_S2S_AUTH_TOTP_SECRET
         s2s-micro: IDAM_S2S_AUTH_MICROSERVICE
+        robotics-email-to: ROBOTICS_EMAIL_TO
+        robotics-email-from: ROBOTICS_EMAIL_FROM
+        robotics-email-scottish-to: ROBOTICS_EMAIL_SCOTTISH_TO
