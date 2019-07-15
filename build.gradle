@@ -32,7 +32,7 @@ mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
 
 checkstyle {
     maxWarnings = 0
-    toolVersion = '8.7'
+    toolVersion = '8.18'
     // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
     configDir = new File(rootDir, 'config/checkstyle')
 }
