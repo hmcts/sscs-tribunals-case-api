@@ -201,7 +201,7 @@ configurations.all {
     resolutionStrategy {
         eachDependency { DependencyResolveDetails details ->
             if (details.requested.group in ['com.fasterxml.jackson.core', 'com.fasterxml.jackson.module', 'com.fasterxml.jackson.datatype', 'com.fasterxml.jackson.core.jackson-databind']) {
-                details.useVersion '2.9.9.1'
+                details.useVersion '2.9.9'
             }
         }
     }
