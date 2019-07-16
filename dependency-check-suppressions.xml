@@ -108,11 +108,4 @@
         <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:9\.0\.19$</gav>
         <cve>CVE-2019-10072</cve>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
-            file name: jackson-databind-2.9.9.jar
-        ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:2\.9\.9$</gav>
-        <cve>CVE-2019-12814</cve>
-    </suppress>
 </suppressions>
