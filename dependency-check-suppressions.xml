@@ -6,6 +6,7 @@
    ]]></notes>
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
         <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
+        <cve>CVE-2019-12814</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -85,6 +86,7 @@
    ]]></notes>
         <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
         <cpe>cpe:/a:apache:tomcat</cpe>
+        <cve>CVE-2019-10072</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
