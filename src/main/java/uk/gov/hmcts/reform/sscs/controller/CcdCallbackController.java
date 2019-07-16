@@ -27,12 +27,12 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 public class CcdCallbackController {
 
     private final AuthorisationService authorisationService;
-    private final PreSubmitCallbackDispatcher dispatcher;
+    private final PreSubmitCallbackDispatcher<SscsCaseData> dispatcher;
     private final SscsCaseCallbackDeserializer deserializer;
 
     @Autowired
     public CcdCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
-                                 PreSubmitCallbackDispatcher dispatcher) {
+                                 PreSubmitCallbackDispatcher<SscsCaseData> dispatcher) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.dispatcher = dispatcher;
