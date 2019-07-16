@@ -1,6 +1,6 @@
 {
   "case_details": {
-    "id": 12345656789,
+    "id": "CASE_ID_TO_BE_REPLACED",
     "jurisdiction": "SSCS",
     "state": "appealCreated",
     "case_type_id": "Benefit",
@@ -68,19 +68,6 @@
           "tya": ""
         }
       },
-      "scannedDocuments" : [
-        {
-          "value" : {
-            "url" : {
-              "document_url": "http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49"
-            },
-            "controlNumber" : "3",
-            "scannedDate" : "2010-10-25T00:00:00.000",
-            "fileName" : "scanned.pdf",
-            "type" : "appellantEvidence"
-          }
-        }
-      ],
       "evidence": {
         "documents": [
         ]
@@ -129,7 +116,6 @@
           "code": "ESA",
           "description": "Employment Support Allowance"
         },
-        "receivedVia": "PAPER",
         "hearingOptions": {
           "wantsToAttend": "No",
           "other": "No"

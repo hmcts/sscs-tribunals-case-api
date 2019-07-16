@@ -26,19 +26,16 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
         T caseData = callback.getCaseDetails().getCaseData();
 
-        PreSubmitCallbackResponse<T> callbackResponse =
-                new PreSubmitCallbackResponse<>(caseData);
+        PreSubmitCallbackResponse<T> callbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         dispatchToHandlers(callbackType, callback, callbackHandlers, callbackResponse);
 
         return callbackResponse;
     }
 
-    private void dispatchToHandlers(
-            CallbackType callbackType, Callback<T> callback,
-            List<PreSubmitCallbackHandler<T>> callbackHandlers,
-            PreSubmitCallbackResponse<T> callbackResponse
-    ) {
+    private void dispatchToHandlers(CallbackType callbackType, Callback<T> callback,
+                                    List<PreSubmitCallbackHandler<T>> callbackHandlers,
+                                    PreSubmitCallbackResponse<T> callbackResponse) {
 
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
 
