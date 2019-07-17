@@ -40,7 +40,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private boolean isInformationReceivedForInterloc(DynamicList furtherEvidenceActionList) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
             && StringUtils.isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
-            return furtherEvidenceActionList.getValue().getCode().equalsIgnoreCase(INFORMATION_RECEIVED_FOR_INTERLOC.getCode());
+            return furtherEvidenceActionList.getValue().getCode().equals(INFORMATION_RECEIVED_FOR_INTERLOC.getCode());
         }
         return false;
     }
