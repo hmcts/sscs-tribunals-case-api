@@ -252,7 +252,7 @@ dependencies {
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
     compile group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
-    compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.9.12'
+    compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.9.14'
 
     compile 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
