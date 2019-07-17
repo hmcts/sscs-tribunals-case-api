@@ -214,8 +214,8 @@
       },
       "furtherEvidenceAction": {
         "value": {
-          "code": "issueFurtherEvidence",
-          "label": "Issue further evidence to all parties"
+          "code": "informationReceivedForInterloc",
+          "label": "Information received for interlocutory review"
         },
         "list_items": [
           {

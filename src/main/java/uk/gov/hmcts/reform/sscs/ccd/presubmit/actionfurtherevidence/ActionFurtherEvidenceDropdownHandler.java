@@ -4,6 +4,8 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,10 +68,11 @@ public class ActionFurtherEvidenceDropdownHandler implements PreSubmitCallbackHa
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
-        listCostOptions.add(new DynamicListItem("appellant", "Appellant (or Appointee)"));
+        listCostOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
-        if (sscsCaseData.getAppeal().getRep() != null && sscsCaseData.getAppeal().getRep().getHasRepresentative().equalsIgnoreCase("yes")) {
-            listCostOptions.add(new DynamicListItem("representative", "Representative"));
+        if (sscsCaseData.getAppeal().getRep() != null
+            && sscsCaseData.getAppeal().getRep().getHasRepresentative().equalsIgnoreCase("yes")) {
+            listCostOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
 
         sscsCaseData.setOriginalSender(new DynamicList(listCostOptions.get(0), listCostOptions));

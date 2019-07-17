@@ -129,7 +129,7 @@ public class CcdCallbackEndpointIt {
         mockCcd();
 
         String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
+            .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
