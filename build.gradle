@@ -220,18 +220,10 @@ dependencies {
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
 
-    compile group: 'commons-io', name: 'commons-io', version: '2.6'
-    compile group: 'org.apache.commons', name: 'commons-text', version: '1.7'
-
-    compile group: 'org.json', name: 'json', version: '20180813'
-
-    compile group: 'net.objectlab.kit', name: 'datecalc-common', version: '1.4.2'
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: versions.springfoxSwagger
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
-
-    compile 'com.migesok:jaxb-java-time-adapters:1.1.3'
 
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '10.0.1'
 
@@ -250,15 +242,11 @@ dependencies {
 
     compile group: 'io.rest-assured', name: 'rest-assured', version: '3.3.0'
 
-    compile group: 'com.github.sps.junidecode', name: 'junidecode', version: '0.3'
-    compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.9.14'
-
     compile 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.6'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
-    testCompile group: 'com.github.tomakehurst', name: 'wiremock', version: '2.23.2'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.7.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.7.0'
 
@@ -268,11 +256,6 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:1.18.8"
     e2eCompile 'org.projectlombok:lombok:1.18.8'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
-
-    runtime "org.springframework.boot:spring-boot-properties-migrator"
-    compile group: 'org.pitest', name: 'pitest', version: '1.4.8'
-    compile 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.4.0'
-    compile 'org.codehaus.sonar-plugins:sonar-pitest-plugin:0.5'
 }
 
 // this is required to force Java running on the Azure Windows Server OS into using
