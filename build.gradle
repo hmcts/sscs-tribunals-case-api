@@ -11,6 +11,8 @@ plugins {
     id "info.solidsoft.pitest" version '1.4.0'
 }
 
+def springCloudVersion = 'Greenwich.SR2'
+
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
@@ -181,10 +183,6 @@ def versions = [
 ]
 
 ext["rest-assured.version"] = '4.0.0'
-
-ext {
-    springCloudVersion = 'Finchley.SR2'
-}
 
 dependencyManagement {
     imports {
