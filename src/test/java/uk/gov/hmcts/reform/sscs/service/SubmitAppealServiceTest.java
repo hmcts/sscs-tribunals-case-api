@@ -8,7 +8,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
-import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
@@ -38,7 +37,6 @@ import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
-import uk.gov.hmcts.reform.sscs.domain.robotics.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -85,9 +83,6 @@ public class SubmitAppealServiceTest {
     private SubmitAppealService submitAppealService;
 
     private final SyaCaseWrapper appealData = getSyaCaseWrapper();
-
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    private RoboticsWrapper roboticsWrapper;
 
     private final JSONObject json = new JSONObject();
 
@@ -263,9 +258,6 @@ public class SubmitAppealServiceTest {
             .build());
         SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
 
-        roboticsWrapper = RoboticsWrapper.builder()
-            .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
-
         submitAppealService.submitAppeal(appealData, null);
 
         verify(ccdPdfService).mergeDocIntoCcd(
@@ -322,9 +314,6 @@ public class SubmitAppealServiceTest {
     public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
             .willReturn(SscsCaseDetails.builder().build());
-
-        roboticsWrapper = RoboticsWrapper.builder()
-            .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
 
         submitAppealService.submitAppeal(appealData, userToken);
 

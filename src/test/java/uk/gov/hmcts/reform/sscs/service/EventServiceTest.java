@@ -32,14 +32,6 @@ public class EventServiceTest {
     @Mock
     private IdamService idamService;
 
-    @Mock
-    private RoboticsService roboticsService;
-
-    @Mock
-    private EvidenceManagementService evidenceManagementService;
-
-    @Mock
-    private RegionalProcessingCenterService regionalProcessingCenterService;
 
     private IdamTokens idamTokens;
 
@@ -53,12 +45,8 @@ public class EventServiceTest {
         idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
 
-        //emailService = new EmailService(mock(JavaMailSender.class));
         eventService = new EventService(sscsPdfService,
-                roboticsService,
-                regionalProcessingCenterService,
                 idamService,
-                evidenceManagementService,
                 emailService);
     }
 
@@ -88,8 +76,6 @@ public class EventServiceTest {
 
         verify(emailService, never()).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
-        verify(evidenceManagementService, never()).download(any(), anyString());
-        verify(roboticsService, never()).sendCaseToRobotics(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any(), any(), any());
     }
 
     @Test
@@ -105,10 +91,8 @@ public class EventServiceTest {
         assertEquals("No", caseData.getEvidencePresent());
         assertNotNull(caseData.getAppeal().getAppellant().getAppointee());
 
-        verify(emailService, times(3)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
+        verify(emailService, times(2)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService,times(1)).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
-        verify(evidenceManagementService, never()).download(any(), anyString());
-        verify(roboticsService, times(1)).sendCaseToRobotics(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any(), any(), any());
     }
 
     @Test
@@ -126,10 +110,8 @@ public class EventServiceTest {
         assertEquals("No", caseData.getEvidencePresent());
         assertNull(caseData.getAppeal().getAppellant().getAppointee());
 
-        verify(emailService, times(3)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
+        verify(emailService, times(2)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
-        verify(evidenceManagementService, never()).download(any(), anyString());
-        verify(roboticsService, times(1)).sendCaseToRobotics(eq(caseData), eq(Long.parseLong(caseData.getCcdCaseId())), any(), any(), any());
     }
 
     @Test
@@ -146,8 +128,6 @@ public class EventServiceTest {
 
         verify(emailService, times(1)).generateUniqueEmailId(eq(caseData.getAppeal().getAppellant()));
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseData), any(), eq(idamTokens), any());
-        verify(evidenceManagementService, never()).download(any(), anyString());
-        verify(roboticsService, never()).sendCaseToRobotics(eq(caseData), any(), any(), any(), any());
     }
 
     private SscsCaseData buildCaseDataWithoutPdf() {
