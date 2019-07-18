@@ -54,6 +54,7 @@ public class CcdCallbackController {
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdAboutToSubmit(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestBody String message) {
+        log.info("Hello world - I am ccdAboutToSubmit callback")
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
 
