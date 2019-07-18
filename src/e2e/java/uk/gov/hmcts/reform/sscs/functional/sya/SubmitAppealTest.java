@@ -82,7 +82,6 @@ public class SubmitAppealTest {
             "ALL_DETAILS, interlocutoryReviewState",
             "ALL_DETAILS, validAppeal",
             "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
-    @Ignore
     public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = getRandomNino();

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -133,6 +133,7 @@ public class HandleEvidenceEventHandlerTest {
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-12", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
+        assertEquals("No", response.getData().getSscsDocument().get(0).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
         assertEquals(expectedEvidenceHandled, response.getData().getEvidenceHandled());
     }

@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.sya;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,9 +23,7 @@ import java.util.Properties;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
-import junitparams.converters.Nullable;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -39,7 +37,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
@@ -60,8 +57,6 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
-import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -106,11 +101,6 @@ public class SyaEndpointsIt {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private RoboticsJsonMapper roboticsJsonMapper;
-    @SpyBean
-    private RoboticsJsonValidator jsonValidator;
 
     @Autowired
     private SubmitAppealService submitAppealService;
@@ -161,18 +151,6 @@ public class SyaEndpointsIt {
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), eq("sscs"),
             eq(Arrays.asList("caseworker", "citizen")), eq(Classification.RESTRICTED), any())).willReturn(uploadResponse);
 
-    }
-
-    private void assertRpcEmail(@Nullable Boolean rpcEmailRoboticsFeatureValue, String expectedRpcEmail) {
-        ArgumentCaptor<JSONObject> roboticsAppealCaptor = ArgumentCaptor.forClass(JSONObject.class);
-        then(jsonValidator).should().validate(roboticsAppealCaptor.capture());
-
-        if (rpcEmailRoboticsFeatureValue != null && rpcEmailRoboticsFeatureValue) {
-            assertTrue(roboticsAppealCaptor.getValue().has("rpcEmail"));
-            assertThat(roboticsAppealCaptor.getValue().get("rpcEmail"), is(expectedRpcEmail));
-        } else {
-            assertFalse(roboticsAppealCaptor.getValue().has("rpcEmail"));
-        }
     }
 
     @Test
