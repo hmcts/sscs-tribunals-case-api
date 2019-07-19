@@ -156,20 +156,28 @@ public class HandleEvidenceEventHandlerTest {
             "Representative");
 
         return new Object[]{
+            //other options scenarios
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other document", null},
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "No", "Other document", "No"},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other document", "No"},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, "Other document", null},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Yes", "Other document", "Yes"},
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", "Other document", "Yes"},
+            //issue parties scenarios
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, "appellantEvidence", "Yes"},
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "No", "appellantEvidence", "Yes"},
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "Yes", "appellantEvidence", "Yes"},
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", "representativeEvidence", "Yes"},
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "Yes", "representativeEvidence", "Yes"},
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, "representativeEvidence", "Yes"},
-
-//            new Object[]{furtherEvidenceActionListInterloc, null, null, "", null},
+            //interloc scenarios
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, "appellantEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", "appellantEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "Yes", "appellantEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, "representativeEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "No", "representativeEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "Yes", "representativeEvidence", "Yes"},
+            //edge cases scenarios
             new Object[]{null, representativeOriginalSender, "", "", null}, //edge case: furtherEvidenceActionOption is null
             new Object[]{furtherEvidenceActionListIssueParties, null, null, "", null} //edge case: originalSender is null
         };
