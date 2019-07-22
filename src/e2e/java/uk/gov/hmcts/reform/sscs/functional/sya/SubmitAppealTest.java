@@ -80,8 +80,8 @@ public class SubmitAppealTest {
     @Test
     @Parameters({"ALL_DETAILS, incompleteApplication",
             "ALL_DETAILS, interlocutoryReviewState",
-            "ALL_DETAILS, validAppeal",
-            "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
+            "ALL_DETAILS, withDwp",
+            "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, withDwp"})
     public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = getRandomNino();
@@ -108,9 +108,18 @@ public class SubmitAppealTest {
         final String location = response.getHeader("Location");
         final Long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
         SscsCaseDetails sscsCaseDetails = findCaseInCcd(id);
-        if (expected.getAppellant().getAppointee() == null) {
-            expected.setAppellant(expected.getAppellant().toBuilder().appointee(Appointee.builder().build()).build());
-        }
+       if (expected.getAppellant().getAppointee() == null) {
+           if (expectedState.equalsIgnoreCase("incompleteApplication")) {
+               expected.setAppellant(expected.getAppellant().toBuilder().appointee(Appointee.builder().build()).build());
+           } else if (expected.getAppellant().getAppointee() == null) {
+               expected.setAppellant(expected.getAppellant().toBuilder().appointee(Appointee.builder()
+                       .name(Name.builder().build())
+                       .address(Address.builder().build())
+                       .identity(Identity.builder().build())
+                       .contact(Contact.builder().build())
+                       .build()).build());
+           }
+       }
         log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
         assertEquals(expectedState, sscsCaseDetails.getState());
