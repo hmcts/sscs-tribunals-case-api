@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static junit.framework.TestCase.assertNull;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -198,6 +197,34 @@ public class CcdCallbackEndpointIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertNull(result.getData().getHmctsDwpState());
+    }
+
+    @Test
+    public void shouldHandleTcwDecisionAppealToProceedEventCallback() throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/tcwDecisionAppealToProceedEventCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertTrue(result.getErrors().isEmpty());
+    }
+
+    @Test
+    public void shouldHandleJudgeDecisionAppealToProceedEventCallback() throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/judgeDecisionAppealToProceedEventCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertTrue(result.getErrors().isEmpty());
     }
 
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
