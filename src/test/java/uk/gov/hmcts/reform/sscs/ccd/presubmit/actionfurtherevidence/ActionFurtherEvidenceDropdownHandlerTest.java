@@ -126,4 +126,15 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals(1, response.getData().getOriginalSender().getListItems().size());
     }
+
+    @Test
+    public void populateOriginalSenderDropdown_whenCaseHasRepIsNull() {
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(null).build()).build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+
+        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
+        assertEquals(1, response.getData().getOriginalSender().getListItems().size());
+    }
 }
