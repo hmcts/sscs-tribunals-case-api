@@ -71,7 +71,7 @@ public class ActionFurtherEvidenceDropdownHandler implements PreSubmitCallbackHa
         listCostOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
         if (sscsCaseData.getAppeal().getRep() != null
-            && sscsCaseData.getAppeal().getRep().getHasRepresentative().equalsIgnoreCase("yes")) {
+            && ("Yes").equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative())) {
             listCostOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
 
