@@ -61,6 +61,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void handlesCallback() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
+                        .documentDateAdded("10-10-2050")
                         .documentLink(DocumentLink.builder()
                                 .documentFilename("SomeDoc.pdf")
                                 .build())
@@ -103,6 +104,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void errorWhenHandlingCallbackAndInterlocDecisionDocumentIsNotPdf() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
+                        .documentDateAdded("10-10-2050")
                         .documentLink(DocumentLink.builder()
                                 .documentFilename("SomeDoc.doc")
                                 .build())
