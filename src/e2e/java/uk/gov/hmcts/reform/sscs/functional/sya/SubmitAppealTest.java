@@ -80,8 +80,8 @@ public class SubmitAppealTest {
     @Test
     @Parameters({"ALL_DETAILS, incompleteApplication",
             "ALL_DETAILS, interlocutoryReviewState",
-            "ALL_DETAILS, withDwp",
-            "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, withDwp"})
+            "ALL_DETAILS, validAppeal",
+            "ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
     public void appealShouldBeSavedViaSya(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = getRandomNino();
@@ -109,7 +109,7 @@ public class SubmitAppealTest {
         final Long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
         SscsCaseDetails sscsCaseDetails = findCaseInCcd(id);
         if (expected.getAppellant().getAppointee() == null) {
-            sscsCaseDetails.getData().getAppeal().getAppellant().setAppointee(null);
+            expected.setAppellant(expected.getAppellant().toBuilder().appointee(Appointee.builder().build()).build());
         }
         log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
