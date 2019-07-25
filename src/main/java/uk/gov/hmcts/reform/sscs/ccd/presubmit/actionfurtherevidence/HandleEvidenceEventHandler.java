@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -70,17 +69,17 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
-                if (scannedDocument != null && scannedDocument.getValue() != null
-                        && !equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
+                if (scannedDocument != null && scannedDocument.getValue() != null) {
                     List<SscsDocument> documents = new ArrayList<>();
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents = sscsCaseData.getSscsDocument();
                     }
-                    SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument);
-                    documents.add(sscsDocument);
-                    sscsCaseData.setSscsDocument(documents);
-                    sscsCaseData.setEvidenceHandled(workOutEvidenceHandled(sscsCaseData.getEvidenceHandled(),
-                        sscsDocument.getValue().getDocumentType()));
+                    if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
+                        SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument);
+                        documents.add(sscsDocument);
+                        sscsCaseData.setSscsDocument(documents);
+                    }
+                    sscsCaseData.setEvidenceHandled("Yes");
                 } else {
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
                 }
@@ -88,15 +87,6 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         }
         sscsCaseData.setScannedDocuments(null);
 
-    }
-
-    private String workOutEvidenceHandled(String evidenceHandled, String documentType) {
-        if ((StringUtils.isBlank(evidenceHandled) || "No".equalsIgnoreCase(evidenceHandled))
-            && (documentType.equals(APPELLANT_EVIDENCE.getValue())
-            || documentType.equals(REPRESENTATIVE_EVIDENCE.getValue()))) {
-            return "Yes";
-        }
-        return evidenceHandled;
     }
 
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
