@@ -61,13 +61,6 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
-    public void givenAInterlocSendToJudge_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.INTERLOC_SENT_TO_JUDGE);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
     public void givenAJudgeDirectionIssued_thenReturnTrue() {
         when(callback.getEvent()).thenReturn(EventType.JUDGE_DIRECTION_ISSUED);
 
