@@ -255,4 +255,13 @@ public class HandleEvidenceEventHandlerTest {
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
+    @Test
+    public void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertNull(updated.getData().getDwpFurtherEvidenceStates());
+    }
+
 }
