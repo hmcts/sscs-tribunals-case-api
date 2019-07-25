@@ -14,6 +14,7 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,6 +82,7 @@ public class HandleEvidenceEventHandlerTest {
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
 
         sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1234")
             .scannedDocuments(scannedDocumentList)
             .furtherEvidenceAction(furtherEvidenceActionList)
             .originalSender(originalSender)
@@ -122,6 +124,31 @@ public class HandleEvidenceEventHandlerTest {
         if (null != furtherEvidenceActionList && null != originalSender) {
             assertHappyPaths(expectedDocumentType, expectedEvidenceHandled, response);
         }
+    }
+
+    @Test
+    public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocuments() {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .type("coversheet")
+                        .fileName("bla.pdf")
+                        .subtype("sscs1")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .scannedDate("2019-06-12T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+        scannedDocumentList = new ArrayList<>();
+        scannedDocumentList.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(scannedDocumentList);
+        sscsCaseData.setFurtherEvidenceAction(buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
+                "Other document type - action manually"));
+        sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
+                "Appellant (or Appointee)"));
+        sscsCaseData.setEvidenceHandled("No");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
     }
 
     private void assertHappyPaths(String expectedDocumentType, String expectedEvidenceHandled,
