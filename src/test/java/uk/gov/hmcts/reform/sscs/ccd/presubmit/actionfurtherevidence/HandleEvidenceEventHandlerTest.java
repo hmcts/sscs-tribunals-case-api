@@ -216,6 +216,24 @@ public class HandleEvidenceEventHandlerTest {
     }
 
     @Test
+    public void givenACaseWithScannedDocumentWithEmptyValues_thenHandleTheDocument() {
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals("www.test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
     public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
         sscsCaseData.setScannedDocuments(null);
 
@@ -225,6 +243,24 @@ public class HandleEvidenceEventHandlerTest {
 
         for (String error : response.getErrors()) {
             assertEquals("No further evidence to process", error);
+        }
+    }
+
+    @Test
+    public void givenADocumentWithNoUrl_thenAddAnErrorToResponse() {
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        for (String error : response.getErrors()) {
+            assertEquals("No document URL so could not process", error);
         }
     }
 

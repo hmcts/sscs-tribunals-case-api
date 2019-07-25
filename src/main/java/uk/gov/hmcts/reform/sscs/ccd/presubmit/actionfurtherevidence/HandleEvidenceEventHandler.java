@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
+
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
@@ -48,9 +50,9 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
         if (sscsCaseData.getScannedDocuments() == null) {
-            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
-                new PreSubmitCallbackResponse<>(sscsCaseData);
             preSubmitCallbackResponse.addError("No further evidence to process");
             return preSubmitCallbackResponse;
         }
@@ -65,10 +67,16 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
+
+                    if (scannedDocument.getValue().getUrl() != null) {
+                        preSubmitCallbackResponse.addError("No document URL so could not process");
+                    }
+
                     List<SscsDocument> documents = new ArrayList<>();
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents = sscsCaseData.getSscsDocument();
                     }
+
                     SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument);
                     documents.add(sscsDocument);
                     sscsCaseData.setSscsDocument(documents);
@@ -94,9 +102,12 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         String controlNumber = scannedDocument.getValue().getControlNumber();
         String fileName = scannedDocument.getValue().getFileName();
 
-        LocalDateTime localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate());
+        String scannedDate = null;
+        if (scannedDocument.getValue().getScannedDate() != null) {
+            LocalDateTime localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate());
+            scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
+        }
 
-        String scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
         DocumentLink url = scannedDocument.getValue().getUrl();
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
