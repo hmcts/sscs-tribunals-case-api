@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -222,9 +224,9 @@ public class HandleEvidenceEventHandlerTest {
         }
     }
 
-    private Callback<SscsCaseData> buildCallback() {
-        DynamicList dynamicList = new DynamicList(new DynamicListItem("issueFurtherEvidence", "label"),
-                Collections.singletonList(new DynamicListItem("issueFurtherEvidence", "label")));
+    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode) {
+        DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
+                Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .originalSender(dynamicList)
                 .furtherEvidenceAction(dynamicList)
@@ -237,12 +239,20 @@ public class HandleEvidenceEventHandlerTest {
 
     @Test
     public void givenIssueFurtherEvidence_shouldUpdateDwpFurtherEvidenceStates() {
-        Callback<SscsCaseData> callback = buildCallback(
-        );
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.code);
 
         PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("furtherEvidenceReceived", updated.getData().getDwpFurtherEvidenceStates());
+    }
+
+    @Test
+    public void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.code);
+
+        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
 }
