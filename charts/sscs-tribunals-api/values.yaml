@@ -1,5 +1,5 @@
 java:
-  image: 'https://hmcts.azurecr.io/hmcts/sscs-tribunals-api:latest'
+  image: 'https://hmctspublic.azurecr.io/hmcts/sscs/tribunals-api:latest'
   applicationPort: 8080
   keyVaults:
     sscs:
