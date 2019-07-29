@@ -251,7 +251,7 @@ public class HandleEvidenceEventHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().build()).build();
+                ScannedDocumentDetails.builder().fileName("Testing.jpg").build()).build();
 
         docs.add(scannedDocument);
 
@@ -259,9 +259,30 @@ public class HandleEvidenceEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
 
+        assertEquals(1, response.getErrors().size());
+
         for (String error : response.getErrors()) {
             assertEquals("No document URL so could not process", error);
         }
     }
 
+    @Test
+    public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse() {
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+
+        docs.add(scannedDocument);
+
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("No document file name so could not process", error);
+        }
+    }
 }

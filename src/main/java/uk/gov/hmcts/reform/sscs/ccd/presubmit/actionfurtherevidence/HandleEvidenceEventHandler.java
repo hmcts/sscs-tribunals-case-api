@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.OTHER_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
@@ -17,13 +15,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -52,14 +44,9 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getScannedDocuments() == null) {
-            preSubmitCallbackResponse.addError("No further evidence to process");
-            return preSubmitCallbackResponse;
-        }
-
         buildSscsDocumentFromScan(sscsCaseData);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return preSubmitCallbackResponse;
     }
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData) {
@@ -68,8 +55,12 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
 
-                    if (scannedDocument.getValue().getUrl() != null) {
+                    if (scannedDocument.getValue().getUrl() == null) {
                         preSubmitCallbackResponse.addError("No document URL so could not process");
+                    }
+
+                    if (scannedDocument.getValue().getFileName() == null) {
+                        preSubmitCallbackResponse.addError("No document file name so could not process");
                     }
 
                     List<SscsDocument> documents = new ArrayList<>();
@@ -84,7 +75,10 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
                         sscsDocument.getValue().getDocumentType()));
                 }
             }
+        } else {
+            preSubmitCallbackResponse.addError("No further evidence to process");
         }
+
         sscsCaseData.setScannedDocuments(null);
 
     }
