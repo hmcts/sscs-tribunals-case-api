@@ -17,7 +17,6 @@ import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import net.serenitybdd.rest.SerenityRest;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -121,7 +120,7 @@ public class IdamConsumerTest {
         headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
 
         String actualResponseBody =
-                SerenityRest
+                RestAssured
                         .given()
                         .headers(headers)
                         .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -164,7 +163,7 @@ public class IdamConsumerTest {
         body.add("redirect_uri", CLIENT_REDIRECT_URI);
 
         String actualResponseBody =
-                SerenityRest
+                RestAssured
                         .given()
                         .headers(headers)
                         .contentType(ContentType.URLENC)
@@ -200,7 +199,7 @@ public class IdamConsumerTest {
 
         String actualResponseBody =
 
-                SerenityRest
+                RestAssured
                         .given()
                         .headers(headers)
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
