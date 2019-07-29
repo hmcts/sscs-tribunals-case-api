@@ -51,7 +51,7 @@ public class IdamConsumerTest {
         RestAssured.config().encoderConfig(new EncoderConfig("UTF-8", "UTF-8"));
     }
 
-    @Pact(provider = "idam_api", consumer = "ia_case_api")
+    @Pact(provider = "idam_api", consumer = "sscs_tribunals_case_api")
     public RequestResponsePact executeGetIdamAuthCodeAndGet200Response(PactDslWithProvider builder) {
 
         Map<String, String> headers = Maps.newHashMap();
@@ -72,7 +72,7 @@ public class IdamConsumerTest {
 
     }
 
-    @Pact(provider = "idam_api", consumer = "ia_case_api")
+    @Pact(provider = "idam_api", consumer = "sscs_tribunals_case_api")
     public RequestResponsePact executeGetIdamAuthTokenAndGet200(PactDslWithProvider builder) {
 
         Map<String, String> headers = Maps.newHashMap();
@@ -81,7 +81,7 @@ public class IdamConsumerTest {
 
         return builder
                 .given("Idam successfully returns user details")
-                .uponReceiving("Provider receives a GET /code request from an IA API")
+                .uponReceiving("Provider receives a GET /code request from an SSCS Tribunals Case API")
                 .path(IDAM_OAUTH2_TOKEN_URL)
                 .headers(headers)
                 .method(HttpMethod.POST.toString())
@@ -95,7 +95,7 @@ public class IdamConsumerTest {
 
     }
 
-    @Pact(provider = "idam_api", consumer = "ia_case_api")
+    @Pact(provider = "idam_api", consumer = "sscs_tribunals_case_api")
     public RequestResponsePact executeGetUserDetailsAndGet200(PactDslWithProvider builder) {
 
         Map<String, String> headers = Maps.newHashMap();
@@ -103,7 +103,7 @@ public class IdamConsumerTest {
 
         return builder
                 .given("Idam successfully returns user details")
-                .uponReceiving("Provider receives a GET /details request from an IA API")
+                .uponReceiving("Provider receives a GET /details request from an SSCS Tribunals Case API")
                 .path(IDAM_DETAILS_URL)
                 .method(HttpMethod.GET.toString())
                 .headers(headers)
@@ -194,7 +194,7 @@ public class IdamConsumerTest {
         body.add("code", "some-code");
         body.add("grant_type", "authorization_code");
         body.add("redirect_uri", CLIENT_REDIRECT_URI);
-        body.add("client_id", "ia");
+        body.add("client_id", "sscs");
         body.add("client_secret", "some-client-secret");
 
         String actualResponseBody =
@@ -223,13 +223,13 @@ public class IdamConsumerTest {
     }
 
     private PactDslJsonBody createUserDetailsResponse() {
-        PactDslJsonArray array = new PactDslJsonArray().stringValue("caseofficer-ia");
+        PactDslJsonArray array = new PactDslJsonArray().stringValue("caseworker-sscs");
 
         return new PactDslJsonBody()
                 .stringValue("id", "123")
-                .stringValue("email", "ia-caseofficer@fake.hmcts.net")
+                .stringValue("email", "sscs-caseworker@fake.hmcts.net")
                 .stringValue("forename", "Case")
-                .stringValue("surname", "Officer")
+                .stringValue("surname", "Worker")
                 .stringValue("roles", array.toString());
 
     }
