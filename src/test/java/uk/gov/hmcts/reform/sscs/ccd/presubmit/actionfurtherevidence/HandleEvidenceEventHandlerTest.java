@@ -7,9 +7,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+<<<<<<< HEAD
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+=======
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+>>>>>>> fix imports
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -125,21 +129,21 @@ public class HandleEvidenceEventHandlerTest {
     @Test
     public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocuments() {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder()
-                        .type("coversheet")
-                        .fileName("bla.pdf")
-                        .subtype("sscs1")
-                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .scannedDate("2019-06-12T00:00:00.000")
-                        .controlNumber("123")
-                        .build()).build();
+            ScannedDocumentDetails.builder()
+                .type("coversheet")
+                .fileName("bla.pdf")
+                .subtype("sscs1")
+                .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                .scannedDate("2019-06-12T00:00:00.000")
+                .controlNumber("123")
+                .build()).build();
         scannedDocumentList = new ArrayList<>();
         scannedDocumentList.add(scannedDocument);
         sscsCaseData.setScannedDocuments(scannedDocumentList);
         sscsCaseData.setFurtherEvidenceAction(buildFurtherEvidenceActionItemListForGivenOption(APPELLANT_EVIDENCE.getValue(),
-                "\"Appellant (or Appointee)"));
+            "\"Appellant (or Appointee)"));
         sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
-                "Appellant (or Appointee)"));
+            "Appellant (or Appointee)"));
         sscsCaseData.setEvidenceHandled("No");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
