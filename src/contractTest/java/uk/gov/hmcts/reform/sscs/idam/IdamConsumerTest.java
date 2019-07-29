@@ -94,62 +94,6 @@ public class IdamConsumerTest {
 
     }
 
-    @Pact(provider = "idam_api", consumer = "sscs_tribunals_case_api")
-    public RequestResponsePact executeGetUserDetailsAndGet200(PactDslWithProvider builder) {
-
-        Map<String, String> headers = Maps.newHashMap();
-        headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
-
-        return builder
-                .given("Idam successfully returns user details")
-                .uponReceiving("Provider receives a GET /details request from an SSCS API")
-                .path(IDAM_DETAILS_URL)
-                .method(HttpMethod.GET.toString())
-                .headers(headers)
-                .willRespondWith()
-                .status(HttpStatus.OK.value())
-                .body(createUserDetailsResponse())
-                .toPact();
-    }
-
-    @Test
-    @PactTestFor(pactMethod = "executeGetUserDetailsAndGet200")
-    public void should_get_user_details_with_access_token(MockServer mockServer) throws JSONException {
-
-        Map<String, String> headers = Maps.newHashMap();
-        headers.put(HttpHeaders.AUTHORIZATION, ACCESS_TOKEN);
-
-        String actualResponseBody =
-                RestAssured
-                        .given()
-                        .headers(headers)
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .when()
-                        .get(mockServer.getUrl() + IDAM_DETAILS_URL)
-                        .then()
-                        .statusCode(200)
-                        .and()
-                        .extract()
-                        .body()
-                        .asString();
-
-        assertThat(actualResponseBody).isNotNull();
-
-        JSONObject response = new JSONObject(actualResponseBody);
-
-        assertThat(response).hasNoNullFieldsOrProperties();
-        assertThat(response.getString("id")).isNotBlank();
-        assertThat(response.getString("forename")).isNotBlank();
-        assertThat(response.getString("surname")).isNotBlank();
-
-        JSONArray rolesArr = new JSONArray(response.getString("roles"));
-
-        assertThat(rolesArr).isNotNull();
-        assertThat(rolesArr.length()).isNotZero();
-        assertThat(rolesArr.get(0).toString()).isNotBlank();
-
-    }
-
     @Test
     @PactTestFor(pactMethod = "executeGetIdamAuthCodeAndGet200Response")
     public void should_post_to_oauth2_authorize_and_receive_code_with_200_response(MockServer mockServer) throws JSONException {
@@ -219,18 +163,6 @@ public class IdamConsumerTest {
         assertThat(response.getString("access_token")).isNotBlank();
         assertThat(response.getString("token_type")).isEqualTo("Bearer");
         assertThat(response.getString("expires_in")).isNotBlank();
-
-    }
-
-    private PactDslJsonBody createUserDetailsResponse() {
-        PactDslJsonArray array = new PactDslJsonArray().stringValue("caseworker-sscs");
-
-        return new PactDslJsonBody()
-                .stringValue("id", "123")
-                .stringValue("email", "sscs-caseworker@fake.hmcts.net")
-                .stringValue("forename", "Case")
-                .stringValue("surname", "Worker")
-                .stringValue("roles", array.toString());
 
     }
 
