@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.REPRESENTATIVE_EVIDENCE;
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -27,7 +29,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
+@Slf4j
 public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private static final String COVERSHEET = "coversheet";
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -69,25 +74,19 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents = sscsCaseData.getSscsDocument();
                     }
-                    SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument);
-                    documents.add(sscsDocument);
-                    sscsCaseData.setSscsDocument(documents);
-                    sscsCaseData.setEvidenceHandled(workOutEvidenceHandled(sscsCaseData.getEvidenceHandled(),
-                        sscsDocument.getValue().getDocumentType()));
+                    if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
+                        SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument);
+                        documents.add(sscsDocument);
+                        sscsCaseData.setSscsDocument(documents);
+                    }
+                    sscsCaseData.setEvidenceHandled("Yes");
+                } else {
+                    log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
                 }
             }
         }
         sscsCaseData.setScannedDocuments(null);
 
-    }
-
-    private String workOutEvidenceHandled(String evidenceHandled, String documentType) {
-        if ((StringUtils.isBlank(evidenceHandled) || "No".equalsIgnoreCase(evidenceHandled))
-            && (documentType.equals(APPELLANT_EVIDENCE.getValue())
-            || documentType.equals(REPRESENTATIVE_EVIDENCE.getValue()))) {
-            return "Yes";
-        }
-        return evidenceHandled;
     }
 
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
