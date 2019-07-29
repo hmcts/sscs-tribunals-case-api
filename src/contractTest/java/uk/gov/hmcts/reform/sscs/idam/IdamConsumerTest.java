@@ -60,7 +60,7 @@ public class IdamConsumerTest {
 
         return builder
                 .given("Idam returns the auth code ")
-                .uponReceiving("Provider receives a POST request from an IA API")
+                .uponReceiving("Provider receives a POST request from an SSCS API")
                 .path(IDAM_OAUTH2_AUTHORIZE_URL)
                 .method(HttpMethod.POST.toString())
                 .headers(headers)
@@ -81,7 +81,7 @@ public class IdamConsumerTest {
 
         return builder
                 .given("Idam successfully returns user details")
-                .uponReceiving("Provider receives a GET /code request from an SSCS Tribunals Case API")
+                .uponReceiving("Provider receives a GET /code request from an SSCS API")
                 .path(IDAM_OAUTH2_TOKEN_URL)
                 .headers(headers)
                 .method(HttpMethod.POST.toString())
@@ -103,7 +103,7 @@ public class IdamConsumerTest {
 
         return builder
                 .given("Idam successfully returns user details")
-                .uponReceiving("Provider receives a GET /details request from an SSCS Tribunals Case API")
+                .uponReceiving("Provider receives a GET /details request from an SSCS API")
                 .path(IDAM_DETAILS_URL)
                 .method(HttpMethod.GET.toString())
                 .headers(headers)
@@ -134,9 +134,10 @@ public class IdamConsumerTest {
                         .body()
                         .asString();
 
+        assertThat(actualResponseBody).isNotNull();
+
         JSONObject response = new JSONObject(actualResponseBody);
 
-        assertThat(actualResponseBody).isNotNull();
         assertThat(response).hasNoNullFieldsOrProperties();
         assertThat(response.getString("id")).isNotBlank();
         assertThat(response.getString("forename")).isNotBlank();
@@ -159,7 +160,7 @@ public class IdamConsumerTest {
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("response_type", "code");
-        body.add("client_id", "ia");
+        body.add("client_id", "sscs");
         body.add("redirect_uri", CLIENT_REDIRECT_URI);
 
         String actualResponseBody =

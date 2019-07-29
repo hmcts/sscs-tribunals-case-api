@@ -76,8 +76,8 @@ sourceSets {
     }
     contractTest {
         java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
+            compileClasspath += main.output
+            runtimeClasspath += main.output
             srcDir file('src/contractTest/java')
         }
         resources.srcDir file('src/contractTest/resources')
@@ -278,7 +278,7 @@ dependencies {
     testCompile "org.junit.jupiter:junit-jupiter-api:5.3.2"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.3.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.2"
-
+    
     //pact contract testing
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
@@ -360,5 +360,4 @@ task contract(type: Test, description: 'Runs the pact contract tests.', group: '
     useJUnitPlatform()
     testClassesDirs = sourceSets.contractTest.output.classesDirs
     classpath = sourceSets.contractTest.runtimeClasspath
-
 }
