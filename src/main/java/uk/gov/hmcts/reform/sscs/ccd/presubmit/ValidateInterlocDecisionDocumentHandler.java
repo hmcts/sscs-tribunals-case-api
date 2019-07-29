@@ -13,10 +13,16 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
 public class ValidateInterlocDecisionDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callbackType == CallbackType.ABOUT_TO_SUBMIT && (
+        boolean canHandle = callbackType == CallbackType.ABOUT_TO_SUBMIT && (
                 callback.getEvent() == EventType.TCW_DECISION_APPEAL_TO_PROCEED
                         || callback.getEvent() == EventType.JUDGE_DECISION_APPEAL_TO_PROCEED
-            );
+        );
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        log.info("Can handle callback for case ["+ caseDetails.getCaseData().getCcdCaseId() + "]" +
+                " for type [" + callbackType + "]" +
+                " event [" + callback.getEvent() + "]" +
+                " can handle [" + canHandle + "]");
+        return canHandle;
     }
 
     @Override
