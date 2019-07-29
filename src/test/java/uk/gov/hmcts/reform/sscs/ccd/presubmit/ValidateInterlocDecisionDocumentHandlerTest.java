@@ -22,6 +22,18 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     @Before
     public void setUp() {
         callback = mock(Callback.class);
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("123456789")
+                .build();
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
+                1L,
+                "sscs",
+                State.INTERLOCUTORY_REVIEW_STATE,
+                sscsCaseData,
+                LocalDateTime.now()
+        );
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+
         validateInterlocDecisionDocumentHandler = new ValidateInterlocDecisionDocumentHandler();
     }
 
