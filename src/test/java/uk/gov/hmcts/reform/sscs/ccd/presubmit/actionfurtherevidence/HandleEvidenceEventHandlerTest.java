@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,6 +79,7 @@ public class HandleEvidenceEventHandlerTest {
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
 
         sscsCaseData = SscsCaseData.builder()
+            .ccdCaseId("1234")
             .scannedDocuments(scannedDocumentList)
             .furtherEvidenceAction(furtherEvidenceActionList)
             .originalSender(originalSender)
@@ -103,8 +106,7 @@ public class HandleEvidenceEventHandlerTest {
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
                                                                          @Nullable DynamicList originalSender,
                                                                          @Nullable String evidenceHandle,
-                                                                         String expectedDocumentType,
-                                                                         @Nullable String expectedEvidenceHandled) {
+                                                                         String expectedDocumentType) {
         sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
         sscsCaseData.setOriginalSender(originalSender);
         sscsCaseData.setEvidenceHandled(evidenceHandle);
@@ -116,11 +118,37 @@ public class HandleEvidenceEventHandlerTest {
             assertTrue(furtherEvidenceActionList == null || originalSender == null);
         }
         if (null != furtherEvidenceActionList && null != originalSender) {
-            assertHappyPaths(expectedDocumentType, expectedEvidenceHandled, response);
+            assertHappyPaths(expectedDocumentType, response);
         }
     }
 
-    private void assertHappyPaths(String expectedDocumentType, String expectedEvidenceHandled,
+    @Test
+    public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocuments() {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .type("coversheet")
+                        .fileName("bla.pdf")
+                        .subtype("sscs1")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .scannedDate("2019-06-12T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+        scannedDocumentList = new ArrayList<>();
+        scannedDocumentList.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(scannedDocumentList);
+        sscsCaseData.setFurtherEvidenceAction(buildFurtherEvidenceActionItemListForGivenOption(APPELLANT_EVIDENCE.getValue(),
+                "\"Appellant (or Appointee)"));
+        sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
+                "Appellant (or Appointee)"));
+        sscsCaseData.setEvidenceHandled("No");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
+        assertEquals("Yes", response.getData().getEvidenceHandled());
+    }
+
+    private void assertHappyPaths(String expectedDocumentType,
                                   PreSubmitCallbackResponse<SscsCaseData> response) {
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
         assertEquals("bla.pdf", sscsDocumentDetail.getDocumentFileName());
@@ -130,7 +158,7 @@ public class HandleEvidenceEventHandlerTest {
         assertEquals("123", sscsDocumentDetail.getControlNumber());
         assertEquals("No", response.getData().getSscsDocument().get(0).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
-        assertEquals(expectedEvidenceHandled, response.getData().getEvidenceHandled());
+        assertEquals("Yes", response.getData().getEvidenceHandled());
     }
 
     private Object[] generateFurtherEvidenceActionListScenarios() {
@@ -153,29 +181,29 @@ public class HandleEvidenceEventHandlerTest {
 
         return new Object[]{
             //other options scenarios
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other document", null},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "No", "Other document", "No"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other document", "No"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, "Other document", null},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Yes", "Other document", "Yes"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", "Other document", "Yes"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "No", "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Yes", "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", "Other document"},
             //issue parties scenarios
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, "appellantEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "No", "appellantEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "Yes", "appellantEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", "representativeEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "Yes", "representativeEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, "representativeEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, "appellantEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "No", "appellantEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "Yes", "appellantEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", "representativeEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "Yes", "representativeEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, "representativeEvidence"},
             //interloc scenarios
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, "appellantEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", "appellantEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "Yes", "appellantEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, "representativeEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "No", "representativeEvidence", "Yes"},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "Yes", "representativeEvidence", "Yes"},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, "appellantEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", "appellantEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "Yes", "appellantEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, "representativeEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "No", "representativeEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "Yes", "representativeEvidence"},
             //edge cases scenarios
-            new Object[]{null, representativeOriginalSender, "", "", null}, //edge case: furtherEvidenceActionOption is null
-            new Object[]{furtherEvidenceActionListIssueParties, null, null, "", null} //edge case: originalSender is null
+            new Object[]{null, representativeOriginalSender, "", ""}, //edge case: furtherEvidenceActionOption is null
+            new Object[]{furtherEvidenceActionListIssueParties, null, null, ""} //edge case: originalSender is null
         };
     }
 

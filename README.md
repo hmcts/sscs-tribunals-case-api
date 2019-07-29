@@ -86,6 +86,26 @@ To run all mutation tests execute the following command:
 ./gradlew pitest
 ```
 
+### Running contract or pact tests:
+
+You can run contract or pact tests as follows:
+
+```
+./gradlew contract
+```
+
+You can then publish your pact tests locally by first running the pact docker-compose:
+
+```
+docker-compose -f docker-pactbroker-compose.yml up
+```
+
+and then using it to publish your tests:
+
+```
+./gradlew pactPublish
+```
+
 ## Gotchas
 
 PRs that start with _"Bump"_ won't have a preview environment. The decision was made after we realised that most the preview environments were created by Depandabot.
