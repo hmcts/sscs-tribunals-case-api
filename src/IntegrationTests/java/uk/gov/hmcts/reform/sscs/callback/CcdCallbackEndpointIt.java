@@ -172,6 +172,26 @@ public class CcdCallbackEndpointIt {
     }
 
     @Test
+    public void coversheetFurtherEvidence_shouldNotAddToDocuments() throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replaceFirst("informationReceivedForInterloc", "otherDocumentManual");
+        json = json.replaceFirst("Information received for interlocutory review", "Other document type - action manually");
+        json = json.replaceFirst("appellantEvidence", "coversheet");
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertNull(result.getData().getInterlocReviewState());
+        assertNull(result.getData().getScannedDocuments());
+        assertNull(result.getData().getSscsDocument());
+        assertEquals("Yes", result.getData().getEvidenceHandled());
+    }
+
+    @Test
     public void shouldHandleInterlocEventEventCallback() throws Exception {
         String path = getClass().getClassLoader().getResource("callback/interlocEventCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
