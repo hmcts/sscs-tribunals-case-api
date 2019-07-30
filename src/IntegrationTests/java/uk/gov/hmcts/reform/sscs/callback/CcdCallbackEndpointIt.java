@@ -5,6 +5,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -119,7 +120,26 @@ public class CcdCallbackEndpointIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertEquals(2, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(1, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(2, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(ISSUE_FURTHER_EVIDENCE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
+        assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+    }
+
+    @Test
+    public void givenFurtherEvidenceIssueToAllParties_shouldUpdateDwpFurtherEvidenceState() throws Exception {
+        String path = Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replaceFirst("informationReceivedForInterloc", "issueFurtherEvidence");
+        json = json.replaceFirst("Information received for interlocutory review", "Issue further evidence to all parties");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertNull(result.getData().getInterlocReviewState());
+        assertEquals("furtherEvidenceReceived", result.getData().getDwpFurtherEvidenceStates());
     }
 
     @Test
@@ -137,6 +157,7 @@ public class CcdCallbackEndpointIt {
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertEquals("interlocutoryReview", result.getData().getInterlocReviewState());
+        assertNull(result.getData().getDwpFurtherEvidenceStates());
     }
 
     private void mockCcd() {

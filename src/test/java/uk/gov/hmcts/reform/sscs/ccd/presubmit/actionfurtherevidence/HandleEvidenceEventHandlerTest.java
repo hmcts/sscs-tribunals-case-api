@@ -8,10 +8,15 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -22,16 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class HandleEvidenceEventHandlerTest {
@@ -272,6 +268,46 @@ public class HandleEvidenceEventHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("No further evidence to process", error);
         }
+    }
+
+    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode) {
+        DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
+                Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .originalSender(dynamicList)
+                .furtherEvidenceAction(dynamicList)
+                .scannedDocuments(Collections.singletonList(ScannedDocument.builder().build()))
+                .build();
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
+                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+        return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE);
+    }
+
+    @Test
+    public void givenIssueFurtherEvidence_shouldUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.code);
+
+        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals("furtherEvidenceReceived", updated.getData().getDwpFurtherEvidenceStates());
+    }
+
+    @Test
+    public void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.code);
+
+        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertNull(updated.getData().getDwpFurtherEvidenceStates());
+    }
+
+    @Test
+    public void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
+        Callback<SscsCaseData> callback = buildCallback(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
     @Test

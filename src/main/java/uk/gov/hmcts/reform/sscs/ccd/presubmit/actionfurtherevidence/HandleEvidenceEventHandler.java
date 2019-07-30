@@ -2,7 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
@@ -22,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 @Slf4j
 public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
 
     private static final String COVERSHEET = "coversheet";
 
@@ -48,9 +51,21 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
+            sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+        }
+
         buildSscsDocumentFromScan(sscsCaseData);
 
         return preSubmitCallbackResponse;
+    }
+
+    private boolean isIssueFurtherEvidenceToAllParties(DynamicList furtherEvidenceActionList) {
+        if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
+                && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
+            return furtherEvidenceActionList.getValue().getCode().equals(ISSUE_FURTHER_EVIDENCE.getCode());
+        }
+        return false;
     }
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData) {
