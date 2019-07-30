@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.OTHER_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
@@ -15,7 +13,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -30,6 +27,8 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
 
     private static final String COVERSHEET = "coversheet";
+
+    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -50,12 +49,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        if (sscsCaseData.getScannedDocuments() == null) {
-            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
-                new PreSubmitCallbackResponse<>(sscsCaseData);
-            preSubmitCallbackResponse.addError("No further evidence to process");
-            return preSubmitCallbackResponse;
-        }
+        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
             sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
@@ -63,7 +57,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         buildSscsDocumentFromScan(sscsCaseData);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return preSubmitCallbackResponse;
     }
 
     private boolean isIssueFurtherEvidenceToAllParties(DynamicList furtherEvidenceActionList) {
@@ -79,6 +73,15 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
+
+                    if (scannedDocument.getValue().getUrl() == null) {
+                        preSubmitCallbackResponse.addError("No document URL so could not process");
+                    }
+
+                    if (scannedDocument.getValue().getFileName() == null) {
+                        preSubmitCallbackResponse.addError("No document file name so could not process");
+                    }
+
                     List<SscsDocument> documents = new ArrayList<>();
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents = sscsCaseData.getSscsDocument();
@@ -93,7 +96,10 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
                 }
             }
+        } else {
+            preSubmitCallbackResponse.addError("No further evidence to process");
         }
+
         sscsCaseData.setScannedDocuments(null);
 
     }
@@ -102,9 +108,12 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         String controlNumber = scannedDocument.getValue().getControlNumber();
         String fileName = scannedDocument.getValue().getFileName();
 
-        LocalDateTime localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate());
+        String scannedDate = null;
+        if (scannedDocument.getValue().getScannedDate() != null) {
+            LocalDateTime localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate());
+            scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
+        }
 
-        String scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
         DocumentLink url = scannedDocument.getValue().getUrl();
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
