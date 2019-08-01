@@ -113,6 +113,30 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     }
 
     @Test
+    public void errorWhenHandlingCallbackAndInterlocDecisionDocumentLinkHasNotBeenSet() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
+                        .documentDateAdded("some date")
+                        .documentFileName("File")
+                        .documentType("Decision Notice")
+                        .build())
+                .build();
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(
+                1L,
+                "sscs",
+                State.INTERLOCUTORY_REVIEW_STATE,
+                sscsCaseData,
+                LocalDateTime.now()
+        );
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+
+        assertThat(response.getData(), is(sscsCaseData));
+        assertThat(response.getErrors(), is(Sets.newHashSet("Interloc decision document must be set")));
+    }
+
+    @Test
     public void errorWhenHandlingCallbackAndInterlocDecisionDocumentIsNotPdf() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
