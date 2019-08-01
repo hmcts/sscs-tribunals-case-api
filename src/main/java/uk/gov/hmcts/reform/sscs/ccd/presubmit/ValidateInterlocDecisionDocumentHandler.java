@@ -36,7 +36,10 @@ public class ValidateInterlocDecisionDocumentHandler implements PreSubmitCallbac
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         log.info("Checking for case [" + caseData.getCcdCaseId() + "] we have [" + caseData.getSscsInterlocDecisionDocument() + "]");
-        if (caseData.getSscsInterlocDecisionDocument() == null || caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded() == null) {
+        if (
+                caseData.getSscsInterlocDecisionDocument() == null
+                        || caseData.getSscsInterlocDecisionDocument().getDocumentLink() == null
+        ) {
             sscsCaseDataPreSubmitCallbackResponse.addError("Interloc decision document must be set");
         } else if (!isPdf(caseData.getSscsInterlocDecisionDocument())) {
             sscsCaseDataPreSubmitCallbackResponse.addError("Interloc decision document must be a PDF");
