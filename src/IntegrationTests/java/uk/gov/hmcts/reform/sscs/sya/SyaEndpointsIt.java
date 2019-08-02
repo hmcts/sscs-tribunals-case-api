@@ -16,10 +16,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
@@ -136,7 +133,13 @@ public class SyaEndpointsIt {
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(null);
         given(ccdClient.startEvent(any(), any(), anyString())).willReturn(StartEventResponse.builder().eventId("12345").build());
-        given(ccdClient.submitEventForCaseworker(any(), any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
+        given(ccdClient.submitEventForCaseworker(any(), any(), any())).willReturn(CaseDetails.builder()
+                .id(123456789876L)
+                .data(new HashMap<>()).build());
+        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder()
+                .id(123456789876L)
+                .data(new HashMap<>())
+                .build());
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
         given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString(), anyString()))
@@ -157,7 +160,6 @@ public class SyaEndpointsIt {
     public void givenAValidAppeal_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
@@ -186,8 +188,6 @@ public class SyaEndpointsIt {
     public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
-
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
         mockMvc.perform(post("/appeals")
@@ -213,8 +213,6 @@ public class SyaEndpointsIt {
     public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.submitForCaseworker(any(), any())).willReturn(CaseDetails.builder().id(123456789876L).build());
-
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
         mockMvc.perform(post("/appeals")
@@ -238,7 +236,7 @@ public class SyaEndpointsIt {
 
     @Test
     public void shouldNotAddDuplicateCaseToCcdAndShouldNotGeneratePdf() throws Exception {
-        CaseDetails caseDetails = CaseDetails.builder().id(1L).build();
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).data(new HashMap<>()).build();
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
 
