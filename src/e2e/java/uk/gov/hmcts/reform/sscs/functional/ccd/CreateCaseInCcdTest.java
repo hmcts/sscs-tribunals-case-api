@@ -6,8 +6,6 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
-import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.RandomStringUtils;
-import java.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,18 +17,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
-import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.exception.EmailSendFailedException;
-import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
@@ -42,16 +35,7 @@ public class CreateCaseInCcdTest {
     private CcdService ccdService;
 
     @Autowired
-    private CcdClient ccdClient;
-
-    @Autowired
-    private CcdRequestDetails ccdRequestDetails;
-
-    @Autowired
     private IdamService idamService;
-
-    @Autowired
-    private SubmitAppealService submitAppealService;
 
     private IdamTokens idamTokens;
 
@@ -76,24 +60,6 @@ public class CreateCaseInCcdTest {
         SscsCaseDetails caseDetails = ccdService.createCase(caseData, "appealCreated",
                 "Appeal created summary", "Appeal created description", idamTokens);
         assertNotNull(caseDetails);
-    }
-
-    @Test
-    public void givenASyaCaseShouldBeSavedIntoCcdViaSubmitAppealService() {
-        try {
-            SyaCaseWrapper wrapper = ALL_DETAILS.getDeserializeMessage();
-            wrapper.getAppellant().setNino(RandomStringUtils.random(9, true, true).toUpperCase());
-            wrapper.getMrn().setDate(LocalDate.now());
-
-            Long id = submitAppealService.submitAppeal(wrapper, "");
-            assertEquals("withDwp", findStateOfCaseInCcd(id));
-        } catch (EmailSendFailedException | PdfGenerationException ep) {
-            assertTrue(true);
-        }
-    }
-
-    private String findStateOfCaseInCcd(Long id) {
-        return ccdService.getByCaseId(id, idamTokens).getState();
     }
 
     @Test

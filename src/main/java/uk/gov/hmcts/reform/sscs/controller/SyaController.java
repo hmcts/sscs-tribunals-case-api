@@ -54,8 +54,10 @@ public class SyaController {
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,
             syaCaseWrapper.getBenefitType().getCode());
-
-        return status(HttpStatus.CREATED).build();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(caseId).toUri();
+        log.info(location.toString());
+        return created(location).build();
     }
 
     @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)

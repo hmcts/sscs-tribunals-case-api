@@ -8,7 +8,6 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
-import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import java.time.LocalDate;
@@ -24,10 +23,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
@@ -41,16 +36,11 @@ import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
-import uk.gov.hmcts.reform.sscs.domain.email.RoboticsEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
-import uk.gov.hmcts.reform.sscs.domain.robotics.RoboticsWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.json.RoboticsJsonMapper;
-import uk.gov.hmcts.reform.sscs.json.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.model.AirlookupBenefitToVenue;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
@@ -85,15 +75,6 @@ public class SubmitAppealServiceTest {
     @Mock
     private IdamService idamService;
 
-    @Mock
-    private RoboticsJsonMapper roboticsJsonMapper;
-
-    @Mock
-    private RoboticsJsonValidator roboticsJsonValidator;
-
-    @Mock
-    private RoboticsJsonUploadService roboticsJsonUploadService;
-
     @Captor
     private ArgumentCaptor<Email> emailCaptor;
 
@@ -102,9 +83,6 @@ public class SubmitAppealServiceTest {
     private SubmitAppealService submitAppealService;
 
     private final SyaCaseWrapper appealData = getSyaCaseWrapper();
-
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    private RoboticsWrapper roboticsWrapper;
 
     private final JSONObject json = new JSONObject();
 
@@ -124,7 +102,6 @@ public class SubmitAppealServiceTest {
     @Before
     public void setUp() {
         when(airLookupService.lookupRegionalCentre("CF10")).thenReturn("Cardiff");
-        when(airLookupService.lookupAirVenueNameByPostCode("TN32")).thenReturn(AirlookupBenefitToVenue.builder().pipVenue("Ashford").esaVenue("Ashford").build());
 
         submitYourAppealEmailTemplate =
             new SubmitYourAppealEmailTemplate("from", "to", "message");
@@ -133,32 +110,12 @@ public class SubmitAppealServiceTest {
             new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
 
-        ResponseEntity<Resource> mockResponseEntity = mock(ResponseEntity.class);
-        ByteArrayResource stubbedResource = new ByteArrayResource(new byte[]{});
-        when(mockResponseEntity.getBody()).thenReturn(stubbedResource);
-
-        when(authTokenGenerator.generate()).thenReturn("token");
-        when(evidenceDownloadClientApi.downloadBinary(anyString(), anyString(), anyString(), anyString(), anyString()))
-            .thenReturn(mockResponseEntity);
-
-        EvidenceManagementService evidenceManagementService =
-            new EvidenceManagementService(authTokenGenerator, documentUploadClientApi, evidenceDownloadClientApi,
-                evidenceMetadataDownloadClientApi);
-
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
             submitYourAppealEmailTemplate, ccdPdfService);
 
-        RoboticsEmailTemplate roboticsEmailTemplate =
-            new RoboticsEmailTemplate("from", "to", "message");
-
-        RoboticsService roboticsService = new RoboticsService(airLookupService, emailService, roboticsJsonMapper,
-            roboticsJsonValidator, roboticsEmailTemplate, roboticsJsonUploadService);
-
         submitAppealService = new SubmitAppealService(
-            ccdService, citizenCcdService, sscsPdfService, roboticsService, regionalProcessingCenterService,
-            idamService, evidenceManagementService, convertAintoBService);
-
-        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", true);
+            ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
+            idamService, convertAintoBService);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -167,10 +124,6 @@ public class SubmitAppealServiceTest {
 
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
-        roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(
-            convertSyaToCcdCaseData(appealData)).ccdCaseId(123L).evidencePresent("No").build();
-
-        given(roboticsJsonMapper.map(any())).willReturn(json);
     }
 
     @Test
@@ -182,23 +135,8 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
-    }
-
-    @Test
-    public void givenCaseDoesNotExistInCcdAndSendToDwpFeatureFlagOff_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndNoSentToDwpEvent() {
-        byte[] expected = {};
-        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
-
-        submitAppealService.submitAppeal(appealData, userToken);
-
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
@@ -275,64 +213,6 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldSendRoboticsByEmailPdfOnly_whenFeatureFlagOff() {
-        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
-
-        byte[] expected = {};
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
-
-        submitAppealService.submitAppeal(appealData, userToken);
-
-        verify(emailService, times(2)).sendEmail(emailCaptor.capture());
-        Email roboticsEmail = emailCaptor.getAllValues().get(1);
-        assertEquals("Expecting 2 attachments", 2, roboticsEmail.getAttachments().size());
-    }
-
-    @Test
-    public void shouldNotSendRoboticsByEmailWithEvidence_whenFeatureFlagOn() {
-
-        byte[] expected = {};
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
-
-        Document stubbedDocument = new Document();
-        Document.Link stubbedLink = new Document.Link();
-        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
-        Document.Links stubbedLinks = new Document.Links();
-        stubbedLinks.binary = stubbedLink;
-        stubbedDocument.links = stubbedLinks;
-        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
-
-        submitAppealService.submitAppeal(appealDataWithEvidence(), userToken);
-
-        verify(emailService, times(1)).sendEmail(emailCaptor.capture());
-    }
-
-    @Test
-    public void shouldSendRoboticsByEmailWithEvidence_whenFeatureFlagOff() {
-        ReflectionTestUtils.setField(submitAppealService, "sendToDwpFeature", false);
-
-        byte[] expected = {};
-
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any(Map.class))).willReturn(expected);
-
-        Document stubbedDocument = new Document();
-        Document.Link stubbedLink = new Document.Link();
-        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
-        Document.Links stubbedLinks = new Document.Links();
-        stubbedLinks.binary = stubbedLink;
-        stubbedDocument.links = stubbedLinks;
-        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
-
-        submitAppealService.submitAppeal(appealDataWithEvidence(), userToken);
-
-        verify(emailService, times(2)).sendEmail(emailCaptor.capture());
-        Email roboticsEmail = emailCaptor.getAllValues().get(1);
-        assertEquals("Expecting 5 attachments", 5, roboticsEmail.getAttachments().size());
-    }
-
-    @Test
     public void testPostcodeSplit() {
         assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN32 6PL"));
     }
@@ -369,7 +249,6 @@ public class SubmitAppealServiceTest {
         Document.Links stubbedLinks = new Document.Links();
         stubbedLinks.binary = stubbedLink;
         stubbedDocument.links = stubbedLinks;
-        given(evidenceMetadataDownloadClientApi.getDocumentMetadata(anyString(), anyString(), anyString(), anyString(), anyString())).willReturn(stubbedDocument);
 
         byte[] expected = {1, 2, 3};
         given(pdfServiceClient.generateFromHtml(any(byte[].class),
@@ -378,9 +257,6 @@ public class SubmitAppealServiceTest {
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
             .build());
         SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
-
-        roboticsWrapper = RoboticsWrapper.builder()
-            .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(987L).evidencePresent("Yes").build();
 
         submitAppealService.submitAppeal(appealData, null);
 
@@ -439,9 +315,6 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
             .willReturn(SscsCaseDetails.builder().build());
 
-        roboticsWrapper = RoboticsWrapper.builder()
-            .sscsCaseData(convertSyaToCcdCaseData(appealData)).ccdCaseId(null).evidencePresent("No").build();
-
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService, never()).createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class));
@@ -457,7 +330,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(SYA_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(citizenCcdService).draftArchived(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
 
 

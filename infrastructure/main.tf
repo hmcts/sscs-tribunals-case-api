@@ -47,6 +47,12 @@ data "azurerm_key_vault_secret" "robotics_email_to" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+data "azurerm_key_vault_secret" "robotics_email_scottish_to" {
+  name      = "robotics-email-scottish-to"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
+
 data "azurerm_key_vault_secret" "smtp_host" {
   name      = "smtp-host"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
@@ -118,10 +124,11 @@ module "tribunals-case-api" {
 
     ROBOTICS_EMAIL_FROM    = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
     ROBOTICS_EMAIL_TO      = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
+    ROBOTICS_EMAIL_SCOTTISH_TO = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
     ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
     ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
 
-    SEND_TO_DWP_ENABLED    = "${var.send_to_dwp_enabled}"
+    ISSUE_FURTHER_EVIDENCE_ENABLED    = "${var.issue_further_evidence_enabled}"
 
     EMAIL_SERVER_HOST      = "${data.azurerm_key_vault_secret.smtp_host.value}"
     EMAIL_SERVER_PORT      = "${data.azurerm_key_vault_secret.smtp_port.value}"

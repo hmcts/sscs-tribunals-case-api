@@ -3,18 +3,13 @@ package uk.gov.hmcts.reform.sscs.service;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
-import java.net.URI;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
@@ -24,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
@@ -39,32 +33,23 @@ public class SubmitAppealService {
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
     private final SscsPdfService sscsPdfService;
-    private final RoboticsService roboticsService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
-    private final EvidenceManagementService evidenceManagementService;
     private final ConvertAintoBService convertAintoBService;
-
-    @Value("${feature.send_to_dwp}")
-    private Boolean sendToDwpFeature;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
                         SscsPdfService sscsPdfService,
-                        RoboticsService roboticsService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        EvidenceManagementService evidenceManagementService,
                         ConvertAintoBService convertAintoBService) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
         this.sscsPdfService = sscsPdfService;
-        this.roboticsService = roboticsService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
-        this.evidenceManagementService = evidenceManagementService;
         this.convertAintoBService = convertAintoBService;
     }
 
@@ -76,7 +61,7 @@ public class SubmitAppealService {
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(appeal, firstHalfOfPostcode, caseData, idamTokens, caseDetails, event, userToken);
+        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, event, userToken);
         // in case of duplicate case the caseDetails will be null
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
@@ -104,21 +89,16 @@ public class SubmitAppealService {
             .build();
     }
 
-    private void postCreateCaseInCcdProcess(SyaCaseWrapper appeal, String firstHalfOfPostcode, SscsCaseData caseData,
+    private void postCreateCaseInCcdProcess(SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
                                             String userToken) {
         if (null != caseDetails) {
-            byte[] pdf = sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
-            Map<String, byte[]> additionalEvidence = downloadEvidence(appeal);
-            if (event.equals(SYA_APPEAL_CREATED)) {
-                if (sendToDwpFeature) {
-                    log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
-                    caseData.setDateSentToDwp(LocalDate.now().toString());
-                    ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
-                    log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
-                } else {
-                    roboticsService.sendCaseToRobotics(caseData, caseDetails.getId(), firstHalfOfPostcode, pdf, additionalEvidence);
-                }
+            sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
+            if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
+                log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
+                caseData.setDateSentToDwp(LocalDate.now().toString());
+                ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
+                log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
             }
             if (StringUtils.isNotEmpty(userToken)) {
                 citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
@@ -183,30 +163,9 @@ public class SubmitAppealService {
     private EventType findEventType(SscsCaseData caseData) {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
-            return mrnDate.plusMonths(13L).isBefore(LocalDate.now()) ? NON_COMPLIANT : SYA_APPEAL_CREATED;
+            return mrnDate.plusMonths(13L).isBefore(LocalDate.now()) ? NON_COMPLIANT : VALID_APPEAL_CREATED;
         } else {
             return INCOMPLETE_APPLICATION_RECEIVED;
         }
     }
-
-    private Map<String, byte[]> downloadEvidence(SyaCaseWrapper appeal) {
-        if (hasEvidence(appeal)) {
-            Map<String, byte[]> map = new LinkedHashMap<>();
-            for (SyaEvidence evidence : appeal.getReasonsForAppealing().getEvidences()) {
-                map.put(evidence.getFileName(), downloadBinary(evidence));
-            }
-            return map;
-        } else {
-            return Collections.emptyMap();
-        }
-    }
-
-    private boolean hasEvidence(SyaCaseWrapper appeal) {
-        return CollectionUtils.isNotEmpty(appeal.getReasonsForAppealing().getEvidences());
-    }
-
-    private byte[] downloadBinary(SyaEvidence evidence) {
-        return evidenceManagementService.download(URI.create(evidence.getUrl()), DM_STORE_USER_ID);
-    }
-
 }

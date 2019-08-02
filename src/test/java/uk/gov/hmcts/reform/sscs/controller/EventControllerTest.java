@@ -64,5 +64,4 @@ public class EventControllerTest {
                 .header("ServiceAuthorization", "")
                 .content(content)).andExpect(status().isOk());
     }
-
 }

@@ -6,6 +6,7 @@
    ]]></notes>
         <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
         <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
+        <cve>CVE-2019-12814</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
@@ -85,5 +86,21 @@
    ]]></notes>
         <gav regex="true">^org\.apache\.tomcat\.embed:tomcat-embed-core:.*$</gav>
         <cpe>cpe:/a:apache:tomcat</cpe>
+        <cve>CVE-2019-10072</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: gradle-pitest-plugin-1.4.0.jar
+   ]]></notes>
+        <sha1>29a4ed185eeca1d90b0f4160911029ec692e746f</sha1>
+        <cve>CVE-2019-11065</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: sscs-pdf-email-common-1.0.8.jar: jquery-1.11.3.js
+   ]]></notes>
+        <sha1>c041edaa88886863aa784de15170a08a2b9f17ba</sha1>
+        <cve>CVE-2015-9251</cve>
+        <cve>CVE-2019-11358</cve>
     </suppress>
 </suppressions>

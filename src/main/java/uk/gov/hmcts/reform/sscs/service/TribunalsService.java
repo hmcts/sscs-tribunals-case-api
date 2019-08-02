@@ -50,7 +50,12 @@ public class TribunalsService {
             throw new AppealNotFoundException(appealNumber);
         }
 
-        return trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()), caseByAppealNumber.getId());
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()), caseByAppealNumber.getId());
+        ObjectNode appealNode = objectNode.with("appeal");
+        if (appealNode != null) {
+            appealNode.put("appealNumber", appealNumber);
+        }
+        return objectNode;
     }
 
     public ObjectNode findAppeal(Long caseId) {

@@ -10,6 +10,6 @@ output "sscs-output" {
   value = "sscs-output"
 }
 
-output "send_to_dwp_enabled" {
-  value = "${var.send_to_dwp_enabled}"
+output "issue_further_evidence_enabled" {
+  value = "${var.issue_further_evidence_enabled}"
 }

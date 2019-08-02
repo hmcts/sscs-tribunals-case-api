@@ -40,6 +40,15 @@ public class EventController {
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestBody String message) {
 
+        SscsCaseDataWrapper sscsCaseDataWrapper = getSscsCaseDataWrapper(serviceAuthHeader, message);
+        eventService.sendEvent(sscsCaseDataWrapper.getNotificationEventType(),
+                sscsCaseDataWrapper.getNewSscsCaseData());
+
+        log.info("Event handled for case {}, {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
+                sscsCaseDataWrapper.getNotificationEventType());
+    }
+
+    private SscsCaseDataWrapper getSscsCaseDataWrapper(String serviceAuthHeader, String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
 
         CaseDetails<SscsCaseData> caseDetailsBefore = callback.getCaseDetailsBefore().orElse(null);
@@ -51,11 +60,7 @@ public class EventController {
                 sscsCaseDataWrapper.getNotificationEventType());
 
         authorisationService.authorise(serviceAuthHeader);
-        eventService.sendEvent(sscsCaseDataWrapper.getNotificationEventType(),
-                sscsCaseDataWrapper.getNewSscsCaseData());
-
-        log.info("Event handled for case {}, {}", sscsCaseDataWrapper.getNewSscsCaseData().getCcdCaseId(),
-                sscsCaseDataWrapper.getNotificationEventType());
+        return sscsCaseDataWrapper;
     }
 
     private SscsCaseDataWrapper buildSscsCaseDataWrapper(SscsCaseData caseData, SscsCaseData caseDataBefore, EventType event) {
@@ -64,5 +69,4 @@ public class EventController {
                 .oldSscsCaseData(caseDataBefore)
                 .notificationEventType(event).build();
     }
-
 }
