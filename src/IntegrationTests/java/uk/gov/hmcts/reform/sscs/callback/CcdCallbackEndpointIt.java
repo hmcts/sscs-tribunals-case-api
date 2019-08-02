@@ -332,8 +332,24 @@ public class CcdCallbackEndpointIt {
     }
 
     @Test
-    @Parameters({"appealCreated", "validAppeal", "incompleteApplication"})
-    public void shouldNotAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
+    public void shouldNotAddAppendixToFooterOfPdfOnEventCallback() throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replaceFirst("issueFurtherEvidence", "otherDocumentManual");
+        json = json.replaceFirst("Issue further evidence to all parties", "Other document type - action manually");
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertNull(result.getData().getScannedDocuments());
+        assertEquals(1, result.getData().getSscsDocument().size());
+        verifyNoMoreInteractions(evidenceManagementService);
+    }
+
+    @Test
+    public void shouldNotAddAppendixToFooterOfPdfOnIfNotIssueingFurtherEvidenceToAllPartiesEventCallback(String state) throws Exception {
         String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         json = json.replaceAll("dormantAppealState", state);
@@ -347,7 +363,6 @@ public class CcdCallbackEndpointIt {
         assertEquals(1, result.getData().getSscsDocument().size());
         verifyNoMoreInteractions(evidenceManagementService);
     }
-
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
         return mockMvc.perform(requestBuilder).andReturn().getResponse();
     }
