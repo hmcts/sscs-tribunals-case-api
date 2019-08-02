@@ -363,6 +363,7 @@ public class CcdCallbackEndpointIt {
         assertEquals(1, result.getData().getSscsDocument().size());
         verifyNoMoreInteractions(evidenceManagementService);
     }
+
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
         return mockMvc.perform(requestBuilder).andReturn().getResponse();
     }
