@@ -12,10 +12,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.Furth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -26,17 +23,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @RunWith(JUnitParamsRunner.class)
 public class HandleEvidenceEventHandlerTest {
@@ -49,6 +37,9 @@ public class HandleEvidenceEventHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private EvidenceManagementService evidenceManagementService;
+
     private SscsCaseData sscsCaseData;
 
     private List<ScannedDocument> scannedDocumentList = new ArrayList<>();
@@ -56,7 +47,7 @@ public class HandleEvidenceEventHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handleEvidenceEventHandler = new HandleEvidenceEventHandler();
+        handleEvidenceEventHandler = new HandleEvidenceEventHandler(evidenceManagementService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -357,5 +348,33 @@ public class HandleEvidenceEventHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("No document file name so could not process", error);
         }
+    }
+
+    @Test
+    @Parameters({"", "A", "B", "C", "D", "X", "Y"})
+    public void canWorkOutTheNextAppendixValue(String currentAppendix) {
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        if (!currentAppendix.equals("")) {
+            SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix(currentAppendix).build()).build();
+            sscsDocuments.add(theDocument);
+
+            if (currentAppendix.toCharArray()[0] > 'A') {
+                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("A").build()).build();
+                sscsDocuments.add(document);
+            }
+            if (currentAppendix.toCharArray()[0] > 'B') {
+                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("B").build()).build();
+                sscsDocuments.add(document);
+            }
+            if (currentAppendix.toCharArray()[0] > 'C') {
+                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("C").build()).build();
+                sscsDocuments.add(document);
+            }
+        }
+
+        String actual = handleEvidenceEventHandler.getNextBundleAddition(sscsDocuments);
+
+        String expected = currentAppendix.equals("") ? "A" : String.valueOf((char)(currentAppendix.charAt(0) +  1));
+        assertEquals(expected, actual);
     }
 }

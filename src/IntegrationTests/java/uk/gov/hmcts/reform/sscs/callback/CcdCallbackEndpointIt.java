@@ -2,9 +2,13 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -15,15 +19,20 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import javax.servlet.http.HttpServletResponse;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.hamcrest.core.StringEndsWith;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,11 +43,14 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -49,9 +61,11 @@ import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@RunWith(JUnitParamsRunner.class)
 public class CcdCallbackEndpointIt {
 
     @Rule
@@ -75,16 +89,34 @@ public class CcdCallbackEndpointIt {
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
+
     @MockBean
     private IdamApiClient idamApiClient;
+
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
+    @MockBean
+    private EvidenceManagementService evidenceManagementService;
+
+    @MockBean
+    UploadResponse uploadResponse;
+
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
+    }
+
+    private Document createDocument() {
+        Document document = new Document();
+        Document.Links links = new Document.Links();
+        Document.Link link = new Document.Link();
+        link.href = "a location";
+        links.self = link;
+        document.links = links;
+        return document;
     }
 
     @Test
@@ -266,6 +298,54 @@ public class CcdCallbackEndpointIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertTrue(result.getErrors().isEmpty());
+    }
+
+    @Test
+    @Parameters({"dormantAppealState", "readyForHearing", "hearing"})
+    public void shouldAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replaceAll("dormantAppealState", state);
+
+        ArgumentCaptor<List<MultipartFile>> captor = ArgumentCaptor.forClass(List.class);
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
+        List<Document> documents = Collections.singletonList(createDocument());
+        when(embedded.getDocuments()).thenReturn(documents);
+        when(uploadResponse.getEmbedded()).thenReturn(embedded);
+        when(evidenceManagementService.upload(captor.capture(), anyString())).thenReturn(uploadResponse);
+
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertNull(result.getData().getScannedDocuments());
+        assertEquals(1, result.getData().getSscsDocument().size());
+        byte[] newBytes = captor.getValue().get(0).getBytes();
+        PDDocument newPdf = PDDocument.load(newBytes);
+        String text = new PDFTextStripper().getText(newPdf);
+        assertThat(text, StringEndsWith.endsWith("Appellant evidence | Appendix  A        1\n"));
+    }
+
+    @Test
+    @Parameters({"appealCreated", "validAppeal", "incompleteApplication"})
+    public void shouldNotAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
+        String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replaceAll("dormantAppealState", state);
+        HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
+
+        assertNull(result.getData().getScannedDocuments());
+        assertEquals(1, result.getData().getSscsDocument().size());
+        verifyNoMoreInteractions(evidenceManagementService);
     }
 
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {

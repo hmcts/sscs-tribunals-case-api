@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils.equalsIgnoreCase;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
@@ -11,33 +13,40 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.Furth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
+import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @Component
 @Slf4j
 public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
-
+    private static final String DM_STORE_USER_ID = "sscs";
     private static final String COVERSHEET = "coversheet";
 
     private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
+    private final EvidenceManagementService evidenceManagementService;
+
+    @Autowired
+    public HandleEvidenceEventHandler(EvidenceManagementService evidenceManagementService) {
+        this.evidenceManagementService = evidenceManagementService;
+    }
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -64,7 +73,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
             sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
         }
 
-        buildSscsDocumentFromScan(sscsCaseData);
+        buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState());
 
         return preSubmitCallbackResponse;
     }
@@ -77,7 +86,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         return false;
     }
 
-    private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData) {
+    private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState) {
 
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
@@ -93,10 +102,10 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
                     List<SscsDocument> documents = new ArrayList<>();
                     if (sscsCaseData.getSscsDocument() != null) {
-                        documents = sscsCaseData.getSscsDocument();
+                        documents.addAll(sscsCaseData.getSscsDocument());
                     }
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
-                        SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument);
+                        SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
                         documents.add(sscsDocument);
                         sscsCaseData.setSscsDocument(documents);
                     }
@@ -113,9 +122,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
     }
 
-    private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
-        String controlNumber = scannedDocument.getValue().getControlNumber();
-        String fileName = scannedDocument.getValue().getFileName();
+    private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
 
         String scannedDate = null;
         if (scannedDocument.getValue().getScannedDate() != null) {
@@ -125,6 +132,17 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
+        log.info("document link: " + url);
+
+        if (caseState != null && (caseState.equals(State.DORMANT_APPEAL_STATE)
+                || caseState.equals(State.HEARING)
+                || caseState.equals(State.READY_FOR_HEARING))) {
+            url = addFooter(sscsCaseData, url);
+            log.info("footer mangled document link: " + url);
+        }
+
+        String fileName = scannedDocument.getValue().getFileName();
+        String controlNumber = scannedDocument.getValue().getControlNumber();
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
             .documentType(getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
                 sscsCaseData.getOriginalSender().getValue().getCode()))
@@ -134,6 +152,47 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
             .controlNumber(controlNumber)
             .evidenceIssued("No")
             .build()).build();
+    }
+
+    private DocumentLink addFooter(SscsCaseData sscsCaseData, DocumentLink url) {
+
+        String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
+        String documentType = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
+        String bundleAddition = getNextBundleAddition(sscsCaseData.getSscsDocument());
+
+        byte[] oldContent = toBytes(url.getDocumentUrl());
+        PdfWatermarker alter = new PdfWatermarker();
+        byte[] newContent;
+        try {
+            newContent = alter.shrinkAndWatermarkPdf(oldContent, String.format("%s | Appendix  %s", documentType, bundleAddition));
+        } catch (Exception e) {
+            log.error("Caught exception :" + e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+        ByteArrayMultipartFile file = ByteArrayMultipartFile.builder()
+                .content(newContent)
+                .name(url.getDocumentFilename())
+                .contentType(APPLICATION_PDF).build();
+
+        UploadResponse uploadResponse = evidenceManagementService.upload(singletonList(file), DM_STORE_USER_ID);
+        String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
+
+        return url.toBuilder().documentUrl(location).documentBinaryUrl(location).build();
+    }
+
+    protected String getNextBundleAddition(List<SscsDocument> sscsDocument) {
+        if (sscsDocument == null) {
+            sscsDocument = new ArrayList<>();
+        }
+        String[] appendixArray = sscsDocument.stream().filter(s -> StringUtils.isNotEmpty(s.getValue().getAppendix())).map(s -> s.getValue().getAppendix()).toArray(String[]::new);
+        Arrays.sort(appendixArray);
+        if (appendixArray.length >  0) {
+            char nextChar =  (char) (StringUtils.upperCase(appendixArray[appendixArray.length - 1]).charAt(0) + 1);
+            return String.valueOf(nextChar);
+        }
+
+        return "A";
     }
 
     private String getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {
@@ -147,6 +206,13 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
             return REPRESENTATIVE_EVIDENCE.getValue();
         }
         throw new IllegalStateException("document Type could not be worked out");
+    }
+
+    private byte[] toBytes(String documentUrl) {
+        return evidenceManagementService.download(
+                URI.create(documentUrl),
+                DM_STORE_USER_ID
+        );
     }
 
 }
