@@ -55,9 +55,7 @@ public class PdfWatermarker {
 
         float rightTextWidth = (font.getStringWidth(rightText) / 1000.0f) * fontSize;
 
-        float xRightTextOffset = page.getMediaBox().getWidth() - margin - rightTextWidth;
-
-        float xLeftTextOffset = margin;
+        float xoffset = page.getMediaBox().getWidth() - margin - rightTextWidth;
 
         try (PDPageContentStream contentStream =
                      new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {
@@ -65,11 +63,11 @@ public class PdfWatermarker {
             contentStream.setFont(font, fontSize);
             contentStream.setNonStrokingColor(0);
             contentStream.beginText();
-            contentStream.newLineAtOffset(xLeftTextOffset, margin);
+            contentStream.newLineAtOffset((float) margin, margin);
             contentStream.showText(leftText);
             contentStream.endText();
             contentStream.beginText();
-            contentStream.newLineAtOffset(xRightTextOffset, margin);
+            contentStream.newLineAtOffset(xoffset, margin);
             contentStream.showText(rightText);
             contentStream.endText();
         }
