@@ -23,7 +23,7 @@ public class PdfWatermarker {
             int count = 1;
             for (PDPage page : document.getPages()) {
                 scaleContent(document, page, SCALE_PERCENTAGE);
-                addFooterText(document, page, leftText, rightText +"        " + count++);
+                addFooterText(document, page, leftText, rightText + "        " + count++);
             }
 
             PdfACompliance p1a = new PdfACompliance();
