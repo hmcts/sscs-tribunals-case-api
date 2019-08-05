@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,9 +52,16 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
         SscsCaseData caseData = caseDetails.getCaseData();
         log.info("Handling create appeal pdf event for case [" + caseData.getCcdCaseId() + "]");
 
+        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+
+        if (callback.getCaseDetails().getState() == INCOMPLETE_APPLICATION) {
+            sscsCaseDataPreSubmitCallbackResponse.addError("Case " + caseData.getCcdCaseId() + " in invalid state " +  callback.getCaseDetails().getState() + " for event " + callback.getEvent());
+            return sscsCaseDataPreSubmitCallbackResponse;
+        }
+
         createAppealPdfAndSendToRobotics(caseData);
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return sscsCaseDataPreSubmitCallbackResponse;
     }
 
 

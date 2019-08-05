@@ -124,6 +124,19 @@ public class RecreateAppealPdfHandlerTest {
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), eq(idamTokens), any());
     }
 
+    @Test
+    public void givenCaseIsIncomplete_thenShowCcdError() throws CcdException {
+        when(callback.getCaseDetails().getState()).thenReturn(State.INCOMPLETE_APPLICATION);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("Case 1234567890 in invalid state incompleteApplication for event CREATE_APPEAL_PDF", error);
+        }
+    }
+
     private SscsCaseData buildCaseDataWithoutPdf() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
         caseData.setSscsDocument(Collections.emptyList());
