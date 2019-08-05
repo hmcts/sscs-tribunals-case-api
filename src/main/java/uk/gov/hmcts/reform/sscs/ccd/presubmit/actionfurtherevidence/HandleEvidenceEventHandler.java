@@ -167,7 +167,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         PdfWatermarker alter = new PdfWatermarker();
         byte[] newContent;
         try {
-            newContent = alter.shrinkAndWatermarkPdf(oldContent, String.format("%s                  | Addition  %s", documentType, bundleAddition));
+            newContent = alter.shrinkAndWatermarkPdf(oldContent, documentType, String.format("Addition  %s", bundleAddition));
         } catch (Exception e) {
             log.error("Caught exception :" + e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);

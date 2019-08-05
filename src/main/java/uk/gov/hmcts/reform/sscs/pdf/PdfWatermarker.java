@@ -18,12 +18,12 @@ public class PdfWatermarker {
     private static final float SCALE_PERCENTAGE = .95f;
     private static final int margin = 50;
 
-    public byte[] shrinkAndWatermarkPdf(byte[] input, String watermarkText) throws Exception {
+    public byte[] shrinkAndWatermarkPdf(byte[] input, String leftText, String rightText) throws Exception {
         try (PDDocument document = PDDocument.load(input)) {
             int count = 1;
             for (PDPage page : document.getPages()) {
                 scaleContent(document, page, SCALE_PERCENTAGE);
-                addFooterText(document, page, watermarkText + "        " + count++);
+                addFooterText(document, page, leftText, rightText +"        " + count++);
             }
 
             PdfACompliance p1a = new PdfACompliance();
@@ -39,7 +39,7 @@ public class PdfWatermarker {
 
     // TODO amend this to be appropriately styled / designed / spaced - also bear in mind lower margins
     // need to be in place for bulk print support which will define the text positioning.
-    private void addFooterText(PDDocument document, PDPage page, String text)  throws IOException {
+    private void addFooterText(PDDocument document, PDPage page, String leftText, String rightText)  throws IOException {
 
         // NB we need to embed the font for PDF/A compliance.
         // Loading it here causes it to be embedded into the resulting PDF doc.
@@ -53,16 +53,24 @@ public class PdfWatermarker {
 
         int fontSize = 12;
 
-        float textWidth = (font.getStringWidth(text) / 1000.0f) * fontSize;
-        float xoffset = page.getMediaBox().getWidth() - margin - textWidth;
+        float rightTextWidth = (font.getStringWidth(rightText) / 1000.0f) * fontSize;
+
+        float xRightTextOffset = page.getMediaBox().getWidth() - margin - rightTextWidth;
+
+        float xLeftTextOffset = margin;
 
         try (PDPageContentStream contentStream =
                      new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {
+
             contentStream.setFont(font, fontSize);
             contentStream.setNonStrokingColor(0);
             contentStream.beginText();
-            contentStream.newLineAtOffset(xoffset, margin);
-            contentStream.showText(text);
+            contentStream.newLineAtOffset(xLeftTextOffset, margin);
+            contentStream.showText(leftText);
+            contentStream.endText();
+            contentStream.beginText();
+            contentStream.newLineAtOffset(xRightTextOffset, margin);
+            contentStream.showText(rightText);
             contentStream.endText();
         }
 
