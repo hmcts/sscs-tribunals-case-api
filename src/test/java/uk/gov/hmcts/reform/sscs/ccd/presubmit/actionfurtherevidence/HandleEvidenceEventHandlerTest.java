@@ -351,7 +351,7 @@ public class HandleEvidenceEventHandlerTest {
     }
 
     @Test
-    @Parameters({"", "A", "B", "C", "D", "X", "Y"})
+    @Parameters({ "Z"})
     public void canWorkOutTheNextAppendixValue(String currentAppendix) {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         if (!currentAppendix.equals("")) {

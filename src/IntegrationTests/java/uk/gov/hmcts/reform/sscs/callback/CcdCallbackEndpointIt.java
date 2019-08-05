@@ -301,7 +301,7 @@ public class CcdCallbackEndpointIt {
     }
 
     @Test
-    @Parameters({"dormantAppealState", "readyForHearing", "hearing"})
+    @Parameters({"dormantAppealState", "readyForHearing","responseReceived"})
     public void shouldAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
         String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
@@ -328,7 +328,7 @@ public class CcdCallbackEndpointIt {
         byte[] newBytes = captor.getValue().get(0).getBytes();
         PDDocument newPdf = PDDocument.load(newBytes);
         String text = new PDFTextStripper().getText(newPdf);
-        assertThat(text, StringEndsWith.endsWith("Appellant evidence | Appendix  A        1\n"));
+        assertThat(text, StringEndsWith.endsWith("Appellant evidence                  | Addition  A        1\n"));
     }
 
     @Test

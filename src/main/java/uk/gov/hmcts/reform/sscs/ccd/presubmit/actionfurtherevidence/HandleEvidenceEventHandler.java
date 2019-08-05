@@ -136,7 +136,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
                 && (caseState.equals(State.DORMANT_APPEAL_STATE)
-                || caseState.equals(State.HEARING)
+                || caseState.equals(State.RESPONSE_RECEIVED)
                 || caseState.equals(State.READY_FOR_HEARING))) {
             url = addFooter(sscsCaseData, url);
             log.info("footer appendix document link: " + url);
@@ -165,7 +165,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         PdfWatermarker alter = new PdfWatermarker();
         byte[] newContent;
         try {
-            newContent = alter.shrinkAndWatermarkPdf(oldContent, String.format("%s | Appendix  %s", documentType, bundleAddition));
+            newContent = alter.shrinkAndWatermarkPdf(oldContent, String.format("%s                  | Addition  %s", documentType, bundleAddition));
         } catch (Exception e) {
             log.error("Caught exception :" + e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
