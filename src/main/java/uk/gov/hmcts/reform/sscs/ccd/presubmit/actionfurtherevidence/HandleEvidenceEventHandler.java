@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
-import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils.equalsIgnoreCase;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.ComparatorUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -182,14 +184,29 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         return url.toBuilder().documentUrl(location).documentBinaryUrl(location).build();
     }
 
-    protected String getNextBundleAddition(List<SscsDocument> sscsDocument) {
+    String getNextBundleAddition(List<SscsDocument> sscsDocument) {
         if (sscsDocument == null) {
             sscsDocument = new ArrayList<>();
         }
-        String[] appendixArray = sscsDocument.stream().filter(s -> StringUtils.isNotEmpty(s.getValue().getAppendix())).map(s -> s.getValue().getAppendix()).toArray(String[]::new);
-        Arrays.sort(appendixArray);
+        String[] appendixArray = sscsDocument.stream().filter(s -> StringUtils.isNotEmpty(s.getValue().getAppendix())).map(s -> StringUtils.stripToEmpty(s.getValue().getAppendix())).toArray(String[]::new);
+        Arrays.sort(appendixArray, (o1, o2) -> {
+            if (StringUtils.isNotEmpty(o1) && StringUtils.isNotEmpty(o2) && o1.length() > 1 && o2.length() > 1) {
+                Integer n1 = NumberUtils.isNumber(o1.substring(1)) ? Integer.parseInt(o1.substring(1)) : 0;
+                Integer n2 = NumberUtils.isNumber(o2.substring(1)) ? Integer.parseInt(o2.substring(1)) : 0;
+                return ComparatorUtils.<Integer>naturalComparator().compare(n1, n2);
+            }
+            return ComparatorUtils.<String>naturalComparator().compare(o1, o2);
+        });
         if (appendixArray.length >  0) {
-            char nextChar =  (char) (StringUtils.upperCase(appendixArray[appendixArray.length - 1]).charAt(0) + 1);
+            String lastAppendix = appendixArray[appendixArray.length - 1];
+            char nextChar =  (char) (StringUtils.upperCase(lastAppendix).charAt(0) + 1);
+            if (nextChar > 'Z') {
+                if (lastAppendix.length() == 1) {
+                    return "Z1";
+                } else if (NumberUtils.isNumber(lastAppendix.substring(1))) {
+                    return "Z" + (Integer.valueOf(lastAppendix.substring(1)) + 1);
+                }
+            }
             return String.valueOf(nextChar);
         }
 
