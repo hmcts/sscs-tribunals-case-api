@@ -32,7 +32,7 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        boolean canHandle = callbackType == CallbackType.ABOUT_TO_SUBMIT
+        boolean canHandle = callbackType == CallbackType.SUBMITTED
                 && callback.getEvent() == EventType.CREATE_APPEAL_PDF;
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         log.info("Can handle callback for case [" + caseDetails.getCaseData().getCcdCaseId() + "]"

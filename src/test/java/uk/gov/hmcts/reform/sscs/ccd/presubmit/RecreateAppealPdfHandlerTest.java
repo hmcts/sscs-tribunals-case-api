@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
 import java.util.ArrayList;
@@ -82,7 +83,7 @@ public class RecreateAppealPdfHandlerTest {
 
         when(emailService.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
 
         assertEquals("No", response.getData().getEvidencePresent());
         assertNotNull(caseDetails.getCaseData().getAppeal().getAppellant().getAppointee());
@@ -98,7 +99,7 @@ public class RecreateAppealPdfHandlerTest {
 
         caseDetails.getCaseData().getAppeal().getAppellant().getAppointee().setName(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
 
         assertEquals("No", caseDetails.getCaseData().getEvidencePresent());
         assertNull(caseDetails.getCaseData().getAppeal().getAppellant().getAppointee());
@@ -116,7 +117,7 @@ public class RecreateAppealPdfHandlerTest {
 
         when(emailService.generateUniqueEmailId(caseDataWithPdf.getAppeal().getAppellant())).thenReturn("Test");
 
-        recreateAppealPdfHandler.handle(ABOUT_TO_SUBMIT, callback);
+        recreateAppealPdfHandler.handle(SUBMITTED, callback);
 
         assertNull(caseDetails.getCaseData().getEvidencePresent());
 
@@ -128,7 +129,7 @@ public class RecreateAppealPdfHandlerTest {
     public void givenCaseIsIncomplete_thenShowCcdError() throws CcdException {
         when(callback.getCaseDetails().getState()).thenReturn(State.INCOMPLETE_APPLICATION);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
 
         assertEquals(1, response.getErrors().size());
 
