@@ -1,65 +1,65 @@
-package uk.gov.hmcts.reform.sscs.service;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_APPEAL_PDF;
-
-import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.EmailService;
+import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
-@Service
+@Component
 @Slf4j
-public class EventService {
-
-    private static final Logger LOG = getLogger(EventService.class);
+public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final SscsPdfService sscsPdfService;
     private final EmailService emailService;
     private final IdamService idamService;
 
     @Autowired
-    EventService(SscsPdfService sscsPdfService,
-                 IdamService idamService,
-                 EmailService emailService) {
+    public RecreateAppealPdfHandler(SscsPdfService sscsPdfService, EmailService emailService, IdamService idamService) {
         this.sscsPdfService = sscsPdfService;
-        this.idamService = idamService;
         this.emailService = emailService;
+        this.idamService = idamService;
     }
 
-    public boolean handleEvent(EventType eventType, SscsCaseData caseData) {
+    @Override
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        boolean canHandle = callbackType == CallbackType.SUBMITTED
+                && callback.getEvent() == EventType.CREATE_APPEAL_PDF;
+        return canHandle;
+    }
 
-        if (CREATE_APPEAL_PDF == eventType) {
-            createAppealPdfAndSendToRobotics(caseData);
-            return true;
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
         }
 
-        return false;
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        SscsCaseData caseData = caseDetails.getCaseData();
+        log.info("Handling create appeal pdf event for case [" + caseData.getCcdCaseId() + "]");
+
+        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+
+        createAppealPdfAndSendToRobotics(caseData);
+
+        return sscsCaseDataPreSubmitCallbackResponse;
     }
 
-    private void handleEvent(Runnable eventHandler) {
-        Executors.newSingleThreadExecutor().submit(eventHandler);
-    }
 
     private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
-        boolean hasPdf = false;
-        try {
-            hasPdf = hasPdfDocument(caseData);
-        } catch (Exception e) {
-            LOG.error("Exception during checking the existing pdf document {}", e);
-        }
+        //FIXME: This code should be refactored to use the PDF generation for SYA
+        boolean hasPdf = hasPdfDocument(caseData);
 
-        LOG.info("Does case have pdf {}", hasPdf);
+        log.info("Does case have pdf {}", hasPdf);
         if (!hasPdf) {
-            LOG.info("Existing pdf document not found, start generating pdf ");
+            log.info("Existing pdf document not found, start generating pdf ");
             updateAppointeeNullIfNotPresent(caseData);
             caseData.setEvidencePresent(hasEvidence(caseData));
 
@@ -79,26 +79,13 @@ public class EventService {
         }
     }
 
-    public boolean sendEvent(EventType eventType, SscsCaseData caseData) {
-
-        if (CREATE_APPEAL_PDF == eventType) {
-            handleEvent(eventHandler(eventType, caseData));
-            return true;
-        }
-        return false;
-    }
-
-    private Runnable eventHandler(EventType eventType, SscsCaseData caseData) {
-        return () -> handleEvent(eventType, caseData);
-    }
-
     private boolean hasPdfDocument(SscsCaseData caseData) {
         String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
-        LOG.info("Case does have document {} and Pdf file name to check {} ",
+        log.info("Case does have document {} and Pdf file name to check {} ",
                 !CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
 
         for (SscsDocument document : caseData.getSscsDocument()) {
-            LOG.info("Existing document {} for case {} ",
+            log.info("Existing document {} for case {} ",
                     document != null ? document.getValue().getDocumentFileName() : null,
                     caseData.getCcdCaseId());
             if (document != null && fileName.equalsIgnoreCase(document.getValue().getDocumentFileName())) {
