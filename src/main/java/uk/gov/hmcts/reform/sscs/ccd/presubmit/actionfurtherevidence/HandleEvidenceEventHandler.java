@@ -138,7 +138,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
                 && (caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
                 || caseState.equals(State.READY_FOR_HEARING))) {
-            log.info("adding footer appendix document link: {} and caseId {}" , url, sscsCaseData.getCcdCaseId());
+            log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
             url = addFooter(sscsCaseData, url);
         }
 
