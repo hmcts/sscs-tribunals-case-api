@@ -55,12 +55,7 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
 
     private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
         //FIXME: This code should be refactored to use the PDF generation for SYA
-        boolean hasPdf = false;
-        try {
-            hasPdf = hasPdfDocument(caseData);
-        } catch (Exception e) {
-            log.error("Exception during checking the existing pdf document {}", e);
-        }
+        boolean hasPdf = hasPdfDocument(caseData);
 
         log.info("Does case have pdf {}", hasPdf);
         if (!hasPdf) {
