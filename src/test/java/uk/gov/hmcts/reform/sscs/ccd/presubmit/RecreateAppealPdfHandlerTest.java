@@ -75,7 +75,7 @@ public class RecreateAppealPdfHandlerTest {
     public void shouldNotCallPdfServiceIfEventIsDifferent() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
 
-        recreateAppealPdfHandler.handle(ABOUT_TO_SUBMIT, callback);
+        recreateAppealPdfHandler.handle(SUBMITTED, callback);
     }
 
     @Test
@@ -123,19 +123,6 @@ public class RecreateAppealPdfHandlerTest {
 
         verify(emailService, times(1)).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), eq(idamTokens), any());
-    }
-
-    @Test
-    public void givenCaseIsIncomplete_thenShowCcdError() throws CcdException {
-        when(callback.getCaseDetails().getState()).thenReturn(State.INCOMPLETE_APPLICATION);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
-
-        assertEquals(1, response.getErrors().size());
-
-        for (String error : response.getErrors()) {
-            assertEquals("Case 1234567890 in invalid state incompleteApplication for event CREATE_APPEAL_PDF", error);
-        }
     }
 
     private SscsCaseData buildCaseDataWithoutPdf() {

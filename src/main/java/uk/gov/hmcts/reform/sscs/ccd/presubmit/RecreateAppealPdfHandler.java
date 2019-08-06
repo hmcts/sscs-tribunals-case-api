@@ -1,7 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INCOMPLETE_APPLICATION;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,11 +32,6 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         boolean canHandle = callbackType == CallbackType.SUBMITTED
                 && callback.getEvent() == EventType.CREATE_APPEAL_PDF;
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        log.info("Can handle callback for case [" + caseDetails.getCaseData().getCcdCaseId() + "]"
-                + " for type [" + callbackType + "]"
-                + " event [" + callback.getEvent() + "]"
-                + " can handle [" + canHandle + "]");
         return canHandle;
     }
 
@@ -53,11 +46,6 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
         log.info("Handling create appeal pdf event for case [" + caseData.getCcdCaseId() + "]");
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
-        if (callback.getCaseDetails().getState() == INCOMPLETE_APPLICATION) {
-            sscsCaseDataPreSubmitCallbackResponse.addError("Case " + caseData.getCcdCaseId() + " in invalid state " +  callback.getCaseDetails().getState() + " for event " + callback.getEvent());
-            return sscsCaseDataPreSubmitCallbackResponse;
-        }
 
         createAppealPdfAndSendToRobotics(caseData);
 
