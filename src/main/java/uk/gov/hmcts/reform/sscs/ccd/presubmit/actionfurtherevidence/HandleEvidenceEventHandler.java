@@ -134,14 +134,12 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
-        log.info("document link: " + url);
-
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
                 && (caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
                 || caseState.equals(State.READY_FOR_HEARING))) {
+            log.info("adding footer appendix document link: {} and caseId {}" , url, sscsCaseData.getCcdCaseId());
             url = addFooter(sscsCaseData, url);
-            log.info("footer appendix document link: " + url);
         }
 
         String fileName = scannedDocument.getValue().getFileName();
