@@ -19,11 +19,6 @@ public class ValidateInterlocDecisionDocumentHandler implements PreSubmitCallbac
                 callback.getEvent() == EventType.TCW_DECISION_APPEAL_TO_PROCEED
                         || callback.getEvent() == EventType.JUDGE_DECISION_APPEAL_TO_PROCEED
         );
-        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        log.info("Can handle callback for case [" + caseDetails.getCaseData().getCcdCaseId() + "]"
-                + " for type [" + callbackType + "]"
-                + " event [" + callback.getEvent() + "]"
-                + " can handle [" + canHandle + "]");
         return canHandle;
     }
 
