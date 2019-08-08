@@ -355,19 +355,19 @@ public class HandleEvidenceEventHandlerTest {
     public void canWorkOutTheNextAppendixValue(String currentAppendix) {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         if (!currentAppendix.equals("")) {
-            SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix(currentAppendix).build()).build();
+            SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
             sscsDocuments.add(theDocument);
 
             if (currentAppendix.toCharArray()[0] > 'A') {
-                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("A").build()).build();
+                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("A").build()).build();
                 sscsDocuments.add(document);
             }
             if (currentAppendix.toCharArray()[0] > 'B') {
-                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("B").build()).build();
+                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("B").build()).build();
                 sscsDocuments.add(document);
             }
             if (currentAppendix.toCharArray()[0] > 'C') {
-                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("C").build()).build();
+                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("C").build()).build();
                 sscsDocuments.add(document);
             }
         }
@@ -381,28 +381,28 @@ public class HandleEvidenceEventHandlerTest {
     @Test
     @Parameters({"Z", "Z1", "Z9", "Z85", "Z100"})
     public void canWorkOutTheNextAppendixValueAfterZ(String currentAppendix) {
-        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix(currentAppendix).build()).build();
-        SscsDocument documentA = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("A").build()).build();
-        SscsDocument documentB = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("B").build()).build();
-        SscsDocument documentC = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("Y").build()).build();
+        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
+        SscsDocument documentA = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("A").build()).build();
+        SscsDocument documentB = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("B").build()).build();
+        SscsDocument documentC = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Y").build()).build();
         List<SscsDocument> sscsDocuments = new ArrayList<>(Arrays.asList(theDocument, documentA, documentB, documentC));
 
         int index = currentAppendix.length() == 1 ? 0 : (Integer.valueOf(currentAppendix.substring(1)));
 
         if (index > 0) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("Z").build()).build();
+            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z").build()).build();
             sscsDocuments.add(document);
         }
         if (index > 8) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("Z7").build()).build();
+            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z7").build()).build();
             sscsDocuments.add(document);
         }
         if (index > 30) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("Z28").build()).build();
+            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z28").build()).build();
             sscsDocuments.add(document);
         }
         if (index > 80) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix("Z79").build()).build();
+            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z79").build()).build();
             sscsDocuments.add(document);
         }
 
@@ -414,7 +414,7 @@ public class HandleEvidenceEventHandlerTest {
     @Test
     @Parameters({"Z!", "Z3$", "ZN"})
     public void nextAppendixCanHandleInvalidDataThatAreNotNumbersAfterZ(String currentAppendix) {
-        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().appendix(currentAppendix).build()).build();
+        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
         String actual = handleEvidenceEventHandler.getNextBundleAddition(Collections.singletonList(theDocument));
         assertEquals("[", actual);
     }

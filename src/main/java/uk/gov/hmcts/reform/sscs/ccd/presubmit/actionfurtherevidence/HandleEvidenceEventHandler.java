@@ -133,13 +133,15 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         }
 
         DocumentLink url = scannedDocument.getValue().getUrl();
+        String bundleAddition = null;
 
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
                 && (caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
                 || caseState.equals(State.READY_FOR_HEARING))) {
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
-            url = addFooter(sscsCaseData, url);
+            bundleAddition = getNextBundleAddition(sscsCaseData.getSscsDocument());
+            url = addFooter(sscsCaseData, url, bundleAddition);
         }
 
         String fileName = scannedDocument.getValue().getFileName();
@@ -149,17 +151,17 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
                 sscsCaseData.getOriginalSender().getValue().getCode()))
             .documentFileName(fileName)
             .documentLink(url)
+            .bundleAddition(bundleAddition)
             .documentDateAdded(scannedDate)
             .controlNumber(controlNumber)
             .evidenceIssued("No")
             .build()).build();
     }
 
-    private DocumentLink addFooter(SscsCaseData sscsCaseData, DocumentLink url) {
+    private DocumentLink addFooter(SscsCaseData sscsCaseData, DocumentLink url, String bundleAddition) {
 
         String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
         String documentType = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
-        String bundleAddition = getNextBundleAddition(sscsCaseData.getSscsDocument());
 
         byte[] oldContent = toBytes(url.getDocumentUrl());
         PdfWatermarker alter = new PdfWatermarker();
@@ -186,7 +188,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         if (sscsDocument == null) {
             sscsDocument = new ArrayList<>();
         }
-        String[] appendixArray = sscsDocument.stream().filter(s -> StringUtils.isNotEmpty(s.getValue().getAppendix())).map(s -> StringUtils.stripToEmpty(s.getValue().getAppendix())).toArray(String[]::new);
+        String[] appendixArray = sscsDocument.stream().filter(s -> StringUtils.isNotEmpty(s.getValue().getBundleAddition())).map(s -> StringUtils.stripToEmpty(s.getValue().getBundleAddition())).toArray(String[]::new);
         Arrays.sort(appendixArray, (o1, o2) -> {
             if (StringUtils.isNotEmpty(o1) && StringUtils.isNotEmpty(o2) && o1.length() > 1 && o2.length() > 1) {
                 Integer n1 = NumberUtils.isNumber(o1.substring(1)) ? Integer.parseInt(o1.substring(1)) : 0;
