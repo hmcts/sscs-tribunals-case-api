@@ -22,7 +22,7 @@ public class PdfWatermarkerTest {
                 "Appellant evidence","Addition  A");
         try (PDDocument doc = PDDocument.load(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
-            assertEquals("Appellant evidence Addition  A        1\n", text);
+            assertEquals("Appellant evidence Addition  A | Page 1\n", text);
         }
     }
 
@@ -38,8 +38,8 @@ public class PdfWatermarkerTest {
         try (PDDocument doc = PDDocument.load(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
             assertEquals(2, doc.getNumberOfPages());
-            assertEquals("Appellant evidence Addition  A        1\n"
-                    + "Appellant evidence Addition  A        2\n", text);
+            assertEquals("Appellant evidence Addition  A | Page 1\n"
+                    + "Appellant evidence Addition  A | Page 2\n", text);
         }
     }
 
