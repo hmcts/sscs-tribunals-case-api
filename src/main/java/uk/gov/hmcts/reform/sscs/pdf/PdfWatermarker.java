@@ -15,8 +15,8 @@ import org.apache.pdfbox.util.Matrix;
  */
 public class PdfWatermarker {
 
-    private static final float SCALE_PERCENTAGE = .95f;
-    private static final int margin = 50;
+    private static final float SCALE_PERCENTAGE = .88f;
+    private static final int margin = 30;
 
     public byte[] shrinkAndWatermarkPdf(byte[] input, String leftText, String rightText) throws Exception {
         try (PDDocument document = PDDocument.load(input)) {
