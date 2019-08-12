@@ -181,7 +181,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         UploadResponse uploadResponse = evidenceManagementService.upload(singletonList(file), DM_STORE_USER_ID);
         String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
 
-        return url.toBuilder().documentUrl(location).documentBinaryUrl(location+"/binary").build();
+        return url.toBuilder().documentUrl(location).documentBinaryUrl(location + "/binary").build();
     }
 
     String getNextBundleAddition(List<SscsDocument> sscsDocument) {
