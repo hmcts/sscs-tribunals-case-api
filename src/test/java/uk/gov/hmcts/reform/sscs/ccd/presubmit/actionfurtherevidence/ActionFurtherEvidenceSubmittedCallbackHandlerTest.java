@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -68,6 +69,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbacWithRightEventAndRightField =
             buildCallback("informationReceivedForInterloc", ACTION_FURTHER_EVIDENCE);
+        Callback<SscsCaseData> callbackWithSecondRightEventAndRightField =
+                buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbacWithRightEventAndWrongField =
             buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbacWithWrongEventAndRightField =
@@ -81,6 +84,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         return new Object[]{
             new Object[]{SUBMITTED, callbacWithRightEventAndRightField, true},
+            new Object[]{SUBMITTED, callbackWithSecondRightEventAndRightField, true},
             new Object[]{ABOUT_TO_SUBMIT, callbacWithRightEventAndRightField, false},
             new Object[]{SUBMITTED, callbacWithRightEventAndWrongField, false},
             new Object[]{SUBMITTED, callbacWithWrongEventAndRightField, false},
@@ -100,17 +104,35 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenHandleMethodIsCalled_shouldUpdateCaseCorrectly() {
-        Callback<SscsCaseData> callback = buildCallback("informationReceivedForInterloc",
+    public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly() {
+        Callback<SscsCaseData> callback = buildCallback("issueFurtherEvidence",
             ACTION_FURTHER_EVIDENCE);
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq("interlocInformationReceived"),
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq("issueFurtherEvidence"),
             anyString(), anyString(), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback);
+
+        assertNull(captor.getValue().getInterlocReviewState());
+    }
+
+    @Test
+    public void givenIssueToAllParties_shouldUpdateCaseCorrectly() {
+        Callback<SscsCaseData> callback = buildCallback("informationReceivedForInterloc",
+                ACTION_FURTHER_EVIDENCE);
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq("interlocInformationReceived"),
+                anyString(), anyString(), any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback);
 
