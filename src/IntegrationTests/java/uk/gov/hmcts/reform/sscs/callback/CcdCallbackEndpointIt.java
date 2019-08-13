@@ -5,6 +5,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -140,6 +141,39 @@ public class CcdCallbackEndpointIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
         assertNull(result.getData().getInterlocReviewState());
         assertEquals("furtherEvidenceReceived", result.getData().getDwpFurtherEvidenceStates());
+    }
+
+    @Test
+    public void givenFurtherEvidenceIssueToAllParties_onSubmitted_willStart_IssueFurtherEvidenceEvent() throws Exception {
+        mockIdam();
+        given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq("issueFurtherEvidence")))
+                .willReturn(StartEventResponse.builder().build());
+
+        given(coreCaseDataApi.submitEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
+                eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
+                eq(true), any(CaseDataContent.class)))
+                .willReturn(CaseDetails.builder()
+                        .id(123L)
+                        .data(new HashMap<>())
+                        .build());
+
+        String path = Objects.requireNonNull(getClass().getClassLoader()
+                .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
+        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replaceFirst("informationReceivedForInterloc", "issueFurtherEvidence");
+        json = json.replaceFirst("Information received for interlocutory review", "Issue further evidence to all parties");
+
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        verify(coreCaseDataApi).startEventForCaseWorker(any(), anyString(), anyString(), anyString(),
+                anyString(), eq("12345656789"), eq("issueFurtherEvidence"));
     }
 
     @Test
