@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum OriginalSenderItemList {
     APPELLANT("appellant", "Appellant (or Appointee)"),
-    REPRESENTATIVE("representative", "Representative");
+    REPRESENTATIVE("representative", "Representative"),
+    DWP("dwp", "DWP");
 
     private String code;
     private String label;
