@@ -3,13 +3,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils.equalsIgnoreCase;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -32,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
-public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
 
     private static final String COVERSHEET = "coversheet";
@@ -145,6 +142,9 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         }
         if (REPRESENTATIVE.getCode().equals(originalSenderCode)) {
             return REPRESENTATIVE_EVIDENCE.getValue();
+        }
+        if (DWP.getCode().equals(originalSenderCode)) {
+            return DWP_EVIDENCE.getValue();
         }
         throw new IllegalStateException("document Type could not be worked out");
     }
