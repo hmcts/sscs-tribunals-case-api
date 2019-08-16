@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
-public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
+public class ActionFurtherEvidenceReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
     private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
