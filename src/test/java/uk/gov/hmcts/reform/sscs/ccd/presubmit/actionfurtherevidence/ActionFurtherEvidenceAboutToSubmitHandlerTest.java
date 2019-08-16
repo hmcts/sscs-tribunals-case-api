@@ -27,9 +27,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @RunWith(JUnitParamsRunner.class)
-public class HandleEvidenceEventHandlerTest {
+public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
-    private HandleEvidenceEventHandler handleEvidenceEventHandler;
+    private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -47,7 +47,7 @@ public class HandleEvidenceEventHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handleEvidenceEventHandler = new HandleEvidenceEventHandler(evidenceManagementService);
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(evidenceManagementService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -91,14 +91,14 @@ public class HandleEvidenceEventHandlerTest {
 
     @Test
     public void givenAHandleEvidenceEvent_thenReturnTrue() {
-        assertTrue(handleEvidenceEventHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertTrue(actionFurtherEvidenceAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
     public void givenANonHandleEvidenceEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
-        assertFalse(handleEvidenceEventHandler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertFalse(actionFurtherEvidenceAboutToSubmitHandler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class HandleEvidenceEventHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = null;
         try {
-            response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+            response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
         } catch (IllegalStateException e) {
             assertTrue(furtherEvidenceActionList == null || originalSender == null);
         }
@@ -142,7 +142,7 @@ public class HandleEvidenceEventHandlerTest {
             "Appellant (or Appointee)"));
         sscsCaseData.setEvidenceHandled("No");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
         assertEquals("Yes", response.getData().getEvidenceHandled());
@@ -178,15 +178,20 @@ public class HandleEvidenceEventHandlerTest {
             "Appellant (or Appointee)");
         DynamicList representativeOriginalSender = buildOriginalSenderItemListForGivenOption("representative",
             "Representative");
+        DynamicList dwpOriginalSender = buildOriginalSenderItemListForGivenOption("dwp",
+                "Dwp");
 
         return new Object[]{
             //other options scenarios
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other document"},
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "No", "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", "Other document"},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other document"},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, "Other document"},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Yes", "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "No", "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "Yes", "Other document"},
             //issue parties scenarios
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, "appellantEvidence"},
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "No", "appellantEvidence"},
@@ -194,6 +199,9 @@ public class HandleEvidenceEventHandlerTest {
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", "representativeEvidence"},
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "Yes", "representativeEvidence"},
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, "representativeEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "No", "dwpEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "Yes", "dwpEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, null, "dwpEvidence"},
             //interloc scenarios
             new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, "appellantEvidence"},
             new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", "appellantEvidence"},
@@ -201,6 +209,9 @@ public class HandleEvidenceEventHandlerTest {
             new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, "representativeEvidence"},
             new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "No", "representativeEvidence"},
             new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "Yes", "representativeEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, null, "dwpEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "No", "dwpEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "Yes", "dwpEvidence"},
             //edge cases scenarios
             new Object[]{null, representativeOriginalSender, "", ""}, //edge case: furtherEvidenceActionOption is null
             new Object[]{furtherEvidenceActionListIssueParties, null, null, ""} //edge case: originalSender is null
@@ -232,7 +243,7 @@ public class HandleEvidenceEventHandlerTest {
         sscsCaseData.setScannedDocuments(scannedDocumentList);
         sscsCaseData.setSscsDocument(sscsDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
@@ -252,7 +263,7 @@ public class HandleEvidenceEventHandlerTest {
 
         sscsCaseData.setScannedDocuments(docs);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("www.test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
@@ -261,7 +272,7 @@ public class HandleEvidenceEventHandlerTest {
     public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
         sscsCaseData.setScannedDocuments(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals(1, response.getErrors().size());
 
@@ -287,7 +298,7 @@ public class HandleEvidenceEventHandlerTest {
     public void givenIssueFurtherEvidence_shouldUpdateDwpFurtherEvidenceStates() {
         Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.code);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals("furtherEvidenceReceived", updated.getData().getDwpFurtherEvidenceStates());
     }
@@ -296,7 +307,7 @@ public class HandleEvidenceEventHandlerTest {
     public void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
         Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.code);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
@@ -305,7 +316,7 @@ public class HandleEvidenceEventHandlerTest {
     public void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
         Callback<SscsCaseData> callback = buildCallback(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
@@ -321,7 +332,7 @@ public class HandleEvidenceEventHandlerTest {
 
         sscsCaseData.setScannedDocuments(docs);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals(1, response.getErrors().size());
 
@@ -341,7 +352,7 @@ public class HandleEvidenceEventHandlerTest {
 
         sscsCaseData.setScannedDocuments(docs);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handleEvidenceEventHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals(1, response.getErrors().size());
 
@@ -372,7 +383,7 @@ public class HandleEvidenceEventHandlerTest {
             }
         }
 
-        String actual = handleEvidenceEventHandler.getNextBundleAddition(sscsDocuments);
+        String actual = actionFurtherEvidenceAboutToSubmitHandler.getNextBundleAddition(sscsDocuments);
 
         String expected = currentAppendix.equals("") ? "A" : String.valueOf((char)(currentAppendix.charAt(0) +  1));
         assertEquals(expected, actual);
@@ -407,7 +418,7 @@ public class HandleEvidenceEventHandlerTest {
         }
 
         String expected = index == 0 ? "Z1" : "Z" + (index + 1);
-        String actual = handleEvidenceEventHandler.getNextBundleAddition(sscsDocuments);
+        String actual = actionFurtherEvidenceAboutToSubmitHandler.getNextBundleAddition(sscsDocuments);
         assertEquals(expected, actual);
     }
 
@@ -415,7 +426,7 @@ public class HandleEvidenceEventHandlerTest {
     @Parameters({"Z!", "Z3$", "ZN"})
     public void nextAppendixCanHandleInvalidDataThatAreNotNumbersAfterZ(String currentAppendix) {
         SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
-        String actual = handleEvidenceEventHandler.getNextBundleAddition(Collections.singletonList(theDocument));
+        String actual = actionFurtherEvidenceAboutToSubmitHandler.getNextBundleAddition(Collections.singletonList(theDocument));
         assertEquals("[", actual);
     }
 

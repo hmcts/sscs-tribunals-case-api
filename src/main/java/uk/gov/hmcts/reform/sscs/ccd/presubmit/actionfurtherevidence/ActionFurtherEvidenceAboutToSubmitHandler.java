@@ -5,13 +5,10 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.http.MediaType.APPLICATION_PDF;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
 
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -37,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @Component
 @Slf4j
-public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String DM_STORE_USER_ID = "sscs";
     private static final String COVERSHEET = "coversheet";
@@ -46,7 +43,7 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
     private final EvidenceManagementService evidenceManagementService;
 
     @Autowired
-    public HandleEvidenceEventHandler(EvidenceManagementService evidenceManagementService) {
+    public ActionFurtherEvidenceAboutToSubmitHandler(EvidenceManagementService evidenceManagementService) {
         this.evidenceManagementService = evidenceManagementService;
     }
 
@@ -222,6 +219,9 @@ public class HandleEvidenceEventHandler implements PreSubmitCallbackHandler<Sscs
         }
         if (REPRESENTATIVE.getCode().equals(originalSenderCode)) {
             return REPRESENTATIVE_EVIDENCE.getValue();
+        }
+        if (DWP.getCode().equals(originalSenderCode)) {
+            return DWP_EVIDENCE.getValue();
         }
         throw new IllegalStateException("document Type could not be worked out");
     }

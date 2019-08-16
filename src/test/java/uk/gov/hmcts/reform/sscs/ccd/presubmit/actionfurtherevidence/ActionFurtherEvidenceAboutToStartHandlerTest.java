@@ -12,11 +12,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.ActionFurtherEvidenceDropdownHandler;
 
-public class ActionFurtherEvidenceDropdownHandlerTest {
+public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
-    private ActionFurtherEvidenceDropdownHandler handler;
+    private ActionFurtherEvidenceAboutToStartHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -29,7 +28,7 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new ActionFurtherEvidenceDropdownHandler();
+        handler = new ActionFurtherEvidenceAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -112,8 +111,9 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
-        assertEquals("representative", response.getData().getOriginalSender().getListItems().get(1).getCode());
-        assertEquals(2, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
+        assertEquals("representative", response.getData().getOriginalSender().getListItems().get(2).getCode());
+        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
     }
 
     @Test
@@ -124,7 +124,8 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
-        assertEquals(1, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
+        assertEquals(2, response.getData().getOriginalSender().getListItems().size());
     }
 
     @Test
@@ -135,6 +136,7 @@ public class ActionFurtherEvidenceDropdownHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
-        assertEquals(1, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
+        assertEquals(2, response.getData().getOriginalSender().getListItems().size());
     }
 }

@@ -5,8 +5,7 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class ActionFurtherEvidenceDropdownHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Value("${feature.issue_further_evidence}")
     private Boolean issueFurtherEvidenceFeature;
@@ -70,6 +69,7 @@ public class ActionFurtherEvidenceDropdownHandler implements PreSubmitCallbackHa
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
         listCostOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        listCostOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         if (sscsCaseData.getAppeal().getRep() != null
                 && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
