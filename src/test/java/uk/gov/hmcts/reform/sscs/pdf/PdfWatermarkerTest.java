@@ -19,10 +19,10 @@ public class PdfWatermarkerTest {
         document.addPage(new PDPage(PDRectangle.A4));
         byte[] blankPdf = getBytes(document);
         byte[] outputBytes = pw.shrinkAndWatermarkPdf(blankPdf,
-                "Appellant Further Evidence | Appendix  A");
+                "Appellant evidence","Addition  A");
         try (PDDocument doc = PDDocument.load(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
-            assertEquals("Appellant Further Evidence | Appendix  A        1\n", text);
+            assertEquals("Appellant evidence Addition  A | Page 1\n", text);
         }
     }
 
@@ -34,12 +34,12 @@ public class PdfWatermarkerTest {
         document.addPage(new PDPage(PDRectangle.A4));
         byte[] blankPdf = getBytes(document);
         byte[] outputBytes = pw.shrinkAndWatermarkPdf(blankPdf,
-                "Appellant Further Evidence | Appendix  A");
+                "Appellant evidence", "Addition  A");
         try (PDDocument doc = PDDocument.load(outputBytes)) {
             String text = new PDFTextStripper().getText(doc);
             assertEquals(2, doc.getNumberOfPages());
-            assertEquals("Appellant Further Evidence | Appendix  A        1\n"
-                    + "Appellant Further Evidence | Appendix  A        2\n", text);
+            assertEquals("Appellant evidence Addition  A | Page 1\n"
+                    + "Appellant evidence Addition  A | Page 2\n", text);
         }
     }
 
