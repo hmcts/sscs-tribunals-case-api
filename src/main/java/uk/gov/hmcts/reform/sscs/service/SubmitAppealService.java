@@ -163,8 +163,20 @@ public class SubmitAppealService {
     private EventType findEventType(SscsCaseData caseData) {
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
-            return mrnDate.plusMonths(13L).isBefore(LocalDate.now()) ? NON_COMPLIANT : VALID_APPEAL_CREATED;
+            boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());
+
+            if (moveToNoneCompliant) {
+                log.info("Moving case {} to non-compliant as MRN Date is older than 13 months", caseData.getCcdCaseId());
+            } else {
+                log.info("Valid appeal create for case {}", caseData.getCcdCaseId());
+            }
+
+            return moveToNoneCompliant ? NON_COMPLIANT : VALID_APPEAL_CREATED;
         } else {
+            log.info("Moving case {} to incomplete due to MRN Details {} present and MRN Date {} present",
+                caseData.getCcdCaseId(),
+                (caseData.getAppeal().getMrnDetails() != null ? "" : "not"),
+                (caseData.getAppeal().getMrnDetails().getMrnDate() != null ? "" : "not"));
             return INCOMPLETE_APPLICATION_RECEIVED;
         }
     }
