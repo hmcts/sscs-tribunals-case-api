@@ -1,0 +1,60 @@
+{
+  "caseId" : "1",
+  "caseReference": "SC123/45/00001",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "Mock",
+        "firstName": "Jason"
+      }
+    },
+    "benefitType": {
+      "code": "ESA"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "No"
+    }
+  },
+  "evidence": {
+    "documents": [
+      {
+        "value": {
+          "dateReceived": "2017-03-10",
+          "description": "1",
+          "evidenceType": "EvidenceType1",
+          "evidenceProvidedBy": "Appellant1"
+        }
+      },
+      {
+        "value": {
+          "dateReceived": "2017-04-12",
+          "description": "1",
+          "evidenceType": "EvidenceType2",
+          "evidenceProvidedBy": "Appellant2"
+        }
+      }
+    ]
+  },
+  "events": [
+    {
+      "value": {
+        "date": "2017-04-10T12:01:47.620",
+        "type": "responseReceived",
+        "description": "Dwp respond"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-03-08T12:01:47.620",
+        "type": "appealReceived",
+        "description": "Appeal received"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}
