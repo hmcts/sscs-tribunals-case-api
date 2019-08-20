@@ -167,11 +167,11 @@ public class SubmitAppealService {
 
             if (moveToNoneCompliant) {
                 log.info("Moving case {} to non-compliant as MRN Date is older than 13 months", caseData.getCcdCaseId());
+                return NON_COMPLIANT;
             } else {
                 log.info("Valid appeal create for case {}", caseData.getCcdCaseId());
+                return VALID_APPEAL_CREATED;
             }
-
-            return moveToNoneCompliant ? NON_COMPLIANT : VALID_APPEAL_CREATED;
         } else {
             log.info("Moving case {} to incomplete due to MRN Details {} present and MRN Date {} present",
                 caseData.getCcdCaseId(),
