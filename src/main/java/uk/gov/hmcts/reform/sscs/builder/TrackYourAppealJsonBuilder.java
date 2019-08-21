@@ -52,7 +52,7 @@ public class TrackYourAppealJsonBuilder {
         caseData.getEvents().removeIf(a -> a.getValue().getDate() == null);
         eventList = caseData.getEvents();
         eventList.sort(Comparator.reverseOrder());
-        processExceptions(eventList);
+        processExceptions(eventList, getHearingType(caseData).equals(PAPER));
 
         if (getHearingType(caseData).equals(PAPER)) {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
@@ -107,12 +107,12 @@ public class TrackYourAppealJsonBuilder {
         return ORAL;
     }
 
-    private void processExceptions(List<Event> eventList) {
+    private void processExceptions(List<Event> eventList, Boolean isPaperCase) {
         if (null != eventList && !eventList.isEmpty()) {
 
             Event currentEvent = eventList.get(0);
 
-            if (isPastHearingBookedDate(currentEvent)) {
+            if (isPastHearingBookedDate(currentEvent, isPaperCase)) {
                 setLatestEventAs(eventList, currentEvent, PAST_HEARING_BOOKED);
             } else if (isNewHearingBookedEvent(eventList)) {
                 setLatestEventAs(eventList, currentEvent, NEW_HEARING_BOOKED);
@@ -130,10 +130,11 @@ public class TrackYourAppealJsonBuilder {
         eventList.set(0, event);
     }
 
-    private boolean isPastHearingBookedDate(Event event) {
+    private boolean isPastHearingBookedDate(Event event, Boolean isPaperCase) {
         return DWP_RESPOND.equals(getEventType(event))
                 && LocalDateTime.now().isAfter(
-                LocalDateTime.parse(event.getValue().getDate()).plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS));
+                LocalDateTime.parse(event.getValue().getDate()).plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS))
+                && !isPaperCase;
     }
 
     private boolean isNewHearingBookedEvent(List<Event> eventList) {
