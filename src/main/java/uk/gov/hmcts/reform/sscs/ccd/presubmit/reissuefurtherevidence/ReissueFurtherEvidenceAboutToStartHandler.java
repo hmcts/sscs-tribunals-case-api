@@ -49,6 +49,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
+            sscsCaseData.setOriginalSender(null);
         }
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);

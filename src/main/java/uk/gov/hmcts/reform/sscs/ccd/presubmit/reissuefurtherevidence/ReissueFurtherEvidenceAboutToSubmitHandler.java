@@ -63,8 +63,6 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
                                 .orElse(""));
                 if (StringUtils.isNotBlank(documentType)) {
                     documentDetails.setDocumentType(documentType);
-                } else {
-                    errors.add(String.format("Cannot work out the original sender from the selected '%s'.", documentType));
                 }
             }
         }

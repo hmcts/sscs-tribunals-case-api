@@ -10,10 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.DWP;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -38,6 +35,8 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private SscsCaseData sscsCaseData;
+    private SscsDocument document1;
+    private SscsDocument document2;
 
     @Before
     public void setUp() {
@@ -46,13 +45,13 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.REISSUE_FURTHER_EVIDENCE);
 
-        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file1.pdf")
                 .documentType(REPRESENTATIVE_EVIDENCE.getValue())
                 .evidenceIssued("Yes")
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
                 .build()).build();
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file2.pdf")
                 .documentType(APPELLANT_EVIDENCE.getValue())
                 .evidenceIssued("Yes")
@@ -61,7 +60,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
-                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url1", "file2.pdf - appellantEvidence"), null))
+                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url2", "file2.pdf - appellantEvidence"), null))
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -120,13 +119,14 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void returnAnErrorIfNoSelectedOriginalSender() {
+    public void doesNotReturnAnErrorIfNoSelectedOriginalSender() {
         sscsCaseData = sscsCaseData.toBuilder().originalSender(null).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
-        assertEquals(1, response.getErrors().size());
-        assertEquals("Cannot work out the original sender from the selected 'null'.", response.getErrors().toArray()[0]);
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+        assertEquals(document2.toBuilder().value(document2.getValue().toBuilder().evidenceIssued("No").build()).build(), response.getData().getSscsDocument().get(1));
+        assertEquals(document1, response.getData().getSscsDocument().get(0));
     }
 
     @Test
