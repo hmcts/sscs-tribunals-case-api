@@ -18,7 +18,7 @@
     "isAddressSameAsAppointee": true,
     "contactDetails": {
       "phoneNumber": "07411222222",
-      "emailAddress": "sscstest@greencroftconsulting.com"
+      "emailAddress": "sscstest+notify@greencroftconsulting.com"
     }
   },
   "appointee": {
