@@ -5,6 +5,10 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.DWP;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,8 +22,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
@@ -42,13 +48,13 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file1.pdf")
-                .documentType("representativeEvidence")
+                .documentType(REPRESENTATIVE_EVIDENCE.getValue())
                 .evidenceIssued("Yes")
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
                 .build()).build();
         SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file2.pdf")
-                .documentType("appellantEvidence")
+                .documentType(APPELLANT_EVIDENCE.getValue())
                 .evidenceIssued("Yes")
                 .documentLink(DocumentLink.builder().documentUrl("url2").build())
                 .build()).build();
@@ -76,19 +82,31 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"url1, file1.pdf - representativeEvidence", "url2, file2.pdf - appellantEvidence"})
-    public void setsEvidenceHandledFlagToNoForDocumentSelected(String code, String label) {
-        sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(code, label), null)).build();
+    @Parameters({"url1, file1.pdf - representativeEvidence, APPELLANT", "url2, file2.pdf - appellantEvidence, DWP"})
+    public void setsEvidenceHandledFlagToNoForDocumentSelected(String selectedUrl, String selectedLabel, OriginalSenderItemList newSender) {
+
+        sscsCaseData = sscsCaseData.toBuilder()
+                .originalSender(new DynamicList(
+                        new DynamicListItem(newSender.getCode(), newSender.getLabel()),
+                        Arrays.asList(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()),
+                                new DynamicListItem(DWP.getCode(), DWP.getLabel()))
+                ))
+                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(selectedUrl, selectedLabel), null)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        Optional<String> selectedDocumentValue = response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(code)).map(f -> f.getValue().getEvidenceIssued()).findFirst();
-        assertEquals("No", selectedDocumentValue.orElse("Unknown"));
-        Optional<String> otherDocumentValue = response.getData().getSscsDocument().stream().filter(f -> !f.getValue().getDocumentLink().getDocumentUrl().equals(code)).map(f -> f.getValue().getEvidenceIssued()).findFirst();
-        assertEquals("Yes", otherDocumentValue.orElse("Unknown"));
+        Optional<SscsDocumentDetails> selectedDocumentValue = response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)).map(f -> f.getValue()).findFirst();
+
+        assertEquals("No", selectedDocumentValue.map(SscsDocumentDetails::getEvidenceIssued).orElse("Unknown"));
+        assertEquals(newSender.getCode() + "Evidence", selectedDocumentValue.map(SscsDocumentDetails::getDocumentType).orElse("Unknown"));
+
+        DocumentType expectedDocumentTypeOfUnselectedDocument = (selectedUrl.equals("url1")) ? APPELLANT_EVIDENCE : REPRESENTATIVE_EVIDENCE;
+        Optional<SscsDocumentDetails> otherDocumentValue = response.getData().getSscsDocument().stream().filter(f -> !f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)).map(f -> f.getValue()).findFirst();
+        assertEquals("Yes", otherDocumentValue.map(SscsDocumentDetails::getEvidenceIssued).orElse("Unknown"));
+        assertEquals(expectedDocumentTypeOfUnselectedDocument.getValue(), otherDocumentValue.map(SscsDocumentDetails::getDocumentType).orElse("Unknown"));
     }
 
     @Test
@@ -99,6 +117,16 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Select a document to re-issue further evidence.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    public void returnAnErrorIfNoSelectedOriginalSender() {
+        sscsCaseData = sscsCaseData.toBuilder().originalSender(null).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Cannot work out the original sender from the selected 'null'.", response.getErrors().toArray()[0]);
     }
 
     @Test

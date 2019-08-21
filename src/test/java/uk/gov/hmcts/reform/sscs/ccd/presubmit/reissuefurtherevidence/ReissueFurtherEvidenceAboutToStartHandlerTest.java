@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,15 +42,20 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file1.pdf")
-                .documentType("appellantEvidence")
+                .documentType(APPELLANT_EVIDENCE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
                 .build()).build();
         SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file2.pdf")
-                .documentType("appellantEvidence")
+                .documentType(REPRESENTATIVE_EVIDENCE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl("url2").build())
                 .build()).build();
-        List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2);
+        SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName("file3.pdf")
+                .documentType(DWP_EVIDENCE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url3").build())
+                .build()).build();
+        List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
                 .build();
@@ -84,9 +90,11 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(2, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(3, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
         assertEquals(new DynamicListItem("url1", "file1.pdf -  appellantEvidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("url2", "file2.pdf -  appellantEvidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  representativeEvidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("url3", "file3.pdf -  dwpEvidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
+
     }
 
     @Test
@@ -97,6 +105,23 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
         assertNull(response.getData().getReissueFurtherEvidenceDocument());
-        assertEquals("There are no documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
+        assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void willNotPopulateDocumentDropdownWhenThereAreNoSscsDocumentsOfDocumentTypeEvidence() {
+        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName("file1.pdf")
+                .documentType(DL6.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
+
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).sscsDocument(Collections.singletonList(document1)).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+
+        assertNull(response.getData().getReissueFurtherEvidenceDocument());
+        assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
     }
 }

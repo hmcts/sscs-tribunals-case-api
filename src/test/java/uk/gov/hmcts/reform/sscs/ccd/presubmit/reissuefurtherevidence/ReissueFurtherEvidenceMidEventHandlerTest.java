@@ -4,6 +4,9 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReissueFurtherEvidenceMidEventHandlerTest {
@@ -81,8 +85,40 @@ public class ReissueFurtherEvidenceMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(label.substring(label.lastIndexOf(" ") + 1), response.getData().getOriginalSender().getValue().getCode());
-        assertEquals(label.substring(label.lastIndexOf(" ") + 1), response.getData().getOriginalSender().getValue().getLabel());
+
+        OriginalSenderItemList expectedSelectedOriginalSender = (label.contains("appellant")) ? APPELLANT : REPRESENTATIVE;
+
+        assertEquals(expectedSelectedOriginalSender.getCode(), response.getData().getOriginalSender().getValue().getCode());
+        assertEquals(expectedSelectedOriginalSender.getLabel(), response.getData().getOriginalSender().getValue().getLabel());
+        assertEquals(Arrays.asList(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()),
+                new DynamicListItem(DWP.getCode(), DWP.getLabel())),
+                response.getData().getOriginalSender().getListItems());
+    }
+
+    @Test
+    public void populatesRepresentativeOriginalSenderIfThereIsARepresentativeOnTheAppeal() {
+        sscsCaseData = sscsCaseData.toBuilder()
+                .appeal(sscsCaseData.getAppeal().toBuilder()
+                        .rep(Representative.builder()
+                                .hasRepresentative("yes")
+                                .name(Name.builder()
+                                        .title("Mrs")
+                                        .firstName("Rebecca")
+                                        .lastName("Rep")
+                                        .build())
+                                .build())
+                        .build())
+                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url1", "file1.pdf - representativeEvidence"), null)).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback);
+
+        assertEquals(Arrays.asList(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()),
+                new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()),
+                new DynamicListItem(DWP.getCode(), DWP.getLabel())
+                ),
+                response.getData().getOriginalSender().getListItems());
     }
 
     @Test

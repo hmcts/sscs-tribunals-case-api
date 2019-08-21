@@ -1,17 +1,34 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuefurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
+@Service
 public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private static Map<String, String> originalSenderToDocumentType = new HashMap<>();
+
+    static {
+        originalSenderToDocumentType.put(APPELLANT.getCode(), APPELLANT_EVIDENCE.getValue());
+        originalSenderToDocumentType.put(REPRESENTATIVE.getCode(), REPRESENTATIVE_EVIDENCE.getValue());
+        originalSenderToDocumentType.put(DWP.getCode(), DWP_EVIDENCE.getValue());
+    }
 
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -38,6 +55,17 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
             } else {
                 SscsDocumentDetails documentDetails = optionalSelectedDocument.get().getValue();
                 documentDetails.setEvidenceIssued("No");
+                String documentType = originalSenderToDocumentType.get(
+                        Optional.ofNullable(sscsCaseData.getOriginalSender())
+                                .map(f -> Optional.ofNullable(f.getValue())
+                                        .map(DynamicListItem::getCode))
+                                .orElse(Optional.of(""))
+                                .orElse(""));
+                if (StringUtils.isNotBlank(documentType)) {
+                    documentDetails.setDocumentType(documentType);
+                } else {
+                    errors.add(String.format("Cannot work out the original sender from the selected '%s'.", documentType));
+                }
             }
         }
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);

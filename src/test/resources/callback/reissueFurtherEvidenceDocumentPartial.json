@@ -1,0 +1,16 @@
+{
+  "value": {
+    "code": "http://www.itv.com",
+    "label": "22222.pdf - representativeEvidence"
+  },
+  "list_items": [
+    {
+      "code": "http://www.itv.com",
+      "label": "22222.pdf - representativeEvidence"
+    },
+    {
+      "code": "http://www.bbc.com",
+      "label": "11111.pdf - appellantEvidence"
+    }
+  ]
+}

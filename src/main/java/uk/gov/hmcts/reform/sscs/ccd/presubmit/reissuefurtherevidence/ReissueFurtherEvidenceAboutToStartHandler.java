@@ -1,9 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuefurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -31,21 +39,29 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        if (CollectionUtils.isNotEmpty(sscsCaseData.getSscsDocument())) {
-            setDocumentDropdown(sscsCaseData);
+        ArrayList<SscsDocument> availableDocumentsToReIssue =
+                Optional.ofNullable(sscsCaseData.getSscsDocument()).map(Collection::stream)
+                        .orElse(Stream.empty()).filter(f ->
+                        APPELLANT_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+                                || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
+        ).collect(Collectors.toCollection(ArrayList::new));
+
+        if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
+            setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
         }
 
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
-        if (CollectionUtils.isEmpty(sscsCaseData.getSscsDocument())) {
-            response.addError("There are no documents in the appeal. Cannot reissue further evidence.");
+        if (CollectionUtils.isEmpty(availableDocumentsToReIssue)) {
+            response.addError("There are no evidence documents in the appeal. Cannot reissue further evidence.");
         }
         return response;
     }
 
-    private void setDocumentDropdown(SscsCaseData sscsCaseData) {
+    private void setDocumentDropdown(SscsCaseData sscsCaseData, ArrayList<SscsDocument> availableDocumentsToReIssue) {
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
-        for (SscsDocument doc: sscsCaseData.getSscsDocument()) {
+        for (SscsDocument doc: availableDocumentsToReIssue) {
             String label = String.format("%s -  %s", doc.getValue().getDocumentFileName(), doc.getValue().getDocumentType());
             if (doc.getValue().getDocumentLink() != null) {
                 listCostOptions.add(new DynamicListItem(doc.getValue().getDocumentLink().getDocumentUrl(), label));
