@@ -52,7 +52,8 @@ public class SyaController {
             syaCaseWrapper.getBenefitType().getCode());
         Optional<Long> caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
         printLoggingMsg(caseId.orElse(null), syaCaseWrapper.getBenefitType().getCode());
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(caseId).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+            .buildAndExpand(caseId.orElse(null)).toUri();
         log.info(location.toString());
         return created(location).build();
     }
