@@ -21,11 +21,13 @@ import java.util.*;
 import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.hamcrest.core.StringEndsWith;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -118,10 +120,12 @@ public class CcdCallbackEndpointIt {
     }
 
     @Test
-    public void shouldHandleActionFurtherEvidenceEventCallback() throws Exception {
+    @Parameters({"form", "coversheet"})
+    public void shouldHandleActionFurtherEvidenceEventCallback(String documentType) throws Exception {
         String path = Objects.requireNonNull(getClass().getClassLoader()
             .getResource("callback/actionFurtherEvidenceCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = json.replaceAll("DOCUMENT_TYPE", documentType);
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
@@ -130,12 +134,17 @@ public class CcdCallbackEndpointIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         List<SscsDocument> documentList = result.getData().getSscsDocument();
-        assertEquals(1, documentList.size());
-        assertNull(result.getData().getScannedDocuments());
-        assertEquals("appellantEvidence", documentList.get(0).getValue().getDocumentType());
-        assertEquals("3", documentList.get(0).getValue().getControlNumber());
-        assertEquals("scanned.pdf", documentList.get(0).getValue().getDocumentFileName());
-        assertEquals("http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
+        if (documentType.equalsIgnoreCase("coversheet")) {
+            Assert.assertTrue(CollectionUtils.isEmpty(documentList));
+            assertNull(result.getData().getScannedDocuments());
+        } else {
+            assertEquals(1, documentList.size());
+            assertNull(result.getData().getScannedDocuments());
+            assertEquals("appellantEvidence", documentList.get(0).getValue().getDocumentType());
+            assertEquals("3", documentList.get(0).getValue().getControlNumber());
+            assertEquals("scanned.pdf", documentList.get(0).getValue().getDocumentFileName());
+            assertEquals("http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
+        }
     }
 
     @Test
@@ -359,7 +368,7 @@ public class CcdCallbackEndpointIt {
         byte[] newBytes = captor.getValue().get(0).getBytes();
         PDDocument newPdf = PDDocument.load(newBytes);
         String text = new PDFTextStripper().getText(newPdf);
-        assertThat(text, StringEndsWith.endsWith("Appellant evidence Addition  A | Page 1\n"));
+        assertThat(text, StringEndsWith.endsWith("SC022/14/12423 Appellant evidence | Addition  A | Page 1\n"));
     }
 
     @Test

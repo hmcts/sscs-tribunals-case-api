@@ -159,12 +159,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
         String documentType = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
+        String scNumber = StringUtils.isNotEmpty(sscsCaseData.getCaseReference()) ? sscsCaseData.getCaseReference() : "";
 
         byte[] oldContent = toBytes(url.getDocumentUrl());
         PdfWatermarker alter = new PdfWatermarker();
         byte[] newContent;
         try {
-            newContent = alter.shrinkAndWatermarkPdf(oldContent, documentType, String.format("Addition  %s", bundleAddition));
+            newContent = alter.shrinkAndWatermarkPdf(oldContent, scNumber, String.format("%s | Addition  %s", documentType, bundleAddition));
         } catch (Exception e) {
             log.error("Caught exception :" + e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
