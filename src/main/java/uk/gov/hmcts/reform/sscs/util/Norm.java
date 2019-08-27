@@ -15,7 +15,8 @@ public class Norm {
         if (value != null) {
             Matcher m = PIP_NUMBER.matcher(value);
             if (m.find()) {
-                return m.replaceFirst("DWP PIP ($1)");
+                String s = m.replaceFirst("DWP PIP ($1)");
+                return s;
             }
         }
         return value;

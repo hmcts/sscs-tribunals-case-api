@@ -193,8 +193,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
         String value = mrnIsNotProvided(syaCaseWrapper) ? null : syaCaseWrapper.getMrn().getDwpIssuingOffice();
-        return Norm.dwpIssuingOffice(
-            value);
+        return Norm.dwpIssuingOffice(value);
     }
 
     private static String getMrnDate(SyaCaseWrapper syaCaseWrapper) {
