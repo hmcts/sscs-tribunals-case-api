@@ -118,7 +118,9 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
     @Test
     @Parameters({
-        "DWP PIP (1),Newcastle", "DWP PIP (2),Glasgow", "DWP PIP (3),Bellevale"
+        "DWP PIP (1),Newcastle", "DWP PIP (2),Glasgow", "DWP PIP (3),Bellevale", "DWP PIP (4),Glasgow",
+        "DWP PIP (5),Springburn", "DWP PIP (6),Blackpool", "DWP PIP (7),Blackpool", "DWP PIP (8),Blackpool",
+        "DWP PIP (9),Blackpool", "DWP PIP (10),Newport"
     })
     public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(String dwpIssuingOffice,
                                                                        String expectedDwpRegionalCenter) {
