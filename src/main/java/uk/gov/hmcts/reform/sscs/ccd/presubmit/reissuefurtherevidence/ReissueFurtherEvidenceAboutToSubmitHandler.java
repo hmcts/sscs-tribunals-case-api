@@ -59,7 +59,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
         if (!caseHasARepresentative && sscsCaseData.isResendToRepresentative()) {
             errors.add("Cannot re-issue to the representative as there is no representative on the appeal.");
         }
-        if (errors.isEmpty()) {
+        if (errors.isEmpty() && selectedDocumentUrl.isPresent()) {
             Optional<SscsDocument> optionalSelectedDocument = sscsCaseData.getSscsDocument().stream().filter(f -> selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl())).findFirst();
             if (!optionalSelectedDocument.isPresent()) {
                 errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
