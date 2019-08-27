@@ -134,5 +134,6 @@
     }
   },
   "evidencePresent" : "No",
-  "sscsDocument":[]
+  "sscsDocument":[],
+  "dwpRegionalCentre": "Newcastle"
 }

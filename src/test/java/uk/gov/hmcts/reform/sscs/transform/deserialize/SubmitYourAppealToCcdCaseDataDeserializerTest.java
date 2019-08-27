@@ -8,12 +8,54 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
-import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.*;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_DIFFERENT_ADDRESS_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_NO_CONTACT_DETAILS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_NO_CONTACT_DETAILS_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_PHONE_WITHOUT_SPACES_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.APPELLANT_PHONE_WITH_SPACES;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.EVIDENCE_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.EVIDENCE_DOCUMENT_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_EMPTY;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_EMPTY_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.NINO_WITHOUT_SPACES_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.NINO_WITH_SPACES;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_ARRANGEMENTS;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_ARRANGEMENTS_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_SCHEDULE;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WANTS_SUPPORT_WITHOUT_SCHEDULE_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_EMAIL_NOTIFICATION;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_EMAIL_NOTIFICATION_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_HEARING;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_HEARING_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_NOTIFICATION;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_NOTIFICATION_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_REGIONAL_PROCESSING_CENTER;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_SMS_NOTIFICATION;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_SMS_NOTIFICATION_CCD;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WANTS_SUPPORT;
+import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WANTS_SUPPORT_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
@@ -22,6 +64,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 
+@RunWith(JUnitParamsRunner.class)
 public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
     private static final String NO = "No";
@@ -71,7 +114,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getMrn().setDwpIssuingOffice("DWP PIP ( 10)");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertEquals("DWP PIP (10)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
@@ -95,8 +138,20 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         mrn.setDwpIssuingOffice("My dwp office");
         syaCaseWrapper.setMrn(mrn);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertEquals("My dwp office", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Parameters({
+        "DWP PIP (1),Newcastle", "DWP PIP (2),Glasgow", "DWP PIP (3),Bellevale"
+    })
+    public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(String dwpIssuingOffice,
+                                                                       String expectedDwpRegionalCenter) {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getMrn().setDwpIssuingOffice(dwpIssuingOffice);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
+            regionalProcessingCenter);
+        assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
     }
 
     @Test
@@ -115,7 +170,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(WITHOUT_NOTIFICATION_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -123,7 +178,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutEmailNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_EMAIL_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(WITHOUT_EMAIL_NOTIFICATION_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -131,7 +186,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutSmsNotificationTest() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_SMS_NOTIFICATION.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(WITHOUT_SMS_NOTIFICATION_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -139,16 +194,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaWithoutRepresentativeTestShouldGenerateAnEmptySubscriptionForRep() {
         SyaCaseWrapper syaCaseWrapper = WITHOUT_REPRESENTATIVE.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         Subscription representativeSubscription = caseData.getSubscriptions().getRepresentativeSubscription();
         assertNotNull(representativeSubscription);
         assertTrue(StringUtils.isNotEmpty(representativeSubscription.getTya()));
         assertEquals(Subscription.builder()
-                        .subscribeEmail(NO)
-                        .subscribeSms(NO)
-                        .wantSmsNotifications(NO)
-                        .build(),
-                removeTyaNumber(representativeSubscription));
+                .subscribeEmail(NO)
+                .subscribeSms(NO)
+                .wantSmsNotifications(NO)
+                .build(),
+            removeTyaNumber(representativeSubscription));
     }
 
     @Test
@@ -187,7 +242,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaHearingWithoutSupportAndScheduleHearingTest() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(HEARING_WITHOUT_SUPPORT_AND_SCHEDULE_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -195,7 +250,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaHearingWithoutSupportWithScheduleHearingTest() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(HEARING_WITHOUT_SUPPORT_WITH_SCHEDULE_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -203,7 +258,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void syaHearingWithSupportWithoutScheduleHearingTest() {
         SyaCaseWrapper syaCaseWrapper = HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -228,7 +283,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void shouldAddEvidenceDocumentDetailsIfPresent() {
         SyaCaseWrapper syaCaseWrapper = EVIDENCE_DOCUMENT.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(EVIDENCE_DOCUMENT_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -236,7 +291,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void shouldRemoveSpacesFromAppellantPhoneNumbers() {
         final SyaCaseWrapper syaCaseWrapper = APPELLANT_PHONE_WITH_SPACES.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(APPELLANT_PHONE_WITHOUT_SPACES_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -244,7 +299,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     public void shouldRemoveSpacesFromNino() {
         final SyaCaseWrapper syaCaseWrapper = NINO_WITH_SPACES.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertJsonEquals(NINO_WITHOUT_SPACES_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
@@ -290,23 +345,23 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void sysWithRepHavingALandLineWillNotReceiveSmsNotifications() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS
-                .getDeserializeMessage();
+            .getDeserializeMessage();
         syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("0203 444 4432");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertFalse("rep should be not sms subscribed",
-                caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
+            caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
     }
 
     @Test
     public void sysWithRepHavingAMobileNumberWillReceiveSmsNotifications() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS
-                .getDeserializeMessage();
+            .getDeserializeMessage();
         syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("07404621944");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+            regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertTrue(caseData.getSubscriptions().getRepresentativeSubscription().isSmsSubscribed());
-        assertEquals("mobile numbers should be equal","+447404621944",
-                caseData.getSubscriptions().getRepresentativeSubscription().getMobile());
+        assertEquals("mobile numbers should be equal", "+447404621944",
+            caseData.getSubscriptions().getRepresentativeSubscription().getMobile());
     }
 }

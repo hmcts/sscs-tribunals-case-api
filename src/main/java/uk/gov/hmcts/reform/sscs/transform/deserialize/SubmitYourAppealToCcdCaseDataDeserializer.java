@@ -11,6 +11,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -99,7 +102,26 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .benefitCode(benefitCode)
             .issueCode(issueCode)
             .caseCode(caseCode)
+            .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getMrnDetails().getDwpIssuingOffice()))
             .build();
+    }
+
+    private static String getDwpRegionalCenterGivenDwpIssuingOffice(String dwpIssuingOffice) {
+        if (dwpIssuingOffice != null) {
+            Optional<String> dwpIssuingOfficeNumber = extractDwpIssuingOfficeNumber(dwpIssuingOffice);
+            return dwpIssuingOfficeNumber.map(DwpRegionalCenterMapping::getDwpRegionForGivenDwpIssuingOfficeNum)
+                .orElseThrow(RuntimeException::new);
+        }
+        return null;
+    }
+
+    private static Optional<String> extractDwpIssuingOfficeNumber(String dwpIssuingOffice) {
+        Pattern p = Pattern.compile("\\d+");
+        Matcher m = p.matcher(dwpIssuingOffice);
+        if (m.find()) {
+            return Optional.of(m.group());
+        }
+        return Optional.empty();
     }
 
     private static boolean isDraft(SyaCaseWrapper syaCaseWrapper) {
