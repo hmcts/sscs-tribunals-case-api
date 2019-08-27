@@ -193,15 +193,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
-
         if (syaCaseWrapper.getBenefitType().getCode().equalsIgnoreCase("uc")
                 && (syaCaseWrapper.getMrn() == null
                 || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
             return "Universal Credit";
         } else {
             String value = mrnIsNotProvided(syaCaseWrapper) ? null : syaCaseWrapper.getMrn().getDwpIssuingOffice();
-            return Norm.dwpIssuingOffice(
-                    value);
+            return Norm.dwpIssuingOffice(value);
         }
     }
 

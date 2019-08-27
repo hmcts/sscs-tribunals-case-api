@@ -53,8 +53,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void syaAllDetailsTest() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
-                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
+            regionalProcessingCenter);
         assertJsonEquals(ALL_DETAILS_CCD.getSerializedMessage(), removeTyaNumber(caseData));
     }
 
