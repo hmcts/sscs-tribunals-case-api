@@ -95,6 +95,9 @@
           }
         }],
       "reissueFurtherEvidenceDocument": {},
+      "resendToAppellant": "NO",
+      "resendToRepresentative": "NO",
+      "resendToDwp": "NO",
       "evidence": {
         "documents": [
         ]

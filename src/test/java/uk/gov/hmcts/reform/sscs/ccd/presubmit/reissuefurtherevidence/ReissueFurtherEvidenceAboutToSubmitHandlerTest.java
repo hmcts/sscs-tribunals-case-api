@@ -60,6 +60,9 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
+                .resendToAppellant("YES")
+                .resendToDwp("YES")
+                .resendToRepresentative("No")
                 .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("url2", "file2.pdf - appellantEvidence"), null))
                 .build();
 
@@ -130,6 +133,17 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void returnsAnErrorIfThereIsNoPartySelectedToReIssueFurtherEvidence() {
+        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("NO").resendToDwp("NO").resendToAppellant("NO").build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Select a party to reissue the further evidence.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
     public void returnsAnErrorIfItCouldNotFindTheSelectedDocumentToReIssueFurtherEvidence() {
         sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("code", "label"), null)).build();
 
@@ -138,6 +152,17 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Could not find the selected document with url 'code' to re-issue further evidence in the appeal with id 'ccdId'.", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    public void returnsAnErrorIfReIssuedToRepresentativeWhenThereIsNoRepOnTheAppealToReIssueFurtherEvidence() {
+        sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("YES").build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Cannot re-issue to the representative as there is no representative on the appeal.", response.getErrors().toArray()[0]);
     }
 
     @Test(expected = IllegalStateException.class)

@@ -102,8 +102,8 @@ public class ReissueFurtherEvidenceIt {
 
         assertHttpStatus(response, HttpStatus.OK);
 
-        DynamicListItem listItem1 = new DynamicListItem("http://www.bbc.com", "11111.pdf -  appellantEvidence");
-        DynamicListItem listItem2 = new DynamicListItem("http://www.itv.com", "22222.pdf -  representativeEvidence");
+        DynamicListItem listItem1 = new DynamicListItem("http://www.bbc.com", "11111.pdf -  Appellant evidence");
+        DynamicListItem listItem2 = new DynamicListItem("http://www.itv.com", "22222.pdf -  Representative evidence");
         DynamicList expected = new DynamicList(listItem1, Arrays.asList(listItem1, listItem2));
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
@@ -134,6 +134,7 @@ public class ReissueFurtherEvidenceIt {
     public void callToAboutToSubmitHandler_willResetEvidenceHandledAndUpdateDocumentType() throws Exception {
         json = json.replaceFirst("\"reissueFurtherEvidenceDocument\": \\{\\}", "\"reissueFurtherEvidenceDocument\": " + midEventPartialJson);
         json = json.replaceFirst("\"originalSender\": \\{\\}", "\"originalSender\": " + aboutToSubmitPartialJson);
+        json = json.replaceFirst("\"resendToAppellant\": \"NO\"", "\"resendToAppellant\": \"YES\"");
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());

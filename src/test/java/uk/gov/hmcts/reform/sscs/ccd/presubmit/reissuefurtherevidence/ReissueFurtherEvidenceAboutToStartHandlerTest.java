@@ -91,9 +91,9 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         assertEquals(3, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
-        assertEquals(new DynamicListItem("url1", "file1.pdf -  appellantEvidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
-        assertEquals(new DynamicListItem("url2", "file2.pdf -  representativeEvidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
-        assertEquals(new DynamicListItem("url3", "file3.pdf -  dwpEvidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(new DynamicListItem("url1", "file1.pdf -  Appellant evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("url2", "file2.pdf -  Representative evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("url3", "file3.pdf -  Dwp evidence"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
         assertNull(response.getData().getOriginalSender());
     }
 
