@@ -1,5 +1,8 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateBenefitCode;
+import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateCaseCode;
+import static uk.gov.hmcts.reform.sscs.service.CaseCodeService.generateIssueCode;
 import static uk.gov.hmcts.reform.sscs.utility.AppealNumberGenerator.generateAppealNumber;
 import static uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil.cleanPhoneNumber;
 
@@ -70,6 +73,10 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         boolean hasContactDetails = syaCaseWrapper.getContactDetails() != null;
 
+        String benefitCode = generateBenefitCode(appeal.getBenefitType().getCode());
+        String issueCode = generateIssueCode();
+        String caseCode = generateCaseCode(benefitCode, issueCode);
+
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         boolean isDraft = isDraft(syaCaseWrapper);
         return SscsCaseData.builder()
@@ -87,6 +94,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .subscriptions(getSubscriptions(syaCaseWrapper))
             .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
             .evidencePresent(hasEvidence(syaCaseWrapper.getEvidenceProvide()))
+            .benefitCode(benefitCode)
+            .issueCode(issueCode)
+            .caseCode(caseCode)
             .build();
     }
 

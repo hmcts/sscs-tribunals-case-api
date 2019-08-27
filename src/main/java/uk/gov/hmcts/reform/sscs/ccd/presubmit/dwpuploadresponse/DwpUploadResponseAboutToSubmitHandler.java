@@ -45,7 +45,6 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
 
         sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
 
-
         return preSubmitCallbackResponse;
     }
 
