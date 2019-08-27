@@ -102,8 +102,8 @@ public class ReissueFurtherEvidenceIt {
 
         assertHttpStatus(response, HttpStatus.OK);
 
-        DynamicListItem listItem1 = new DynamicListItem("http://www.bbc.com", "11111.pdf -  appellantEvidence");
-        DynamicListItem listItem2 = new DynamicListItem("http://www.itv.com", "22222.pdf -  representativeEvidence");
+        DynamicListItem listItem1 = new DynamicListItem("http://www.bbc.com", "11111.pdf -  Appellant evidence");
+        DynamicListItem listItem2 = new DynamicListItem("http://www.itv.com", "22222.pdf -  Representative evidence");
         DynamicList expected = new DynamicList(listItem1, Arrays.asList(listItem1, listItem2));
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
