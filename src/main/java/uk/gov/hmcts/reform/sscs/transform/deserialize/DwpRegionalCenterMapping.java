@@ -24,7 +24,8 @@ public enum DwpRegionalCenterMapping {
             .filter(e -> e.dwpIssuingOfficeNumber.contains(issuingOfficeNum))
             .map(e -> e.dwpRegion)
             .findFirst()
-            .orElseThrow(RuntimeException::new);
+            .orElseThrow(() ->
+                new RuntimeException("the provided DWP issuing office number is NOT valid: " + issuingOfficeNum));
     }
 
 }
