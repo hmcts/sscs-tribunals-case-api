@@ -2,3 +2,6 @@ dependencies:
   - name: java
     version: ~2.2.2
     repository: '@hmctspublic'
+  - name: ccd
+    version: ~3.0.4
+    repository: '@hmctspublic'

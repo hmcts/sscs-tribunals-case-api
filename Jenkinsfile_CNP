@@ -22,6 +22,15 @@ def secrets = [
         secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
         secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
+    ],
+    's2s-${env}'      : [
+        secret('microservicekey-ccd-data', 'DATA_STORE_S2S_KEY'),
+        secret('microservicekey-ccd-definition', 'DEFINITION_STORE_S2S_KEY'),
+        secret('microservicekey-ccd-gw', 'API_GATEWAY_S2S_KEY'),
+        secret('microservicekey-ccd-ps', 'PRINT_S2S_KEY')
+    ],
+    'ccd-${env}'      : [
+        secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET')
     ]
 ]
 
