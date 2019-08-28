@@ -60,7 +60,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         return response;
     }
 
-    private void setDocumentDropdown(SscsCaseData sscsCaseData, ArrayList<SscsDocument> availableDocumentsToReIssue) {
+    private void setDocumentDropdown(SscsCaseData sscsCaseData, List<SscsDocument> availableDocumentsToReIssue) {
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
         for (SscsDocument doc: availableDocumentsToReIssue) {
