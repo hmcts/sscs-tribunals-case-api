@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
-public class ActionFurtherEvidenceReissueFurtherEvidenceAboutToStartHandlerTest {
+public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     private ActionFurtherEvidenceAboutToStartHandler handler;
 

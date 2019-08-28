@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @RunWith(JUnitParamsRunner.class)
-public class ActionFurtherEvidenceReissueFurtherEvidenceAboutToSubmitHandlerTest {
+public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
