@@ -110,7 +110,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         if (dwpIssuingOffice != null) {
             Optional<String> dwpIssuingOfficeNumber = extractDwpIssuingOfficeNumber(dwpIssuingOffice);
             return dwpIssuingOfficeNumber.map(DwpRegionalCenterMapping::getDwpRegionForGivenDwpIssuingOfficeNum)
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() ->
+                    new RuntimeException("Fail to extract the DWP issuing office number from:" + dwpIssuingOffice));
         }
         return null;
     }

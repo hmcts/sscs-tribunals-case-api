@@ -156,6 +156,15 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
     }
 
+    @Test(expected = RuntimeException.class)
+    @Parameters({"DWP PIP ()", "DWP PIP (11)"})
+    public void givenInvalidDwpIssuingOffice_shouldThrowException(String invalidDwpIssuingOffice) {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getMrn().setDwpIssuingOffice(invalidDwpIssuingOffice);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
+            regionalProcessingCenter);
+    }
+
     @Test
     public void syaMissingMrnTest() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
