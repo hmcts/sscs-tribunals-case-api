@@ -42,7 +42,7 @@ ccd:
       NODE_TLS_REJECT_UNAUTHORIZED: 0
 
   adminWeb:
-    enabled: true # if you need access to the admin web ui then enable this, otherwise it won't be deployed
+    enabled: false # if you need access to the admin web ui then enable this, otherwise it won't be deployed
     s2sKey: ${ADMIN_S2S_KEY}
     idamClientSecret:
       value: ${ADMIN_WEB_IDAM_SECRET}
