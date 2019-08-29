@@ -73,12 +73,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         boolean hasContactDetails = syaCaseWrapper.getContactDetails() != null;
 
-        String benefitCode = generateBenefitCode(appeal.getBenefitType().getCode());
-        String issueCode = generateIssueCode();
-        String caseCode = generateCaseCode(benefitCode, issueCode);
+        boolean isDraft = isDraft(syaCaseWrapper);
+
+        String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode());
+        String issueCode = isDraft ? null : generateIssueCode();
+        String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
-        boolean isDraft = isDraft(syaCaseWrapper);
         return SscsCaseData.builder()
             .caseCreated(LocalDate.now().toString())
             .generatedSurname(isDraft ? null : syaCaseWrapper.getAppellant().getLastName())
