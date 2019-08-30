@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.transform.deserialize;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public enum DwpRegionalCenterMapping {
@@ -19,13 +20,11 @@ public enum DwpRegionalCenterMapping {
         this.dwpIssuingOfficeNumber = dwpIssuingOfficeNumber;
     }
 
-    public static String getDwpRegionForGivenDwpIssuingOfficeNum(String issuingOfficeNum) {
+    public static Optional<String> getDwpRegionForGivenDwpIssuingOfficeNum(String issuingOfficeNum) {
         return Stream.of(DwpRegionalCenterMapping.values())
-            .filter(e -> e.dwpIssuingOfficeNumber.contains(issuingOfficeNum))
-            .map(e -> e.dwpRegion)
-            .findFirst()
-            .orElseThrow(() ->
-                new RuntimeException("the provided DWP issuing office number is NOT valid: " + issuingOfficeNum));
+            .filter(dwp -> dwp.dwpIssuingOfficeNumber.contains(issuingOfficeNum))
+            .map(dwp -> dwp.dwpRegion)
+            .findFirst();
     }
 
 }
