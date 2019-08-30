@@ -1,0 +1,20 @@
+{
+  "value": {
+    "code": "appellant",
+    "label": "Appellant (or Appointee)"
+  },
+  "list_items": [
+    {
+      "code": "appellant",
+      "label": "Appellant (or Appointee)"
+    },
+    {
+      "code": "representative",
+      "label": "Representative"
+    },
+    {
+      "code": "dwp",
+      "label": "DWP"
+    }
+  ]
+}
