@@ -34,7 +34,7 @@ ccd:
 
   definitionStoreApi:
     s2sKey: ${DEFINITION_STORE_S2S_KEY}
-    s2sAuthorisedServices: ccd_admin,ccd_data,cmc_claim_store,ccd_gw
+    s2sAuthorisedServices: ccd_admin,ccd_data,sscs,ccd_gw
 
   caseManagementWeb:
     enabled: true # if you need access to the web ui then enable this, otherwise it won't be deployed
