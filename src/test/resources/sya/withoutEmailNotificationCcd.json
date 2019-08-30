@@ -4,6 +4,9 @@
   "generatedMobile" : "07411222222",
   "generatedNino" : "AB877533C",
   "generatedSurname" : "Bloggs",
+  "benefitCode" : "002",
+  "issueCode" : "DD",
+  "caseCode" : "002DD",
   "region": "CARDIFF",
   "regionalProcessingCenter": {
     "name" : "CARDIFF",

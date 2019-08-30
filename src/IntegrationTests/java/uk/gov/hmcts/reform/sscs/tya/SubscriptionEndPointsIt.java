@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @AutoConfigureMockMvc
 public class SubscriptionEndPointsIt {
 
-    public static final String BENEFIT_TYPE_RESPONSE = "{\"benefitType\":\"jsa\"}";
+    public static final String BENEFIT_TYPE_RESPONSE = "{\"benefitType\":\"pip\"}";
     public static final String SUBSCRIPTION_MANAGE_URL = "/appeals/abc2345/subscriptions/subscriptionId";
 
     @Autowired
