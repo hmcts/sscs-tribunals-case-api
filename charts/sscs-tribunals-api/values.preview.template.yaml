@@ -59,7 +59,7 @@ ccd:
         - SSCS
       users:
         - system.update@hmcts.net|SSCS|Benefit|appealCreated
-      userProfileDatabaseHost: ${SERVICE_NAME}-postgres
+      userProfileDatabaseHost: ${SERVICE_NAME}-ccd-postgres
       userProfileDatabasePort: 5432
       userProfileDatabaseUser: hmcts
       userProfileDatabasePassword: hmcts
