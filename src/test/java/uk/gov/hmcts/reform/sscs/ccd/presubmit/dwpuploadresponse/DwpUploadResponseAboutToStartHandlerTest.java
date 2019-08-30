@@ -70,4 +70,14 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         assertEquals("DWP PIP (1)", response.getData().getDwpPresentingOffice().getValue().getCode());
     }
 
+    @Test
+    public void defaultTheDwpOptionsToNo() {
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+
+        assertEquals("No", response.getData().getDwpIsOfficerAttending());
+        assertEquals("No", response.getData().getDwpUcb());
+        assertEquals("No", response.getData().getDwpPhme());
+        assertEquals("No", response.getData().getDwpComplexAppeal());
+    }
+
 }

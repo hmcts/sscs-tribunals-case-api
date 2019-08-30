@@ -40,6 +40,7 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         setOfficeDropdowns(sscsCaseData);
+        setDefaultFieldValues(sscsCaseData);
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
@@ -64,5 +65,12 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
 
         sscsCaseData.setDwpOriginatingOffice(new DynamicList(listOptions.get(defaultSelectedIndex), listOptions));
         sscsCaseData.setDwpPresentingOffice(new DynamicList(listOptions.get(defaultSelectedIndex), listOptions));
+    }
+
+    private void setDefaultFieldValues(SscsCaseData sscsCaseData) {
+        sscsCaseData.setDwpIsOfficerAttending("No");
+        sscsCaseData.setDwpUcb("No");
+        sscsCaseData.setDwpPhme("No");
+        sscsCaseData.setDwpComplexAppeal("No");
     }
 }
