@@ -14,9 +14,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
     private final List<PreSubmitCallbackHandler<T>> callbackHandlers;
 
-    public PreSubmitCallbackDispatcher(
-        List<PreSubmitCallbackHandler<T>> callbackHandlers
-    ) {
+    public PreSubmitCallbackDispatcher(List<PreSubmitCallbackHandler<T>> callbackHandlers) {
         requireNonNull(callbackHandlers, "callbackHandlers must not be null");
         this.callbackHandlers = callbackHandlers;
     }
@@ -32,15 +30,10 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
     private void dispatchToHandlers(CallbackType callbackType, Callback<T> callback,
                                     List<PreSubmitCallbackHandler<T>> callbackHandlers,
                                     PreSubmitCallbackResponse<T> callbackResponse) {
-
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
-
             if (callbackHandler.canHandle(callbackType, callback)) {
-
                 PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback);
-
                 callbackResponse.setData(callbackResponseFromHandler.getData());
-
                 callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
             }
         }
