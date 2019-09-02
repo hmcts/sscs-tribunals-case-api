@@ -246,8 +246,6 @@ dependencies {
     compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.16'
     compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.16'
 
-    compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-
     compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
 
