@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+        return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.ADMIN_APPEAL_WITHDRAWN);
     }
 
