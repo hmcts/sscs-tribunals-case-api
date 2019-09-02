@@ -1,6 +1,5 @@
 tags:
   ccd-idam-pr: true
-  postgresql-pod: false  # stop any subcharts starting their own postgres instance
 
 java:
   image: ${IMAGE_NAME}
