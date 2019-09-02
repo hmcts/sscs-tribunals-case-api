@@ -211,6 +211,11 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
+
+    dependencies {
+        dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+    }
+
 }
 
 configurations.all {
@@ -236,8 +241,6 @@ dependencies {
     compile group: 'com.fasterxml.jackson.module', name: 'jackson-module-parameter-names'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310'
-
-    dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
