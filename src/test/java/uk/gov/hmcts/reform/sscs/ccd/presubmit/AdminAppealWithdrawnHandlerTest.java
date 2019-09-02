@@ -67,7 +67,9 @@ public class AdminAppealWithdrawnHandlerTest {
     }
 
     private Callback<SscsCaseData> buildTestCallback(EventType eventType) throws IOException {
-        if (eventType == null) return null;
+        if (eventType == null) {
+            return null;
+        }
         String json = fetchData("callback/adminAppealWithdrawnCallback.json");
         String jsonCallback = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
