@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -19,12 +19,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 public class AdminAppealWithdrawnHandlerTest {
 
     @Test
-    @Parameters({"ABOUT_TO_SUBMIT,ADMIN_APPEAL_WITHDRAWN"})
-    public void canHandle(CallbackType callbackType, EventType eventType) {
+    @Parameters({
+        "ABOUT_TO_SUBMIT,ADMIN_APPEAL_WITHDRAWN,true",
+        "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN,false"
+    })
+    public void canHandle(CallbackType callbackType, EventType eventType, boolean expectedResult) {
         AdminAppealWithdrawnHandler adminAppealWithdrawnHandler = new AdminAppealWithdrawnHandler();
         boolean actualResult = adminAppealWithdrawnHandler.canHandle(callbackType,
             buildTestCallback(eventType));
-        assertTrue(actualResult);
+        assertEquals(expectedResult, actualResult);
     }
 
     private Callback<SscsCaseData> buildTestCallback(EventType eventType) {

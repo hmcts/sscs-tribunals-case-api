@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return true;
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT);
     }
 
     @Override
