@@ -21,7 +21,9 @@ public class AdminAppealWithdrawnHandlerTest {
     @Test
     @Parameters({
         "ABOUT_TO_SUBMIT,ADMIN_APPEAL_WITHDRAWN,true",
-        "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN,false"
+        "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN,false",
+        "SUBMITTED,ADMIN_APPEAL_WITHDRAWN,false",
+        "MID_EVENT,ADMIN_APPEAL_WITHDRAWN,false"
     })
     public void canHandle(CallbackType callbackType, EventType eventType, boolean expectedResult) {
         AdminAppealWithdrawnHandler adminAppealWithdrawnHandler = new AdminAppealWithdrawnHandler();
