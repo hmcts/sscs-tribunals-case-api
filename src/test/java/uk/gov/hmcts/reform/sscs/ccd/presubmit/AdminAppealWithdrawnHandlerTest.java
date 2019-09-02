@@ -84,6 +84,17 @@ public class AdminAppealWithdrawnHandlerTest {
         assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
     }
 
+    @Test(expected = IllegalStateException.class)
+    @Parameters({
+        "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN",
+        "ABOUT_TO_START,null",
+        "null,ADMIN_APPEAL_WITHDRAWN"
+    })
+    public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
+        throws IOException {
+        adminAppealWithdrawnHandler.handle(callbackType, buildTestCallback(eventType));
+    }
+
     private String fetchData(String s) throws IOException {
         String file = Objects.requireNonNull(getClass().getClassLoader().getResource(s)).getFile();
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
