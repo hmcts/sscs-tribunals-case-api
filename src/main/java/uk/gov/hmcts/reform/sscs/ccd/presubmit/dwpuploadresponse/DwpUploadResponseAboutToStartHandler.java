@@ -49,7 +49,7 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         Optional<OfficeMapping> selectedOfficeMapping = sscsCaseData.getAppeal().getMrnDetails() != null && sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice() != null
-                ? service.getOfficeMappingByDwpIssuingOffice(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) : Optional.empty();
+                ? service.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) : Optional.empty();
 
         OfficeMapping[] offices = service.allDwpBenefitOffices();
         int defaultSelectedIndex = 0;
