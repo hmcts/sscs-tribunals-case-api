@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -59,15 +60,15 @@ public class AdminAppealWithdrawnHandlerTest {
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, boolean expectedResult)
         throws IOException {
         Callback<SscsCaseData> callback = buildTestCallback(eventType);
+
         boolean actualResult = adminAppealWithdrawnHandler.canHandle(callbackType, callback);
+
         assertEquals(expectedResult, actualResult);
     }
 
     private Callback<SscsCaseData> buildTestCallback(EventType eventType) throws IOException {
         if (eventType == null) return null;
-        String file = Objects.requireNonNull(getClass().getClassLoader().getResource(
-            "callback/adminAppealWithdrawnCallback.json")).getFile();
-        String json = FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
+        String json = fetchData("callback/adminAppealWithdrawnCallback.json");
         String jsonCallback = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
         return sscsCaseCallbackDeserializer.deserialize(jsonCallback);
@@ -77,6 +78,14 @@ public class AdminAppealWithdrawnHandlerTest {
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = adminAppealWithdrawnHandler.handle(
             CallbackType.ABOUT_TO_SUBMIT, buildTestCallback(EventType.ADMIN_APPEAL_WITHDRAWN));
+
+        String expectedCaseData = fetchData("callback/adminAppealWithdrawnExpectedCaseData.json");
         assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
+        assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
+    }
+
+    private String fetchData(String s) throws IOException {
+        String file = Objects.requireNonNull(getClass().getClassLoader().getResource(s)).getFile();
+        return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
 }
