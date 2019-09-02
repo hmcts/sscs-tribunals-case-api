@@ -17,6 +17,8 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return null;
+        return new PreSubmitCallbackResponse<>(SscsCaseData.builder()
+            .dwpState("withdrawalReceived")
+            .build());
     }
 }

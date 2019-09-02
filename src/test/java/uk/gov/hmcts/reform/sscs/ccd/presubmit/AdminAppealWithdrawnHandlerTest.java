@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -18,6 +19,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
 public class AdminAppealWithdrawnHandlerTest {
+
+    private final AdminAppealWithdrawnHandler adminAppealWithdrawnHandler = new AdminAppealWithdrawnHandler();
 
     @Test
     @Parameters({
@@ -30,7 +33,6 @@ public class AdminAppealWithdrawnHandlerTest {
         "ABOUT_TO_SUBMIT,null,false",
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, boolean expectedResult) {
-        AdminAppealWithdrawnHandler adminAppealWithdrawnHandler = new AdminAppealWithdrawnHandler();
         boolean actualResult = adminAppealWithdrawnHandler.canHandle(callbackType, buildTestCallback(eventType));
         assertEquals(expectedResult, actualResult);
     }
@@ -44,5 +46,8 @@ public class AdminAppealWithdrawnHandlerTest {
 
     @Test
     public void handle() {
+        PreSubmitCallbackResponse<SscsCaseData> actualResult = adminAppealWithdrawnHandler.handle(
+            CallbackType.ABOUT_TO_SUBMIT, buildTestCallback(EventType.ADMIN_APPEAL_WITHDRAWN));
+        assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
     }
 }
