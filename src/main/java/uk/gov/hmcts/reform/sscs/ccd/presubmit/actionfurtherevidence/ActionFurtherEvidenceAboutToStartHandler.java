@@ -50,33 +50,33 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
     }
 
     private void setFurtherEvidenceActionDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listCostOptions = new ArrayList<>();
+        List<DynamicListItem> listOptions = new ArrayList<>();
 
         if (issueFurtherEvidenceFeature) {
-            listCostOptions.add(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.getCode(), ISSUE_FURTHER_EVIDENCE.getLabel()));
+            listOptions.add(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.getCode(), ISSUE_FURTHER_EVIDENCE.getLabel()));
         }
-        listCostOptions.add(new DynamicListItem(OTHER_DOCUMENT_MANUAL.getCode(), OTHER_DOCUMENT_MANUAL.getLabel()));
+        listOptions.add(new DynamicListItem(OTHER_DOCUMENT_MANUAL.getCode(), OTHER_DOCUMENT_MANUAL.getLabel()));
 
         if (sscsCaseData.getInterlocReviewState() != null) {
-            listCostOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC.getCode(),
+            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC.getCode(),
                 INFORMATION_RECEIVED_FOR_INTERLOC.getLabel()));
         }
 
-        sscsCaseData.setFurtherEvidenceAction(new DynamicList(listCostOptions.get(0), listCostOptions));
+        sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
-        List<DynamicListItem> listCostOptions = new ArrayList<>();
+        List<DynamicListItem> listOptions = new ArrayList<>();
 
-        listCostOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        listCostOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
+        listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         if (sscsCaseData.getAppeal().getRep() != null
                 && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
-            listCostOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
+            listOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
 
-        sscsCaseData.setOriginalSender(new DynamicList(listCostOptions.get(0), listCostOptions));
+        sscsCaseData.setOriginalSender(new DynamicList(listOptions.get(0), listOptions));
 
     }
 }
