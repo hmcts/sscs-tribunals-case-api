@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals.DwpState.WITHDRAWAL_RECEIVED;
+
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -12,7 +14,7 @@ public class DwpActionWithdrawalHandler implements PreSubmitCallbackHandler<Sscs
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.DWP_ACTION_WITHDRAWAL)
-            && "withdrawalReceived".equals(callback.getCaseDetails().getCaseData().getDwpState());
+            && WITHDRAWAL_RECEIVED.getValue().equals(callback.getCaseDetails().getCaseData().getDwpState());
     }
 
     @Override

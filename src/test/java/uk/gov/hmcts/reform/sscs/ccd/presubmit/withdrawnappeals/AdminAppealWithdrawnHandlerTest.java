@@ -17,8 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @RunWith(JUnitParamsRunner.class)
 public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
 
-    private final AdminAppealWithdrawnHandler handler =
-        new AdminAppealWithdrawnHandler();
+    private final AdminAppealWithdrawnHandler handler = new AdminAppealWithdrawnHandler();
 
     @Test
     @Parameters({

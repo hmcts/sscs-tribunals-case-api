@@ -22,7 +22,7 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState("withdrawalReceived");
+        caseData.setDwpState(DwpState.WITHDRAWAL_RECEIVED.getValue());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
