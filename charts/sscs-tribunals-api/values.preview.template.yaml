@@ -56,9 +56,6 @@ ccd:
       NODE_TLS_REJECT_UNAUTHORIZED: 0
 
   importer:
-    resources:
-      limits:
-        memory: 1024Mi
     userprofile:
       enabled: true
       jurisdictions:
