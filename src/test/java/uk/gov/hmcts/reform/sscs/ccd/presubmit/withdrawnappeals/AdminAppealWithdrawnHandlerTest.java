@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.admin_appeal_withdrawn;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
@@ -15,10 +15,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
-public class AdminAppealWithdrawnDwpStateToWithdrawalReceivedHandlerTest extends AdminAppealWithdrawnBase {
+public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
 
-    private final AdminAppealWithdrawnDwpStateToWithdrawalReceivedHandler handler =
-        new AdminAppealWithdrawnDwpStateToWithdrawalReceivedHandler();
+    private final AdminAppealWithdrawnHandler handler =
+        new AdminAppealWithdrawnHandler();
 
     @Test
     @Parameters({
@@ -32,15 +32,16 @@ public class AdminAppealWithdrawnDwpStateToWithdrawalReceivedHandlerTest extends
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, boolean expectedResult)
         throws IOException {
-        boolean actualResult = handler.canHandle(callbackType,
-            buildTestCallback(eventType));
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallback(eventType,
+            "adminAppealWithdrawnCallback.json"));
         assertEquals(expectedResult, actualResult);
     }
 
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(
-            CallbackType.ABOUT_TO_SUBMIT, buildTestCallback(EventType.ADMIN_APPEAL_WITHDRAWN));
+            CallbackType.ABOUT_TO_SUBMIT, buildTestCallback(EventType.ADMIN_APPEAL_WITHDRAWN,
+                "adminAppealWithdrawnCallback.json"));
 
         String expectedCaseData = fetchData("callback/adminAppealWithdrawnExpectedCaseData.json");
         assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
@@ -55,7 +56,7 @@ public class AdminAppealWithdrawnDwpStateToWithdrawalReceivedHandlerTest extends
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
         throws IOException {
-        handler.handle(callbackType, buildTestCallback(eventType));
+        handler.handle(callbackType, buildTestCallback(eventType, "adminAppealWithdrawnCallback.json"));
     }
 
 }

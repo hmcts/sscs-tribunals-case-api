@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.admin_appeal_withdrawn;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
@@ -35,11 +35,11 @@ public class AdminAppealWithdrawnBase {
         mapper.registerModule(new JavaTimeModule());
     }
 
-    Callback<SscsCaseData> buildTestCallback(EventType eventType) throws IOException {
+    Callback<SscsCaseData> buildTestCallback(EventType eventType, final String callbackName) throws IOException {
         if (eventType == null) {
             return null;
         }
-        String json = fetchData("callback/adminAppealWithdrawnCallback.json");
+        String json = fetchData("callback/" + callbackName);
         String jsonCallback = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
         return sscsCaseCallbackDeserializer.deserialize(jsonCallback);

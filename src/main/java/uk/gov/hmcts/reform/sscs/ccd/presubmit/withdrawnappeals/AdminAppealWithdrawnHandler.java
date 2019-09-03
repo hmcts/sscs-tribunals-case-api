@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.admin_appeal_withdrawn;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class AdminAppealWithdrawnDwpStateToWithdrawalReceivedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
