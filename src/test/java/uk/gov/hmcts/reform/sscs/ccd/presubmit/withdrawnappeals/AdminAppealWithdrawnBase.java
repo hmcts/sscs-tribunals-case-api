@@ -35,17 +35,7 @@ public class AdminAppealWithdrawnBase {
         mapper.registerModule(new JavaTimeModule());
     }
 
-    Callback<SscsCaseData> buildTestCallback(EventType eventType, final String callbackName, String dwpStateValue)
-        throws IOException {
-        if (eventType == null) {
-            return null;
-        }
-        Callback<SscsCaseData> callback = buildTestCallback(eventType, callbackName);
-        callback.getCaseDetails().getCaseData().setDwpState(dwpStateValue);
-        return callback;
-    }
-
-    Callback<SscsCaseData> buildTestCallback(EventType eventType, final String callbackName) throws IOException {
+    Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, final String callbackName) throws IOException {
         if (eventType == null) {
             return null;
         }

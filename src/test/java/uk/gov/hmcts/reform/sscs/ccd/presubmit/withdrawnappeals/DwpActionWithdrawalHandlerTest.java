@@ -9,6 +9,7 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -34,15 +35,25 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                           @Nullable String dwpStateValue, boolean expectedResult) throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallback(eventType,
-            "dwpActionWithdrawalCallback.json", dwpStateValue));
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEventAndDwpState(eventType,
+            dwpStateValue));
         assertEquals(expectedResult, actualResult);
+    }
+
+    private Callback<SscsCaseData> buildTestCallbackGivenEventAndDwpState(EventType eventType, String dwpStateValue)
+        throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenEvent(eventType,
+            "dwpActionWithdrawalCallback.json");
+        if (callback != null) {
+            callback.getCaseDetails().getCaseData().setDwpState(dwpStateValue);
+        }
+        return callback;
     }
 
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallback(EventType.DWP_ACTION_WITHDRAWAL, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
+            buildTestCallbackGivenEvent(EventType.DWP_ACTION_WITHDRAWAL, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/dwpActionWithdrawalExpectedCaseData.json");
         assertEquals("Withdrawn", actualResult.getData().getDwpState());
@@ -57,6 +68,6 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
         throws IOException {
-        handler.handle(callbackType, buildTestCallback(eventType, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
+        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
     }
 }

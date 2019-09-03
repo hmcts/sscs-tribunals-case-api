@@ -32,7 +32,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, boolean expectedResult)
         throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallback(eventType,
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType,
             "adminAppealWithdrawnCallback.json"));
         assertEquals(expectedResult, actualResult);
     }
@@ -40,7 +40,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(
-            CallbackType.ABOUT_TO_SUBMIT, buildTestCallback(EventType.ADMIN_APPEAL_WITHDRAWN,
+            CallbackType.ABOUT_TO_SUBMIT, buildTestCallbackGivenEvent(EventType.ADMIN_APPEAL_WITHDRAWN,
                 ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON));
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/adminAppealWithdrawnExpectedCaseData.json");
@@ -56,7 +56,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
         throws IOException {
-        handler.handle(callbackType, buildTestCallback(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON));
+        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON));
     }
 
 }
