@@ -208,8 +208,12 @@ ext {
 }
 
 dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    dependencies {
+        dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
     }
 }
 
@@ -256,7 +260,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.50'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.51'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.2'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
