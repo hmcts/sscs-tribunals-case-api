@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @RunWith(JUnitParamsRunner.class)
 public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
 
+    public static final String ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON = "adminAppealWithdrawnCallback.json";
     private final AdminAppealWithdrawnHandler handler = new AdminAppealWithdrawnHandler();
 
     @Test
@@ -40,7 +41,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(
             CallbackType.ABOUT_TO_SUBMIT, buildTestCallback(EventType.ADMIN_APPEAL_WITHDRAWN,
-                "adminAppealWithdrawnCallback.json"));
+                ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON));
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/adminAppealWithdrawnExpectedCaseData.json");
         assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
@@ -50,12 +51,12 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
     @Test(expected = IllegalStateException.class)
     @Parameters({
         "ABOUT_TO_START,ADMIN_APPEAL_WITHDRAWN",
-        "ABOUT_TO_START,null",
+        "ABOUT_TO_SUBMIT,null",
         "null,ADMIN_APPEAL_WITHDRAWN"
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
         throws IOException {
-        handler.handle(callbackType, buildTestCallback(eventType, "adminAppealWithdrawnCallback.json"));
+        handler.handle(callbackType, buildTestCallback(eventType, ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON));
     }
 
 }

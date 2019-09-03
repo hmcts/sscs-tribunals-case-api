@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @RunWith(JUnitParamsRunner.class)
 public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
 
+    private static final String DWP_ACTION_WITHDRAWAL_CALLBACK_JSON = "dwpActionWithdrawalCallback.json";
     private final DwpActionWithdrawalHandler handler = new DwpActionWithdrawalHandler();
 
     @Test
@@ -41,10 +42,21 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallback(EventType.DWP_ACTION_WITHDRAWAL, "dwpActionWithdrawalCallback.json"));
+            buildTestCallback(EventType.DWP_ACTION_WITHDRAWAL, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/dwpActionWithdrawalExpectedCaseData.json");
         assertEquals("Withdrawn", actualResult.getData().getDwpState());
         assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @Parameters({
+        "ABOUT_TO_START,DWP_ACTION_WITHDRAWAL",
+        "ABOUT_TO_SUBMIT,null",
+        "null,DWP_ACTION_WITHDRAWAL"
+    })
+    public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
+        throws IOException {
+        handler.handle(callbackType, buildTestCallback(eventType, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
     }
 }
