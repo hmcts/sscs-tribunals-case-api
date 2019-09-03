@@ -19,6 +19,11 @@ public class DwpActionWithdrawalHandler implements PreSubmitCallbackHandler<Sscs
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return null;
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setDwpState(DwpState.WITHDRAWN.getValue());
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }

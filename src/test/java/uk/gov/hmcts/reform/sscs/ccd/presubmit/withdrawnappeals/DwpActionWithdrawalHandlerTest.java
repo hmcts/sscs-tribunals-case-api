@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
@@ -9,10 +10,14 @@ import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
+
+    private final DwpActionWithdrawalHandler handler = new DwpActionWithdrawalHandler();
 
     @Test
     @Parameters({
@@ -28,13 +33,18 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                           @Nullable String dwpStateValue, boolean expectedResult) throws IOException {
-        DwpActionWithdrawalHandler handler = new DwpActionWithdrawalHandler();
         boolean actualResult = handler.canHandle(callbackType, buildTestCallback(eventType,
             "dwpActionWithdrawalCallback.json", dwpStateValue));
         assertEquals(expectedResult, actualResult);
     }
 
     @Test
-    public void handle() {
+    public void handle() throws IOException {
+        PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
+            buildTestCallback(EventType.DWP_ACTION_WITHDRAWAL, "dwpActionWithdrawalCallback.json"));
+
+        String expectedCaseData = fetchData("callback/withdrawnappeals/dwpActionWithdrawalExpectedCaseData.json");
+        assertEquals("Withdrawn", actualResult.getData().getDwpState());
+        assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
     }
 }
