@@ -39,7 +39,7 @@ public class AdminAppealWithdrawnBase {
         if (eventType == null) {
             return null;
         }
-        String json = fetchData("callback/" + callbackName);
+        String json = fetchData("callback/withdrawnappeals/" + callbackName);
         String jsonCallback = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
         return sscsCaseCallbackDeserializer.deserialize(jsonCallback);
