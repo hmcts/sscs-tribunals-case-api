@@ -55,6 +55,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
 
     @Test
     public void populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withCorrectSelectedOffice() {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
 
         assertEquals("DWP PIP (3)", response.getData().getDwpOriginatingOffice().getValue().getCode());
