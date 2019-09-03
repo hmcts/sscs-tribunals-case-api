@@ -215,6 +215,11 @@ dependencyManagement {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
     }
+
+    dependencies {
+        dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+    }
+
 }
 
 configurations.all {
