@@ -16,20 +16,21 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
 
     @Test
     @Parameters({
-        "ABOUT_TO_SUBMIT,DWP_ACTION_WITHDRAWAL,true",
-//        "ABOUT_TO_START,DWP_ACTION_WITHDRAWAL,false",
-//        "SUBMITTED,DWP_ACTION_WITHDRAWAL,false",
-//        "MID_EVENT,ADMIN_APPEAL_WITHDRAWN,false",
-//        "ABOUT_TO_SUBMIT,ISSUE_FURTHER_EVIDENCE,false",
-//        "null,DWP_ACTION_WITHDRAWAL,false",
-//        "ABOUT_TO_SUBMIT,null,false",
+        "ABOUT_TO_SUBMIT,DWP_ACTION_WITHDRAWAL,withdrawalReceived,true",
+        "ABOUT_TO_SUBMIT,DWP_ACTION_WITHDRAWAL,anyOtherValue,false",
+        "ABOUT_TO_SUBMIT,DWP_ACTION_WITHDRAWAL,null,false",
+        "ABOUT_TO_START,DWP_ACTION_WITHDRAWAL,withdrawalReceived,false",
+        "SUBMITTED,DWP_ACTION_WITHDRAWAL,withdrawalReceived,false",
+        "MID_EVENT,ADMIN_APPEAL_WITHDRAWN,withdrawalReceived,false",
+        "ABOUT_TO_SUBMIT,ISSUE_FURTHER_EVIDENCE,withdrawalReceived,false",
+        "null,DWP_ACTION_WITHDRAWAL,withdrawalReceived,false",
+        "ABOUT_TO_SUBMIT,null,withdrawalReceived,false",
     })
-    public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, boolean expectedResult)
-        throws IOException {
+    public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType,
+                          @Nullable String dwpStateValue, boolean expectedResult) throws IOException {
         DwpActionWithdrawalHandler handler = new DwpActionWithdrawalHandler();
-        boolean actualResult = handler.canHandle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallback(EventType.DWP_ACTION_WITHDRAWAL,
-                "dwpActionWithdrawalCallback.json"));
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallback(eventType,
+            "dwpActionWithdrawalCallback.json", dwpStateValue));
         assertEquals(expectedResult, actualResult);
     }
 
