@@ -47,6 +47,9 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
+            sscsCaseData.setResendToAppellant(null);
+            sscsCaseData.setResendToRepresentative(null);
+            sscsCaseData.setResendToDwp(null);
             sscsCaseData.setOriginalSender(null);
         }
 
@@ -73,4 +76,5 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
     private String userFriendlyName(String documentType) {
         return StringUtils.capitalize(StringUtils.join(Arrays.stream(StringUtils.splitByCharacterTypeCamelCase(documentType)).map(StringUtils::uncapitalize).toArray(String[]::new), " "));
     }
+
 }

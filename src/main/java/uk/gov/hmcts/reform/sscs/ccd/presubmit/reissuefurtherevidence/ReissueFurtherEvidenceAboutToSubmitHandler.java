@@ -46,9 +46,20 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         Optional<String> selectedDocumentUrl = Optional.ofNullable(sscsCaseData.getReissueFurtherEvidenceDocument()).map(f -> f.getValue().getCode());
         ArrayList<String> errors = new ArrayList<>();
+
+        boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("YES", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
+        boolean somewhereToResend = sscsCaseData.isResendToAppellant() ||  (sscsCaseData.isResendToRepresentative() && caseHasARepresentative) || sscsCaseData.isResendToDwp();
+
+        if (!somewhereToResend) {
+            errors.add("Select a party to reissue the further evidence.");
+        }
         if (!selectedDocumentUrl.isPresent()) {
             errors.add("Select a document to re-issue further evidence.");
-        } else {
+        }
+        if (!caseHasARepresentative && sscsCaseData.isResendToRepresentative()) {
+            errors.add("Cannot re-issue to the representative as there is no representative on the appeal.");
+        }
+        if (errors.isEmpty() && selectedDocumentUrl.isPresent()) {
             Optional<SscsDocument> optionalSelectedDocument = sscsCaseData.getSscsDocument().stream().filter(f -> selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl())).findFirst();
             if (!optionalSelectedDocument.isPresent()) {
                 errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));

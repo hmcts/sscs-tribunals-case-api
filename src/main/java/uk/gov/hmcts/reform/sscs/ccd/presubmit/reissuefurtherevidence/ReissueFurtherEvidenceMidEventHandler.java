@@ -56,7 +56,6 @@ public class ReissueFurtherEvidenceMidEventHandler implements PreSubmitCallbackH
             if (!optionalSelectedDocument.isPresent()) {
                 errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
             } else {
-
                 List<DynamicListItem> listCostOptions = new ArrayList<>();
                 listCostOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
                 if (sscsCaseData.getAppeal().getRep() != null
