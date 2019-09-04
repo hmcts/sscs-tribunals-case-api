@@ -59,6 +59,7 @@ public class SubmitAppealService {
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
 
         EventType event = findEventType(caseData);
+        log.info("Event type is " + event.getCcdType());
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
         postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, event, userToken);
