@@ -134,6 +134,7 @@ public class ReissueFurtherEvidenceIt {
     public void callToAboutToSubmitHandler_willResetEvidenceHandledAndUpdateDocumentType() throws Exception {
         json = json.replaceFirst("\"reissueFurtherEvidenceDocument\": \\{\\}", "\"reissueFurtherEvidenceDocument\": " + midEventPartialJson);
         json = json.replaceFirst("\"originalSender\": \\{\\}", "\"originalSender\": " + aboutToSubmitPartialJson);
+        json = json.replaceFirst("\"resendToAppellant\": \"NO\"", "\"resendToAppellant\": \"YES\"");
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
