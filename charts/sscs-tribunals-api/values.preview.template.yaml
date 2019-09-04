@@ -10,6 +10,11 @@ java:
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
 
+memoryRequests: "1024Mi"
+cpuRequests: "25m"
+memoryLimits: "2048Mi"
+cpuLimits: "2500m"
+
 ccd:
   ingressHost: ${SERVICE_FQDN}
   ingressIP: ${INGRESS_IP}
@@ -67,8 +72,6 @@ ccd:
       userProfileDatabaseUser: hmcts
       userProfileDatabasePassword: hmcts
       userProfileDatabaseName: user-profile
-    environment:
-      JAVA_OPTS: -Xms128m -Xmx1024m
     definition:
       enabled: true
       image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.1.18
