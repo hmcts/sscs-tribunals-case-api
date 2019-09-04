@@ -67,6 +67,8 @@ ccd:
       userProfileDatabaseUser: hmcts
       userProfileDatabasePassword: hmcts
       userProfileDatabaseName: user-profile
+    environment:
+      JAVA_OPTS: -Xms128m -Xmx1024m
     definition:
       enabled: true
       image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.1.18
