@@ -39,7 +39,7 @@ public class GenerateFileTest {
         log.info(documentUrl);
         assertNotNull(documentUrl);
         byte[] bytes = evidenceManagementService.download(URI.create(documentUrl), DM_STORE_USER_ID);
-        try(PDDocument pdDocument = PDDocument.load(bytes)) {
+        try (PDDocument pdDocument = PDDocument.load(bytes)) {
             String text = new PDFTextStripper().getText(pdDocument);
             log.info("Got text.", text);
         }
