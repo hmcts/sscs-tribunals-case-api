@@ -46,7 +46,8 @@ public class UploadDocumentsHandlerTest {
 
     @Test
     @Parameters({
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,true"
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,true",
+        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,false"
     })
     public void canHandle(CallbackType callbackType, EventType eventType, boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType,
