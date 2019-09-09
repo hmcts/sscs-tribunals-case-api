@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.docassembly;
+package uk.gov.hmcts.reform.sscs.functional.docassembly;
 
 import static org.junit.Assert.assertNotNull;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
@@ -12,10 +12,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.functional.ccd.CreateCaseInCcdTest;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:config/application_e2e.properties")
+@ContextConfiguration(initializers = CreateCaseInCcdTest.Initializer.class)
 @SpringBootTest
 @Slf4j
 public class GenerateFileTest {
