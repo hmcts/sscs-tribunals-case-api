@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,22 +47,28 @@ public class UploadDocumentsHandlerTest {
 
     @Test
     @Parameters({
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,true",
-        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,false"
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,true",
+        "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,false",
+        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,false",
+        "null,APPEAL_RECEIVED,withDwp,false"
     })
-    public void canHandle(CallbackType callbackType, EventType eventType, boolean expectedResult) throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType,
-            "uploadDocumentCallback.json"));
+    public void canHandle(@Nullable CallbackType callbackType, EventType eventType, String state, boolean expectedResult)
+        throws IOException {
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state
+        ));
         assertEquals(expectedResult, actualResult);
     }
 
-    private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, final String callbackName)
+    private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state)
         throws IOException {
         if (eventType == null) {
             return null;
         }
-        String json = fetchData("callback/" + callbackName);
-        String jsonCallback = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
+        String json = fetchData("callback/" + "uploadDocumentCallback.json");
+        String eventIdPlaceholder = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
+        String jsonCallback = eventIdPlaceholder.replace("STATE_ID_PLACEHOLDER", state);
+
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
         return sscsCaseCallbackDeserializer.deserialize(jsonCallback);
     }

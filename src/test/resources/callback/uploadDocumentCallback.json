@@ -2,7 +2,7 @@
   "case_details": {
     "id": 1567775849641360,
     "jurisdiction": "SSCS",
-    "state": "withDwp",
+    "state": "STATE_ID_PLACEHOLDER",
     "version": 3,
     "case_type_id": "Benefit",
     "created_date": [2019, 9, 6, 13, 17, 29, 696000000],
