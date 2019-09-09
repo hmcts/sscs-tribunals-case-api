@@ -1,7 +1,13 @@
 package uk.gov.hmcts.reform.sscs.docassembly;
 
 import static org.junit.Assert.assertNotNull;
+import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
+import java.io.IOException;
+import java.net.URI;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,22 +16,33 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.ccd.CreateCaseInCcdTest;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @ContextConfiguration(initializers = CreateCaseInCcdTest.Initializer.class)
 @SpringBootTest
+@Slf4j
 public class GenerateFileTest {
 
     @Autowired
     private GenerateFile generateFile;
 
+    @Autowired
+    EvidenceManagementService evidenceManagementService;
+
     @Test
-    public void canUseDocAssembly() {
+    public void canUseDocAssembly() throws IOException {
 
-        String response = generateFile.assemble();
+        String documentUrl = generateFile.assemble();
 
-        System.out.println(response);
-        assertNotNull(response);
+        log.info(documentUrl);
+        assertNotNull(documentUrl);
+        byte[] bytes = evidenceManagementService.download(URI.create(documentUrl), DM_STORE_USER_ID);
+        try(PDDocument pdDocument = PDDocument.load(bytes)) {
+            String text = new PDFTextStripper().getText(pdDocument);
+            log.info("Got text.", text);
+        }
+
     }
 }
