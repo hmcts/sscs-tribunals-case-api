@@ -124,9 +124,33 @@ public class RecreateAppealPdfHandlerTest {
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), eq(idamTokens), any());
     }
 
+    @Test
+    public void shouldCallPdfServiceWhenSscsDocumentIsNull() {
+        SscsCaseData caseDataWithNullSscsDocument = buildCaseDataWithNullSscsDocument();
+
+        when(caseDetails.getCaseData()).thenReturn(caseDataWithNullSscsDocument);
+
+        when(emailService.generateUniqueEmailId(caseDataWithNullSscsDocument.getAppeal().getAppellant())).thenReturn("Test");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
+
+        assertEquals("No", response.getData().getEvidencePresent());
+        assertNotNull(caseDetails.getCaseData().getAppeal().getAppellant().getAppointee());
+
+        verify(emailService, times(2)).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService,times(1)).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), eq(idamTokens), any());
+    }
+
     private SscsCaseData buildCaseDataWithoutPdf() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
         caseData.setSscsDocument(Collections.emptyList());
+        caseData.setCcdCaseId(CCD_CASE_ID.toString());
+        return caseData;
+    }
+
+    private SscsCaseData buildCaseDataWithNullSscsDocument() {
+        SscsCaseData caseData = CaseDataUtils.buildCaseData();
+        caseData.setSscsDocument(null);
         caseData.setCcdCaseId(CCD_CASE_ID.toString());
         return caseData;
     }
