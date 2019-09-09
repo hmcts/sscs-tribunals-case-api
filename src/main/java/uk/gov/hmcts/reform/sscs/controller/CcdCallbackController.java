@@ -1,9 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.springframework.http.ResponseEntity.ok;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
 import com.google.common.base.Preconditions;
@@ -59,6 +57,17 @@ public class CcdCallbackController {
 
         authorisationService.authorise(serviceAuthHeader);
         return performRequest(ABOUT_TO_SUBMIT, callback);
+    }
+
+    @PostMapping(path = "/ccdMidEvent")
+    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEvent(
+            @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+            @RequestBody String message) {
+        Callback<SscsCaseData> callback = deserializer.deserialize(message);
+        log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+
+        authorisationService.authorise(serviceAuthHeader);
+        return performRequest(MID_EVENT, callback);
     }
 
     @PostMapping(path = "/ccdSubmittedEvent")
