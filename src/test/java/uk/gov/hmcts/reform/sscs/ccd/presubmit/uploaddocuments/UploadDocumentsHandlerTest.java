@@ -51,9 +51,10 @@ public class UploadDocumentsHandlerTest {
         "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp,false",
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,false",
         "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,false",
-        "null,APPEAL_RECEIVED,withDwp,false"
+        "null,APPEAL_RECEIVED,withDwp,false",
+        "ABOUT_TO_SUBMIT,null,withDwp,false",
     })
-    public void canHandle(@Nullable CallbackType callbackType, EventType eventType, String state, boolean expectedResult)
+    public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state, boolean expectedResult)
         throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state
         ));
@@ -62,7 +63,7 @@ public class UploadDocumentsHandlerTest {
 
     private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state)
         throws IOException {
-        if (eventType == null) {
+        if (eventType == null) {//custom condition to return a null callback needed for one test scenario above
             return null;
         }
         String json = fetchData("callback/" + "uploadDocumentCallback.json");
