@@ -105,7 +105,7 @@ public class CreateCaseInCcdTest {
         assertEquals("Yes", caseData.getAppeal().getAppellant().getIsAddressSameAsAppointee());
     }
 
-    static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+    public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
         private final String env = System.getenv("ENV");
 
