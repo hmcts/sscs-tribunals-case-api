@@ -12,15 +12,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.sscs.functional.ccd.CreateCaseInCcdTest;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(locations = "classpath:config/application_e2e.properties")
-@ContextConfiguration(initializers = CreateCaseInCcdTest.Initializer.class)
 @SpringBootTest
 @Slf4j
 public class GenerateFileTest {
@@ -36,7 +31,7 @@ public class GenerateFileTest {
 
         String documentUrl = generateFile.assemble();
 
-        log.info(documentUrl);
+        log.info("Document Assembly Url", documentUrl);
         assertNotNull(documentUrl);
         byte[] bytes = evidenceManagementService.download(URI.create(documentUrl), DM_STORE_USER_ID);
         try (PDDocument pdDocument = PDDocument.load(bytes)) {
