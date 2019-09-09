@@ -166,15 +166,15 @@ public class SubmitAppealService {
             boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());
 
             if (moveToNoneCompliant) {
-                log.info("Moving case {} to non-compliant as MRN Date is older than 13 months", caseData.getCcdCaseId());
+                log.info("Moving case for {} to non-compliant as MRN Date is older than 13 months", caseData.getAppeal().getAppellant().getIdentity().getNino());
                 return NON_COMPLIANT;
             } else {
-                log.info("Valid appeal create for case {}", caseData.getCcdCaseId());
+                log.info("Valid appeal create for case for {}", caseData.getAppeal().getAppellant().getIdentity().getNino());
                 return VALID_APPEAL_CREATED;
             }
         } else {
-            log.info("Moving case {} to incomplete due to MRN Details {} present and MRN Date {} present",
-                caseData.getCcdCaseId(),
+            log.info("Moving case for {} to incomplete due to MRN Details {} present and MRN Date {} present",
+                caseData.getAppeal().getAppellant().getIdentity().getNino(),
                 (caseData.getAppeal().getMrnDetails() != null ? "" : "not"),
                 (caseData.getAppeal().getMrnDetails().getMrnDate() != null ? "" : "not"));
             return INCOMPLETE_APPLICATION_RECEIVED;
