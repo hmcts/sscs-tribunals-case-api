@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,12 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         return eventTypeToSecondaryStatus;
     }
 
-    protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue) {
+    protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
         newSscsCaseData.setInterlocReviewState(newValue);
+
+        if (eventType.equals(EventType.NON_COMPLIANT)) {
+            newSscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+        }
 
         return newSscsCaseData;
     }
