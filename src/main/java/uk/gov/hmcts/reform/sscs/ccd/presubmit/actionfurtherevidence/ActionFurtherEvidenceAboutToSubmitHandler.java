@@ -135,7 +135,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
                 && (caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
-                || caseState.equals(State.READY_FOR_HEARING))) {
+                || caseState.equals(State.READY_TO_LIST))) {
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
             bundleAddition = getNextBundleAddition(sscsCaseData.getSscsDocument());
             url = addFooter(sscsCaseData, url, bundleAddition);

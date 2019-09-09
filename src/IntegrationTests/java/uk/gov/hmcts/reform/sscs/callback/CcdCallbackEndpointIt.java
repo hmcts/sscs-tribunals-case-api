@@ -332,7 +332,7 @@ public class CcdCallbackEndpointIt {
     }
 
     @Test
-    @Parameters({"dormantAppealState", "readyForHearing","responseReceived"})
+    @Parameters({"dormantAppealState", "readyToList","responseReceived"})
     public void shouldAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
         String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
