@@ -84,12 +84,14 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
         log.info("Case does have document {} and Pdf file name to check {} ",
                 !CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
 
-        for (SscsDocument document : caseData.getSscsDocument()) {
-            log.info("Existing document {} for case {} ",
-                    document != null ? document.getValue().getDocumentFileName() : null,
-                    caseData.getCcdCaseId());
-            if (document != null && fileName.equalsIgnoreCase(document.getValue().getDocumentFileName())) {
-                return true;
+        if (caseData.getSscsDocument() != null) {
+            for (SscsDocument document : caseData.getSscsDocument()) {
+                log.info("Existing document {} for case {} ",
+                        document != null ? document.getValue().getDocumentFileName() : null,
+                        caseData.getCcdCaseId());
+                if (document != null && fileName.equalsIgnoreCase(document.getValue().getDocumentFileName())) {
+                    return true;
+                }
             }
         }
         return false;
