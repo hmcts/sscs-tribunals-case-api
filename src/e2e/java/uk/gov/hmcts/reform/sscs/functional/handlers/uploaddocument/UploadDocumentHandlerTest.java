@@ -84,6 +84,13 @@ public class UploadDocumentHandlerTest {
         return sscsCaseCallbackDeserializer.deserialize(getJsonCallbackForTest(id)).getCaseDetails();
     }
 
+    private String getJsonCallbackForTest(long caseDetailsId) throws IOException {
+        String path = Objects.requireNonNull(getClass().getClassLoader()
+            .getResource("uploadDocumentCallback.json")).getFile();
+        String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetailsId));
+    }
+
     @Test
     public void givenUploadDocumentEventIsTriggered_shouldUploadDocument() {
         SscsCaseDetails actualCase = ccdService.updateCase(caseDetails.getCaseData(), caseDetails.getId(),
@@ -92,11 +99,5 @@ public class UploadDocumentHandlerTest {
         assertEquals("withDwp", actualCase.getState());
     }
 
-    private String getJsonCallbackForTest(long caseDetailsId) throws IOException {
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("uploadDocumentCallback.json")).getFile();
-        String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetailsId));
-    }
 }
 
