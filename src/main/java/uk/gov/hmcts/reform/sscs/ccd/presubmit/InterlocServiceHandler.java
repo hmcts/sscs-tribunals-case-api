@@ -36,7 +36,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
     protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
         newSscsCaseData.setInterlocReviewState(newValue);
 
-        if (eventType.equals(EventType.NON_COMPLIANT)) {
+        if (eventType.equals(EventType.NON_COMPLIANT) || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)) {
             newSscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
         }
 
