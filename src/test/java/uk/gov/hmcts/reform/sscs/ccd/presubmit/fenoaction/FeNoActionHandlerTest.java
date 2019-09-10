@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.BaseHandlerTest;
 public class FeNoActionHandlerTest extends BaseHandlerTest {
 
     private FeNoActionHandler handler = new FeNoActionHandler();
-    private static final String UPLOAD_DOCUMENT_CALLBACK_JSON = "uploaddocument/uploadDocumentCallback.json";
+    private static final String FE_NO_ACTION_CALLBACK_JSON = "fenoaction/feNoActionCallback.json";
 
     @Test
     @Parameters({
@@ -30,7 +30,7 @@ public class FeNoActionHandlerTest extends BaseHandlerTest {
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
                           boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state,
-            UPLOAD_DOCUMENT_CALLBACK_JSON));
+            FE_NO_ACTION_CALLBACK_JSON));
         assertEquals(expectedResult, actualResult);
     }
 }
