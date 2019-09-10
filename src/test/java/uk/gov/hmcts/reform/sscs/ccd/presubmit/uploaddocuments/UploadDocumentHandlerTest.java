@@ -60,18 +60,17 @@ public class UploadDocumentHandlerTest {
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
                           boolean expectedResult) throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(
-            eventType, state, UPLOAD_DOCUMENT_CALLBACK_JSON));
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state));
         assertEquals(expectedResult, actualResult);
     }
 
-    private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state, String filePath)
+    private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state)
         throws IOException {
         //custom condition to return a null callback needed for one test scenario above
         if (eventType == null) {
             return null;
         }
-        String json = fetchData(filePath);
+        String json = fetchData(UploadDocumentHandlerTest.UPLOAD_DOCUMENT_CALLBACK_JSON);
         String eventIdPlaceholder = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         String jsonCallback = eventIdPlaceholder.replace("STATE_ID_PLACEHOLDER", state);
 
@@ -88,7 +87,7 @@ public class UploadDocumentHandlerTest {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallbackGivenEvent(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(), UPLOAD_DOCUMENT_CALLBACK_JSON));
+            buildTestCallbackGivenEvent(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId()));
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
@@ -104,7 +103,6 @@ public class UploadDocumentHandlerTest {
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                                           @Nullable String state)
         throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state,
-            UPLOAD_DOCUMENT_CALLBACK_JSON));
+        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state));
     }
 }
