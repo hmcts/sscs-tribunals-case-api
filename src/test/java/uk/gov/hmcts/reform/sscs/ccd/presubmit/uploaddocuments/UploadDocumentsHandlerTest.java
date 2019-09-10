@@ -63,7 +63,8 @@ public class UploadDocumentsHandlerTest {
 
     private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state)
         throws IOException {
-        if (eventType == null) {//custom condition to return a null callback needed for one test scenario above
+        //custom condition to return a null callback needed for one test scenario above
+        if (eventType == null) {
             return null;
         }
         String json = fetchData("callback/" + "uploadDocumentCallback.json");
