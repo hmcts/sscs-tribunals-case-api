@@ -29,6 +29,7 @@ public class DirectionIssuedTemplateBodyTest {
         assertEquals("123", body.getCaseId());
         assertEquals("noticeType", body.getNoticeType());
         assertEquals(now, body.getDateAdded());
+        assertEquals("noticeBody", body.getNoticeBody());
         assertEquals(now, body.getGeneratedDate());
 
     }
