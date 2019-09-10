@@ -31,6 +31,7 @@ public class DirectionIssuedTemplateBodyTest {
         assertEquals(now, body.getDateAdded());
         assertEquals("noticeBody", body.getNoticeBody());
         assertEquals(now, body.getGeneratedDate());
+        assertEquals("[userImage:enhmcts.png]", body.getImage());
 
     }
 }

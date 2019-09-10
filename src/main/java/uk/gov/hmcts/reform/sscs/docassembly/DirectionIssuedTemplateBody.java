@@ -27,4 +27,7 @@ public class DirectionIssuedTemplateBody implements FormPayload {
     private String dateAdded;
     @JsonProperty("generated_date")
     private String generatedDate;
+    @JsonProperty("hmcts2")
+    @Builder.Default private String image = "[userImage:enhmcts.png]";
+
 }
