@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.docassembly;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @Service
 @Slf4j
 public class GenerateFile {
-
 
     private final DocAssemblyClient docAssemblyClient;
 
@@ -40,8 +38,8 @@ public class GenerateFile {
                         .noticeBody("Here is the body")
                         .userName("User Name")
                         .userRole("Judge")
-                        .dateAdded(LocalDate.now().toString())
-                        .generatedDate(LocalDateTime.now().toString())
+                        .dateAdded(LocalDate.now())
+                        .generatedDate(LocalDate.now())
                         .build())
                 .build();
 

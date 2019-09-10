@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.sscs.docassembly;
 
+import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Builder;
 import lombok.Value;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
@@ -23,10 +27,14 @@ public class DirectionIssuedTemplateBody implements FormPayload {
     private String userName;
     @JsonProperty("user_role")
     private String userRole;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
     @JsonProperty("date_added")
-    private String dateAdded;
+    private LocalDate dateAdded;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonSerialize(using = LocalDateSerializer.class)
     @JsonProperty("generated_date")
-    private String generatedDate;
+    private LocalDate generatedDate;
     @JsonProperty("hmcts2")
     @Builder.Default private String image = "[userImage:enhmcts.png]";
 

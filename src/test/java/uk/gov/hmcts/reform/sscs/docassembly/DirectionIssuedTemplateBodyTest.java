@@ -9,7 +9,7 @@ public class DirectionIssuedTemplateBodyTest {
 
     @Test
     public void canBuildATemplateBody() {
-        String now = LocalDate.now().toString();
+        LocalDate now = LocalDate.now();
         DirectionIssuedTemplateBody body = DirectionIssuedTemplateBody.builder()
                 .appellantFullName("Appellant")
                 .userRole("userRole")
