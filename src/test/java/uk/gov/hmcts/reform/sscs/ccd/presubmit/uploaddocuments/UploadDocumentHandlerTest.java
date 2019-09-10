@@ -59,7 +59,8 @@ public class UploadDocumentHandlerTest {
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state, boolean expectedResult)
         throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state, "uploadDocumentCallback.json"
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state,
+            "uploaddocument/uploadDocumentCallback.json"
         ));
         assertEquals(expectedResult, actualResult);
     }
