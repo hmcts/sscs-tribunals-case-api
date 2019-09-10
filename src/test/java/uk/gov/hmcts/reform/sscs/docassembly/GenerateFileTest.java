@@ -10,16 +10,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.docassembly.DocAssemblyClient;
 import uk.gov.hmcts.reform.docassembly.domain.DocAssemblyResponse;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GenerateFileTest {
-
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
 
     @Mock
     private DocAssemblyClient docAssemblyClient;
@@ -34,13 +31,12 @@ public class GenerateFileTest {
 
     @Before
     public void setUp() {
-        generateFile = new GenerateFile(authTokenGenerator, docAssemblyClient, idamService);
+        generateFile = new GenerateFile(docAssemblyClient, idamService);
     }
 
     @Test
     public void willCallGenerateOrderOnDocAssemblyClient() {
-        when(idamService.generateServiceAuthorization()).thenReturn("authString");
-        when(authTokenGenerator.generate()).thenReturn("token");
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().idamOauth2Token("oauth").serviceAuthorization("sscs").build());
         when(docAssemblyClient.generateOrder(anyString(), anyString(), any())).thenReturn(response);
         when(response.getRenditionOutputLocation()).thenReturn("test");
         String output = generateFile.assemble();
