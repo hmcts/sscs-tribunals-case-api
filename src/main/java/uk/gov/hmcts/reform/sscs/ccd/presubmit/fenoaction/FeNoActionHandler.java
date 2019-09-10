@@ -7,6 +7,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -21,6 +22,8 @@ public class FeNoActionHandler implements PreSubmitCallbackHandler<SscsCaseData>
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setDwpState(DwpState.FE_ACTIONED_NR.getValue());
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }

@@ -34,6 +34,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
                           boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state,
             UPLOAD_DOCUMENT_CALLBACK_JSON));
+
         assertEquals(expectedResult, actualResult);
     }
 
@@ -42,6 +43,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
             buildTestCallbackGivenEvent(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
                 UPLOAD_DOCUMENT_CALLBACK_JSON));
+
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
         assertEquals("feReceived", actualCaseData.getData().getDwpState());

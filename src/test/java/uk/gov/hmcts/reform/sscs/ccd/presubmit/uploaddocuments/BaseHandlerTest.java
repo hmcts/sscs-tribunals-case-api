@@ -49,7 +49,7 @@ public class BaseHandlerTest {
         return sscsCaseCallbackDeserializer.deserialize(jsonCallback);
     }
 
-    String fetchData(final String filePath) throws IOException {
+    protected String fetchData(final String filePath) throws IOException {
         String file = Objects.requireNonNull(getClass().getClassLoader()
             .getResource("callback/" + filePath)).getFile();
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
