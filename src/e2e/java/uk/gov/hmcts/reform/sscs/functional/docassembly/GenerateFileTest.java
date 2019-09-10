@@ -37,12 +37,12 @@ public class GenerateFileTest {
 
         String documentUrl = generateFile.assemble();
 
-        log.info("Document Assembly Url", documentUrl);
+        log.info("Document Assembly Url " + documentUrl);
         assertNotNull(documentUrl);
         byte[] bytes = evidenceManagementService.download(URI.create(documentUrl), DM_STORE_USER_ID);
         try (PDDocument pdDocument = PDDocument.load(bytes)) {
             String text = new PDFTextStripper().getText(pdDocument);
-            log.info("Got text.", text);
+            log.info("Got text. " + text);
         }
 
     }
