@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
 import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_ENUMS_USING_TO_STRING;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,14 +23,16 @@ import org.junit.runner.RunWith;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
-public class UploadDocumentsHandlerTest {
+public class UploadDocumentHandlerTest {
 
-    private UploadDocumentsHandler handler = new UploadDocumentsHandler();
+    private UploadDocumentHandler handler = new UploadDocumentHandler();
     private ObjectMapper mapper;
 
     @Before
@@ -56,18 +59,18 @@ public class UploadDocumentsHandlerTest {
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state, boolean expectedResult)
         throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state, "uploadDocumentCallback.json"
         ));
         assertEquals(expectedResult, actualResult);
     }
 
-    private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state)
+    private Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state, String filePath)
         throws IOException {
         //custom condition to return a null callback needed for one test scenario above
         if (eventType == null) {
             return null;
         }
-        String json = fetchData("callback/" + "uploadDocumentCallback.json");
+        String json = fetchData(filePath);
         String eventIdPlaceholder = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         String jsonCallback = eventIdPlaceholder.replace("STATE_ID_PLACEHOLDER", state);
 
@@ -75,12 +78,19 @@ public class UploadDocumentsHandlerTest {
         return sscsCaseCallbackDeserializer.deserialize(jsonCallback);
     }
 
-    private String fetchData(String s) throws IOException {
-        String file = Objects.requireNonNull(getClass().getClassLoader().getResource(s)).getFile();
+    private String fetchData(final String filePath) throws IOException {
+        String file = Objects.requireNonNull(getClass().getClassLoader()
+            .getResource("callback/" + filePath)).getFile();
         return FileUtils.readFileToString(new File(file), StandardCharsets.UTF_8.name());
     }
 
     @Test
-    public void handle() {
+    public void handle() throws IOException {
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
+            buildTestCallbackGivenEvent(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
+                "uploaddocument/uploadDocumentCallback.json"));
+        String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
+        assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
+        assertEquals("feReceived", actualCaseData.getData().getDwpState());
     }
 }
