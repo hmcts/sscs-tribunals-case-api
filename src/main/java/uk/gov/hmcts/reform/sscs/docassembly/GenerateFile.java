@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.docassembly;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,16 @@ public class GenerateFile {
         DocAssemblyRequest docAssemblyRequest = DocAssemblyRequest.builder()
                 .templateId("TB-SCS-GNO-ENG-00091.docx")
                 .outputType(OutputType.PDF)
-                .formPayload(null)
+                .formPayload(DirectionIssuedTemplateBody.builder()
+                        .appellantFullName("Appellant Name")
+                        .caseId("1234")
+                        .nino("nino")
+                        .noticeBody("Here is the body")
+                        .userName("User Name")
+                        .userRole("Judge")
+                        .dateAdded(LocalDate.now().toString())
+                        .generatedDate(LocalDateTime.now().toString())
+                        .build())
                 .build();
 
         DocAssemblyResponse docAssemblyResponse = docAssemblyClient.generateOrder(
