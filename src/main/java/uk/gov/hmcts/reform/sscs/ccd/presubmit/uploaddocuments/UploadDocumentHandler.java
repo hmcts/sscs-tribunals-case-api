@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
@@ -23,7 +24,7 @@ public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseD
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState("feReceived");
+        caseData.setDwpState(DwpState.FE_RECEIVED.getValue());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
