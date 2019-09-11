@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.functional.handlers.uploaddocument;
+package uk.gov.hmcts.reform.sscs.functional.handlers;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_ENUMS_USING_TO_STRING;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE;
