@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.functional.handlers.uploaddocument;
+package uk.gov.hmcts.reform.sscs.functional.handlers.fenoaction;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,21 +11,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.functional.handlers.uploaddocument.BaseHandlerTest;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class UploadDocumentHandlerTest extends BaseHandlerTest {
+public class FeNoActionHandlerTest extends BaseHandlerTest {
 
     @Test
     public void givenUploadDocumentEventIsTriggered_shouldUploadDocument() throws IOException {
-        caseDetails = createCaseInWithDwpStateUsingGivenCallback("uploadDocumentCallback.json");
+        caseDetails = createCaseInWithDwpStateUsingGivenCallback("feNoActionCallback.json");
 
         SscsCaseDetails actualCase = ccdService.updateCase(caseDetails.getCaseData(), caseDetails.getId(),
-            EventType.UPLOAD_DOCUMENT.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-        assertEquals(2, actualCase.getData().getSscsDocument().size());
+            EventType.FE_NO_ACTION.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
         assertEquals(State.WITH_DWP.getId(), actualCase.getState());
-        assertEquals("feReceived", actualCase.getData().getDwpState());
+        assertEquals("feActionedNR", actualCase.getData().getDwpState());
     }
 
 }
