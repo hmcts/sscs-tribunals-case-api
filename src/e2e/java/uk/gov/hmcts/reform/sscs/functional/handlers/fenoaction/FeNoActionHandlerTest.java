@@ -10,7 +10,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
 
 @RunWith(SpringRunner.class)
@@ -24,7 +23,6 @@ public class FeNoActionHandlerTest extends BaseHandlerTest {
 
         SscsCaseDetails actualCase = ccdService.updateCase(caseDetails.getCaseData(), caseDetails.getId(),
             EventType.FE_NO_ACTION.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-        assertEquals(State.WITH_DWP.getId(), actualCase.getState());
         assertEquals("feActionedNR", actualCase.getData().getDwpState());
     }
 

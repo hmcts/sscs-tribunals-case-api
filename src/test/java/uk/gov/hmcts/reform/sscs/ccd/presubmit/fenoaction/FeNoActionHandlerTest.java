@@ -26,7 +26,7 @@ public class FeNoActionHandlerTest extends BaseHandlerTest {
     @Parameters({
         "ABOUT_TO_SUBMIT,FE_NO_ACTION,withDwp,true",
         "ABOUT_TO_START,FE_NO_ACTION,withDwp,false",
-        "ABOUT_TO_SUBMIT,FE_NO_ACTION,appealCreated,false",
+        "ABOUT_TO_SUBMIT,FE_NO_ACTION,appealCreated,true",
         "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,false",
         "null,FE_NO_ACTION,withDwp,false",
         "ABOUT_TO_SUBMIT,null,withDwp,false"
