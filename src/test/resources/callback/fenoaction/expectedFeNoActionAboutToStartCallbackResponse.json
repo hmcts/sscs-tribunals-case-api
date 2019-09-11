@@ -238,7 +238,23 @@
         }
       ]
     },
-    "dwpState": "feActionedNR"
+    "dwpState": "feReceived",
+    "dwpStateFeNoAction": {
+      "value": {
+        "code": "feActionedNR",
+        "label": "FE Actioned - NR"
+      },
+      "list_items": [
+        {
+          "code": "feActionedNR",
+          "label": "FE Actioned - NR"
+        },
+        {
+          "code": "feActionedNA",
+          "label": "FE Actioned - NA"
+        }
+      ]
+    }
   },
   "errors": []
 }

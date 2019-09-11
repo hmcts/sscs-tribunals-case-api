@@ -30,14 +30,13 @@ public class FeNoActionAboutToStartHandler implements PreSubmitCallbackHandler<S
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         if (!DwpState.FE_RECEIVED.getValue().equals(caseData.getDwpState())) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
-            response.addError("the dwp state value has to be 'FE received' in order to run this event");
+            response.addError("The dwp state value has to be 'FE received' in order to run this event");
             return response;
         }
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NR.getValue(), DwpState.FE_ACTIONED_NR.getLabel()));
         listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NA.getValue(), DwpState.FE_ACTIONED_NA.getLabel()));
-        caseData
-            .setDwpStateFeNoAction(new DynamicList(listOptions.get(0), listOptions));
+        caseData.setDwpStateFeNoAction(new DynamicList(listOptions.get(0), listOptions));
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
