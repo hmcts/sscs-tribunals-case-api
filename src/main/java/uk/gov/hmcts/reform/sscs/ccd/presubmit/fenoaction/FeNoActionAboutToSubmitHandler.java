@@ -10,18 +10,19 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class FeNoActionHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class FeNoActionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.FE_NO_ACTION);
+            && callback.getEvent().equals(EventType.FE_NO_ACTION)
+            && DwpState.FE_RECEIVED.getValue().equals(callback.getCaseDetails().getCaseData().getDwpState());
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState(DwpState.FE_ACTIONED_NR.getValue());
+        caseData.setDwpState(caseData.getDwpStateFeNoAction().getValue().getCode());
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }

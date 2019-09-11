@@ -17,9 +17,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.BaseHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
-public class FeNoActionHandlerTest extends BaseHandlerTest {
+public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
 
-    private FeNoActionHandler handler = new FeNoActionHandler();
+    private FeNoActionAboutToStartHandler handler = new FeNoActionAboutToStartHandler();
     private static final String FE_NO_ACTION_CALLBACK_JSON = "fenoaction/feNoActionCallback.json";
 
     @Test
