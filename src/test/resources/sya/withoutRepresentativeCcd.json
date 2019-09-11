@@ -136,5 +136,6 @@
     "representativeSubscription": null
   },
   "evidencePresent" : "No",
-  "sscsDocument":[]
+  "sscsDocument":[],
+  "dwpRegionalCentre": "Newcastle"
 }
