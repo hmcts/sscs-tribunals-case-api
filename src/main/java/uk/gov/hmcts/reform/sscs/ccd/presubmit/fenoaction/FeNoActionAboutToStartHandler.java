@@ -19,17 +19,25 @@ public class FeNoActionAboutToStartHandler implements PreSubmitCallbackHandler<S
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_START)
-            && callback.getEvent().equals(EventType.FE_NO_ACTION)
-            && DwpState.FE_RECEIVED.getValue().equals(callback.getCaseDetails().getCaseData().getDwpState());
+            && callback.getEvent().equals(EventType.FE_NO_ACTION);
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        if (!DwpState.FE_RECEIVED.getValue().equals(caseData.getDwpState())) {
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+            response.addError("the dwp state value has to be 'FE received' in order to run this event");
+            return response;
+        }
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NR.getValue(), DwpState.FE_ACTIONED_NR.getLabel()));
         listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NA.getValue(), DwpState.FE_ACTIONED_NA.getLabel()));
-        callback.getCaseDetails().getCaseData()
+        caseData
             .setDwpStateFeNoAction(new DynamicList(listOptions.get(0), listOptions));
-        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }

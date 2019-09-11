@@ -21,6 +21,9 @@ public class FeNoActionAboutToSubmitHandler implements PreSubmitCallbackHandler<
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setDwpState(caseData.getDwpStateFeNoAction().getValue().getCode());
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
