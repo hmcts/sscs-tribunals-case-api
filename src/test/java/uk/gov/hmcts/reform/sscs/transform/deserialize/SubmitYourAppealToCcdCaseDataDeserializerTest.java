@@ -60,7 +60,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @RunWith(JUnitParamsRunner.class)
 public class SubmitYourAppealToCcdCaseDataDeserializerTest {
@@ -68,7 +70,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     private static final String NO = "No";
 
     private RegionalProcessingCenter regionalProcessingCenter;
-
 
     @Before
     public void setUp() {
@@ -122,13 +123,25 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (5),Springburn", "DWP PIP (6),Blackpool", "DWP PIP (7),Blackpool", "DWP PIP (8),Blackpool",
         "DWP PIP (9),Blackpool", "DWP PIP (10),Newport"
     })
-    public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(String dwpIssuingOffice,
+    public void givenADwpPipIssuingOffice_shouldMapToTheDwpRegionalCenter(String dwpIssuingOffice,
                                                                        String expectedDwpRegionalCenter) {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getMrn().setDwpIssuingOffice(dwpIssuingOffice);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
             regionalProcessingCenter);
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
+    }
+
+    @Test
+    public void givenADwpEsaIssuingOffice_shouldMapToTheDwpRegionalCenter() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getMrn().setDwpIssuingOffice("Sheffield DRT");
+        SyaBenefitType esaBenefit = new SyaBenefitType();
+        esaBenefit.setCode("ESA");
+        syaCaseWrapper.setBenefitType(esaBenefit);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
+                regionalProcessingCenter);
+        assertEquals(null, caseData.getDwpRegionalCentre());
     }
 
     @Test(expected = RuntimeException.class)

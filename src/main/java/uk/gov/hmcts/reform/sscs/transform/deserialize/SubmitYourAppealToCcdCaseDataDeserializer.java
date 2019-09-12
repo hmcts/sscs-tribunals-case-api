@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.AppealReason;
@@ -51,6 +52,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaHearingOptions;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaReasonsForAppealing;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaRepresentative;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaSmsNotify;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.util.Norm;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
@@ -101,31 +104,20 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .benefitCode(benefitCode)
             .issueCode(issueCode)
             .caseCode(caseCode)
-            .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getMrnDetails().getDwpIssuingOffice()))
+            .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal))
             .build();
     }
 
-    private static String getDwpRegionalCenterGivenDwpIssuingOffice(String dwpIssuingOffice) {
-        if (dwpIssuingOffice != null) {
-            Optional<String> dwpIssuingOfficeNumber = extractDwpIssuingOfficeNumber(dwpIssuingOffice);
-            if (dwpIssuingOfficeNumber.isPresent()) {
-                Optional<String> dwpRegion = DwpRegionalCenterMapping
-                    .getDwpRegionForGivenDwpIssuingOfficeNum(dwpIssuingOfficeNumber.get());
-                return dwpRegion.orElseThrow(() -> new RuntimeException(
-                    "the provided DWP issuing office number is NOT valid: " + dwpIssuingOfficeNumber.get()));
+    private static String getDwpRegionalCenterGivenDwpIssuingOffice(Appeal appeal) {
+        if (appeal.getMrnDetails().getDwpIssuingOffice() != null) {
+            DwpAddressLookupService service = new DwpAddressLookupService();
+            Optional<OfficeMapping> officeMapping = service.getDwpMappingByOffice(appeal.getBenefitType().getCode(), appeal.getMrnDetails().getDwpIssuingOffice());
+            if (officeMapping.isPresent()) {
+                return officeMapping.get().getMapping().getDwpRegionCentre();
             }
-            throw new RuntimeException("Fail to extract the DWP issuing office number from:" + dwpIssuingOffice);
+            throw new RuntimeException("Fail to extract the DWP issuing office number from:" + appeal.getMrnDetails().getDwpIssuingOffice());
         }
         return null;
-    }
-
-    private static Optional<String> extractDwpIssuingOfficeNumber(String dwpIssuingOffice) {
-        Pattern p = Pattern.compile("\\d+");
-        Matcher m = p.matcher(dwpIssuingOffice);
-        if (m.find()) {
-            return Optional.of(m.group());
-        }
-        return Optional.empty();
     }
 
     private static boolean isDraft(SyaCaseWrapper syaCaseWrapper) {
