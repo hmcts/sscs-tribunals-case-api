@@ -25,7 +25,7 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
     private final String templateId;
 
     @Autowired
-    public DirectionIssuedMidEventHandler(GenerateFile generateFile, @Value("doc_assembly.direction_issued") String templateId) {
+    public DirectionIssuedMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.direction_issued}") String templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
     }
