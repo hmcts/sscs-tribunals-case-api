@@ -90,6 +90,7 @@ locals {
   s2sCnpUrl     = "http://rpe-service-auth-provider-${var.env}.service.${local.local_ase}.internal"
   pdfService    = "http://cmc-pdf-service-${var.env}.service.${local.local_ase}.internal"
   documentStore = "http://dm-store-${var.env}.service.${local.local_ase}.internal"
+  docAssembly   = "http://dg-docassembly-${var.env}.service.${local.local_ase}.internal"
 
   azureVaultName = "sscs-${var.env}"
 
@@ -155,6 +156,7 @@ module "tribunals-case-api" {
     IDAM_OAUTH2_REDIRECT_URL  = "${var.idam_redirect_url}"
 
     DOCUMENT_MANAGEMENT_URL = "${local.documentStore}"
+    DOC_ASSEMBLY_URL        = "${local.docAssembly}"
 
     MAX_FILE_SIZE    = "${var.max_file_size}"
     MAX_REQUEST_SIZE = "${var.max_request_size}"
