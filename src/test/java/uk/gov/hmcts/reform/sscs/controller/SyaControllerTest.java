@@ -30,32 +30,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppellantNino;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionAppointee;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionBenefitType;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCheckMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionContactDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionCreateAccount;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDob;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionDwpIssuingOffice;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionEvidenceProvide;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionHaveAMrn;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepName;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentative;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionRepresentativeDetails;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSameAddress;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionSendToNumber;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
-import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
+import uk.gov.hmcts.reform.sscs.model.draft.*;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(SpringRunner.class)
@@ -70,7 +45,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
-        when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(Optional.of(1L));
+        when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(1L);
 
         String json = getSyaCaseWrapperJson();
 
@@ -122,7 +97,7 @@ public class SyaControllerTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
-            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantName(new SessionName("Mrs.","Ap","Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("AB123456C"))
             .appellantContactDetails(
@@ -213,7 +188,7 @@ public class SyaControllerTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("no"))
-            .appellantName(new SessionName("Mrs.", "Ap", "Pellant"))
+            .appellantName(new SessionName("Mrs.","Ap","Pellant"))
             .appellantDob(new SessionDob(new SessionDate("31", "12", "1998")))
             .appellantNino(new SessionAppellantNino("AB123456C"))
             .appellantContactDetails(
@@ -313,7 +288,7 @@ public class SyaControllerTest {
             .mrnOverThirteenMonthsLate(new SessionMrnOverThirteenMonthsLate("Just forgot to do it"))
             .dwpIssuingOffice(new SessionDwpIssuingOffice("1"))
             .appointee(new SessionAppointee("yes"))
-            .appointeeName(new SessionName("Mr.", "Ap", "Pointee"))
+            .appointeeName(new SessionName("Mr.","Ap","Pointee"))
             .appointeeDob(new SessionDob(new SessionDate("1", "1", "1999")))
             .appointeeContactDetails(
                 new SessionContactDetails(
