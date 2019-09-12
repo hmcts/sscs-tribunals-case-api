@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SYA_APPEAL_CREATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.time.LocalDate;
@@ -57,15 +53,17 @@ public class SubmitAppealService {
         this.convertAintoBService = convertAintoBService;
     }
 
-    public Optional<Long> submitAppeal(SyaCaseWrapper appeal, String userToken) {
-        String firstHalfOfPostcode = regionalProcessingCenterService.getFirstHalfOfPostcode(appeal.getContactDetails()
-            .getPostCode());
+    public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
+        String firstHalfOfPostcode = regionalProcessingCenterService
+            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
+
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
-        Optional<SscsCaseDetails> caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        caseDetails.ifPresent(c -> postCreateCaseInCcdProcess(caseData, idamTokens, c, event, userToken));
-        return caseDetails.map(SscsCaseDetails::getId);
+        SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
+        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, event, userToken);
+        // in case of duplicate case the caseDetails will be null
+        return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
     public SaveCaseResult submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
@@ -91,18 +89,20 @@ public class SubmitAppealService {
             .build();
     }
 
-    private void postCreateCaseInCcdProcess(SscsCaseData caseData, IdamTokens idamTokens, SscsCaseDetails caseDetails,
-                                            EventType event, String userToken) {
-        sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
-        if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
-            log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
-            caseData.setDateSentToDwp(LocalDate.now().toString());
-            ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP",
-                "Send to DWP event has been triggered from Tribunals service", idamTokens);
-            log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
-        }
-        if (StringUtils.isNotEmpty(userToken)) {
-            citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
+    private void postCreateCaseInCcdProcess(SscsCaseData caseData,
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
+                                            String userToken) {
+        if (null != caseDetails) {
+            sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
+            if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
+                log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
+                caseData.setDateSentToDwp(LocalDate.now().toString());
+                ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
+                log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
+            }
+            if (StringUtils.isNotEmpty(userToken)) {
+                citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
+            }
         }
     }
 
@@ -123,22 +123,27 @@ public class SubmitAppealService {
         return "";
     }
 
-    private Optional<SscsCaseDetails> createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
+    private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
             caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
             if (caseDetails == null) {
-                caseDetails = ccdService.createCase(caseData, eventType.getCcdType(), "SSCS - new case created",
+                caseDetails = ccdService.createCase(caseData,
+                    eventType.getCcdType(),
+                    "SSCS - new case created",
                     "Created SSCS case from Submit Your Appeal online with event " + eventType.getCcdType(),
                     idamTokens);
-                log.info("Case {} successfully created in CCD for benefit type {} with event {}", caseDetails.getId(),
-                    caseData.getAppeal().getBenefitType().getCode(), eventType);
-                return Optional.of(caseDetails);
+                log.info("Case {} successfully created in CCD for benefit type {} with event {}",
+                    caseDetails.getId(),
+                    caseData.getAppeal().getBenefitType().getCode(),
+                    eventType);
+                return caseDetails;
             } else {
                 log.info("Duplicate case {} found for Nino {} and benefit type {}. "
-                        + "No need to continue with post create case processing.", caseDetails.getId(),
-                    caseData.getGeneratedNino(), caseData.getAppeal().getBenefitType().getCode());
-                return Optional.empty();
+                        + "No need to continue with post create case processing.",
+                    caseDetails.getId(), caseData.getGeneratedNino(),
+                    caseData.getAppeal().getBenefitType().getCode());
+                return null;
             }
         } catch (Exception e) {
             throw new CcdException(

@@ -23,7 +23,7 @@
   },
   "appeal": {
     "mrnDetails": {
-      "dwpIssuingOffice": "DWP PIP (1)",
+      "dwpIssuingOffice": "1",
       "mrnDate": "2018-02-01",
       "mrnLateReason": null,
       "mrnMissingReason": null
@@ -162,6 +162,5 @@
     }
   },
   "evidencePresent" : "No",
-  "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle"
+  "sscsDocument":[]
 }
