@@ -87,12 +87,12 @@ variable "common_tags" {
 }
 
 variable "max_file_size" {
-  type = "string"
+  type    = "string"
   default = "10MB"
 }
 
 variable "max_request_size" {
-  type = "string"
+  type    = "string"
   default = "10MB"
 }
 
@@ -104,4 +104,14 @@ variable "appinsights_instrumentation_key" {
 variable "issue_further_evidence_enabled" {
   type    = "string"
   default = "false"
+}
+
+variable "enable_ase" {
+  default = true
+}
+
+variable "appinsights_location" {
+  type        = "string"
+  default     = "West Europe"
+  description = "Location for Application Insights"
 }

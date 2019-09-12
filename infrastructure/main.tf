@@ -2,9 +2,16 @@ resource "azurerm_resource_group" "rg" {
   name     = "${var.product}-${var.component}-${var.env}"
   location = "${var.location}"
 
-  tags = "${merge(var.common_tags,
-    map("lastUpdated", "${timestamp()}")
-    )}"
+  tags = "${var.common_tags}"
+}
+
+resource "azurerm_application_insights" "appinsights" {
+  name                = "${var.product}-${var.component}-appinsights-${var.env}"
+  location            = "${var.appinsights_location}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  application_type    = "Web"
+
+  tags = "${var.common_tags}"
 }
 
 data "azurerm_key_vault" "sscs_key_vault" {
@@ -51,7 +58,6 @@ data "azurerm_key_vault_secret" "robotics_email_scottish_to" {
   name      = "robotics-email-scottish-to"
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
-
 
 data "azurerm_key_vault_secret" "smtp_host" {
   name      = "smtp-host"
@@ -100,20 +106,21 @@ locals {
 }
 
 module "tribunals-case-api" {
-  source       = "git@github.com:hmcts/cnp-module-webapp?ref=master"
-  product      = "${var.product}-${var.component}"
-  location     = "${var.location}"
-  env          = "${var.env}"
-  ilbIp        = "${var.ilbIp}"
-  is_frontend  = false
-  subscription = "${var.subscription}"
-  capacity     = 2
-  common_tags  = "${var.common_tags}"
-  asp_rg       = "${local.app_service_plan}"
-  asp_name     = "${local.app_service_plan}"
+  source              = "git@github.com:hmcts/cnp-module-webapp?ref=master"
+  enable_ase          = "${var.enable_ase}"
+  resource_group_name = "${azurerm_resource_group.rg.name}"
+  product             = "${var.product}-${var.component}"
+  location            = "${var.location}"
+  env                 = "${var.env}"
+  ilbIp               = "${var.ilbIp}"
+  is_frontend         = false
+  subscription        = "${var.subscription}"
+  capacity            = 2
+  common_tags         = "${var.common_tags}"
+  asp_rg              = "${local.app_service_plan}"
+  asp_name            = "${local.app_service_plan}"
 
   appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
-
 
   app_settings = {
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
@@ -123,13 +130,13 @@ module "tribunals-case-api" {
     EMAIL_SUBJECT = "${var.appeal_email_subject}"
     EMAIL_MESSAGE = "${var.appeal_email_message}"
 
-    ROBOTICS_EMAIL_FROM    = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
-    ROBOTICS_EMAIL_TO      = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
+    ROBOTICS_EMAIL_FROM        = "${data.azurerm_key_vault_secret.robotics_email_from.value}"
+    ROBOTICS_EMAIL_TO          = "${data.azurerm_key_vault_secret.robotics_email_to.value}"
     ROBOTICS_EMAIL_SCOTTISH_TO = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
-    ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
-    ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
+    ROBOTICS_EMAIL_SUBJECT     = "${var.robotics_email_subject}"
+    ROBOTICS_EMAIL_MESSAGE     = "${var.robotics_email_message}"
 
-    ISSUE_FURTHER_EVIDENCE_ENABLED    = "${var.issue_further_evidence_enabled}"
+    ISSUE_FURTHER_EVIDENCE_ENABLED = "${var.issue_further_evidence_enabled}"
 
     EMAIL_SERVER_HOST      = "${data.azurerm_key_vault_secret.smtp_host.value}"
     EMAIL_SERVER_PORT      = "${data.azurerm_key_vault_secret.smtp_port.value}"
