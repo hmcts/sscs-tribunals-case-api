@@ -4,7 +4,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -92,7 +94,7 @@ public class SubmitAppealService {
     private void postCreateCaseInCcdProcess(SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
                                             String userToken) {
-        if (null != caseDetails) {
+        if (false) {
             sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
                 log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
@@ -126,7 +128,18 @@ public class SubmitAppealService {
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
+            //caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
+
+            Map<String, String> map = new HashMap<String, String>();
+
+            map.put("case.generatedNino", caseData.getGeneratedNino());
+
+            List<SscsCaseDetails> matchedByNinoCases = ccdService.findCaseBy(map, idamTokens);
+
+            if (matchedByNinoCases.size() > 0) {
+                caseDetails = findDuplicateCases(caseData, matchedByNinoCases);
+            }
+
             if (caseDetails == null) {
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
@@ -153,6 +166,23 @@ public class SubmitAppealService {
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
     }
+
+    private SscsCaseDetails findDuplicateCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
+        if (caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
+            String benefitCode = caseData.getAppeal().getBenefitType().getCode();
+            String mrnDate = caseData.getAppeal().getMrnDetails().getMrnDate();
+
+            for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
+                if (sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().equals(benefitCode)
+                        && sscsCaseDetails.getData().getAppeal().getMrnDetails().getMrnDate().equals(mrnDate)) {
+                    //then we have one so return it
+                    return sscsCaseDetails;
+                }
+            }
+        }
+        return null;
+    }
+
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
