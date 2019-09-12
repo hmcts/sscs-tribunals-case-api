@@ -5,6 +5,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -18,6 +20,7 @@ public class IntegrationTestHelper {
     public static MockHttpServletRequestBuilder getRequestWithAuthHeader(String json, String endpoint) {
 
         return getRequestWithoutAuthHeader(json, endpoint)
+            .header(HttpHeaders.AUTHORIZATION, "Bearer userToken")
             .header(AuthorisationService.SERVICE_AUTHORISATION_HEADER, "some-auth-header");
     }
 

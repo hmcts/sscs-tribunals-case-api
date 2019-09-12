@@ -98,12 +98,13 @@ public class CcdCallbackControllerTest {
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().originalSender(
             new DynamicList(new DynamicListItem("1", "2"), null)).build());
 
-        when(dispatcher.handle(any(CallbackType.class), any()))
+        when(dispatcher.handle(any(CallbackType.class), any(), anyString()))
             .thenReturn(response);
 
         mockMvc.perform(post("/ccdAboutToStart")
             .contentType(MediaType.APPLICATION_JSON)
             .header("ServiceAuthorization", "")
+            .header("Authorization", "")
             .content(content))
             .andExpect(status().isOk())
             .andExpect(content().json("{'data': {'originalSender': {'value': {'code': '1', 'label': '2'}}}}"));
@@ -121,12 +122,13 @@ public class CcdCallbackControllerTest {
             INTERLOC_INFORMATION_RECEIVED));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
-        when(dispatcher.handle(any(CallbackType.class), any()))
+        when(dispatcher.handle(any(CallbackType.class), any(), anyString()))
             .thenReturn(response);
 
         mockMvc.perform(post("/ccdAboutToSubmit")
             .contentType(MediaType.APPLICATION_JSON)
             .header("ServiceAuthorization", "")
+            .header("Authorization", "")
             .content(content))
             .andExpect(status().isOk())
             .andExpect(content().json("{'data': {'interlocReviewState': 'new_state'}}"));
@@ -142,11 +144,12 @@ public class CcdCallbackControllerTest {
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder()
             .interlocReviewState("interlocutoryReview")
             .build());
-        when(dispatcher.handle(any(CallbackType.class), any())).thenReturn(response);
+        when(dispatcher.handle(any(CallbackType.class), any(), anyString())).thenReturn(response);
 
         mockMvc.perform(post("/ccdSubmittedEvent")
             .contentType(MediaType.APPLICATION_JSON)
             .header("ServiceAuthorization", "s2s")
+            .header("Authorization", "Bearer token")
             .content("something"))
             .andExpect(status().isOk())
             .andExpect(content().json("{'data': {'interlocReviewState': 'interlocutoryReview'}}"));

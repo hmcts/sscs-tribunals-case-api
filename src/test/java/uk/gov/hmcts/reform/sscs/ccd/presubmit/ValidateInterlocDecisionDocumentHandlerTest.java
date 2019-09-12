@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class ValidateInterlocDecisionDocumentHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private Callback<SscsCaseData> callback;
     private ValidateInterlocDecisionDocumentHandler validateInterlocDecisionDocumentHandler;
@@ -88,7 +89,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors().isEmpty(), is(true));
@@ -106,7 +107,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors(), is(Sets.newHashSet("Interloc decision document must be set")));
@@ -130,7 +131,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors(), is(Sets.newHashSet("Interloc decision document must be set")));
@@ -155,7 +156,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors(), is(Sets.newHashSet("Interloc decision document must be a PDF")));

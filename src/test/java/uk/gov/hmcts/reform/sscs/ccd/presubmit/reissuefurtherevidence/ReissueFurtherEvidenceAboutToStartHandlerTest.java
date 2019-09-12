@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class ReissueFurtherEvidenceAboutToStartHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private ReissueFurtherEvidenceAboutToStartHandler handler;
 
@@ -74,7 +75,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_START, callback);
+        handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
     }
 
     @Test
@@ -87,7 +88,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
     public void populateDocumentDropdownWithAllSscsDocuments() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         assertEquals(3, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
@@ -102,7 +103,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getReissueFurtherEvidenceDocument());
         assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
@@ -119,7 +120,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).sscsDocument(Collections.singletonList(document1)).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getReissueFurtherEvidenceDocument());
         assertEquals("There are no evidence documents in the appeal. Cannot reissue further evidence.", response.getErrors().iterator().next());
