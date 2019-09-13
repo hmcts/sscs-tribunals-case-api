@@ -282,7 +282,7 @@ dependencies {
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
 
     testCompile "org.junit.jupiter:junit-jupiter-api:5.5.1"
-    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.5.1"
+    testRuntime "org.junit.jupiter:junit-jupiter-engine:5.5.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.3.2"
 
     //pact contract testing
@@ -290,7 +290,7 @@ dependencies {
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
 
     contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.3.2")
-    contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.5.2")
     contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.3.2')
 
     contractTestCompile(group: 'org.yaml', name: 'snakeyaml', version: '1.25') {
