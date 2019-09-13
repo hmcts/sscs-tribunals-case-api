@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -11,18 +13,21 @@ import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-
+import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String TEMPLATE_ID = "nuts.docx";
+    private static final String URL = "http://dm-store/documents/123";
 
     private DirectionIssuedMidEventHandler handler;
 
@@ -37,6 +42,8 @@ public class DirectionIssuedMidEventHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    private ArgumentCaptor<GenerateFileParams> capture;
+
     @Before
     public void setUp() {
         initMocks(this);
@@ -46,6 +53,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
+                .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
                                 .name(Name.builder().build())
@@ -53,10 +61,12 @@ public class DirectionIssuedMidEventHandlerTest {
                                 .build())
                         .build()).build();
 
+        capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(generateFile.assemble(any())).thenReturn(URL);
     }
-
 
     @Test
     @Parameters({"APPEAL_RECEIVED", "ACTION_FURTHER_EVIDENCE"})
@@ -84,15 +94,32 @@ public class DirectionIssuedMidEventHandlerTest {
 
     @Test
     public void willSetPreviewFile() {
-        String url = "http://dm-store/documents/123";
-        when(generateFile.assemble(any())).thenReturn(url);
+
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
         assertNotNull(response.getData().getPreviewDocument());
         assertEquals(DocumentLink.builder()
                 .documentFilename("directionIssued.pdf")
-                .documentBinaryUrl(url + "/binary")
-                .documentUrl(url)
+                .documentBinaryUrl(URL + "/binary")
+                .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
+
+        verifyShowsImage(DirectionIssuedTemplateBody.ENGLISH_IMAGE);
+    }
+
+    @Test
+    public void scottishRpcWillShowAScottishImage() {
+        sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        verifyShowsImage(DirectionIssuedTemplateBody.SCOTTISH_IMAGE);
+    }
+
+    private void verifyShowsImage(String englishImage) {
+        verify(generateFile, atLeastOnce()).assemble(capture.capture());
+        DirectionIssuedTemplateBody payload = (DirectionIssuedTemplateBody) capture.getValue().getFormPayload();
+        assertEquals(englishImage, payload.getImage());
     }
 }
 

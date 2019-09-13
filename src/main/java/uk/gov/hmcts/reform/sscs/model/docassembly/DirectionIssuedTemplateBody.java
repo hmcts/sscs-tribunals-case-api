@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.model.docassembly;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -10,10 +11,14 @@ import lombok.Builder;
 import lombok.Value;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 
-@Builder
+@Builder(toBuilder = true)
 @Value
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DirectionIssuedTemplateBody implements FormPayload {
+    @JsonIgnore
+    public static final String SCOTTISH_IMAGE = "[userImage:schmcts.png]";
+    @JsonIgnore
+    public static final String ENGLISH_IMAGE = "[userImage:schmcts.png]";
     @JsonProperty("appellant_full_name")
     private String appellantFullName;
     private String nino;
@@ -36,6 +41,6 @@ public class DirectionIssuedTemplateBody implements FormPayload {
     @JsonProperty("generated_date")
     private LocalDate generatedDate;
     @JsonProperty("hmcts2")
-    @Builder.Default private String image = "[userImage:enhmcts.png]";
+    @Builder.Default private String image = ENGLISH_IMAGE;
 
 }

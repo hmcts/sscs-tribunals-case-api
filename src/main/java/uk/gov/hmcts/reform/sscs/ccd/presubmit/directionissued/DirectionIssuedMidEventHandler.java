@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +23,8 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 @Component
 @Slf4j
 public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private static final String GLASGOW = "GLASGOW";
+
     private final GenerateFile generateFile;
     private final String templateId;
 
@@ -56,6 +60,12 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
                 .generatedDate(LocalDate.now())
                 .build();
 
+        boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
+
+        if (isScottish) {
+            formPayload.toBuilder().image(DirectionIssuedTemplateBody.SCOTTISH_IMAGE).build();
+        }
+
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(documentUrl)
                 .templateId(templateId)
@@ -65,7 +75,6 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(callback.getEvent().getCcdType() + ".pdf")
                 .documentBinaryUrl(generatedFileUrl + "/binary")
@@ -73,10 +82,7 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
                 .build();
         caseData.setPreviewDocument(previewFile);
 
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
-
-        return sscsCaseDataPreSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 
 }
