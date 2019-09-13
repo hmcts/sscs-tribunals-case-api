@@ -109,7 +109,7 @@ public class SubmitAppealTest {
         final Long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
         SscsCaseDetails sscsCaseDetails = findCaseInCcd(id);
         if (expected.getAppellant().getAppointee() == null) {
-            expected.setAppellant(expected.getAppellant().toBuilder().appointee(Appointee.builder().build()).build());
+            sscsCaseDetails.getData().getAppeal().setAppellant(null);
         }
         log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
