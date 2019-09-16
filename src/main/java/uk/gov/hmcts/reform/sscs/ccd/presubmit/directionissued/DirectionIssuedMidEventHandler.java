@@ -63,7 +63,7 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
         if (isScottish) {
-            formPayload.toBuilder().image(DirectionIssuedTemplateBody.SCOTTISH_IMAGE).build();
+            formPayload = formPayload.toBuilder().image(DirectionIssuedTemplateBody.SCOTTISH_IMAGE).build();
         }
 
         GenerateFileParams params = GenerateFileParams.builder()

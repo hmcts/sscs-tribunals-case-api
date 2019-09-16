@@ -116,10 +116,10 @@ public class DirectionIssuedMidEventHandlerTest {
         verifyShowsImage(DirectionIssuedTemplateBody.SCOTTISH_IMAGE);
     }
 
-    private void verifyShowsImage(String englishImage) {
+    private void verifyShowsImage(String image) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionIssuedTemplateBody payload = (DirectionIssuedTemplateBody) capture.getValue().getFormPayload();
-        assertEquals(englishImage, payload.getImage());
+        assertEquals(image, payload.getImage());
     }
 }
 

@@ -24,6 +24,15 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "generateNotice" : "Yes",
+      "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
+      "signedBy": "Maple Magoo",
+      "signedRole": "Proxy Judge",
+      "previewDocument" : {
+        "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
+        "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
+        "document_filename": "directionIssued.pdf"
+      },
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -628,5 +637,5 @@
       }
     }
   },
-  "event_id": "reissueFurtherEvidence"
+  "event_id": "directionIssued"
 }
