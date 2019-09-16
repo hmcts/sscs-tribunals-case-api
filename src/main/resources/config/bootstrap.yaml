@@ -19,3 +19,4 @@ spring:
         robotics-email-scottish-to: ROBOTICS_EMAIL_SCOTTISH_TO
         appeal-email-to: EMAIL_TO
         appeal-email-from: EMAIL_FROM
+        ccd-def-fixed-list-users: CCD_DEF_FIXED_LIST_USERS
