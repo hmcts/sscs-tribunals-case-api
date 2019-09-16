@@ -54,7 +54,6 @@ public class CcdCallbackController {
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
-
         authorisationService.authorise(serviceAuthHeader);
         return performRequest(ABOUT_TO_SUBMIT, callback);
     }
@@ -87,12 +86,11 @@ public class CcdCallbackController {
         Preconditions.checkNotNull(serviceAuthHeader);
     }
 
-    private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> performRequest(CallbackType callbackType, Callback<SscsCaseData> callback) {
-
+    private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> performRequest(CallbackType callbackType,
+                                                                                   Callback<SscsCaseData> callback) {
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = dispatcher.handle(callbackType, callback);
-
-        log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
-
+        log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(),
+            callback.getCaseDetails().getId());
         return ok(callbackResponse);
     }
 
