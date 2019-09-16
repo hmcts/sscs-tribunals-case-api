@@ -72,6 +72,8 @@ ccd:
       userProfileDatabaseUser: hmcts
       userProfileDatabasePassword: hmcts
       userProfileDatabaseName: user-profile
+    environment:
+      CCD_DEF_FIXED_LIST_USERS: '{"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "unassigned", "ListElement": "Unassigned"}'
     definition:
       enabled: true
       image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.2.04
