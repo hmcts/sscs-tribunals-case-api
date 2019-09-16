@@ -17,9 +17,12 @@ public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseD
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+        log.info("UploadDocumentHandler.canHandle begin...");
+        boolean result = callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT)
             && State.WITH_DWP.equals(callback.getCaseDetails().getState());
+        log.info("UploadDocumentHandler.canHandle.result: " + result);
+        return result;
     }
 
     @Override
@@ -27,10 +30,10 @@ public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseD
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-        log.info("UploadDocumentHandler FE_RECEIVED begin...");
+        log.info("UploadDocumentHandler.handle FE_RECEIVED begin...");
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setDwpState(DwpState.FE_RECEIVED.getValue());
-        log.info("UploadDocumentHandler FE_RECEIVED end");
+        log.info("UploadDocumentHandler.handle FE_RECEIVED end");
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
