@@ -76,7 +76,7 @@ ccd:
       enabled: true
       image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.2.04
       environment:
-        CCD_DEF_TRIBUNALS_CASE_API_URL: '{"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "unassigned", "ListElement": "Unassigned"}'
+        CCD_DEF_FIXED_LIST_USERS: '{"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "unassigned", "ListElement": "Unassigned"}'
       kvSecretRef: kvcreds
       gitSecretRef: kvcreds
       redirectUri: https://case-management-web-${SERVICE_FQDN}/oauth2redirect
