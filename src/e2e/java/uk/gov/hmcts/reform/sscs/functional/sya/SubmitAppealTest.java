@@ -121,6 +121,7 @@ public class SubmitAppealTest {
     public void appealShouldCreateDuplicateAndLinked(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = getRandomNino();
+
         body = setNino(body, nino);
 
         LocalDate mrnDate = LocalDate.now();
@@ -145,10 +146,12 @@ public class SubmitAppealTest {
         SscsCaseDetails sscsCaseDetails = findCaseInCcd(id);
 
         log.info(String.format("SYA created with CCD ID %s", id));
-        //assertEquals(expected, sscsCaseDetails.getData().getAppeal());
-        assertEquals(expectedState, sscsCaseDetails.getState());
+        assertEquals(expected, sscsCaseDetails.getData().getAppeal());
 
         //create a case with different mrn date
+        body = syaJsonMessageSerializer.getSerializedMessage();
+        body = setNino(body, nino);
+
         mrnDate = LocalDate.now().minusMonths(12);
         body = setLatestMrnDate(body, mrnDate);
 
@@ -161,8 +164,11 @@ public class SubmitAppealTest {
         response.then().statusCode(HttpStatus.SC_CREATED);
 
         String secondCaseLocation = response.getHeader("Location");
-        final Long secondCaseId = Long.parseLong(location.substring(secondCaseLocation.lastIndexOf("/") + 1));
+        final Long secondCaseId = Long.parseLong(secondCaseLocation.substring(secondCaseLocation.lastIndexOf("/") + 1));
+        log.info("Duplicate case " + secondCaseId);
         SscsCaseDetails secondCaseSscsCaseDetails = findCaseInCcd(secondCaseId);
+
+        assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         log.info(secondCaseSscsCaseDetails.toString());
 
     }

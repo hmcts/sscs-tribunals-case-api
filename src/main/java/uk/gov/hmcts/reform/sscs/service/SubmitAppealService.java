@@ -4,19 +4,14 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -128,7 +123,7 @@ public class SubmitAppealService {
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
-            //caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
 
             Map<String, String> map = new HashMap<String, String>();
 
@@ -137,10 +132,13 @@ public class SubmitAppealService {
             List<SscsCaseDetails> matchedByNinoCases = ccdService.findCaseBy(map, idamTokens);
 
             if (matchedByNinoCases.size() > 0) {
-                caseDetails = findDuplicateCases(caseData, matchedByNinoCases);
+                SscsCaseDetails duplicateCaseDetails = findDuplicateCases(caseData, matchedByNinoCases);
             }
 
             if (caseDetails == null) {
+                if (matchedByNinoCases.size() > 0) {
+                    caseData = addAssociatedCases(caseData, matchedByNinoCases);
+                }
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
                     "SSCS - new case created",
@@ -167,6 +165,17 @@ public class SubmitAppealService {
         }
     }
 
+    protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
+        List<CaseLink> associatedCases = new ArrayList<>();
+
+        for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
+            CaseLink caseLink = CaseLink.builder().value(
+                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
+            associatedCases.add(caseLink);
+        }
+        return caseData.toBuilder().associatedCase(associatedCases).build();
+    }
+
     private SscsCaseDetails findDuplicateCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
         if (caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             String benefitCode = caseData.getAppeal().getBenefitType().getCode();
@@ -175,7 +184,6 @@ public class SubmitAppealService {
             for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
                 if (sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().equals(benefitCode)
                         && sscsCaseDetails.getData().getAppeal().getMrnDetails().getMrnDate().equals(mrnDate)) {
-                    //then we have one so return it
                     return sscsCaseDetails;
                 }
             }
