@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 import java.time.LocalDate;
 import java.util.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -136,6 +137,9 @@ public class SubmitAppealService {
             if (caseDetails == null) {
                 if (matchedByNinoCases.size() > 0) {
                     caseData = addAssociatedCases(caseData, matchedByNinoCases);
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String data = objectMapper.writeValueAsString(caseData);
+                    log.info(data);
                 }
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
@@ -170,7 +174,7 @@ public class SubmitAppealService {
             CaseLink caseLink = CaseLink.builder().value(
                     CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
             associatedCases.add(caseLink);
-            log.info("Added associated cases to " + caseData.getCcdCaseId());
+            log.info("Added associated case " + sscsCaseDetails.getId().toString());
         }
         return caseData.toBuilder().associatedCase(associatedCases).build();
     }
