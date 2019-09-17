@@ -131,6 +131,8 @@ public class SubmitAppealService {
 
             List<SscsCaseDetails> matchedByNinoCases = ccdService.findCaseBy(map, idamTokens);
 
+            log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getGeneratedNino());
+
             if (caseDetails == null) {
                 if (matchedByNinoCases.size() > 0) {
                     caseData = addAssociatedCases(caseData, matchedByNinoCases);
@@ -168,6 +170,7 @@ public class SubmitAppealService {
             CaseLink caseLink = CaseLink.builder().value(
                     CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
             associatedCases.add(caseLink);
+            log.info("Added associated cases to " + caseData.getCcdCaseId());
         }
         return caseData.toBuilder().associatedCase(associatedCases).build();
     }
