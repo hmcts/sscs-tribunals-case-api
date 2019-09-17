@@ -147,6 +147,7 @@ public class SubmitAppealTest {
 
         log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
+        assertEquals(expectedState, sscsCaseDetails.getState());
 
         //create a case with different mrn date
         body = syaJsonMessageSerializer.getSerializedMessage();
