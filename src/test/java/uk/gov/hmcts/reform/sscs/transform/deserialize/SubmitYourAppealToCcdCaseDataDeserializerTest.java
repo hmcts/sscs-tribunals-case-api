@@ -18,7 +18,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 
 public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
@@ -71,6 +73,30 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
                 regionalProcessingCenter.getName(), regionalProcessingCenter);
         assertEquals("DWP PIP (10)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Test
+    public void givenAUniversalCreditCaseFromSya_thenDefaultIssuingOfficeToUniversalCredit() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType uc = new SyaBenefitType("Universal Credit Description", "UC");
+        syaCaseWrapper.setBenefitType(uc);
+        syaCaseWrapper.setMrn(null);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertEquals("Universal Credit", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+    }
+
+    @Test
+    public void givenAUniversalCreditCaseFromSyaAndMrnIsPopulated_thenUseTheIssuingOfficeFromSya() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        SyaBenefitType uc = new SyaBenefitType("Universal Credit Description", "UC");
+        syaCaseWrapper.setBenefitType(uc);
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("My dwp office");
+        syaCaseWrapper.setMrn(mrn);
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
+                regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertEquals("My dwp office", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
     @Test
