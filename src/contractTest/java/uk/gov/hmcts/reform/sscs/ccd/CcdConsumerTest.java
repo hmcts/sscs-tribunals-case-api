@@ -32,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 public class CcdConsumerTest {
 
-    String SERVICE_AUTHORIZATION = "ServiceAuthorization";
+    private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
     private static final String USER_ID = "1";
     private static final String JURSIDICTION_ID = "1";
@@ -43,8 +43,8 @@ public class CcdConsumerTest {
     private static final String SERVICE_AUTHORIZATION_TOKEN = "678910";
 
     private static final String CCD_BASE_URL =
-            "/caseworkers/" + USER_ID + "/jurisdictions/" + JURSIDICTION_ID +
-                    "/case-types/" + CASE_TYPE;
+            "/caseworkers/" + USER_ID + "/jurisdictions/" + JURSIDICTION_ID
+                    + "/case-types/" + CASE_TYPE;
 
     private static final String CCD_START_FOR_CASEWORKER_URL =
             CCD_BASE_URL + "/event-triggers/" + EVENT_ID + "/token";
