@@ -344,4 +344,14 @@ public class SubmitAppealServiceTest {
 
         assertEquals(1, caseData.getAssociatedCase().size());
     }
+
+    @Test
+    public void getMatchedCases() {
+        given(ccdService.findCaseBy(any(),any())).willReturn(Arrays.asList(
+                SscsCaseDetails.builder().id(12345678L).build()
+        ));
+        List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
+
+        assertEquals(1, matchedCases.size());
+    }
 }

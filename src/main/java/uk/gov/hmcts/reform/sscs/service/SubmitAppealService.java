@@ -125,13 +125,9 @@ public class SubmitAppealService {
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);;
 
-            Map<String, String> map = new HashMap<String, String>();
-
-            map.put("case.generatedNino", caseData.getGeneratedNino());
-
-            List<SscsCaseDetails> matchedByNinoCases = ccdService.findCaseBy(map, idamTokens);
+            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getGeneratedNino(), idamTokens);
 
             log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getGeneratedNino());
 
@@ -166,6 +162,14 @@ public class SubmitAppealService {
                     caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
+    }
+
+    protected List<SscsCaseDetails> getMatchedCases(String generatedNino, IdamTokens idamTokens) {
+        HashMap<String, String> map = new HashMap<String, String>();
+
+        map.put("case.generatedNino", generatedNino);
+
+        return ccdService.findCaseBy(map, idamTokens);
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
