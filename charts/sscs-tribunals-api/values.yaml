@@ -9,7 +9,6 @@ java:
       secrets:
         - sscs-email-mac-secret-text
         - idam-oauth-user
-        - ccd-api
         - ccd-jid
         - ccd-tid
         - idam-redirect
@@ -18,6 +17,9 @@ java:
         - idam-sscs-oauth2-client-secret
         - sscs-s2s-secret
         - s2s-micro
+        - robotics-email-to
+        - robotics-email-from
+        - robotics-email-scottish-to
         - appeal-email-to
         - appeal-email-from
   environment:
@@ -41,4 +43,5 @@ java:
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
-    IDAM_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    
