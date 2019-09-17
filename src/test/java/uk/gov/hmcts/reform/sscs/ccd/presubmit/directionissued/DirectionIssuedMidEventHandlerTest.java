@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
+import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -22,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedMidEventHandlerTest {
@@ -56,7 +58,9 @@ public class DirectionIssuedMidEventHandlerTest {
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
-                                .name(Name.builder().build())
+                                .name(Name.builder().firstName("APPELLANT")
+                                        .lastName("LastNamE")
+                                        .build())
                                 .identity(Identity.builder().build())
                                 .build())
                         .build()).build();
@@ -99,12 +103,12 @@ public class DirectionIssuedMidEventHandlerTest {
 
         assertNotNull(response.getData().getPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename("directionIssued.pdf")
+                .documentFilename(String.format("Direction Notice issued on %s.pdf", LocalDate.now().toString()))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
 
-        verifyShowsImage(DirectionIssuedTemplateBody.ENGLISH_IMAGE);
+        verifyTemplateBody(DirectionIssuedTemplateBody.ENGLISH_IMAGE);
     }
 
     @Test
@@ -113,13 +117,14 @@ public class DirectionIssuedMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyShowsImage(DirectionIssuedTemplateBody.SCOTTISH_IMAGE);
+        verifyTemplateBody(DirectionIssuedTemplateBody.SCOTTISH_IMAGE);
     }
 
-    private void verifyShowsImage(String image) {
+    private void verifyTemplateBody(String image) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionIssuedTemplateBody payload = (DirectionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
+        assertEquals("Appellant Lastname", payload.getAppellantFullName());
     }
 }
 

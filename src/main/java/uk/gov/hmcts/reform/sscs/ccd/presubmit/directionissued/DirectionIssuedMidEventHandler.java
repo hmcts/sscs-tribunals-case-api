@@ -6,11 +6,13 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -49,14 +51,17 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         String documentUrl = Optional.ofNullable(caseData.getPreviewDocument()).map(DocumentLink::getDocumentUrl).orElse(null);
 
+        LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
+
         DirectionIssuedTemplateBody formPayload = DirectionIssuedTemplateBody.builder()
-                .appellantFullName(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle())
+                .appellantFullName(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'))
                 .caseId(caseData.getCcdCaseId())
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .noticeBody(caseData.getBodyContent())
                 .userName(caseData.getSignedBy())
+                .noticeType(DocumentType.DIRECTION_NOTICE.getValue())
                 .userRole(caseData.getSignedRole())
-                .dateAdded(LocalDate.now())
+                .dateAdded(dateAdded)
                 .generatedDate(LocalDate.now())
                 .build();
 
@@ -75,8 +80,10 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
 
         final String generatedFileUrl = generateFile.assemble(params);
 
+        final String filename = String.format("%s issued on %s.pdf", formPayload.getNoticeType(), dateAdded.toString());
+
         DocumentLink previewFile = DocumentLink.builder()
-                .documentFilename(callback.getEvent().getCcdType() + ".pdf")
+                .documentFilename(filename)
                 .documentBinaryUrl(generatedFileUrl + "/binary")
                 .documentUrl(generatedFileUrl)
                 .build();

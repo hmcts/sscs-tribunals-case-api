@@ -122,6 +122,7 @@ public class DirectionIssuedIt {
         assertNull(result.getData().getSignedRole());
         assertNull(result.getData().getSignedBy());
         assertNull(result.getData().getGenerateNotice());
+        assertNull(result.getData().getDateAdded());
         assertNotNull(result.getData().getSscsInterlocDirectionDocument());
         assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsInterlocDirectionDocument().getDocumentLink().getDocumentUrl());
     }

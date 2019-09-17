@@ -32,11 +32,11 @@ public class DirectionIssuedTemplateBody implements FormPayload {
     private String userName;
     @JsonProperty("user_role")
     private String userRole;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonProperty("date_added")
     private LocalDate dateAdded;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonProperty("generated_date")
     private LocalDate generatedDate;

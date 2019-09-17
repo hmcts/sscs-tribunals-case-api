@@ -1,7 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import java.time.LocalDate;
-import java.util.Objects;
+import java.util.*;
+
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -22,7 +23,8 @@ public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHan
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
                 && callback.getCaseDetails().getCaseData().isGenerateNotice()
-                && Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument());
+                && (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())
+                    || Objects.nonNull(callback.getCaseDetails().getCaseData().getSscsInterlocDirectionDocument()));
     }
 
     @Override
@@ -30,15 +32,20 @@ public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHan
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        SscsInterlocDirectionDocument document = SscsInterlocDirectionDocument.builder()
-                .documentFileName(caseData.getPreviewDocument().getDocumentFilename())
-                .documentLink(caseData.getPreviewDocument())
-                .documentDateAdded(LocalDate.now().toString())
-                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .build();
+        if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
+            SscsInterlocDirectionDocument document = SscsInterlocDirectionDocument.builder()
+                    .documentFileName(caseData.getPreviewDocument().getDocumentFilename())
+                    .documentLink(caseData.getPreviewDocument())
+                    .documentDateAdded(Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()))
+                    .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                    .build();
 
-        caseData.setSscsInterlocDirectionDocument(document);
-        clearTemporaryFields(caseData);
+            caseData.setSscsInterlocDirectionDocument(document);
+            saveToHistory(caseData);
+        } else {
+            saveToHistory(caseData);
+        }
+        clearTransientFields(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
@@ -46,10 +53,19 @@ public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHan
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
-    private void clearTemporaryFields(SscsCaseData caseData) {
+    private void saveToHistory(SscsCaseData caseData) {
+        List<SscsInterlocDirectionDocument> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDirectionDocs()).orElse(Collections.emptyList()));
+        historicDocs.add(caseData.getSscsInterlocDirectionDocument());
+        caseData.setHistoricSscsInterlocDirectionDocs(historicDocs);
+    }
+
+    // Fields used for a short period in case progression are transient,
+    // relevant for a short period of the case lifecycle.
+    private void clearTransientFields(SscsCaseData caseData) {
         caseData.setPreviewDocument(null);
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
         caseData.setGenerateNotice(null);
+        caseData.setDateAdded(null);
     }
 }
