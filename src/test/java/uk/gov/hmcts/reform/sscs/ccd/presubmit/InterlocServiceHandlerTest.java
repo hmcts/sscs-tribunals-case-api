@@ -169,7 +169,7 @@ public class InterlocServiceHandlerTest {
     public void checkInterlocDateIsSet() {
         when(callback.getEvent()).thenReturn(EventType.NON_COMPLIANT);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
     }
