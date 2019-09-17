@@ -172,21 +172,6 @@ public class SubmitAppealService {
         return caseData.toBuilder().associatedCase(associatedCases).build();
     }
 
-    private SscsCaseDetails findDuplicateCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
-        if (caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
-            String benefitCode = caseData.getAppeal().getBenefitType().getCode();
-            String mrnDate = caseData.getAppeal().getMrnDetails().getMrnDate();
-
-            for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
-                if (sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().equals(benefitCode)
-                        && sscsCaseDetails.getData().getAppeal().getMrnDetails().getMrnDate().equals(mrnDate)) {
-                    return sscsCaseDetails;
-                }
-            }
-        }
-        return null;
-    }
-
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
