@@ -131,7 +131,6 @@ public class SubmitAppealTest {
         wrapper.getAppellant().setNino(nino);
 
         RegionalProcessingCenter rpc = getRegionalProcessingCenter();
-        Appeal expected = convertSyaToCcdCaseData(wrapper, rpc.getName(),  rpc).getAppeal();
 
         RequestSpecification httpRequest = RestAssured.given()
                 .body(body)
@@ -146,7 +145,6 @@ public class SubmitAppealTest {
         SscsCaseDetails sscsCaseDetails = findCaseInCcd(id);
 
         log.info(String.format("SYA created with CCD ID %s", id));
-        assertEquals(expected, sscsCaseDetails.getData().getAppeal());
         assertEquals(expectedState, sscsCaseDetails.getState());
 
         //create a case with different mrn date
