@@ -25,7 +25,7 @@ public class OutcomeServiceHandler extends EventToFieldPreSubmitCallbackHandler 
         return eventFieldMappings;
     }
 
-    protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue) {
+    protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
         newSscsCaseData.setOutcome(newValue);
 
         return newSscsCaseData;
