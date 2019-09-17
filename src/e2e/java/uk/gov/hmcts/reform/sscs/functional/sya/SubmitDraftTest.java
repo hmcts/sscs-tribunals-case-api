@@ -22,6 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,6 +84,8 @@ public class SubmitDraftTest {
 
     private IdamTokens userIdamTokens;
 
+    private SyaCaseWrapper draftAppeal;
+
     @Before
     public void setUp() {
         baseURI = testUrl;
@@ -95,19 +98,20 @@ public class SubmitDraftTest {
                 .build();
 
         userIdamTokens = idamService.getIdamTokens();
+        draftAppeal = buildTestDraftAppeal();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
+
+        if (savedDrafts.size() > 0) {
+            archiveDraft(savedDrafts.get(0));
+        }
     }
 
     private String getUserId(String userToken) {
         return idamApiClient.getUserDetails(userToken).getId();
-    }
-
-    @Test
-    public void givenDraftDoesExist_shouldBeUpdatedInCcd() {
-        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
-        Response response = saveDraft(draftAppeal);
-        response.then()
-            .statusCode(HttpStatus.SC_OK)
-            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
@@ -119,7 +123,6 @@ public class SubmitDraftTest {
 
     @Test
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
-        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
@@ -137,7 +140,6 @@ public class SubmitDraftTest {
 
     @Test
     public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
-        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
         saveDraft(draftAppeal);
         RestAssured.given()
             .header(new Header(AUTHORIZATION, citizenToken))
@@ -158,8 +160,6 @@ public class SubmitDraftTest {
 
     @Test
     public void onceADraftIsArchived_itCannotBeRetrievedByTheCitizenUser() {
-        SyaCaseWrapper draftAppeal = buildTestDraftAppeal();
-
         saveDraft(draftAppeal);
 
         List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
