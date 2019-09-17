@@ -48,16 +48,6 @@ public class CcdConsumerTest {
 
     private static final String CCD_START_FOR_CASEWORKER_URL =
             CCD_BASE_URL + "/event-triggers/" + EVENT_ID + "/token";
-    private static final String CCD_SUBMIT_FOR_CASEWORKER_URL =
-            CCD_BASE_URL + "/cases";
-    private static final String CCD_START_EVENT_URL =
-            CCD_BASE_URL + "/cases/" + CASE_ID + "/event-triggers/" + EVENT_ID + "/token";
-    private static final String CCD_SUBMIT_EVENT_FOR_CASEWORKER_URL =
-            CCD_BASE_URL + "/events";
-    private static final String CCD_SEARCH_FOR_CASEWORKER_URL =
-            CCD_BASE_URL + "/cases/" + CASE_ID;
-    private static final String CCD_READ_FOR_CASEWORKER_URL =
-            CCD_BASE_URL + "/cases/";
 
     @BeforeEach
     public void setUp() {
