@@ -89,7 +89,7 @@ public class SubmitAppealService {
     private void postCreateCaseInCcdProcess(SscsCaseData caseData,
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
                                             String userToken) {
-        if (false) {
+        if (null != caseDetails) {
             sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
                 log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
@@ -130,10 +130,6 @@ public class SubmitAppealService {
             map.put("case.generatedNino", caseData.getGeneratedNino());
 
             List<SscsCaseDetails> matchedByNinoCases = ccdService.findCaseBy(map, idamTokens);
-
-            if (matchedByNinoCases.size() > 0) {
-                SscsCaseDetails duplicateCaseDetails = findDuplicateCases(caseData, matchedByNinoCases);
-            }
 
             if (caseDetails == null) {
                 if (matchedByNinoCases.size() > 0) {
