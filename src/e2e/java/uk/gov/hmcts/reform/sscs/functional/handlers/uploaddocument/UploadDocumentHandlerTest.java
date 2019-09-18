@@ -26,7 +26,6 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
             EventType.UPLOAD_DOCUMENT.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
         assertEquals(2, actualCase.getData().getSscsDocument().size());
         assertEquals(State.WITH_DWP.getId(), actualCase.getState());
-        assertEquals("feReceived", actualCase.getData().getDwpState());
     }
 
 }
