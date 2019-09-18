@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.time.LocalDate;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -21,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
 
 @Service
@@ -34,6 +38,8 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAintoBService convertAintoBService;
+    private final DwpAddressLookupService dwpAddressLookupService;
+    private final List<String> offices;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -41,7 +47,9 @@ public class SubmitAppealService {
                         SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        ConvertAintoBService convertAintoBService) {
+                        ConvertAintoBService convertAintoBService,
+                        DwpAddressLookupService dwpAddressLookupService,
+                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -49,6 +57,8 @@ public class SubmitAppealService {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAintoBService = convertAintoBService;
+        this.dwpAddressLookupService = dwpAddressLookupService;
+        this.offices = offices;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -107,11 +117,31 @@ public class SubmitAppealService {
     SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
 
+        SscsCaseData sscsCaseData;
         if (rpc == null) {
-            return convertSyaToCcdCaseData(appeal);
+            sscsCaseData = convertSyaToCcdCaseData(appeal);
         } else {
-            return convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
+            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
         }
+
+        setCreatedInGapsFromField(sscsCaseData);
+
+        return sscsCaseData;
+    }
+
+    private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
+        String createdInGapsFrom = VALID_APPEAL.name();
+        Optional<OfficeMapping> selectedOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+
+        for (String office : offices) {
+            Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), office);
+            if (officeMapping.isPresent() && selectedOfficeMapping.equals(officeMapping)) {
+                createdInGapsFrom = (READY_TO_LIST.name());
+            }
+        }
+
+        sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
+        return sscsCaseData;
     }
 
     String getFirstHalfOfPostcode(String postcode) {

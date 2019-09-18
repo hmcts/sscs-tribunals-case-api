@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
@@ -33,8 +34,9 @@ import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -95,6 +97,10 @@ public class SubmitAppealServiceTest {
     @Mock
     private ConvertAintoBService convertAintoBService;
 
+    private DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+
+    private List<String> offices;
+
     @Before
     public void setUp() {
         when(airLookupService.lookupRegionalCentre("CF10")).thenReturn("Cardiff");
@@ -106,12 +112,16 @@ public class SubmitAppealServiceTest {
             new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
 
+        offices = new ArrayList<>();
+        offices.add("1");
+        offices.add("Balham DRT");
+
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
-            submitYourAppealEmailTemplate, ccdPdfService);
+                submitYourAppealEmailTemplate, ccdPdfService);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAintoBService);
+            idamService, convertAintoBService, dwpAddressLookupService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -238,6 +248,62 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
+    public void givenAPipCaseWithReadyToListOffice_thenSetCreatedInGapsFromFieldToReadyToList() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("PIP", "PIP");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("1");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        assertEquals(READY_TO_LIST.name(), caseData.getCreatedInGapsFrom());
+    }
+
+    @Test
+    public void givenAPipCaseWithValidAppealOffice_thenSetCreatedInGapsFromFieldToValidAppeal() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("PIP", "PIP");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("2");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        assertEquals(State.VALID_APPEAL.name(), caseData.getCreatedInGapsFrom());
+    }
+
+    @Test
+    public void givenAEsaCaseWithReadyToListOffice_thenSetCreatedInGapsFromToReadyToList() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("ESA", "ESA");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("Balham DRT");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        assertEquals(READY_TO_LIST.name(), caseData.getCreatedInGapsFrom());
+    }
+
+    @Test
+    public void givenAEsaCaseWithValidAppealOffice_thenSetCreatedInGapsFromFieldToValidAppeal() {
+        SyaCaseWrapper appealData = getSyaCaseWrapper();
+        SyaBenefitType syaBenefitType = new SyaBenefitType("ESA", "ESA");
+        appealData.setBenefitType(syaBenefitType);
+
+        SyaMrn mrn = new SyaMrn();
+        mrn.setDwpIssuingOffice("Chesterfield DRT");
+        appealData.setMrn(mrn);
+
+        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        assertEquals(VALID_APPEAL.name(), caseData.getCreatedInGapsFrom());
+    }
+
+    @Test
     public void shouldUpdateCcdWithPdf() {
         Document stubbedDocument = new Document();
         Document.Link stubbedLink = new Document.Link();
@@ -264,16 +330,6 @@ public class SubmitAppealServiceTest {
             any(),
             eq("sscs1")
         );
-    }
-
-    private SyaCaseWrapper appealDataWithEvidence() {
-        SyaEvidence evidence1 = new SyaEvidence("http://localhost/1", "letter.pdf", LocalDate.now());
-        SyaEvidence evidence2 = new SyaEvidence("http://localhost/2", "photo.jpg", LocalDate.now());
-        SyaEvidence evidence3 = new SyaEvidence("http://localhost/3", "report.png", LocalDate.now());
-        SyaCaseWrapper appealDataWithEvidence = getSyaCaseWrapper();
-        appealDataWithEvidence.getReasonsForAppealing()
-            .setEvidences(Arrays.asList(evidence1, evidence2, evidence3));
-        return appealDataWithEvidence;
     }
 
     @Test(expected = CcdException.class)
