@@ -270,7 +270,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.69'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.5'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: 'DEV-SNAPSHOT'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.66-sscs-6201-RC'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
