@@ -11,7 +11,7 @@ java:
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    IDAM_URL: https://idam-api.aat.platform.hmcts.net
+    IDAM_URL: "https://idam-api.aat.platform.hmcts.net"
 
 memoryRequests: "1024Mi"
 cpuRequests: "25m"
