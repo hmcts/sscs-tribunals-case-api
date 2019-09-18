@@ -6,7 +6,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 
 public class PaperCaseEventFilterUtil {
 
-    private PaperCaseEventFilterUtil(){}
+    private PaperCaseEventFilterUtil() {
+
+    }
 
     public static void removeNonPaperCaseEvents(List<Event> eventsList) {
         NonPaperCaseEvents[] values = NonPaperCaseEvents.values();
