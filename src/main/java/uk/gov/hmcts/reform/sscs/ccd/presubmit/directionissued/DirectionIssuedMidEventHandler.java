@@ -78,6 +78,8 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
                 .userAuthentication(userAuthorisation)
                 .build();
 
+        log.info(String.format("Generating Interloc Direction document isScottish = %s", isScottish));
+
         final String generatedFileUrl = generateFile.assemble(params);
 
         final String filename = String.format("%s issued on %s.pdf", formPayload.getNoticeType(), dateAdded.toString());

@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import java.time.LocalDate;
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocuments;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
+@Slf4j
 public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
@@ -42,14 +44,12 @@ public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHan
                     .build();
 
             caseData.setSscsInterlocDirectionDocument(document);
-            saveToHistory(caseData);
-        } else {
-            saveToHistory(caseData);
         }
+        saveToHistory(caseData);
         clearTransientFields(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
+        log.info("Saved the new Interloc Direction document.");
 
         return sscsCaseDataPreSubmitCallbackResponse;
     }
@@ -63,6 +63,7 @@ public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHan
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
     private void clearTransientFields(SscsCaseData caseData) {
+        caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
