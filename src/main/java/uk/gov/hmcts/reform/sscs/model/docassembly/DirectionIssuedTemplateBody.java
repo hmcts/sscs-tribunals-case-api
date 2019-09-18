@@ -18,7 +18,7 @@ public class DirectionIssuedTemplateBody implements FormPayload {
     @JsonIgnore
     public static final String SCOTTISH_IMAGE = "[userImage:schmcts.png]";
     @JsonIgnore
-    public static final String ENGLISH_IMAGE = "[userImage:schmcts.png]";
+    public static final String ENGLISH_IMAGE = "[userImage:enhmcts.png]";
     @JsonProperty("appellant_full_name")
     private String appellantFullName;
     private String nino;
