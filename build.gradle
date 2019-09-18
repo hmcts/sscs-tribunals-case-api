@@ -150,9 +150,15 @@ repositories {
         url 'https://repo.spring.io/libs-milestone'
     }
 
+<<<<<<< HEAD
     jcenter()
     mavenCentral()
 
+=======
+    maven {
+        url "https://dl.bintray.com/hmcts/hmcts-maven"
+    }
+>>>>>>> upgrade candiate version of common
 
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
@@ -264,6 +270,7 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.69'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.5'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: 'DEV-SNAPSHOT'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
