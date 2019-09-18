@@ -7,7 +7,6 @@ import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -22,7 +21,6 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     private static final String UPLOAD_DOCUMENT_CALLBACK_JSON = "uploaddocument/uploadDocumentCallback.json";
     private UploadDocumentHandler handler = new UploadDocumentHandler();
 
-    @Ignore
     @Test
     @Parameters({
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,true",
@@ -51,7 +49,6 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
     }
 
-    @Ignore
     @Test(expected = IllegalStateException.class)
     @Parameters({
         "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp",
