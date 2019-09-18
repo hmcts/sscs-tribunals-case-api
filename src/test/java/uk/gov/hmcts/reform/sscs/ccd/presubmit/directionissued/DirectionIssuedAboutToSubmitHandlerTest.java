@@ -112,7 +112,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
 
         assertEquals(expectedDocument, response.getData().getSscsInterlocDirectionDocument());
-        assertEquals(Collections.singletonList(expectedDocument), response.getData().getHistoricSscsInterlocDirectionDocs());
+        assertEquals(Collections.singletonList(SscsInterlocDirectionDocuments.builder().value(expectedDocument).build()), response.getData().getHistoricSscsInterlocDirectionDocs());
     }
 
     @Test
@@ -127,6 +127,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
 
         assertEquals(expectedDocument, response.getData().getSscsInterlocDirectionDocument());
-        assertEquals(Collections.singletonList(expectedDocument), response.getData().getHistoricSscsInterlocDirectionDocs());
+        assertEquals(Collections.singletonList(SscsInterlocDirectionDocuments.builder().value(expectedDocument).build()), response.getData().getHistoricSscsInterlocDirectionDocs());
     }
 }

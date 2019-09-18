@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocuments;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -54,8 +55,8 @@ public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHan
     }
 
     private void saveToHistory(SscsCaseData caseData) {
-        List<SscsInterlocDirectionDocument> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDirectionDocs()).orElse(Collections.emptyList()));
-        historicDocs.add(caseData.getSscsInterlocDirectionDocument());
+        List<SscsInterlocDirectionDocuments> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDirectionDocs()).orElse(Collections.emptyList()));
+        historicDocs.add(SscsInterlocDirectionDocuments.builder().value(caseData.getSscsInterlocDirectionDocument()).build());
         caseData.setHistoricSscsInterlocDirectionDocs(historicDocs);
     }
 
