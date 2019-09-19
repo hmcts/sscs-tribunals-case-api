@@ -21,10 +21,10 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
 
 public class EvidenceDocumentUploadTest {
 
-    public static final String APPLICATION_PDF = "application/pdf";
-    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
-    public static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json;charset=UTF-8";
-    public static final String UTF_8 = "UTF-8";
+    private static final String APPLICATION_PDF = "application/pdf";
+    private static final String MULTIPART_FORM_DATA = "multipart/form-data";
+    private static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json;charset=UTF-8";
+    private static final String UTF_8 = "UTF-8";
 
     private final String tcaInstance = System.getenv("TEST_URL");
     private final String localInstance = "http://localhost:8080";
