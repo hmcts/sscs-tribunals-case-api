@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadDocumentHandlerTest extends BaseHandlerTest {
-
+    private static final String USER_AUTHORISATION = "Bearer token";
     private static final String UPLOAD_DOCUMENT_CALLBACK_JSON = "uploaddocument/uploadDocumentCallback.json";
     private UploadDocumentHandler handler = new UploadDocumentHandler();
 
@@ -42,7 +42,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
             buildTestCallbackGivenEvent(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
-                UPLOAD_DOCUMENT_CALLBACK_JSON));
+                UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
@@ -59,6 +59,6 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                                           @Nullable String state)
         throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state, UPLOAD_DOCUMENT_CALLBACK_JSON));
+        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state, UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
     }
 }
