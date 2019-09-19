@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 @Slf4j
 public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String GLASGOW = "GLASGOW";
+    private static final String NOTICE_TYPE = "DIRECTIONS NOTICE";
 
     private final GenerateFile generateFile;
     private final String templateId;
@@ -59,7 +60,7 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .noticeBody(caseData.getBodyContent())
                 .userName(caseData.getSignedBy())
-                .noticeType(DocumentType.DIRECTION_NOTICE.getValue())
+                .noticeType(NOTICE_TYPE)
                 .userRole(caseData.getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(LocalDate.now())
@@ -82,7 +83,7 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        final String filename = String.format("%s issued on %s.pdf", formPayload.getNoticeType(), dateAdded.toString());
+        final String filename = String.format("%s issued on %s.pdf", DocumentType.DIRECTION_NOTICE.getValue(), dateAdded.toString());
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)

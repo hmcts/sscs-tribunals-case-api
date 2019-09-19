@@ -124,6 +124,7 @@ public class DirectionIssuedMidEventHandlerTest {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionIssuedTemplateBody payload = (DirectionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
+        assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
         assertEquals("Appellant Lastname", payload.getAppellantFullName());
     }
 }
