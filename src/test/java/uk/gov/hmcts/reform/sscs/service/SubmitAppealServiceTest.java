@@ -97,8 +97,6 @@ public class SubmitAppealServiceTest {
     @Mock
     private ConvertAintoBService convertAintoBService;
 
-    private DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
-
     private List<String> offices;
 
     @Before
@@ -121,7 +119,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAintoBService, dwpAddressLookupService, offices);
+            idamService, convertAintoBService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());

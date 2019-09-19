@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
 
 @Service
@@ -38,7 +37,6 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAintoBService convertAintoBService;
-    private final DwpAddressLookupService dwpAddressLookupService;
     private final List<String> offices;
 
     @Autowired
@@ -48,7 +46,6 @@ public class SubmitAppealService {
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAintoBService convertAintoBService,
-                        DwpAddressLookupService dwpAddressLookupService,
                         @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
@@ -57,7 +54,6 @@ public class SubmitAppealService {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAintoBService = convertAintoBService;
-        this.dwpAddressLookupService = dwpAddressLookupService;
         this.offices = offices;
     }
 
@@ -130,15 +126,7 @@ public class SubmitAppealService {
     }
 
     private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
-        String createdInGapsFrom = VALID_APPEAL.name();
-        Optional<OfficeMapping> selectedOfficeMapping = dwpAddressLookupService.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
-
-        for (String office : offices) {
-            Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), office);
-            if (officeMapping.isPresent() && selectedOfficeMapping.equals(officeMapping)) {
-                createdInGapsFrom = (READY_TO_LIST.name());
-            }
-        }
+        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) ? READY_TO_LIST.name() : VALID_APPEAL.name();
 
         sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
         return sscsCaseData;
