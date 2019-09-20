@@ -9,6 +9,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -103,7 +105,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         assertNotNull(response.getData().getPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Direction Notice issued on %s.pdf", LocalDate.now().toString()))
+                .documentFilename(String.format("Direction Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());

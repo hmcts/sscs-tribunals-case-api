@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +84,7 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        final String filename = String.format("%s issued on %s.pdf", DocumentType.DIRECTION_NOTICE.getValue(), dateAdded.toString());
+        final String filename = String.format("%s issued on %s.pdf", DocumentType.DIRECTION_NOTICE.getValue(), dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)
