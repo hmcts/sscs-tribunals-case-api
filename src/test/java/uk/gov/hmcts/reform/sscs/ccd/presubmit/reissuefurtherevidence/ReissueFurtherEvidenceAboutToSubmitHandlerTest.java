@@ -26,6 +26,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSend
 
 @RunWith(JUnitParamsRunner.class)
 public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
+
     private ReissueFurtherEvidenceAboutToSubmitHandler handler;
 
     @Mock
@@ -97,7 +99,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         Optional<SscsDocumentDetails> selectedDocumentValue = response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentLink().getDocumentUrl().equals(selectedUrl)).map(f -> f.getValue()).findFirst();
@@ -115,7 +117,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     public void returnAnErrorIfNoSelectedDocument() {
         sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidenceDocument(null).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Select a document to re-issue further evidence.", response.getErrors().toArray()[0]);
@@ -125,7 +127,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     public void doesNotReturnAnErrorIfNoSelectedOriginalSender() {
         sscsCaseData = sscsCaseData.toBuilder().originalSender(null).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
         assertEquals(document2.toBuilder().value(document2.getValue().toBuilder().evidenceIssued("No").build()).build(), response.getData().getSscsDocument().get(1));
@@ -137,7 +139,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("NO").resendToDwp("NO").resendToAppellant("NO").build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Select a party to reissue the further evidence.", response.getErrors().toArray()[0]);
@@ -148,7 +150,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("code", "label"), null)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Could not find the selected document with url 'code' to re-issue further evidence in the appeal with id 'ccdId'.", response.getErrors().toArray()[0]);
@@ -159,7 +161,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData = sscsCaseData.toBuilder().resendToRepresentative("YES").build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Cannot re-issue to the representative as there is no representative on the appeal.", response.getErrors().toArray()[0]);
@@ -168,7 +170,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
 

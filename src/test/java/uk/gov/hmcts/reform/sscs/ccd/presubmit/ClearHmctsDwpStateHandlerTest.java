@@ -16,6 +16,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 public class ClearHmctsDwpStateHandlerTest {
 
+    private static final String USER_AUTHORISATION = "Bearer token";
+
     private ClearHmctsDwpStateHandler handler;
 
     @Mock
@@ -55,7 +57,7 @@ public class ClearHmctsDwpStateHandlerTest {
     public void givenACaseWithHmctsDwpStatePopulated_thenClearTheValue() {
         assertNotNull(callback.getCaseDetails().getCaseData().getHmctsDwpState());
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getHmctsDwpState());
     }

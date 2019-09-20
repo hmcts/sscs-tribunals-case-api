@@ -25,6 +25,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSend
 
 @RunWith(JUnitParamsRunner.class)
 public class ReissueFurtherEvidenceMidEventHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
+
     private ReissueFurtherEvidenceMidEventHandler handler;
 
     @Mock
@@ -82,7 +84,7 @@ public class ReissueFurtherEvidenceMidEventHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
@@ -112,7 +114,7 @@ public class ReissueFurtherEvidenceMidEventHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(Arrays.asList(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()),
                 new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()),
@@ -125,7 +127,7 @@ public class ReissueFurtherEvidenceMidEventHandlerTest {
     public void returnAnErrorIfNoSelectedDocument() {
         sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidenceDocument(null).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Select a document to re-issue further evidence.", response.getErrors().toArray()[0]);
@@ -136,7 +138,7 @@ public class ReissueFurtherEvidenceMidEventHandlerTest {
         sscsCaseData = sscsCaseData.toBuilder().reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem("code", "label"), null)).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
         assertEquals("Could not find the selected document with url 'code' to re-issue further evidence in the appeal with id 'ccdId'.", response.getErrors().toArray()[0]);
@@ -145,7 +147,7 @@ public class ReissueFurtherEvidenceMidEventHandlerTest {
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(MID_EVENT, callback);
+        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
     }
 
 

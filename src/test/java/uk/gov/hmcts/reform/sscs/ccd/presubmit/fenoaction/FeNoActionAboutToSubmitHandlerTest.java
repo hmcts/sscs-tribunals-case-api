@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.BaseHandlerTest;
 
 @RunWith(JUnitParamsRunner.class)
 public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private FeNoActionAboutToSubmitHandler handler = new FeNoActionAboutToSubmitHandler();
     private static final String FE_NO_ACTION_CALLBACK_JSON = "fenoaction/feNoActionAboutToSubmitCallback.json";
@@ -43,7 +44,7 @@ public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallbackGivenEvent(EventType.FE_NO_ACTION, State.WITH_DWP.getId(), FE_NO_ACTION_CALLBACK_JSON));
+            buildTestCallbackGivenEvent(EventType.FE_NO_ACTION, State.WITH_DWP.getId(), FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("fenoaction/expectedFeNoActionAboutToSubmitCallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
@@ -60,7 +61,7 @@ public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                                           @Nullable String state)
         throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state, FE_NO_ACTION_CALLBACK_JSON));
+        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state, FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
     }
 
 }

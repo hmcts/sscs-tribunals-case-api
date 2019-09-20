@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 public class DwpUploadResponseAboutToStartHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private DwpUploadResponseAboutToStartHandler handler;
 
@@ -56,7 +57,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     @Test
     public void populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withCorrectSelectedOffice() {
         callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("DWP PIP (3)", response.getData().getDwpOriginatingOffice().getValue().getCode());
         assertEquals("DWP PIP (3)", response.getData().getDwpPresentingOffice().getValue().getCode());
@@ -65,7 +66,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     @Test
     public void givenMrnIsNull_populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withDefaultSelectedOffice() {
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("DWP PIP (1)", response.getData().getDwpOriginatingOffice().getValue().getCode());
         assertEquals("DWP PIP (1)", response.getData().getDwpPresentingOffice().getValue().getCode());
@@ -73,7 +74,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
 
     @Test
     public void defaultTheDwpOptionsToNo() {
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("No", response.getData().getDwpIsOfficerAttending());
         assertEquals("No", response.getData().getDwpUcb());

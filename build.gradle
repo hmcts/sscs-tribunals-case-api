@@ -258,11 +258,12 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-httpcomponents', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
+    compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.69'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.5'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.66'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
@@ -366,6 +367,6 @@ task contract(type: Test, description: 'Runs the pact contract tests.', group: '
 run {
     def debug = System.getProperty("debug")
     if (debug == 'true') {
-        jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005']
+        jvmArgs = ['-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5006']
     }
 }

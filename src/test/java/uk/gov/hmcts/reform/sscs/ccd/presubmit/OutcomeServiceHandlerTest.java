@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 public class OutcomeServiceHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private OutcomeServiceHandler handler;
 
@@ -71,7 +72,7 @@ public class OutcomeServiceHandlerTest {
     public void setsOutcomeForTcwDecisionStrikeOut() {
         when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_STRIKE_OUT);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOutcome(), is("nonCompliantAppealStruckout"));
     }
@@ -80,7 +81,7 @@ public class OutcomeServiceHandlerTest {
     public void setsOutcomeForJudgeDecisionStrikeout() {
         when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_STRIKEOUT);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOutcome(), is("nonCompliantAppealStruckout"));
     }
@@ -89,7 +90,7 @@ public class OutcomeServiceHandlerTest {
     public void setsOutcomeForReinstateAppeal() {
         when(callback.getEvent()).thenReturn(EventType.REINSTATE_APPEAL);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOutcome(), is("reinstated"));
     }
@@ -98,7 +99,7 @@ public class OutcomeServiceHandlerTest {
     public void setsOutcomeForCohDecisionIssued() {
         when(callback.getEvent()).thenReturn(EventType.COH_DECISION_ISSUED);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getOutcome(), is("decisionUpheld"));
     }
@@ -110,6 +111,6 @@ public class OutcomeServiceHandlerTest {
         sscsCaseData = SscsCaseData.builder().interlocReviewState("someValue").build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+        handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 }
