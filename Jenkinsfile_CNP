@@ -40,5 +40,6 @@ withPipeline(type, product, component) {
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()
+    disableLegacyDeployment()
 }
 
