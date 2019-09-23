@@ -128,6 +128,7 @@ module "tribunals-case-api" {
     ROBOTICS_EMAIL_SCOTTISH_TO = "${data.azurerm_key_vault_secret.robotics_email_scottish_to.value}"
     ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
     ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
+    READY_TO_LIST_ROBOTICS_ENABLED = "${var.ready_to_list_robotics_enabled}"
 
     ISSUE_FURTHER_EVIDENCE_ENABLED    = "${var.issue_further_evidence_enabled}"
 
