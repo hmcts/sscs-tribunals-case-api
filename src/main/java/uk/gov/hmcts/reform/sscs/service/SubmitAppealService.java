@@ -177,7 +177,10 @@ public class SubmitAppealService {
                     CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
             associatedCases.add(caseLink);
         }
-        return caseData.toBuilder().associatedCase(associatedCases).build();
+        if (associatedCases.size() > 0){
+            return caseData.toBuilder().associatedCase(associatedCases).build();
+        }
+        return caseData;
     }
 
 
