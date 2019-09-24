@@ -134,7 +134,6 @@ public class SubmitAppealService {
             if (caseDetails == null) {
                 if (matchedByNinoCases.size() > 0) {
                     caseData = addAssociatedCases(caseData, matchedByNinoCases);
-                    log.info(new ObjectMapper().writeValueAsString(caseData));
                 }
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
