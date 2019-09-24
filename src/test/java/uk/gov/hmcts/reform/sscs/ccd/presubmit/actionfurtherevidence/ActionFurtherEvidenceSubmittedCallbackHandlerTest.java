@@ -41,6 +41,8 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
     @Mock
@@ -116,7 +118,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             anyString(), anyString(), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(SUBMITTED, callback);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertNull(captor.getValue().getInterlocReviewState());
     }
@@ -134,7 +136,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
                 anyString(), anyString(), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(SUBMITTED, callback);
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals("interlocutoryReview", captor.getValue().getInterlocReviewState());
     }

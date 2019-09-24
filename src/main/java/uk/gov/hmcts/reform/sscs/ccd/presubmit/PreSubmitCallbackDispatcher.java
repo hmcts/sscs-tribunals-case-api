@@ -19,20 +19,27 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
         this.callbackHandlers = callbackHandlers;
     }
 
-    public PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback) {
+    public PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback, String userAuthorisation) {
         requireNonNull(callback, "callback must not be null");
         T caseData = callback.getCaseDetails().getCaseData();
         PreSubmitCallbackResponse<T> callbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        dispatchToHandlers(callbackType, callback, callbackHandlers, callbackResponse);
+
+        dispatchToHandlers(callbackType, callback, callbackHandlers, callbackResponse, userAuthorisation);
+
         return callbackResponse;
     }
 
     private void dispatchToHandlers(CallbackType callbackType, Callback<T> callback,
                                     List<PreSubmitCallbackHandler<T>> callbackHandlers,
-                                    PreSubmitCallbackResponse<T> callbackResponse) {
+                                    PreSubmitCallbackResponse<T> callbackResponse,
+                                    String userAuthorisation
+                                    ) {
+
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
             if (callbackHandler.canHandle(callbackType, callback)) {
-                PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback);
+
+                PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback, userAuthorisation);
+
                 callbackResponse.setData(callbackResponseFromHandler.getData());
                 callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
             }

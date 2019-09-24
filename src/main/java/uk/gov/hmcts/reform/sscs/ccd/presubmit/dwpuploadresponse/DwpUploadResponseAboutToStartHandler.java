@@ -23,6 +23,7 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
         this.service = service;
     }
 
+    @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
@@ -31,7 +32,8 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
             && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }

@@ -1,0 +1,260 @@
+{
+  "data": {
+    "caseReference": "SC068/17/00013",
+    "caseCreated": "2019-09-10",
+    "region": "CARDIFF",
+    "appeal": {
+      "mrnDetails": {
+        "dwpIssuingOffice": "1",
+        "mrnDate": "2018-06-29",
+        "mrnLateReason": "Lost my paperwork",
+        "mrnMissingReason": null
+      },
+      "appellant": {
+        "name": {
+          "title": "Mr",
+          "firstName": "User",
+          "lastName": "Test"
+        },
+        "address": {
+          "line1": "123 Hairy Lane",
+          "line2": "Off Hairy Park",
+          "town": "Hairyfield",
+          "county": "Kent",
+          "postcode": "TN32 6PL"
+        },
+        "contact": {
+          "email": "mail@email.com",
+          "phone": "01234567890",
+          "mobile": "01234567890"
+        },
+        "identity": {
+          "dob": "1904-03-10",
+          "nino": "AB225566B"
+        },
+        "isAppointee": null,
+        "appointee": {
+          "name": {
+            "title": "Mrs",
+            "firstName": "April",
+            "lastName": "Appointer"
+          },
+          "address": {
+            "line1": "42 Appointed Mews",
+            "line2": "Apford",
+            "town": "Apton",
+            "county": "Appshire",
+            "postcode": "AP12 4PA"
+          },
+          "contact": {
+            "email": "appointee@hmcts.net",
+            "phone": "0207 946 0555",
+            "mobile": "07700 900555"
+          },
+          "identity": {
+            "dob": "1905-05-05",
+            "nino": "ZZ 11 22 33 B"
+          }
+        },
+        "isAddressSameAsAppointee": null
+      },
+      "benefitType": {
+        "code": "PIP",
+        "description": null
+      },
+      "hearingOptions": {
+        "wantsToAttend": "Yes",
+        "languageInterpreter": "Yes",
+        "languages": "Spanish",
+        "signLanguageType": "A sign language",
+        "arrangements": [
+          "hearingLoop",
+          "signLanguageInterpreter"
+        ],
+        "excludeDates": [
+          {
+            "value": {
+              "start": "2018-06-30",
+              "end": "2018-06-30"
+            }
+          },
+          {
+            "value": {
+              "start": "2018-07-30",
+              "end": "2018-07-30"
+            }
+          },
+          {
+            "value": {
+              "start": "2018-08-30",
+              "end": "2018-08-30"
+            }
+          }
+        ],
+        "other": "Yes, this..."
+      },
+      "appealReasons": {},
+      "rep": {
+        "hasRepresentative": "Yes",
+        "organisation": "HP Ltd",
+        "name": {
+          "title": "Mrs",
+          "firstName": "Wendy",
+          "lastName": "Giles"
+        },
+        "address": {
+          "line1": "123 Hairy Lane",
+          "line2": "Off Hairy Park",
+          "town": "Hairyfield",
+          "county": "Kent",
+          "postcode": "TN32 6PL"
+        },
+        "contact": {
+          "email": "mail@email.com",
+          "phone": "01234567890",
+          "mobile": "01234567890"
+        }
+      },
+      "signer": "Signer",
+      "hearingType": "oral",
+      "receivedVia": "Online"
+    },
+    "hearings": [
+      {
+        "value": {
+          "venue": {
+            "name": "Aberdeen",
+            "address": {
+              "postcode": "AB12 3ED"
+            },
+            "googleMapLink": null
+          },
+          "hearingDate": "2017-05-24",
+          "time": "10:45",
+          "adjourned": "Yes",
+          "eventDate": null,
+          "hearingId": null
+        }
+      }
+    ],
+    "evidence": {
+      "documents": [
+        {
+          "value": {
+            "dateReceived": "2017-05-24",
+            "evidenceType": "General",
+            "evidenceProvidedBy": null
+          }
+        }
+      ]
+    },
+    "dwpTimeExtension": [
+      {
+        "value": {
+          "requested": "Yes",
+          "granted": "Yes"
+        }
+      }
+    ],
+    "events": [
+      {
+        "value": {
+          "date": "2001-12-14T21:59:43.10-05:00",
+          "type": "appealCreated",
+          "description": "Appeal Created"
+        }
+      }
+    ],
+    "subscriptions": {
+      "appellantSubscription": {
+        "wantSmsNotifications": null,
+        "tya": "app-appeal-number",
+        "email": "appellant@email.com",
+        "mobile": "07700 900555",
+        "subscribeEmail": "Yes",
+        "subscribeSms": "Yes",
+        "reason": ""
+      },
+      "supporterSubscription": {
+        "wantSmsNotifications": null,
+        "tya": "",
+        "email": "supporter@email.com",
+        "mobile": "07700 900555",
+        "subscribeEmail": "",
+        "subscribeSms": "",
+        "reason": ""
+      },
+      "representativeSubscription": {
+        "wantSmsNotifications": null,
+        "tya": "rep-appeal-number",
+        "email": "representative@email.com",
+        "mobile": "07700 900555",
+        "subscribeEmail": "Yes",
+        "subscribeSms": "Yes",
+        "reason": null
+      },
+      "appointeeSubscription": {
+        "wantSmsNotifications": null,
+        "tya": "appointee-appeal-number",
+        "email": "appointee@hmcts.net",
+        "mobile": "07700 900555",
+        "subscribeEmail": "Yes",
+        "subscribeSms": "Yes",
+        "reason": ""
+      }
+    },
+    "regionalProcessingCenter": {
+      "faxNumber": "0870 739 4438",
+      "address4": "Newport Road",
+      "phoneNumber": "0300 123 1142",
+      "name": "CARDIFF",
+      "address1": "HM Courts & Tribunals Service",
+      "address2": "Social Security & Child Support Appeals",
+      "address3": "Eastgate House",
+      "postcode": "CF24 0AB",
+      "city": "CARDIFF",
+      "email": "Cardiff_SYA_Respon@justice.gov.uk"
+    },
+    "sscsDocument": [
+      {
+        "value": {
+          "documentLink": {
+            "document_url": "http://dm-store:5005/documents/bd4b1909-0ee0-4cb3-beb7-65a851f57260",
+            "document_binary_url": "http://dm-store:5005/documents/bd4b1909-0ee0-4cb3-beb7-65a851f57260/binary",
+            "document_filename": "Screenshot 2019-09-09 at 14.48.09.pdf"
+          }
+        }
+      }
+    ],
+    "furtherEvidenceAction": {
+      "value": {
+        "code": "informationReceivedForInterloc",
+        "label": "any"
+      },
+      "list_items": [
+        {
+          "code": "informationReceivedForInterloc",
+          "label": "any"
+        }
+      ]
+    },
+    "dwpState": "feReceived",
+    "dwpStateFeNoAction": {
+      "value": {
+        "code": "feActionedNR",
+        "label": "FE Actioned - NR"
+      },
+      "list_items": [
+        {
+          "code": "feActionedNR",
+          "label": "FE Actioned - NR"
+        },
+        {
+          "code": "feActionedNA",
+          "label": "FE Actioned - NA"
+        }
+      ]
+    }
+  },
+  "errors": []
+}

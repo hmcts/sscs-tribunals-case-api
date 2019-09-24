@@ -28,7 +28,7 @@ import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RecreateAppealPdfHandlerTest {
-
+    private static final String USER_AUTHORISATION = "Bearer token";
     private static final Long CCD_CASE_ID = 1234567890L;
     private static final String DOCUMENT_URL = "http://dm-store:4506/documents/35d53efc-a30d-4b0d-b5a9-312d52bb1a4d";
     private static final String EVIDENCE_URL = "http://dm-store:4506/documents/35d53efc-a45c-a30d-b5a9-412d52bb1a4d";
@@ -74,7 +74,7 @@ public class RecreateAppealPdfHandlerTest {
     public void shouldNotCallPdfServiceIfEventIsDifferent() {
         when(callback.getEvent()).thenReturn(APPEAL_RECEIVED);
 
-        recreateAppealPdfHandler.handle(SUBMITTED, callback);
+        recreateAppealPdfHandler.handle(SUBMITTED, callback, USER_AUTHORISATION);
     }
 
     @Test
@@ -82,7 +82,7 @@ public class RecreateAppealPdfHandlerTest {
 
         when(emailService.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals("No", response.getData().getEvidencePresent());
         assertNotNull(caseDetails.getCaseData().getAppeal().getAppellant().getAppointee());
@@ -98,7 +98,7 @@ public class RecreateAppealPdfHandlerTest {
 
         caseDetails.getCaseData().getAppeal().getAppellant().getAppointee().setName(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals("No", caseDetails.getCaseData().getEvidencePresent());
         assertNull(caseDetails.getCaseData().getAppeal().getAppellant().getAppointee());
@@ -116,7 +116,7 @@ public class RecreateAppealPdfHandlerTest {
 
         when(emailService.generateUniqueEmailId(caseDataWithPdf.getAppeal().getAppellant())).thenReturn("Test");
 
-        recreateAppealPdfHandler.handle(SUBMITTED, callback);
+        recreateAppealPdfHandler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertNull(caseDetails.getCaseData().getEvidencePresent());
 
@@ -132,7 +132,7 @@ public class RecreateAppealPdfHandlerTest {
 
         when(emailService.generateUniqueEmailId(caseDataWithNullSscsDocument.getAppeal().getAppellant())).thenReturn("Test");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = recreateAppealPdfHandler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals("No", response.getData().getEvidencePresent());
         assertNotNull(caseDetails.getCaseData().getAppeal().getAppellant().getAppointee());

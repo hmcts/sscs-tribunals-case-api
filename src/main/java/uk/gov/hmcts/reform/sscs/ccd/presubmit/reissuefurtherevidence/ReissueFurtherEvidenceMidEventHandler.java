@@ -32,6 +32,7 @@ public class ReissueFurtherEvidenceMidEventHandler implements PreSubmitCallbackH
         documentTypeToOriginalSender.put(DWP_EVIDENCE.getValue(), DWP);
     }
 
+    @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null.");
         requireNonNull(callbackType, "callbacktype must not be null.");
@@ -40,7 +41,8 @@ public class ReissueFurtherEvidenceMidEventHandler implements PreSubmitCallbackH
                 && callback.getEvent() == EventType.REISSUE_FURTHER_EVIDENCE;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback.");
         }

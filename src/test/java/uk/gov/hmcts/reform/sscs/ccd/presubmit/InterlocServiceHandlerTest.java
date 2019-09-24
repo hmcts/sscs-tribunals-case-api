@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 
 public class InterlocServiceHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private InterlocServiceHandler handler;
 
@@ -122,7 +123,7 @@ public class InterlocServiceHandlerTest {
     public void setsCorrectInterlocReviewStatus() {
         when(callback.getEvent()).thenReturn(EventType.TCW_DIRECTION_ISSUED);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is("awaitingInformation"));
     }
@@ -131,7 +132,7 @@ public class InterlocServiceHandlerTest {
     public void resetsInterlocReviewStatusJudgeDecisionAppealToProceed() {
         when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is("none"));
     }
@@ -140,7 +141,7 @@ public class InterlocServiceHandlerTest {
     public void resetsInterlocReviewStatusTcwDecisionAppealToProceed() {
         when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_APPEAL_TO_PROCEED);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is("none"));
     }
@@ -149,7 +150,7 @@ public class InterlocServiceHandlerTest {
     public void setsCorrectInterlocReviewStatusForUploadFurtherEvidence() {
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is("interlocutoryReview"));
     }
@@ -161,14 +162,14 @@ public class InterlocServiceHandlerTest {
         sscsCaseData = SscsCaseData.builder().interlocReviewState("someValue").build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        handler.handle(ABOUT_TO_SUBMIT, callback);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
     @Test
     public void checkInterlocDateIsSet() {
         when(callback.getEvent()).thenReturn(EventType.NON_COMPLIANT);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
     }

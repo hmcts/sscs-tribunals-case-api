@@ -63,6 +63,7 @@ public class CcdCallbackControllerTest {
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
+            .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
             .body(getJsonCallbackForTest())
             .post("/ccdSubmittedEvent")
             .then()

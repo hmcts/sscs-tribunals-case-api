@@ -18,13 +18,15 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
         this.eventFieldMappings = eventFieldMappings;
     }
 
+    @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
 
         return eventFieldMappings.containsKey(callback.getEvent()) && callbackType.equals(ABOUT_TO_SUBMIT);
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }

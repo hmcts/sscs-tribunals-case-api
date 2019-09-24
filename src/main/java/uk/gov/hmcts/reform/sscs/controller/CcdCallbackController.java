@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.*;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
@@ -39,58 +40,64 @@ public class CcdCallbackController {
     @PostMapping(path = "/ccdAboutToStart")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdAboutToStart(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+        @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to start sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
 
-        return performRequest(ABOUT_TO_START, callback);
+        return performRequest(ABOUT_TO_START, callback, userAuthorisation);
     }
 
     @PostMapping(path = "/ccdAboutToSubmit")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdAboutToSubmit(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+        @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
-        return performRequest(ABOUT_TO_SUBMIT, callback);
+        return performRequest(ABOUT_TO_SUBMIT, callback, userAuthorisation);
     }
 
     @PostMapping(path = "/ccdMidEvent")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEvent(
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+            @RequestHeader(AUTHORIZATION) String userAuthorisation,
             @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
-        return performRequest(MID_EVENT, callback);
+        return performRequest(MID_EVENT, callback, userAuthorisation);
     }
 
     @PostMapping(path = "/ccdSubmittedEvent")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdSubmittedEvent(
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
+        @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
-        validateRequest(serviceAuthHeader, message);
+        validateRequest(serviceAuthHeader, userAuthorisation, message);
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("processing SubmittedEvent callback for`{}` event and Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
-        return performRequest(SUBMITTED, callback);
+        return performRequest(SUBMITTED, callback, userAuthorisation);
     }
 
-    private void validateRequest(String serviceAuthHeader, String message) {
+    private void validateRequest(String serviceAuthHeader, String userAuthorisation, String message) {
         Preconditions.checkNotNull(message);
+        Preconditions.checkNotNull(userAuthorisation);
         Preconditions.checkNotNull(serviceAuthHeader);
     }
 
-    private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> performRequest(CallbackType callbackType,
-                                                                                   Callback<SscsCaseData> callback) {
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = dispatcher.handle(callbackType, callback);
-        log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(),
-            callback.getCaseDetails().getId());
+    private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> performRequest(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+
+        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = dispatcher.handle(callbackType, callback, userAuthorisation);
+
+        log.info("Sscs Case CCD callback `{}` handled for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+
         return ok(callbackResponse);
     }
 

@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
-
+    private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DWP_ACTION_WITHDRAWAL_CALLBACK_JSON = "dwpActionWithdrawalCallback.json";
     private final DwpActionWithdrawalHandler handler = new DwpActionWithdrawalHandler();
 
@@ -53,7 +53,7 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualResult = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallbackGivenEvent(EventType.DWP_ACTION_WITHDRAWAL, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
+            buildTestCallbackGivenEvent(EventType.DWP_ACTION_WITHDRAWAL, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/dwpActionWithdrawalExpectedCaseData.json");
         assertEquals("Withdrawn", actualResult.getData().getDwpState());
@@ -68,6 +68,6 @@ public class DwpActionWithdrawalHandlerTest extends AdminAppealWithdrawnBase {
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType)
         throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON));
+        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, DWP_ACTION_WITHDRAWAL_CALLBACK_JSON), USER_AUTHORISATION);
     }
 }
