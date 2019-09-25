@@ -169,9 +169,11 @@ public class SubmitAppealService {
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
+        log.info("Adding " + matchedByNinoCases.size() + " associated cases");
         List<CaseLink> associatedCases = new ArrayList<>();
 
         for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
+            log.info("Linking case " + sscsCaseDetails.getId().toString() + " to " + caseData.getCcdCaseId());
             CaseLink caseLink = CaseLink.builder().value(
                     CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
             associatedCases.add(caseLink);
