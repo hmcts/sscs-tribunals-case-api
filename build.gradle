@@ -153,7 +153,6 @@ repositories {
     jcenter()
     mavenCentral()
 
-
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
     maven { url 'https://jitpack.io' }
@@ -262,8 +261,8 @@ dependencies {
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.69'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.5'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.70'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
