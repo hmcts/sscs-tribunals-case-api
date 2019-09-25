@@ -116,6 +116,7 @@ public class SubmitAppealTest {
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
 
+    @Ignore
     @Test
     @Parameters({"ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
     public void appealShouldCreateDuplicateAndLinked(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
