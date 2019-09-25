@@ -256,7 +256,7 @@ public class SubmitAppealServiceTest {
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
-        assertEquals(READY_TO_LIST.name(), caseData.getCreatedInGapsFrom());
+        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
     @Test
@@ -270,7 +270,7 @@ public class SubmitAppealServiceTest {
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
-        assertEquals(State.VALID_APPEAL.name(), caseData.getCreatedInGapsFrom());
+        assertEquals(State.VALID_APPEAL.getId(), caseData.getCreatedInGapsFrom());
     }
 
     @Test
@@ -284,7 +284,7 @@ public class SubmitAppealServiceTest {
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
-        assertEquals(READY_TO_LIST.name(), caseData.getCreatedInGapsFrom());
+        assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
     @Test
@@ -298,7 +298,7 @@ public class SubmitAppealServiceTest {
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
-        assertEquals(VALID_APPEAL.name(), caseData.getCreatedInGapsFrom());
+        assertEquals(State.VALID_APPEAL.getId(), caseData.getCreatedInGapsFrom());
     }
 
     @Test

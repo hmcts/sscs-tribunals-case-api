@@ -126,7 +126,7 @@ public class SubmitAppealService {
     }
 
     private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
-        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) ? READY_TO_LIST.name() : VALID_APPEAL.name();
+        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
 
         sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
         return sscsCaseData;
