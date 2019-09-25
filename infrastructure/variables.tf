@@ -105,7 +105,3 @@ variable "issue_further_evidence_enabled" {
   type    = "string"
   default = "false"
 }
-
-variable "ready_to_list_robotics_enabled" {
-  default = false
-}
