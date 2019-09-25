@@ -116,4 +116,61 @@ public class SubmitAppealTest {
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
 
+    @Ignore
+    @Test
+    @Parameters({"ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
+    public void appealShouldCreateDuplicateAndLinked(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
+        String body = syaJsonMessageSerializer.getSerializedMessage();
+        String nino = getRandomNino();
+
+        body = setNino(body, nino);
+
+        LocalDate mrnDate = LocalDate.now();
+        body = setLatestMrnDate(body, mrnDate);
+
+        SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
+        wrapper.getAppellant().setNino(nino);
+
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+
+        RequestSpecification httpRequest = RestAssured.given()
+                .body(body)
+                .header("Content-Type", "application/json");
+
+        Response response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CREATED);
+
+        final String location = response.getHeader("Location");
+        final Long id = Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
+        SscsCaseDetails sscsCaseDetails = findCaseInCcd(id);
+
+        log.info(String.format("SYA created with CCD ID %s", id));
+        assertEquals(expectedState, sscsCaseDetails.getState());
+
+        //create a case with different mrn date
+        body = syaJsonMessageSerializer.getSerializedMessage();
+        body = setNino(body, nino);
+
+        mrnDate = LocalDate.now().minusMonths(12);
+        body = setLatestMrnDate(body, mrnDate);
+
+        httpRequest = RestAssured.given()
+                .body(body)
+                .header("Content-Type", "application/json");
+
+        response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CREATED);
+
+        String secondCaseLocation = response.getHeader("Location");
+        final Long secondCaseId = Long.parseLong(secondCaseLocation.substring(secondCaseLocation.lastIndexOf("/") + 1));
+        log.info("Duplicate case " + secondCaseId);
+        SscsCaseDetails secondCaseSscsCaseDetails = findCaseInCcd(secondCaseId);
+
+        assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
+        log.info(secondCaseSscsCaseDetails.toString());
+
+    }
+
 }
