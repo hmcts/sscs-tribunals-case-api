@@ -91,7 +91,7 @@ public class SubmitAppealService {
                                             IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
                                             String userToken) {
         if (null != caseDetails) {
-            //sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
+            sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
                 log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
                 caseData.setDateSentToDwp(LocalDate.now().toString());
