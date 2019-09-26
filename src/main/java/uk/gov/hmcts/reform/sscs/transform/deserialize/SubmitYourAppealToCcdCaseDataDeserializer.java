@@ -56,6 +56,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     private static final String YES = "Yes";
     private static final String NO = "No";
 
+
     private SubmitYourAppealToCcdCaseDataDeserializer() {
         // Empty
     }

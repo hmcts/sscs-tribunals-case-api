@@ -1,20 +1,21 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -36,6 +37,7 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAintoBService convertAintoBService;
+    private final List<String> offices;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -43,7 +45,8 @@ public class SubmitAppealService {
                         SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        ConvertAintoBService convertAintoBService) {
+                        ConvertAintoBService convertAintoBService,
+                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -51,6 +54,7 @@ public class SubmitAppealService {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAintoBService = convertAintoBService;
+        this.offices = offices;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -109,11 +113,23 @@ public class SubmitAppealService {
     SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
 
+        SscsCaseData sscsCaseData;
         if (rpc == null) {
-            return convertSyaToCcdCaseData(appeal);
+            sscsCaseData = convertSyaToCcdCaseData(appeal);
         } else {
-            return convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
+            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
         }
+
+        setCreatedInGapsFromField(sscsCaseData);
+
+        return sscsCaseData;
+    }
+
+    private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
+        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
+
+        sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
+        return sscsCaseData;
     }
 
     String getFirstHalfOfPostcode(String postcode) {
@@ -126,8 +142,16 @@ public class SubmitAppealService {
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);;
+
+            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getGeneratedNino(), idamTokens);
+
+            log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getGeneratedNino());
+
             if (caseDetails == null) {
+                if (matchedByNinoCases.size() > 0) {
+                    caseData = addAssociatedCases(caseData, matchedByNinoCases);
+                }
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
                     "SSCS - new case created",
@@ -153,6 +177,31 @@ public class SubmitAppealService {
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
     }
+
+    protected List<SscsCaseDetails> getMatchedCases(String generatedNino, IdamTokens idamTokens) {
+        HashMap<String, String> map = new HashMap<String, String>();
+
+        map.put("case.generatedNino", generatedNino);
+
+        return ccdService.findCaseBy(map, idamTokens);
+    }
+
+    protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
+        log.info("Adding " + matchedByNinoCases.size() + " associated cases");
+        List<CaseLink> associatedCases = new ArrayList<>();
+
+        for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
+            log.info("Linking case " + sscsCaseDetails.getId().toString());
+            CaseLink caseLink = CaseLink.builder().value(
+                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
+            associatedCases.add(caseLink);
+        }
+        if (associatedCases.size() > 0) {
+            return caseData.toBuilder().associatedCase(associatedCases).build();
+        }
+        return caseData;
+    }
+
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
