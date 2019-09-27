@@ -193,7 +193,7 @@ configurations {
 
 
 def versions = [
-        reformLogging: '5.1.0-rc',
+        reformLogging: '5.1.0',
         springfoxSwagger: '2.8.0',
         pitest: '1.3.2',
         gradlePitest: '1.3.0',
