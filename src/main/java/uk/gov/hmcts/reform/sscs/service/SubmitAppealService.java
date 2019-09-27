@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import java.time.LocalDate;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -34,6 +37,7 @@ public class SubmitAppealService {
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAintoBService convertAintoBService;
+    private final List<String> offices;
 
     @Autowired
     SubmitAppealService(CcdService ccdService,
@@ -41,7 +45,8 @@ public class SubmitAppealService {
                         SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        ConvertAintoBService convertAintoBService) {
+                        ConvertAintoBService convertAintoBService,
+                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -49,6 +54,7 @@ public class SubmitAppealService {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAintoBService = convertAintoBService;
+        this.offices = offices;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -107,11 +113,23 @@ public class SubmitAppealService {
     SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
 
+        SscsCaseData sscsCaseData;
         if (rpc == null) {
-            return convertSyaToCcdCaseData(appeal);
+            sscsCaseData = convertSyaToCcdCaseData(appeal);
         } else {
-            return convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
+            sscsCaseData = convertSyaToCcdCaseData(appeal, rpc.getName(), rpc);
         }
+
+        setCreatedInGapsFromField(sscsCaseData);
+
+        return sscsCaseData;
+    }
+
+    private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
+        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
+
+        sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
+        return sscsCaseData;
     }
 
     String getFirstHalfOfPostcode(String postcode) {
