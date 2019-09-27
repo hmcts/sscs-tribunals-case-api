@@ -1,5 +1,5 @@
 java:
-  image: 'https://hmctspublic.azurecr.io/sscs/tribunals-api:latest'
+  image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
