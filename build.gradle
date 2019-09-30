@@ -13,7 +13,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '2.7.1'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.1.6.RELEASE'
+    id 'org.springframework.boot' version '2.1.8.RELEASE'
     id 'org.owasp.dependencycheck' version '5.1.1'
     id 'com.github.ben-manes.versions' version '0.25.0'
     id 'net.ltgt.apt' version '0.21'
