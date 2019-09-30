@@ -26,10 +26,10 @@ public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseD
             return sscsDocuments.stream()
                 .anyMatch(doc -> {
                     String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
-                    return "Medical evidence".equals(docType)
-                        || "Other evidence".equals(docType)
-                        || "appellantEvidence".equals(docType)
-                        || "representativeEvidence".equals(docType);
+                    return DocumentType.MEDICAL_EVIDENCE.getValue().equals(docType)
+                        || DocumentType.OTHER_EVIDENCE.getValue().equals(docType)
+                        || DocumentType.APPELLANT_EVIDENCE.getValue().equals(docType)
+                        || DocumentType.REPRESENTATIVE_EVIDENCE.getValue().equals(docType);
                 });
         }
         return false;
