@@ -19,7 +19,7 @@ public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseD
             && callback.getCaseDetails().getCaseData().getSscsDocument() != null
             && callback.getCaseDetails().getCaseData().getSscsDocument().stream()
             .anyMatch(doc -> {
-                String docType = doc.getValue().getDocumentType();
+                String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
                 return "Medical evidence".equals(docType)
                     || "Other evidence".equals(docType)
                     || "appellantEvidence".equals(docType)

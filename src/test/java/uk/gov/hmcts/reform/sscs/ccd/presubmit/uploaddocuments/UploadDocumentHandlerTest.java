@@ -41,8 +41,9 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
         "null,UPLOAD_DOCUMENT,withDwp,appellantEvidence,false",
         "ABOUT_TO_SUBMIT,null,withDwp,appellantEvidence,false",
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullSscsDocument,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullSscsDocuments,false",
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullDocumentType,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullSscsDocument,false"
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
                           @Nullable String documentType, boolean expectedResult) throws IOException {

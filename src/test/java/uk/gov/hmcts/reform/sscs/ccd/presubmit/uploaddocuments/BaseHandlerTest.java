@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -50,7 +51,7 @@ public class BaseHandlerTest {
         json = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         json = json.replace("STATE_ID_PLACEHOLDER", state);
         json = json.replace("DOCUMENT_TYPE_PLACEHOLDER",
-            (!documentType.equals("nullSscsDocument")) ? documentType : "it will be null");
+            (!documentType.equals("nullSscsDocuments")) ? documentType : "it will be null");
 
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
@@ -60,7 +61,7 @@ public class BaseHandlerTest {
     }
 
     private void configureTestDataForEdgeCaseScenarios(String documentType, Callback<SscsCaseData> sscsCaseDataCallback) {
-        if (documentType.equals("nullSscsDocument")) {
+        if (documentType.equals("nullSscsDocuments")) {
             sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(null);
         }
         if (documentType.equals("nullDocumentType")) {
@@ -69,6 +70,11 @@ public class BaseHandlerTest {
                 .map(doc -> new SscsDocument(SscsDocumentDetails.builder().build()))
                 .collect(Collectors.toList());
             sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocumentsWithNullDocTypes);
+        }
+        if (documentType.equals("nullSscsDocument")) {
+            List<SscsDocument> sscsDocuments = new ArrayList<>();
+            sscsDocuments.add(SscsDocument.builder().build());
+            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocuments);
         }
     }
 
