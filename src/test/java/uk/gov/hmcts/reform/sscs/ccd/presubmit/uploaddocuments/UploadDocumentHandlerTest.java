@@ -46,7 +46,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
                           @Nullable String documentType, boolean expectedResult) throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state,
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenData(eventType, state,
             documentType, UPLOAD_DOCUMENT_CALLBACK_JSON));
 
         assertEquals(expectedResult, actualResult);
@@ -55,7 +55,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallbackGivenEvent(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
+            buildTestCallbackGivenData(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
                 "representativeEvidence", UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
@@ -72,7 +72,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                                           @Nullable String state)
         throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state, "representativeEvidence",
+        handler.handle(callbackType, buildTestCallbackGivenData(eventType, state, "representativeEvidence",
             UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
     }
 }

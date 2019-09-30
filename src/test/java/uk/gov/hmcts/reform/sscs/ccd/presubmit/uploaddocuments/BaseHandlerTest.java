@@ -39,10 +39,10 @@ public class BaseHandlerTest {
         mapper.registerModule(new JavaTimeModule());
     }
 
-    protected Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state,
-                                                                 String documentType, String filePath)
+    protected Callback<SscsCaseData> buildTestCallbackGivenData(EventType eventType, String state,
+                                                                String documentType, String filePath)
         throws IOException {
-        //custom condition to return a null callback needed for one test scenario above
+        //edge case test scenario: callback is null
         if (eventType == null) {
             return null;
         }
@@ -55,7 +55,11 @@ public class BaseHandlerTest {
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
         Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
 
-        //set edges cases test scenarios
+        configureTestDataForEdgeCaseScenarios(documentType, sscsCaseDataCallback);
+        return sscsCaseDataCallback;
+    }
+
+    private void configureTestDataForEdgeCaseScenarios(String documentType, Callback<SscsCaseData> sscsCaseDataCallback) {
         if (documentType.equals("nullSscsDocument")) {
             sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(null);
         }
@@ -66,7 +70,6 @@ public class BaseHandlerTest {
                 .collect(Collectors.toList());
             sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocumentsWithNullDocTypes);
         }
-        return sscsCaseDataCallback;
     }
 
     protected String fetchData(final String filePath) throws IOException {
