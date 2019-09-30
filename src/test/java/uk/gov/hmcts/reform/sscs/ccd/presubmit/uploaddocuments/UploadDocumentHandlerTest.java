@@ -25,7 +25,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     @Parameters({
         "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,true",
         "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,true",
         "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,false",
         "null,UPLOAD_DOCUMENT,withDwp,false",
         "ABOUT_TO_SUBMIT,null,withDwp,false",
