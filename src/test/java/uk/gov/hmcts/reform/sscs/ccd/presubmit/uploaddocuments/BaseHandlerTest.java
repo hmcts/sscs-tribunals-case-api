@@ -10,7 +10,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -18,6 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
 public class BaseHandlerTest {
     private ObjectMapper mapper;
@@ -35,18 +39,34 @@ public class BaseHandlerTest {
         mapper.registerModule(new JavaTimeModule());
     }
 
-    protected Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state, String filePath)
+    protected Callback<SscsCaseData> buildTestCallbackGivenEvent(EventType eventType, String state,
+                                                                 String documentType, String filePath)
         throws IOException {
         //custom condition to return a null callback needed for one test scenario above
         if (eventType == null) {
             return null;
         }
         String json = fetchData(filePath);
-        String eventIdPlaceholder = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
-        String jsonCallback = eventIdPlaceholder.replace("STATE_ID_PLACEHOLDER", state);
+        json = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
+        json = json.replace("STATE_ID_PLACEHOLDER", state);
+        json = json.replace("DOCUMENT_TYPE_PLACEHOLDER",
+            (!documentType.equals("nullSscsDocument")) ? documentType : "it will be null");
 
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
-        return sscsCaseCallbackDeserializer.deserialize(jsonCallback);
+        Callback<SscsCaseData> sscsCaseDataCallback = sscsCaseCallbackDeserializer.deserialize(json);
+
+        //set edges cases test scenarios
+        if (documentType.equals("nullSscsDocument")) {
+            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(null);
+        }
+        if (documentType.equals("nullDocumentType")) {
+            List<SscsDocument> sscsDocumentsWithNullDocTypes = sscsCaseDataCallback.getCaseDetails()
+                .getCaseData().getSscsDocument().stream()
+                .map(doc -> new SscsDocument(SscsDocumentDetails.builder().build()))
+                .collect(Collectors.toList());
+            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocumentsWithNullDocTypes);
+        }
+        return sscsCaseDataCallback;
     }
 
     protected String fetchData(final String filePath) throws IOException {
