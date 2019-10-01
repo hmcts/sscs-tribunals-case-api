@@ -44,11 +44,12 @@ public class TyaControllerTest {
         controller.validateSurname(APPEAL_ID, SURNAME);
     }
 
-    @Test(expected = InvalidSurnameException.class)
+    @Test
     public void shouldReturn404GivenInvalidAppealNumberSurnameCombination() throws CcdException {
         when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenThrow(new InvalidSurnameException());
 
-        controller.validateSurname(APPEAL_ID, SURNAME);
+        ResponseEntity<SurnameResponse> receivedAppeal = controller.validateSurname(APPEAL_ID, SURNAME);
+        assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
     }
 
     @Test
