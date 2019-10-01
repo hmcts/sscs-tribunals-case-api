@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 
 @RestController
 public class TyaController {
@@ -29,14 +30,19 @@ public class TyaController {
     @ApiOperation(value = "validateSurname",
         notes = "Checks valid appeal number and surname",
         response = ResponseEntity.class, responseContainer = "Appeal details")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class),
+        @ApiResponse(code = 404, message = "The surname could not be found")})
     @RequestMapping(value = "/appeals/{appealNumber}/surname/{surname}", method = GET,
             produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SurnameResponse> validateSurname(
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) {
 
-        return  ResponseEntity.ok(tribunalsService.validateSurname(appealNumber, surname));
+        try {
+            return ResponseEntity.ok(tribunalsService.validateSurname(appealNumber, surname));
+        } catch (InvalidSurnameException invalidSurnameException) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @ApiOperation(value = "getAppeal",
