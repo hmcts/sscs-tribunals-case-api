@@ -272,7 +272,7 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.1.8.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.8.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.8.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.9.0'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
