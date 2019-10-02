@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
-import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 
 @Service
 @Slf4j
@@ -98,7 +97,7 @@ public class TribunalsService {
         SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
         if (caseData == null) {
             log.error("Not a valid surname: " + surname);
-            throw new InvalidSurnameException();
+            return null;
         }
         return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname);
     }

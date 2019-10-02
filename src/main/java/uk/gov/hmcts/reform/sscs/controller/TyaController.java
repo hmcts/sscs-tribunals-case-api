@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
-import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 
 @RestController
 public class TyaController {
@@ -38,9 +37,10 @@ public class TyaController {
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) {
 
-        try {
+        SurnameResponse surnameResponse = tribunalsService.validateSurname(appealNumber, surname);
+        if (surnameResponse != null) {
             return ResponseEntity.ok(tribunalsService.validateSurname(appealNumber, surname));
-        } catch (InvalidSurnameException invalidSurnameException) {
+        } else {
             return ResponseEntity.notFound().build();
         }
     }

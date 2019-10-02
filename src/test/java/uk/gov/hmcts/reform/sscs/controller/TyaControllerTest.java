@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
-import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 
 public class TyaControllerTest {
 
@@ -46,7 +45,7 @@ public class TyaControllerTest {
 
     @Test
     public void shouldReturn404GivenInvalidAppealNumberSurnameCombination() throws CcdException {
-        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenThrow(new InvalidSurnameException());
+        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenReturn(null);
 
         ResponseEntity<SurnameResponse> receivedAppeal = controller.validateSurname(APPEAL_ID, SURNAME);
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));

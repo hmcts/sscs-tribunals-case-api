@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
-import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
@@ -114,11 +113,12 @@ public class TribunalsServiceTest {
         assertThat(appeal, is(objectNode));
     }
 
-    @Test(expected = InvalidSurnameException.class)
     public void shouldThrowExceptionGivenValidationFails() throws CcdException {
         given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(null);
 
-        tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
+        SurnameResponse actualResponse = tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
+
+        assertNull(actualResponse);
     }
 
     @Test
