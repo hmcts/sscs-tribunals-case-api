@@ -7,6 +7,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
+
 
 public class TyaControllerTest {
 
@@ -38,14 +40,14 @@ public class TyaControllerTest {
 
     @Test
     public void shouldReturnOkGivenValidAppealNumberSurnameCombination() throws CcdException {
-        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenReturn(new SurnameResponse(CCD_CASE_ID, APPEAL_ID, SURNAME));
+        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenReturn(Optional.of(new SurnameResponse(CCD_CASE_ID, APPEAL_ID, SURNAME)));
 
         controller.validateSurname(APPEAL_ID, SURNAME);
     }
 
     @Test
     public void shouldReturn404GivenInvalidAppealNumberSurnameCombination() throws CcdException {
-        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenReturn(null);
+        when(tribunalsService.validateSurname(APPEAL_ID, SURNAME)).thenReturn(Optional.empty());
 
         ResponseEntity<SurnameResponse> receivedAppeal = controller.validateSurname(APPEAL_ID, SURNAME);
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));

@@ -7,6 +7,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 import uk.gov.hmcts.reform.sscs.service.TribunalsService;
+
 
 @RestController
 public class TyaController {
@@ -37,12 +39,12 @@ public class TyaController {
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) {
 
-        SurnameResponse surnameResponse = tribunalsService.validateSurname(appealNumber, surname);
-        if (surnameResponse != null) {
-            return ResponseEntity.ok(tribunalsService.validateSurname(appealNumber, surname));
-        } else {
-            return ResponseEntity.notFound().build();
+        Optional<SurnameResponse> surnameResponse = tribunalsService.validateSurname(appealNumber, surname);
+        if (surnameResponse.isPresent()) {
+            return ResponseEntity.ok(tribunalsService.validateSurname(appealNumber, surname).get());
         }
+        return ResponseEntity.notFound().build();
+
     }
 
     @ApiOperation(value = "getAppeal",
