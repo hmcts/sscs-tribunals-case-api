@@ -197,7 +197,7 @@ public class SubmitAppealService {
             associatedCases.add(caseLink);
         }
         if (associatedCases.size() > 0) {
-            return caseData.toBuilder().associatedCase(associatedCases).build();
+            return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean(true).build();
         }
         return caseData;
     }
