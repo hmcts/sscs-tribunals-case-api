@@ -52,6 +52,7 @@ import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessi
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -143,26 +144,19 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Parameters({
-        "DWP PIP (1),Newcastle", "DWP PIP (2),Glasgow", "DWP PIP (3),Bellevale", "DWP PIP (4),Glasgow",
-        "DWP PIP (5),Springburn", "DWP PIP (6),Blackpool", "DWP PIP (7),Blackpool", "DWP PIP (8),Blackpool",
-        "DWP PIP (9),Blackpool", "DWP PIP (10),Newport"
+        "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
+        "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
+        "DWP PIP (9),PIP,Blackpool", "DWP PIP (10),PIP,Newport", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
+        "DWP PIP (11),PIP,null"
     })
-    public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(String dwpIssuingOffice,
-                                                                       String expectedDwpRegionalCenter) {
+    public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(String dwpIssuingOffice, String benefitCode,
+                                                                       @Nullable String expectedDwpRegionalCenter) {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getMrn().setDwpIssuingOffice(dwpIssuingOffice);
+        syaCaseWrapper.getBenefitType().setCode(benefitCode);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
             regionalProcessingCenter);
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
-    }
-
-    @Test(expected = RuntimeException.class)
-    @Parameters({"DWP PIP ()", "DWP PIP (11)"})
-    public void givenInvalidDwpIssuingOffice_shouldThrowException(String invalidDwpIssuingOffice) {
-        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        syaCaseWrapper.getMrn().setDwpIssuingOffice(invalidDwpIssuingOffice);
-        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
-            regionalProcessingCenter);
     }
 
     @Test
