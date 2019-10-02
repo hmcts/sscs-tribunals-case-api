@@ -183,7 +183,7 @@ public class TribunalsServiceTest {
 
         Optional<SurnameResponse> surnameResponse =  tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
 
-        assertNotNull(surnameResponse.get());
+        assertTrue(surnameResponse.isPresent());
         assertThat(surnameResponse.get().getCaseId(), equalTo(CCD_CASE_ID));
     }
 
