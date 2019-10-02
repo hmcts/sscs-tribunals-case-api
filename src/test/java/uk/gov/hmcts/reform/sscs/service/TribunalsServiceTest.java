@@ -120,7 +120,7 @@ public class TribunalsServiceTest {
 
         Optional<SurnameResponse> actualResponse = tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
 
-        assertNull(actualResponse.get());
+        assertFalse(actualResponse.isPresent());
     }
 
     @Test
