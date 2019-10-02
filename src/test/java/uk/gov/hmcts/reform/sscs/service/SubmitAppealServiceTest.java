@@ -403,6 +403,19 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
+    public void addNoAssociatedCases() {
+        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).build();
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+
+        SscsCaseData caseData = submitAppealService.addAssociatedCases(
+                SscsCaseData.builder().caseReference("00000000").build(),
+                matchedByNinoCases);
+
+        assertNull(caseData.getAssociatedCase());
+        assertEquals(false, caseData.getLinkedCasesBoolean());
+    }
+
+    @Test
     public void getMatchedCases() {
         given(ccdService.findCaseBy(any(),any())).willReturn(Arrays.asList(
                 SscsCaseDetails.builder().id(12345678L).build()
