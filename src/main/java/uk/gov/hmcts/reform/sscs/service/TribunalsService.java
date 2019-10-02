@@ -97,7 +97,7 @@ public class TribunalsService {
     public SurnameResponse validateSurname(String appealNumber, String surname) {
         SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
         if (caseData == null) {
-            log.info("Not a valid surname: " + surname);
+            log.error("Not a valid surname: " + surname);
             throw new InvalidSurnameException();
         }
         return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname);
