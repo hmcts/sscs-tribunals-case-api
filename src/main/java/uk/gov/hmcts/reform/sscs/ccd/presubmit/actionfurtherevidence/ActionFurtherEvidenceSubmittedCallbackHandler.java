@@ -34,12 +34,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         requireNonNull(callbackType, "callbackType must not be null");
         return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent().equals(EventType.ACTION_FURTHER_EVIDENCE)
-                && (isInformationReceivedForInterloc(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
-                || isInformationReceivedForInterloc(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
+                && (isInformationReceivedForInterlocType(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
+                || isInformationReceivedForInterlocType(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
                 || isIssueToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction()));
     }
 
-    private boolean isInformationReceivedForInterloc(DynamicList furtherEvidenceActionList, FurtherEvidenceActionDynamicListItems interlocType) {
+    private boolean isInformationReceivedForInterlocType(DynamicList furtherEvidenceActionList, FurtherEvidenceActionDynamicListItems interlocType) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
             && StringUtils.isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
             return furtherEvidenceActionList.getValue().getCode().equals(interlocType.getCode());
@@ -67,9 +67,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (isInformationReceivedForInterloc(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
+        if (isInformationReceivedForInterlocType(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(), "reviewByJudge", INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE);
-        } else if (isInformationReceivedForInterloc(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
+        } else if (isInformationReceivedForInterlocType(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
             return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(), "reviewByTcw", INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
         } else {
             return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
