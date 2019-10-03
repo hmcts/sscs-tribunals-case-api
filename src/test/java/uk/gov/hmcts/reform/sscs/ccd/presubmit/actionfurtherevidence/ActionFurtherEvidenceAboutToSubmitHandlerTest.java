@@ -169,7 +169,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 "Other document type - action manually");
 
         DynamicList furtherEvidenceActionListInterloc =
-            buildFurtherEvidenceActionItemListForGivenOption("informationReceivedForInterloc",
+            buildFurtherEvidenceActionItemListForGivenOption("informationReceivedForInterlocJudge",
                 "Information received for interlocutory review");
 
         DynamicList furtherEvidenceActionListIssueParties =

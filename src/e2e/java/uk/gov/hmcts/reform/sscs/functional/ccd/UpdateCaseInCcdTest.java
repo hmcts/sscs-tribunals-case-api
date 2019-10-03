@@ -102,7 +102,7 @@ public class UpdateCaseInCcdTest {
 
     private static void addFurtherEvidenceActionData(SscsCaseData testCaseData) {
         testCaseData.setInterlocReviewState(null);
-        DynamicListItem value = new DynamicListItem("informationReceivedForInterloc", "any");
+        DynamicListItem value = new DynamicListItem("informationReceivedForInterlocJudge", "any");
         DynamicList furtherEvidenceActionList = new DynamicList(value, Collections.singletonList(value));
         testCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
     }

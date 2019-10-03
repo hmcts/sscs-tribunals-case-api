@@ -34,14 +34,15 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         requireNonNull(callbackType, "callbackType must not be null");
         return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent().equals(EventType.ACTION_FURTHER_EVIDENCE)
-                && (isInformationReceivedForInterloc(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())
+                && (isInformationReceivedForInterloc(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
+                || isInformationReceivedForInterloc(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
                 || isIssueToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction()));
     }
 
-    private boolean isInformationReceivedForInterloc(DynamicList furtherEvidenceActionList) {
+    private boolean isInformationReceivedForInterloc(DynamicList furtherEvidenceActionList, FurtherEvidenceActionDynamicListItems interlocType) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
             && StringUtils.isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
-            return furtherEvidenceActionList.getValue().getCode().equals(INFORMATION_RECEIVED_FOR_INTERLOC.getCode());
+            return furtherEvidenceActionList.getValue().getCode().equals(interlocType.getCode());
         }
         return false;
     }
@@ -66,18 +67,24 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        SscsCaseDetails sscsCaseDetails;
-        if (isInformationReceivedForInterloc(caseData.getFurtherEvidenceAction())) {
-            caseData.setInterlocReviewState("interlocutoryReview");
-            sscsCaseDetails = ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType(), "update to Information received event",
-                "update to Information received event", idamService.getIdamTokens());
+        if (isInformationReceivedForInterloc(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
+            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(), "reviewByJudge", INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE);
+        } else if (isInformationReceivedForInterloc(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
+            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(), "reviewByTcw", INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
         } else {
-            sscsCaseDetails = ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+            return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
                     "Issue to all parties", idamService.getIdamTokens());
         }
-        return sscsCaseDetails;
+    }
+
+    private SscsCaseDetails updateCaseInformationReceivedForInterlocDetails(SscsCaseData caseData, Long caseId, String interlocReviewState,
+                                                                            FurtherEvidenceActionDynamicListItems interlocType) {
+
+        caseData.setInterlocReviewState(interlocReviewState);
+        return ccdService.updateCase(caseData, caseId,
+                EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType(), "Update to Information received event",
+                interlocType.getLabel(), idamService.getIdamTokens());
     }
 
 }
