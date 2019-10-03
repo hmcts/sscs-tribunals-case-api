@@ -41,7 +41,7 @@ public class TyaController {
 
         Optional<SurnameResponse> surnameResponse = tribunalsService.validateSurname(appealNumber, surname);
         if (surnameResponse.isPresent()) {
-            return ResponseEntity.ok(tribunalsService.validateSurname(appealNumber, surname).get());
+            return ResponseEntity.ok(surnameResponse.get());
         }
         return ResponseEntity.notFound().build();
 
