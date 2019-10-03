@@ -83,7 +83,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
         caseData.setInterlocReviewState(interlocReviewState);
         return ccdService.updateCase(caseData, caseId,
-                EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType(), "Update to Information received event",
+                EventType.INTERLOC_INFORMATION_RECEIVED.getCcdType(), "Interloc information received event",
                 interlocType.getLabel(), idamService.getIdamTokens());
     }
 
