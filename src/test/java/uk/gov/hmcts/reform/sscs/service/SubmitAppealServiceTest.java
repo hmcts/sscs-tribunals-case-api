@@ -399,7 +399,7 @@ public class SubmitAppealServiceTest {
             matchedByNinoCases);
 
         assertEquals(1, caseData.getAssociatedCase().size());
-        assertEquals(true, caseData.getLinkedCasesBoolean());
+        assertEquals("Yes", caseData.getLinkedCasesBoolean());
     }
 
     @Test
@@ -412,7 +412,7 @@ public class SubmitAppealServiceTest {
                 matchedByNinoCases);
 
         assertNull(caseData.getAssociatedCase());
-        assertEquals(false, caseData.getLinkedCasesBoolean());
+        assertEquals("No", caseData.getLinkedCasesBoolean());
     }
 
     @Test
