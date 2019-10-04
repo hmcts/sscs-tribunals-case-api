@@ -126,7 +126,7 @@
         "id": "ceedc25b-35e6-45f8-b33f-776699e429a7"
       }, {
         "value": {
-          "documentType": null,
+          "documentType": "DOCUMENT_TYPE_PLACEHOLDER",
           "documentEmailContent": null,
           "documentLink": {
             "document_url": "http://dm-store:5005/documents/88a100bf-75f4-40f3-8f3e-73e04607ffbf",

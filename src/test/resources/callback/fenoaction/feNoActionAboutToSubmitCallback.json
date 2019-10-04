@@ -147,7 +147,7 @@
             "document_filename": "dl6-1567775849641360.pdf",
             "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary"
           },
-          "documentType": "dl6",
+          "documentType": "DOCUMENT_TYPE_PLACEHOLDER",
           "documentFileName": "dl6-1567775849641360.pdf",
           "documentDateAdded": "2019-09-06"
         }
