@@ -96,7 +96,12 @@ public class TribunalsService {
     }
 
     public Optional<SurnameResponse> validateSurname(String appealNumber, String surname) {
-        SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
+        SscsCaseData caseData = null;
+        try {
+            caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
+        } catch (uk.gov.hmcts.reform.sscs.ccd.exception.AppealNotFoundException e) {
+            log.error("Appeal does not exist for appeal number: {} with given surname", appealNumber);
+        }
         if (caseData == null) {
             log.error("Not a valid surname: " + surname);
             return Optional.empty();
