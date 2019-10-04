@@ -193,9 +193,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
-        if (syaCaseWrapper != null && syaCaseWrapper.getBenefitType() != null &&
-                syaCaseWrapper.getBenefitType().getCode() != null &&
-                syaCaseWrapper.getBenefitType().getCode().equalsIgnoreCase("uc")
+        if (syaCaseWrapper != null && syaCaseWrapper.getBenefitType() != null
+                && syaCaseWrapper.getBenefitType().getCode() != null
+                && syaCaseWrapper.getBenefitType().getCode().equalsIgnoreCase("uc")
                 && (syaCaseWrapper.getMrn() == null
                 || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
             return "Universal Credit";
