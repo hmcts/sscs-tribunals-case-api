@@ -114,7 +114,6 @@ public class SubmitAppealTest {
         log.info(String.format("SYA created with CCD ID %s", id));
         assertEquals(expected, sscsCaseDetails.getData().getAppeal());
         assertEquals(expectedState, sscsCaseDetails.getState());
-        assertEquals(false, sscsCaseDetails.getData().getLinkedCasesBoolean());
     }
 
     @Ignore
