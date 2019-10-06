@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.functional.handlers.uploaddocument;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
 public class UploadDocumentHandlerTest extends BaseHandlerTest {
-
+    @Ignore
     @Test
     public void givenUploadDocumentEventIsTriggered_shouldUploadDocument() throws IOException {
         caseDetails = createCaseInWithDwpStateUsingGivenCallback("uploadDocumentCallback.json");
