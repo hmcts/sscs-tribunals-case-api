@@ -218,6 +218,7 @@
     "sscsDocument": [
       {
         "value": {
+          "documentType":"appellantEvidence",
           "documentLink": {
             "document_url": "http://dm-store:5005/documents/bd4b1909-0ee0-4cb3-beb7-65a851f57260",
             "document_binary_url": "http://dm-store:5005/documents/bd4b1909-0ee0-4cb3-beb7-65a851f57260/binary",
