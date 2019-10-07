@@ -109,7 +109,7 @@
       "generatedEmail": "mail@example.com",
       "sscsDocument": [{
         "value": {
-          "documentType": "dl6",
+          "documentType": "appellantEvidence",
           "documentEmailContent": null,
           "documentLink": {
             "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
