@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
-import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
+
 
 @Service
 @Slf4j
@@ -94,12 +95,12 @@ public class TribunalsService {
         return sscsCaseDetails != null ? sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().toLowerCase() : "";
     }
 
-    public SurnameResponse validateSurname(String appealNumber, String surname) {
+    public Optional<SurnameResponse> validateSurname(String appealNumber, String surname) {
         SscsCaseData caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
         if (caseData == null) {
             log.error("Not a valid surname: " + surname);
-            throw new InvalidSurnameException();
+            return Optional.empty();
         }
-        return new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname);
+        return Optional.of(new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname));
     }
 }
