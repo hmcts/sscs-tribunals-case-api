@@ -1,12 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -17,7 +18,21 @@ public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseD
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT)
-            && State.WITH_DWP.equals(callback.getCaseDetails().getState());
+            && isValidDocumentType(callback.getCaseDetails().getCaseData().getSscsDocument());
+    }
+
+    private boolean isValidDocumentType(List<SscsDocument> sscsDocuments) {
+        if (sscsDocuments != null) {
+            return sscsDocuments.stream()
+                .anyMatch(doc -> {
+                    String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
+                    return DocumentType.MEDICAL_EVIDENCE.getValue().equals(docType)
+                        || DocumentType.OTHER_EVIDENCE.getValue().equals(docType)
+                        || DocumentType.APPELLANT_EVIDENCE.getValue().equals(docType)
+                        || DocumentType.REPRESENTATIVE_EVIDENCE.getValue().equals(docType);
+                });
+        }
+        return false;
     }
 
     @Override

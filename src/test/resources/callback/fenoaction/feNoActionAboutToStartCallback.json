@@ -173,6 +173,7 @@
       "sscsDocument": [{
         "id": "b6f681dd-9755-4a9c-8fa7-af0b7c81aff7",
         "value": {
+          "documentType": "DOCUMENT_TYPE_PLACEHOLDER",
           "documentLink": {
             "document_url": "http://dm-store:5005/documents/bd4b1909-0ee0-4cb3-beb7-65a851f57260",
             "document_filename": "Screenshot 2019-09-09 at 14.48.09.pdf",
