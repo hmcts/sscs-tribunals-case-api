@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
@@ -25,15 +25,15 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 
 @Component
 @Slf4j
-public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DecisionIssuedMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String GLASGOW = "GLASGOW";
-    private static final String NOTICE_TYPE = "DIRECTIONS NOTICE";
+    private static final String NOTICE_TYPE = "DECISION NOTICE";
 
     private final GenerateFile generateFile;
     private final String templateId;
 
     @Autowired
-    public DirectionIssuedMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.direction_issued}") String templateId) {
+    public DecisionIssuedMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.decision_issued}") String templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
     }
@@ -41,7 +41,7 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
-                && callback.getEvent() == EventType.DIRECTION_ISSUED
+                && callback.getEvent() == EventType.DECISION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
                 && callback.getCaseDetails().getCaseData().isGenerateNotice();
@@ -80,11 +80,11 @@ public class DirectionIssuedMidEventHandler implements PreSubmitCallbackHandler<
                 .userAuthentication(userAuthorisation)
                 .build();
 
-        log.info(String.format("Generating Interloc direction issued document isScottish = %s", isScottish));
+        log.info(String.format("Generating Interloc decision issued document isScottish = %s", isScottish));
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        final String filename = String.format("%s issued on %s.pdf", DocumentType.DIRECTION_NOTICE.getValue(), dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        final String filename = String.format("%s issued on %s.pdf", DocumentType.DECISION_NOTICE.getValue(), dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)

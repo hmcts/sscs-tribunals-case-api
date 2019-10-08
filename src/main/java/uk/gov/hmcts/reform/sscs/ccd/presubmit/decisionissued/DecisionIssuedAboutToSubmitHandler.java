@@ -1,8 +1,9 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
+
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 
 import java.time.LocalDate;
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -11,23 +12,23 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocuments;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocuments;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 @Slf4j
-public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DecisionIssuedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && callback.getEvent() == EventType.DIRECTION_ISSUED
+                && callback.getEvent() == EventType.DECISION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
                 && callback.getCaseDetails().getCaseData().isGenerateNotice()
                 && (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())
-                    || Objects.nonNull(callback.getCaseDetails().getCaseData().getSscsInterlocDirectionDocument()));
+                    || Objects.nonNull(callback.getCaseDetails().getCaseData().getSscsInterlocDecisionDocument()));
     }
 
     @Override
@@ -36,28 +37,32 @@ public class DirectionIssuedAboutToSubmitHandler implements PreSubmitCallbackHan
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         if (Objects.nonNull(caseData.getPreviewDocument())) {
-            SscsInterlocDirectionDocument document = SscsInterlocDirectionDocument.builder()
+            SscsInterlocDecisionDocument document = SscsInterlocDecisionDocument.builder()
                     .documentFileName(caseData.getPreviewDocument().getDocumentFilename())
                     .documentLink(caseData.getPreviewDocument())
                     .documentDateAdded(Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()))
-                    .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                    .documentType(DocumentType.DECISION_NOTICE.getValue())
                     .build();
 
-            caseData.setSscsInterlocDirectionDocument(document);
+            caseData.setSscsInterlocDecisionDocument(document);
         }
         saveToHistory(caseData);
         clearTransientFields(caseData);
 
+        if (caseData.getDecisionType() != null && caseData.getDecisionType().equals(STRIKE_OUT.getValue())) {
+            caseData.setOutcome("nonCompliantAppealStruckout");
+        }
+
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-        log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
+        log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
     private void saveToHistory(SscsCaseData caseData) {
-        List<SscsInterlocDirectionDocuments> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDirectionDocs()).orElse(Collections.emptyList()));
-        historicDocs.add(SscsInterlocDirectionDocuments.builder().value(caseData.getSscsInterlocDirectionDocument()).build());
-        caseData.setHistoricSscsInterlocDirectionDocs(historicDocs);
+        List<SscsInterlocDecisionDocuments> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDecisionDocs()).orElse(Collections.emptyList()));
+        historicDocs.add(SscsInterlocDecisionDocuments.builder().value(caseData.getSscsInterlocDecisionDocument()).build());
+        caseData.setHistoricSscsInterlocDecisionDocs(historicDocs);
     }
 
     // Fields used for a short period in case progression are transient,

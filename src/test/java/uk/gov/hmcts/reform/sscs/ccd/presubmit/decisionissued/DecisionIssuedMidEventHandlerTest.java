@@ -1,16 +1,13 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -22,13 +19,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionIssuedMidEventHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class DirectionIssuedMidEventHandlerTest {
+public class DecisionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
