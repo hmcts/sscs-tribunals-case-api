@@ -7,8 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 import io.restassured.RestAssured;
@@ -18,6 +17,7 @@ import io.restassured.response.Response;
 import java.util.Base64;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
+@Slf4j
 public class SubmitDraftTest {
 
     private static final String CLIENT_ID = "sscs";
@@ -121,6 +122,12 @@ public class SubmitDraftTest {
         return draftAppeal;
     }
 
+    private SyaCaseWrapper buildEmptyTestDraftAppeal() {
+        SyaCaseWrapper draftAppeal = new SyaCaseWrapper();
+        draftAppeal.setCaseType("draft");
+        return draftAppeal;
+    }
+
     @Test
     public void givenAnUserSaveADraftMultipleTimes_shouldOnlyUpdateTheSameDraftForTheUser() {
         Response response = saveDraft(draftAppeal);
@@ -169,6 +176,13 @@ public class SubmitDraftTest {
         archiveDraft(caseData);
 
         assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
+
+    @Test
+    public void givenNoBenefitTypeNoErrors() {
+        draftAppeal = buildEmptyTestDraftAppeal();
+
+        saveDraft(draftAppeal);
     }
 
     private Response saveDraft(SyaCaseWrapper draftAppeal) {
