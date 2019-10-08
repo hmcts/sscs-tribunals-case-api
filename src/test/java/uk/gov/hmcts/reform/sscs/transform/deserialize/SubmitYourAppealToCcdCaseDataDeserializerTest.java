@@ -147,7 +147,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
         "DWP PIP (9),PIP,Blackpool", "DWP PIP (10),PIP,Newport", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
-        "DWP PIP (11),PIP,null", "null,UC,Universal Credit"
+        "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit"
     })
     @Test
     public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(@Nullable String dwpIssuingOffice, String benefitCode,
