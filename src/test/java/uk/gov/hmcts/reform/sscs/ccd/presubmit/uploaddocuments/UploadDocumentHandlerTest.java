@@ -23,17 +23,32 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
 
     @Test
     @Parameters({
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,true",
-        "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,false",
-        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,false",
-        "null,UPLOAD_DOCUMENT,withDwp,false",
-        "ABOUT_TO_SUBMIT,null,withDwp,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,Medical evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,Other evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,appellantEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,representativeEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,sscs1,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,Decision Notice,false",
+        "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp,representativeEvidence,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,Medical evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,Other evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,appellantEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,representativeEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,dl6,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,DWP response,false",
+        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,representativeEvidence,false",
+        "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,dl6,false",
+        "null,UPLOAD_DOCUMENT,withDwp,appellantEvidence,false",
+        "ABOUT_TO_SUBMIT,null,withDwp,appellantEvidence,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullSscsDocuments,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullDocumentType,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullSscsDocument,false"
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
-                          boolean expectedResult) throws IOException {
-        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenEvent(eventType, state,
-            UPLOAD_DOCUMENT_CALLBACK_JSON));
+                          @Nullable String documentType, boolean expectedResult) throws IOException {
+        boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenData(eventType, state,
+            documentType, UPLOAD_DOCUMENT_CALLBACK_JSON));
 
         assertEquals(expectedResult, actualResult);
     }
@@ -41,8 +56,8 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallbackGivenEvent(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
-                UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
+            buildTestCallbackGivenData(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
+                "representativeEvidence", UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
@@ -52,13 +67,13 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     @Test(expected = IllegalStateException.class)
     @Parameters({
         "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated",
         "ABOUT_TO_SUBMIT,null,withDwp",
         "null,UPLOAD_DOCUMENT,withDwp"
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                                           @Nullable String state)
         throws IOException {
-        handler.handle(callbackType, buildTestCallbackGivenEvent(eventType, state, UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
+        handler.handle(callbackType, buildTestCallbackGivenData(eventType, state, "representativeEvidence",
+            UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
     }
 }
