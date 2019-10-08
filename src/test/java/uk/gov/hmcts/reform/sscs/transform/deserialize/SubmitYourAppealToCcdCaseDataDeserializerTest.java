@@ -154,8 +154,10 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getMrn().setDwpIssuingOffice(dwpIssuingOffice);
         syaCaseWrapper.getBenefitType().setCode(benefitCode);
+
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(),
             regionalProcessingCenter);
+
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
     }
 
