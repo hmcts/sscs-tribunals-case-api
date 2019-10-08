@@ -262,7 +262,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.8'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: 'DEV-SNAPSHOT'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.80'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
