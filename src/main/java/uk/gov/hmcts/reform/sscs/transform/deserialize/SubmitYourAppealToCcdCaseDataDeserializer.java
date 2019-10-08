@@ -113,7 +113,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
                 benefitTypeCode, dwpIssuingOffice);
             if ("ESA".equals(benefitTypeCode)) {
-                return dwpIssuingOffice;
+                return officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
             }
             if ("PIP".equals(benefitTypeCode)) {
                 return officeMapping.map(mapping -> mapping.getMapping().getDwpRegionCentre()).orElse(null);
