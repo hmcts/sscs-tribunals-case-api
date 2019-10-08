@@ -108,6 +108,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
+        if ("UC".equals(benefitTypeCode)) {
+            DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+            Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
+                benefitTypeCode, dwpIssuingOffice);
+            return officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
+        }
         if (dwpIssuingOffice != null && benefitTypeCode != null) {
             DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
             Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
@@ -210,8 +216,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
         if (syaCaseWrapper.getBenefitType().getCode().equalsIgnoreCase("uc")
-                && (syaCaseWrapper.getMrn() == null
-                || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
+            && (syaCaseWrapper.getMrn() == null
+            || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
             return "Universal Credit";
         } else {
             String value = mrnIsNotProvided(syaCaseWrapper) ? null : syaCaseWrapper.getMrn().getDwpIssuingOffice();
