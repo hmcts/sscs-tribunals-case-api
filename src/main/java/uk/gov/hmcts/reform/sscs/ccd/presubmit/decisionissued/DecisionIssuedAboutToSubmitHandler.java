@@ -14,11 +14,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocuments;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 @Slf4j
-public class DecisionIssuedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -63,16 +64,5 @@ public class DecisionIssuedAboutToSubmitHandler implements PreSubmitCallbackHand
         List<SscsInterlocDecisionDocuments> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDecisionDocs()).orElse(Collections.emptyList()));
         historicDocs.add(SscsInterlocDecisionDocuments.builder().value(caseData.getSscsInterlocDecisionDocument()).build());
         caseData.setHistoricSscsInterlocDecisionDocs(historicDocs);
-    }
-
-    // Fields used for a short period in case progression are transient,
-    // relevant for a short period of the case lifecycle.
-    private void clearTransientFields(SscsCaseData caseData) {
-        caseData.setBodyContent(null);
-        caseData.setPreviewDocument(null);
-        caseData.setSignedBy(null);
-        caseData.setSignedRole(null);
-        caseData.setGenerateNotice(null);
-        caseData.setDateAdded(null);
     }
 }
