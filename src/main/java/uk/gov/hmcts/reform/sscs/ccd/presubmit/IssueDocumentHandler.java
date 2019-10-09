@@ -32,7 +32,7 @@ public class IssueDocumentHandler {
         caseData.setDateAdded(null);
     }
 
-    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, String noticeType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+    protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         String documentUrl = Optional.ofNullable(caseData.getPreviewDocument()).map(DocumentLink::getDocumentUrl).orElse(null);
 
@@ -44,7 +44,7 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .noticeBody(caseData.getBodyContent())
                 .userName(caseData.getSignedBy())
-                .noticeType(noticeType)
+                .noticeType(documentType.getValue().toUpperCase())
                 .userRole(caseData.getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(LocalDate.now())
@@ -63,11 +63,11 @@ public class IssueDocumentHandler {
                 .userAuthentication(userAuthorisation)
                 .build();
 
-        log.info(String.format("Generating {} document isScottish = {}", noticeType, isScottish));
+        log.info(String.format("Generating %s document isScottish = %s", documentType.getValue(), isScottish));
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        final String filename = String.format("%s issued on %s.pdf", DocumentType.DECISION_NOTICE.getValue(), dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        final String filename = String.format("%s issued on %s.pdf", documentType.getValue(), dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)

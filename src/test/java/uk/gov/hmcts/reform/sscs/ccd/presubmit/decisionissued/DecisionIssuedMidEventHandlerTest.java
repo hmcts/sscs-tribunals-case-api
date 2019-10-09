@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionIssuedMidEventHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -31,7 +30,7 @@ public class DecisionIssuedMidEventHandlerTest {
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
 
-    private DirectionIssuedMidEventHandler handler;
+    private DecisionIssuedMidEventHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -49,9 +48,9 @@ public class DecisionIssuedMidEventHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new DirectionIssuedMidEventHandler(generateFile, TEMPLATE_ID);
+        handler = new DecisionIssuedMidEventHandler(generateFile, TEMPLATE_ID);
 
-        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
@@ -103,7 +102,7 @@ public class DecisionIssuedMidEventHandlerTest {
 
         assertNotNull(response.getData().getPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Direction Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
@@ -124,7 +123,7 @@ public class DecisionIssuedMidEventHandlerTest {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
-        assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
+        assertEquals("DECISION NOTICE", payload.getNoticeType());
         assertEquals("Appellant Lastname", payload.getAppellantFullName());
     }
 }
