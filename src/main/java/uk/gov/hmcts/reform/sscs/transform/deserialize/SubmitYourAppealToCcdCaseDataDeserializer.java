@@ -108,24 +108,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
-        if ("UC".equals(benefitTypeCode)) {
-            DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
-            Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
-                benefitTypeCode, dwpIssuingOffice);
-            return officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
-        }
-        if (dwpIssuingOffice != null && benefitTypeCode != null) {
-            DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
-            Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
-                benefitTypeCode, dwpIssuingOffice);
-            if ("ESA".equals(benefitTypeCode)) {
-                return officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
-            }
-            if ("PIP".equals(benefitTypeCode)) {
-                return officeMapping.map(mapping -> mapping.getMapping().getDwpRegionCentre()).orElse(null);
-            }
-        }
-        return null;
+        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+        Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
+            benefitTypeCode, dwpIssuingOffice);
+        return "PIP".equals(benefitTypeCode) ?
+            officeMapping.map(mapping -> mapping.getMapping().getDwpRegionCentre()).orElse(null) :
+            officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
     }
 
     private static boolean isDraft(SyaCaseWrapper syaCaseWrapper) {

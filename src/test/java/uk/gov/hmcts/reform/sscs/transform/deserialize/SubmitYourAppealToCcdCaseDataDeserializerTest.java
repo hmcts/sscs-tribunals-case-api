@@ -150,7 +150,8 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit"
     })
     @Test
-    public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(@Nullable String dwpIssuingOffice, String benefitCode,
+    public void givenADwpIssuingOffice_shouldMapToTheDwpRegionalCenter(@Nullable String dwpIssuingOffice,
+                                                                       String benefitCode,
                                                                        @Nullable String expectedDwpRegionalCenter) {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         syaCaseWrapper.getMrn().setDwpIssuingOffice(dwpIssuingOffice);
