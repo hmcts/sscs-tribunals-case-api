@@ -43,7 +43,7 @@ public class FileToPdfConversionService {
     private MultipartFile convert(MultipartFile f) throws IOException {
         String mimeType = tika.detect(f.getInputStream(), new Metadata());
 
-        String suffix = String.format(".%s", FilenameUtils.getExtension(f.getOriginalFilename());
+        String suffix = String.format(".%s", FilenameUtils.getExtension(f.getOriginalFilename()));
         File tempFile = File.createTempFile("tempConversion", suffix);
         tempFile.deleteOnExit();
         f.transferTo(tempFile);
