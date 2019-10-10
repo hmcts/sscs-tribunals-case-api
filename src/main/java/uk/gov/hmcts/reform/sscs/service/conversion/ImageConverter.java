@@ -41,8 +41,6 @@ public class ImageConverter implements FileToPdfConverter {
             // a valid PDF document requires at least one page
             PDPage page = new PDPage(PDRectangle.A4);
             // To get MacOSX Preview to scale exactly 100% for A4 you need to use rounded dimensions:
-            // PDRectangle adjustedA4 = new PDRectangle(595F, 842F);
-            // PDPage page = new PDPage(adjustedA4);
             doc.addPage(page);
 
             // Load image:
