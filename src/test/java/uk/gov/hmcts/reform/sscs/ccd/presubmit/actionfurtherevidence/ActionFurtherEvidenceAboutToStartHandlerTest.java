@@ -63,8 +63,9 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals("issueFurtherEvidence", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
         assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
-        assertEquals("informationReceivedForInterloc", response.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
-        assertEquals(3, response.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals("informationReceivedForInterlocJudge", response.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
+        assertEquals("informationReceivedForInterlocTcw", response.getData().getFurtherEvidenceAction().getListItems().get(3).getCode());
+        assertEquals(4, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     @Test
@@ -76,8 +77,9 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
-        assertEquals("informationReceivedForInterloc", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
-        assertEquals(2, response.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals("informationReceivedForInterlocJudge", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+        assertEquals("informationReceivedForInterlocTcw", response.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
+        assertEquals(3, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     @Test

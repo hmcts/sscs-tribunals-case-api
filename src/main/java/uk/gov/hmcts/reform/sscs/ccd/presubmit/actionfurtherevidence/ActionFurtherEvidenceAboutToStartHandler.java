@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
 
 import java.util.ArrayList;
@@ -60,8 +58,11 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
         listOptions.add(new DynamicListItem(OTHER_DOCUMENT_MANUAL.getCode(), OTHER_DOCUMENT_MANUAL.getLabel()));
 
         if (sscsCaseData.getInterlocReviewState() != null) {
-            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC.getCode(),
-                INFORMATION_RECEIVED_FOR_INTERLOC.getLabel()));
+            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(),
+                INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getLabel()));
+
+            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
+                INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel()));
         }
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
