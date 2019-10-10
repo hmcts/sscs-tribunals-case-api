@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -47,6 +48,7 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
         }
 
         sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
+        sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         return preSubmitCallbackResponse;
     }
