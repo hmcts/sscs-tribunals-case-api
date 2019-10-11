@@ -111,8 +111,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
         Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
             benefitTypeCode, dwpIssuingOffice);
-        return "PIP".equals(benefitTypeCode) ?
-            officeMapping.map(mapping -> mapping.getMapping().getDwpRegionCentre()).orElse(null) :
+        return "PIP".equals(benefitTypeCode)
+            ? officeMapping.map(mapping -> mapping.getMapping().getDwpRegionCentre()).orElse(null) :
             officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
     }
 
