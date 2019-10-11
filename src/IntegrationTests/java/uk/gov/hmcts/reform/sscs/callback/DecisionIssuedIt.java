@@ -32,6 +32,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -121,8 +122,8 @@ public class DecisionIssuedIt {
         assertNull(result.getData().getSignedBy());
         assertNull(result.getData().getGenerateNotice());
         assertNull(result.getData().getDateAdded());
-        assertNotNull(result.getData().getSscsInterlocDecisionDocument());
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsInterlocDecisionDocument().getDocumentLink().getDocumentUrl());
+        assertEquals(DocumentType.DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(2).getValue().getDocumentType());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsDocument().get(2).getValue().getDocumentLink().getDocumentUrl());
     }
 
 
