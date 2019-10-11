@@ -108,6 +108,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
+        if (dwpIssuingOffice == null) {
+            return null;
+        }
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
         Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
             benefitTypeCode, dwpIssuingOffice);
