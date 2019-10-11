@@ -85,18 +85,6 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenGenerateNoticeIsNo_thenReturnFalse() {
-        sscsCaseData.setGenerateNotice("No");
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenNoPreviewDocument_thenReturnFalse() {
-        sscsCaseData.setPreviewDocument(null);
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
     public void givenGenerateNoticeIsYes_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }

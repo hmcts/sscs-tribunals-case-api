@@ -26,10 +26,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && callback.getEvent() == EventType.DECISION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && callback.getCaseDetails().getCaseData().isGenerateNotice()
-                && (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())
-                    || Objects.nonNull(callback.getCaseDetails().getCaseData().getSscsInterlocDecisionDocument()));
+                && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
