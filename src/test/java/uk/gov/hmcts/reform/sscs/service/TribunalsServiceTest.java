@@ -115,8 +115,10 @@ public class TribunalsServiceTest {
         assertThat(appeal, is(objectNode));
     }
 
-    public void shouldThrowExceptionGivenValidationFails() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(null);
+    @Test
+    public void shouldThrowExceptionAndReturnEmptyWhenGivenNotValidSurname() throws CcdException {
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens))
+                .willThrow(uk.gov.hmcts.reform.sscs.ccd.exception.AppealNotFoundException.class);
 
         Optional<SurnameResponse> actualResponse = tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
 
