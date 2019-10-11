@@ -1,16 +1,13 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -28,12 +25,12 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 
 
 @RunWith(JUnitParamsRunner.class)
-public class DirectionIssuedMidEventHandlerTest {
+public class DecisionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
 
-    private DirectionIssuedMidEventHandler handler;
+    private DecisionIssuedMidEventHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -51,9 +48,9 @@ public class DirectionIssuedMidEventHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new DirectionIssuedMidEventHandler(generateFile, TEMPLATE_ID);
+        handler = new DecisionIssuedMidEventHandler(generateFile, TEMPLATE_ID);
 
-        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
@@ -105,7 +102,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         assertNotNull(response.getData().getPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Direction Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
@@ -126,7 +123,7 @@ public class DirectionIssuedMidEventHandlerTest {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
-        assertEquals("DIRECTION NOTICE", payload.getNoticeType());
+        assertEquals("DECISION NOTICE", payload.getNoticeType());
         assertEquals("Appellant Lastname", payload.getAppellantFullName());
     }
 }
