@@ -229,12 +229,12 @@
     ],
     "furtherEvidenceAction": {
       "value": {
-        "code": "informationReceivedForInterloc",
+        "code": "informationReceivedForInterlocJudge",
         "label": "any"
       },
       "list_items": [
         {
-          "code": "informationReceivedForInterloc",
+          "code": "informationReceivedForInterlocJudge",
           "label": "any"
         }
       ]
