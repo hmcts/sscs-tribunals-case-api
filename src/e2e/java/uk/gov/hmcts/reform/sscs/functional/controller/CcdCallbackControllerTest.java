@@ -69,7 +69,7 @@ public class CcdCallbackControllerTest {
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
-            .assertThat().body("data.interlocReviewState", equalTo("interlocutoryReview"));
+            .assertThat().body("data.interlocReviewState", equalTo("reviewByJudge"));
     }
 
     private String getJsonCallbackForTest() throws IOException {

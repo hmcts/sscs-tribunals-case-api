@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum FurtherEvidenceActionDynamicListItems {
     ISSUE_FURTHER_EVIDENCE("issueFurtherEvidence", "Issue further evidence to all parties"),
     OTHER_DOCUMENT_MANUAL("otherDocumentManual", "Other document type - action manually"),
-    INFORMATION_RECEIVED_FOR_INTERLOC("informationReceivedForInterloc", "Information received for interlocutory review");
+    INFORMATION_RECEIVED_FOR_INTERLOC_TCW("informationReceivedForInterlocTcw", "Information received for Interloc - send to TCW"),
+    INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE("informationReceivedForInterlocJudge", "Information received for Interloc - send to Judge");
 
     String code;
     String label;
