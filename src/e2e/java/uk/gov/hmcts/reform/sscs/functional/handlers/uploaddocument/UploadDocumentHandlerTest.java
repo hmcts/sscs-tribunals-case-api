@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
 public class UploadDocumentHandlerTest extends BaseHandlerTest {
-    @Ignore
+
     @Test
     public void givenUploadDocumentEventIsTriggered_shouldUploadDocument() throws IOException {
         caseDetails = createCaseInWithDwpStateUsingGivenCallback("uploadDocumentCallback.json");
