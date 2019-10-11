@@ -69,14 +69,16 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     private Object[] generateCanHandleScenarios() {
-        Callback<SscsCaseData> callbacWithRightEventAndRightField =
-            buildCallback("informationReceivedForInterloc", ACTION_FURTHER_EVIDENCE);
+        Callback<SscsCaseData> callbackWithRightEventAndRightField =
+            buildCallback("informationReceivedForInterlocTcw", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithSecondRightEventAndRightField =
+                buildCallback("informationReceivedForInterlocJudge", ACTION_FURTHER_EVIDENCE);
+        Callback<SscsCaseData> callbackWithThirdRightEventAndRightField =
                 buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbacWithRightEventAndWrongField =
             buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbacWithWrongEventAndRightField =
-            buildCallback("informationReceivedForInterloc", APPEAL_RECEIVED);
+            buildCallback("informationReceivedForInterlocJudge", APPEAL_RECEIVED);
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
@@ -85,9 +87,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             ACTION_FURTHER_EVIDENCE);
 
         return new Object[]{
-            new Object[]{SUBMITTED, callbacWithRightEventAndRightField, true},
+            new Object[]{SUBMITTED, callbackWithRightEventAndRightField, true},
             new Object[]{SUBMITTED, callbackWithSecondRightEventAndRightField, true},
-            new Object[]{ABOUT_TO_SUBMIT, callbacWithRightEventAndRightField, false},
+            new Object[]{SUBMITTED, callbackWithThirdRightEventAndRightField, true},
+            new Object[]{ABOUT_TO_SUBMIT, callbackWithRightEventAndRightField, false},
             new Object[]{SUBMITTED, callbacWithRightEventAndWrongField, false},
             new Object[]{SUBMITTED, callbacWithWrongEventAndRightField, false},
             new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false}
@@ -106,7 +109,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly() {
+    public void givenIssueToAllParties_shouldUpdateCaseCorrectly() {
         Callback<SscsCaseData> callback = buildCallback("issueFurtherEvidence",
             ACTION_FURTHER_EVIDENCE);
 
@@ -124,9 +127,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenIssueToAllParties_shouldUpdateCaseCorrectly() {
-        Callback<SscsCaseData> callback = buildCallback("informationReceivedForInterloc",
-                ACTION_FURTHER_EVIDENCE);
+    @Parameters({"informationReceivedForInterlocJudge, reviewByJudge", "informationReceivedForInterlocTcw, reviewByTcw"})
+    public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly(String informationReceivedForInterlocValue, String interlocReviewState) {
+        Callback<SscsCaseData> callback = buildCallback(informationReceivedForInterlocValue, ACTION_FURTHER_EVIDENCE);
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
@@ -138,6 +141,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        assertEquals("interlocutoryReview", captor.getValue().getInterlocReviewState());
+        assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
     }
+
 }

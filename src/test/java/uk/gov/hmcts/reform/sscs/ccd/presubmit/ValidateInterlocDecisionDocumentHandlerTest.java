@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -74,7 +75,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void handlesCallback() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
-                        .documentDateAdded("10-10-2050")
+                        .documentDateAdded(LocalDate.now().minusDays(1))
                         .documentLink(DocumentLink.builder()
                                 .documentFilename("SomeDoc.pdf")
                                 .build())
@@ -117,7 +118,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void errorWhenHandlingCallbackAndInterlocDecisionDocumentLinkHasNotBeenSet() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
-                        .documentDateAdded("some date")
+                        .documentDateAdded(LocalDate.now().minusDays(1))
                         .documentFileName("File")
                         .documentType("Decision Notice")
                         .build())
@@ -141,7 +142,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void errorWhenHandlingCallbackAndInterlocDecisionDocumentIsNotPdf() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
-                        .documentDateAdded("10-10-2050")
+                        .documentDateAdded(LocalDate.now().minusDays(1))
                         .documentLink(DocumentLink.builder()
                                 .documentFilename("SomeDoc.doc")
                                 .build())
