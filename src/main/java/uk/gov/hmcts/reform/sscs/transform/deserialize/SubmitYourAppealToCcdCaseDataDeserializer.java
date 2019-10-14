@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
@@ -48,6 +49,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaHearingOptions;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaReasonsForAppealing;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaRepresentative;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaSmsNotify;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.util.Norm;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
@@ -99,7 +102,21 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             .benefitCode(benefitCode)
             .issueCode(issueCode)
             .caseCode(caseCode)
+            .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getBenefitType().getCode(),
+                appeal.getMrnDetails().getDwpIssuingOffice()))
             .build();
+    }
+
+    private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
+        if (dwpIssuingOffice == null) {
+            return null;
+        }
+        DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
+        Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
+            benefitTypeCode, dwpIssuingOffice);
+        return "PIP".equals(benefitTypeCode)
+            ? officeMapping.map(mapping -> mapping.getMapping().getDwpRegionCentre()).orElse(null) :
+            officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
     }
 
     private static boolean isDraft(SyaCaseWrapper syaCaseWrapper) {
@@ -178,11 +195,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             return true;
         }
 
-        if ("DWP PIP (undefined)".equalsIgnoreCase(syaCaseWrapper.getMrn().getDwpIssuingOffice())) {
-            return true;
-        }
-
-        return false;
+        return "DWP PIP (undefined)".equalsIgnoreCase(syaCaseWrapper.getMrn().getDwpIssuingOffice());
     }
 
     private static String getReasonForBeingLate(SyaCaseWrapper syaCaseWrapper) {
@@ -193,15 +206,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     }
 
     private static String getDwpIssuingOffice(SyaCaseWrapper syaCaseWrapper) {
-
         if (syaCaseWrapper.getBenefitType().getCode().equalsIgnoreCase("uc")
-                && (syaCaseWrapper.getMrn() == null
-                || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
+            && (syaCaseWrapper.getMrn() == null
+            || syaCaseWrapper.getMrn().getDwpIssuingOffice() == null)) {
             return "Universal Credit";
         } else {
             String value = mrnIsNotProvided(syaCaseWrapper) ? null : syaCaseWrapper.getMrn().getDwpIssuingOffice();
-            return Norm.dwpIssuingOffice(
-                    value);
+            return Norm.dwpIssuingOffice(value);
         }
     }
 
