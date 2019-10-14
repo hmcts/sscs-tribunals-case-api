@@ -1,10 +1,10 @@
 {
   "benefitType": {
     "description": "Personal Independence Payment",
-    "code": "PIP"
+    "code": "BENEFIT_TYPE_CODE"
   },
   "mrn": {
-    "dwpIssuingOffice": "DWP PIP (1)",
+    "dwpIssuingOffice": "MRN_DWP_ISSUING_OFFICE",
     "date": "01-02-2018"
   },
   "isAppointee": false,
