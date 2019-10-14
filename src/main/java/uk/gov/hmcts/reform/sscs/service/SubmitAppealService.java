@@ -149,9 +149,8 @@ public class SubmitAppealService {
             log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getGeneratedNino());
 
             if (caseDetails == null) {
-                if (matchedByNinoCases.size() > 0) {
-                    caseData = addAssociatedCases(caseData, matchedByNinoCases);
-                }
+                caseData = addAssociatedCases(caseData, matchedByNinoCases);
+
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
                     "SSCS - new case created",
@@ -197,9 +196,10 @@ public class SubmitAppealService {
             associatedCases.add(caseLink);
         }
         if (associatedCases.size() > 0) {
-            return caseData.toBuilder().associatedCase(associatedCases).build();
+            return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean("Yes").build();
+        } else {
+            return caseData.toBuilder().linkedCasesBoolean("No").build();
         }
-        return caseData;
     }
 
 

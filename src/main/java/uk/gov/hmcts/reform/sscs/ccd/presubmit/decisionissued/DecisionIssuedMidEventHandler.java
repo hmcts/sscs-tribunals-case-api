@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +17,13 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @Component
 @Slf4j
-public class DirectionIssuedMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final GenerateFile generateFile;
     private final String templateId;
 
     @Autowired
-    public DirectionIssuedMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.direction_issued}") String templateId) {
+    public DecisionIssuedMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.decision_issued}") String templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
     }
@@ -31,7 +31,7 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
-                && callback.getEvent() == EventType.DIRECTION_ISSUED
+                && callback.getEvent() == EventType.DECISION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData())
                 && callback.getCaseDetails().getCaseData().isGenerateNotice();
@@ -39,7 +39,8 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
-        return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+
+        return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
     }
 
 }

@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,7 +45,7 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class DirectionIssuedIt {
+public class DecisionIssuedIt {
 
     @Rule
     public final SpringMethodRule springMethodRule = new SpringMethodRule();
@@ -85,7 +83,7 @@ public class DirectionIssuedIt {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
-        json = getJson("callback/directionIssuedForPreview.json");
+        json = getJson("callback/decisionIssuedForPreview.json");
 
     }
 
@@ -111,7 +109,7 @@ public class DirectionIssuedIt {
     }
 
     @Test
-    public void callToAboutToSubmitEventHandler_willSaveTheInterlocDirectionDocumentFromPreview() throws Exception {
+    public void callToAboutToSubmitEventHandler_willSaveTheInterlocDecisionDocumentFromPreview() throws Exception {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
@@ -123,8 +121,8 @@ public class DirectionIssuedIt {
         assertNull(result.getData().getSignedBy());
         assertNull(result.getData().getGenerateNotice());
         assertNull(result.getData().getDateAdded());
-        assertNotNull(result.getData().getSscsInterlocDirectionDocument());
-        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsInterlocDirectionDocument().getDocumentLink().getDocumentUrl());
+        assertNotNull(result.getData().getSscsInterlocDecisionDocument());
+        assertEquals("http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c", result.getData().getSscsInterlocDecisionDocument().getDocumentLink().getDocumentUrl());
     }
 
 
