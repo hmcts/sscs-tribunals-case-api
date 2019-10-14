@@ -169,6 +169,7 @@ public class SubmitAppealTest {
         SscsCaseDetails secondCaseSscsCaseDetails = findCaseInCcd(secondCaseId);
 
         assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
+        assertEquals(true, secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
 
     }
