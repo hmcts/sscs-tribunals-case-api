@@ -7,9 +7,8 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,8 +50,7 @@ public class DocmosisHealthIndicatorTest {
                         eq(DOCMOSIS_STATUS_URI),
                         eq(HttpMethod.GET),
                         eq(null),
-                        any(ParameterizedTypeReference.class)
-                );
+                        any(ParameterizedTypeReference.class));
     }
 
     @Test
