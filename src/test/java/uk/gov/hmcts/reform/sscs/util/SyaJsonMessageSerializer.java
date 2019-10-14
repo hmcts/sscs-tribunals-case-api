@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 public enum SyaJsonMessageSerializer {
 
     ALL_DETAILS("allDetails.json"),
+    ALL_DETAILS_DWP_REGIONAL_CENTRE("allDetailsDwpRegionalCentre.json"),
     ALL_DETAILS_CCD("allDetailsCcd.json"),
     WITHOUT_NOTIFICATION("withoutNotification.json"),
     WITHOUT_NOTIFICATION_CCD("withoutNotificationCcd.json"),
