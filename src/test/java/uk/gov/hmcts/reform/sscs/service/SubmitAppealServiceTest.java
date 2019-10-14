@@ -399,6 +399,20 @@ public class SubmitAppealServiceTest {
             matchedByNinoCases);
 
         assertEquals(1, caseData.getAssociatedCase().size());
+        assertEquals("Yes", caseData.getLinkedCasesBoolean());
+    }
+
+    @Test
+    public void addNoAssociatedCases() {
+        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).build();
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+
+        SscsCaseData caseData = submitAppealService.addAssociatedCases(
+                SscsCaseData.builder().caseReference("00000000").build(),
+                matchedByNinoCases);
+
+        assertNull(caseData.getAssociatedCase());
+        assertEquals("No", caseData.getLinkedCasesBoolean());
     }
 
     @Test
