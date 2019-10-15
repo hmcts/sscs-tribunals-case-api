@@ -117,7 +117,7 @@ public class SubmitDraftTest {
     }
 
     @After
-    public void beforeEach() {
+    public void tearDown() {
         List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
 
         if (savedDrafts.size() > 0) {
