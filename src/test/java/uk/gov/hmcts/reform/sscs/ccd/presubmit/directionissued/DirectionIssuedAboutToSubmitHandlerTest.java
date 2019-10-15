@@ -18,18 +18,30 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
-    private DirectionIssuedAboutToSubmitHandler handler = new DirectionIssuedAboutToSubmitHandler();
+
+    private FooterService footerService;
+    private DirectionIssuedAboutToSubmitHandler handler;
+
+    @Mock
+    private EvidenceManagementService evidenceManagementService;
+
     @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private PdfWatermarker watermarker;
 
     private SscsCaseData sscsCaseData;
 
@@ -38,6 +50,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
+
+        footerService = new FooterService(evidenceManagementService, watermarker);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 

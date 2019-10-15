@@ -8,19 +8,17 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.Furth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.ComparatorUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -119,82 +117,51 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
 
         String scannedDate = null;
+        LocalDate localDate = null;
         if (scannedDocument.getValue().getScannedDate() != null) {
-            LocalDateTime localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate());
+            localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate()).toLocalDate();
             scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
         }
 
         DocumentLink url = scannedDocument.getValue().getUrl();
-        String bundleAddition = null;
+
+        DocumentType documentType = getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
+                sscsCaseData.getOriginalSender().getValue().getCode());
 
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
                 && (caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
                 || caseState.equals(State.READY_TO_LIST))) {
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
-            bundleAddition = getNextBundleAddition(sscsCaseData.getSscsDocument());
 
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
-            String documentType = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
+            String documentFooterText = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
 
-            url = footerService.addFooter(url, documentType, String.format("Addition  %s", bundleAddition));
+            footerService.createFooterDocument(sscsCaseData, url, documentFooterText,
+                    scannedDocument.getValue().getFileName(), localDate, documentType);
         }
-
-        String fileName = scannedDocument.getValue().getFileName();
-        String controlNumber = scannedDocument.getValue().getControlNumber();
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
-            .documentType(getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
-                sscsCaseData.getOriginalSender().getValue().getCode()))
-            .documentFileName(fileName)
-            .documentLink(url)
-            .bundleAddition(bundleAddition)
-            .documentDateAdded(scannedDate)
-            .controlNumber(controlNumber)
-            .evidenceIssued("No")
-            .build()).build();
+                .documentType(documentType.getValue())
+                .documentFileName(scannedDocument.getValue().getFileName())
+                .documentLink(url)
+                .documentDateAdded(scannedDate)
+                .controlNumber(scannedDocument.getValue().getControlNumber())
+                .evidenceIssued("No")
+                .build()).build();
     }
 
-    String getNextBundleAddition(List<SscsDocument> sscsDocument) {
-        if (sscsDocument == null) {
-            sscsDocument = new ArrayList<>();
-        }
-        String[] appendixArray = sscsDocument.stream().filter(s -> StringUtils.isNotEmpty(s.getValue().getBundleAddition())).map(s -> StringUtils.stripToEmpty(s.getValue().getBundleAddition())).toArray(String[]::new);
-        Arrays.sort(appendixArray, (o1, o2) -> {
-            if (StringUtils.isNotEmpty(o1) && StringUtils.isNotEmpty(o2) && o1.length() > 1 && o2.length() > 1) {
-                Integer n1 = NumberUtils.isNumber(o1.substring(1)) ? Integer.parseInt(o1.substring(1)) : 0;
-                Integer n2 = NumberUtils.isNumber(o2.substring(1)) ? Integer.parseInt(o2.substring(1)) : 0;
-                return ComparatorUtils.<Integer>naturalComparator().compare(n1, n2);
-            }
-            return ComparatorUtils.<String>naturalComparator().compare(o1, o2);
-        });
-        if (appendixArray.length >  0) {
-            String lastAppendix = appendixArray[appendixArray.length - 1];
-            char nextChar =  (char) (StringUtils.upperCase(lastAppendix).charAt(0) + 1);
-            if (nextChar > 'Z') {
-                if (lastAppendix.length() == 1) {
-                    return "Z1";
-                } else if (NumberUtils.isNumber(lastAppendix.substring(1))) {
-                    return "Z" + (Integer.valueOf(lastAppendix.substring(1)) + 1);
-                }
-            }
-            return String.valueOf(nextChar);
-        }
-
-        return "A";
-    }
-
-    private String getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {
+    private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(furtherEvidenceActionItemCode)) {
-            return OTHER_DOCUMENT.getValue();
+            return OTHER_DOCUMENT;
         }
         if (APPELLANT.getCode().equals(originalSenderCode)) {
-            return APPELLANT_EVIDENCE.getValue();
+            return APPELLANT_EVIDENCE;
         }
         if (REPRESENTATIVE.getCode().equals(originalSenderCode)) {
-            return REPRESENTATIVE_EVIDENCE.getValue();
+            return REPRESENTATIVE_EVIDENCE;
         }
         if (DWP.getCode().equals(originalSenderCode)) {
-            return DWP_EVIDENCE.getValue();
+            return DWP_EVIDENCE;
         }
         throw new IllegalStateException("document Type could not be worked out");
     }

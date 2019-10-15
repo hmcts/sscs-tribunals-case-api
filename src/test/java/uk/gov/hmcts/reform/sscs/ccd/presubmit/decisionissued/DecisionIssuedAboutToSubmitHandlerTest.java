@@ -19,14 +19,27 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionIssuedAboutToSubmitHandler;
+import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class DecisionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
-    private DecisionIssuedAboutToSubmitHandler handler = new DecisionIssuedAboutToSubmitHandler();
+
+    private FooterService footerService;
+    private DecisionIssuedAboutToSubmitHandler handler = new DecisionIssuedAboutToSubmitHandler(footerService);
+
+    @Mock
+    private EvidenceManagementService evidenceManagementService;
+
     @Mock
     private Callback<SscsCaseData> callback;
+
+    @Mock
+    private PdfWatermarker watermarker;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
@@ -38,6 +51,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
+
+        footerService = new FooterService(evidenceManagementService, watermarker);
+        handler = new DecisionIssuedAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
