@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
@@ -95,7 +94,6 @@ public class ReissueFurtherEvidenceIt {
 
     }
 
-
     @Test
     public void callAboutToStartHandler_willPopulateDocumentsToReissue() throws Exception {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
@@ -128,25 +126,6 @@ public class ReissueFurtherEvidenceIt {
 
         DynamicList expected = new DynamicList(repListItem, Arrays.asList(appellantListItem, repListItem, dwpListItem));
         assertEquals(expected, result.getData().getOriginalSender());
-    }
-
-    @Test
-    public void callToAboutToSubmitHandler_willResetEvidenceHandledAndUpdateDocumentType() throws Exception {
-        json = json.replaceFirst("\"reissueFurtherEvidenceDocument\": \\{\\}", "\"reissueFurtherEvidenceDocument\": " + midEventPartialJson);
-        json = json.replaceFirst("\"originalSender\": \\{\\}", "\"originalSender\": " + aboutToSubmitPartialJson);
-        json = json.replaceFirst("\"resendToAppellant\": \"NO\"", "\"resendToAppellant\": \"YES\"");
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertEquals(Collections.EMPTY_SET, result.getErrors());
-
-        SscsDocument document1 = result.getData().getSscsDocument().get(0);
-        assertEquals("Yes", document1.getValue().getEvidenceIssued());
-        assertEquals("appellantEvidence", document1.getValue().getDocumentType());
-
-        SscsDocument document2 = result.getData().getSscsDocument().get(1);
-        assertEquals("No", document2.getValue().getEvidenceIssued());
-        assertEquals("appellantEvidence", document2.getValue().getDocumentType());
     }
 
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
