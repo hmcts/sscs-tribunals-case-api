@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.postpone;
 
 import static java.util.Objects.requireNonNull;
 
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -11,7 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 
-
+@Service
 public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
 
