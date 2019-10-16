@@ -68,6 +68,6 @@ public class PostponeHearingHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("postponed", response.getData().getDwpState());
+        assertEquals("inProgress", response.getData().getDwpState());
     }
 }
