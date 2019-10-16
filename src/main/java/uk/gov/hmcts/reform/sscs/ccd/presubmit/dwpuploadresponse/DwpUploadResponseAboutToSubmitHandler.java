@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -16,8 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
-
+    @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
@@ -26,7 +26,8 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
             && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -34,7 +35,7 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.getBenefitCode() == null) {
             preSubmitCallbackResponse.addError("Benefit code cannot be empty");
@@ -42,8 +43,12 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
         if (sscsCaseData.getIssueCode() == null) {
             preSubmitCallbackResponse.addError("Issue code cannot be empty");
         }
+        if (sscsCaseData.getDwpFurtherInfo() == null) {
+            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
+        }
 
         sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
+        sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         return preSubmitCallbackResponse;
     }

@@ -9,5 +9,5 @@ public interface PreSubmitCallbackHandler<T extends CaseData> {
 
     boolean canHandle(CallbackType callbackType, Callback<T> callback);
 
-    PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback);
+    PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback, String userAuthorisation);
 }

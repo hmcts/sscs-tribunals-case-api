@@ -214,8 +214,8 @@
       },
       "furtherEvidenceAction": {
         "value": {
-          "code": "informationReceivedForInterloc",
-          "label": "Information received for interlocutory review"
+          "code": "informationReceivedForInterlocJudge",
+          "label": "Information received for interlocutory review Judge"
         },
         "list_items": [
           {
@@ -227,8 +227,8 @@
             "label": "Other document type - action manually"
           },
           {
-            "code": "informationReceivedForInterloc",
-            "label": "Information received for interlocutory review"
+            "code": "informationReceivedForInterlocJudge",
+            "label": "Information received for interlocutory review Judge"
           }
         ]
       }

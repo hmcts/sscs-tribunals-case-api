@@ -160,7 +160,7 @@ public class CcdCallbackEndpointIt {
         String path = Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        json = json.replaceFirst("informationReceivedForInterloc", "issueFurtherEvidence");
+        json = json.replaceFirst("informationReceivedForInterlocJudge", "issueFurtherEvidence");
         json = json.replaceFirst("Information received for interlocutory review", "Issue further evidence to all parties");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
@@ -191,7 +191,7 @@ public class CcdCallbackEndpointIt {
         String path = Objects.requireNonNull(getClass().getClassLoader()
                 .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        json = json.replaceFirst("informationReceivedForInterloc", "issueFurtherEvidence");
+        json = json.replaceFirst("informationReceivedForInterlocJudge", "issueFurtherEvidence");
         json = json.replaceFirst("Information received for interlocutory review", "Issue further evidence to all parties");
 
 
@@ -259,7 +259,7 @@ public class CcdCallbackEndpointIt {
     public void coversheetFurtherEvidence_shouldNotAddToDocuments() throws Exception {
         String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json").getFile();
         json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        json = json.replaceFirst("informationReceivedForInterloc", "otherDocumentManual");
+        json = json.replaceFirst("informationReceivedForInterlocJudge", "otherDocumentManual");
         json = json.replaceFirst("Information received for interlocutory review", "Other document type - action manually");
         json = json.replaceFirst("appellantEvidence", "coversheet");
 
@@ -286,6 +286,7 @@ public class CcdCallbackEndpointIt {
 
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
+        assertEquals("No", result.getData().getLinkedCasesBoolean());
         assertEquals("reviewByTcw", result.getData().getInterlocReviewState());
     }
 

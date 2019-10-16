@@ -1,7 +1,7 @@
 dependencies:
   - name: java
-    version: ~2.6.0
+    version: ~2.9.1
     repository: '@hmctspublic'
   - name: ccd
-    version: ~3.1.1
+    version: ~3.0.6
     repository: '@hmctspublic'

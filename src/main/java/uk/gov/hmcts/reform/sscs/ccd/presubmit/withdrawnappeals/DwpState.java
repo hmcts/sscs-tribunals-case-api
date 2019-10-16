@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
 public enum DwpState {
     WITHDRAWAL_RECEIVED("withdrawalReceived"),
-    WITHDRAWN("Withdrawn");
+    WITHDRAWN("Withdrawn"),
+    WITHDRAW_FOR_ACTION("withdrawForAction");
     private String value;
 
     public String getValue() {

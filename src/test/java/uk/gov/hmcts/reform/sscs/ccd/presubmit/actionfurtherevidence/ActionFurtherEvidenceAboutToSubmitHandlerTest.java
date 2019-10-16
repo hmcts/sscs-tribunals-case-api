@@ -29,6 +29,8 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
+    private static final String USER_AUTHORISATION = "Bearer token";
+
     private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
     @Mock
@@ -113,7 +115,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = null;
         try {
-            response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+            response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         } catch (IllegalStateException e) {
             assertTrue(furtherEvidenceActionList == null || originalSender == null);
         }
@@ -142,7 +144,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             "Appellant (or Appointee)"));
         sscsCaseData.setEvidenceHandled("No");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
         assertEquals("Yes", response.getData().getEvidenceHandled());
@@ -167,7 +169,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 "Other document type - action manually");
 
         DynamicList furtherEvidenceActionListInterloc =
-            buildFurtherEvidenceActionItemListForGivenOption("informationReceivedForInterloc",
+            buildFurtherEvidenceActionItemListForGivenOption("informationReceivedForInterlocJudge",
                 "Information received for interlocutory review");
 
         DynamicList furtherEvidenceActionListIssueParties =
@@ -243,7 +245,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setScannedDocuments(scannedDocumentList);
         sscsCaseData.setSscsDocument(sscsDocuments);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
@@ -263,7 +265,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setScannedDocuments(docs);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("www.test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
@@ -272,7 +274,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenACaseWithNoScannedDocuments_thenAddAnErrorToResponse() {
         sscsCaseData.setScannedDocuments(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -298,7 +300,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenIssueFurtherEvidence_shouldUpdateDwpFurtherEvidenceStates() {
         Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.code);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("furtherEvidenceReceived", updated.getData().getDwpFurtherEvidenceStates());
     }
@@ -307,7 +309,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenOtherDocument_shouldNotUpdateDwpFurtherEvidenceStates() {
         Callback<SscsCaseData> callback = buildCallback(OTHER_DOCUMENT_MANUAL.code);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
@@ -316,7 +318,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenNullFurtherEvidenceAction_shouldNotUpdateDwpFurtherEvidenceStates() {
         Callback<SscsCaseData> callback = buildCallback(null);
 
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
@@ -332,7 +334,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setScannedDocuments(docs);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 
@@ -352,7 +354,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setScannedDocuments(docs);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
 

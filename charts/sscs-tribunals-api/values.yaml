@@ -1,5 +1,5 @@
 java:
-  image: 'https://hmctspublic.azurecr.io/sscs/tribunals-api:latest'
+  image: 'hmctspublic.azurecr.io/sscs/tribunals-api:latest'
   applicationPort: 8080
   aadIdentityName: sscs
   ingressHost: sscs-tribunals-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
@@ -38,10 +38,10 @@ java:
     EMAIL_SMTP_SSL_TRUST: "*"
     MAX_FILE_SIZE: "10MB"
     MAX_REQUEST_SIZE: "10MB"
+    DOC_ASSEMBLY_URL: "http://dg-docassembly-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_OAUTH2_REDIRECT_URL: "https://evidence-sharing-preprod.sscs.reform.hmcts.net"
     PDF_API_URL: "http://cmc-pdf-service-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
-    

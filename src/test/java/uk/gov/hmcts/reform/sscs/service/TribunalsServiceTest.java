@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
 import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
-import uk.gov.hmcts.reform.sscs.service.exceptions.InvalidSurnameException;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class TribunalsServiceTest {
@@ -114,11 +115,14 @@ public class TribunalsServiceTest {
         assertThat(appeal, is(objectNode));
     }
 
-    @Test(expected = InvalidSurnameException.class)
-    public void shouldThrowExceptionGivenValidationFails() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(null);
+    @Test
+    public void shouldThrowExceptionAndReturnEmptyWhenGivenNotValidSurname() throws CcdException {
+        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens))
+                .willThrow(uk.gov.hmcts.reform.sscs.ccd.exception.AppealNotFoundException.class);
 
-        tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
+        Optional<SurnameResponse> actualResponse = tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
+
+        assertFalse(actualResponse.isPresent());
     }
 
     @Test
@@ -179,10 +183,10 @@ public class TribunalsServiceTest {
     public void shouldReturnSurnameResponseWithCcdIdIfSurnameIsValidForGivenAppealNumber() {
         given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(getCaseData());
 
-        SurnameResponse surnameResponse =  tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
+        Optional<SurnameResponse> surnameResponse =  tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
 
-        assertNotNull(surnameResponse);
-        assertThat(surnameResponse.getCaseId(), equalTo(CCD_CASE_ID));
+        assertTrue(surnameResponse.isPresent());
+        assertThat(surnameResponse.get().getCaseId(), equalTo(CCD_CASE_ID));
     }
 
     private SscsCaseDetails getCaseDetailsWithRpc() {

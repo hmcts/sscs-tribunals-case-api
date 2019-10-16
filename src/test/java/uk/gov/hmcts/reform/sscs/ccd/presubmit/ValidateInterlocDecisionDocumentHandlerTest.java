@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Sets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class ValidateInterlocDecisionDocumentHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private Callback<SscsCaseData> callback;
     private ValidateInterlocDecisionDocumentHandler validateInterlocDecisionDocumentHandler;
@@ -73,7 +75,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void handlesCallback() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
-                        .documentDateAdded("10-10-2050")
+                        .documentDateAdded(LocalDate.now().minusDays(1))
                         .documentLink(DocumentLink.builder()
                                 .documentFilename("SomeDoc.pdf")
                                 .build())
@@ -88,7 +90,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors().isEmpty(), is(true));
@@ -106,7 +108,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors(), is(Sets.newHashSet("Interloc decision document must be set")));
@@ -116,7 +118,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void errorWhenHandlingCallbackAndInterlocDecisionDocumentLinkHasNotBeenSet() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
-                        .documentDateAdded("some date")
+                        .documentDateAdded(LocalDate.now().minusDays(1))
                         .documentFileName("File")
                         .documentType("Decision Notice")
                         .build())
@@ -130,7 +132,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors(), is(Sets.newHashSet("Interloc decision document must be set")));
@@ -140,7 +142,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
     public void errorWhenHandlingCallbackAndInterlocDecisionDocumentIsNotPdf() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
                 .sscsInterlocDecisionDocument(SscsInterlocDecisionDocument.builder()
-                        .documentDateAdded("10-10-2050")
+                        .documentDateAdded(LocalDate.now().minusDays(1))
                         .documentLink(DocumentLink.builder()
                                 .documentFilename("SomeDoc.doc")
                                 .build())
@@ -155,7 +157,7 @@ public class ValidateInterlocDecisionDocumentHandlerTest {
         );
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         PreSubmitCallbackResponse<SscsCaseData> response =
-                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback);
+                validateInterlocDecisionDocumentHandler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData(), is(sscsCaseData));
         assertThat(response.getErrors(), is(Sets.newHashSet("Interloc decision document must be a PDF")));

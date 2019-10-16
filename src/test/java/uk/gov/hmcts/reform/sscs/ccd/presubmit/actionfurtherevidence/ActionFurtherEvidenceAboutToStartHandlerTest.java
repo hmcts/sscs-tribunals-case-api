@@ -15,6 +15,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
+    private static final String USER_AUTHORISATION = "Bearer token";
+
     private ActionFurtherEvidenceAboutToStartHandler handler;
 
     @Mock
@@ -57,12 +59,13 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", true);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("issueFurtherEvidence", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
         assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
-        assertEquals("informationReceivedForInterloc", response.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
-        assertEquals(3, response.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals("informationReceivedForInterlocJudge", response.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
+        assertEquals("informationReceivedForInterlocTcw", response.getData().getFurtherEvidenceAction().getListItems().get(3).getCode());
+        assertEquals(4, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     @Test
@@ -71,11 +74,12 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
-        assertEquals("informationReceivedForInterloc", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
-        assertEquals(2, response.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals("informationReceivedForInterlocJudge", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+        assertEquals("informationReceivedForInterlocTcw", response.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
+        assertEquals(3, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
 
     @Test
@@ -84,7 +88,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", true);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("issueFurtherEvidence", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
         assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
@@ -97,7 +101,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", false);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("otherDocumentManual", response.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
         assertEquals(1, response.getData().getFurtherEvidenceAction().getListItems().size());
@@ -108,7 +112,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
@@ -121,7 +125,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("No").build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
@@ -133,7 +137,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(null).build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());

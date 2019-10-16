@@ -23,7 +23,7 @@ public class ValidateInterlocDecisionDocumentHandler implements PreSubmitCallbac
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
         log.info("Handling validate interloc decision document for case [" + caseData.getCcdCaseId() + "]");
