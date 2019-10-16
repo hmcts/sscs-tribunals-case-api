@@ -20,3 +20,4 @@ spring:
         appeal-email-to: EMAIL_TO
         appeal-email-from: EMAIL_FROM
         ccd-def-fixed-list-users: CCD_DEF_FIXED_LIST_USERS
+        AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
