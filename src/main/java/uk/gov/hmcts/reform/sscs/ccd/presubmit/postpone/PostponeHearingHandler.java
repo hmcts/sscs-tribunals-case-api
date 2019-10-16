@@ -34,8 +34,7 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        //sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED.getValue());
-        sscsCaseData.setDwpState("inProgress");
+        sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED.getValue());
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
