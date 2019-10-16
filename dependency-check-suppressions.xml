@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.1.xsd">
-    <suppress>
-        <notes><![CDATA[
-   file name: jackson-databind-2.9.3.jar
-   ]]></notes>
-        <gav regex="true">^com\.fasterxml\.jackson\.core:jackson-databind:.*$</gav>
-        <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
-        <cve>CVE-2019-12814</cve>
-    </suppress>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <suppress>
         <notes><![CDATA[
    file name: groovy-xml-2.4.15.jar
@@ -102,5 +94,14 @@
         <sha1>c041edaa88886863aa784de15170a08a2b9f17ba</sha1>
         <cve>CVE-2015-9251</cve>
         <cve>CVE-2019-11358</cve>
+    </suppress>
+    <suppress until="2019-10-31">
+        <notes><![CDATA[
+   file name: jackson-databind-2.9.10.jar
+   No fix available
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+        <cve>CVE-2019-16942</cve>
+        <cve>CVE-2019-16943</cve>
     </suppress>
 </suppressions>
