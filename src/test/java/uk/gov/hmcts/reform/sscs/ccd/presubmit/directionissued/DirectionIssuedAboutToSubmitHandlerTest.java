@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -105,7 +107,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void willCopyThePreviewFileToTheInterlocDirectionDocument() {
+    public void willCopyThePreviewFileToTheInterlocDirectionDocumentAndAddFooter() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getPreviewDocument());
         assertNull(response.getData().getSignedBy());
@@ -114,5 +116,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
 
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        verify(evidenceManagementService).upload(any(), any());
     }
 }

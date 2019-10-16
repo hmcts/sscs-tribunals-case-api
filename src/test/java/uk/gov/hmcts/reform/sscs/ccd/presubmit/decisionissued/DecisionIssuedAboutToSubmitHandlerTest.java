@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -19,7 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionIssuedAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -30,7 +31,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
 
     private FooterService footerService;
-    private DecisionIssuedAboutToSubmitHandler handler = new DecisionIssuedAboutToSubmitHandler(footerService);
+    private DecisionIssuedAboutToSubmitHandler handler;
 
     @Mock
     private EvidenceManagementService evidenceManagementService;
@@ -106,7 +107,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void willCopyThePreviewFileToTheInterlocDecisionDocument() {
+    public void willCopyThePreviewFileToTheInterlocDecisionDocumentAndAddFooter() {
         sscsCaseData.setDecisionType(STRIKE_OUT.getValue());
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getPreviewDocument());
@@ -117,5 +118,6 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
+        verify(evidenceManagementService).upload(any(), any());
     }
 }

@@ -1,18 +1,34 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 
 @RunWith(JUnitParamsRunner.class)
 public class FooterServiceTest {
@@ -20,9 +36,66 @@ public class FooterServiceTest {
     @Mock
     private EvidenceManagementService evidenceManagementService;
 
-    private FooterService footerService = new FooterService(evidenceManagementService, null);
+    @Mock
+    private PdfWatermarker pdfWatermarker;
 
-    //TODO: createFooterDocument
+    private FooterService footerService;
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Mock private UploadResponse uploadResponse;
+    @Mock private UploadResponse.Embedded uploadResponseEmbedded;
+    @Mock private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
+    private uk.gov.hmcts.reform.document.domain.Document uploadedDocument = new uk.gov.hmcts.reform.document.domain.Document();
+
+    private String fileName = "some-file.pdf";
+    private String expectedDocumentUrl = "document-self-href";
+    private String expectedBinaryUrl = "document-binary-href";
+
+    @Before
+    public void setup() {
+        footerService = new FooterService(evidenceManagementService, pdfWatermarker);
+
+        uploadedDocument.originalDocumentName = fileName;
+        uploadedDocument.links = new uk.gov.hmcts.reform.document.domain.Document.Links();
+        uploadedDocument.links.self = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        uploadedDocument.links.self.href = expectedDocumentUrl;
+        uploadedDocument.links.binary = new uk.gov.hmcts.reform.document.domain.Document.Link();
+        uploadedDocument.links.binary.href = expectedBinaryUrl;
+
+        when(uploadResponse.getEmbedded()).thenReturn(uploadResponseEmbedded);
+        when(uploadResponseEmbedded.getDocuments()).thenReturn(uploadedDocuments);
+        when(uploadedDocuments.get(0)).thenReturn(uploadedDocument);
+    }
+
+    @Test
+    public void givenADocument_thenAddAFooter() throws IOException {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        when(evidenceManagementService.upload(any(), eq(DM_STORE_USER_ID))).thenReturn(uploadResponse);
+
+        List<SscsDocument> sscsDocumentList = Collections.singletonList(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder()
+                                .documentBinaryUrl("https://documentLink")
+                                .build())
+                        .build())
+                .build());
+
+        LocalDate now = LocalDate.now();
+
+        SscsCaseData sscsCaseData = SscsCaseData.builder().sscsDocument(sscsDocumentList).build();
+        SscsDocument result = footerService.createFooterDocument(sscsCaseData, DocumentLink.builder().documentUrl("MyUrl").build(), "leftText", "fileName.jpg",
+                now, DocumentType.DIRECTION_NOTICE);
+
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getValue().getDocumentType());
+        assertEquals("fileName.jpg", result.getValue().getDocumentFileName());
+        assertEquals(now.toString(), result.getValue().getDocumentDateAdded());
+        assertEquals("document-self-href", result.getValue().getDocumentLink().getDocumentUrl());
+        verify(evidenceManagementService).upload(any(), eq(DM_STORE_USER_ID));
+    }
 
     @Test
     @Parameters({"", "A", "B", "C", "D", "X", "Y"})

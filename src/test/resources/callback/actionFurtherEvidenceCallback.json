@@ -2,7 +2,7 @@
   "case_details": {
     "id": 12345656789,
     "jurisdiction": "SSCS",
-    "state": "appealCreated",
+    "state": "readyToList",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
