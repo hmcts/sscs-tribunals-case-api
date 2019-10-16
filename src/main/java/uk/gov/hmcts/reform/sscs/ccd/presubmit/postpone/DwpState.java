@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.postpone;
 
 public enum DwpState {
-    HEARING_POSTPONED("inProgress");
+    HEARING_POSTPONED("hearingPostponed");
 
     private String value;
 
