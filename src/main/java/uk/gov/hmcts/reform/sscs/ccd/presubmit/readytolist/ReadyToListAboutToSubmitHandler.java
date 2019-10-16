@@ -41,6 +41,7 @@ public class ReadyToListAboutToSubmitHandler implements PreSubmitCallbackHandler
         if (sscsCaseData.getCreatedInGapsFrom() == null
                 || StringUtils.equalsIgnoreCase(sscsCaseData.getCreatedInGapsFrom(), State.VALID_APPEAL.getId())) {
             callbackResponse.addError("Case already created in GAPS at valid appeal.");
+            log.warn(String.format("Case already created in GAPS at valid appeal for caseId %s.", sscsCaseData.getCcdCaseId()));
         }
         return callbackResponse;
     }
