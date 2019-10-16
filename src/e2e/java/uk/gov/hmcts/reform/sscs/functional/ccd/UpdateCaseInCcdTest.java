@@ -53,6 +53,20 @@ public class UpdateCaseInCcdTest {
         assertEquals("SC123/12/78765", updatedCaseDetails.getData().getCaseReference());
     }
 
+    @Test
+    public void givenACase_hearingShouldBePostponedInCcd() {
+        SscsCaseData testCaseData = buildSscsCaseDataForTestingWithValidMobileNumbers();
+        SscsCaseDetails caseDetails = ccdService.createCase(testCaseData, "appealCreated",
+                "Appeal created summary", "Appeal created description",
+                idamTokens);
+
+        assertNotNull(caseDetails);
+        testCaseData.setCaseReference("SC123/12/78765");
+        SscsCaseDetails updatedCaseDetails = ccdService.updateCase(testCaseData, caseDetails.getId(),
+                "hearingPostponed", "", "", idamTokens);
+        assertEquals("postponed", updatedCaseDetails.getData().getDwpState());
+    }
+
     public static SscsCaseData buildSscsCaseDataForTestingWithValidMobileNumbers() {
         SscsCaseData testCaseData = CaseDataUtils.buildCaseData();
 
