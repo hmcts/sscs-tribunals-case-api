@@ -7,10 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.document.domain.UploadResponse.Embedded;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -81,18 +78,12 @@ public class EvidenceDocumentUploadEndpointIt {
             .willReturn(uploadResponse);
         Embedded embedded = new Embedded();
         when(uploadResponse.getEmbedded()).thenReturn(embedded);
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            PDDocument doc = new PDDocument();
-            doc.addPage(new PDPage());
-            doc.save(baos);
-            doc.close();
-            final byte[] bytes = baos.toByteArray();
-            MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-            mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload")
-                    .file("file", bytes)
-                    .characterEncoding("UTF-8"))
-                    .andExpect(status().is(200));
 
-        }
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/evidence/upload")
+            .file("file", "data".getBytes())
+            .characterEncoding("UTF-8"))
+            .andExpect(status().is(200));
+
     }
 }
