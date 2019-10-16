@@ -21,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileToPdfConversionServiceTest {
 
     @Mock
-    private PdfConverter pdfConverter;
+    private FileToPdfConverter pdfConverter;
     private final Tika tika = new Tika();
     private final ImageConverter imageConverter = new ImageConverter();
 
