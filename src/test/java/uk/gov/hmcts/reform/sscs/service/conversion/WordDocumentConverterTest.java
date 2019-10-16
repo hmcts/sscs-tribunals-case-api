@@ -47,10 +47,11 @@ public class WordDocumentConverterTest {
 
     @Test
     public void accepts() {
-        assertEquals("application/msword", converter.accepts().get(0));
-        assertEquals("application/vnd.openxmlformats-officedocument.wordprocessingml.document", converter.accepts().get(1));
-        assertEquals("application/x-tika-ooxml", converter.accepts().get(2));
-        assertEquals("application/x-tika-msoffice", converter.accepts().get(3));
+        assertEquals("text/plain", converter.accepts().get(0));
+        assertEquals("application/msword", converter.accepts().get(1));
+        assertEquals("application/vnd.openxmlformats-officedocument.wordprocessingml.document", converter.accepts().get(2));
+        assertEquals("application/x-tika-ooxml", converter.accepts().get(3));
+        assertEquals("application/x-tika-msoffice", converter.accepts().get(4));
     }
 
     @Test
