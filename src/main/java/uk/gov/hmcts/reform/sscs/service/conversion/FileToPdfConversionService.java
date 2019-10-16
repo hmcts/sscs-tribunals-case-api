@@ -64,11 +64,11 @@ public class FileToPdfConversionService {
 
         // This shoddy library doesn't work as it should.
         // See https://stackoverflow.com/questions/8978290/org-apache-commons-fileupload-disk-diskfileitem-is-not-created-properly
-        InputStream input =  new FileInputStream(file);
-        OutputStream os = diskFileItem.getOutputStream();
-        IOUtils.copy(input, os);
-        input.close();
-        os.close();
+        try (InputStream input =  new FileInputStream(file)) {
+            try (OutputStream os = diskFileItem.getOutputStream()) {
+                IOUtils.copy(input, os);
+            }
+        }
 
         return new CommonsMultipartFile(diskFileItem);
     }
