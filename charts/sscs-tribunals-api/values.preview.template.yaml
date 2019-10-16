@@ -75,7 +75,7 @@ ccd:
       userProfileDatabaseName: user-profile
     definition:
       enabled: true
-      image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.2.04
+      image: hmctspublic.azurecr.io/sscs/ccd-definition-importer-benefit:5.2.25
       environment:
       - name: CCD_DEF_FIXED_LIST_USERS
         value: '{"LiveFrom": "01/01/2018", "ID": "FL_AssignToJudge", "ListElementCode": "unassigned", "ListElement": "Unassigned"}'
