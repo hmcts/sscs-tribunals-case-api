@@ -33,6 +33,7 @@ public class WordDocumentConverter implements FileToPdfConverter {
     @Override
     public List<String> accepts() {
         return Lists.newArrayList(
+                "text/plain",
                 "application/msword",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 "application/x-tika-ooxml",
