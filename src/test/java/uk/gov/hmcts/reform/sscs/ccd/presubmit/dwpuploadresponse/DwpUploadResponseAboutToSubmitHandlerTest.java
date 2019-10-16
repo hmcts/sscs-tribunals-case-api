@@ -22,14 +22,13 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private DwpUploadResponseAboutToSubmitHandler dwpUploadResponseAboutToSubmitHandler;
+    private SscsCaseData sscsCaseData;
 
     @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
-
-    private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
@@ -42,9 +41,11 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .ccdCaseId("1234")
             .benefitCode("002")
             .issueCode("DD")
+            .dwpFurtherInfo("Yes")
             .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getId()).thenReturn(Long.valueOf(sscsCaseData.getCcdCaseId()));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -90,6 +91,25 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Issue code cannot be empty", error);
         }
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithEmptyDwpFurtherInfo_displayAnError() {
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("Further information to assist the tribunal cannot be empty.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithDwpFurtherInfoIsNo_assertNoErrors() {
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 
 }
