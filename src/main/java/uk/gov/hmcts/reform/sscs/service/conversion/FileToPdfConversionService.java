@@ -2,14 +2,14 @@ package uk.gov.hmcts.reform.sscs.service.conversion;
 
 import static pl.touk.throwing.ThrowingFunction.unchecked;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +60,15 @@ public class FileToPdfConversionService {
         String extension =  FilenameUtils.getExtension(file.getName());
         final String fileName = String.format("%s.%s", FilenameUtils.getBaseName(f.getOriginalFilename()), extension);
 
-        final DiskFileItem diskFileItem = new DiskFileItem(fileName, newMimeType, false, fileName, (int) file.length(), file);
-        // This silliness is to avoid a null pointer exception.
-        diskFileItem.getOutputStream();
+        final DiskFileItem diskFileItem = new DiskFileItem(fileName, newMimeType, false, fileName, (int) file.length(), file.getParentFile());
+
+        // This shoddy library doesn't work as it should.
+        // See https://stackoverflow.com/questions/8978290/org-apache-commons-fileupload-disk-diskfileitem-is-not-created-properly
+        InputStream input =  new FileInputStream(file);
+        OutputStream os = diskFileItem.getOutputStream();
+        IOUtils.copy(input, os);
+        input.close();
+        os.close();
 
         return new CommonsMultipartFile(diskFileItem);
     }
