@@ -189,7 +189,7 @@
   "evidencePresent": "No",
   "dateSentToDwp": "2019-09-01",
   "hmctsDwpState": "sentToDwp",
-  "dwpState": "withdrawalReceived",
+  "dwpState": "withdrawForAction",
   "appealNotePad": {
     "notesCollection": [{
       "value": {

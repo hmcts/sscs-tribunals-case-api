@@ -17,8 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -37,13 +35,16 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.getBenefitCode() == null) {
             preSubmitCallbackResponse.addError("Benefit code cannot be empty");
         }
         if (sscsCaseData.getIssueCode() == null) {
             preSubmitCallbackResponse.addError("Issue code cannot be empty");
+        }
+        if (sscsCaseData.getDwpFurtherInfo() == null) {
+            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
         }
 
         sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
