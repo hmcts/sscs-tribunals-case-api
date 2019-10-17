@@ -38,10 +38,7 @@ public class ImageConverter implements FileToPdfConverter {
     public File convert(File file) throws IOException {
         // create blank PDF
         try (PDDocument doc = new PDDocument()) {
-            // a valid PDF document requires at least one page
-            PDPage page = new PDPage(PDRectangle.A4);
-            // To get MacOSX Preview to scale exactly 100% for A4 you need to use rounded dimensions:
-            doc.addPage(page);
+
 
             // Load image:
             byte[] imageBytes = readImageAsBytesWithCorrectRotation(file);
@@ -51,6 +48,16 @@ public class ImageConverter implements FileToPdfConverter {
             // Q: do we scale up, if the image is too small? Will result in pixellation..
             int imageHeight = pdImage.getHeight();
             int imageWidth = pdImage.getWidth();
+
+            boolean isPdfLandscape = imageHeight < imageWidth;
+            float pdfWidth = isPdfLandscape ?  PDRectangle.A4.getHeight(): PDRectangle.A4.getWidth() ;
+            float pdfHeight = isPdfLandscape ? PDRectangle.A4.getWidth() : PDRectangle.A4.getHeight();
+
+            // a valid PDF document requires at least one page
+            PDPage page = new PDPage(new PDRectangle(pdfWidth, pdfHeight));
+
+            // To get MacOSX Preview to scale exactly 100% for A4 you need to use rounded dimensions:
+            doc.addPage(page);
 
             float hscale = (page.getCropBox().getWidth() - (MARGIN * 2)) / imageWidth;
             float vscale = (page.getCropBox().getHeight() - (MARGIN * 2)) / imageHeight;
