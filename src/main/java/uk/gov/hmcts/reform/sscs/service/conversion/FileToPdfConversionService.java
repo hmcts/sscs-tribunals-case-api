@@ -41,17 +41,17 @@ public class FileToPdfConversionService {
     }
 
     private MultipartFile convert(MultipartFile f) throws IOException {
-        String mimeType = tika.detect(f.getInputStream(), new Metadata());
 
-        String suffix = String.format(".%s", FilenameUtils.getExtension(f.getOriginalFilename()));
-        File tempFile = File.createTempFile("tempConversion", suffix);
-        tempFile.deleteOnExit();
-        f.transferTo(tempFile);
-        Optional<File> fileOptional = convertFile(mimeType, tempFile);
-        if (!fileOptional.isPresent()) {
-            return f;
+        try (InputStream is = f.getInputStream()) {
+            String mimeType = tika.detect(is, new Metadata());
+
+            Optional<File> fileOptional = convertFile(mimeType, f);
+
+            if (!fileOptional.isPresent()) {
+                return f;
+            }
+            return getMultipartFile(f, fileOptional.get());
         }
-        return getMultipartFile(f, fileOptional.get());
     }
 
     private MultipartFile getMultipartFile(MultipartFile f, File file) throws IOException {
@@ -73,10 +73,18 @@ public class FileToPdfConversionService {
         return new CommonsMultipartFile(diskFileItem);
     }
 
-    private Optional<File> convertFile(String mimeType, File f) {
+    private Optional<File> convertFile(String mimeType, MultipartFile f) {
         return converters.stream()
                 .filter(g -> g.accepts().contains(mimeType))
                 .findFirst()
-                .map(unchecked(g -> g.convert(f)));
+                .map(unchecked(g -> g.convert(transferToFile(f))));
+    }
+
+    private File transferToFile(MultipartFile f) throws IOException {
+        String suffix = String.format(".%s", FilenameUtils.getExtension(f.getOriginalFilename()));
+        File tempFile = File.createTempFile("tempConversion", suffix);
+        tempFile.deleteOnExit();
+        f.transferTo(tempFile);
+        return tempFile;
     }
 }
