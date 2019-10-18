@@ -50,7 +50,7 @@ public class ImageConverter implements FileToPdfConverter {
             int imageWidth = pdImage.getWidth();
 
             boolean isPdfLandscape = imageHeight < imageWidth;
-            float pdfWidth = isPdfLandscape ?  PDRectangle.A4.getHeight(): PDRectangle.A4.getWidth() ;
+            float pdfWidth = isPdfLandscape ?  PDRectangle.A4.getHeight() : PDRectangle.A4.getWidth();
             float pdfHeight = isPdfLandscape ? PDRectangle.A4.getWidth() : PDRectangle.A4.getHeight();
 
             // a valid PDF document requires at least one page
