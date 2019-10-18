@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
@@ -39,11 +38,9 @@ public class FooterService {
         this.alter = alter;
     }
 
-    public SscsDocument createFooterDocument(SscsCaseData caseData, DocumentLink url, String leftText, String documentFileName,
+    public SscsDocument createFooterDocument(DocumentLink url, String leftText, String rightText, String documentFileName,
                                                 LocalDate dateAdded, DocumentType documentType) {
-        String bundleAddition = getNextBundleAddition(caseData.getSscsDocument());
-
-        url = addFooter(url, leftText, bundleAddition);
+        url = addFooter(url, leftText, rightText);
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(documentFileName)
@@ -54,13 +51,13 @@ public class FooterService {
                 .build();
     }
 
-    private DocumentLink addFooter(DocumentLink url, String leftText, String rightText) {
+    public DocumentLink addFooter(DocumentLink url, String leftText, String rightText) {
 
         byte[] oldContent = toBytes(url.getDocumentUrl());
         byte[] newContent;
 
         try {
-            newContent = alter.shrinkAndWatermarkPdf(oldContent, leftText, String.format("Addition  %s", rightText));
+            newContent = alter.shrinkAndWatermarkPdf(oldContent, leftText, String.format("Addition %s", rightText));
         } catch (Exception e) {
             log.error("Caught exception :" + e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
@@ -81,7 +78,7 @@ public class FooterService {
         }
     }
 
-    protected String getNextBundleAddition(List<SscsDocument> sscsDocument) {
+    public String getNextBundleAddition(List<SscsDocument> sscsDocument) {
         if (sscsDocument == null) {
             sscsDocument = new ArrayList<>();
         }
@@ -108,6 +105,10 @@ public class FooterService {
         }
 
         return "A";
+    }
+
+    public String buildBundleAdditionFileName(String bundleAddition, String rightText) {
+        return "Addition " + bundleAddition + " - " + rightText;
     }
 
     private byte[] toBytes(String documentUrl) {

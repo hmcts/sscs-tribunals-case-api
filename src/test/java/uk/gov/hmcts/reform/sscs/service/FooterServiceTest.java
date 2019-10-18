@@ -19,13 +19,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
@@ -43,6 +44,9 @@ public class FooterServiceTest {
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Captor
+    private ArgumentCaptor<String> stringCaptor;
 
     @Mock private UploadResponse uploadResponse;
     @Mock private UploadResponse.Embedded uploadResponseEmbedded;
@@ -70,31 +74,38 @@ public class FooterServiceTest {
     }
 
     @Test
-    public void givenADocument_thenAddAFooter() throws IOException {
+    public void givenADocument_thenAddAFooter() throws Exception {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
 
         when(evidenceManagementService.upload(any(), eq(DM_STORE_USER_ID))).thenReturn(uploadResponse);
 
-        List<SscsDocument> sscsDocumentList = Collections.singletonList(SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
-                                .documentBinaryUrl("https://documentLink")
-                                .build())
-                        .build())
-                .build());
+        when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
 
         LocalDate now = LocalDate.now();
 
-        SscsCaseData sscsCaseData = SscsCaseData.builder().sscsDocument(sscsDocumentList).build();
-        SscsDocument result = footerService.createFooterDocument(sscsCaseData, DocumentLink.builder().documentUrl("MyUrl").build(), "leftText", "fileName.jpg",
-                now, DocumentType.DIRECTION_NOTICE);
+        SscsDocument result = footerService.createFooterDocument(DocumentLink.builder().documentUrl("MyUrl").build(), "leftText", "rightText",
+                "fileName.jpg", now, DocumentType.DIRECTION_NOTICE);
 
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getValue().getDocumentType());
         assertEquals("fileName.jpg", result.getValue().getDocumentFileName());
         assertEquals(now.toString(), result.getValue().getDocumentDateAdded());
-        assertEquals("document-self-href", result.getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(expectedDocumentUrl, result.getValue().getDocumentLink().getDocumentUrl());
         verify(evidenceManagementService).upload(any(), eq(DM_STORE_USER_ID));
+        assertEquals("leftText", stringCaptor.getAllValues().get(0));
+        assertEquals("Addition rightText", stringCaptor.getAllValues().get(1));
+    }
+
+    @Test
+    public void buildFooterLinkFromLeftAndRightText() throws IOException {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        when(evidenceManagementService.upload(any(), eq(DM_STORE_USER_ID))).thenReturn(uploadResponse);
+
+        DocumentLink result = footerService.addFooter(DocumentLink.builder().documentUrl("oldLink").build(), "leftText", "rightText");
+
+        assertEquals(expectedDocumentUrl, result.getDocumentUrl());
     }
 
     @Test
@@ -164,5 +175,12 @@ public class FooterServiceTest {
         SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
         String actual = footerService.getNextBundleAddition(Collections.singletonList(theDocument));
         assertEquals("[", actual);
+    }
+
+    @Test
+    public void buildBundleAdditionFileNameText() {
+        String result = footerService.buildBundleAdditionFileName("A", "I am the right text");
+
+        assertEquals("Addition A - I am the right text", result);
     }
 }

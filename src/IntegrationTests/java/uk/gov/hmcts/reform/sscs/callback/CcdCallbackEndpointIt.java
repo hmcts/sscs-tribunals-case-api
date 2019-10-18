@@ -371,7 +371,7 @@ public class CcdCallbackEndpointIt {
         byte[] newBytes = captor.getValue().get(0).getBytes();
         PDDocument newPdf = PDDocument.load(newBytes);
         String text = new PDFTextStripper().getText(newPdf);
-        assertThat(text, StringEndsWith.endsWith("Appellant evidence Addition  A | Page 1\n"));
+        assertThat(text, StringEndsWith.endsWith("Appellant evidence Addition A | Page 1\n"));
     }
 
     @Test

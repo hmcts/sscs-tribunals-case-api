@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,8 +68,13 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (url != null) {
             log.info("Direction issued adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
 
-            SscsDocument sscsDocument = footerService.createFooterDocument(caseData, url, "Direction notice",
-                    caseData.getPreviewDocument().getDocumentFilename(), caseData.getDateAdded(), DocumentType.DIRECTION_NOTICE);
+            String bundleAddition = footerService.getNextBundleAddition(caseData.getSscsDocument());
+
+            String bundleFileName = footerService.buildBundleAdditionFileName(bundleAddition, "Direction notice issued on "
+                    + Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+
+            SscsDocument sscsDocument = footerService.createFooterDocument(url, "Direction notice", bundleAddition, bundleFileName,
+                    caseData.getDateAdded(), DocumentType.DIRECTION_NOTICE);
 
             List<SscsDocument> documents = new ArrayList<>();
             if (caseData.getSscsDocument() != null) {

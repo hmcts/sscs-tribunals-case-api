@@ -14,6 +14,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
@@ -137,6 +139,7 @@ public class DirectionIssuedIt {
         assertNull(result.getData().getDateAdded());
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(2).getValue().getDocumentType());
         assertEquals("some location", result.getData().getSscsDocument().get(2).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("Addition A - Direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")), result.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
     }
 
 

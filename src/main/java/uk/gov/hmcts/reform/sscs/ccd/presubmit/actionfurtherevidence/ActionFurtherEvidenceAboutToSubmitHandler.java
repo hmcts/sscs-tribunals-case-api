@@ -137,8 +137,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
             String documentFooterText = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
 
-            footerService.createFooterDocument(sscsCaseData, url, documentFooterText,
-                    scannedDocument.getValue().getFileName(), localDate, documentType);
+            String bundleAddition = footerService.getNextBundleAddition(sscsCaseData.getSscsDocument());
+
+            url = footerService.addFooter(url, documentFooterText, bundleAddition);
         }
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
