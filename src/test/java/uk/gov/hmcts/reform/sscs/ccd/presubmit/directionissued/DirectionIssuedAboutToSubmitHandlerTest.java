@@ -7,6 +7,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -41,11 +43,16 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
+        SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
+        List<SscsDocument> docs = new ArrayList<>();
+        docs.add(document);
+
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
                 .signedBy("User")
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
+                .sscsDocument(docs)
                 .previewDocument(DocumentLink.builder()
                         .documentUrl(DOCUMENT_URL)
                         .documentBinaryUrl(DOCUMENT_URL + "/binary")
@@ -98,6 +105,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getGenerateNotice());
         assertNull(response.getData().getDateAdded());
 
-        assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(2, response.getData().getSscsDocument().size());
+        assertEquals("myTest.doc", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(1).getValue().getDocumentType());
+
     }
 }
