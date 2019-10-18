@@ -93,14 +93,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     }
 
                     List<SscsDocument> documents = new ArrayList<>();
-                    if (sscsCaseData.getSscsDocument() != null) {
-                        documents.addAll(sscsCaseData.getSscsDocument());
-                    }
+
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
                         documents.add(sscsDocument);
-                        sscsCaseData.setSscsDocument(documents);
                     }
+                    if (sscsCaseData.getSscsDocument() != null) {
+                        documents.addAll(sscsCaseData.getSscsDocument());
+                    }
+                    sscsCaseData.setSscsDocument(documents);
                     sscsCaseData.setEvidenceHandled("Yes");
                 } else {
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
@@ -128,6 +129,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         DocumentType documentType = getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
                 sscsCaseData.getOriginalSender().getValue().getCode());
 
+        String bundleAddition = null;
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
                 && (caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
@@ -137,13 +139,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
             String documentFooterText = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
 
-            String bundleAddition = footerService.getNextBundleAddition(sscsCaseData.getSscsDocument());
+            bundleAddition = footerService.getNextBundleAddition(sscsCaseData.getSscsDocument());
 
             url = footerService.addFooter(url, documentFooterText, bundleAddition);
         }
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
                 .documentFileName(scannedDocument.getValue().getFileName())
+                .bundleAddition(bundleAddition)
                 .documentLink(url)
                 .documentDateAdded(scannedDate)
                 .controlNumber(scannedDocument.getValue().getControlNumber())

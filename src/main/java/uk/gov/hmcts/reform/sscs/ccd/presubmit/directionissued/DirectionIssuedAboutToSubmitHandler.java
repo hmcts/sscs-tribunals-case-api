@@ -77,10 +77,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                     caseData.getDateAdded(), DocumentType.DIRECTION_NOTICE);
 
             List<SscsDocument> documents = new ArrayList<>();
+            documents.add(sscsDocument);
+
             if (caseData.getSscsDocument() != null) {
                 documents.addAll(caseData.getSscsDocument());
             }
-            documents.add(sscsDocument);
             caseData.setSscsDocument(documents);
         } else {
             log.info("Could not find direction issued document for caseId {} so skipping generating footer", caseData.getCcdCaseId());

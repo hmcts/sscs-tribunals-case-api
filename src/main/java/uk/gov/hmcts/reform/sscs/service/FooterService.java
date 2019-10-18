@@ -38,13 +38,14 @@ public class FooterService {
         this.alter = alter;
     }
 
-    public SscsDocument createFooterDocument(DocumentLink url, String leftText, String rightText, String documentFileName,
+    public SscsDocument createFooterDocument(DocumentLink url, String leftText, String bundleAddition, String documentFileName,
                                                 LocalDate dateAdded, DocumentType documentType) {
-        url = addFooter(url, leftText, rightText);
+        url = addFooter(url, leftText, bundleAddition);
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(documentFileName)
                 .documentLink(url)
+                .bundleAddition(bundleAddition)
                 .documentDateAdded(Optional.ofNullable(dateAdded).orElse(LocalDate.now()).format(DateTimeFormatter.ISO_DATE))
                 .documentType(documentType.getValue())
                 .build())

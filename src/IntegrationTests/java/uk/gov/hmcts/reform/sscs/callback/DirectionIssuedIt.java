@@ -137,11 +137,12 @@ public class DirectionIssuedIt {
         assertNull(result.getData().getSignedBy());
         assertNull(result.getData().getGenerateNotice());
         assertNull(result.getData().getDateAdded());
-        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(2).getValue().getDocumentType());
-        assertEquals("some location", result.getData().getSscsDocument().get(2).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("Addition A - Direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")), result.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
+        assertEquals(4, result.getData().getSscsDocument().size());
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("Addition B - Direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")), result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
     }
-
 
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
         return mockMvc.perform(requestBuilder).andReturn().getResponse();

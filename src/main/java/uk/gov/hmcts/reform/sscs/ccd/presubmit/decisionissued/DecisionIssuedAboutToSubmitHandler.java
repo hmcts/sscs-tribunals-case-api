@@ -83,10 +83,11 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
                     caseData.getDateAdded(), DocumentType.DECISION_NOTICE);
 
             List<SscsDocument> documents = new ArrayList<>();
+            documents.add(sscsDocument);
+
             if (caseData.getSscsDocument() != null) {
                 documents.addAll(caseData.getSscsDocument());
             }
-            documents.add(sscsDocument);
             caseData.setSscsDocument(documents);
         } else {
             log.info("Could not find decision issued document for caseId {} so skipping generating footer", caseData.getCcdCaseId());
