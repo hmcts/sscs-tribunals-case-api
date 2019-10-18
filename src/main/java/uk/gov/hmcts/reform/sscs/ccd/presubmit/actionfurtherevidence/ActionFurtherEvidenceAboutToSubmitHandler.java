@@ -101,7 +101,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents.addAll(sscsCaseData.getSscsDocument());
                     }
-                    sscsCaseData.setSscsDocument(documents);
+
+                    if (documents.size() > 0) {
+                        sscsCaseData.setSscsDocument(documents);
+                    }
                     sscsCaseData.setEvidenceHandled("Yes");
                 } else {
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
