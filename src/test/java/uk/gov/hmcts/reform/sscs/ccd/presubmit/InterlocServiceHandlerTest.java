@@ -8,8 +8,11 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDate;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 
+@RunWith(JUnitParamsRunner.class)
 public class InterlocServiceHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -40,6 +44,16 @@ public class InterlocServiceHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    }
+
+    @Test
+    @Parameters({
+        "INTERLOC_SEND_TO_TCW", "TCW_DIRECTION_ISSUED"
+    })
+    public void givenEvent_thenCanHandleReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
