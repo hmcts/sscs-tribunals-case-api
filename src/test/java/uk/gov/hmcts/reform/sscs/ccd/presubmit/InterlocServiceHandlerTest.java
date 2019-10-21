@@ -48,87 +48,12 @@ public class InterlocServiceHandlerTest {
 
     @Test
     @Parameters({
-        "INTERLOC_SEND_TO_TCW", "TCW_DIRECTION_ISSUED"
+        "INTERLOC_SEND_TO_TCW", "TCW_DIRECTION_ISSUED", "INTERLOC_INFORMATION_RECEIVED", "JUDGE_DIRECTION_ISSUED",
+        "TCW_REFER_TO_JUDGE", "NON_COMPLIANT", "NON_COMPLIANT_SEND_TO_INTERLOC", "REINSTATE_APPEAL",
+        "TCW_DECISION_APPEAL_TO_PROCEED", "JUDGE_DECISION_APPEAL_TO_PROCEED", "UPLOAD_FURTHER_EVIDENCE"
     })
     public void givenEvent_thenCanHandleReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAInterlocSendToTcwEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.INTERLOC_SEND_TO_TCW);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenATcwDirectionIssuedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DIRECTION_ISSUED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAInterlocInformationReceivedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.INTERLOC_INFORMATION_RECEIVED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAJudgeDirectionIssued_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DIRECTION_ISSUED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenATcwReferToJudgeEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_REFER_TO_JUDGE);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenANonCompliantEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.NON_COMPLIANT);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenANonCompliantSendToInterlocEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.NON_COMPLIANT_SEND_TO_INTERLOC);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAReinstateAppealEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.REINSTATE_APPEAL);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenATcwDecisionAppealToProceedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_APPEAL_TO_PROCEED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAJudgeDecisionAppealToProceedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAnUploadFurtherEvidenceEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
 
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
