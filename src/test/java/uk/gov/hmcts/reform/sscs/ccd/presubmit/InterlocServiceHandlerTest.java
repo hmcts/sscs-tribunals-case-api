@@ -59,39 +59,19 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
-    public void setsCorrectInterlocReviewStatus() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DIRECTION_ISSUED);
+    @Parameters({
+        "TCW_DIRECTION_ISSUED, awaitingInformation", "JUDGE_DECISION_APPEAL_TO_PROCEED, none",
+        "TCW_DECISION_APPEAL_TO_PROCEED, none", "UPLOAD_FURTHER_EVIDENCE, interlocutoryReview",
+        "SEND_TO_ADMIN, awaitingAdminAction"
+    })
+    public void givenEvent_thenSetInterlocReviewStateToExpected(EventType eventType,
+                                                                String expectedInterlocReviewState) {
+        when(callback.getEvent()).thenReturn(eventType);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getInterlocReviewState(), is("awaitingInformation"));
-    }
+        assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
 
-    @Test
-    public void resetsInterlocReviewStatusJudgeDecisionAppealToProceed() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is("none"));
-    }
-
-    @Test
-    public void resetsInterlocReviewStatusTcwDecisionAppealToProceed() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_APPEAL_TO_PROCEED);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is("none"));
-    }
-
-    @Test
-    public void setsCorrectInterlocReviewStatusForUploadFurtherEvidence() {
-        when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is("interlocutoryReview"));
     }
 
     @Test(expected = IllegalStateException.class)
