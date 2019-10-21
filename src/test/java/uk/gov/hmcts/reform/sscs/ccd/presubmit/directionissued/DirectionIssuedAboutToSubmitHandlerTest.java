@@ -7,8 +7,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
-import java.util.Collections;
-
+import java.util.ArrayList;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -35,7 +35,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private SscsInterlocDirectionDocument expectedDocument;
+    private SscsDocument expectedDocument;
 
     @Before
     public void setUp() {
@@ -43,11 +43,16 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
+        SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
+        List<SscsDocument> docs = new ArrayList<>();
+        docs.add(document);
+
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
                 .signedBy("User")
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
+                .sscsDocument(docs)
                 .previewDocument(DocumentLink.builder()
                         .documentUrl(DOCUMENT_URL)
                         .documentBinaryUrl(DOCUMENT_URL + "/binary")
@@ -60,12 +65,13 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
                                 .build())
                         .build()).build();
 
-        expectedDocument = SscsInterlocDirectionDocument.builder()
+        expectedDocument = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
                 .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
                 .documentLink(sscsCaseData.getPreviewDocument())
-                .documentDateAdded(LocalDate.now().minusDays(1))
+                .documentDateAdded(LocalDate.now().minusDays(1).toString())
                 .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .build();
+                .build()).build();
 
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -86,18 +92,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenGenerateNoticeIsNo_thenReturnFalse() {
-        sscsCaseData.setGenerateNotice("No");
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenNoPreviewDocument_thenReturnFalse() {
-        sscsCaseData.setPreviewDocument(null);
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
     public void givenGenerateNoticeIsYes_thenReturnTrue() {
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
@@ -111,22 +105,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getGenerateNotice());
         assertNull(response.getData().getDateAdded());
 
-        assertEquals(expectedDocument, response.getData().getSscsInterlocDirectionDocument());
-        assertEquals(Collections.singletonList(SscsInterlocDirectionDocuments.builder().value(expectedDocument).build()), response.getData().getHistoricSscsInterlocDirectionDocs());
-    }
+        assertEquals(2, response.getData().getSscsDocument().size());
+        assertEquals("myTest.doc", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(1).getValue().getDocumentType());
 
-    @Test
-    public void whenNoPreviewAndDirectionDocumentExistsWillSetHistoricDocuments() {
-        sscsCaseData.setPreviewDocument(null);
-        sscsCaseData.setSscsInterlocDirectionDocument(expectedDocument);
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNull(response.getData().getPreviewDocument());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getGenerateNotice());
-        assertNull(response.getData().getDateAdded());
-
-        assertEquals(expectedDocument, response.getData().getSscsInterlocDirectionDocument());
-        assertEquals(Collections.singletonList(SscsInterlocDirectionDocuments.builder().value(expectedDocument).build()), response.getData().getHistoricSscsInterlocDirectionDocs());
     }
 }

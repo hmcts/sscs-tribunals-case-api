@@ -1,18 +1,18 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import java.time.LocalDate;
-import java.util.*;
-
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocuments;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -25,10 +25,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && callback.getEvent() == EventType.DIRECTION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && callback.getCaseDetails().getCaseData().isGenerateNotice()
-                && (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())
-                    || Objects.nonNull(callback.getCaseDetails().getCaseData().getSscsInterlocDirectionDocument()));
+                && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -36,28 +33,27 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (Objects.nonNull(caseData.getPreviewDocument())) {
-            SscsInterlocDirectionDocument document = SscsInterlocDirectionDocument.builder()
-                    .documentFileName(caseData.getPreviewDocument().getDocumentFilename())
-                    .documentLink(caseData.getPreviewDocument())
-                    .documentDateAdded(Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()))
-                    .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                    .build();
+        if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
+            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName(caseData.getPreviewDocument().getDocumentFilename())
+                .documentLink(caseData.getPreviewDocument())
+                .documentDateAdded(Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ISO_DATE))
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .build())
+                .build();
 
-            caseData.setSscsInterlocDirectionDocument(document);
+            List<SscsDocument> documents = new ArrayList<>();
+            if (caseData.getSscsDocument() != null) {
+                documents.addAll(caseData.getSscsDocument());
+            }
+            documents.add(document);
+            caseData.setSscsDocument(documents);
         }
-        saveToHistory(caseData);
         clearTransientFields(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
-    }
-
-    private void saveToHistory(SscsCaseData caseData) {
-        List<SscsInterlocDirectionDocuments> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDirectionDocs()).orElse(Collections.emptyList()));
-        historicDocs.add(SscsInterlocDirectionDocuments.builder().value(caseData.getSscsInterlocDirectionDocument()).build());
-        caseData.setHistoricSscsInterlocDirectionDocs(historicDocs);
     }
 }
