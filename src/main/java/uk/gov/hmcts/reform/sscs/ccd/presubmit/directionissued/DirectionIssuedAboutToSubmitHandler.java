@@ -33,6 +33,14 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        log.info("Direction Type is " + caseData.getDirectionType());
+
+        if (caseData.getDirectionType() == null) {
+            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
+            errorResponse.addError("Direction Type cannot be empty");
+            return errorResponse;
+        }
+
         if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
             SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(caseData.getPreviewDocument().getDocumentFilename())
@@ -49,6 +57,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             documents.add(document);
             caseData.setSscsDocument(documents);
         }
+
+        if (DirectionType.PROVIDE_INFORMATION.equals(caseData.getDirectionType())) {
+            caseData.setInterlocReviewState("awaitingInformation");
+            caseData.setDirectionType(null);
+        }
+
         clearTransientFields(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
