@@ -43,7 +43,7 @@ public class SendToAdminTest {
     }
 
     @Test
-    public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent() throws Exception {
+    public void givenAboutToSubmitCallbackForSendToAdmin_shouldSetInterlocReviewStateField() throws Exception {
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
