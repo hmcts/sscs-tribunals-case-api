@@ -50,11 +50,11 @@ public class InterlocServiceHandlerTest {
     @Parameters({
         "INTERLOC_SEND_TO_TCW", "TCW_DIRECTION_ISSUED", "INTERLOC_INFORMATION_RECEIVED", "JUDGE_DIRECTION_ISSUED",
         "TCW_REFER_TO_JUDGE", "NON_COMPLIANT", "NON_COMPLIANT_SEND_TO_INTERLOC", "REINSTATE_APPEAL",
-        "TCW_DECISION_APPEAL_TO_PROCEED", "JUDGE_DECISION_APPEAL_TO_PROCEED", "UPLOAD_FURTHER_EVIDENCE"
+        "TCW_DECISION_APPEAL_TO_PROCEED", "JUDGE_DECISION_APPEAL_TO_PROCEED", "UPLOAD_FURTHER_EVIDENCE",
+        "SEND_TO_ADMIN"
     })
     public void givenEvent_thenCanHandleReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
-
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
