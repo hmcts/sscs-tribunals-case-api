@@ -241,7 +241,7 @@ dependencies {
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.4.RELEASE'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.10'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.0'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
