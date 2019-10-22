@@ -9,10 +9,12 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.util.Matrix;
+import org.springframework.stereotype.Service;
 
 /**
  * Copied from https://github.com/keefmarshall/pdfpoc
  */
+@Service
 public class PdfWatermarker {
 
     private static final float SCALE_PERCENTAGE = .88f;
