@@ -59,7 +59,7 @@ public class SendToAdminTest {
 
     private String getJsonCallbackForTest() throws IOException {
         String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("sendToAdminCallback.json")).getFile();
+            .getResource("handlers/interloc/sendToAdminCallback.json")).getFile();
         return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
     }
 }
