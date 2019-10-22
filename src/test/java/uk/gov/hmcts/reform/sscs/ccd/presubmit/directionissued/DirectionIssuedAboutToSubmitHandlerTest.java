@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -20,18 +22,30 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
-    private DirectionIssuedAboutToSubmitHandler handler = new DirectionIssuedAboutToSubmitHandler();
+
+    private FooterService footerService;
+    private DirectionIssuedAboutToSubmitHandler handler;
+
+    @Mock
+    private EvidenceManagementService evidenceManagementService;
+
     @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private PdfWatermarker watermarker;
 
     private SscsCaseData sscsCaseData;
 
@@ -40,6 +54,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
+
+        footerService = new FooterService(evidenceManagementService, watermarker);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -98,7 +115,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void willCopyThePreviewFileToTheInterlocDirectionDocument() {
+    public void willCopyThePreviewFileToTheInterlocDirectionDocumentAndAddFooter() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getPreviewDocument());
         assertNull(response.getData().getSignedBy());
@@ -107,9 +124,10 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
 
         assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("myTest.doc", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(1).getValue().getDocumentType());
+        assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertNull(response.getData().getInterlocReviewState());
+        verify(evidenceManagementService).upload(any(), any());
     }
 
     @Test
