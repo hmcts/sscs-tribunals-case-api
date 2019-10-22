@@ -34,7 +34,6 @@ public class ImageConverterTest {
             assertEquals(1, document.getPages().getCount());
             assertEquals(PDRectangle.A4.getWidth(), document.getPage(0).getMediaBox().getWidth(), 0);
             assertEquals(PDRectangle.A4.getHeight(), document.getPage(0).getMediaBox().getHeight(), 0);
-            document.save("output.pdf");
         }
     }
 
