@@ -50,3 +50,4 @@ java:
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal"
     IDAM_API_URL: https://idam-api.{{ .Values.global.environment }}.platform.hmcts.net
+    ISSUE_FURTHER_EVIDENCE_ENABLED: "false"
