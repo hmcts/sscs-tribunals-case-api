@@ -102,6 +102,20 @@
               "document_filename" : "myfile2.jpg"
             }
           }
+        },
+        {
+          "value" : {
+            "documentType" : "decisionIssued",
+            "documentFileName" : "oldDecisionIssued.pdf",
+            "documentDateAdded" : "2018-10-12",
+            "evidenceIssued": "Yes",
+            "bundleAddition": "A",
+            "documentLink" : {
+              "document_url" : "http://www.itv3.com",
+              "document_binary_url" : "http://www.itv3.com/binary",
+              "document_filename" : "myfile3.jpg"
+            }
+          }
         }],
       "reissueFurtherEvidenceDocument": {},
       "resendToAppellant": "NO",
