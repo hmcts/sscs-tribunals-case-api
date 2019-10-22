@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -141,6 +142,7 @@ public class DecisionIssuedIt {
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals("Addition B - Decision notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")), result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
 
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {

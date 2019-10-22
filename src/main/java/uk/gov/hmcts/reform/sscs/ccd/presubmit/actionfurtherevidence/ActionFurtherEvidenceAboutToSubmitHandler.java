@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.Furth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -121,10 +120,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
 
         String scannedDate = null;
-        LocalDate localDate = null;
         if (scannedDocument.getValue().getScannedDate() != null) {
-            localDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate()).toLocalDate();
-            scannedDate = localDate.format(DateTimeFormatter.ISO_DATE);
+            scannedDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate()).toLocalDate().format(DateTimeFormatter.ISO_DATE);
         }
 
         DocumentLink url = scannedDocument.getValue().getUrl();

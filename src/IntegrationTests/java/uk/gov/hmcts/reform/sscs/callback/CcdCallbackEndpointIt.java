@@ -8,8 +8,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,6 +61,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -86,6 +86,9 @@ public class CcdCallbackEndpointIt {
 
     @Autowired
     private ObjectMapper mapper;
+
+    @Autowired
+    private FooterService footerService;
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
@@ -129,6 +132,9 @@ public class CcdCallbackEndpointIt {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
         when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
 
+        UploadResponse uploadResponse = createUploadResponse();
+        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
         assertHttpStatus(response, HttpStatus.OK);
@@ -145,7 +151,7 @@ public class CcdCallbackEndpointIt {
             assertEquals("appellantEvidence", documentList.get(0).getValue().getDocumentType());
             assertEquals("3", documentList.get(0).getValue().getControlNumber());
             assertEquals("scanned.pdf", documentList.get(0).getValue().getDocumentFileName());
-            assertEquals("http://localhost:4603/documents/f812db06-fd5a-476d-a603-bee44b2ecd49", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
+            assertEquals("some location", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
         }
     }
 
