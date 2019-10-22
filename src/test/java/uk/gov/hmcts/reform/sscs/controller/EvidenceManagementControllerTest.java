@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.exception.EvidenceDocumentsMissingException;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 
 
 public class EvidenceManagementControllerTest {
@@ -22,12 +23,15 @@ public class EvidenceManagementControllerTest {
     @Mock
     private EvidenceManagementService evidenceManagementService;
 
+    @Mock
+    private FileToPdfConversionService fileToPdfConversionService;
+
     private EvidenceManagementController controller;
 
     @Before
     public void setUp() {
         initMocks(this);
-        controller = new EvidenceManagementController(evidenceManagementService);
+        controller = new EvidenceManagementController(evidenceManagementService, fileToPdfConversionService);
     }
 
     @Test(expected = EvidenceDocumentsMissingException.class)
@@ -50,6 +54,7 @@ public class EvidenceManagementControllerTest {
         UploadResponse.Embedded uploadResponseEmbedded = mock(UploadResponse.Embedded.class);
 
         when(uploadResponse.getEmbedded()).thenReturn(uploadResponseEmbedded);
+        when(fileToPdfConversionService.convert(files)).thenReturn(files);
         when(evidenceManagementService.upload(files, DM_STORE_USER_ID)).thenReturn(uploadResponse);
 
         UploadResponse.Embedded actualUploadResponseEmbedded = controller.upload(files);

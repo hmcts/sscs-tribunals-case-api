@@ -21,3 +21,4 @@ spring:
         appeal-email-from: EMAIL_FROM
         ccd-def-fixed-list-users: CCD_DEF_FIXED_LIST_USERS
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        docmosis-api-key: PDF_SERVICE_ACCESS_KEY

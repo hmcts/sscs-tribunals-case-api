@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -45,7 +46,6 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
-import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
@@ -273,25 +273,6 @@ public class SyaEndpointsIt {
         String syaCaseJson = "json/sya.json";
         URL resource = getClass().getClassLoader().getResource(syaCaseJson);
         return mapper.readValue(resource, SyaCaseWrapper.class);
-    }
-
-    private UploadResponse createUploadResponse() {
-        UploadResponse response = mock(UploadResponse.class);
-        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
-        when(response.getEmbedded()).thenReturn(embedded);
-        Document document = createDocument();
-        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
-        return response;
-    }
-
-    private Document createDocument() {
-        Document document = new Document();
-        Document.Links links = new Document.Links();
-        Document.Link link = new Document.Link();
-        link.href = "some location";
-        links.self = link;
-        document.links = links;
-        return document;
     }
 
 }
