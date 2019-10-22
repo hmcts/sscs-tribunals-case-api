@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs;
 
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
+import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -52,6 +54,16 @@ public class TribunalsCaseApiApplication {
         properties.put("mail.smtp.ssl.trust","*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
+    }
+
+    @Bean
+    public OkHttpClient okHttpClient() {
+        int timeout = 10;
+        return new OkHttpClient.Builder()
+                .connectTimeout(timeout, TimeUnit.MINUTES)
+                .readTimeout(timeout, TimeUnit.MINUTES)
+                .retryOnConnectionFailure(true)
+                .build();
     }
 
     @Bean
