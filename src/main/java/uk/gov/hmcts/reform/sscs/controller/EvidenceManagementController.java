@@ -29,7 +29,7 @@ public class EvidenceManagementController {
     @PostMapping(
         value = "/evidence/upload",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-        produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
     public UploadResponse.Embedded upload(
         @RequestParam("file") List<MultipartFile> files

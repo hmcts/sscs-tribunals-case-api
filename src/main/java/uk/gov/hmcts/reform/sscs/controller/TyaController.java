@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -34,16 +35,13 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class),
         @ApiResponse(code = 404, message = "The surname could not be found")})
     @RequestMapping(value = "/appeals/{appealNumber}/surname/{surname}", method = GET,
-            produces = APPLICATION_JSON_UTF8_VALUE)
+            produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SurnameResponse> validateSurname(
             @PathVariable(value = "appealNumber") String appealNumber,
             @PathVariable(value = "surname") String surname) {
 
         Optional<SurnameResponse> surnameResponse = tribunalsService.validateSurname(appealNumber, surname);
-        if (surnameResponse.isPresent()) {
-            return ResponseEntity.ok(surnameResponse.get());
-        }
-        return ResponseEntity.notFound().build();
+        return surnameResponse.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 
     }
 
