@@ -125,16 +125,16 @@ public class SyaControllerTest {
 
     private Object[] generateInvalidScenarios() throws Exception {
         String emptyPayload = "{}";
-        String noBenefitCode = "{\n" +
-            "  \"benefitType\": {\n" +
-            "    \"description\": \"Personal Independence Payment\"\n" +
-            "  }\n" +
-            "}";
-        String emptyBenefitCode = "{\n" +
-            "  \"benefitType\": {\n" +
-            "    \"code\": \"\"\n" +
-            "  }\n" +
-            "}";
+        String noBenefitCode = "{\n"
+            + "  \"benefitType\": {\n"
+            + "    \"description\": \"Personal Independence Payment\"\n"
+            + "  }\n"
+            + "}";
+        String emptyBenefitCode = "{\n"
+            + "  \"benefitType\": {\n"
+            + "    \"code\": \"\"\n"
+            + "  }\n"
+            + "}";
         String validPayload = getSyaCaseWrapperJson("json/sya.json");
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
