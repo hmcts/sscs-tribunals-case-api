@@ -102,7 +102,8 @@ public class SyaController {
 
     private boolean isValid(SyaCaseWrapper syaCaseWrapper, String authorisation) {
         return syaCaseWrapper != null && syaCaseWrapper.getBenefitType() != null
-            && syaCaseWrapper.getBenefitType().getCode() != null && StringUtils.isNotBlank(authorisation);
+            && StringUtils.isNotBlank(syaCaseWrapper.getBenefitType().getCode())
+            && StringUtils.isNotBlank(authorisation);
     }
 
 }

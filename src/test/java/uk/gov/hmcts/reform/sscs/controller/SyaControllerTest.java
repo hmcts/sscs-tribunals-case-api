@@ -130,12 +130,19 @@ public class SyaControllerTest {
             "    \"description\": \"Personal Independence Payment\"\n" +
             "  }\n" +
             "}";
+        String emptyBenefitCode = "{\n" +
+            "  \"benefitType\": {\n" +
+            "    \"code\": \"\"\n" +
+            "  }\n" +
+            "}";
         String validPayload = getSyaCaseWrapperJson("json/sya.json");
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
+
         return new Object[]{
             new Object[]{emptyPayload, validUserToken},
             new Object[]{noBenefitCode, validUserToken},
+            new Object[]{emptyBenefitCode, validUserToken},
             new Object[]{validPayload, invalidUserToken},
         };
     }
