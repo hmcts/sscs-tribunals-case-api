@@ -17,14 +17,20 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit4.rules.SpringClassRule;
+import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
@@ -58,9 +64,18 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionTextReminders;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
-@RunWith(SpringRunner.class)
+@RunWith(JUnitParamsRunner.class)
 @WebMvcTest(SyaController.class)
 public class SyaControllerTest {
+
+    // being: it needed to run springRunner and junitParamsRunner
+    @ClassRule
+    public static final SpringClassRule SCR = new SpringClassRule();
+
+    @Rule
+    public final SpringMethodRule springMethodRule = new SpringMethodRule();
+    // end
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -72,7 +87,7 @@ public class SyaControllerTest {
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {
         when(submitAppealService.submitAppeal(any(SyaCaseWrapper.class), any(String.class))).thenReturn(1L);
 
-        String json = getSyaCaseWrapperJson();
+        String json = getSyaCaseWrapperJson("json/sya.json");
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -88,7 +103,7 @@ public class SyaControllerTest {
                 .saveCaseOperation(SaveCaseOperation.CREATE)
                 .build());
 
-        String json = getSyaCaseWrapperJson();
+        String json = getSyaCaseWrapperJson("json/sya.json");
 
         mockMvc.perform(put("/drafts")
             .header("Authorization", "Bearer myToken")
@@ -98,10 +113,38 @@ public class SyaControllerTest {
     }
 
     @Test
+    @Parameters(method = "generateInvalidScenarios")
+    public void givenParameterIsNotValid_whenPutDraftIsCalled_shouldReturn422Response(String payload, String token)
+        throws Exception {
+        mockMvc.perform(put("/drafts")
+            .header("Authorization", token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(payload))
+            .andExpect(status().isUnprocessableEntity());
+    }
+
+    private Object[] generateInvalidScenarios() throws Exception {
+        String emptyPayload = "{}";
+        String noBenefitCode = "{\n" +
+            "  \"benefitType\": {\n" +
+            "    \"description\": \"Personal Independence Payment\"\n" +
+            "  }\n" +
+            "}";
+        String validPayload = getSyaCaseWrapperJson("json/sya.json");
+        String validUserToken = "Bearer myToken";
+        String invalidUserToken = "";
+        return new Object[]{
+            new Object[]{emptyPayload, validUserToken},
+            new Object[]{noBenefitCode, validUserToken},
+            new Object[]{validPayload, invalidUserToken},
+        };
+    }
+
+    @Test
     public void shouldHandleErrorWhileSubmitAppeal() throws Exception {
         doThrow(new PdfGenerationException("malformed html template", new Exception()))
             .when(submitAppealService).submitAppeal(any(SyaCaseWrapper.class), any());
-        String json = getSyaCaseWrapperJson();
+        String json = getSyaCaseWrapperJson("json/sya.json");
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -367,9 +410,9 @@ public class SyaControllerTest {
             .andExpect(status().isNotFound());
     }
 
-    private String getSyaCaseWrapperJson() throws IOException, URISyntaxException {
-        URL resource = getClass().getClassLoader().getResource("json/sya.json");
-        return String.join("\n", Files.readAllLines(Paths.get(resource.toURI())));
+    private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
+        URL resource = getClass().getClassLoader().getResource(resourcePath);
+        return String.join("\n", Files.readAllLines(Paths.get(Objects.requireNonNull(resource).toURI())));
     }
 
 }

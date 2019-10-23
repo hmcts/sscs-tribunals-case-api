@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiResponses;
 import java.net.URI;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -82,8 +83,9 @@ public class SyaController {
     public ResponseEntity<Draft> createDraftAppeal(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestBody SyaCaseWrapper syaCaseWrapper) {
-        Preconditions.checkNotNull(syaCaseWrapper);
-        if (!isValid(syaCaseWrapper, authorisation)) return ResponseEntity.unprocessableEntity().build();
+        if (!isValid(syaCaseWrapper, authorisation)) {
+            return ResponseEntity.unprocessableEntity().build();
+        }
         SaveCaseResult submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
         Draft draft = Draft.builder()
             .id(submitDraftResult.getCaseDetailsId())
@@ -100,7 +102,7 @@ public class SyaController {
 
     private boolean isValid(SyaCaseWrapper syaCaseWrapper, String authorisation) {
         return syaCaseWrapper != null && syaCaseWrapper.getBenefitType() != null
-            && syaCaseWrapper.getBenefitType().getCode() != null && authorisation != null;
+            && syaCaseWrapper.getBenefitType().getCode() != null && StringUtils.isNotBlank(authorisation);
     }
 
 }
