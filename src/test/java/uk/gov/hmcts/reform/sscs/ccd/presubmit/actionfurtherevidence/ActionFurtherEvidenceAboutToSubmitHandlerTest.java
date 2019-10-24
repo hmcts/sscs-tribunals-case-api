@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -12,7 +9,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.Furth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -24,7 +24,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
@@ -40,7 +40,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
+    private FooterService footerService;
 
     private SscsCaseData sscsCaseData;
 
@@ -49,7 +49,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(evidenceManagementService);
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -152,13 +152,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     private void assertHappyPaths(String expectedDocumentType,
                                   PreSubmitCallbackResponse<SscsCaseData> response) {
-        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(0).getValue();
+        SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(1).getValue();
         assertEquals("bla.pdf", sscsDocumentDetail.getDocumentFileName());
         assertEquals(expectedDocumentType, sscsDocumentDetail.getDocumentType());
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-12", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
-        assertEquals("No", response.getData().getSscsDocument().get(0).getValue().getEvidenceIssued());
+        assertEquals("No", response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
         assertEquals("Yes", response.getData().getEvidenceHandled());
     }
@@ -247,8 +247,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("exist.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("bla2.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("bla.pdf", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
         assertNull(response.getData().getScannedDocuments());
     }
 
@@ -362,74 +363,4 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             assertEquals("No document file name so could not process", error);
         }
     }
-
-    @Test
-    @Parameters({"", "A", "B", "C", "D", "X", "Y"})
-    public void canWorkOutTheNextAppendixValue(String currentAppendix) {
-        List<SscsDocument> sscsDocuments = new ArrayList<>();
-        if (!currentAppendix.equals("")) {
-            SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
-            sscsDocuments.add(theDocument);
-
-            if (currentAppendix.toCharArray()[0] > 'A') {
-                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("A").build()).build();
-                sscsDocuments.add(document);
-            }
-            if (currentAppendix.toCharArray()[0] > 'B') {
-                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("B").build()).build();
-                sscsDocuments.add(document);
-            }
-            if (currentAppendix.toCharArray()[0] > 'C') {
-                SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("C").build()).build();
-                sscsDocuments.add(document);
-            }
-        }
-
-        String actual = actionFurtherEvidenceAboutToSubmitHandler.getNextBundleAddition(sscsDocuments);
-
-        String expected = currentAppendix.equals("") ? "A" : String.valueOf((char)(currentAppendix.charAt(0) +  1));
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    @Parameters({"Z", "Z1", "Z9", "Z85", "Z100"})
-    public void canWorkOutTheNextAppendixValueAfterZ(String currentAppendix) {
-        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
-        SscsDocument documentA = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("A").build()).build();
-        SscsDocument documentB = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("B").build()).build();
-        SscsDocument documentC = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Y").build()).build();
-        List<SscsDocument> sscsDocuments = new ArrayList<>(Arrays.asList(theDocument, documentA, documentB, documentC));
-
-        int index = currentAppendix.length() == 1 ? 0 : (Integer.valueOf(currentAppendix.substring(1)));
-
-        if (index > 0) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z").build()).build();
-            sscsDocuments.add(document);
-        }
-        if (index > 8) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z7").build()).build();
-            sscsDocuments.add(document);
-        }
-        if (index > 30) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z28").build()).build();
-            sscsDocuments.add(document);
-        }
-        if (index > 80) {
-            SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition("Z79").build()).build();
-            sscsDocuments.add(document);
-        }
-
-        String expected = index == 0 ? "Z1" : "Z" + (index + 1);
-        String actual = actionFurtherEvidenceAboutToSubmitHandler.getNextBundleAddition(sscsDocuments);
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    @Parameters({"Z!", "Z3$", "ZN"})
-    public void nextAppendixCanHandleInvalidDataThatAreNotNumbersAfterZ(String currentAppendix) {
-        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().bundleAddition(currentAppendix).build()).build();
-        String actual = actionFurtherEvidenceAboutToSubmitHandler.getNextBundleAddition(Collections.singletonList(theDocument));
-        assertEquals("[", actual);
-    }
-
 }
