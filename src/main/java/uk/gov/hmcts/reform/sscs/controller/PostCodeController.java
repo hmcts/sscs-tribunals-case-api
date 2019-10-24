@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -30,7 +30,7 @@ public class PostCodeController {
             notes = "Returns the regional centre given the appellants full post code or out code",
             response = String.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Regional Centre", response = String.class)})
-    @RequestMapping(value = "/regionalcentre/{postCode}", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/regionalcentre/{postCode}", method = GET, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> getRegionalCentre(@PathVariable(value = "postCode") String postCode) {
         String regionalCentre = airLookupService.lookupRegionalCentre(postCode);
 
