@@ -84,6 +84,8 @@ public class SyaController {
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestBody SyaCaseWrapper syaCaseWrapper) {
         if (!isValid(syaCaseWrapper, authorisation)) {
+            log.info("Cannot proceed because the {} data is missing",
+                getMissingDataInfo(syaCaseWrapper, authorisation));
             return ResponseEntity.unprocessableEntity().build();
         }
         SaveCaseResult submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
@@ -98,6 +100,17 @@ public class SyaController {
         } else {
             return status(HttpStatus.OK).location(location).build();
         }
+    }
+
+    private String getMissingDataInfo(SyaCaseWrapper syaCaseWrapper, String authorisation) {
+        if (StringUtils.isBlank(authorisation)) {
+            return "authorization token";
+        }
+        if (syaCaseWrapper == null || syaCaseWrapper.getBenefitType() == null
+            || StringUtils.isBlank(syaCaseWrapper.getBenefitType().getCode())) {
+            return "benefit code";
+        }
+        return null;
     }
 
     private boolean isValid(SyaCaseWrapper syaCaseWrapper, String authorisation) {
