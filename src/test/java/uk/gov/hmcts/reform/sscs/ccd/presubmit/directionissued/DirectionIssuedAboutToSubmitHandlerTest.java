@@ -127,6 +127,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionResponse());
+        assertEquals(State.VALID_APPEAL, response.getData().getState());
         verify(evidenceManagementService).upload(any(), any());
     }
 
@@ -146,6 +148,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("awaitingInformation", response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionResponse());
     }
 
 }

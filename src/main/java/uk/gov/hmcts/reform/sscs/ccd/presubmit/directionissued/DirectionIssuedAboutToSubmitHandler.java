@@ -61,6 +61,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (DirectionType.PROVIDE_INFORMATION.equals(caseData.getDirectionType())) {
             caseData.setInterlocReviewState("awaitingInformation");
             caseData.setDirectionType(null);
+        } else if (DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType())) {
+            caseData.setState(State.VALID_APPEAL);
+            caseData.setDirectionType(null);
         }
 
         createFooter(url, caseData);
