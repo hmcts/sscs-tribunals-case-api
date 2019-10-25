@@ -113,7 +113,7 @@ public class SubmitAppealServiceTest {
         regionalProcessingCenterService.init();
 
         offices = new ArrayList<>();
-        offices.add("1");
+        offices.add("DWP PIP (1)");
         offices.add("Balham DRT");
 
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
