@@ -71,6 +71,7 @@ public class TrackYourAppealJsonBuilder {
         caseNode.put("status", getAppealStatus(caseData.getEvents()));
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
+        caseNode.put("createdInGapsFrom", caseData.getCreatedInGapsFrom());
 
         if (caseData.getAppeal().getAppellant() != null) {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
