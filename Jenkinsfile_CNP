@@ -22,6 +22,8 @@ def secrets = [
         secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
         secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
+        secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
+        secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
     ]
 ]
 
