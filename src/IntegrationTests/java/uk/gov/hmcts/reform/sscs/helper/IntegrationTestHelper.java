@@ -1,14 +1,19 @@
 package uk.gov.hmcts.reform.sscs.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+import java.util.Collections;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 public class IntegrationTestHelper {
@@ -33,5 +38,24 @@ public class IntegrationTestHelper {
 
     public static void assertHttpStatus(HttpServletResponse response, HttpStatus status) {
         assertThat(response.getStatus()).isEqualTo(status.value());
+    }
+
+    public static UploadResponse createUploadResponse() {
+        UploadResponse response = mock(UploadResponse.class);
+        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
+        when(response.getEmbedded()).thenReturn(embedded);
+        Document document = createDocument();
+        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
+        return response;
+    }
+
+    private static Document createDocument() {
+        Document document = new Document();
+        Document.Links links = new Document.Links();
+        Document.Link link = new Document.Link();
+        link.href = "some location";
+        links.self = link;
+        document.links = links;
+        return document;
     }
 }

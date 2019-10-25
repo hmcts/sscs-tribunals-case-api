@@ -1,34 +1,43 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import java.time.LocalDate;
-import java.util.*;
-
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocuments;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Service
 @Slf4j
 public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final FooterService footerService;
+
+    @Autowired
+    public DirectionIssuedAboutToSubmitHandler(FooterService footerService) {
+        this.footerService = footerService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && callback.getEvent() == EventType.DIRECTION_ISSUED
                 && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData())
-                && callback.getCaseDetails().getCaseData().isGenerateNotice()
-                && (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())
-                    || Objects.nonNull(callback.getCaseDetails().getCaseData().getSscsInterlocDirectionDocument()));
+                && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -36,17 +45,17 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (Objects.nonNull(caseData.getPreviewDocument())) {
-            SscsInterlocDirectionDocument document = SscsInterlocDirectionDocument.builder()
-                    .documentFileName(caseData.getPreviewDocument().getDocumentFilename())
-                    .documentLink(caseData.getPreviewDocument())
-                    .documentDateAdded(Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()))
-                    .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                    .build();
-
-            caseData.setSscsInterlocDirectionDocument(document);
+        DocumentLink url = null;
+        if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
+            url = caseData.getPreviewDocument();
+        } else {
+            SscsDocument directionNotice = caseData.getLatestDocumentForDocumentType(DocumentType.DIRECTION_NOTICE);
+            if (directionNotice != null) {
+                url = directionNotice.getValue().getDocumentLink();
+            }
         }
-        saveToHistory(caseData);
+
+        createFooter(url, caseData);
         clearTransientFields(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
@@ -55,9 +64,27 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
-    private void saveToHistory(SscsCaseData caseData) {
-        List<SscsInterlocDirectionDocuments> historicDocs = new ArrayList<>(Optional.ofNullable(caseData.getHistoricSscsInterlocDirectionDocs()).orElse(Collections.emptyList()));
-        historicDocs.add(SscsInterlocDirectionDocuments.builder().value(caseData.getSscsInterlocDirectionDocument()).build());
-        caseData.setHistoricSscsInterlocDirectionDocs(historicDocs);
+    private void createFooter(DocumentLink url, SscsCaseData caseData) {
+        if (url != null) {
+            log.info("Direction issued adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
+
+            String bundleAddition = footerService.getNextBundleAddition(caseData.getSscsDocument());
+
+            String bundleFileName = footerService.buildBundleAdditionFileName(bundleAddition, "Direction notice issued on "
+                    + Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+
+            SscsDocument sscsDocument = footerService.createFooterDocument(url, "Direction notice", bundleAddition, bundleFileName,
+                    caseData.getDateAdded(), DocumentType.DIRECTION_NOTICE);
+
+            List<SscsDocument> documents = new ArrayList<>();
+            documents.add(sscsDocument);
+
+            if (caseData.getSscsDocument() != null) {
+                documents.addAll(caseData.getSscsDocument());
+            }
+            caseData.setSscsDocument(documents);
+        } else {
+            log.info("Could not find direction issued document for caseId {} so skipping generating footer", caseData.getCcdCaseId());
+        }
     }
 }

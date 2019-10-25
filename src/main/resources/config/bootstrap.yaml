@@ -19,3 +19,4 @@ spring:
         robotics-email-scottish-to: ROBOTICS_EMAIL_SCOTTISH_TO
         appeal-email-to: EMAIL_TO
         appeal-email-from: EMAIL_FROM
+        docmosis-api-key: PDF_SERVICE_ACCESS_KEY

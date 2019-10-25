@@ -2,9 +2,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -168,9 +166,9 @@ public class CcdCallbackControllerTest {
 
         mockMvc.perform(requestBuilder);
 
-        then(deserializer).shouldHaveZeroInteractions();
-        then(authorisationService).shouldHaveZeroInteractions();
-        then(ccdService).shouldHaveZeroInteractions();
+        verifyNoInteractions(deserializer);
+        verifyNoInteractions(authorisationService);
+        verifyNoInteractions(ccdService);
     }
 
     public Object[] getEdgeScenariosForTheRequest() {
