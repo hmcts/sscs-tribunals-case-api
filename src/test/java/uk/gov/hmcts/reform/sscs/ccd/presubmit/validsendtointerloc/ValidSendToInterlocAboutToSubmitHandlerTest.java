@@ -38,7 +38,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         initMocks(this);
         handler = new ValidSendToInterlocAboutToSubmitHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.VALID_SENT_TO_INTERLOC);
+        when(callback.getEvent()).thenReturn(EventType.VALID_SEND_TO_INTERLOC);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null))

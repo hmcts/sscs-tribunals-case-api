@@ -37,9 +37,9 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new ValidSendToInterlocAboutToStartHandler(true);
+        handler = new ValidSendToInterlocAboutToStartHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.VALID_SENT_TO_INTERLOC);
+        when(callback.getEvent()).thenReturn(EventType.VALID_SEND_TO_INTERLOC);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
@@ -58,13 +58,6 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     @Parameters({"ABOUT_TO_SUBMIT", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
-    }
-
-    @Test
-    public void givenFeatureFlagIsFalse_thenReturnFalse() {
-        handler = new ValidSendToInterlocAboutToStartHandler(false);
-
-        assertFalse(handler.canHandle(ABOUT_TO_START, callback));
     }
 
     @Test

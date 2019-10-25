@@ -22,7 +22,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.VALID_SENT_TO_INTERLOC;
+            && callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC;
     }
 
     @Override
