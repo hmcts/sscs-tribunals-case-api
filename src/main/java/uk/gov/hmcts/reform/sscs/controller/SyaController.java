@@ -86,7 +86,7 @@ public class SyaController {
         if (!isValid(syaCaseWrapper, authorisation)) {
             log.info("Cannot proceed because the {} data is missing",
                 getMissingDataInfo(syaCaseWrapper, authorisation));
-            return ResponseEntity.unprocessableEntity().build();
+            return ResponseEntity.noContent().build();
         }
         SaveCaseResult submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
         Draft draft = Draft.builder()
