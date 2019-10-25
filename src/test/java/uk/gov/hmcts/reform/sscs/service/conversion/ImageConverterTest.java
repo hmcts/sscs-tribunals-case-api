@@ -4,12 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 
+@RunWith(JUnitParamsRunner.class)
 public class ImageConverterTest {
     private final ImageConverter converter = new ImageConverter();
 
@@ -25,8 +28,9 @@ public class ImageConverterTest {
     }
 
     @Test
-    public void convertImageWithALargerHeightThanWidthToPortraitPdf() throws IOException {
-        File input = new File(ClassLoader.getSystemResource("flying-pig.jpg").getPath());
+    @Parameters({"flying-pig.jpg", "flying-pig.tiff"})
+    public void convertImageWithALargerHeightThanWidthToPortraitPdf(String filename) throws IOException {
+        File input = new File(ClassLoader.getSystemResource(filename).getPath());
         File output = converter.convert(input);
 
         assertEquals(".pdf", output.getName().substring(output.getName().lastIndexOf(".")));
