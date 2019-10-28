@@ -8,8 +8,11 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDate;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -18,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 
+@RunWith(JUnitParamsRunner.class)
 public class InterlocServiceHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -43,116 +47,31 @@ public class InterlocServiceHandlerTest {
     }
 
     @Test
-    public void givenAInterlocSendToTcwEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.INTERLOC_SEND_TO_TCW);
-
+    @Parameters({
+        "INTERLOC_SEND_TO_TCW", "TCW_DIRECTION_ISSUED", "INTERLOC_INFORMATION_RECEIVED", "JUDGE_DIRECTION_ISSUED",
+        "TCW_REFER_TO_JUDGE", "NON_COMPLIANT", "NON_COMPLIANT_SEND_TO_INTERLOC", "REINSTATE_APPEAL",
+        "TCW_DECISION_APPEAL_TO_PROCEED", "JUDGE_DECISION_APPEAL_TO_PROCEED", "UPLOAD_FURTHER_EVIDENCE",
+        "SEND_TO_ADMIN"
+    })
+    public void givenEvent_thenCanHandleReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
-    public void givenATcwDirectionIssuedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DIRECTION_ISSUED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAInterlocInformationReceivedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.INTERLOC_INFORMATION_RECEIVED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAJudgeDirectionIssued_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DIRECTION_ISSUED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenATcwReferToJudgeEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_REFER_TO_JUDGE);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenANonCompliantEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.NON_COMPLIANT);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenANonCompliantSendToInterlocEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.NON_COMPLIANT_SEND_TO_INTERLOC);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAReinstateAppealEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.REINSTATE_APPEAL);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenATcwDecisionAppealToProceedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_APPEAL_TO_PROCEED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAJudgeDecisionAppealToProceedEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenAnUploadFurtherEvidenceEvent_thenReturnTrue() {
-        when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
-
-        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void setsCorrectInterlocReviewStatus() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DIRECTION_ISSUED);
+    @Parameters({
+        "TCW_DIRECTION_ISSUED, awaitingInformation", "JUDGE_DECISION_APPEAL_TO_PROCEED, none",
+        "TCW_DECISION_APPEAL_TO_PROCEED, none", "UPLOAD_FURTHER_EVIDENCE, interlocutoryReview",
+        "SEND_TO_ADMIN, awaitingAdminAction"
+    })
+    public void givenEvent_thenSetInterlocReviewStateToExpected(EventType eventType,
+                                                                String expectedInterlocReviewState) {
+        when(callback.getEvent()).thenReturn(eventType);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertThat(response.getData().getInterlocReviewState(), is("awaitingInformation"));
-    }
+        assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
 
-    @Test
-    public void resetsInterlocReviewStatusJudgeDecisionAppealToProceed() {
-        when(callback.getEvent()).thenReturn(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is("none"));
-    }
-
-    @Test
-    public void resetsInterlocReviewStatusTcwDecisionAppealToProceed() {
-        when(callback.getEvent()).thenReturn(EventType.TCW_DECISION_APPEAL_TO_PROCEED);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is("none"));
-    }
-
-    @Test
-    public void setsCorrectInterlocReviewStatusForUploadFurtherEvidence() {
-        when(callback.getEvent()).thenReturn(EventType.UPLOAD_FURTHER_EVIDENCE);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReviewState(), is("interlocutoryReview"));
     }
 
     @Test(expected = IllegalStateException.class)
