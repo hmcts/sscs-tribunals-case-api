@@ -252,7 +252,7 @@ dependencies {
     compile group: 'pl.touk', name: 'throwing-function', version: '1.3'
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
     compile group: 'net.coobird', name: 'thumbnailator', version: '0.4.8'
-    compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.16'
+    compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.17'
     compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.16'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
 
