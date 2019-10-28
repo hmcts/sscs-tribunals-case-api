@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final Map<EventType, String> eventFieldMappings;
 
-    public EventToFieldPreSubmitCallbackHandler(Map<EventType, String> eventFieldMappings) {
+    EventToFieldPreSubmitCallbackHandler(Map<EventType, String> eventFieldMappings) {
         this.eventFieldMappings = eventFieldMappings;
     }
 
