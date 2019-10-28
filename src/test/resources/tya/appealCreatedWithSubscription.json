@@ -26,5 +26,22 @@
       "faxNumber":"0870 324 0109"
     }
   },
-  "subscriptions":{}
+  "subscriptions":{
+    "Appellant":{
+      "email":"appellant@example.com",
+      "mobile":"07999999999"
+    },
+    "Appointee":{
+      "email":"appointee@example.com",
+      "mobile":"07888888888"
+    },
+    "Representative":{
+      "email":"representative@example.com",
+      "mobile":"07777777777"
+    },
+    "Supporter":{
+      "email":"supporter@example.com",
+      "mobile":"07666666666"
+    }
+  }
 }

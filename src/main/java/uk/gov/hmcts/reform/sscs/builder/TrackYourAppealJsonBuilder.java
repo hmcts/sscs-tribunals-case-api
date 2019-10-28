@@ -56,8 +56,7 @@ public class TrackYourAppealJsonBuilder {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
         }
 
-        Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
-        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
@@ -76,6 +75,9 @@ public class TrackYourAppealJsonBuilder {
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
+
+        Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
+        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
         caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
@@ -86,7 +88,36 @@ public class TrackYourAppealJsonBuilder {
         processRpcDetails(regionalProcessingCenter, caseNode);
         root.set("appeal", caseNode);
 
+        root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
+
         return root;
+    }
+
+    private ObjectNode buildSubscriptions(Subscriptions subscriptions) {
+        ObjectNode subscriptionsNode = JsonNodeFactory.instance.objectNode();
+
+        if (subscriptions != null) {
+            addSubscription(subscriptionsNode, subscriptions.getAppellantSubscription(), "Appellant");
+            addSubscription(subscriptionsNode, subscriptions.getAppointeeSubscription(), "Appointee");
+            addSubscription(subscriptionsNode, subscriptions.getRepresentativeSubscription(), "Representative");
+            addSubscription(subscriptionsNode, subscriptions.getSupporterSubscription(), "Supporter");
+        }
+
+        return subscriptionsNode;
+    }
+
+    private void addSubscription(ObjectNode subscriptionsNode, Subscription subscription, String type) {
+        if (subscription != null && (subscription.isEmailSubscribed() || subscription.isSmsSubscribed())) {
+            ObjectNode subscriptionNode = JsonNodeFactory.instance.objectNode();
+
+            if (subscription.isEmailSubscribed()) {
+                subscriptionNode.put("email", subscription.getEmail());
+            }
+            if (subscription.isSmsSubscribed()) {
+                subscriptionNode.put("mobile", subscription.getMobile());
+            }
+            subscriptionsNode.set(type, subscriptionNode);
+        }
     }
 
     private String getHearingType(SscsCaseData caseData) {

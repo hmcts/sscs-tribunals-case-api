@@ -12,10 +12,7 @@ import java.time.ZoneId;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
@@ -211,6 +208,22 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(APPEAL_CREATED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void appealCreatedWithSubscriptionTest() throws CcdException {
+        SscsCaseData caseData = APPEAL_CREATED_WITH_SUBSCRIPTION_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L);
+        assertJsonEquals(APPEAL_CREATED_WITH_SUBSCRIPTION.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void appealCreatedWithOnlyAppellantEmailSubscriptionTest() throws CcdException {
+        SscsCaseData caseData = APPEAL_CREATED_WITH_APPELLANT_SUBSCRIPTION_CCD.getDeserializeMessage();
+
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L);
+        assertJsonEquals(APPEAL_CREATED_WITH_APPELLANT_SUBSCRIPTION.getSerializedMessage(), objectNode);
+    }
 
     @Test
     public void shouldHandleMissingHearings() throws CcdException {
@@ -291,6 +304,6 @@ public class TrackYourAppealJsonBuilderTest {
                 .faxNumber("0870 324 0109")
                 .build();
     }
-    
+
 }
 
