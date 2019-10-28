@@ -15,6 +15,7 @@ public enum SerializeJsonMessageManager {
 
     APPEAL_RECEIVED("tya/appealReceived.json"),
     APPEAL_RECEIVED_CCD("tya/appealReceivedCcd.json"),
+    APPEAL_CREATED_WITH_CREATEDINGAPSFROM_FIELD_CCD_RESPONSE("tya/appealCreatedWithCreatedInGapsFromFieldCcdResponse.json"),
     DWP_RESPOND("tya/dwpRespond.json"),
     DWP_RESPOND_CCD("tya/dwpRespondCcd.json"),
     DWP_RESPOND_PAPER_CASE_OLDER_THAN_8_WEEKS("tya/dwpRespondPaperCaseOlderThan8Weeks.json"),
