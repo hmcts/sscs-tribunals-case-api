@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class PdfWatermarker {
 
     private static final float SCALE_PERCENTAGE = .88f;
-    private static final int margin = 30;
+    private static final int margin = 45;
 
     public byte[] shrinkAndWatermarkPdf(byte[] input, String leftText, String rightText) throws Exception {
         try (PDDocument document = PDDocument.load(input)) {
