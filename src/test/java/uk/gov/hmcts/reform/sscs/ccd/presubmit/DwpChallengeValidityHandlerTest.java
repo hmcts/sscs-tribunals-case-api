@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -43,10 +44,18 @@ public class DwpChallengeValidityHandlerTest {
 
     @Test
     @Parameters({
-        "DWP_CHALLENGE_VALIDITY, true", "TCW_DIRECTION_ISSUED, false", "INTERLOC_INFORMATION_RECEIVED, false"
+        "DWP_CHALLENGE_VALIDITY, ABOUT_TO_SUBMIT, true",
+        "DWP_CHALLENGE_VALIDITY, ABOUT_TO_START, false",
+        "TCW_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, false",
+        "INTERLOC_INFORMATION_RECEIVED, ABOUT_TO_SUBMIT, false"
     })
-    public void givenEvent_thenCanHandle(EventType eventType, boolean expected) {
+    public void givenEvent_thenCanHandle(EventType eventType, CallbackType callbackType, boolean expected) {
         when(callback.getEvent()).thenReturn(eventType);
-        assertEquals(expected, handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertEquals(expected, handler.canHandle(callbackType, callback));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void givenNullCallback_shouldThrowException() {
+        handler.canHandle(ABOUT_TO_SUBMIT, null);
     }
 }
