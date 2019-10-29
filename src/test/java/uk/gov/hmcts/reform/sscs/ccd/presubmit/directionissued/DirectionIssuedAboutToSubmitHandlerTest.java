@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -24,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
-import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -33,8 +33,11 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
+    private static final String DOCUMENT_URL2 = "dm-store/documents/456";
 
+    @Mock
     private FooterService footerService;
+
     private DirectionIssuedAboutToSubmitHandler handler;
 
     @Mock
@@ -46,9 +49,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Mock
-    private PdfWatermarker watermarker;
-
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
@@ -57,10 +57,11 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     public void setUp() {
         initMocks(this);
 
-        footerService = new FooterService(evidenceManagementService, watermarker);
         handler = new DirectionIssuedAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(footerService.createFooterDocument(any(), any(), any(), any(), any(), any())).thenReturn(SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.DIRECTION_NOTICE.getValue()).bundleAddition("A").documentLink(DocumentLink.builder().documentUrl("footerUrl").build()).build()).build());
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
         List<SscsDocument> docs = new ArrayList<>();
@@ -127,7 +128,81 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        verify(evidenceManagementService).upload(any(), any());
+        verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+    }
+
+    @Test
+    public void givenManuallyUploadedDirectionDocument_thenOverwriteOriginalWithFooterDocument() {
+        sscsCaseData.setPreviewDocument(null);
+
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build())
+                .documentDateAdded(LocalDate.now().toString()).build()).build();
+
+        sscsDocuments.add(theDocument);
+        sscsCaseData.setSscsDocument(sscsDocuments);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getSscsDocument().size());
+        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    public void given2ManuallyUploadedDirectionDocumentsOneWithNoDate_thenIssueDocumentWithNoDate() {
+        sscsCaseData.setPreviewDocument(null);
+
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
+                .build();
+
+        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build())
+                .documentDateAdded(LocalDate.now().toString()).build()).build();
+
+        sscsDocuments.add(document1);
+        sscsDocuments.add(document2);
+        sscsCaseData.setSscsDocument(sscsDocuments);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterDocument(eq(document1.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+        assertEquals(2, response.getData().getSscsDocument().size());
+        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    public void given2ManuallyUploadedDirectionDocumentsWithNoDates_thenIssueLastDocumentWithNoDate() {
+        sscsCaseData.setPreviewDocument(null);
+
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
+                .build();
+
+        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build()).build())
+                .build();
+
+        sscsDocuments.add(document1);
+        sscsDocuments.add(document2);
+        sscsCaseData.setSscsDocument(sscsDocuments);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterDocument(eq(document2.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+        assertEquals(2, response.getData().getSscsDocument().size());
+        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
 
     @Test
