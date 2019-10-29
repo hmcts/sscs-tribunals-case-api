@@ -140,7 +140,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         syaCaseWrapper.setMrn(mrn);
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals("My dwp office", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertEquals("Universal Credit", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
     @Parameters({
