@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,19 +50,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         DocumentLink url = null;
-        SscsDocument directionNotice = null;
         if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
             url = caseData.getPreviewDocument();
         } else {
-            Stream<SscsDocument> doc = caseData.getSscsDocument().stream()
-                    .filter(c -> c.getValue().getDocumentType().equals(DocumentType.DIRECTION_NOTICE.getValue()))
-                    .filter(c -> c.getValue().getDocumentDateAdded() == null);
-
-            // Take latest direction issued without date otherwise choose latest with date
-            directionNotice = doc.reduce((first, second) -> second).orElse(caseData.getLatestDocumentForDocumentType(DocumentType.DIRECTION_NOTICE));
-
-            if (directionNotice != null) {
-                url = directionNotice.getValue().getDocumentLink();
+            if (caseData.getSscsInterlocDirectionDocument() != null) {
+                url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
+                caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
             }
         }
 
@@ -78,10 +70,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         createFooter(url, caseData);
         clearTransientFields(caseData);
         setDwpState(caseData);
-
-        if (directionNotice != null) {
-            caseData.getSscsDocument().remove(directionNotice);
-        }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
