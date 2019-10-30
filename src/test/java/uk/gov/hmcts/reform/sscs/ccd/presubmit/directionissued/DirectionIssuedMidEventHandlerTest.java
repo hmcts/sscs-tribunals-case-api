@@ -57,7 +57,6 @@ public class DirectionIssuedMidEventHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
-                .directionType(DirectionType.APPEAL_TO_PROCEED)
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
@@ -121,16 +120,6 @@ public class DirectionIssuedMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE);
-    }
-
-    @Test
-    public void givenDirectionTypeIsNull_displayAnError() {
-        callback.getCaseDetails().getCaseData().setDirectionType(null);
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getErrors().size());
-
-        assertEquals("Direction Type cannot be empty", response.getErrors().toArray()[0]);
     }
 
     private void verifyTemplateBody(String image) {
