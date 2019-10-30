@@ -46,6 +46,8 @@ public class DwpChallengeValidityHandlerTest {
     @Parameters({
         "DWP_CHALLENGE_VALIDITY, ABOUT_TO_SUBMIT, true",
         "DWP_CHALLENGE_VALIDITY, ABOUT_TO_START, false",
+        "DWP_CHALLENGE_VALIDITY, SUBMITTED, false",
+        "DWP_CHALLENGE_VALIDITY, MID_EVENT, false",
         "TCW_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, false",
         "INTERLOC_INFORMATION_RECEIVED, ABOUT_TO_SUBMIT, false"
     })
@@ -58,4 +60,7 @@ public class DwpChallengeValidityHandlerTest {
     public void givenNullCallback_shouldThrowException() {
         handler.canHandle(ABOUT_TO_SUBMIT, null);
     }
+
+    //todo: handle scenario
+
 }
