@@ -115,6 +115,7 @@ public class SubmitAppealServiceTest {
         offices = new ArrayList<>();
         offices.add("DWP PIP (1)");
         offices.add("Balham DRT");
+        offices.add("Watford DRT");
 
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
                 submitYourAppealEmailTemplate, ccdPdfService);
@@ -282,7 +283,7 @@ public class SubmitAppealServiceTest {
         appealData.setBenefitType(syaBenefitType);
 
         SyaMrn mrn = new SyaMrn();
-        mrn.setDwpIssuingOffice("Balham DRT");
+        mrn.setDwpIssuingOffice("Watford DRT");
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
