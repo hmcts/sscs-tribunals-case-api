@@ -73,7 +73,7 @@ public class SyaController {
         if (!draftAppeal.isPresent()) {
             log.info("Did not find any draft appeals for the requested user.");
         }
-        return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return draftAppeal.map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
     }
 
     @ApiOperation(value = "submitDraftAppeal", notes = "Creates a draft appeal", response = Draft.class)
@@ -86,7 +86,7 @@ public class SyaController {
         if (!isValid(syaCaseWrapper, authorisation)) {
             log.info("Cannot proceed because the {} data is missing",
                 getMissingDataInfo(syaCaseWrapper, authorisation));
-            return ResponseEntity.unprocessableEntity().build();
+            return ResponseEntity.noContent().build();
         }
         SaveCaseResult submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
         Draft draft = Draft.builder()
