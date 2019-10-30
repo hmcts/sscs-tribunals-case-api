@@ -252,11 +252,11 @@ dependencies {
     compile group: 'pl.touk', name: 'throwing-function', version: '1.3'
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
     compile group: 'net.coobird', name: 'thumbnailator', version: '0.4.8'
-    compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.16'
+    compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.17'
     compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.16'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.4'
+    compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.5'
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
 
     compile group: 'uk.gov.hmcts.reform', name: 'logging-spring', version: versions.reformLogging
@@ -268,7 +268,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.10'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.85-SSCS-6758-2-RC'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.87-SSCS-6758-RC'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
@@ -278,7 +278,7 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.0.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.10.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.8.0'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.10.0'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
