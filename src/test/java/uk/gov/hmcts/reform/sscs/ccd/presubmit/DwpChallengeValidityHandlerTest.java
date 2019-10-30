@@ -81,8 +81,17 @@ public class DwpChallengeValidityHandlerTest {
         assertEquals("reviewByJudge", actualResponse.getData().getInterlocReviewState());
     }
 
-    //handle throws exception
-//    "DWP_CHALLENGE_VALIDITY, INCOMPLETE_APPLICATION, ABOUT_TO_START, false",
+    @Test(expected = IllegalStateException.class)
+    @Parameters({
+        "DWP_CHALLENGE_VALIDITY, ABOUT_TO_START",
+        "DWP_RESPOND, ABOUT_TO_SUBMIT",
+    })
+    public void givenEvent_thenHandleThrowsException(EventType eventType, CallbackType callbackType) {
+        Callback<SscsCaseData> callback = createCallbackTestData(eventType, State.APPEAL_CREATED);
+
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(callbackType, callback,
+            "user token");
+    }
 
     @NotNull
     private Callback<SscsCaseData> createCallbackTestData(EventType eventType, State state) {
