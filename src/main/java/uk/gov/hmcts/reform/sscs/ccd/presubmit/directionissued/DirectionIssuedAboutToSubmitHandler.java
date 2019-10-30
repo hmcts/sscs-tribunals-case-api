@@ -14,10 +14,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -46,6 +44,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        if (caseData.getDirectionType() == null) {
+            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
+            errorResponse.addError("Direction Type cannot be empty");
+            return errorResponse;
+        }
+
         DocumentLink url = null;
         SscsDocument directionNotice = null;
         if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
@@ -63,8 +67,17 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
         }
 
+        if (DirectionType.PROVIDE_INFORMATION.equals(caseData.getDirectionType())) {
+            caseData.setInterlocReviewState("awaitingInformation");
+            caseData.setDirectionType(null);
+        } else if (DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType())) {
+            caseData.setState(State.VALID_APPEAL);
+            caseData.setDirectionType(null);
+        }
+
         createFooter(url, caseData);
         clearTransientFields(caseData);
+        setDwpState(caseData);
 
         if (directionNotice != null) {
             caseData.getSscsDocument().remove(directionNotice);
@@ -74,6 +87,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
+    }
+
+    private void setDwpState(SscsCaseData caseData) {
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getValue());
     }
 
     private void createFooter(DocumentLink url, SscsCaseData caseData) {
