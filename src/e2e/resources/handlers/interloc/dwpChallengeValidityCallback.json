@@ -234,7 +234,7 @@
         "faxNumber": "0126 434 7983",
         "phoneNumber": "0300 123 1142"
       },
-      "interlocReviewState": "reviewByJudge",
+      "interlocReviewState": "someValue",
       "region": "BIRMINGHAM",
       "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
