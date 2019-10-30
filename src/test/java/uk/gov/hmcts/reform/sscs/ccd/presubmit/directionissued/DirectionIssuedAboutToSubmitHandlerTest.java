@@ -41,9 +41,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private DirectionIssuedAboutToSubmitHandler handler;
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
-
-    @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
@@ -70,6 +67,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
                 .signedBy("User")
+                .directionType(DirectionType.APPEAL_TO_PROCEED)
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
                 .sscsDocument(docs)
@@ -129,6 +127,10 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionResponse());
+        assertEquals(State.VALID_APPEAL, response.getData().getState());
+        verify(footerService).createFooterDocument(any(), eq("Direction notice"), any(), any(), any(), any());
     }
 
     @Test
@@ -205,9 +207,28 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
 
-    @Test
     public void willSetTheWithDwpStateToDirectionActionRequired() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getValue()));
     }
+
+    @Test
+    public void givenDirectionTypeIsNull_displayAnError() {
+        callback.getCaseDetails().getCaseData().setDirectionType(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("Direction Type cannot be empty", response.getErrors().toArray()[0]);
+    }
+
+    @Test
+    public void givenDirectionTypeOfProvideInformation_setInterlocStateToAwaitingInformation() {
+        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.PROVIDE_INFORMATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("awaitingInformation", response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionResponse());
+    }
+
 }
