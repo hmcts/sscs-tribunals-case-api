@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -76,6 +77,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         createFooter(url, caseData);
         clearTransientFields(caseData);
+        setDwpState(caseData);
 
         if (directionNotice != null) {
             caseData.getSscsDocument().remove(directionNotice);
@@ -85,6 +87,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
+    }
+
+    private void setDwpState(SscsCaseData caseData) {
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getValue());
     }
 
     private void createFooter(DocumentLink url, SscsCaseData caseData) {
