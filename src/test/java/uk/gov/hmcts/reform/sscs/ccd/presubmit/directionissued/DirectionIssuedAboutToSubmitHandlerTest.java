@@ -39,9 +39,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private DirectionIssuedAboutToSubmitHandler handler;
 
     @Mock
-    private EvidenceManagementService evidenceManagementService;
-
-    @Mock
     private Callback<SscsCaseData> callback;
 
     @Mock
@@ -131,7 +128,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionResponse());
         assertEquals(State.VALID_APPEAL, response.getData().getState());
-        verify(evidenceManagementService).upload(any(), any());
+        verify(footerService).createFooterDocument(any(), eq("Direction notice"), any(), any(), any(), any());
     }
 
     @Test
