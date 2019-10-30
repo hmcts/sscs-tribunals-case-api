@@ -145,6 +145,7 @@ public class DirectionIssuedIt {
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals(DwpState.DIRECTION_ACTION_REQUIRED.getValue(), result.getData().getDwpState());
+        assertEquals("awaitingInformation", result.getData().getInterlocReviewState());
     }
 
     private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
