@@ -9,11 +9,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class DwpChallengeValidityHandler extends EventToFieldPreSubmitCallbackHandler {
 
     DwpChallengeValidityHandler() {
-        super(Collections.singletonMap(EventType.DWP_CHALLENGE_VALIDITY, "password1"));
+        super(Collections.singletonMap(EventType.DWP_CHALLENGE_VALIDITY, "reviewByJudge"));
     }
 
     @Override
     protected SscsCaseData setField(SscsCaseData sscsCaseData, String newValue, EventType eventType) {
-        return sscsCaseData.toBuilder().interlocReviewState("reviewByJudge").build();
+        return sscsCaseData.toBuilder().interlocReviewState(newValue).build();
     }
 }
