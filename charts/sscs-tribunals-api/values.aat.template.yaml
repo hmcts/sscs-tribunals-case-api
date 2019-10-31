@@ -1,3 +1,5 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  environment:
+    READY_TO_LIST_OFFICES: DWP PIP (3)
