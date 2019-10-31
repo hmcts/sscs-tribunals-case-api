@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.WITHDRAW_FOR_ACTION;
+
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -22,7 +24,7 @@ public class AdminAppealWithdrawnHandler implements PreSubmitCallbackHandler<Ssc
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState(DwpState.WITHDRAW_FOR_ACTION.getValue());
+        caseData.setDwpState(WITHDRAW_FOR_ACTION.getValue());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }
