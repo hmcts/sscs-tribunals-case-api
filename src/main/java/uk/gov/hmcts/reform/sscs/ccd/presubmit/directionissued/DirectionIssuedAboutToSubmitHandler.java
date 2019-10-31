@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -50,19 +50,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         DocumentLink url = null;
-        SscsDocument directionNotice = null;
         if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
             url = caseData.getPreviewDocument();
         } else {
-            Stream<SscsDocument> doc = caseData.getSscsDocument().stream()
-                    .filter(c -> c.getValue().getDocumentType().equals(DocumentType.DIRECTION_NOTICE.getValue()))
-                    .filter(c -> c.getValue().getDocumentDateAdded() == null);
-
-            // Take latest direction issued without date otherwise choose latest with date
-            directionNotice = doc.reduce((first, second) -> second).orElse(caseData.getLatestDocumentForDocumentType(DocumentType.DIRECTION_NOTICE));
-
-            if (directionNotice != null) {
-                url = directionNotice.getValue().getDocumentLink();
+            if (caseData.getSscsInterlocDirectionDocument() != null) {
+                url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
+                caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
             }
         }
 
@@ -76,15 +69,16 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         createFooter(url, caseData);
         clearTransientFields(caseData);
-
-        if (directionNotice != null) {
-            caseData.getSscsDocument().remove(directionNotice);
-        }
+        setDwpState(caseData);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
+    }
+
+    private void setDwpState(SscsCaseData caseData) {
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getValue());
     }
 
     private void createFooter(DocumentLink url, SscsCaseData caseData) {

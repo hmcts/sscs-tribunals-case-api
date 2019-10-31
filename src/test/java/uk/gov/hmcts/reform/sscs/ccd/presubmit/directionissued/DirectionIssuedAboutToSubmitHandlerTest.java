@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 
@@ -133,15 +135,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenManuallyUploadedDirectionDocument_thenOverwriteOriginalWithFooterDocument() {
         sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.setSscsDocument(null);
 
-        List<SscsDocument> sscsDocuments = new ArrayList<>();
-        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
                 .documentType(DocumentType.DIRECTION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build())
-                .documentDateAdded(LocalDate.now().toString()).build()).build();
+                .documentDateAdded(LocalDate.now()).build();
 
-        sscsDocuments.add(theDocument);
-        sscsCaseData.setSscsDocument(sscsDocuments);
+        sscsCaseData.setSscsInterlocDirectionDocument(theDocument);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -151,7 +152,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void given2ManuallyUploadedDirectionDocumentsOneWithNoDate_thenIssueDocumentWithNoDate() {
+    public void givenDirectionNoticeAlreadyExistsAndThenManuallyUploadANewNotice_thenIssueTheNewDocumentWithFooter() {
         sscsCaseData.setPreviewDocument(null);
 
         List<SscsDocument> sscsDocuments = new ArrayList<>();
@@ -160,48 +161,27 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
                 .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
                 .build();
 
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
                 .documentType(DocumentType.DIRECTION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build())
-                .documentDateAdded(LocalDate.now().toString()).build()).build();
+                .documentDateAdded(LocalDate.now()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(theDocument);
 
         sscsDocuments.add(document1);
-        sscsDocuments.add(document2);
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterDocument(eq(document1.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+        verify(footerService).createFooterDocument(eq(theDocument.getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
 
-    @Test
-    public void given2ManuallyUploadedDirectionDocumentsWithNoDates_thenIssueLastDocumentWithNoDate() {
-        sscsCaseData.setPreviewDocument(null);
-
-        List<SscsDocument> sscsDocuments = new ArrayList<>();
-        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
-                .build();
-
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build()).build())
-                .build();
-
-        sscsDocuments.add(document1);
-        sscsDocuments.add(document2);
-        sscsCaseData.setSscsDocument(sscsDocuments);
-
+    public void willSetTheWithDwpStateToDirectionActionRequired() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(footerService).createFooterDocument(eq(document2.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getValue()));
     }
 
     @Test

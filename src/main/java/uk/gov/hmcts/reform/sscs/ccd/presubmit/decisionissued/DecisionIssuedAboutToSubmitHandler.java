@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,28 +48,17 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         DocumentLink url = null;
-        SscsDocument decisionNotice = null;
         if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
             url = caseData.getPreviewDocument();
         } else {
-            Stream<SscsDocument> doc = caseData.getSscsDocument().stream()
-                    .filter(c -> c.getValue().getDocumentType().equals(DocumentType.DECISION_NOTICE.getValue()))
-                    .filter(c -> c.getValue().getDocumentDateAdded() == null);
-
-            // Take latest decision issued without date otherwise choose latest with date
-            decisionNotice = doc.reduce((first, second) -> second).orElse(caseData.getLatestDocumentForDocumentType(DocumentType.DECISION_NOTICE));
-
-            if (decisionNotice != null) {
-                url = decisionNotice.getValue().getDocumentLink();
+            if (caseData.getSscsInterlocDecisionDocument() != null) {
+                url = caseData.getSscsInterlocDecisionDocument().getDocumentLink();
+                caseData.setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
             }
         }
 
         createFooter(url, caseData);
         clearTransientFields(caseData);
-
-        if (decisionNotice != null) {
-            caseData.getSscsDocument().remove(decisionNotice);
-        }
 
         if (caseData.getDecisionType() != null && caseData.getDecisionType().equals(STRIKE_OUT.getValue())) {
             caseData.setOutcome("nonCompliantAppealStruckout");
