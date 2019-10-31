@@ -34,10 +34,10 @@ public class TyaController {
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class),
         @ApiResponse(code = 404, message = "The surname could not be found")})
     @RequestMapping(value = "/appeals/{appealNumber}/surname/{surname}", method = GET,
-            produces = APPLICATION_JSON_VALUE)
+        produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SurnameResponse> validateSurname(
-            @PathVariable(value = "appealNumber") String appealNumber,
-            @PathVariable(value = "surname") String surname) {
+        @PathVariable(value = "appealNumber") String appealNumber,
+        @PathVariable(value = "surname") String surname) {
 
         Optional<SurnameResponse> surnameResponse = tribunalsService.validateSurname(appealNumber, surname);
         return surnameResponse.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
@@ -49,18 +49,16 @@ public class TyaController {
         response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
     @RequestMapping(value = "/appeals/{appealNumber}", method = GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAppeal(
-            @PathVariable(value = "appealNumber") String appealNumber) {
+    public ResponseEntity<String> getAppeal(@PathVariable(value = "appealNumber") String appealNumber) {
         return ok(tribunalsService.findAppeal(appealNumber).toString());
     }
 
     @ApiOperation(value = "getAppeal",
-            notes = "Returns an appeal given the CCD case id",
-            response = String.class, responseContainer = "Appeal details")
+        notes = "Returns an appeal given the CCD case id",
+        response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
     @RequestMapping(value = "/appeals", method = GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAppealByCaseId(
-            @RequestParam(value = "caseId") Long caseId) {
+    public ResponseEntity<String> getAppealByCaseId(@RequestParam(value = "caseId") Long caseId) {
         return ok(tribunalsService.findAppeal(caseId).toString());
     }
 }

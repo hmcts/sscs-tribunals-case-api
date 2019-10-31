@@ -131,15 +131,14 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenManuallyUploadedDecisionDocument_thenOverwriteOriginalWithFooterDocument() {
         sscsCaseData.setPreviewDocument(null);
+        sscsCaseData.setSscsDocument(null);
 
-        List<SscsDocument> sscsDocuments = new ArrayList<>();
-        SscsDocument theDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
                 .documentType(DocumentType.DECISION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build())
-                .documentDateAdded(LocalDate.now().toString()).build()).build();
+                .documentDateAdded(LocalDate.now()).build();
 
-        sscsDocuments.add(theDocument);
-        sscsCaseData.setSscsDocument(sscsDocuments);
+        sscsCaseData.setSscsInterlocDecisionDocument(theDocument);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -158,45 +157,19 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
                 .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
                 .build();
 
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
                 .documentType(DocumentType.DECISION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build())
-                .documentDateAdded(LocalDate.now().toString()).build()).build();
+                .documentDateAdded(LocalDate.now()).build();
+
+        sscsCaseData.setSscsInterlocDecisionDocument(theDocument);
 
         sscsDocuments.add(document1);
-        sscsDocuments.add(document2);
         sscsCaseData.setSscsDocument(sscsDocuments);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterDocument(eq(document1.getValue().getDocumentLink()), eq("Decision notice"), eq("A"), any(), any(), eq(DocumentType.DECISION_NOTICE));
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-    }
-
-    @Test
-    public void given2ManuallyUploadedDecisionDocumentsWithNoDates_thenIssueLastDocumentWithNoDate() {
-        sscsCaseData.setPreviewDocument(null);
-
-        List<SscsDocument> sscsDocuments = new ArrayList<>();
-        SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentType(DocumentType.DECISION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
-                .build();
-
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentType(DocumentType.DECISION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build()).build())
-                .build();
-
-        sscsDocuments.add(document1);
-        sscsDocuments.add(document2);
-        sscsCaseData.setSscsDocument(sscsDocuments);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(footerService).createFooterDocument(eq(document2.getValue().getDocumentLink()), eq("Decision notice"), eq("A"), any(), any(), eq(DocumentType.DECISION_NOTICE));
+        verify(footerService).createFooterDocument(eq(theDocument.getDocumentLink()), eq("Decision notice"), eq("A"), any(), any(), eq(DocumentType.DECISION_NOTICE));
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());

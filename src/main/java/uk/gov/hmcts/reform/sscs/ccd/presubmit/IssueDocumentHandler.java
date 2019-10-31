@@ -30,6 +30,8 @@ public class IssueDocumentHandler {
         caseData.setSignedRole(null);
         caseData.setGenerateNotice(null);
         caseData.setDateAdded(null);
+        caseData.setSscsInterlocDirectionDocument(null);
+        caseData.setSscsInterlocDecisionDocument(null);
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {

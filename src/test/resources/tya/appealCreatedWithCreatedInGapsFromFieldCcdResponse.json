@@ -1,0 +1,27 @@
+{
+  "caseId" : "1",
+  "caseReference": "SC123/45/00001",
+  "caseCreated" : "2028-06-08",
+  "createdInGapsFrom": "readyToList",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "Mock",
+        "firstName": "Jason"
+      }
+    },
+    "benefitType": {
+      "code": "PIP",
+      "description": "benefit Type"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}
