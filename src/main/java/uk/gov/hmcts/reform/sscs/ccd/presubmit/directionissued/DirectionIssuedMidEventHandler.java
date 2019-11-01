@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
@@ -40,7 +42,8 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         log.info("Direction Type is " + callback.getCaseDetails().getCaseData().getDirectionType());
-        if (callback.getCaseDetails().getCaseData().getDirectionType() == null) {
+        DynamicList selectedDirectionType = callback.getCaseDetails().getCaseData().getSelectDirectionType();
+        if (selectedDirectionType == null || selectedDirectionType.getValue() == null || StringUtils.isBlank(selectedDirectionType.getValue().getCode())) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;

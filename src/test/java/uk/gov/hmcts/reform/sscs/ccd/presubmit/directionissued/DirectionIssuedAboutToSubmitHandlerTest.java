@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToSubmitHandlerTest {
@@ -63,10 +63,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(document);
 
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getId(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getId(), PROVIDE_INFORMATION.getLabel()));
+
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
                 .signedBy("User")
-                .directionType(DirectionType.APPEAL_TO_PROCEED)
+                .selectDirectionType(new DynamicList(listOptions.get(0), listOptions))
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
                 .sscsDocument(docs)
@@ -186,7 +190,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDirectionTypeIsNull_displayAnError() {
-        callback.getCaseDetails().getCaseData().setDirectionType(null);
+        callback.getCaseDetails().getCaseData().setSelectDirectionType(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
@@ -196,11 +200,33 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDirectionTypeOfProvideInformation_setInterlocStateToAwaitingInformation() {
-        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.PROVIDE_INFORMATION);
+        final DynamicList selectDirectionType = callback.getCaseDetails().getCaseData().getSelectDirectionType();
+        selectDirectionType.getValue().setCode(PROVIDE_INFORMATION.getId());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("awaitingInformation", response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionResponse());
+        assertNull(response.getData().getSelectDirectionType());
+    }
+
+    @Test
+    public void givenDirectionTypeOfGrantExtension_setInterlocStateToAwaitingInformation() {
+        final DynamicList selectDirectionType = callback.getCaseDetails().getCaseData().getSelectDirectionType();
+        selectDirectionType.getValue().setCode(GRANT_EXTENSION.getId());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("extensionGranted", response.getData().getDwpState());
+        assertNull(response.getData().getSelectDirectionType());
+    }
+
+    @Test
+    public void givenDirectionTypeOfDenyExtension_setInterlocStateToAwaitingInformation() {
+        final DynamicList selectDirectionType = callback.getCaseDetails().getCaseData().getSelectDirectionType();
+        selectDirectionType.getValue().setCode(DENY_EXTENSION.getId());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("extensionDenied", response.getData().getDwpState());
+        assertEquals(State.READY_TO_LIST, response.getData().getState());
+        assertNull(response.getData().getSelectDirectionType());
     }
 
 }

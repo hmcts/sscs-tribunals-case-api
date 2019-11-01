@@ -7,9 +7,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -54,10 +57,13 @@ public class DirectionIssuedMidEventHandlerTest {
         handler = new DirectionIssuedMidEventHandler(generateFile, TEMPLATE_ID);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getId(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getId(), PROVIDE_INFORMATION.getLabel()));
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
-                .directionType(DirectionType.APPEAL_TO_PROCEED)
+                .selectDirectionType(new DynamicList(listOptions.get(0), listOptions))
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
@@ -124,8 +130,8 @@ public class DirectionIssuedMidEventHandlerTest {
     }
 
     @Test
-    public void givenDirectionTypeIsNull_displayAnError() {
-        callback.getCaseDetails().getCaseData().setDirectionType(null);
+    public void givenSelectedDirectionTypeIsNull_displayAnError() {
+        callback.getCaseDetails().getCaseData().setSelectDirectionType(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());

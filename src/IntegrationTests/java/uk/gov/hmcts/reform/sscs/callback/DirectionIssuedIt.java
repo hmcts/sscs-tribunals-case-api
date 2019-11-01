@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.APPEAL_TO_PROCEED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType.PROVIDE_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -16,7 +18,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -40,6 +44,8 @@ import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
@@ -96,6 +102,22 @@ public class DirectionIssuedIt {
         mapper.registerModule(new JavaTimeModule());
         json = getJson("callback/directionIssuedForPreview.json");
 
+    }
+
+    @Test
+    public void callToAboutToStartEventHandler_willPreviewTheDocument() throws Exception {
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        List<DynamicListItem> listItems = new ArrayList<>();
+        listItems.add(new DynamicListItem(APPEAL_TO_PROCEED.getId(), APPEAL_TO_PROCEED.getLabel()));
+        listItems.add(new DynamicListItem(PROVIDE_INFORMATION.getId(), PROVIDE_INFORMATION.getLabel()));
+        DynamicList expectedDirectionType = new DynamicList(listItems.get(0), listItems);
+        assertEquals(expectedDirectionType, result.getData().getSelectDirectionType());
     }
 
     @Test

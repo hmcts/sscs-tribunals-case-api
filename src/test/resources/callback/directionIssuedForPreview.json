@@ -24,7 +24,18 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "directionType": "provideInformation",
+      "selectDirectionType": {
+        "value": {
+          "code" : "provideInformation",
+          "label" : "Provide Information"
+        },
+        "list_items": [
+          {
+            "code": "provideInformation",
+            "label": "Provide Information"
+          }
+          ]
+      },
       "generateNotice" : "Yes",
       "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
       "signedBy": "Maple Magoo",

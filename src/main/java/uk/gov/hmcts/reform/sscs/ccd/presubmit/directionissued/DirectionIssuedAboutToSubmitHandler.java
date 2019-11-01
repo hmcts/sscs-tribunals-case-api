@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -43,7 +44,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (caseData.getDirectionType() == null) {
+        if (caseData.getSelectDirectionType() == null || caseData.getSelectDirectionType().getValue() == null || StringUtils.isBlank(caseData.getSelectDirectionType().getValue().getCode())) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;
@@ -59,17 +60,27 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
         }
 
-        if (DirectionType.PROVIDE_INFORMATION.equals(caseData.getDirectionType())) {
+        String selectedDirectionType = caseData.getSelectDirectionType().getValue().getCode();
+        if (DirectionType.PROVIDE_INFORMATION.getId().equals(selectedDirectionType)) {
             caseData.setInterlocReviewState("awaitingInformation");
-            caseData.setDirectionType(null);
-        } else if (DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType())) {
+            setDwpState(caseData);
+        } else if (DirectionType.APPEAL_TO_PROCEED.getId().equals(selectedDirectionType)) {
             caseData.setState(State.VALID_APPEAL);
-            caseData.setDirectionType(null);
+            setDwpState(caseData);
+        } else if (DirectionType.GRANT_EXTENSION.getId().equals(selectedDirectionType)) {
+            caseData.setDwpState("extensionGranted");
+        } else if (DirectionType.DENY_EXTENSION.getId().equals(selectedDirectionType)) {
+            caseData.setDwpState("extensionDenied");
+            caseData.setState(State.READY_TO_LIST);
+        } else {
+            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
+            errorResponse.addError("Invalid selected direction Type " + selectedDirectionType);
+            return errorResponse;
         }
 
         createFooter(url, caseData);
         clearTransientFields(caseData);
-        setDwpState(caseData);
+        caseData.setSelectDirectionType(null);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
