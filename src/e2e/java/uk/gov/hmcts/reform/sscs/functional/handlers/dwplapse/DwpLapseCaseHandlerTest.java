@@ -60,7 +60,7 @@ public class DwpLapseCaseHandlerTest {
                 .and()
                 .extract().body().jsonPath().get("data.interlocReviewState");
 
-        assertEquals("hearingPostponed", response);
+        assertEquals("awaitingAdminAction", response);
     }
 
     private String getJsonCallbackForTest() throws IOException {
