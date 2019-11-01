@@ -58,9 +58,8 @@ public class DwpLapseCaseHandlerTest {
     }
 
     @Test
-    @Parameters({"DWP_LAPSE_CASE"})
-    public void givenAHandleDwpLapseEvent_thenReturnTrue(EventType eventType) {
-        when(callback.getEvent()).thenReturn(eventType);
+    public void givenAHandleDwpLapseEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.DWP_LAPSE_CASE);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
