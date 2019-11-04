@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,16 +29,28 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-        "APPEAL_RECEIVED, ABOUT_TO_SUBMIT, false",
-        "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_SUBMIT, true"
+        "APPEAL_RECEIVED, ABOUT_TO_SUBMIT, false, true",
+        "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_SUBMIT, true, true",
+        "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_START, false, false",
+        "DWP_REQUEST_TIME_EXTENSION, null, false, false",
+        "null, ABOUT_TO_SUBMIT, false, true",
     })
-    public void canHandle(EventType eventType, CallbackType callbackType, boolean expected) {
-        when(callback.getEvent()).thenReturn(eventType);
+    public void canHandle(@Nullable EventType eventType, @Nullable CallbackType callbackType, boolean expected,
+                          boolean mockNeeded) {
+        if (mockNeeded) {
+            when(callback.getEvent()).thenReturn(eventType);
+        }
 
         DwpRequestTimeExtensionAboutToSubmitHandler handler = new DwpRequestTimeExtensionAboutToSubmitHandler();
 
         boolean actualResult = handler.canHandle(callbackType, callback);
         assertEquals(expected, actualResult);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void givenNullCallback_canHandleThrowException() {
+        DwpRequestTimeExtensionAboutToSubmitHandler handler = new DwpRequestTimeExtensionAboutToSubmitHandler();
+        handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, null);
     }
 
     @Test
