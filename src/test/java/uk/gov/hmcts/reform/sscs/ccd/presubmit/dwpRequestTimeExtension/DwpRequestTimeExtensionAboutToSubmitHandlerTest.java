@@ -1,32 +1,48 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpRequestTimeExtension;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
-    @Mock
+    @Spy
     private Callback<SscsCaseData> callback;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
     private final DwpRequestTimeExtensionAboutToSubmitHandler handler = new DwpRequestTimeExtensionAboutToSubmitHandler();
+    private final DocumentLink expectedDocumentLink = DocumentLink.builder()
+        .documentBinaryUrl("/BinaryUrl")
+        .documentUrl("/url")
+        .documentFilename("Tl1Form.pdf")
+        .build();
 
     @Test
     @Parameters({
@@ -49,10 +65,33 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
     @Test(expected = NullPointerException.class)
     public void givenNullCallback_canHandleThrowException() {
-        handler.canHandle(CallbackType.ABOUT_TO_SUBMIT, null);
+        handler.canHandle(CallbackType.ABOUT_TO_SUBMIT,
+            null);
     }
 
     @Test
     public void handle() {
+        createTestData();
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCallback = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
+            callback, "user token");
+
+        assertNull(actualCallback.getData().getTl1Form());
+        List<SscsDocument> sscsDocument = actualCallback.getData().getSscsDocument();
+        assertNotNull(sscsDocument);
+
+        assertEquals(expectedDocumentLink, actualCallback.getData().getSscsDocument().get(0)
+            .getValue().getDocumentLink());
+    }
+
+    private void createTestData() {
+        SscsCaseData caseData = SscsCaseData.builder()
+            .tl1Form(DwpResponseDocument.builder()
+                .documentLink(expectedDocumentLink)
+                .build())
+            .build();
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "sscs", State.WITH_DWP, caseData,
+            LocalDateTime.now());
+        callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_REQUEST_TIME_EXTENSION);
     }
 }
