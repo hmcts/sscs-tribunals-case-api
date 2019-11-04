@@ -141,4 +141,14 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
             new Object[]{twoDocs}
         };
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void givenUnHandleCallbackType_shouldThrowException() {
+        handler.handle(CallbackType.ABOUT_TO_START, callback, "user token");
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void givenNullCallback_shouldThrowException() {
+        handler.handle(CallbackType.ABOUT_TO_SUBMIT, null, "user token");
+    }
 }

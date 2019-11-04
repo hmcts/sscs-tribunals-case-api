@@ -28,7 +28,9 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
         transformTl1FormToSscsDocument(callback);
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
