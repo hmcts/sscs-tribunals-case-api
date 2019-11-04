@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpRequestTimeExtension;
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.TL1_FORM;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,8 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
             .value(SscsDocumentDetails.builder()
                 .documentLink(tl1Form.getDocumentLink())
                 .documentType(TL1_FORM.getId())
+                .documentDateAdded(LocalDate.now().toString())
+                .documentFileName(tl1Form.getDocumentLink().getDocumentFilename())
                 .build())
             .build());
         callback.getCaseDetails().getCaseData().setSscsDocument(sscsDocuments);

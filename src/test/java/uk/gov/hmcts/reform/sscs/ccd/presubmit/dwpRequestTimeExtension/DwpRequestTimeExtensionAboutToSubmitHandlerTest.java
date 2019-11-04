@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +83,8 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         assertNumberOfTl1FormDocsIsOne(actualCallback);
         SscsDocumentDetails tl1FormDoc = getTl1FormFromTheSscsDocuments(actualCallback).getValue();
         assertEquals(expectedDocumentLink, tl1FormDoc.getDocumentLink());
+        assertEquals(LocalDate.now().toString(), tl1FormDoc.getDocumentDateAdded());
+        assertEquals(expectedDocumentLink.getDocumentFilename(), tl1FormDoc.getDocumentFileName());
     }
 
     private SscsDocument getTl1FormFromTheSscsDocuments(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
