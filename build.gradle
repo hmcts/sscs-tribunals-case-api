@@ -253,7 +253,7 @@ dependencies {
     compile group: 'org.apache.tika', name: 'tika-core', version: '1.22'
     compile group: 'net.coobird', name: 'thumbnailator', version: '0.4.8'
     compile group: 'org.apache.pdfbox', name: 'xmpbox', version: '2.0.17'
-    compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.16'
+    compile group: 'org.apache.pdfbox', name: 'pdfbox', version: '2.0.17'
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
 
     compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.5'
@@ -268,7 +268,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.1.10'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.87'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.0.88'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
