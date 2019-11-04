@@ -33,6 +33,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
             throw new IllegalStateException("Cannot handle callback");
         }
         transformTl1FormToSscsDocument(callback);
+        callback.getCaseDetails().getCaseData().setDwpState("extensionRequested");
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 

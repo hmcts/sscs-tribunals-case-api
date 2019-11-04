@@ -79,6 +79,12 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> actualCallback = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
             callback, "user token");
 
+        assertTl1FromToSscsDocument(actualCallback);
+        assertEquals("extensionRequested",actualCallback.getData().getDwpState());
+
+    }
+
+    private void assertTl1FromToSscsDocument(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
         assertNull(actualCallback.getData().getTl1Form());
         assertNumberOfTl1FormDocsIsOne(actualCallback);
         SscsDocumentDetails tl1FormDoc = getTl1FormFromTheSscsDocuments(actualCallback).getValue();
@@ -106,6 +112,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
                 .documentLink(expectedDocumentLink)
                 .build())
             .sscsDocument(sscsDocuments)
+            .dwpState(null)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "sscs", State.WITH_DWP, caseData,
             LocalDateTime.now());
