@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpRequestTimeExtension;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.TL1_FORM;
