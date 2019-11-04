@@ -100,7 +100,6 @@ public class SubmitAppealService {
             sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
                 log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
-                caseData.setDateSentToDwp(LocalDate.now().toString());
                 ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
                 log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
             }
@@ -126,8 +125,8 @@ public class SubmitAppealService {
     }
 
     private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
-        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
-
+        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice())
+            ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
         sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
         return sscsCaseData;
     }
