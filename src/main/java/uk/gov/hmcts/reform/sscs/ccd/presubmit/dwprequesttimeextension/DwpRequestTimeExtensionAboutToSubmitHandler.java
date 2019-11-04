@@ -35,6 +35,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
         }
         transformTl1FormToSscsDocument(callback);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.EXTENSION_REQUESTED.getId());
+        callback.getCaseDetails().getCaseData().setInterlocReviewState("reviewByTcw");
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 

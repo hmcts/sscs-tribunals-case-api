@@ -80,8 +80,8 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
             callback, "user token");
 
         assertTl1FromToSscsDocument(actualCallback);
-        assertEquals("extensionRequested",actualCallback.getData().getDwpState());
-
+        assertEquals("extensionRequested", actualCallback.getData().getDwpState());
+        assertEquals("reviewByTcw", actualCallback.getData().getInterlocReviewState());
     }
 
     private void assertTl1FromToSscsDocument(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
