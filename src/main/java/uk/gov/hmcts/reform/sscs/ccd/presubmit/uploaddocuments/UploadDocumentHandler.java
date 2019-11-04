@@ -41,7 +41,7 @@ public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseD
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState(DwpState.FE_RECEIVED.getValue());
+        caseData.setDwpState(DwpState.FE_RECEIVED.getId());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

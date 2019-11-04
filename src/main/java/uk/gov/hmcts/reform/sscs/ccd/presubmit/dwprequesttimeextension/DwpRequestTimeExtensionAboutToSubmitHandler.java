@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -33,7 +34,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
             throw new IllegalStateException("Cannot handle callback");
         }
         transformTl1FormToSscsDocument(callback);
-        callback.getCaseDetails().getCaseData().setDwpState("extensionRequested");
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.EXTENSION_REQUESTED.getId());
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 

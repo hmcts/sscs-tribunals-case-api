@@ -39,7 +39,7 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        sscsCaseData.setDwpState(REP_ADDED.getValue());
+        sscsCaseData.setDwpState(REP_ADDED.getId());
 
         return preSubmitCallbackResponse;
     }

@@ -9,21 +9,22 @@ public enum DwpState {
     FE_ACTIONED_NA("feActionedNA", "FE Actioned - NA"),
     DIRECTION_ACTION_REQUIRED("directionActionRequired", "Direction - action req'd"),
     DIRECTION_RESPONDED("directionResponded", "Direction - responded"),
-    HEARING_POSTPONED("hearingPostponed", null), REP_ADDED("repAdded", null);
+    HEARING_POSTPONED("hearingPostponed", null), REP_ADDED("repAdded", null),
+    EXTENSION_REQUESTED("extensionRequested", null);
 
-    private String value;
+    private String id;
     private String label;
 
-    public String getValue() {
-        return value;
+    public String getId() {
+        return id;
     }
 
     public String getLabel() {
         return label;
     }
 
-    DwpState(String value, String label) {
-        this.value = value;
+    DwpState(String id, String label) {
+        this.id = id;
         this.label = label;
     }
 }

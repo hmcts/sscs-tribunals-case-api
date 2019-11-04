@@ -28,8 +28,8 @@ public class DwpDirectionResponseAboutToSubmitHandler implements PreSubmitCallba
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (DwpState.DIRECTION_ACTION_REQUIRED.getValue().equals(caseData.getDwpState())) {
-            caseData.setDwpState(DwpState.DIRECTION_RESPONDED.getValue());
+        if (DwpState.DIRECTION_ACTION_REQUIRED.getId().equals(caseData.getDwpState())) {
+            caseData.setDwpState(DwpState.DIRECTION_RESPONDED.getId());
         }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
