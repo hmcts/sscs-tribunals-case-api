@@ -5,6 +5,7 @@ import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.collections4.ListUtils.union;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
                         .type("other")
                         .url(responseDocument.getDocumentLink())
                         .fileName(responseDocument.getDocumentLink().getDocumentFilename())
-                        .scannedDate(LocalDate.now().toString())
+                        .scannedDate(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
                         .build()).build();
 
             scannedDocs.add(scannedDocument);
