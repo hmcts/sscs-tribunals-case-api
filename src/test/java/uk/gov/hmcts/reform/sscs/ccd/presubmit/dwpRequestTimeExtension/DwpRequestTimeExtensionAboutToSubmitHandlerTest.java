@@ -1,11 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpRequestTimeExtension;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
@@ -70,28 +71,74 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void handle() {
-        createTestData();
+    @Parameters(method = "generateSscsCaseDataWithDifferentSscsDocumentLength")
+    public void handle(@Nullable List<SscsDocument> sscsDocuments) {
+        createTestData(sscsDocuments);
 
         PreSubmitCallbackResponse<SscsCaseData> actualCallback = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
             callback, "user token");
 
         assertNull(actualCallback.getData().getTl1Form());
-        List<SscsDocument> sscsDocument = actualCallback.getData().getSscsDocument();
-        assertNotNull(sscsDocument);
-
-        assertEquals(expectedDocumentLink, actualCallback.getData().getSscsDocument().get(0)
-            .getValue().getDocumentLink());
+        assertNumberOfTl1FormDocsIsOne(actualCallback);
+        SscsDocumentDetails tl1FormDoc = getTl1FormFromTheSscsDocuments(actualCallback).getValue();
+        assertEquals(expectedDocumentLink, tl1FormDoc.getDocumentLink());
     }
 
-    private void createTestData() {
+    private SscsDocument getTl1FormFromTheSscsDocuments(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
+        return actualCallback.getData().getSscsDocument().stream()
+            .filter(doc -> "tl1Form".equals(doc.getValue().getDocumentType()))
+            .findFirst().orElse(null);
+    }
+
+    private void assertNumberOfTl1FormDocsIsOne(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
+        int tl1FormNumber = (int) actualCallback.getData().getSscsDocument().stream()
+            .filter(doc -> "tl1Form".equals(doc.getValue().getDocumentType()))
+            .count();
+        assertEquals(1, tl1FormNumber);
+    }
+
+    private void createTestData(List<SscsDocument> sscsDocuments) {
         SscsCaseData caseData = SscsCaseData.builder()
             .tl1Form(DwpResponseDocument.builder()
                 .documentLink(expectedDocumentLink)
                 .build())
+            .sscsDocument(sscsDocuments)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "sscs", State.WITH_DWP, caseData,
             LocalDateTime.now());
         callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_REQUEST_TIME_EXTENSION);
+    }
+
+    public Object[] generateSscsCaseDataWithDifferentSscsDocumentLength() {
+        SscsDocument sscs1Doc = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/anotherUrl")
+                    .build())
+                .documentType("sscs1")
+                .build())
+            .build();
+
+        SscsDocument appellantEvidenceDoc = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/anotherUrl")
+                    .build())
+                .documentType("appellantEvidence")
+                .build())
+            .build();
+
+        List<SscsDocument> oneDoc = new ArrayList<>();
+        oneDoc.add(sscs1Doc);
+
+        List<SscsDocument> twoDocs = new ArrayList<>();
+        twoDocs.add(sscs1Doc);
+        twoDocs.add(appellantEvidenceDoc);
+
+        return new Object[]{
+            new Object[]{null},
+            new Object[]{oneDoc},
+            new Object[]{twoDocs}
+        };
     }
 }

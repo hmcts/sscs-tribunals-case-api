@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpRequestTimeExtension;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.DocumentType.TL1_FORM;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,11 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
 
+        transformTl1FormToSscsDocument(callback);
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+    }
+
+    private void transformTl1FormToSscsDocument(Callback<SscsCaseData> callback) {
         DwpResponseDocument tl1Form = callback.getCaseDetails().getCaseData().getTl1Form();
         List<SscsDocument> sscsDocuments = callback.getCaseDetails().getCaseData().getSscsDocument();
         if (sscsDocuments == null) {
@@ -36,10 +42,10 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
         sscsDocuments.add(SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .documentLink(tl1Form.getDocumentLink())
+                .documentType(TL1_FORM.getId())
                 .build())
             .build());
         callback.getCaseDetails().getCaseData().setSscsDocument(sscsDocuments);
         callback.getCaseDetails().getCaseData().setTl1Form(null);
-        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }
