@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.functional.handlers.interloc;
+package uk.gov.hmcts.reform.sscs.functional.handlers;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
@@ -16,14 +16,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class SendToAdminTest {
+public class DwpChallengeValidityHandlerTest {
 
     @Value("${test-url}")
     private String testUrl;
@@ -44,13 +43,13 @@ public class SendToAdminTest {
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(BaseHandlerTest.getJsonCallbackForTest("handlers/interloc/sendToAdminCallback.json"))
+            .body(BaseHandlerTest.getJsonCallbackForTest("handlers/interloc/dwpChallengeValidityCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
-            .assertThat().body("data.interlocReviewState", equalTo("awaitingAdminAction"));
+            .log().all(true)
+            .assertThat().body("data.interlocReviewState", equalTo("reviewByJudge"));
     }
 
 
 }
-

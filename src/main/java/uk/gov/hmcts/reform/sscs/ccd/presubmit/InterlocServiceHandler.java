@@ -33,6 +33,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         eventTypeToSecondaryStatus.put(EventType.TCW_DECISION_APPEAL_TO_PROCEED, "none");
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED, "none");
         eventTypeToSecondaryStatus.put(EventType.SEND_TO_ADMIN, "awaitingAdminAction");
+        eventTypeToSecondaryStatus.put(EventType.DWP_CHALLENGE_VALIDITY, "reviewByJudge");
 
         return eventTypeToSecondaryStatus;
     }
