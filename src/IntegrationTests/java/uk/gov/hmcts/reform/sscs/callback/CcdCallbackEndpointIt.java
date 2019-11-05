@@ -4,31 +4,27 @@ import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.hamcrest.core.StringEndsWith;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -38,10 +34,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
@@ -51,41 +43,18 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
-import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @RunWith(JUnitParamsRunner.class)
-public class CcdCallbackEndpointIt {
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
-
-    private MockMvc mockMvc;
-
-    @MockBean
-    private AuthorisationService authorisationService;
-
-    @Autowired
-    private SscsCaseCallbackDeserializer deserializer;
-
-    private String json;
-
-    @Autowired
-    private PreSubmitCallbackDispatcher dispatcher;
-
-    @Autowired
-    private ObjectMapper mapper;
+public class CcdCallbackEndpointIt extends AbstractEventIt {
 
     @Autowired
     private FooterService footerService;
@@ -107,9 +76,7 @@ public class CcdCallbackEndpointIt {
 
     @Before
     public void setup() throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mapper.registerModule(new JavaTimeModule());
+        setup("callback/actionFurtherEvidenceCallback.json");
     }
 
     private Document createDocument() {
@@ -125,8 +92,7 @@ public class CcdCallbackEndpointIt {
     @Test
     @Parameters({"form", "coversheet"})
     public void shouldHandleActionFurtherEvidenceEventCallback(String documentType) throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/actionFurtherEvidenceCallback.json");
         json = json.replaceAll("DOCUMENT_TYPE", documentType);
 
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
@@ -157,8 +123,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void actionFurtherEvidenceDropdownAboutToStartCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/actionFurtherEvidenceCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
 
@@ -174,9 +139,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void givenFurtherEvidenceIssueToAllParties_shouldUpdateDwpFurtherEvidenceState() throws Exception {
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/actionFurtherEvidenceWithInterlocOptionCallback.json");
         json = json.replaceFirst("informationReceivedForInterlocJudge", "issueFurtherEvidence");
         json = json.replaceFirst("Information received for interlocutory review", "Issue further evidence to all parties");
 
@@ -205,9 +168,7 @@ public class CcdCallbackEndpointIt {
                         .data(new HashMap<>())
                         .build());
 
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/actionFurtherEvidenceWithInterlocOptionCallback.json");
         json = json.replaceFirst("informationReceivedForInterlocJudge", "issueFurtherEvidence");
         json = json.replaceFirst("Information received for interlocutory review", "Issue further evidence to all parties");
 
@@ -227,9 +188,7 @@ public class CcdCallbackEndpointIt {
         mockIdam();
         mockCcd();
 
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json")).getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/actionFurtherEvidenceWithInterlocOptionCallback.json");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
 
@@ -274,8 +233,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void coversheetFurtherEvidence_shouldNotAddToDocuments() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/actionFurtherEvidenceWithInterlocOptionCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/actionFurtherEvidenceWithInterlocOptionCallback.json");
         json = json.replaceFirst("informationReceivedForInterlocJudge", "otherDocumentManual");
         json = json.replaceFirst("Information received for interlocutory review", "Other document type - action manually");
         json = json.replaceFirst("appellantEvidence", "coversheet");
@@ -294,8 +252,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void shouldHandleInterlocEventCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/interlocEventCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/interlocEventCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
@@ -309,8 +266,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void shouldHandleSendToDwpOfflineEventCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/sendToDwpOfflineEventCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/sendToDwpOfflineEventCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
@@ -323,8 +279,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void shouldHandleTcwDecisionAppealToProceedEventCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/tcwDecisionAppealToProceedEventCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/tcwDecisionAppealToProceedEventCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
@@ -337,8 +292,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void shouldHandleJudgeDecisionAppealToProceedEventCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/judgeDecisionAppealToProceedEventCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/judgeDecisionAppealToProceedEventCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
@@ -352,8 +306,7 @@ public class CcdCallbackEndpointIt {
     @Test
     @Parameters({"dormantAppealState", "readyToList","responseReceived"})
     public void shouldAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/appealDormantCallback.json");
         json = json.replaceAll("dormantAppealState", state);
 
         ArgumentCaptor<List<MultipartFile>> captor = ArgumentCaptor.forClass(List.class);
@@ -383,8 +336,7 @@ public class CcdCallbackEndpointIt {
     @Test
     @Parameters({"appealCreated", "incompleteApplication", "validAppeal"})
     public void shouldNotAddAppendixToFooterOfPdfOnEventCallback(String state) throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/appealDormantCallback.json");
         json = json.replaceAll("dormantAppealState", state);
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
@@ -399,8 +351,7 @@ public class CcdCallbackEndpointIt {
 
     @Test
     public void shouldNotAddAppendixToFooterOfPdfOnIfNotIssuingFurtherEvidenceToAllPartiesEventCallback() throws Exception {
-        String path = getClass().getClassLoader().getResource("callback/appealDormantCallback.json").getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        json = getJson("callback/appealDormantCallback.json");
         json = json.replaceFirst("issueFurtherEvidence", "otherDocumentManual");
         json = json.replaceFirst("Issue further evidence to all parties", "Other document type - action manually");
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
@@ -414,22 +365,4 @@ public class CcdCallbackEndpointIt {
         verifyNoMoreInteractions(evidenceManagementService);
     }
 
-    private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
-        return mockMvc.perform(requestBuilder).andReturn().getResponse();
-    }
-
-    public PreSubmitCallbackResponse deserialize(String source) {
-        try {
-            PreSubmitCallbackResponse callback = mapper.readValue(
-                source,
-                new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
-                }
-            );
-
-            return callback;
-
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not deserialize object", e);
-        }
-    }
 }
