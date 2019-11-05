@@ -1,9 +1,9 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -13,18 +13,29 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Component
 @Slf4j
-public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final CcdService ccdService;
+    private final IdamService idamService;
+
+    @Autowired
+    public HmctsResponseReviewedSubmittedHandler(CcdService ccdService, IdamService idamService) {
+        this.ccdService = ccdService;
+        this.idamService = idamService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+        return callbackType.equals(CallbackType.SUBMITTED)
+            && callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED;
     }
 
     @Override
@@ -38,15 +49,18 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
-
-        if (sscsCaseData.getDwpFurtherInfo() == null) {
-            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
+        if (callback.getCaseDetails().getCaseData().getIsInterlocRequired() == "Yes") {
+            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.VALID_SEND_TO_INTERLOC);
+        } else {
+            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.READY_TO_LIST);
         }
-        setCaseCode(sscsCaseData);
-
-        sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         return preSubmitCallbackResponse;
+    }
+
+    private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType) {
+        ccdService.updateCase(caseData, caseId,
+                eventType, "Case was sent to interloc",
+                interlocType.getLabel(), idamService.getIdamTokens());
     }
 }
