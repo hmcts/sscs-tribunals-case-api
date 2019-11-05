@@ -60,7 +60,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
             .assertThat().body("interlocReviewState", equalTo("reviewByTcw"))
             .assertThat().body("dwpState", equalTo("extensionRequested"))
             .assertThat().body("interlocReferralReason", equalTo("timeExtension"))
-            .assertThat().body("sscsDocument.value", hasItem(hasEntry("documentType", "tl1Form1")));
+            .assertThat().body("sscsDocument.value", hasItem(hasEntry("documentType", "tl1Form")));
     }
 
     private String getJsonCallbackForTest() throws IOException {
