@@ -91,6 +91,17 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenASupplementaryResponseWithEmptyDocs_thenHandleRequestAndShowError() {
+        sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(null).build());
+        sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(null).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getScannedDocuments());
+        assertEquals("Supplementary response document cannot be empty", response.getErrors().toArray()[0]);
+    }
+
+    @Test
     public void givenASupplementaryResponseWithDwpSupplementaryResponseDocAndDwpOtherDoc_thenMoveBothToScannedDocsList() {
         sscsCaseData.setDwpSupplementaryResponseDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test1.doc").documentUrl("myurl1").build()).build());
         sscsCaseData.setDwpOtherDoc(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("test2.doc").documentUrl("myurl2").build()).build());

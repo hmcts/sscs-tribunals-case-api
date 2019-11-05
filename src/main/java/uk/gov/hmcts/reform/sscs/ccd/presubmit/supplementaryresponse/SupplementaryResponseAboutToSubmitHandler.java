@@ -39,12 +39,16 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
 
         List<DwpResponseDocument> responseDocuments = new ArrayList<>();
 
-        if (sscsCaseData.getDwpSupplementaryResponseDoc() != null) {
+        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        if (sscsCaseData.getDwpSupplementaryResponseDoc() != null && sscsCaseData.getDwpSupplementaryResponseDoc().getDocumentLink() != null) {
             responseDocuments.add(sscsCaseData.getDwpSupplementaryResponseDoc());
             sscsCaseData.setDwpSupplementaryResponseDoc(null);
+        } else {
+            callbackResponse.addError("Supplementary response document cannot be empty");
         }
 
-        if (sscsCaseData.getDwpOtherDoc() != null) {
+        if (sscsCaseData.getDwpOtherDoc() != null && sscsCaseData.getDwpOtherDoc().getDocumentLink() != null) {
             responseDocuments.add(sscsCaseData.getDwpOtherDoc());
             sscsCaseData.setDwpOtherDoc(null);
         }
@@ -54,8 +58,6 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
             sscsCaseData.setEvidenceHandled("No");
             sscsCaseData.setDwpState("supplementaryResponse");
         }
-
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return callbackResponse;
     }
