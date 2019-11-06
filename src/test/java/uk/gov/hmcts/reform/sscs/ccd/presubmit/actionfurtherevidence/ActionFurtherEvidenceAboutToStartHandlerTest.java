@@ -68,9 +68,9 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     @Parameters({
-        "true, any, 4, true, true, true, true",
-        "true, null, 2, true, true, false, false",
-        "false, null, 1, false, true, false, false"
+        "true, any, 6, true, true, true, true, true, true",
+        "true, null, 2, true, true, false, false, false, false",
+        "false, null, 1, false, true, false, false, false, false"
     })
     public void GivenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown(
         boolean issueFurtherEvidenceFeature,
@@ -79,7 +79,9 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         boolean expectedIssueFurtherEvidenceItem,
         boolean expectedOtherDocumentManualItem,
         boolean informationReceivedForInterlocJudgeItem,
-        boolean informationReceivedForInterlocTcwItem
+        boolean informationReceivedForInterlocTcwItem,
+        boolean sendToInterlocJudgeItem,
+        boolean sendToInterlocTcwItem
     ) {
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
@@ -100,6 +102,12 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals(informationReceivedForInterlocTcwItem, "informationReceivedForInterlocTcw".equals(
             getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocTcw")));
+
+        assertEquals(sendToInterlocJudgeItem, "Send to Interloc - Review by Judge".equals(
+            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "Send to Interloc - Review by Judge")));
+
+        assertEquals(sendToInterlocTcwItem, "Send to Interloc - Review by Twc".equals(
+            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "Send to Interloc - Review by Twc")));
 
         assertEquals(expectedListItemSize, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
