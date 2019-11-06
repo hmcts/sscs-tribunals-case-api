@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
@@ -69,6 +70,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("test.doc", response.getData().getScannedDocuments().get(0).getValue().getFileName());
         assertEquals("myurl", response.getData().getScannedDocuments().get(0).getValue().getUrl().getDocumentUrl());
         assertEquals("other", response.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals("No", response.getData().getEvidenceHandled());
@@ -84,6 +86,7 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("test.doc", response.getData().getScannedDocuments().get(0).getValue().getFileName());
         assertEquals("myurl", response.getData().getScannedDocuments().get(0).getValue().getUrl().getDocumentUrl());
         assertEquals("other", response.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals("No", response.getData().getEvidenceHandled());
@@ -111,9 +114,11 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("test1.doc", response.getData().getScannedDocuments().get(0).getValue().getFileName());
         assertEquals("myurl1", response.getData().getScannedDocuments().get(0).getValue().getUrl().getDocumentUrl());
         assertEquals("other", response.getData().getScannedDocuments().get(0).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
         assertEquals("test2.doc", response.getData().getScannedDocuments().get(1).getValue().getFileName());
         assertEquals("myurl2", response.getData().getScannedDocuments().get(1).getValue().getUrl().getDocumentUrl());
         assertEquals("other", response.getData().getScannedDocuments().get(1).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(0).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals("No", response.getData().getEvidenceHandled());
@@ -136,9 +141,11 @@ public class SupplementaryResponseAboutToSubmitHandlerTest {
         assertEquals("test1.doc", response.getData().getScannedDocuments().get(1).getValue().getFileName());
         assertEquals("myurl1", response.getData().getScannedDocuments().get(1).getValue().getUrl().getDocumentUrl());
         assertEquals("other", response.getData().getScannedDocuments().get(1).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(1).getValue().getSubtype());
         assertEquals("test2.doc", response.getData().getScannedDocuments().get(2).getValue().getFileName());
         assertEquals("myurl2", response.getData().getScannedDocuments().get(2).getValue().getUrl().getDocumentUrl());
         assertEquals("other", response.getData().getScannedDocuments().get(2).getValue().getType());
+        assertEquals(DocumentSubtype.DWP_EVIDENCE.getValue(), response.getData().getScannedDocuments().get(2).getValue().getSubtype());
 
         assertEquals("supplementaryResponse", response.getData().getDwpState());
         assertEquals("No", response.getData().getEvidenceHandled());

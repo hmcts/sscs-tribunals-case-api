@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentSubtype;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -71,6 +72,7 @@ public class SupplementaryResponseAboutToSubmitHandler implements PreSubmitCallb
                         .url(responseDocument.getDocumentLink())
                         .fileName(responseDocument.getDocumentLink().getDocumentFilename())
                         .scannedDate(LocalDateTime.now().toString())
+                        .subtype(DocumentSubtype.DWP_EVIDENCE.getValue())
                         .build()).build();
 
             scannedDocs.add(scannedDocument);
