@@ -1,22 +1,27 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
+import java.util.Collections;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
-public class DwpUploadResponseAboutToStartHandlerTest {
+@RunWith(JUnitParamsRunner.class)
+public class ResponseEventsAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private DwpUploadResponseAboutToStartHandler handler;
+    private ResponseEventsAboutToStartHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -32,7 +37,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     public void setUp() {
         initMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new DwpUploadResponseAboutToStartHandler(dwpAddressLookupService);
+        handler = new ResponseEventsAboutToStartHandler(dwpAddressLookupService);
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
 
@@ -43,7 +48,10 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenADwpUploadResponseEvent_thenReturnTrue() {
+    @Parameters({"DWP_UPLOAD_RESPONSE", "HMCTS_RESPONSE_REVIEWED"})
+    public void givenAValidEvent_thenReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
         assertTrue(handler.canHandle(ABOUT_TO_START, callback));
     }
 
@@ -64,12 +72,30 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenMrnIsNull_populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withDefaultSelectedOffice() {
+    public void givenMrnIsNull_populateOriginatingAndPresentingOfficeDropdownsWhenHandlerFires_withNoDefaultedSelectedOffice() {
         callback.getCaseDetails().getCaseData().getAppeal().setMrnDetails(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals("DWP PIP (1)", response.getData().getDwpOriginatingOffice().getValue().getCode());
-        assertEquals("DWP PIP (1)", response.getData().getDwpPresentingOffice().getValue().getCode());
+        assertNull(response.getData().getDwpOriginatingOffice().getValue().getCode());
+        assertNull(response.getData().getDwpPresentingOffice().getValue().getCode());
+    }
+
+    @Test
+    public void givenOriginatingAndPresentingOfficeHavePreviouslyBeenSet_thenDefaultToTheseOfficesAndNotTheOneSetInMrn() {
+        callback.getCaseDetails().getCaseData().getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
+
+        DynamicListItem value = new DynamicListItem("DWP PIP (4)", "DWP PIP (4)");
+        DynamicList originatingOfficeList = new DynamicList(value, Collections.singletonList(value));
+
+        DynamicListItem value2 = new DynamicListItem("DWP PIP (5)", "DWP PIP (5)");
+        DynamicList presentingOfficeList = new DynamicList(value2, Collections.singletonList(value2));
+
+        callback.getCaseDetails().getCaseData().setDwpOriginatingOffice(originatingOfficeList);
+        callback.getCaseDetails().getCaseData().setDwpPresentingOffice(presentingOfficeList);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("DWP PIP (4)", response.getData().getDwpOriginatingOffice().getValue().getCode());
+        assertEquals("DWP PIP (5)", response.getData().getDwpPresentingOffice().getValue().getCode());
     }
 
     @Test

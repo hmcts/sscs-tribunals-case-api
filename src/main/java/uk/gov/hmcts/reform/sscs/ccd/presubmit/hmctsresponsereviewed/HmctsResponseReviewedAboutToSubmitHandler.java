@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -12,7 +11,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToStartHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 
 @Component
@@ -25,8 +23,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED
-            && callback.getCaseDetails().getCaseData().getIsInterlocRequired() == "Yes";
+            && callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED;
     }
 
     @Override
@@ -43,16 +40,6 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
         setCaseCode(sscsCaseData);
 
-        if (sscsCaseData.getWhoShouldReviewCase().equals("reviewByJudge")) {
-            sscsCaseData.setInterlocReviewState("reviewByJudge");
-        } else if (sscsCaseData.getWhoShouldReviewCase().equals("reviewByTcw")) {
-            sscsCaseData.setInterlocReviewState("reviewByTcw");
-        }
-
         return preSubmitCallbackResponse;
-    }
-
-    private String buildCaseCode(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
     }
 }

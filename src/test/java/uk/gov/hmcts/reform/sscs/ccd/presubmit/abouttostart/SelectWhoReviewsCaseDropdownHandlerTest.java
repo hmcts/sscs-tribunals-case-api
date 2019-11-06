@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,11 +20,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
-public class ValidSendToInterlocAboutToStartHandlerTest {
+public class SelectWhoReviewsCaseDropdownHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private ValidSendToInterlocAboutToStartHandler handler;
+    private SelectWhoReviewsCaseDropdownHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -37,9 +37,7 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new ValidSendToInterlocAboutToStartHandler();
-
-        when(callback.getEvent()).thenReturn(EventType.VALID_SEND_TO_INTERLOC);
+        handler = new SelectWhoReviewsCaseDropdownHandler();
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
@@ -61,7 +59,10 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void populatesSelectWhoReviewsCaseDropDown() {
+    @Parameters({"VALID_SEND_TO_INTERLOC", "HMCTS_RESPONSE_REVIEWED"})
+    public void populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         List<DynamicListItem> listOptions = new ArrayList<>();

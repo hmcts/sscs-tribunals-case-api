@@ -49,18 +49,16 @@ public class HmctsResponseReviewedSubmittedHandler extends ResponseEventsAboutTo
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (callback.getCaseDetails().getCaseData().getIsInterlocRequired() == "Yes") {
-            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.VALID_SEND_TO_INTERLOC);
+        if (sscsCaseData.getIsInterlocRequired() != null && sscsCaseData.getIsInterlocRequired().equals("Yes")) {
+            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.VALID_SEND_TO_INTERLOC, "Send to interloc", "Send a case to a judge for review");
         } else {
-            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.READY_TO_LIST);
+            updateCase(sscsCaseData, callback.getCaseDetails().getId(), EventType.READY_TO_LIST, "Ready to list", "Makes an appeal ready to list");
         }
 
         return preSubmitCallbackResponse;
     }
 
-    private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType) {
-        ccdService.updateCase(caseData, caseId,
-                eventType, "Case was sent to interloc",
-                interlocType.getLabel(), idamService.getIdamTokens());
+    private void updateCase(SscsCaseData caseData, Long caseId, EventType eventType, String summary, String description) {
+        ccdService.updateCase(caseData, caseId, eventType.getCcdType(), summary, description, idamService.getIdamTokens());
     }
 }
