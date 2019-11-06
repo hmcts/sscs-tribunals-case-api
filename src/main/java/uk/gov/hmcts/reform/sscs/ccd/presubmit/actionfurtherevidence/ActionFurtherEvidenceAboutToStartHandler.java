@@ -6,6 +6,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.Furth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.DWP;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
@@ -61,23 +63,28 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
         if (issueFurtherEvidenceFeature) {
             listOptions.add(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.getCode(), ISSUE_FURTHER_EVIDENCE.getLabel()));
         }
+
         listOptions.add(new DynamicListItem(OTHER_DOCUMENT_MANUAL.getCode(), OTHER_DOCUMENT_MANUAL.getLabel()));
 
         if (StringUtils.isNotBlank(sscsCaseData.getInterlocReviewState())) {
-            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(),
-                INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getLabel()));
-
-            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
-                INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel()));
-
-            listOptions.add(new DynamicListItem("Send to Interloc - Review by Judge",
-                "Send to Interloc - Review by Judge"));
-
-            listOptions.add(new DynamicListItem("Send to Interloc - Review by Twc",
-                "Send to Interloc - Review by Twc"));
+            populateListWithItemsWhenInterlocStateIsNotBlank(listOptions);
         }
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
+    }
+
+    private void populateListWithItemsWhenInterlocStateIsNotBlank(List<DynamicListItem> listOptions) {
+        listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getLabel()));
+
+        listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel()));
+
+        listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
+
+        listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+            SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {

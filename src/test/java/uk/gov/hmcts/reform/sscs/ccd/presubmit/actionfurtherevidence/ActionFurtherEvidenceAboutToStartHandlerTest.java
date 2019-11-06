@@ -70,7 +70,8 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
     @Parameters({
         "true, any, 6, true, true, true, true, true, true",
         "true, null, 2, true, true, false, false, false, false",
-        "false, null, 1, false, true, false, false, false, false"
+        "false, null, 1, false, true, false, false, false, false",
+        "false, any, 5, false, true, true, true, true, true"
     })
     public void GivenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown(
         boolean issueFurtherEvidenceFeature,
@@ -103,11 +104,11 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         assertEquals(informationReceivedForInterlocTcwItem, "informationReceivedForInterlocTcw".equals(
             getItemCodeInList(response.getData().getFurtherEvidenceAction(), "informationReceivedForInterlocTcw")));
 
-        assertEquals(sendToInterlocJudgeItem, "Send to Interloc - Review by Judge".equals(
-            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "Send to Interloc - Review by Judge")));
+        assertEquals(sendToInterlocJudgeItem, "sendToInterlocReviewByJudge".equals(
+            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByJudge")));
 
-        assertEquals(sendToInterlocTcwItem, "Send to Interloc - Review by Twc".equals(
-            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "Send to Interloc - Review by Twc")));
+        assertEquals(sendToInterlocTcwItem, "sendToInterlocReviewByTcw".equals(
+            getItemCodeInList(response.getData().getFurtherEvidenceAction(), "sendToInterlocReviewByTcw")));
 
         assertEquals(expectedListItemSize, response.getData().getFurtherEvidenceAction().getListItems().size());
     }
