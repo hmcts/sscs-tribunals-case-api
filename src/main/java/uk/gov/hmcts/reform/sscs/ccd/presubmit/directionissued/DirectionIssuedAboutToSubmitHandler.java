@@ -78,7 +78,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     private void setDwpState(SscsCaseData caseData) {
-        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getValue());
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
     }
 
     private void createFooter(DocumentLink url, SscsCaseData caseData) {
