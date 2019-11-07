@@ -70,16 +70,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     private Object[] generateCanHandleScenarios() {
-        Callback<SscsCaseData> callbackWithRightEventAndRightField =
+        Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocTcwOption =
             buildCallback("informationReceivedForInterlocTcw", ACTION_FURTHER_EVIDENCE);
-        Callback<SscsCaseData> callbackWithSecondRightEventAndRightField =
+        Callback<SscsCaseData> callbackWithValidEventAndInformationReceivedForInterlocJudgeOption =
             buildCallback("informationReceivedForInterlocJudge", ACTION_FURTHER_EVIDENCE);
-        Callback<SscsCaseData> callbackWithThirdRightEventAndRightField =
+        Callback<SscsCaseData> callbackWithValidEventAndIssueFurtherEvidenceOption =
             buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
-        Callback<SscsCaseData> callbacWithRightEventAndWrongField =
+        Callback<SscsCaseData> callbackWithValidEventAndWrongOption =
             buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
-        Callback<SscsCaseData> callbacWithWrongEventAndRightField =
+        Callback<SscsCaseData> callbacWithWrongEventAndValidOption =
             buildCallback("informationReceivedForInterlocJudge", APPEAL_RECEIVED);
+        Callback<SscsCaseData> callbacWithValidEventAndSendToInterlocReviewByJudgeOption =
+            buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
@@ -88,13 +90,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             ACTION_FURTHER_EVIDENCE);
 
         return new Object[]{
-            new Object[]{SUBMITTED, callbackWithRightEventAndRightField, true},
-            new Object[]{SUBMITTED, callbackWithSecondRightEventAndRightField, true},
-            new Object[]{SUBMITTED, callbackWithThirdRightEventAndRightField, true},
-            new Object[]{ABOUT_TO_SUBMIT, callbackWithRightEventAndRightField, false},
-            new Object[]{SUBMITTED, callbacWithRightEventAndWrongField, false},
-            new Object[]{SUBMITTED, callbacWithWrongEventAndRightField, false},
-            new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false}
+            new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, true},
+            new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocJudgeOption, true},
+            new Object[]{SUBMITTED, callbackWithValidEventAndIssueFurtherEvidenceOption, true},
+            new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, false},
+            new Object[]{SUBMITTED, callbackWithValidEventAndWrongOption, false},
+            new Object[]{SUBMITTED, callbacWithWrongEventAndValidOption, false},
+            new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false},
+            new Object[]{SUBMITTED, callbacWithValidEventAndSendToInterlocReviewByJudgeOption, true}
         };
     }
 
@@ -131,7 +134,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     @Parameters({
         "informationReceivedForInterlocJudge, reviewByJudge, interlocInformationReceived",
         "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceived",
-//        "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc"
+        "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc"
     })
     public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly(
         String furtherEvidenceActionSelectedOption, String interlocReviewState, String eventType) {
@@ -142,8 +145,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType),
-            anyString(), anyString(), any(IdamTokens.class)))
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType), anyString(), anyString(),
+            any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
