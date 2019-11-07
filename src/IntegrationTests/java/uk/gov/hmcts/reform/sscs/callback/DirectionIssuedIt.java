@@ -128,7 +128,7 @@ public class DirectionIssuedIt extends AbstractEventIt {
         assertEquals("Addition B - Direction notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")), result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED.getValue(), result.getData().getDwpState());
+        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED.getId(), result.getData().getDwpState());
         assertEquals("awaitingInformation", result.getData().getInterlocReviewState());
     }
 

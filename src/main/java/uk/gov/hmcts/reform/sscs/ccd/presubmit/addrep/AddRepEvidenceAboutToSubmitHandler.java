@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addrep;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.postpone.DwpState.REP_ADDED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.REP_ADDED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -39,7 +39,7 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        sscsCaseData.setDwpState(REP_ADDED.getValue());
+        sscsCaseData.setDwpState(REP_ADDED.getId());
 
         return preSubmitCallbackResponse;
     }
