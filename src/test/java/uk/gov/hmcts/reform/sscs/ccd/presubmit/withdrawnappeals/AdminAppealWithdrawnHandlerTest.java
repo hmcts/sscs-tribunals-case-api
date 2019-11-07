@@ -44,7 +44,7 @@ public class AdminAppealWithdrawnHandlerTest extends AdminAppealWithdrawnBase {
                 ADMIN_APPEAL_WITHDRAWN_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("callback/withdrawnappeals/adminAppealWithdrawnExpectedCaseData.json");
-        assertEquals("withdrawForAction", actualResult.getData().getDwpState());
+        assertEquals("withdrawalReceived", actualResult.getData().getDwpState());
         assertThatJson(actualResult.getData()).isEqualTo(expectedCaseData);
     }
 
