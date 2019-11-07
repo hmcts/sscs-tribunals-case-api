@@ -34,7 +34,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.ActionFurtherEvidenceSubmittedCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -72,9 +71,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         Callback<SscsCaseData> callbackWithRightEventAndRightField =
             buildCallback("informationReceivedForInterlocTcw", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithSecondRightEventAndRightField =
-                buildCallback("informationReceivedForInterlocJudge", ACTION_FURTHER_EVIDENCE);
+            buildCallback("informationReceivedForInterlocJudge", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithThirdRightEventAndRightField =
-                buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
+            buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbacWithRightEventAndWrongField =
             buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbacWithWrongEventAndRightField =
@@ -127,7 +126,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    @Parameters({"informationReceivedForInterlocJudge, reviewByJudge", "informationReceivedForInterlocTcw, reviewByTcw"})
+    @Parameters({
+        "informationReceivedForInterlocJudge, reviewByJudge",
+        "informationReceivedForInterlocTcw, reviewByTcw"
+    })
     public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly(String informationReceivedForInterlocValue, String interlocReviewState) {
         Callback<SscsCaseData> callback = buildCallback(informationReceivedForInterlocValue, ACTION_FURTHER_EVIDENCE);
 
@@ -136,8 +138,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
 
         given(ccdService.updateCase(captor.capture(), anyLong(), eq("interlocInformationReceived"),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+            anyString(), anyString(), any(IdamTokens.class)))
+            .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 

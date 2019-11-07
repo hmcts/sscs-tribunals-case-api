@@ -16,13 +16,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -32,9 +28,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-@RunWith(SpringRunner.class)
-@TestPropertySource(locations = "classpath:config/application_e2e.properties")
-@SpringBootTest
 public class BaseHandler {
 
     protected static final String CREATED_BY_FUNCTIONAL_TEST = "created by functional test";

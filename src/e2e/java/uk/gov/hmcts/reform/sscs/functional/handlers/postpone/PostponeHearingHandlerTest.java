@@ -6,9 +6,16 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.POSTPONE_HE
 
 import io.restassured.http.ContentType;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
+@RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:config/application_e2e.properties")
+@SpringBootTest
 public class PostponeHearingHandlerTest extends BaseHandler {
 
     @Test

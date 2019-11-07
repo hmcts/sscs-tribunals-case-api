@@ -56,7 +56,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -67,10 +68,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        if (isInformationReceivedForInterlocType(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
-            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(), "reviewByJudge", INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE);
-        } else if (isInformationReceivedForInterlocType(caseData.getFurtherEvidenceAction(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
-            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(), "reviewByTcw", INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
+        if (isInformationReceivedForInterlocType(caseData.getFurtherEvidenceAction(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
+            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(),
+                "reviewByJudge", INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE);
+        } else if (isInformationReceivedForInterlocType(caseData.getFurtherEvidenceAction(),
+            INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
+            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(),
+                "reviewByTcw", INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
         } else {
             return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                     EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
