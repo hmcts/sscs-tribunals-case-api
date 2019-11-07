@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
-import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -41,6 +39,8 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null))
+                .benefitCode("002")
+                .issueCode("DD")
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -58,35 +58,45 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"reviewByTcw, Review by TCW", "reviewByJudge, Review by Judge"})
-    public void setsEvidenceHandledFlagToNoForDocumentSelected(String code, String selectedLabel) {
-
-        sscsCaseData = sscsCaseData.toBuilder()
-                .selectWhoReviewsCase(new DynamicList(
-                        new DynamicListItem(code, selectedLabel),
-                        Arrays.asList(new DynamicListItem("reviewByJudge", "Review by Judge"),
-                                new DynamicListItem("reviewByTcw", "Review by TCW"))
-                ))
-                .reissueFurtherEvidenceDocument(new DynamicList(new DynamicListItem(code, selectedLabel), null)).build();
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+    public void givenAHmctsResponseReviewedEventWithNoDwpResponseDate_thenSetCaseCodeAndDefaultDwpResponseDateToToday() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(Collections.EMPTY_SET, response.getErrors());
-
-        assertEquals(code, response.getData().getInterlocReviewState());
-        assertNull(response.getData().getSelectWhoReviewsCase());
+        assertEquals("002DD", response.getData().getCaseCode());
+        assertEquals(LocalDate.now().toString(), response.getData().getDwpResponseDate());
     }
 
     @Test
-    public void returnAnErrorIfNoSelectedDocument() {
-        sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(null).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+    public void givenAHmctsResponseReviewedEventWithDwpResponseDate_thenSetCaseCodeAndUseProvidedDwpResponseDate() {
+        callback.getCaseDetails().getCaseData().setDwpResponseDate(LocalDate.now().minusDays(1).toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("002DD", response.getData().getCaseCode());
+        assertEquals(LocalDate.now().minusDays(1).toString(), response.getData().getDwpResponseDate());
+    }
+
+    @Test
+    public void givenAHmctsResponseReviewedWithEmptyBenefitCode_displayAnError() {
+        callback.getCaseDetails().getCaseData().setBenefitCode(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
-        assertEquals("Must select who reviews the appeal.", response.getErrors().toArray()[0]);
+
+        for (String error : response.getErrors()) {
+            assertEquals("Benefit code cannot be empty", error);
+        }
+    }
+
+    @Test
+    public void givenAHmctsResponseReviewedWithEmptyIssueCode_displayAnError() {
+        callback.getCaseDetails().getCaseData().setIssueCode(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("Issue code cannot be empty", error);
+        }
     }
 
     @Test(expected = IllegalStateException.class)

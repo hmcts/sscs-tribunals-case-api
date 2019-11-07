@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDate;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -39,6 +40,10 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
         setCaseCode(sscsCaseData);
+
+        if (sscsCaseData.getDwpResponseDate() == null) {
+            sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
+        }
 
         return preSubmitCallbackResponse;
     }

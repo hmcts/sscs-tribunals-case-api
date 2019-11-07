@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -18,10 +18,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @RunWith(JUnitParamsRunner.class)
-public class ResponseEventsAboutToStartHandlerTest {
+public class HmctsResponseReviewedAboutToStartTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private ResponseEventsAboutToStartHandler handler;
+    private HmctsResponseReviewedAboutToStartHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -37,18 +37,18 @@ public class ResponseEventsAboutToStartHandlerTest {
     public void setUp() {
         initMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
-        handler = new ResponseEventsAboutToStartHandler(dwpAddressLookupService);
+        handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService);
 
-        when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
+        when(callback.getEvent()).thenReturn(EventType.HMCTS_RESPONSE_REVIEWED);
 
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+        sscsCaseData = SscsCaseData.builder().createdInGapsFrom("readyToList").appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
     @Test
-    @Parameters({"DWP_UPLOAD_RESPONSE", "HMCTS_RESPONSE_REVIEWED"})
+    @Parameters({"HMCTS_RESPONSE_REVIEWED"})
     public void givenAValidEvent_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
@@ -56,7 +56,7 @@ public class ResponseEventsAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenANonHandleEvidenceEvent_thenReturnFalse() {
+    public void givenANonResponseReviewedEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
 
         assertFalse(handler.canHandle(ABOUT_TO_START, callback));
@@ -106,6 +106,14 @@ public class ResponseEventsAboutToStartHandlerTest {
         assertEquals("No", response.getData().getDwpUcb());
         assertEquals("No", response.getData().getDwpPhme());
         assertEquals("No", response.getData().getDwpComplexAppeal());
+    }
+
+    @Test
+    public void givenHmctsResponseReviewedEventIsTriggeredNonDigitalCase_thenDisplayError() {
+        callback.getCaseDetails().getCaseData().setCreatedInGapsFrom("validAppeal");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("This event cannot be run for cases created in GAPS at valid appeal", response.getErrors().toArray()[0]);
     }
 
 }
