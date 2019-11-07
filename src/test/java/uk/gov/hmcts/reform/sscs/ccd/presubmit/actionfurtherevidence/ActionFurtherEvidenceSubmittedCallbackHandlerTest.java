@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_FURTHER_EVIDENCE;
@@ -127,23 +129,30 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-        "informationReceivedForInterlocJudge, reviewByJudge",
-        "informationReceivedForInterlocTcw, reviewByTcw"
+        "informationReceivedForInterlocJudge, reviewByJudge, interlocInformationReceived",
+        "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceived",
+//        "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc"
     })
-    public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly(String informationReceivedForInterlocValue, String interlocReviewState) {
-        Callback<SscsCaseData> callback = buildCallback(informationReceivedForInterlocValue, ACTION_FURTHER_EVIDENCE);
+    public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly(
+        String furtherEvidenceActionSelectedOption, String interlocReviewState, String eventType) {
+
+        Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
 
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq("interlocInformationReceived"),
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(eventType),
             anyString(), anyString(), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
+
+        then(ccdService).should(times(1))
+            .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(eventType), anyString(),
+                anyString(), any(IdamTokens.class));
     }
 
 }
