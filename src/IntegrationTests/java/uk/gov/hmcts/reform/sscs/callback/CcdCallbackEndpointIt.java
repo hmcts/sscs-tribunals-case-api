@@ -8,13 +8,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -129,12 +136,12 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
         assertHttpStatus(response, HttpStatus.OK);
 
+        @SuppressWarnings({"unchecked", "CastCanBeRemovedNarrowingVariableType"})
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertEquals(3, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(2, result.getData().getFurtherEvidenceAction().getListItems().size());
-        assertEquals(ISSUE_FURTHER_EVIDENCE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
-        assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+        assertEquals(1, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
     }
 
     @Test
