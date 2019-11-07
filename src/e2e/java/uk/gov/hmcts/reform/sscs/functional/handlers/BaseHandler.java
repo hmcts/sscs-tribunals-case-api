@@ -35,7 +35,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class BaseHandlerTest {
+public class BaseHandler {
 
     protected static final String CREATED_BY_FUNCTIONAL_TEST = "created by functional test";
 
@@ -91,7 +91,7 @@ public class BaseHandlerTest {
     }
 
     public static String getJsonCallbackForTest(String path) throws IOException {
-        String pathName = Objects.requireNonNull(BaseHandlerTest.class.getClassLoader().getResource(path)).getFile();
+        String pathName = Objects.requireNonNull(BaseHandler.class.getClassLoader().getResource(path)).getFile();
         return FileUtils.readFileToString(new File(pathName), StandardCharsets.UTF_8.name());
     }
 

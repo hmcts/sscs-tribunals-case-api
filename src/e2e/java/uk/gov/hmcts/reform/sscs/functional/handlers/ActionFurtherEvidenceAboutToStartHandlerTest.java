@@ -10,7 +10,7 @@ import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandlerTest {
+public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
 
     @Test
     public void givenAboutToStartCallback_shouldSetItemsInFurtherActionDropdownMenu() throws Exception {
@@ -18,7 +18,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandlerTes
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(BaseHandlerTest.getJsonCallbackForTest("actionFurtherEvidenceAboutToStartCallback.json"))
+            .body(BaseHandler.getJsonCallbackForTest("actionFurtherEvidenceAboutToStartCallback.json"))
             .post("/ccdAboutToStart")
             .then()
             .statusCode(HttpStatus.SC_OK)

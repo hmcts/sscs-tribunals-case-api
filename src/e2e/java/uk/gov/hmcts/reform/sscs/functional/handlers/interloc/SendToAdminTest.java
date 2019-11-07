@@ -7,9 +7,9 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-public class SendToAdminTest extends BaseHandlerTest {
+public class SendToAdminTest extends BaseHandler {
 
     @Test
     public void givenAboutToSubmitCallbackForSendToAdmin_shouldSetInterlocReviewStateField() throws Exception {
@@ -17,7 +17,7 @@ public class SendToAdminTest extends BaseHandlerTest {
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(BaseHandlerTest.getJsonCallbackForTest("handlers/interloc/sendToAdminCallback.json"))
+            .body(BaseHandler.getJsonCallbackForTest("handlers/interloc/sendToAdminCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)

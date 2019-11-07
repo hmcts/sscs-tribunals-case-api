@@ -8,7 +8,7 @@ import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-public class DwpChallengeValidityHandlerTest extends BaseHandlerTest {
+public class DwpChallengeValidityHandlerTest extends BaseHandler {
 
     @Test
     public void givenAboutToSubmitCallbackForSendToAdmin_shouldSetInterlocReviewStateField() throws Exception {
@@ -16,7 +16,7 @@ public class DwpChallengeValidityHandlerTest extends BaseHandlerTest {
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(BaseHandlerTest.getJsonCallbackForTest("handlers/interloc/dwpChallengeValidityCallback.json"))
+            .body(BaseHandler.getJsonCallbackForTest("handlers/interloc/dwpChallengeValidityCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)

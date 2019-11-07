@@ -7,9 +7,9 @@ import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
-import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-public class UploadDocumentHandlerTest extends BaseHandlerTest {
+public class UploadDocumentHandlerTest extends BaseHandler {
 
     @Test
     public void givenUploadDocumentEventIsTriggered_shouldUploadDocument() throws IOException {

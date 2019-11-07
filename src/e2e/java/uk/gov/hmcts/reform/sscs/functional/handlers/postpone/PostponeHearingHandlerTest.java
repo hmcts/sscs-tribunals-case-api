@@ -7,9 +7,9 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.POSTPONE_HE
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
-import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-public class PostponeHearingHandlerTest extends BaseHandlerTest {
+public class PostponeHearingHandlerTest extends BaseHandler {
 
     @Test
     public void hitCallback() {
