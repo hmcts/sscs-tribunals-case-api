@@ -73,7 +73,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         "false, null, 1, false, true, false, false, false, false",
         "false, any, 5, false, true, true, true, true, true"
     })
-    public void GivenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown(
+    public void givenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown(
         boolean issueFurtherEvidenceFeature,
         @Nullable String interlocReviewState,
         int expectedListItemSize,
