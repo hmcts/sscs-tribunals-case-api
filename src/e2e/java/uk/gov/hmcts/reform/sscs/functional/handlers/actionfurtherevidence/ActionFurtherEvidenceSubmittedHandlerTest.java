@@ -41,10 +41,11 @@ public class ActionFurtherEvidenceSubmittedHandlerTest extends BaseHandler {
 
     @Test
     @Parameters({
-        "NON_COMPLIANT, interlocutoryReviewState"
+        "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState",
+        "VALID_APPEAL_CREATED, sendToInterlocReviewByJudge, validAppeal"
     })
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent(
-        EventType eventType, String expectedState) throws Exception {
+        EventType eventType, String furtherEvidenceActionSelectedOption, String expectedState) throws Exception {
 
         Long caseId = createCaseTriggeringGivenEvent(eventType).getId();
 
@@ -53,7 +54,7 @@ public class ActionFurtherEvidenceSubmittedHandlerTest extends BaseHandler {
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest(caseId))
+            .body(getJsonCallbackForTest(caseId, furtherEvidenceActionSelectedOption))
             .post("/ccdSubmittedEvent")
             .then()
             .statusCode(HttpStatus.SC_OK)
@@ -69,10 +70,12 @@ public class ActionFurtherEvidenceSubmittedHandlerTest extends BaseHandler {
             "non compliant created test case", idamTokens);
     }
 
-    private String getJsonCallbackForTest(Long caseId) throws IOException {
+    private String getJsonCallbackForTest(Long caseId, String furtherEvidenceActionSelectedOption) throws IOException {
         String path = Objects.requireNonNull(getClass().getClassLoader()
             .getResource("handlers/actionfurtherevidence/actionFurtherEvidenceSubmittedCallback.json")).getFile();
         String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
+        jsonCallback = jsonCallback.replace("FURTHER_EVIDENCE_ACTION_SELECTED_OPTION",
+            furtherEvidenceActionSelectedOption);
         return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", caseId.toString());
     }
 }
