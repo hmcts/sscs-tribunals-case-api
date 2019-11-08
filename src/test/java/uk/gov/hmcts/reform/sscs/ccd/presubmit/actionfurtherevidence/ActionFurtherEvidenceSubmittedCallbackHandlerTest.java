@@ -137,7 +137,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     @Parameters({
         "informationReceivedForInterlocJudge, reviewByJudge, interlocInformationReceived",
         "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceived",
-        "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc"
+        "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc",
+        "sendToInterlocReviewByTcw, reviewByTcw, validSendToInterloc"
     })
     public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
         String furtherEvidenceActionSelectedOption, String interlocReviewState, String eventType) {

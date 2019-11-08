@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -42,11 +43,15 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         DynamicList furtherEvidenceAction = callback.getCaseDetails().getCaseData().getFurtherEvidenceAction();
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent().equals(EventType.ACTION_FURTHER_EVIDENCE)
-            && (isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
-            || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
-            || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE)
-            || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)
-            || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW));
+            && furtherEvidenceActionOptionValidation(furtherEvidenceAction);
+    }
+
+    private boolean furtherEvidenceActionOptionValidation(DynamicList furtherEvidenceAction) {
+        return isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)
+        || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
+        || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE)
+        || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)
+        || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW);
     }
 
     private boolean isFurtherEvidenceActionOptionValid(DynamicList furtherEvidenceActionList,
@@ -85,9 +90,15 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
-            setSelectWhoReviewsCaseField(caseData);
+            setSelectWhoReviewsCaseField(caseData, REVIEW_BY_JUDGE);
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                 REVIEW_BY_JUDGE.getId(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                EventType.VALID_SEND_TO_INTERLOC, "Send a case to a judge for review");
+        }
+        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), SEND_TO_INTERLOC_REVIEW_BY_TCW)) {
+            setSelectWhoReviewsCaseField(caseData, REVIEW_BY_TCW);
+            return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                REVIEW_BY_TCW.getId(), SEND_TO_INTERLOC_REVIEW_BY_TCW,
                 EventType.VALID_SEND_TO_INTERLOC, "Send a case to a judge for review");
         }
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
@@ -95,8 +106,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             "Issue to all parties", idamService.getIdamTokens());
     }
 
-    private void setSelectWhoReviewsCaseField(SscsCaseData caseData) {
-        DynamicListItem reviewByJudgeItem = new DynamicListItem(REVIEW_BY_JUDGE.getId(), null);
+    private void setSelectWhoReviewsCaseField(SscsCaseData caseData, InterlocReviewState reviewByWhom) {
+        DynamicListItem reviewByJudgeItem = new DynamicListItem(reviewByWhom.getId(), null);
         caseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
     }
 
