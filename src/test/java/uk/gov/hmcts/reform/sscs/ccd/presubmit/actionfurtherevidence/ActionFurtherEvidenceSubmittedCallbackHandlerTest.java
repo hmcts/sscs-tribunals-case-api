@@ -78,10 +78,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndWrongOption =
             buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
-        Callback<SscsCaseData> callbacWithWrongEventAndValidOption =
+        Callback<SscsCaseData> callbackWithWrongEventAndValidOption =
             buildCallback("informationReceivedForInterlocJudge", APPEAL_RECEIVED);
-        Callback<SscsCaseData> callbacWithValidEventAndSendToInterlocReviewByJudgeOption =
+        Callback<SscsCaseData> callbackWithValidEventAndSendToInterlocReviewByJudgeOption =
             buildCallback("sendToInterlocReviewByJudge", ACTION_FURTHER_EVIDENCE);
+        Callback<SscsCaseData> callbackWithValidEventAndSendToInterlocReviewByTcwOption =
+            buildCallback("sendToInterlocReviewByTcw", ACTION_FURTHER_EVIDENCE);
 
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
@@ -95,9 +97,10 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             new Object[]{SUBMITTED, callbackWithValidEventAndIssueFurtherEvidenceOption, true},
             new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, false},
             new Object[]{SUBMITTED, callbackWithValidEventAndWrongOption, false},
-            new Object[]{SUBMITTED, callbacWithWrongEventAndValidOption, false},
+            new Object[]{SUBMITTED, callbackWithWrongEventAndValidOption, false},
             new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false},
-            new Object[]{SUBMITTED, callbacWithValidEventAndSendToInterlocReviewByJudgeOption, true}
+            new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByJudgeOption, true},
+            new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByTcwOption, true}
         };
     }
 
