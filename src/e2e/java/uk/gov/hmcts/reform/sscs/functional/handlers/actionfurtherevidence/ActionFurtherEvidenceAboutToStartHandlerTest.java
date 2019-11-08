@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.functional.handlers;
+package uk.gov.hmcts.reform.sscs.functional.handlers.actionfurtherevidence;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasEntry;
@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
@@ -25,7 +26,8 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest extends BaseHandler {
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(BaseHandler.getJsonCallbackForTest("actionFurtherEvidenceAboutToStartCallback.json"))
+            .body(BaseHandler.getJsonCallbackForTest(
+                "handlers/actionfurtherevidence/actionFurtherEvidenceAboutToStartCallback.json"))
             .post("/ccdAboutToStart")
             .then()
             .statusCode(HttpStatus.SC_OK)

@@ -1,8 +1,7 @@
-package uk.gov.hmcts.reform.sscs.functional.controller;
+package uk.gov.hmcts.reform.sscs.functional.handlers.actionfurtherevidence;
 
-import static io.restassured.RestAssured.baseURI;
-import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static uk.gov.hmcts.reform.sscs.functional.ccd.UpdateCaseInCcdTest.buildSscsCaseDataForTestingWithValidMobileNumbers;
 
 import io.restassured.RestAssured;
@@ -17,36 +16,23 @@ import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class CcdCallbackControllerTest {
+public class ActionFurtherEvidenceSubmittedHandlerTest extends BaseHandler {
 
-    @Value("${test-url}")
-    private String testUrl;
-    @Autowired
-    private IdamService idamService;
-    @Autowired
-    private CcdService ccdService;
     private Long ccdCaseId;
-    private IdamTokens idamTokens;
 
     @Before
     public void setUp() {
-        baseURI = testUrl;
-        useRelaxedHTTPSValidation();
-        idamTokens = idamService.getIdamTokens();
+        super.setUp();
         ccdCaseId = createCaseInCcdInterlocutoryReviewState().getId();
     }
 
@@ -70,11 +56,14 @@ public class CcdCallbackControllerTest {
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
             .assertThat().body("data.interlocReviewState", equalTo("reviewByJudge"));
+
+        assertEquals("interlocutoryReviewState",
+            ccdService.getByCaseId(ccdCaseId, idamTokens).getState());
     }
 
     private String getJsonCallbackForTest() throws IOException {
         String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("actionFurtherEvidenceCallback.json")).getFile();
+            .getResource("handlers/actionfurtherevidence/actionFurtherEvidenceSubmittedCallback.json")).getFile();
         String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", ccdCaseId.toString());
     }

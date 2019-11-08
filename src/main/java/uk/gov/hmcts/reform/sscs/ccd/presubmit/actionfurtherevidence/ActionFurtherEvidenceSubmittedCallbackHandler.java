@@ -94,7 +94,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     }
 
     private void setSelectWhoReviewsCaseField(SscsCaseData caseData) {
-        DynamicListItem reviewByJudgeItem = new DynamicListItem(REVIEW_BY_JUDGE.getId(), "");
+        DynamicListItem reviewByJudgeItem = new DynamicListItem(REVIEW_BY_JUDGE.getId(), null);
         caseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
     }
 
