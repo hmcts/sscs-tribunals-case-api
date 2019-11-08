@@ -136,7 +136,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceived",
         "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc"
     })
-    public void givenInformationReceivedForInterloc_shouldTriggerEventAndUpdateCaseCorrectly(
+    public void givenFurtherEvidenceActionSelectedOption_shouldTriggerEventAndUpdateCaseCorrectly(
         String furtherEvidenceActionSelectedOption, String interlocReviewState, String eventType) {
 
         Callback<SscsCaseData> callback = buildCallback(furtherEvidenceActionSelectedOption, ACTION_FURTHER_EVIDENCE);

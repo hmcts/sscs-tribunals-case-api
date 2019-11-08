@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class ActionFurtherEvidenceSubmittedHandlerTest extends BaseHandler {
+public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandler {
 
     @ClassRule
     public static final SpringClassRule scr = new SpringClassRule();
@@ -66,8 +66,7 @@ public class ActionFurtherEvidenceSubmittedHandlerTest extends BaseHandler {
 
     private SscsCaseDetails createCaseTriggeringGivenEvent(EventType eventType) {
         return ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
-            eventType.getCcdType(), "non compliant created test case",
-            "non compliant created test case", idamTokens);
+            eventType.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
     private String getJsonCallbackForTest(Long caseId, String furtherEvidenceActionSelectedOption) throws IOException {
