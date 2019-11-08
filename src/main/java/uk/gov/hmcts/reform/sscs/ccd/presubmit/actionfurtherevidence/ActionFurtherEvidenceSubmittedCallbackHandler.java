@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
@@ -68,20 +71,21 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
-            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(),
-                "reviewByJudge", INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
+            return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                REVIEW_BY_JUDGE.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
                 EventType.INTERLOC_INFORMATION_RECEIVED, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
-            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(),
-                "reviewByTcw", INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
+            return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                REVIEW_BY_TCW.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
                 EventType.INTERLOC_INFORMATION_RECEIVED, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
-            return updateCaseInformationReceivedForInterlocDetails(caseData, callback.getCaseDetails().getId(),
-                "reviewByJudge", SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+            setSelectWhoReviewsCaseField(caseData);
+            return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                REVIEW_BY_JUDGE.getId(), SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
                 EventType.VALID_SEND_TO_INTERLOC, "Send a case to a judge for review");
         }
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
@@ -89,11 +93,15 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             "Issue to all parties", idamService.getIdamTokens());
     }
 
-    private SscsCaseDetails updateCaseInformationReceivedForInterlocDetails(
+    private void setSelectWhoReviewsCaseField(SscsCaseData caseData) {
+        DynamicListItem reviewByJudgeItem = new DynamicListItem(REVIEW_BY_JUDGE.getId(), "");
+        caseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
+    }
+
+    private SscsCaseDetails setInterlocReviewStateFieldAndTriggerEvent(
         SscsCaseData caseData, Long caseId,
         String interlocReviewState,
         FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
-
         caseData.setInterlocReviewState(interlocReviewState);
         return ccdService.updateCase(caseData, caseId,
             eventType.getCcdType(), summary,
