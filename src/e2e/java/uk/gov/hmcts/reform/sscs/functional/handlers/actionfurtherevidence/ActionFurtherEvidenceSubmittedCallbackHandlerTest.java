@@ -41,12 +41,16 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
 
     @Test
     @Parameters({
-        "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState",
+        "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
         //todo: uncomment it once this PR is on Prod: https://github.com/hmcts/sscs-tribunals-case-api/pull/832
-        //"VALID_APPEAL_CREATED, sendToInterlocReviewByJudge, validAppeal"
+        //"VALID_APPEAL_CREATED, sendToInterlocReviewByJudge, validAppeal, reviewByJudge",
+        //"VALID_APPEAL_CREATED, sendToInterlocReviewByTcw, validAppeal, reviewByTcw"
     })
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent(
-        EventType eventType, String furtherEvidenceActionSelectedOption, String expectedState) throws Exception {
+        EventType eventType,
+        String furtherEvidenceActionSelectedOption,
+        String expectedState,
+        String expectedReviewedBy) throws Exception {
 
         Long caseId = createCaseTriggeringGivenEvent(eventType).getId();
 
@@ -60,7 +64,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
-            .assertThat().body("data.interlocReviewState", equalTo("reviewByJudge"));
+            .assertThat().body("data.interlocReviewState", equalTo(expectedReviewedBy));
 
         assertEquals(expectedState, ccdService.getByCaseId(caseId, idamTokens).getState());
     }
