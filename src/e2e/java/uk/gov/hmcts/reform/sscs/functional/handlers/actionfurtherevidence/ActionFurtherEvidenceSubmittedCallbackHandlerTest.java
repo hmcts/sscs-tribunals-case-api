@@ -42,9 +42,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
     @Test
     @Parameters({
         "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
-        //todo: uncomment it once this PR is on Prod: https://github.com/hmcts/sscs-tribunals-case-api/pull/832
-        //"VALID_APPEAL_CREATED, sendToInterlocReviewByJudge, validAppeal, reviewByJudge",
-        //"VALID_APPEAL_CREATED, sendToInterlocReviewByTcw, validAppeal, reviewByTcw"
+        "VALID_APPEAL_CREATED, sendToInterlocReviewByJudge, validAppeal, reviewByJudge",
+        "VALID_APPEAL_CREATED, sendToInterlocReviewByTcw, validAppeal, reviewByTcw"
     })
     public void givenSubmittedCallbackForActionFurtherEvidence_shouldUpdateFieldAndTriggerEvent(
         EventType eventType,
