@@ -11,10 +11,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
+import feign.FeignException;
 import java.time.LocalDate;
 import java.util.*;
 
-import feign.FeignException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
