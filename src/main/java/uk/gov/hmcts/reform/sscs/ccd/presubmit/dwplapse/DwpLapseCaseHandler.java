@@ -32,6 +32,7 @@ public class DwpLapseCaseHandler implements PreSubmitCallbackHandler<SscsCaseDat
 
         log.info("Setting interloc review field to " + "awaitingAdminAction");
         caseData.setInterlocReviewState("awaitingAdminAction");
+        caseData.setDwpState("lapsed");
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Handled DWP lapse case " + caseData.getCcdCaseId());

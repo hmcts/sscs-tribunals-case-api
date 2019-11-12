@@ -71,5 +71,6 @@ public class DwpLapseCaseHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("awaitingAdminAction", response.getData().getInterlocReviewState());
+        assertEquals("lapsed", response.getData().getDwpState());
     }
 }
