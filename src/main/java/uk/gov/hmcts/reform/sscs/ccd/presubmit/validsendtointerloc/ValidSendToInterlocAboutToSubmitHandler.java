@@ -1,7 +1,6 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.addrep;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.REP_ADDED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,9 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
-public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
+public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -25,7 +22,7 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ADD_REPRESENTATIVE;
+            && callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC;
     }
 
     @Override
@@ -37,10 +34,20 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        sscsCaseData.setDwpState(REP_ADDED.getId());
+        if (sscsCaseData.getSelectWhoReviewsCase() == null || sscsCaseData.getSelectWhoReviewsCase().getValue() == null
+                || sscsCaseData.getSelectWhoReviewsCase().getValue().getCode() == null) {
+            preSubmitCallbackResponse.addError("Must select who reviews the appeal.");
+            return preSubmitCallbackResponse;
+        }
+
+        final String code = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode();
+        sscsCaseData.setInterlocReviewState(code);
+        sscsCaseData.setSelectWhoReviewsCase(null);
 
         return preSubmitCallbackResponse;
     }
+
+
 }

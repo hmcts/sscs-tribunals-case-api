@@ -1,31 +1,26 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.addrep;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.REP_ADDED;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
-@Component
-@Slf4j
-public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
+@Service
+public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ADD_REPRESENTATIVE;
+        return callbackType.equals(CallbackType.ABOUT_TO_START)
+                && callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC;
     }
 
     @Override
@@ -37,10 +32,17 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        setSelectWhoReviewsCase(sscsCaseData);
 
-        sscsCaseData.setDwpState(REP_ADDED.getId());
-
-        return preSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
+
+    private void setSelectWhoReviewsCase(SscsCaseData sscsCaseData) {
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem("reviewByTcw", "Review by TCW"));
+        listOptions.add(new DynamicListItem("reviewByJudge", "Review by Judge"));
+
+        sscsCaseData.setSelectWhoReviewsCase(new DynamicList(new DynamicListItem("", ""), listOptions));
+    }
+
 }
