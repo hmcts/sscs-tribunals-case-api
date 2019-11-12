@@ -77,7 +77,7 @@ public class SubmitAppealService {
             return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens));
         } catch (FeignException e) {
             if (e.status() == 409) {
-                log.info("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
+                log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
                         appeal.getAppellant().getNino(),
                         idamTokens.getUserId());
                 return Optional.empty();
