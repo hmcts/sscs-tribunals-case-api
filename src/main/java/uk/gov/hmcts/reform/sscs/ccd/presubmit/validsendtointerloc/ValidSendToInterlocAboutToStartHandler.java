@@ -20,7 +20,8 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC;
+                && (callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC
+                || callback.getEvent() == EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Override

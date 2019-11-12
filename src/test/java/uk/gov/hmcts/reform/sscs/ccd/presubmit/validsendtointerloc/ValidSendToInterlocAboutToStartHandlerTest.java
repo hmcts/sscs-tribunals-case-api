@@ -39,8 +39,6 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
         initMocks(this);
         handler = new ValidSendToInterlocAboutToStartHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.VALID_SEND_TO_INTERLOC);
-
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -61,7 +59,10 @@ public class ValidSendToInterlocAboutToStartHandlerTest {
     }
 
     @Test
-    public void populatesSelectWhoReviewsCaseDropDown() {
+    @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    public void populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
