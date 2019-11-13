@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
 
@@ -15,11 +15,11 @@ import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 
 @Service
-public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class HmctsResponseReviewedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private DwpAddressLookupService service;
 
-    public DwpUploadResponseAboutToStartHandler(DwpAddressLookupService service) {
+    public HmctsResponseReviewedAboutToStartHandler(DwpAddressLookupService service) {
         this.service = service;
     }
 
@@ -29,7 +29,7 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-            && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+            && callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED;
     }
 
     @Override
@@ -41,20 +41,26 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
         setOfficeDropdowns(sscsCaseData);
         setDefaultFieldValues(sscsCaseData);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        if (sscsCaseData.getCreatedInGapsFrom() == null || !sscsCaseData.getCreatedInGapsFrom().equals("readyToList")) {
+            preSubmitCallbackResponse.addError("This event cannot be run for cases created in GAPS at valid appeal");
+        }
+
+        return preSubmitCallbackResponse;
     }
 
-    private void setOfficeDropdowns(SscsCaseData sscsCaseData) {
+    public void setOfficeDropdowns(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         Optional<OfficeMapping> selectedOfficeMapping = sscsCaseData.getAppeal().getMrnDetails() != null && sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice() != null && sscsCaseData.getAppeal().getBenefitType() != null
                 ? service.getDwpMappingByOffice(sscsCaseData.getAppeal().getBenefitType().getCode(), sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) : Optional.empty();
 
         OfficeMapping[] offices = service.allDwpBenefitOffices();
-        int defaultSelectedIndex = 0;
+        int defaultSelectedIndex = -1;
 
         for (int i = 0; i < offices.length; i++) {
             OfficeMapping office = offices[i];
@@ -65,14 +71,28 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
             }
         }
 
-        sscsCaseData.setDwpOriginatingOffice(new DynamicList(listOptions.get(defaultSelectedIndex), listOptions));
-        sscsCaseData.setDwpPresentingOffice(new DynamicList(listOptions.get(defaultSelectedIndex), listOptions));
+        DynamicListItem selectedDynamicListItem = defaultSelectedIndex == -1 ? new DynamicListItem(null, null) : listOptions.get(defaultSelectedIndex);
+
+        if (sscsCaseData.getDwpOriginatingOffice() == null) {
+            sscsCaseData.setDwpOriginatingOffice(new DynamicList(selectedDynamicListItem, listOptions));
+        }
+        if (sscsCaseData.getDwpPresentingOffice() == null) {
+            sscsCaseData.setDwpPresentingOffice(new DynamicList(selectedDynamicListItem, listOptions));
+        }
     }
 
-    private void setDefaultFieldValues(SscsCaseData sscsCaseData) {
-        sscsCaseData.setDwpIsOfficerAttending("No");
-        sscsCaseData.setDwpUcb("No");
-        sscsCaseData.setDwpPhme("No");
-        sscsCaseData.setDwpComplexAppeal("No");
+    public void setDefaultFieldValues(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getDwpIsOfficerAttending() == null) {
+            sscsCaseData.setDwpIsOfficerAttending("No");
+        }
+        if (sscsCaseData.getDwpUcb() == null) {
+            sscsCaseData.setDwpUcb("No");
+        }
+        if (sscsCaseData.getDwpPhme() == null) {
+            sscsCaseData.setDwpPhme("No");
+        }
+        if (sscsCaseData.getDwpComplexAppeal() == null) {
+            sscsCaseData.setDwpComplexAppeal("No");
+        }
     }
 }
