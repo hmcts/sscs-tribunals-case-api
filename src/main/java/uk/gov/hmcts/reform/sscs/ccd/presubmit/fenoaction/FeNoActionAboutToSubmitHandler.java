@@ -16,7 +16,7 @@ public class FeNoActionAboutToSubmitHandler implements PreSubmitCallbackHandler<
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.FE_NO_ACTION)
-            && DwpState.FE_RECEIVED.getValue().equals(callback.getCaseDetails().getCaseData().getDwpState());
+            && DwpState.FE_RECEIVED.getId().equals(callback.getCaseDetails().getCaseData().getDwpState());
     }
 
     @Override

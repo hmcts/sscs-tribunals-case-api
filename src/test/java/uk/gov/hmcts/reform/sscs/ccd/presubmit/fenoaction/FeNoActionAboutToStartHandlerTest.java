@@ -55,8 +55,8 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
 
         List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NR.getValue(), DwpState.FE_ACTIONED_NR.getLabel()));
-        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NA.getValue(), DwpState.FE_ACTIONED_NA.getLabel()));
+        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NR.getId(), DwpState.FE_ACTIONED_NR.getLabel()));
+        listOptions.add(new DynamicListItem(DwpState.FE_ACTIONED_NA.getId(), DwpState.FE_ACTIONED_NA.getLabel()));
         assertEquals(listOptions, actualCaseData.getData().getDwpStateFeNoAction().getListItems());
     }
 
