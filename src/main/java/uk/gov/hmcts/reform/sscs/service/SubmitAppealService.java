@@ -5,9 +5,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
+import feign.FeignException;
 import java.time.LocalDate;
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -70,9 +70,21 @@ public class SubmitAppealService {
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
-    public SaveCaseResult submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
+    public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
-        return saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+        try {
+            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens));
+        } catch (FeignException e) {
+            if (e.status() == 409) {
+                log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
+                        appeal.getAppellant().getNino(),
+                        idamTokens.getUserId());
+                return Optional.empty();
+            } else {
+                throw e;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
