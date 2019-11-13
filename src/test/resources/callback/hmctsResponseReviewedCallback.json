@@ -54,6 +54,18 @@
           "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
         }
       ],
+      "selectWhoReviewsCase": {
+        "value": {
+          "code": "judge",
+          "label": "Judge"
+        },
+        "list_items": [
+          {
+            "code": "judge",
+            "label": "Judge"
+          }
+        ]
+      },
       "subscriptions": {
         "appellantSubscription": {
           "wantSmsNotifications": "Yes",
