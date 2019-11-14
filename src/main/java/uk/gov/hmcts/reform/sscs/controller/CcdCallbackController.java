@@ -100,5 +100,4 @@ public class CcdCallbackController {
 
         return ok(callbackResponse);
     }
-
 }

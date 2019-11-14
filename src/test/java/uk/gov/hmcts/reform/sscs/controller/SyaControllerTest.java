@@ -98,10 +98,10 @@ public class SyaControllerTest {
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
         when(submitAppealService.submitDraftAppeal(any(), any()))
-            .thenReturn(SaveCaseResult.builder()
+            .thenReturn(Optional.of(SaveCaseResult.builder()
                 .caseDetailsId(1L)
                 .saveCaseOperation(SaveCaseOperation.CREATE)
-                .build());
+                .build()));
 
         String json = getSyaCaseWrapperJson("json/sya.json");
 
