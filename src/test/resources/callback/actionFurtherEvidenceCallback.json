@@ -211,26 +211,6 @@
             "label": "Representative"
           }
         ]
-      },
-      "furtherEvidenceAction": {
-        "value": {
-          "code": "issueFurtherEvidence",
-          "label": "Issue further evidence to all parties"
-        },
-        "list_items": [
-          {
-            "code": "issueFurtherEvidence",
-            "label": "Issue further evidence to all parties"
-          },
-          {
-            "code": "otherDocumentManual",
-            "label": "Other document type - action manually"
-          },
-          {
-            "code": "informationReceivedForInterlocJudge",
-            "label": "Information received for interlocutory review Judge"
-          }
-        ]
       }
     },
     "data_classification": {
