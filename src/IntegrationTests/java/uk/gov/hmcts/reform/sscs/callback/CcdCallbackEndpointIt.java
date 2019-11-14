@@ -132,7 +132,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
     @Test
     public void actionFurtherEvidenceDropdownAboutToStartCallback() throws Exception {
-        json = getJson("callback/actionFurtherEvidenceCallback.json");
+        json = getJson("callback/actionFurtherEvidenceWithEmptyFurtherEvidenceActionFieldCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
 
