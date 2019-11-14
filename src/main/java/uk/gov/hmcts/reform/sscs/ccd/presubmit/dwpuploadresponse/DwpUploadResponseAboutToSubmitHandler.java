@@ -12,10 +12,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 
 @Component
 @Slf4j
-public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -23,7 +24,7 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+                && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
     }
 
     @Override
@@ -37,23 +38,15 @@ public class DwpUploadResponseAboutToSubmitHandler implements PreSubmitCallbackH
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getBenefitCode() == null) {
-            preSubmitCallbackResponse.addError("Benefit code cannot be empty");
-        }
-        if (sscsCaseData.getIssueCode() == null) {
-            preSubmitCallbackResponse.addError("Issue code cannot be empty");
-        }
+        checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
+
         if (sscsCaseData.getDwpFurtherInfo() == null) {
             preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
         }
+        setCaseCode(sscsCaseData);
 
-        sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
         return preSubmitCallbackResponse;
-    }
-
-    private String buildCaseCode(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
     }
 }

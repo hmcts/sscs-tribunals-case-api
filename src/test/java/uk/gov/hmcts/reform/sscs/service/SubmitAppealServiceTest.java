@@ -11,9 +11,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
+import feign.FeignException;
 import java.time.LocalDate;
 import java.util.*;
+
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -115,6 +118,7 @@ public class SubmitAppealServiceTest {
         offices = new ArrayList<>();
         offices.add("DWP PIP (1)");
         offices.add("Balham DRT");
+        offices.add("Watford DRT");
 
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
                 submitYourAppealEmailTemplate, ccdPdfService);
@@ -182,9 +186,37 @@ public class SubmitAppealServiceTest {
                 .saveCaseOperation(SaveCaseOperation.CREATE)
                 .build());
 
-        submitAppealService.submitDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        Assert.assertTrue(result.isPresent());
+
+    }
+
+    @Test(expected = FeignException.class)
+    public void shouldRaisedExceptionOnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(404);
+        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willThrow(feignException);
+
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+
+        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        Assert.assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void shouldSuppressExceptionIfIts409OnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(409);
+        given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willThrow(feignException);
+
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+
+        verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        Assert.assertFalse(result.isPresent());
     }
 
     @SuppressWarnings("unchecked")
@@ -282,7 +314,7 @@ public class SubmitAppealServiceTest {
         appealData.setBenefitType(syaBenefitType);
 
         SyaMrn mrn = new SyaMrn();
-        mrn.setDwpIssuingOffice("Balham DRT");
+        mrn.setDwpIssuingOffice("Watford DRT");
         appealData.setMrn(mrn);
 
         SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");

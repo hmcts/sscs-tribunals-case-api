@@ -51,9 +51,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
             url = caseData.getPreviewDocument();
         } else {
-            SscsDocument decisionNotice = caseData.getLatestDocumentForDocumentType(DocumentType.DECISION_NOTICE);
-            if (decisionNotice != null) {
-                url = decisionNotice.getValue().getDocumentLink();
+            if (caseData.getSscsInterlocDecisionDocument() != null) {
+                url = caseData.getSscsInterlocDecisionDocument().getDocumentLink();
+                caseData.setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
             }
         }
 

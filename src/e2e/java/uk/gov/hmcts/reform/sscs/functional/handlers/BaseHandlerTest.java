@@ -54,11 +54,10 @@ public class BaseHandlerTest {
         ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.SENT_TO_DWP.getCcdType(),
             CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
-        return updateCaseDataWithSomeDocsAndAMoreRealisticBodyForTheUploadDocumentEvent(caseDetails.getId(),
-            filePath);
+        return createCaseDetailsUsingGivenCallback(caseDetails.getId(), filePath);
     }
 
-    private CaseDetails<SscsCaseData> updateCaseDataWithSomeDocsAndAMoreRealisticBodyForTheUploadDocumentEvent(
+    private CaseDetails<SscsCaseData> createCaseDetailsUsingGivenCallback(
         Long id, String filePath) throws IOException {
         Jackson2ObjectMapperBuilder objectMapperBuilder =
             new Jackson2ObjectMapperBuilder()
@@ -71,13 +70,20 @@ public class BaseHandlerTest {
         mapper.registerModule(new JavaTimeModule());
 
         SscsCaseCallbackDeserializer sscsCaseCallbackDeserializer = new SscsCaseCallbackDeserializer(mapper);
-        return sscsCaseCallbackDeserializer.deserialize(getJsonCallbackForTest(id, filePath)).getCaseDetails();
+        return sscsCaseCallbackDeserializer.deserialize(getJsonCallbackForTestAndReplaceCcdId(id, filePath)).getCaseDetails();
     }
 
-    private String getJsonCallbackForTest(long caseDetailsId, String filePath) throws IOException {
+    private String getJsonCallbackForTestAndReplaceCcdId(long caseDetailsId, String filePath) throws IOException {
         String path = Objects.requireNonNull(getClass().getClassLoader()
             .getResource(filePath)).getFile();
         String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetailsId));
     }
+
+    public static String getJsonCallbackForTest(String path) throws IOException {
+        String pathName = Objects.requireNonNull(BaseHandlerTest.class.getClassLoader().getResource(path)).getFile();
+        return FileUtils.readFileToString(new File(pathName), StandardCharsets.UTF_8.name());
+    }
+
+
 }

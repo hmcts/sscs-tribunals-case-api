@@ -2,14 +2,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 public enum DocumentType {
     MEDICAL_EVIDENCE("Medical evidence"), OTHER_EVIDENCE("Other evidence"),
-    APPELLANT_EVIDENCE("appellantEvidence"), REPRESENTATIVE_EVIDENCE("representativeEvidence");
-    private String value;
+    APPELLANT_EVIDENCE("appellantEvidence"), REPRESENTATIVE_EVIDENCE("representativeEvidence"),
+    TL1_FORM("tl1Form");
+    private String id;
 
-    public String getValue() {
-        return value;
+    public String getId() {
+        return id;
     }
 
-    DocumentType(String value) {
-        this.value = value;
+    DocumentType(String id) {
+        this.id = id;
     }
 }

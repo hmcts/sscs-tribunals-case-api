@@ -5,61 +5,30 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.Origi
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Objects;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
-import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ReissueFurtherEvidenceIt {
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
-
-    private MockMvc mockMvc;
-
-    @MockBean
-    private AuthorisationService authorisationService;
-
-    @Autowired
-    private SscsCaseCallbackDeserializer deserializer;
-
-    @Autowired
-    private PreSubmitCallbackDispatcher dispatcher;
-
-    @Autowired
-    private ObjectMapper mapper;
+public class ReissueFurtherEvidenceIt extends AbstractEventIt {
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
@@ -70,8 +39,6 @@ public class ReissueFurtherEvidenceIt {
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
 
-    private String json;
-
     private String midEventPartialJson;
 
     private String aboutToSubmitPartialJson;
@@ -81,17 +48,9 @@ public class ReissueFurtherEvidenceIt {
         CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         mapper.registerModule(new JavaTimeModule());
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("callback/reissueFurtherEvidenceCallback.json")).getFile();
-        json = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        String path2 = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("callback/reissueFurtherEvidenceDocumentPartial.json")).getFile();
-        midEventPartialJson = FileUtils.readFileToString(new File(path2), StandardCharsets.UTF_8.name());
-
-        String path3 = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("callback/reissueFurtherEvidenceOriginalSenderPartial.json")).getFile();
-        aboutToSubmitPartialJson = FileUtils.readFileToString(new File(path3), StandardCharsets.UTF_8.name());
-
+        json = getJson("callback/reissueFurtherEvidenceCallback.json");
+        midEventPartialJson = getJson("callback/reissueFurtherEvidenceDocumentPartial.json");
+        aboutToSubmitPartialJson = getJson("callback/reissueFurtherEvidenceOriginalSenderPartial.json");
     }
 
     @Test
@@ -126,23 +85,6 @@ public class ReissueFurtherEvidenceIt {
 
         DynamicList expected = new DynamicList(repListItem, Arrays.asList(appellantListItem, repListItem, dwpListItem));
         assertEquals(expected, result.getData().getOriginalSender());
-    }
-
-    private MockHttpServletResponse getResponse(MockHttpServletRequestBuilder requestBuilder) throws Exception {
-        return mockMvc.perform(requestBuilder).andReturn().getResponse();
-    }
-
-    private PreSubmitCallbackResponse<SscsCaseData> deserialize(String source) {
-        try {
-            return mapper.readValue(
-                    source,
-                    new TypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
-                    }
-            );
-
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not deserialize object", e);
-        }
     }
 
 }

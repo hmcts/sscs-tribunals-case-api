@@ -4,8 +4,41 @@ import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADJOURNED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CLOSED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DORMANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND_OVERDUE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.EVIDENCE_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NEW_HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.PAST_HEARING_BOOKED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POSTPONED;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_3;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADJOURNED_DATE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADJOURNED_HEARING_DATE_CONTACT_WEEKS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADJOURNED_LETTER_RECEIVED_BY_DATE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADJOURNED_LETTER_RECEIVED_MAX_DAYS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.CONTENT_KEY;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DATE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DECISION_LETTER_RECEIVE_BY_DATE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DORMANT_TO_CLOSED_DURATION_IN_MONTHS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_RESPONSE_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.EVIDENCE_PROVIDED_BY;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.EVIDENCE_TYPE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.GOOGLE_MAP_URL;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.HEARING_CONTACT_DATE_LITERAL;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.HEARING_DATETIME;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.MAX_DWP_RESPONSE_DAYS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.PAST_HEARING_BOOKED_IN_WEEKS;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.POSTCODE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.TYPE;
+import static uk.gov.hmcts.reform.sscs.model.AppConstants.VENUE_NAME;
 import static uk.gov.hmcts.reform.sscs.util.DateTimeUtils.convertLocalDateLocalTimetoUtc;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -13,12 +46,25 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Document;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Evidence;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
@@ -68,6 +114,9 @@ public class TrackYourAppealJsonBuilder {
         caseNode.put("status", getAppealStatus(caseData.getEvents()));
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
+        if (StringUtils.isNotBlank(caseData.getCreatedInGapsFrom())) {
+            caseNode.put("createdInGapsFrom", caseData.getCreatedInGapsFrom());
+        }
 
         if (caseData.getAppeal().getAppellant() != null) {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
@@ -155,47 +204,47 @@ public class TrackYourAppealJsonBuilder {
 
     private void setLatestEventAs(List<Event> eventList, Event currentEvent, EventType eventType) {
         Event event = Event.builder().value(currentEvent.getValue().toBuilder().type(eventType
-                .getCcdType()).build()).build();
+            .getCcdType()).build()).build();
         eventList.set(0, event);
     }
 
     private boolean isPastHearingBookedDate(Event event, Boolean isPaperCase) {
         return DWP_RESPOND.equals(getEventType(event))
-                && LocalDateTime.now().isAfter(
-                LocalDateTime.parse(event.getValue().getDate()).plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS))
-                && !isPaperCase;
+            && LocalDateTime.now().isAfter(
+            LocalDateTime.parse(event.getValue().getDate()).plusWeeks(PAST_HEARING_BOOKED_IN_WEEKS))
+            && !isPaperCase;
     }
 
     private boolean isNewHearingBookedEvent(List<Event> eventList) {
         return eventList.size() > 1
-                && HEARING_BOOKED.equals(getEventType(eventList.get(0)))
-                && (POSTPONED.equals(getEventType(eventList.get(1)))
-                || ADJOURNED.equals(getEventType(eventList.get(1))));
+            && HEARING_BOOKED.equals(getEventType(eventList.get(0)))
+            && (POSTPONED.equals(getEventType(eventList.get(1)))
+            || ADJOURNED.equals(getEventType(eventList.get(1))));
     }
 
     private boolean isAppealClosed(Event event) {
         return DORMANT.equals(getEventType(event))
-                && LocalDateTime.now().isAfter(
-                LocalDateTime.parse(event.getValue().getDate()).plusMonths(
-                        DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
+            && LocalDateTime.now().isAfter(
+            LocalDateTime.parse(event.getValue().getDate()).plusMonths(
+                DORMANT_TO_CLOSED_DURATION_IN_MONTHS));
     }
 
     private boolean isDwpRespondOverdue(Event event) {
         return APPEAL_RECEIVED.equals(getEventType(event))
-                && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
-                MAX_DWP_RESPONSE_DAYS));
+            && LocalDateTime.now().isAfter(LocalDateTime.parse(event.getValue().getDate()).plusDays(
+            MAX_DWP_RESPONSE_DAYS));
     }
 
     private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
-        for (Event event: events) {
+        for (Event event : events) {
             ObjectNode eventNode = JsonNodeFactory.instance.objectNode();
 
             eventNode.put(DATE, getUtcDate((event)));
             eventNode.put(TYPE, getEventType(event).toString());
-            eventNode.put(CONTENT_KEY,"status." + getEventType(event).getType());
+            eventNode.put(CONTENT_KEY, "status." + getEventType(event).getType());
 
             buildEventNode(event, eventNode, eventDocumentMap, eventHearingMap);
 
@@ -208,7 +257,7 @@ public class TrackYourAppealJsonBuilder {
     private List<Event> buildLatestEvents(List<Event> events) {
         List<Event> latestEvents = new ArrayList<>();
 
-        for (Event event: events) {
+        for (Event event : events) {
             if (EVIDENCE_RECEIVED.equals(getEventType(event))) {
                 latestEvents.add(event);
             } else {
@@ -243,30 +292,30 @@ public class TrackYourAppealJsonBuilder {
     private void buildEventNode(Event event, ObjectNode eventNode, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap) {
 
         switch (getEventType(event)) {
-            case APPEAL_RECEIVED :
-            case DWP_RESPOND_OVERDUE :
+            case APPEAL_RECEIVED:
+            case DWP_RESPOND_OVERDUE:
                 eventNode.put(DWP_RESPONSE_DATE_LITERAL, getCalculatedDate(event, MAX_DWP_RESPONSE_DAYS, true));
                 break;
-            case EVIDENCE_RECEIVED :
+            case EVIDENCE_RECEIVED:
                 Document document = eventDocumentMap.get(event);
                 if (document != null) {
                     eventNode.put(EVIDENCE_TYPE, document.getValue().getEvidenceType());
                     eventNode.put(EVIDENCE_PROVIDED_BY, document.getValue().getEvidenceProvidedBy());
                 }
                 break;
-            case DWP_RESPOND :
-            case PAST_HEARING_BOOKED :
-            case POSTPONED :
+            case DWP_RESPOND:
+            case PAST_HEARING_BOOKED:
+            case POSTPONED:
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS, false));
+                    DWP_RESPONSE_HEARING_CONTACT_DATE_IN_WEEKS, false));
                 break;
-            case HEARING_BOOKED :
-            case NEW_HEARING_BOOKED :
+            case HEARING_BOOKED:
+            case NEW_HEARING_BOOKED:
                 Hearing hearing = eventHearingMap.get(event);
                 if (hearing != null) {
                     eventNode.put(POSTCODE, hearing.getValue().getVenue().getAddress().getPostcode());
                     eventNode.put(HEARING_DATETIME,
-                            convertLocalDateLocalTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
+                        convertLocalDateLocalTimetoUtc(hearing.getValue().getHearingDate(), hearing.getValue().getTime()));
                     eventNode.put(VENUE_NAME, hearing.getValue().getVenue().getName());
                     eventNode.put(ADDRESS_LINE_1, hearing.getValue().getVenue().getAddress().getLine1());
                     eventNode.put(ADDRESS_LINE_2, hearing.getValue().getVenue().getAddress().getLine2());
@@ -274,21 +323,22 @@ public class TrackYourAppealJsonBuilder {
                     eventNode.put(GOOGLE_MAP_URL, hearing.getValue().getVenue().getGoogleMapLink());
                 }
                 break;
-            case ADJOURNED :
+            case ADJOURNED:
                 eventNode.put(ADJOURNED_DATE, getUtcDate((event)));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
+                    ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
                 eventNode.put(ADJOURNED_LETTER_RECEIVED_BY_DATE, getCalculatedDate(event,
-                        ADJOURNED_LETTER_RECEIVED_MAX_DAYS, true));
+                    ADJOURNED_LETTER_RECEIVED_MAX_DAYS, true));
                 eventNode.put(HEARING_CONTACT_DATE_LITERAL, getCalculatedDate(event,
-                        ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
+                    ADJOURNED_HEARING_DATE_CONTACT_WEEKS, false));
                 break;
-            case DORMANT :
-            case HEARING :
+            case DORMANT:
+            case HEARING:
                 eventNode.put(DECISION_LETTER_RECEIVE_BY_DATE, getBusinessDay(event,
-                        HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS));
+                    HEARING_DECISION_LETTER_RECEIVED_MAX_DAYS));
                 break;
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -356,15 +406,15 @@ public class TrackYourAppealJsonBuilder {
             for (Document document : documentList) {
                 if (document != null && document.getValue() != null) {
                     EventDetails eventDetails = EventDetails.builder()
-                            .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().plusHours(1)
-                                    .toString())
-                            .type(EventType.EVIDENCE_RECEIVED.getCcdType())
-                            .description("Evidence received")
-                            .build();
+                        .date(LocalDate.parse(document.getValue().getDateReceived()).atStartOfDay().plusHours(1)
+                            .toString())
+                        .type(EventType.EVIDENCE_RECEIVED.getCcdType())
+                        .description("Evidence received")
+                        .build();
 
                     events.add(Event.builder()
-                            .value(eventDetails)
-                            .build());
+                        .value(eventDetails)
+                        .build());
                 }
             }
             caseData.getEvents().addAll(events);
@@ -393,7 +443,7 @@ public class TrackYourAppealJsonBuilder {
             }
         }
 
-        return  eventDocumentMap;
+        return eventDocumentMap;
     }
 
     private Map<Event, Hearing> buildEventHearingMap(SscsCaseData caseData) {
@@ -410,7 +460,7 @@ public class TrackYourAppealJsonBuilder {
                 int hearingIndex = 0;
                 for (Event event : events) {
                     if (HEARING_BOOKED.equals(getEventType(event))
-                            || NEW_HEARING_BOOKED.equals(getEventType(event))) {
+                        || NEW_HEARING_BOOKED.equals(getEventType(event))) {
                         if (hearingIndex < hearingList.size()) {
                             eventHearingMap.put(event, hearingList.get(hearingIndex));
                             hearingIndex++;
@@ -420,20 +470,20 @@ public class TrackYourAppealJsonBuilder {
             }
         }
 
-        return  eventHearingMap;
+        return eventHearingMap;
     }
 
     private SscsCaseData createAppealReceivedEventTypeForAppealCreatedEvent(SscsCaseData caseData) {
 
         EventDetails eventDetails = EventDetails.builder()
-                .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())
-                .type(EventType.APPEAL_RECEIVED.getCcdType())
-                .description("Appeal received")
-                .build();
+            .date(LocalDate.parse(caseData.getCaseCreated()).atStartOfDay().plusHours(1).toString())
+            .type(EventType.APPEAL_RECEIVED.getCcdType())
+            .description("Appeal received")
+            .build();
 
         Event event = Event.builder()
-                .value(eventDetails)
-                .build();
+            .value(eventDetails)
+            .build();
 
         List<Event> events = new ArrayList<>();
         events.add(event);

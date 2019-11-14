@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals;
 
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.withdrawnappeals.DwpState.WITHDRAWAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.WITHDRAWAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.WITHDRAWN;
 
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -16,7 +17,7 @@ public class DwpActionWithdrawalHandler implements PreSubmitCallbackHandler<Sscs
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.DWP_ACTION_WITHDRAWAL)
-            && WITHDRAWAL_RECEIVED.getValue().equals(callback.getCaseDetails().getCaseData().getDwpState());
+            && WITHDRAWAL_RECEIVED.getId().equals(callback.getCaseDetails().getCaseData().getDwpState());
     }
 
     @Override
@@ -25,7 +26,7 @@ public class DwpActionWithdrawalHandler implements PreSubmitCallbackHandler<Sscs
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.setDwpState(DwpState.WITHDRAWN.getValue());
+        caseData.setDwpState(WITHDRAWN.getId());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

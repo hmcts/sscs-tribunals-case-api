@@ -7,11 +7,6 @@ import static org.hamcrest.Matchers.equalTo;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandlerTest;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -45,22 +41,16 @@ public class SendToAdminTest {
     @Test
     public void givenAboutToSubmitCallbackForSendToAdmin_shouldSetInterlocReviewStateField() throws Exception {
         RestAssured.given()
-            .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(new Header("ServiceAuthorization", idamTokens.getServiceAuthorization()))
             .header(new Header("Authorization", idamTokens.getIdamOauth2Token()))
-            .body(getJsonCallbackForTest())
+            .body(BaseHandlerTest.getJsonCallbackForTest("handlers/interloc/sendToAdminCallback.json"))
             .post("/ccdAboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
-            .log().all(true)
             .assertThat().body("data.interlocReviewState", equalTo("awaitingAdminAction"));
     }
 
-    private String getJsonCallbackForTest() throws IOException {
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-            .getResource("handlers/interloc/sendToAdminCallback.json")).getFile();
-        return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-    }
+
 }
 

@@ -5,9 +5,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
+import feign.FeignException;
 import java.time.LocalDate;
 import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -70,9 +70,21 @@ public class SubmitAppealService {
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
 
-    public SaveCaseResult submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
+    public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
-        return saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), getUserTokens(oauth2Token));
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+        try {
+            return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens));
+        } catch (FeignException e) {
+            if (e.status() == 409) {
+                log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
+                        appeal.getAppellant().getNino(),
+                        idamTokens.getUserId());
+                return Optional.empty();
+            } else {
+                throw e;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -100,7 +112,6 @@ public class SubmitAppealService {
             sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
             if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
                 log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
-                caseData.setDateSentToDwp(LocalDate.now().toString());
                 ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
                 log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
             }
@@ -126,8 +137,8 @@ public class SubmitAppealService {
     }
 
     private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
-        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice()) ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
-
+        String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice())
+            ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
         sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
         return sscsCaseData;
     }
