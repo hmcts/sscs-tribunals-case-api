@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart;
 
 import static java.util.Objects.requireNonNull;
 
@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class SelectWhoReviewsCaseDropdownHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -21,6 +21,7 @@ public class ValidSendToInterlocAboutToStartHandler implements PreSubmitCallback
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
                 && (callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC
+                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED)
                 || callback.getEvent() == EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE);
     }
 
