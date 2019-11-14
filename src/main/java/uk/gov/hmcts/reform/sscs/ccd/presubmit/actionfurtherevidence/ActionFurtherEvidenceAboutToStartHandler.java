@@ -61,30 +61,26 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         if (issueFurtherEvidenceFeature) {
-            listOptions.add(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.getCode(), ISSUE_FURTHER_EVIDENCE.getLabel()));
+            populateListWithItems(listOptions, ISSUE_FURTHER_EVIDENCE);
         }
-
-        listOptions.add(new DynamicListItem(OTHER_DOCUMENT_MANUAL.getCode(), OTHER_DOCUMENT_MANUAL.getLabel()));
+        populateListWithItems(listOptions, OTHER_DOCUMENT_MANUAL);
 
         if (StringUtils.isNotBlank(sscsCaseData.getInterlocReviewState())) {
-            populateListWithItemsWhenInterlocStateIsNotBlank(listOptions);
+            populateListWithItems(listOptions, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
+                INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
         } else {
-            listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
-
-            listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-                SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
+            populateListWithItems(listOptions, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                SEND_TO_INTERLOC_REVIEW_BY_TCW);
         }
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
     }
 
-    private void populateListWithItemsWhenInterlocStateIsNotBlank(List<DynamicListItem> listOptions) {
-        listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(),
-            INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getLabel()));
-
-        listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
-            INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel()));
+    private void populateListWithItems(List<DynamicListItem> listOptions,
+                                       FurtherEvidenceActionDynamicListItems... items) {
+        for (FurtherEvidenceActionDynamicListItems item : items) {
+            listOptions.add(new DynamicListItem(item.getCode(), item.getLabel()));
+        }
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
