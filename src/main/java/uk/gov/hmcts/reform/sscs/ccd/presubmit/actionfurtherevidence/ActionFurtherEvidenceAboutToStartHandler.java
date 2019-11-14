@@ -68,6 +68,12 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
 
         if (StringUtils.isNotBlank(sscsCaseData.getInterlocReviewState())) {
             populateListWithItemsWhenInterlocStateIsNotBlank(listOptions);
+        } else {
+            listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
+                SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
+
+            listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
+                SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
         }
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
@@ -79,12 +85,6 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
 
         listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel()));
-
-        listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(),
-            SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getLabel()));
-
-        listOptions.add(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(),
-            SEND_TO_INTERLOC_REVIEW_BY_TCW.getLabel()));
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {

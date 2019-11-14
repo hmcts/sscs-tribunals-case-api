@@ -68,17 +68,19 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     @Parameters({
-        "true, any, 6, true, true, true, true, true, true",
-        "true, null, 2, true, true, false, false, false, false",
-        "false, null, 1, false, true, false, false, false, false",
-        "false, any, 5, false, true, true, true, true, true"
+        "true, any, 4, true, true, true, true, false, false",
+        "true, null, 4, true, true, false, false, true, true",
+        "true,, 4, true, true, false, false, true, true",
+        "false, null, 3, false, true, false, false, true, true",
+        "false,, 3, false, true, false, false, true, true",
+        "false, any, 3, false, true, true, true, false, false"
     })
     public void givenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown(
         boolean issueFurtherEvidenceFeature,
         @Nullable String interlocReviewState,
         int expectedListItemSize,
-        boolean expectedIssueFurtherEvidenceItem,
-        boolean expectedOtherDocumentManualItem,
+        boolean issueFurtherEvidenceItem,
+        boolean otherDocumentManualItem,
         boolean informationReceivedForInterlocJudgeItem,
         boolean informationReceivedForInterlocTcwItem,
         boolean sendToInterlocJudgeItem,
@@ -92,10 +94,10 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        assertEquals(expectedIssueFurtherEvidenceItem, "issueFurtherEvidence".equals(getItemCodeInList(
+        assertEquals(issueFurtherEvidenceItem, "issueFurtherEvidence".equals(getItemCodeInList(
             response.getData().getFurtherEvidenceAction(), "issueFurtherEvidence")));
 
-        assertEquals(expectedOtherDocumentManualItem, "otherDocumentManual".equals(getItemCodeInList(
+        assertEquals(otherDocumentManualItem, "otherDocumentManual".equals(getItemCodeInList(
             response.getData().getFurtherEvidenceAction(), "otherDocumentManual")));
 
         assertEquals(informationReceivedForInterlocJudgeItem, "informationReceivedForInterlocJudge".equals(
