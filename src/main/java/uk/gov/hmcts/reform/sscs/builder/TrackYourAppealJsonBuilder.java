@@ -114,15 +114,9 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
             caseNode.put("surname", caseData.getAppeal().getAppellant().getName().getLastName());
             if (caseData.getAppeal().getAppellant().getContact() != null) {
-                Contact contact = caseData.getAppeal().getAppellant().getContact();
 
-                ObjectNode contactNode = JsonNodeFactory.instance.objectNode();
 
-                contactNode.put("phone", contact.getPhone());
-                contactNode.put("email", contact.getEmail());
-                contactNode.put("mobile", contact.getMobile());
-
-                caseNode.put("contact", contactNode);
+                caseNode.put("contact", getContactNode(caseData));
             }
         }
 
@@ -143,6 +137,23 @@ public class TrackYourAppealJsonBuilder {
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
 
         return root;
+    }
+
+    private ObjectNode getContactNode(SscsCaseData caseData) {
+        Contact contact = caseData.getAppeal().getAppellant().getContact();
+
+        ObjectNode contactNode = JsonNodeFactory.instance.objectNode();
+
+        if (contact.getPhone() != null) {
+            contactNode.put("phone", contact.getPhone());
+        }
+        if (contact.getEmail() != null) {
+            contactNode.put("email", contact.getEmail());
+        }
+        if (contact.getMobile() != null) {
+            contactNode.put("mobile", contact.getMobile());
+        }
+        return contactNode;
     }
 
     private ObjectNode buildSubscriptions(Subscriptions subscriptions) {
