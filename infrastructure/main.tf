@@ -80,6 +80,16 @@ data "azurerm_key_vault_secret" "idam_oauth2_client_secret" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+data "azurerm_key_vault_secret" "pdf_service_base_url" {
+  name      = "docmosis-endpoint"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
+data "azurerm_key_vault_secret" "pdf_service_access_key" {
+  name      = "docmosis-api-key"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 locals {
   local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
@@ -134,6 +144,10 @@ module "tribunals-case-api" {
     EMAIL_SMTP_SSL_TRUST = "${var.appeal_email_smtp_ssl_trust}"
 
     PDF_API_URL = "${local.pdfService}"
+
+    PDF_API_URL                 = "${local.pdfService}"
+    PDF_SERVICE_ACCESS_KEY      = "${data.azurerm_key_vault_secret.pdf_service_access_key.value}"
+    PDF_SERVICE_HEALTH_URL      = "${data.azurerm_key_vault_secret.pdf_service_base_url.value}rs/status"
 
     SUBSCRIPTIONS_MAC_SECRET = "${data.azurerm_key_vault_secret.email_mac_secret.value}"
 
