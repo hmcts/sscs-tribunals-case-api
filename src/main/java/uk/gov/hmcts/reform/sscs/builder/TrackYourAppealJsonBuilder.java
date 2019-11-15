@@ -113,6 +113,17 @@ public class TrackYourAppealJsonBuilder {
         if (caseData.getAppeal().getAppellant() != null) {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
             caseNode.put("surname", caseData.getAppeal().getAppellant().getName().getLastName());
+            if (caseData.getAppeal().getAppellant().getContact() != null) {
+                Contact contact = caseData.getAppeal().getAppellant().getContact();
+
+                ObjectNode contactNode = JsonNodeFactory.instance.objectNode();
+
+                contactNode.put("phone", contact.getPhone());
+                contactNode.put("email", contact.getEmail());
+                contactNode.put("mobile", contact.getMobile());
+
+                caseNode.put("contact", contactNode);
+            }
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());

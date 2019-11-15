@@ -236,6 +236,15 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
+    public void appealCreatedWithContactDetails() throws CcdException {
+        SscsCaseData caseData = APPEAL_CREATED_WITH_SUBSCRIPTION_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L);
+
+        assertJsonEquals(APPEAL_CREATED_WITH_SUBSCRIPTION.getSerializedMessage(), objectNode);
+    }
+
+    @Test
     public void shouldHandleMissingHearings() throws CcdException {
         SscsCaseData caseData = MISSING_HEARING_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,

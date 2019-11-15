@@ -2,12 +2,17 @@
   "appeal": {
     "caseId" : "1",
     "caseReference": "SC123/45/00001",
-    "name": "Mr Jason Mock",
-    "surname": "Mock",
     "appealNumber": "abcde12345",
+    "status": "APPEAL_RECEIVED",
     "benefitType": "pip",
     "hearingType": "oral",
-    "status": "APPEAL_RECEIVED",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
+      "contact": {
+        "phone": "012345678",
+        "mobile": "09876543",
+        "email": "contact.email@myemail.com"
+    },
     "latestEvents": [
       {
         "date": "2028-06-08T00:00:00.000Z",
