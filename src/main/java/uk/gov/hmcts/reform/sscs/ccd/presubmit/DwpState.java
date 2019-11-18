@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 public enum DwpState {
     WITHDRAWAL_RECEIVED("withdrawalReceived", "Withdrawal received"),
     WITHDRAWN("Withdrawn", "Withdrawn"),
-    WITHDRAW_FOR_ACTION("withdrawForAction", "Withdraw for action"),
     FE_RECEIVED("feReceived", "FE received"),
     FE_ACTIONED_NR("feActionedNR", "FE Actioned - NR"),
     FE_ACTIONED_NA("feActionedNA", "FE Actioned - NA"),

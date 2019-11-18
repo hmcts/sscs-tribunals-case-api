@@ -1,9 +1,9 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDate;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 
 @Component
 @Slf4j
-public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -24,7 +24,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE;
+            && callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED;
     }
 
     @Override
@@ -39,13 +39,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
-
-        if (sscsCaseData.getDwpFurtherInfo() == null) {
-            preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
-        }
         setCaseCode(sscsCaseData);
 
-        sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
+        if (sscsCaseData.getDwpResponseDate() == null) {
+            sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
+        }
 
         return preSubmitCallbackResponse;
     }

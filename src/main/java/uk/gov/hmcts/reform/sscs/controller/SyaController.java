@@ -88,14 +88,18 @@ public class SyaController {
                 getMissingDataInfo(syaCaseWrapper, authorisation));
             return ResponseEntity.noContent().build();
         }
-        SaveCaseResult submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
+        Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
+        if (!submitDraftResult.isPresent()) {
+            return ResponseEntity.noContent().build();
+        }
+
         Draft draft = Draft.builder()
-            .id(submitDraftResult.getCaseDetailsId())
+            .id(submitDraftResult.get().getCaseDetailsId())
             .build();
-        log.info("{} {} successfully", draft, submitDraftResult.getSaveCaseOperation().name());
+        log.info("{} {} successfully", draft, submitDraftResult.get().getSaveCaseOperation().name());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(draft.getId()).toUri();
-        if (submitDraftResult.getSaveCaseOperation().equals(SaveCaseOperation.CREATE)) {
+        if (submitDraftResult.get().getSaveCaseOperation().equals(SaveCaseOperation.CREATE)) {
             return created(location).build();
         } else {
             return status(HttpStatus.OK).location(location).build();

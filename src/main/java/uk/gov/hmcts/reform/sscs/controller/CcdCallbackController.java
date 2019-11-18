@@ -43,7 +43,8 @@ public class CcdCallbackController {
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("About to start sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("About to start sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
+            callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
 
@@ -56,7 +57,8 @@ public class CcdCallbackController {
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
+            callback.getCaseDetails().getId());
         authorisationService.authorise(serviceAuthHeader);
         return performRequest(ABOUT_TO_SUBMIT, callback, userAuthorisation);
     }
@@ -67,7 +69,8 @@ public class CcdCallbackController {
             @RequestHeader(AUTHORIZATION) String userAuthorisation,
             @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("Midevent sscs case callback `{}` received for Case ID `{}`", callback.getEvent(), callback.getCaseDetails().getId());
+        log.info("Midevent sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
+            callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
         return performRequest(MID_EVENT, callback, userAuthorisation);
@@ -100,5 +103,4 @@ public class CcdCallbackController {
 
         return ok(callbackResponse);
     }
-
 }
