@@ -83,7 +83,7 @@ public class IssueDocumentHandler {
 
     private String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
-        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equals("Yes")) {
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equals("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
             fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
             fullNameText.append(", appointee for ");
         }
