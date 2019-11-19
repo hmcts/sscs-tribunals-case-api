@@ -106,8 +106,9 @@
         <cve>CVE-2019-17531</cve>
     </suppress>
     <suppress until="2019-12-31">
-    <notes><![CDATA[
+        <notes><![CDATA[
    Temp fix for demo
    ]]></notes>
-    <cve>CVE-2018-20200</cve>
+        <cve>CVE-2018-20200</cve>
+    </suppress>
 </suppressions>
