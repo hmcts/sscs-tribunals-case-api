@@ -26,5 +26,9 @@
       "faxNumber":"0870 324 0109"
     }
   },
-  "subscriptions":{}
+  "subscriptions":{
+    "Appellant":{
+      "email":"appellant@example.com"
+    }
+  }
 }

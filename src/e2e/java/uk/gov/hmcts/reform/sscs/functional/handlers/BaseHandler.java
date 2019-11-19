@@ -28,19 +28,22 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
-public class BaseHandlerTest {
+public class BaseHandler {
+
     protected static final String CREATED_BY_FUNCTIONAL_TEST = "created by functional test";
+
     @Autowired
     protected CcdService ccdService;
+    @Autowired
+    private IdamService idamService;
+
     protected IdamTokens idamTokens;
     protected CaseDetails<SscsCaseData> caseDetails;
     @Value("${test-url}")
     private String testUrl;
-    @Autowired
-    private IdamService idamService;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
         idamTokens = idamService.getIdamTokens();
@@ -81,7 +84,7 @@ public class BaseHandlerTest {
     }
 
     public static String getJsonCallbackForTest(String path) throws IOException {
-        String pathName = Objects.requireNonNull(BaseHandlerTest.class.getClassLoader().getResource(path)).getFile();
+        String pathName = Objects.requireNonNull(BaseHandler.class.getClassLoader().getResource(path)).getFile();
         return FileUtils.readFileToString(new File(pathName), StandardCharsets.UTF_8.name());
     }
 
