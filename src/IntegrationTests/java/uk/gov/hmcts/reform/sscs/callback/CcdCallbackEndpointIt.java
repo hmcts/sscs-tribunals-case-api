@@ -8,13 +8,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
+import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -123,18 +132,20 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
 
     @Test
     public void actionFurtherEvidenceDropdownAboutToStartCallback() throws Exception {
-        json = getJson("callback/actionFurtherEvidenceCallback.json");
+        json = getJson("callback/actionFurtherEvidenceWithEmptyFurtherEvidenceActionFieldCallback.json");
 
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToStart"));
 
         assertHttpStatus(response, HttpStatus.OK);
 
+        @SuppressWarnings({"unchecked", "CastCanBeRemovedNarrowingVariableType"})
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertEquals(3, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(2, result.getData().getFurtherEvidenceAction().getListItems().size());
-        assertEquals(ISSUE_FURTHER_EVIDENCE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
-        assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+        assertEquals(3, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
+        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
     }
 
     @Test

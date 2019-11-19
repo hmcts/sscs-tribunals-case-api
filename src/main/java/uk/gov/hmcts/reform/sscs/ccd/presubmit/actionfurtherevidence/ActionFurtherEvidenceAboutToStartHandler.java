@@ -2,11 +2,19 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -53,19 +61,26 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         if (issueFurtherEvidenceFeature) {
-            listOptions.add(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.getCode(), ISSUE_FURTHER_EVIDENCE.getLabel()));
+            populateListWithItems(listOptions, ISSUE_FURTHER_EVIDENCE);
         }
-        listOptions.add(new DynamicListItem(OTHER_DOCUMENT_MANUAL.getCode(), OTHER_DOCUMENT_MANUAL.getLabel()));
+        populateListWithItems(listOptions, OTHER_DOCUMENT_MANUAL);
 
-        if (sscsCaseData.getInterlocReviewState() != null) {
-            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode(),
-                INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getLabel()));
-
-            listOptions.add(new DynamicListItem(INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getCode(),
-                INFORMATION_RECEIVED_FOR_INTERLOC_TCW.getLabel()));
+        if (StringUtils.isNotBlank(sscsCaseData.getInterlocReviewState())) {
+            populateListWithItems(listOptions, INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
+                INFORMATION_RECEIVED_FOR_INTERLOC_TCW);
+        } else {
+            populateListWithItems(listOptions, SEND_TO_INTERLOC_REVIEW_BY_JUDGE,
+                SEND_TO_INTERLOC_REVIEW_BY_TCW);
         }
 
         sscsCaseData.setFurtherEvidenceAction(new DynamicList(listOptions.get(0), listOptions));
+    }
+
+    private void populateListWithItems(List<DynamicListItem> listOptions,
+                                       FurtherEvidenceActionDynamicListItems... items) {
+        for (FurtherEvidenceActionDynamicListItems item : items) {
+            listOptions.add(new DynamicListItem(item.getCode(), item.getLabel()));
+        }
     }
 
     private void setOriginalSenderDropdown(SscsCaseData sscsCaseData) {
@@ -75,7 +90,7 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
         listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
 
         if (sscsCaseData.getAppeal().getRep() != null
-                && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
+            && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {
             listOptions.add(new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel()));
         }
 
