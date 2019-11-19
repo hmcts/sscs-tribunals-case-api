@@ -1,0 +1,59 @@
+{
+  "caseId" : "1",
+  "caseReference": "SC123/45/00001",
+  "caseCreated" : "2028-06-08",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr",
+        "lastName": "Mock",
+        "firstName": "Jason"
+      },
+      "contact": {
+        "phone": "012345678",
+        "email": "contact.email@myemail.com"
+      }
+    },
+    "benefitType": {
+      "code": "PIP",
+      "description": "benefit Type"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345",
+      "subscribeEmail": "yes",
+      "wantSmsNotifications": "yes",
+      "subscribeSms": "yes",
+      "email": "appellant@example.com",
+      "mobile": "07999999999"
+    },
+    "appointeeSubscription": {
+      "tya": "abcde12345",
+      "subscribeEmail": "yes",
+      "wantSmsNotifications": "yes",
+      "subscribeSms": "yes",
+      "email": "appointee@example.com",
+      "mobile": "07888888888"
+    },
+    "representativeSubscription": {
+      "tya": "abcde12345",
+      "subscribeEmail": "yes",
+      "wantSmsNotifications": "yes",
+      "subscribeSms": "yes",
+      "email": "representative@example.com",
+      "mobile": "07777777777"
+    },
+    "supporterSubscription": {
+      "tya": "abcde12345",
+      "subscribeEmail": "yes",
+      "wantSmsNotifications": "yes",
+      "subscribeSms": "yes",
+      "email": "supporter@example.com",
+      "mobile": "07666666666"
+    }
+  }
+}
