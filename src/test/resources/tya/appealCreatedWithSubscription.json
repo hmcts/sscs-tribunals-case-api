@@ -2,12 +2,16 @@
   "appeal": {
     "caseId" : "1",
     "caseReference": "SC123/45/00001",
-    "name": "Mr Jason Mock",
-    "surname": "Mock",
     "appealNumber": "abcde12345",
+    "status": "APPEAL_RECEIVED",
     "benefitType": "pip",
     "hearingType": "oral",
-    "status": "APPEAL_RECEIVED",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
+      "contact": {
+        "phone": "012345678",
+        "email": "contact.email@myemail.com"
+    },
     "latestEvents": [
       {
         "date": "2028-06-08T00:00:00.000Z",
@@ -26,5 +30,22 @@
       "faxNumber":"0870 324 0109"
     }
   },
-  "subscriptions":{}
+  "subscriptions":{
+    "Appellant":{
+      "email":"appellant@example.com",
+      "mobile":"07999999999"
+    },
+    "Appointee":{
+      "email":"appointee@example.com",
+      "mobile":"07888888888"
+    },
+    "Representative":{
+      "email":"representative@example.com",
+      "mobile":"07777777777"
+    },
+    "Supporter":{
+      "email":"supporter@example.com",
+      "mobile":"07666666666"
+    }
+  }
 }
