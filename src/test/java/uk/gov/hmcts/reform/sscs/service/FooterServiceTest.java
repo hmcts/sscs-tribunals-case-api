@@ -181,6 +181,6 @@ public class FooterServiceTest {
     public void buildBundleAdditionFileNameText() {
         String result = footerService.buildBundleAdditionFileName("A", "I am the right text");
 
-        assertEquals("Addition A - I am the right text", result);
+        assertEquals("Addition A - I am the right text.pdf", result);
     }
 }
