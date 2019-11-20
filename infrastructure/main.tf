@@ -118,6 +118,7 @@ module "tribunals-case-api" {
   common_tags = "${var.common_tags}"
   asp_rg = "${local.app_service_plan}"
   asp_name = "${local.app_service_plan}"
+  enable_ase          = "${var.enable_ase}"
 
   appinsights_instrumentation_key = "${var.appinsights_instrumentation_key}"
 
