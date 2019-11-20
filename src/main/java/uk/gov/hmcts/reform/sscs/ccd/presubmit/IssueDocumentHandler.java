@@ -10,8 +10,10 @@ import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -23,7 +25,7 @@ public class IssueDocumentHandler {
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
-    protected void clearTransientFields(SscsCaseData caseData) {
+    protected void clearTransientFields(SscsCaseData caseData, State state) {
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
         caseData.setSignedBy(null);
@@ -32,6 +34,10 @@ public class IssueDocumentHandler {
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
+
+        if (DirectionType.PROVIDE_INFORMATION.equals(caseData.getDirectionType()) || !state.equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+            caseData.setDirectionType(null);
+        }
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
