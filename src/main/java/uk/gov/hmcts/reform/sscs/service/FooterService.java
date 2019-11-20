@@ -109,7 +109,7 @@ public class FooterService {
     }
 
     public String buildBundleAdditionFileName(String bundleAddition, String rightText) {
-        return "Addition " + bundleAddition + " - " + rightText;
+        return "Addition " + bundleAddition + " - " + rightText + ".pdf";
     }
 
     private byte[] toBytes(String documentUrl) {

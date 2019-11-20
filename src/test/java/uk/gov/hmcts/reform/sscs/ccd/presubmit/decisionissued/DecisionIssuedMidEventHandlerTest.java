@@ -107,24 +107,39 @@ public class DecisionIssuedMidEventHandlerTest {
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE);
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
     }
 
     @Test
     public void scottishRpcWillShowAScottishImage() {
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE);
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname");
     }
 
-    private void verifyTemplateBody(String image) {
+    @Test
+    public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
+                .name(Name.builder().firstName("APPOINTEE")
+                        .lastName("SurNamE")
+                        .build())
+                .identity(Identity.builder().build())
+                .build());
+
+        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname");
+    }
+
+    private void verifyTemplateBody(String image, String expectedName) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
         assertEquals("DECISION NOTICE", payload.getNoticeType());
-        assertEquals("Appellant Lastname", payload.getAppellantFullName());
+        assertEquals(expectedName, payload.getAppellantFullName());
     }
 }
 

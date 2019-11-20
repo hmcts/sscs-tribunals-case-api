@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -63,8 +65,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReviewState("awaitingInformation");
             caseData.setDirectionType(null);
         } else if (DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType())) {
-            caseData.setState(State.VALID_APPEAL);
-            caseData.setDirectionType(null);
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         }
 
         createFooter(url, caseData);

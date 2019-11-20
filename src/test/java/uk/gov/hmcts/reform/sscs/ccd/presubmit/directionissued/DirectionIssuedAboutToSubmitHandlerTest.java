@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -126,9 +127,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
-        assertNull(response.getData().getInterlocReviewState());
+        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionResponse());
-        assertEquals(State.VALID_APPEAL, response.getData().getState());
         verify(footerService).createFooterDocument(any(), eq("Direction notice"), any(), any(), any(), any());
     }
 

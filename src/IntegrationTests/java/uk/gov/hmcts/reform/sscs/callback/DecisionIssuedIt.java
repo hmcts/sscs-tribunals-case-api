@@ -100,7 +100,7 @@ public class DecisionIssuedIt extends AbstractEventIt {
         assertEquals(4, result.getData().getSscsDocument().size());
         assertEquals(DocumentType.DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("Addition B - Decision notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")), result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition B - Decision notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
