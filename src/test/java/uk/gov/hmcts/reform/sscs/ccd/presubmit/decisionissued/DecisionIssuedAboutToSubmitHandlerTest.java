@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -133,12 +134,14 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValue() {
-        sscsCaseData.setDecisionType("strikeOut");
+    @Parameters({"strikeOut, strikeOutAction", "null, null", ",null"})
+    public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValue(@Nullable String decisionType,
+                                                                    @Nullable String expectedDwpState) {
+        sscsCaseData.setDecisionType(decisionType);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         String currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
-        assertEquals(String.format(assertionMsg, currentDwpState, "strikeOut"), "strikeOutAction", currentDwpState);
+        assertEquals(String.format(assertionMsg, currentDwpState, "strikeOut"), expectedDwpState, currentDwpState);
     }
 
     @Test
