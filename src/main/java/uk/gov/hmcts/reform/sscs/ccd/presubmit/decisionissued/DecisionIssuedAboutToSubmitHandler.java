@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -37,9 +38,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && callback.getEvent() == EventType.DECISION_ISSUED
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+            && callback.getEvent() == EventType.DECISION_ISSUED
+            && Objects.nonNull(callback.getCaseDetails())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -62,6 +63,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         if (caseData.getDecisionType() != null && caseData.getDecisionType().equals(STRIKE_OUT.getValue())) {
             caseData.setOutcome("nonCompliantAppealStruckout");
+            caseData.setDwpState(DwpState.STRIKE_OUT_ACTION.getId());
         }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
@@ -77,10 +79,10 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             String bundleAddition = footerService.getNextBundleAddition(caseData.getSscsDocument());
 
             String bundleFileName = footerService.buildBundleAdditionFileName(bundleAddition, "Decision notice issued on "
-                    + Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+                + Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
 
             SscsDocument sscsDocument = footerService.createFooterDocument(url, "Decision notice", bundleAddition, bundleFileName,
-                    caseData.getDateAdded(), DocumentType.DECISION_NOTICE);
+                caseData.getDateAdded(), DocumentType.DECISION_NOTICE);
 
             List<SscsDocument> documents = new ArrayList<>();
             documents.add(sscsDocument);

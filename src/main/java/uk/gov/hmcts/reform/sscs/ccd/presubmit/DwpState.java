@@ -8,7 +8,9 @@ public enum DwpState {
     FE_ACTIONED_NA("feActionedNA", "FE Actioned - NA"),
     DIRECTION_ACTION_REQUIRED("directionActionRequired", "Direction - action req'd"),
     DIRECTION_RESPONDED("directionResponded", "Direction - responded"),
-    HEARING_POSTPONED("hearingPostponed", null), REP_ADDED("repAdded", null),
+    HEARING_POSTPONED("hearingPostponed", null),
+    REP_ADDED("repAdded", null),
+    STRIKE_OUT_ACTION("strikeOutAction", null),
     EXTENSION_REQUESTED("extensionRequested", null);
 
     private String id;
