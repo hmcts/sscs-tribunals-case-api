@@ -56,15 +56,7 @@ import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Document;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Evidence;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
@@ -75,8 +67,6 @@ public class TrackYourAppealJsonBuilder {
     private static final Logger LOG = getLogger(TrackYourAppealJsonBuilder.class);
     public static final String YES = "Yes";
     public static final String PAPER = "paper";
-    private Map<Event, Document> eventDocumentMap;
-    private Map<Event, Hearing> eventHearingMap;
 
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
@@ -104,8 +94,7 @@ public class TrackYourAppealJsonBuilder {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
         }
 
-        eventDocumentMap = buildEventDocumentMap(caseData);
-        eventHearingMap = buildEventHearingMap(caseData);
+
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
@@ -124,20 +113,74 @@ public class TrackYourAppealJsonBuilder {
         if (caseData.getAppeal().getAppellant() != null) {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
             caseNode.put("surname", caseData.getAppeal().getAppellant().getName().getLastName());
+            if (caseData.getAppeal().getAppellant().getContact() != null) {
+
+
+                caseNode.put("contact", getContactNode(caseData));
+            }
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
-        caseNode.set("latestEvents", buildEventArray(latestEvents));
+
+        Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
+        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+        caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
-            caseNode.set("historicalEvents", buildEventArray(historicalEvents));
+            caseNode.set("historicalEvents", buildEventArray(historicalEvents, eventDocumentMap, eventHearingMap));
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
         processRpcDetails(regionalProcessingCenter, caseNode);
         root.set("appeal", caseNode);
 
+        root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
+
         return root;
+    }
+
+    private ObjectNode getContactNode(SscsCaseData caseData) {
+        Contact contact = caseData.getAppeal().getAppellant().getContact();
+
+        ObjectNode contactNode = JsonNodeFactory.instance.objectNode();
+
+        if (contact.getPhone() != null) {
+            contactNode.put("phone", contact.getPhone());
+        }
+        if (contact.getEmail() != null) {
+            contactNode.put("email", contact.getEmail());
+        }
+        if (contact.getMobile() != null) {
+            contactNode.put("mobile", contact.getMobile());
+        }
+        return contactNode;
+    }
+
+    private ObjectNode buildSubscriptions(Subscriptions subscriptions) {
+        ObjectNode subscriptionsNode = JsonNodeFactory.instance.objectNode();
+
+        if (subscriptions != null) {
+            addSubscription(subscriptionsNode, subscriptions.getAppellantSubscription(), "Appellant");
+            addSubscription(subscriptionsNode, subscriptions.getAppointeeSubscription(), "Appointee");
+            addSubscription(subscriptionsNode, subscriptions.getRepresentativeSubscription(), "Representative");
+            addSubscription(subscriptionsNode, subscriptions.getSupporterSubscription(), "Supporter");
+        }
+
+        return subscriptionsNode;
+    }
+
+    private void addSubscription(ObjectNode subscriptionsNode, Subscription subscription, String type) {
+        if (subscription != null && (subscription.isEmailSubscribed() || subscription.isSmsSubscribed())) {
+            ObjectNode subscriptionNode = JsonNodeFactory.instance.objectNode();
+
+            if (subscription.isEmailSubscribed()) {
+                subscriptionNode.put("email", subscription.getEmail());
+            }
+            if (subscription.isSmsSubscribed()) {
+                subscriptionNode.put("mobile", subscription.getMobile());
+            }
+            subscriptionsNode.set(type, subscriptionNode);
+        }
     }
 
     private String getHearingType(SscsCaseData caseData) {
@@ -206,7 +249,7 @@ public class TrackYourAppealJsonBuilder {
             MAX_DWP_RESPONSE_DAYS));
     }
 
-    private ArrayNode buildEventArray(List<Event> events) {
+    private ArrayNode buildEventArray(List<Event> events, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap) {
 
         ArrayNode eventsNode = JsonNodeFactory.instance.arrayNode();
 
@@ -217,7 +260,7 @@ public class TrackYourAppealJsonBuilder {
             eventNode.put(TYPE, getEventType(event).toString());
             eventNode.put(CONTENT_KEY, "status." + getEventType(event).getType());
 
-            buildEventNode(event, eventNode);
+            buildEventNode(event, eventNode, eventDocumentMap, eventHearingMap);
 
             eventsNode.add(eventNode);
         }
@@ -260,7 +303,7 @@ public class TrackYourAppealJsonBuilder {
         return appealStatus;
     }
 
-    private void buildEventNode(Event event, ObjectNode eventNode) {
+    private void buildEventNode(Event event, ObjectNode eventNode, Map<Event, Document> eventDocumentMap, Map<Event, Hearing> eventHearingMap) {
 
         switch (getEventType(event)) {
             case APPEAL_RECEIVED:
@@ -394,7 +437,7 @@ public class TrackYourAppealJsonBuilder {
 
     private Map<Event, Document> buildEventDocumentMap(SscsCaseData caseData) {
 
-        eventDocumentMap = new HashMap<>();
+        Map<Event, Document> eventDocumentMap = new HashMap<>();
         Evidence evidence = caseData.getEvidence();
         List<Document> documentList = evidence != null ? evidence.getDocuments() : null;
 
@@ -419,7 +462,7 @@ public class TrackYourAppealJsonBuilder {
 
     private Map<Event, Hearing> buildEventHearingMap(SscsCaseData caseData) {
 
-        eventHearingMap = new HashMap<>();
+        Map<Event, Hearing> eventHearingMap = new HashMap<>();
         List<Hearing> hearingList = caseData.getHearings();
 
         if (hearingList != null && !hearingList.isEmpty()) {
