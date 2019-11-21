@@ -35,10 +35,8 @@ public abstract class EventToFieldPreSubmitCallbackHandler implements PreSubmitC
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        final SscsCaseData updatedInterlocCaseData = setField(sscsCaseData, eventFieldMappings.get(callback.getEvent()),
-                callback.getEvent());
-
-        return new PreSubmitCallbackResponse<>(updatedInterlocCaseData);
+        return new PreSubmitCallbackResponse<>(setField(sscsCaseData, eventFieldMappings.get(callback.getEvent()),
+                callback.getEvent()));
     }
 
     protected abstract SscsCaseData setField(SscsCaseData sscsCaseData, String newValue, EventType eventType);
