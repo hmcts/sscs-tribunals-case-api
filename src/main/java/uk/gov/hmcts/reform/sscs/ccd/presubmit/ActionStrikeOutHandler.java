@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.STRUCK_OUT;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ public class ActionStrikeOutHandler extends EventToFieldPreSubmitCallbackHandler
 
     private static Map<EventType, String> createMappings() {
         Map<EventType, String> eventFieldMappings = new HashMap<>();
-        eventFieldMappings.put(EventType.ACTION_STRIKE_OUT, "struckOut");
+        eventFieldMappings.put(EventType.ACTION_STRIKE_OUT, STRUCK_OUT.getId());
         return eventFieldMappings;
     }
 
