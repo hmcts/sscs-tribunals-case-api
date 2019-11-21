@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -15,12 +17,14 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionStrikeOutHandlerTest {
+    private static final String USER_AUTHORISATION = "Bearer token";
 
     private ActionStrikeOutHandler actionStrikeOutHandler;
 
@@ -61,6 +65,16 @@ public class ActionStrikeOutHandlerTest {
     }
 
     @Test
-    public void setField() {
+    @Parameters({
+        "ACTION_STRIKE_OUT, struckOut",
+    })
+    public void givenEvent_thenSetDwpStateToExpected(EventType eventType, String expectedDwpState) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback,
+            USER_AUTHORISATION);
+
+        assertThat(response.getData().getDwpState(), is(expectedDwpState));
+
     }
 }

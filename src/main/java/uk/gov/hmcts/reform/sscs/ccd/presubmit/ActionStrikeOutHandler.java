@@ -17,13 +17,13 @@ public class ActionStrikeOutHandler extends EventToFieldPreSubmitCallbackHandler
 
     private static Map<EventType, String> createMappings() {
         Map<EventType, String> eventFieldMappings = new HashMap<>();
-        eventFieldMappings.put(EventType.ACTION_STRIKE_OUT, null);
+        eventFieldMappings.put(EventType.ACTION_STRIKE_OUT, "struckOut");
         return eventFieldMappings;
     }
 
-
     @Override
     protected SscsCaseData setField(SscsCaseData sscsCaseData, String newValue, EventType eventType) {
-        return null;
+        sscsCaseData.setDwpState(newValue);
+        return sscsCaseData;
     }
 }
