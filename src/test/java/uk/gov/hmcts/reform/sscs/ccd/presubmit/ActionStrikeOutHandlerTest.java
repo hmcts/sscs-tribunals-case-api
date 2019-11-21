@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -52,6 +53,11 @@ public class ActionStrikeOutHandlerTest {
     public void givenEvent_thenCanHandle(EventType eventType, CallbackType callbackType, boolean expected) {
         when(callback.getEvent()).thenReturn(eventType);
         assertEquals(expected, actionStrikeOutHandler.canHandle(callbackType, callback));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void givenNullCallback_shouldThrowException() {
+        actionStrikeOutHandler.canHandle(ABOUT_TO_SUBMIT, null);
     }
 
     @Test
