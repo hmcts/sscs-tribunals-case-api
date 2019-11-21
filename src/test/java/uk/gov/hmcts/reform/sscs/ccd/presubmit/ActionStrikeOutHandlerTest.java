@@ -77,4 +77,15 @@ public class ActionStrikeOutHandlerTest {
         assertThat(response.getData().getDwpState(), is(expectedDwpState));
 
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void throwExceptionIfCannotHandleEventType() {
+        when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
+
+        sscsCaseData = SscsCaseData.builder().dwpState("someValue").build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
 }

@@ -26,4 +26,5 @@ public class ActionStrikeOutHandler extends EventToFieldPreSubmitCallbackHandler
         sscsCaseData.setDwpState(newValue);
         return sscsCaseData;
     }
+
 }
