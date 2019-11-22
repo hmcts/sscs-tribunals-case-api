@@ -82,7 +82,10 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void returnAnErrorIfNoSelectedDocument() {
+    @Parameters({"VALID_SEND_TO_INTERLOC", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
+    public void returnAnErrorIfNoSelectedDocument(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
         sscsCaseData = sscsCaseData.toBuilder().selectWhoReviewsCase(null).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

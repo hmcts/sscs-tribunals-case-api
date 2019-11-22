@@ -59,7 +59,7 @@ public class SelectWhoReviewsCaseDropdownHandlerTest {
     }
 
     @Test
-    @Parameters({"VALID_SEND_TO_INTERLOC", "HMCTS_RESPONSE_REVIEWED"})
+    @Parameters({"VALID_SEND_TO_INTERLOC", "HMCTS_RESPONSE_REVIEWED", "ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE"})
     public void populatesSelectWhoReviewsCaseDropDown(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
