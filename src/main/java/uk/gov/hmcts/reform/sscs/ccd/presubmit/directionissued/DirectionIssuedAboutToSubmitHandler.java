@@ -66,6 +66,16 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
         } else if (DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionType()) && ExtensionNextEvent.SEND_TO_LISTING.equals(caseData.getExtensionNextEvent())) {
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+            caseData.setState(State.RESPONSE_RECEIVED);
+        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionType()) && ExtensionNextEvent.SEND_TO_VALID_APPEAL.equals(caseData.getExtensionNextEvent())) {
+            caseData.setHmctsDwpState("sentToDwp");
+            caseData.setDateSentToDwp(LocalDate.now().toString());
+            caseData.setInterlocReviewState(null);
+            caseData.setState(State.WITH_DWP);
+        } else {
+            caseData.setInterlocReviewState(null);
         }
 
         createFooter(url, caseData);
