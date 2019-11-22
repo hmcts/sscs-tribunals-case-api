@@ -248,7 +248,7 @@
       "dwpState": "strikeOutAction",
       "interlocReferralDate": "2019-11-08",
       "caseCreated": "2019-11-08",
-      "decisionType": "strikeOut",
+      "decisionType": "DECISION_TYPE_PLACEHOLDER",
       "regionalProcessingCenter": {
         "city": "BIRMINGHAM",
         "name": "BIRMINGHAM",
