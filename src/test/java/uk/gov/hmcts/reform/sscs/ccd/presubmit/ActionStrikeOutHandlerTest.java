@@ -8,9 +8,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
@@ -52,7 +54,7 @@ public class ActionStrikeOutHandlerTest {
 
     @Test
     @Parameters({
-        "ACTION_STRIKE_OUT, ABOUT_TO_SUBMIT, true",
+        "ACTION_STRIKE_OUT, ABOUT_TO_SUBMIT, true"
     })
     public void givenEvent_thenCanHandle(EventType eventType, CallbackType callbackType, boolean expected) {
         when(callback.getEvent()).thenReturn(eventType);
@@ -66,16 +68,25 @@ public class ActionStrikeOutHandlerTest {
 
     @Test
     @Parameters({
-        "ACTION_STRIKE_OUT, struckOut",
+        "ACTION_STRIKE_OUT, strikeOut, struckOut",
+        "ACTION_STRIKE_OUT, ,null",
+        "ACTION_STRIKE_OUT, null,null",
     })
-    public void givenEvent_thenSetDwpStateToExpected(EventType eventType, String expectedDwpState) {
+    public void givenEvent_thenSetDwpStateToExpected(EventType eventType, @Nullable String decisionType,
+                                                     @Nullable String expectedDwpState) {
         when(callback.getEvent()).thenReturn(eventType);
+        sscsCaseData.setDecisionType(decisionType);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionStrikeOutHandler.handle(ABOUT_TO_SUBMIT, callback,
             USER_AUTHORISATION);
 
         assertThat(response.getData().getDwpState(), is(expectedDwpState));
-
+        if (StringUtils.isBlank(decisionType)) {
+            String error = response.getErrors().stream()
+                .findFirst()
+                .orElse("");
+            assertEquals("The decision type is not \"strike out\". We cannot proceed.", error);
+        }
     }
 
     @Test(expected = IllegalStateException.class)
