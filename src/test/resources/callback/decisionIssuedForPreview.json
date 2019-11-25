@@ -2,7 +2,7 @@
   "case_details": {
     "id": 12345656789,
     "jurisdiction": "SSCS",
-    "state": "appealCreated",
+    "state": "interlocutoryReviewState",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -28,6 +28,7 @@
       "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
       "signedBy": "Maple Magoo",
       "signedRole": "Proxy Judge",
+      "decisionType": "strikeOut",
       "previewDocument" : {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",

@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -94,6 +95,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Test
@@ -128,7 +130,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionResponse());
+        assertEquals(DirectionType.APPEAL_TO_PROCEED, response.getData().getDirectionType());
         verify(footerService).createFooterDocument(any(), eq("Direction notice"), any(), any(), any(), any());
     }
 
@@ -195,12 +197,32 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDirectionTypeOfProvideInformation_setInterlocStateToAwaitingInformation() {
+    public void givenDirectionTypeOfProvideInformation_setInterlocStateToAwaitingInformationAndDirectionTypeIsNull() {
         callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.PROVIDE_INFORMATION);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("awaitingInformation", response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionResponse());
+        assertEquals(AWAITING_INFORMATION.getId(), response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionType());
+    }
+
+    @Test
+    public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
+        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.APPEAL_TO_PROCEED);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertEquals(DirectionType.APPEAL_TO_PROCEED, response.getData().getDirectionType());
+    }
+
+    @Test
+    public void givenDirectionTypeOfAppealToProceedAndCaseIsPostValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
+        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.APPEAL_TO_PROCEED);
+        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionType());
     }
 
 }

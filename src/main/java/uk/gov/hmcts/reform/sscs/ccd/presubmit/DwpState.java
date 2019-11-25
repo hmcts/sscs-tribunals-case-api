@@ -11,8 +11,8 @@ public enum DwpState {
     HEARING_POSTPONED("hearingPostponed", null),
     REP_ADDED("repAdded", null),
     STRIKE_OUT_ACTION("strikeOutAction", null),
-    STRUCK_OUT("struckOut", null),
-    EXTENSION_REQUESTED("extensionRequested", null);
+    EXTENSION_REQUESTED("extensionRequested", null),
+    STRUCK_OUT("struckOut", "Struck out");
 
     private String id;
     private String label;

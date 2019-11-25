@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.STRUCK_OUT;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -85,22 +88,23 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
-            .generateNotice("Yes")
-            .signedBy("User")
-            .signedRole("Judge")
-            .dateAdded(LocalDate.now().minusDays(1))
-            .sscsDocument(docs)
-            .previewDocument(DocumentLink.builder()
-                .documentUrl(DOCUMENT_URL)
-                .documentBinaryUrl(DOCUMENT_URL + "/binary")
-                .documentFilename("decisionIssued.pdf")
-                .build())
-            .appeal(Appeal.builder()
-                .appellant(Appellant.builder()
-                    .name(Name.builder().build())
-                    .identity(Identity.builder().build())
-                    .build())
-                .build()).build();
+                .generateNotice("Yes")
+                .signedBy("User")
+                .signedRole("Judge")
+                .dateAdded(LocalDate.now().minusDays(1))
+                .sscsDocument(docs)
+                .decisionType(STRIKE_OUT.getValue())
+                .previewDocument(DocumentLink.builder()
+                        .documentUrl(DOCUMENT_URL)
+                        .documentBinaryUrl(DOCUMENT_URL + "/binary")
+                        .documentFilename("decisionIssued.pdf")
+                        .build())
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .name(Name.builder().build())
+                                .identity(Identity.builder().build())
+                                .build())
+                        .build()).build();
 
         expectedDocument = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
@@ -113,6 +117,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Test
@@ -134,14 +139,14 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"strikeOut, strikeOutAction", "null, null", ",null"})
+    @Parameters({"strikeOut, strikeOutAction", "null, struckOut", ",struckOut"})
     public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValue(@Nullable String decisionType,
                                                                     @Nullable String expectedDwpState) {
         sscsCaseData.setDecisionType(decisionType);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         String currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
-        assertEquals(String.format(assertionMsg, currentDwpState, "strikeOut"), expectedDwpState, currentDwpState);
+        assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
     }
 
     @Test
@@ -207,5 +212,23 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    @Test
+    public void givenDecisionIssuedAndCaseIsPreValidInterloc_setDwpStateToStruckOutAndOutcomeToNonCompliantAppealStruckout() {
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
+    }
+
+    @Test
+    public void givenDecisionIssuedAndCaseIsPostValidInterloc_setDwpStateAndOutcomeToStruckOut() {
+        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals("struckOut", response.getData().getOutcome());
     }
 }
