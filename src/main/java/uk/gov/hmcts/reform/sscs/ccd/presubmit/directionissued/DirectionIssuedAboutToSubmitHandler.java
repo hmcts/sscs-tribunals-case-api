@@ -69,7 +69,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         createFooter(url, caseData);
-        clearTransientFields(caseData, callback.getCaseDetails().getState());
+
+        State beforeState = callback.getCaseDetailsBefore().map(e -> e.getState()).orElse(null);
+
+        clearTransientFields(caseData, beforeState);
 
         caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
 
