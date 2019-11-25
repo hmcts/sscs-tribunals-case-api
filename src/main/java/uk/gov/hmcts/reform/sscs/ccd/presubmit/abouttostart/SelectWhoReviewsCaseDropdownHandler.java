@@ -21,7 +21,8 @@ public class SelectWhoReviewsCaseDropdownHandler implements PreSubmitCallbackHan
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
                 && (callback.getEvent() == EventType.VALID_SEND_TO_INTERLOC
-                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED);
+                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED
+                || callback.getEvent() == EventType.ADMIN_SEND_TO_INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Override
