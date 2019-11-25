@@ -15,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITIN
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -46,6 +47,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     private SscsCaseData sscsCaseData;
 
@@ -94,8 +98,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Test
@@ -217,7 +222,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPostValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
         callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.APPEAL_TO_PROCEED);
-        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

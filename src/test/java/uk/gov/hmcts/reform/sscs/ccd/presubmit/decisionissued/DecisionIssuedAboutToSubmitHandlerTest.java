@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.STRUCK_OUT;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -47,6 +48,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
 
     private SscsCaseData sscsCaseData;
 
@@ -95,8 +99,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Test
@@ -189,7 +194,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDecisionIssuedAndCaseIsPostValidInterloc_setDwpStateAndOutcomeToStruckOut() {
-        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
