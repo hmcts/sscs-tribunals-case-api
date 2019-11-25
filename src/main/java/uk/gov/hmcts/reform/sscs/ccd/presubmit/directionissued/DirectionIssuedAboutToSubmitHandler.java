@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -62,24 +63,20 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         if (DirectionType.PROVIDE_INFORMATION.equals(caseData.getDirectionType())) {
-            caseData.setInterlocReviewState("awaitingInformation");
-            caseData.setDirectionType(null);
+            caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
         } else if (DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         }
 
         createFooter(url, caseData);
-        clearTransientFields(caseData);
-        setDwpState(caseData);
+        clearTransientFields(caseData, callback.getCaseDetails().getState());
+
+        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
-    }
-
-    private void setDwpState(SscsCaseData caseData) {
-        caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
     }
 
     private void createFooter(DocumentLink url, SscsCaseData caseData) {

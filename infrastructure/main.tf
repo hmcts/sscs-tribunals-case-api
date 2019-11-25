@@ -172,5 +172,7 @@ module "tribunals-case-api" {
 
     MAX_FILE_SIZE = "${var.max_file_size}"
     MAX_REQUEST_SIZE = "${var.max_request_size}"
+
+    READY_TO_LIST_OFFICES = "${var.ready_to_list_offices}"
   }
 }
