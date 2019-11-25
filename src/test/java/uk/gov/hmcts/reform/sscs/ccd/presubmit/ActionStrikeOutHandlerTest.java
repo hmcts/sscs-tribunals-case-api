@@ -68,7 +68,7 @@ public class ActionStrikeOutHandlerTest {
 
     @Test
     @Parameters({
-        "ACTION_STRIKE_OUT, strikeOut, StrikeOutActioned",
+        "ACTION_STRIKE_OUT, strikeOut, strikeOutActioned",
         "ACTION_STRIKE_OUT, ,null",
         "ACTION_STRIKE_OUT, null,null",
     })

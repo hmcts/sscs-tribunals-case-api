@@ -30,8 +30,8 @@ public class ActionStrikeOutHandlerTest extends BaseHandler {
 
     @Test
     @Parameters({
-        "strikeOut, struckOut",
-        ", strikeOutAction"
+        "strikeOut, strikeOutActioned",
+        ", struckOut"
     })
     public void givenAboutToSubmitCallback_shouldSetDwpStateField(String decisionType, String expectedDwpState)
         throws Exception {
