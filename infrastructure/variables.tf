@@ -109,3 +109,9 @@ variable "issue_further_evidence_enabled" {
 variable "enable_ase" {
   default = false
 }
+
+variable "ready_to_list_offices" {
+  type    = "string"
+  default = ""
+}
+

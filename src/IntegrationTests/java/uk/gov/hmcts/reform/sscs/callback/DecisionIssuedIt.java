@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.STRUCK_OUT;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
 
 import java.io.IOException;
@@ -103,6 +104,8 @@ public class DecisionIssuedIt extends AbstractEventIt {
         assertEquals("Addition B - Decision notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(STRUCK_OUT.getId(), result.getData().getDwpState());
+        assertEquals("nonCompliantAppealStruckout", result.getData().getOutcome());
     }
 
 }
