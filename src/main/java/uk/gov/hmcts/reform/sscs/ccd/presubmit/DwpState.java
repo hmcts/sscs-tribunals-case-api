@@ -10,7 +10,6 @@ public enum DwpState {
     DIRECTION_RESPONDED("directionResponded", "Direction - responded"),
     HEARING_POSTPONED("hearingPostponed", null),
     REP_ADDED("repAdded", null),
-    STRIKE_OUT_ACTION("strikeOutAction", null),
     STRIKE_OUT_ACTIONED("strikeOutActioned", "Strike-out actioned"),
     EXTENSION_REQUESTED("extensionRequested", null),
     STRUCK_OUT("struckOut", "Struck out");
