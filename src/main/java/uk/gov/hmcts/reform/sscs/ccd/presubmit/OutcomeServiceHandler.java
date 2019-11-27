@@ -21,13 +21,11 @@ public class OutcomeServiceHandler extends EventToFieldPreSubmitCallbackHandler 
         eventFieldMappings.put(EventType.JUDGE_DECISION_STRIKEOUT, "nonCompliantAppealStruckout");
         eventFieldMappings.put(EventType.REINSTATE_APPEAL, "reinstated");
         eventFieldMappings.put(EventType.COH_DECISION_ISSUED, "decisionUpheld");
-
         return eventFieldMappings;
     }
 
     protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
         newSscsCaseData.setOutcome(newValue);
-
         return newSscsCaseData;
     }
 }

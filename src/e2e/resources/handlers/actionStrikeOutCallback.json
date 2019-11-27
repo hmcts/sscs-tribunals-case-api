@@ -1,0 +1,305 @@
+{
+  "case_details": {
+    "id": 1573207127632814,
+    "jurisdiction": "SSCS",
+    "state": "dormantAppealState",
+    "version": 9,
+    "case_type_id": "Benefit",
+    "created_date": [
+      2019,
+      11,
+      8,
+      9,
+      58,
+      47,
+      699000000
+    ],
+    "last_modified": [
+      2019,
+      11,
+      21,
+      18,
+      34,
+      53,
+      548000000
+    ],
+    "security_classification": "PUBLIC",
+    "case_data": {
+      "evidencePresent": "No",
+      "generatedNino": "JT 12 34 56 D",
+      "interlocReferralReason": "other",
+      "subscriptions": {
+        "appellantSubscription": {
+          "tya": "NpmhpYaFLa",
+          "email": "sscstest+notify@greencroftconsulting.com",
+          "mobile": "07398785050",
+          "reason": "",
+          "subscribeSms": "Yes",
+          "subscribeEmail": "Yes",
+          "wantSmsNotifications": "Yes"
+        },
+        "appointeeSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "supporterSubscription": {
+          "tya": null,
+          "email": null,
+          "mobile": null,
+          "reason": null,
+          "subscribeSms": null,
+          "subscribeEmail": null,
+          "wantSmsNotifications": null
+        },
+        "representativeSubscription": {
+          "tya": "",
+          "email": "",
+          "mobile": "",
+          "reason": null,
+          "subscribeSms": "No",
+          "subscribeEmail": "No",
+          "wantSmsNotifications": null
+        }
+      },
+      "evidence": {
+        "documents": []
+      },
+      "caseReference": "SC022/14/12423",
+      "appealNotePad": {
+        "notesCollection": []
+      },
+      "generatedSurname": "Test",
+      "appeal": {
+        "rep": {
+          "name": {
+            "title": "Mr",
+            "lastName": "Potter",
+            "firstName": "Harry"
+          },
+          "address": {
+            "town": "Town",
+            "line1": "123 Hairy Lane",
+            "line2": "Off Hairy Park",
+            "county": "County",
+            "postcode": "TS3 3ST"
+          },
+          "contact": {
+            "email": "harry.potter@wizards.com",
+            "phone": null,
+            "mobile": "07411999999"
+          },
+          "organisation": "HP Ltd",
+          "hasRepresentative": "Yes"
+        },
+        "signer": null,
+        "appellant": {
+          "name": {
+            "title": "Miss",
+            "lastName": "Test",
+            "firstName": "AN"
+          },
+          "address": {
+            "town": "Brentwood",
+            "line1": "2 Drake Close",
+            "line2": "Hutton",
+            "county": "Essex",
+            "postcode": "CM13 1AQ"
+          },
+          "contact": {
+            "email": null,
+            "phone": "01424 752419",
+            "mobile": null
+          },
+          "identity": {
+            "dob": "1900-01-01",
+            "nino": "JT 12 34 56 D"
+          },
+          "appointee": {
+            "name": {
+              "title": null,
+              "lastName": null,
+              "firstName": null
+            },
+            "address": {},
+            "contact": {
+              "email": null,
+              "phone": null,
+              "mobile": null
+            },
+            "identity": {
+              "dob": null,
+              "nino": null
+            }
+          },
+          "isAppointee": null,
+          "isAddressSameAsAppointee": null
+        },
+        "mrnDetails": {
+          "mrnDate": null,
+          "mrnLateReason": null,
+          "dwpIssuingOffice": null,
+          "mrnMissingReason": null
+        },
+        "benefitType": {
+          "code": "ESA",
+          "description": "Employment Support Allowance"
+        },
+        "hearingType": "paper",
+        "receivedVia": null,
+        "appealReasons": {},
+        "hearingOptions": {
+          "other": "No",
+          "wantsToAttend": "No"
+        }
+      },
+      "sscsDocument": [
+        {
+          "id": "da136874-a982-4400-b30a-516a771b32b3",
+          "value": {
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/dac800d4-1cf2-47c1-a1ef-db91c6ab3412",
+              "document_filename": "Decision Notice issued on 21-11-2019.pdf",
+              "document_binary_url": "http://dm-store:5005/documents/dac800d4-1cf2-47c1-a1ef-db91c6ab3412/binary"
+            },
+            "documentType": "Decision Notice",
+            "bundleAddition": "C",
+            "documentFileName": "Addition C - Decision notice issued on 21-11-2019.pdf",
+            "documentDateAdded": "2019-11-21"
+          }
+        },
+        {
+          "id": "d2ba0acc-d604-4d22-a382-34ad36e5454d",
+          "value": {
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/dbed7988-4ed5-4965-b1b4-50e5582770f3",
+              "document_filename": "Decision Notice issued on 20-11-2019.pdf",
+              "document_binary_url": "http://dm-store:5005/documents/dbed7988-4ed5-4965-b1b4-50e5582770f3/binary"
+            },
+            "documentType": "Decision Notice",
+            "bundleAddition": "B",
+            "documentFileName": "Addition B - Decision notice issued on 20-11-2019.pdf",
+            "documentDateAdded": "2019-11-20"
+          }
+        },
+        {
+          "id": "9d287290-f8a3-45ce-afdc-0bc51f930e61",
+          "value": {
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/b502f219-ef46-4778-9aef-4e47d3176e32",
+              "document_filename": "Decision Notice issued on 19-11-2019.pdf",
+              "document_binary_url": "http://dm-store:5005/documents/b502f219-ef46-4778-9aef-4e47d3176e32/binary"
+            },
+            "documentType": "Decision Notice",
+            "bundleAddition": "A",
+            "documentFileName": "Addition A - Decision notice issued on 19-11-2019",
+            "documentDateAdded": "2019-11-19"
+          }
+        }
+      ],
+      "dwpTimeExtension": [],
+      "hearings": [
+        {
+          "id": "fc36f2b2-b320-466d-b251-883d77164492",
+          "value": {
+            "time": "11:40:00",
+            "venue": {
+              "name": "Prudential House",
+              "address": {
+                "town": "Blackpool",
+                "line1": "2-10 Topping Street",
+                "line2": "",
+                "county": "",
+                "postcode": "FY1 3AB"
+              },
+              "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
+            },
+            "adjourned": "No",
+            "eventDate": null,
+            "hearingId": "3698764",
+            "hearingDate": "2018-06-01"
+          }
+        }
+      ],
+      "furtherEvidenceAction": {
+        "value": {
+          "code": "informationReceivedForInterlocJudge",
+          "label": "Information received for interlocutory review Judge"
+        },
+        "list_items": [
+          {
+            "code": "issueFurtherEvidence",
+            "label": "Issue further evidence to all parties"
+          },
+          {
+            "code": "otherDocumentManual",
+            "label": "Other document typeÂ - action manually"
+          },
+          {
+            "code": "informationReceivedForInterlocJudge",
+            "label": "Information received for interlocutory review Judge"
+          }
+        ]
+      },
+      "dwpState": "struckOut",
+      "interlocReferralDate": "2019-11-08",
+      "caseCreated": "2019-11-08",
+      "decisionType": "DECISION_TYPE_PLACEHOLDER",
+      "regionalProcessingCenter": {
+        "city": "BIRMINGHAM",
+        "name": "BIRMINGHAM",
+        "email": null,
+        "address1": "HM Courts & Tribunals Service",
+        "address2": "Social Security & Child Support Appeals",
+        "address3": "Administrative Support Centre",
+        "address4": "PO Box 14620",
+        "postcode": "B16 6FR",
+        "faxNumber": "0126 434 7983",
+        "phoneNumber": "0300 123 1142"
+      },
+      "interlocReviewState": "reviewByJudge",
+      "region": "BIRMINGHAM",
+      "generatedDOB": "1900-01-01",
+      "events": [
+        {
+          "id": "7d2f5ff0-6a2c-4e0d-929e-5a2fa14445bc",
+          "value": {
+            "date": "2018-07-05T14:38:26.443",
+            "type": "appealDormant",
+            "description": "Appeal dormant"
+          }
+        },
+        {
+          "id": "28cf4a5e-9211-43b4-9aca-a17c971e8289",
+          "value": {
+            "date": "2018-05-09T11:16:01.867",
+            "type": "responseReceived",
+            "description": "Response received"
+          }
+        },
+        {
+          "id": "395646b4-b476-479f-aa3b-3f93af7fdd57",
+          "value": {
+            "date": "2018-02-09T14:38:26.443",
+            "type": "hearingBooked",
+            "description": "Hearing booked"
+          }
+        },
+        {
+          "id": "f4641ed1-1713-49e1-8b96-00d71901c2db",
+          "value": {
+            "date": "2017-10-06T09:38:25.190",
+            "type": "appealReceived",
+            "description": "Appeal received"
+          }
+        }
+      ],
+      "outcome": "nonCompliantAppealStruckout"
+    }
+  },
+  "event_id": "actionStrikeOut"
+}
