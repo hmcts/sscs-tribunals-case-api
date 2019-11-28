@@ -56,12 +56,15 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         }
 
         createFooter(url, caseData);
-        clearTransientFields(caseData, callback.getCaseDetails().getState());
+
+        State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
+
+        clearTransientFields(caseData, beforeState);
 
         caseData.setDwpState(DwpState.STRUCK_OUT.getId());
 
         if (STRIKE_OUT.getValue().equals(caseData.getDecisionType())) {
-            if (callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+            if (State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
                 caseData.setOutcome("nonCompliantAppealStruckout");
             } else {
                 caseData.setOutcome("struckOut");

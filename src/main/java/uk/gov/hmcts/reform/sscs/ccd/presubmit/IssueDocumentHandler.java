@@ -25,7 +25,7 @@ public class IssueDocumentHandler {
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
-    protected void clearTransientFields(SscsCaseData caseData, State state) {
+    protected void clearTransientFields(SscsCaseData caseData, State beforeState) {
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
         caseData.setSignedBy(null);
@@ -35,7 +35,7 @@ public class IssueDocumentHandler {
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
 
-        if (!DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType()) || !state.equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+        if (!DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType()) || !beforeState.equals(State.INTERLOCUTORY_REVIEW_STATE)) {
             caseData.setDirectionType(null);
         }
     }

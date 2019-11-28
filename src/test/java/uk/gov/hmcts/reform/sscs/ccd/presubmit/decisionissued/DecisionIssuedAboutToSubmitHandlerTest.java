@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -14,8 +17,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.STRUCK_OUT;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +29,18 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDecisionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -48,6 +64,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
+
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
@@ -59,7 +78,13 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         handler = new DecisionIssuedAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
-        when(footerService.createFooterDocument(any(), any(), any(), any(), any(), any())).thenReturn(SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.DECISION_NOTICE.getValue()).bundleAddition("A").documentLink(DocumentLink.builder().documentUrl("footerUrl").build()).build()).build());
+        when(footerService.createFooterDocument(any(), any(), any(), any(), any(), any()))
+            .thenReturn(SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                    .documentType(DocumentType.DECISION_NOTICE.getValue())
+                    .bundleAddition("A").documentLink(DocumentLink.builder()
+                        .documentUrl("footerUrl").build()).build())
+                .build());
         when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
@@ -86,7 +111,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
                         .build()).build();
 
         expectedDocument = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
+            .value(SscsDocumentDetails.builder()
                 .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
                 .documentLink(sscsCaseData.getPreviewDocument())
                 .documentDateAdded(LocalDate.now().minusDays(1).toString())
@@ -95,8 +120,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
     }
 
     @Test
@@ -118,6 +144,17 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"strikeOut, struckOut", "null, struckOut", ",struckOut"})
+    public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValue(@Nullable String decisionType,
+                                                                    @Nullable String expectedDwpState) {
+        sscsCaseData.setDecisionType(decisionType);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        String currentDwpState = response.getData().getDwpState();
+        String assertionMsg = "dwpState value (%s) is not as expected (%s)";
+        assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
+    }
+
+    @Test
     public void willCopyThePreviewFileToTheInterlocDecisionDocumentAndAddFooter() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getPreviewDocument());
@@ -127,9 +164,12 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
 
         assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Decision notice"), eq("A"), any(), any(), eq(DocumentType.DECISION_NOTICE));
+        assertEquals("myTest.doc",
+            response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals(expectedDocument.getValue().getDocumentType(),
+            response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()),
+            eq("Decision notice"), eq("A"), any(), any(), eq(DocumentType.DECISION_NOTICE));
     }
 
     @Test
@@ -138,9 +178,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         sscsCaseData.setSscsDocument(null);
 
         SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
-                .documentType(DocumentType.DECISION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build())
-                .documentDateAdded(LocalDate.now()).build();
+            .documentType(DocumentType.DECISION_NOTICE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build())
+            .documentDateAdded(LocalDate.now()).build();
 
         sscsCaseData.setSscsInterlocDecisionDocument(theDocument);
 
@@ -157,14 +197,14 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentType(DocumentType.DECISION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
-                .build();
+            .documentType(DocumentType.DECISION_NOTICE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
+            .build();
 
         SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
-                .documentType(DocumentType.DECISION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build())
-                .documentDateAdded(LocalDate.now()).build();
+            .documentType(DocumentType.DECISION_NOTICE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build())
+            .documentDateAdded(LocalDate.now()).build();
 
         sscsCaseData.setSscsInterlocDecisionDocument(theDocument);
 
@@ -189,7 +229,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDecisionIssuedAndCaseIsPostValidInterloc_setDwpStateAndOutcomeToStruckOut() {
-        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
