@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -76,7 +77,7 @@ public class SubmitAppealService {
         try {
             return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens));
         } catch (FeignException e) {
-            if (e.status() == 409) {
+            if (e.status() == HttpStatus.SC_CONFLICT) {
                 log.error("The case data has been altered outside of this transaction for case with nino {} and idam id {}",
                         appeal.getAppellant().getNino(),
                         idamTokens.getUserId());
