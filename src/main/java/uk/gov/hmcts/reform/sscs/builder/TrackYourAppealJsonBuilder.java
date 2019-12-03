@@ -4,17 +4,7 @@ import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
 import static org.slf4j.LoggerFactory.getLogger;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ADJOURNED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CLOSED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DORMANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND_OVERDUE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.EVIDENCE_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.HEARING_BOOKED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NEW_HEARING_BOOKED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.PAST_HEARING_BOOKED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.POSTPONED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_3;
@@ -121,6 +111,7 @@ public class TrackYourAppealJsonBuilder {
         }
 
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
+        boolean isDigitalCase = isCaseStateReadyToList(caseData);
 
         Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
         Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
@@ -131,7 +122,7 @@ public class TrackYourAppealJsonBuilder {
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
-        processRpcDetails(regionalProcessingCenter, caseNode);
+        processRpcDetails(regionalProcessingCenter, caseNode, isDigitalCase);
         root.set("appeal", caseNode);
 
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
@@ -283,6 +274,10 @@ public class TrackYourAppealJsonBuilder {
         return latestEvents;
     }
 
+    private boolean isCaseStateReadyToList(SscsCaseData caseData) {
+        return State.READY_TO_LIST.toString().equals(caseData.getCreatedInGapsFrom()) ? true : false;
+    }
+
     private List<Event> buildHistoricalEvents(List<Event> events, List<Event> latestEvents) {
 
         return events.stream().skip(latestEvents.size()).collect(toList());
@@ -376,16 +371,16 @@ public class TrackYourAppealJsonBuilder {
         return DateTimeUtils.convertLocalDateTimetoUtc(localDateTime);
     }
 
-    private void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode) {
+    private void processRpcDetails(RegionalProcessingCenter regionalProcessingCenter, ObjectNode caseNode, boolean isDigitalCase) {
         if (null != regionalProcessingCenter) {
             ObjectNode rpcNode = JsonNodeFactory.instance.objectNode();
 
-            rpcNode.put("name", regionalProcessingCenter.getName());
-            rpcNode.set("addressLines", buildRpcAddressArray(regionalProcessingCenter));
-            rpcNode.put("city", regionalProcessingCenter.getCity());
-            rpcNode.put("postcode", regionalProcessingCenter.getPostcode());
-            rpcNode.put("phoneNumber", regionalProcessingCenter.getPhoneNumber());
-            rpcNode.put("faxNumber", regionalProcessingCenter.getFaxNumber());
+            rpcNode.put("name", (isDigitalCase) ? "HMCTS SSCS" : regionalProcessingCenter.getName());
+            rpcNode.set("addressLines", (isDigitalCase) ? buildDigitalCaseRpcAddressArray() : buildRpcAddressArray(regionalProcessingCenter));
+            rpcNode.put("city", (isDigitalCase) ? "Harlow" : regionalProcessingCenter.getCity());
+            rpcNode.put("postcode", (isDigitalCase) ? "CM20 9QF" : regionalProcessingCenter.getPostcode());
+            rpcNode.put("phoneNumber", (isDigitalCase) ? "" : regionalProcessingCenter.getPhoneNumber());
+            rpcNode.put("faxNumber", (isDigitalCase) ? "" : regionalProcessingCenter.getFaxNumber());
 
             caseNode.set("regionalProcessingCenter", rpcNode);
         }
@@ -398,6 +393,15 @@ public class TrackYourAppealJsonBuilder {
         rpcAddressArray.add(regionalProcessingCenter.getAddress2());
         rpcAddressArray.add(regionalProcessingCenter.getAddress3());
         rpcAddressArray.add(regionalProcessingCenter.getAddress4());
+
+        return rpcAddressArray;
+    }
+
+    private ArrayNode buildDigitalCaseRpcAddressArray() {
+        ArrayNode rpcAddressArray = JsonNodeFactory.instance.arrayNode();
+
+        rpcAddressArray.add("HMCTS SSCS");
+        rpcAddressArray.add("PO BOX 12626");
 
         return rpcAddressArray;
     }
