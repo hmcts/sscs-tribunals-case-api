@@ -50,7 +50,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
         ArrayList<String> errors = new ArrayList<>();
 
         boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("YES", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
-        boolean somewhereToResend = sscsCaseData.isResendToAppellant() ||  (sscsCaseData.isResendToRepresentative() && caseHasARepresentative) || sscsCaseData.isResendToDwp();
+        boolean somewhereToResend = sscsCaseData.isResendToAppellant() ||  (sscsCaseData.isResendToRepresentative() && caseHasARepresentative);
 
         if (!somewhereToResend) {
             errors.add("Select a party to reissue the further evidence.");
