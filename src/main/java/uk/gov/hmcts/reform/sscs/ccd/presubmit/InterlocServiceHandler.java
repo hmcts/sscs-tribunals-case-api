@@ -44,7 +44,8 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
     }
 
     protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
-        log.info("Setting interloc review field to " + newValue);
+        log.info(String.format("Case(%s): Setting interloc review field to %s", newSscsCaseData.getCcdCaseId(),
+            newValue));
         newSscsCaseData.setInterlocReviewState(newValue);
 
         if (eventType.equals(EventType.NON_COMPLIANT) || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)) {
