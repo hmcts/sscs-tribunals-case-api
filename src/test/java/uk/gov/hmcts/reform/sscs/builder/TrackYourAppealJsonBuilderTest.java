@@ -262,6 +262,14 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
+    public void shouldReturnHearingTypeAndExelaAddressIfPresentInCcd() {
+        SscsCaseData caseData = APPEAL_WITH_HEARING_TYPE_AND_STATE_READY_TO_LIST_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L);
+        assertJsonEquals(APPEAL_WITH_HEARING_TYPE_AND_STATE_READY_TO_LIST.getSerializedMessage(), objectNode);
+    }
+
+    @Test
     public void shouldReturnOralHearingTypeIfNoHearingTypeInCcdAndWantsToAttendIsYes() {
         SscsCaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,

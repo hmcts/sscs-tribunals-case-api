@@ -1,0 +1,30 @@
+{
+  "appeal": {
+    "caseId" : "1",
+    "caseReference": "SC123/45/00001",
+    "name": "Mr Jason Mock",
+    "surname": "Mock",
+    "appealNumber": "abcde12345",
+    "benefitType": "pip",
+    "hearingType": "oral",
+    "status": "APPEAL_RECEIVED",
+    "latestEvents": [
+      {
+        "date": "2028-06-08T00:00:00.000Z",
+        "type": "APPEAL_RECEIVED",
+        "dwpResponseDate": "2028-07-13T00:00:00.000Z",
+        "contentKey": "status.appealReceived"
+      }
+    ],
+    "createdInGapsFrom":"readyToList",
+    "regionalProcessingCenter": {
+      "name":"HMCTS SSCS",
+      "addressLines":["HMCTS SSCS","PO BOX 12626"],
+      "city":"Harlow",
+      "postcode":"CM20 9QF",
+      "phoneNumber":"",
+      "faxNumber":""
+    }
+  },
+  "subscriptions":{}
+}
