@@ -216,6 +216,10 @@ dependencyManagement {
             entry 'kotlin-stdlib'
         }
 
+//        dependencySet(group: 'com.squareup.okhttp3', version: '4.2.2') {
+//            entry 'okhttp'
+//        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
@@ -249,6 +253,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '10.0.1'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
 
     compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.5'
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
