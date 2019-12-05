@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuefurtherevidence;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevidence;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
