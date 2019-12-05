@@ -19,6 +19,10 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-        return null;
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+        callback.getCaseDetails().getCaseData().setHmctsDwpState(null);
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }
