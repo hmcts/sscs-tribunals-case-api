@@ -1,11 +1,13 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fehandledoffline;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -23,6 +25,8 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
             throw new IllegalStateException("Cannot handle callback");
         }
         callback.getCaseDetails().getCaseData().setHmctsDwpState(null);
+        List<SscsDocument> docs = callback.getCaseDetails().getCaseData().getSscsDocument();
+        docs.forEach(doc -> doc.getValue().setEvidenceIssued("Yes"));
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 }

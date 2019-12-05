@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fehandledoffline;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -9,10 +10,11 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import java.util.Arrays;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +27,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 
 @RunWith(JUnitParamsRunner.class)
 public class FeHandledOfflineHandlerTest {
@@ -38,15 +42,6 @@ public class FeHandledOfflineHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private final FeHandledOfflineHandler feHandledOfflineHandler = new FeHandledOfflineHandler();
-
-    @Before
-    public void setUp() {
-        when(callback.getCaseDetails()).thenReturn(caseDetails);
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-            .hmctsDwpState("failedSendingFurtherEvidence")
-            .build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-    }
 
     @Test
     @Parameters({
@@ -72,12 +67,34 @@ public class FeHandledOfflineHandlerTest {
 
     @Test
     public void givenEventIsTriggered_shouldHandleIt() {
-        given(callback.getEvent()).willReturn(EventType.FURTHER_EVIDENCE_HANDLED_OFFLINE);
+        mockCallback();
 
         PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
             callback, auth_token);
 
         assertNull(currentCallback.getData().getHmctsDwpState());
+        verifyEvidenceIssuedIsYes(currentCallback);
+    }
+
+    private void verifyEvidenceIssuedIsYes(PreSubmitCallbackResponse<SscsCaseData> currentCallback) {
+        List<SscsDocument> sscsDocument = currentCallback.getData().getSscsDocument();
+        sscsDocument.forEach(doc -> assertThat(doc.getValue().getEvidenceIssued(), equalTo("Yes")));
+    }
+
+    private void mockCallback() {
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        SscsDocument document = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .evidenceIssued("No")
+                .build())
+            .build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+            .hmctsDwpState("failedSendingFurtherEvidence")
+            .sscsDocument(Arrays.asList(document, document))
+            .build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        given(callback.getEvent()).willReturn(EventType.FURTHER_EVIDENCE_HANDLED_OFFLINE);
     }
 
     @Test(expected = IllegalStateException.class)
