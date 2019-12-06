@@ -171,6 +171,20 @@ public class FeHandledOfflineHandlerTest {
         verifyDl16(sscsDocuments);
     }
 
+    @Test
+    public void givenCaseWithNoDocs_shouldHandleIt() {
+        SscsCaseData sscsCaseDataWithIssuedAndDl16Docs = SscsCaseData.builder()
+            .hmctsDwpState("failedSendingFurtherEvidence")
+            .sscsDocument(null)
+            .build();
+        mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseDataWithIssuedAndDl16Docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
+            callback, auth_token);
+
+        assertNull(currentCallback.getData().getHmctsDwpState());
+    }
+
     private void verifyEvidenceDocs(List<SscsDocument> sscsDocuments) {
         List<SscsDocument> evidenceDocs = sscsDocuments.stream()
             .filter(doc -> "Yes".equals(doc.getValue().getEvidenceIssued()))

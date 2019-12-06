@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fehandledoffline;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +52,9 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
 
     @NotNull
     private List<SscsDocument> getNoIssuedEvidenceDocs(List<SscsDocument> sscsDocument) {
+        if (sscsDocument == null) {
+            return Collections.emptyList();
+        }
         return sscsDocument.stream()
             .filter(doc -> "No".equals(doc.getValue().getEvidenceIssued()))
             .collect(Collectors.toList());
