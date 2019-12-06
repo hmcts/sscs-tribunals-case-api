@@ -26,6 +26,7 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
 
     private boolean thereIsAnyDocumentToIssue(List<SscsDocument> sscsDocuments) {
         return null != sscsDocuments && sscsDocuments.stream()
+            .filter(doc -> doc.getValue() != null)
             .anyMatch(doc -> "No".equals(doc.getValue().getEvidenceIssued()));
     }
 

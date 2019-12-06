@@ -92,6 +92,10 @@ public class FeHandledOfflineHandlerTest {
             .sscsDocument(null)
             .build();
 
+        SscsCaseData sscsCaseDataWithEmptyDocs = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(SscsDocument.builder().build()))
+            .build();
+
         SscsCaseData sscsCaseDataWithIssuedDocs = SscsCaseData.builder()
             .sscsDocument(Collections.singletonList(issuedDoc))
             .build();
@@ -111,6 +115,7 @@ public class FeHandledOfflineHandlerTest {
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagEmpty, true},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedAndNoIssuedDocs, true},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithNullDocs, false},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithEmptyDocs, false},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedDocs, false},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedDocsAndHmctsDwpStateToClear, true},
             new Object[]{APPEAL_RECEIVED, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
