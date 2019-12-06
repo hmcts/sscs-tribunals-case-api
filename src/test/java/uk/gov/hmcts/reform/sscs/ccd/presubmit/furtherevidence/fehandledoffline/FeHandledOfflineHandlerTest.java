@@ -39,7 +39,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 @Slf4j
 public class FeHandledOfflineHandlerTest {
 
-    private final String auth_token = "auth token";
+    private final String authToken = "auth token";
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -146,7 +146,7 @@ public class FeHandledOfflineHandlerTest {
         mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseDataWithIssuedAndNoIssuedAndDl16Docs);
 
         PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
-            callback, auth_token);
+            callback, authToken);
 
         assertNull(currentCallback.getData().getHmctsDwpState());
         verifyEvidenceIssuedIsYesAndDl6WasNotModified(currentCallback.getData().getSscsDocument());
@@ -161,7 +161,7 @@ public class FeHandledOfflineHandlerTest {
         mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseDataWithIssuedAndDl16Docs);
 
         PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
-            callback, auth_token);
+            callback, authToken);
 
         assertNull(currentCallback.getData().getHmctsDwpState());
 
@@ -180,7 +180,7 @@ public class FeHandledOfflineHandlerTest {
         mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseDataWithIssuedAndDl16Docs);
 
         PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
-            callback, auth_token);
+            callback, authToken);
 
         assertNull(currentCallback.getData().getHmctsDwpState());
     }
@@ -218,6 +218,6 @@ public class FeHandledOfflineHandlerTest {
 
     @Test(expected = IllegalStateException.class)
     public void givenEventIsHandled_shouldThrowExceptionIfCannotBeHandled() {
-        feHandledOfflineHandler.handle(ABOUT_TO_START, callback, auth_token);
+        feHandledOfflineHandler.handle(ABOUT_TO_START, callback, authToken);
     }
 }
