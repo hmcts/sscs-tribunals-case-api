@@ -15,7 +15,8 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callback != null && EventType.FURTHER_EVIDENCE_HANDLED_OFFLINE == callback.getEvent()
-            && CallbackType.ABOUT_TO_SUBMIT == callbackType;
+            && CallbackType.ABOUT_TO_SUBMIT == callbackType
+            && null != callback.getCaseDetails().getCaseData().getSscsDocument();
     }
 
     @Override
