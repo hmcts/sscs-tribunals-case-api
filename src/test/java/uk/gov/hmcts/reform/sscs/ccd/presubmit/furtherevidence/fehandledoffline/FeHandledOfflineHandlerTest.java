@@ -138,18 +138,48 @@ public class FeHandledOfflineHandlerTest {
     }
 
     @Test
-    @Parameters(method = "generateSscsCaseDataScenariosToHandleEvent")
-    public void givenEventIsTriggered_shouldHandleIt(SscsCaseData sscsCaseData) {
-        mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseData);
+    public void givenCaseWithIssuedAndNoIssuedAndDl16Docs_shouldHandleIt() {
+        SscsCaseData sscsCaseDataWithIssuedAndNoIssuedAndDl16Docs = SscsCaseData.builder()
+            .hmctsDwpState("failedSendingFurtherEvidence")
+            .sscsDocument(Arrays.asList(noIssuedDoc, issuedDoc, dl16Doc))
+            .build();
+        mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseDataWithIssuedAndNoIssuedAndDl16Docs);
 
         PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
             callback, auth_token);
 
         assertNull(currentCallback.getData().getHmctsDwpState());
-        verifyEvidenceIssuedIsYes(currentCallback.getData().getSscsDocument());
+        verifyEvidenceIssuedIsYesAndDl6WasNotModified(currentCallback.getData().getSscsDocument());
     }
 
-    private void verifyEvidenceIssuedIsYes(List<SscsDocument> sscsDocuments) {
+    @Test
+    public void givenCaseWithIssuedAndDl16Docs_shouldHandleIt() {
+        SscsCaseData sscsCaseDataWithIssuedAndDl16Docs = SscsCaseData.builder()
+            .hmctsDwpState("failedSendingFurtherEvidence")
+            .sscsDocument(Arrays.asList(issuedDoc, dl16Doc))
+            .build();
+        mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseDataWithIssuedAndDl16Docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
+            callback, auth_token);
+
+        assertNull(currentCallback.getData().getHmctsDwpState());
+
+        List<SscsDocument> sscsDocuments = currentCallback.getData().getSscsDocument();
+
+        verifyEvidenceDocs(sscsDocuments);
+        verifyDl16(sscsDocuments);
+    }
+
+    private void verifyEvidenceDocs(List<SscsDocument> sscsDocuments) {
+        List<SscsDocument> evidenceDocs = sscsDocuments.stream()
+            .filter(doc -> "Yes".equals(doc.getValue().getEvidenceIssued()))
+            .collect(Collectors.toList());
+
+        assertThat(evidenceDocs, hasItems(issuedDoc));
+    }
+
+    private void verifyEvidenceIssuedIsYesAndDl6WasNotModified(List<SscsDocument> sscsDocuments) {
         List<SscsDocument> evidenceDocs = sscsDocuments.stream()
             .filter(doc -> "Yes".equals(doc.getValue().getEvidenceIssued()))
             .collect(Collectors.toList());
@@ -162,22 +192,14 @@ public class FeHandledOfflineHandlerTest {
             .build();
         assertThat(evidenceDocs, hasItems(expectedDoc, issuedDoc));
 
+        verifyDl16(sscsDocuments);
+    }
+
+    private void verifyDl16(List<SscsDocument> sscsDocuments) {
         List<SscsDocument> noEvidenceDocs = sscsDocuments.stream()
             .filter(doc -> null == doc.getValue().getEvidenceIssued())
             .collect(Collectors.toList());
         assertThat(noEvidenceDocs, hasItem(dl16Doc));
-    }
-
-    private Object[] generateSscsCaseDataScenariosToHandleEvent() {
-
-        SscsCaseData sscsCaseDataWithIssuedAndNoIssuedAndDl16Docs = SscsCaseData.builder()
-            .hmctsDwpState("failedSendingFurtherEvidence")
-            .sscsDocument(Arrays.asList(noIssuedDoc, issuedDoc, dl16Doc))
-            .build();
-
-        return new Object[]{
-            new Object[]{sscsCaseDataWithIssuedAndNoIssuedAndDl16Docs}
-        };
     }
 
     @Test(expected = IllegalStateException.class)
