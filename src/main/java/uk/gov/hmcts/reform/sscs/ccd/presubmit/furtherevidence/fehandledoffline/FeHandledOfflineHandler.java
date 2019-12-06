@@ -16,7 +16,17 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callback != null && EventType.FURTHER_EVIDENCE_HANDLED_OFFLINE == callback.getEvent()
             && CallbackType.ABOUT_TO_SUBMIT == callbackType
-            && null != callback.getCaseDetails().getCaseData().getSscsDocument();
+            && (thereIsAnyDocumentToIssue(callback.getCaseDetails().getCaseData().getSscsDocument())
+            || hmctsDwpStateFlagIsToClear(callback));
+    }
+
+    private boolean hmctsDwpStateFlagIsToClear(Callback<SscsCaseData> callback) {
+        return "failedSendingFurtherEvidence".equals(callback.getCaseDetails().getCaseData().getHmctsDwpState());
+    }
+
+    private boolean thereIsAnyDocumentToIssue(List<SscsDocument> sscsDocuments) {
+        return null != sscsDocuments && sscsDocuments.stream()
+            .anyMatch(doc -> "No".equals(doc.getValue().getEvidenceIssued()));
     }
 
     @Override

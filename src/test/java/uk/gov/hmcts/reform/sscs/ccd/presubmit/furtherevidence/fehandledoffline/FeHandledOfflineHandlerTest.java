@@ -66,29 +66,57 @@ public class FeHandledOfflineHandlerTest {
     }
 
     private Object[] generateCanHandleScenarios() {
+        SscsDocument noIssuedDoc = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .evidenceIssued("No")
+                .build())
+            .build();
+
         SscsDocument issuedDoc = SscsDocument.builder()
             .value(SscsDocumentDetails.builder()
                 .evidenceIssued("Yes")
                 .build())
             .build();
 
-        SscsCaseData sscsCaseDataWitIssuedDocs = SscsCaseData.builder()
+        SscsCaseData sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear = SscsCaseData.builder()
+            .hmctsDwpState("failedSendingFurtherEvidence")
+            .sscsDocument(Collections.singletonList(noIssuedDoc))
+            .build();
+
+        SscsCaseData sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagEmpty = SscsCaseData.builder()
+            .hmctsDwpState("")
+            .sscsDocument(Collections.singletonList(noIssuedDoc))
+            .build();
+
+        SscsCaseData sscsCaseDataWithNullDocs = SscsCaseData.builder()
+            .sscsDocument(null)
+            .build();
+
+        SscsCaseData sscsCaseDataWithIssuedDocs = SscsCaseData.builder()
+            .sscsDocument(Collections.singletonList(issuedDoc))
+            .build();
+
+        SscsCaseData sscsCaseDataWithIssuedDocsAndHmctsDwpStateToClear = SscsCaseData.builder()
             .hmctsDwpState("failedSendingFurtherEvidence")
             .sscsDocument(Collections.singletonList(issuedDoc))
             .build();
 
-        SscsCaseData sscsCaseDataWithNullDocs = SscsCaseData.builder()
+        SscsCaseData sscsCaseDataWithIssuedAndNoIssuedDocs = SscsCaseData.builder()
             .hmctsDwpState("failedSendingFurtherEvidence")
-            .sscsDocument(null)
+            .sscsDocument(Arrays.asList(issuedDoc, noIssuedDoc))
             .build();
 
         return new Object[]{
-            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWitIssuedDocs, true},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, true},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagEmpty, true},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedAndNoIssuedDocs, true},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithNullDocs, false},
-            new Object[]{APPEAL_RECEIVED, ABOUT_TO_SUBMIT, sscsCaseDataWitIssuedDocs, false},
-            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_START, sscsCaseDataWitIssuedDocs, false},
-            new Object[]{null, ABOUT_TO_SUBMIT, sscsCaseDataWitIssuedDocs, false},
-            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, null, sscsCaseDataWitIssuedDocs, false},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedDocs, false},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedDocsAndHmctsDwpStateToClear, true},
+            new Object[]{APPEAL_RECEIVED, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_START, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
+            new Object[]{null, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
+            new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, null, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
         };
     }
 
