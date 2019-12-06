@@ -18,7 +18,6 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +46,16 @@ public class FeHandledOfflineHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
     private final FeHandledOfflineHandler feHandledOfflineHandler = new FeHandledOfflineHandler();
+    private final SscsDocument noIssuedDoc = SscsDocument.builder()
+        .value(SscsDocumentDetails.builder()
+            .evidenceIssued("No")
+            .build())
+        .build();
+    private final SscsDocument issuedDoc = SscsDocument.builder()
+        .value(SscsDocumentDetails.builder()
+            .evidenceIssued("Yes")
+            .build())
+        .build();
 
     @Test
     @Parameters(method = "generateCanHandleScenarios")
@@ -66,17 +75,6 @@ public class FeHandledOfflineHandlerTest {
     }
 
     private Object[] generateCanHandleScenarios() {
-        SscsDocument noIssuedDoc = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .evidenceIssued("No")
-                .build())
-            .build();
-
-        SscsDocument issuedDoc = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .evidenceIssued("Yes")
-                .build())
-            .build();
 
         SscsCaseData sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear = SscsCaseData.builder()
             .hmctsDwpState("failedSendingFurtherEvidence")
@@ -132,11 +130,8 @@ public class FeHandledOfflineHandlerTest {
 
     @Test
     @Parameters(method = "generateSscsCaseDataScenariosToHandleEvent")
-    @Ignore
-    public void givenEventIsTriggered_shouldHandleIt(String testScenarioDesc, SscsCaseData sscsCaseData) {
-        log.info(testScenarioDesc);
+    public void givenEventIsTriggered_shouldHandleIt(SscsCaseData sscsCaseData) {
         mockCallback(FURTHER_EVIDENCE_HANDLED_OFFLINE, sscsCaseData);
-        given(callback.getEvent()).willReturn(FURTHER_EVIDENCE_HANDLED_OFFLINE);
 
         PreSubmitCallbackResponse<SscsCaseData> currentCallback = feHandledOfflineHandler.handle(ABOUT_TO_SUBMIT,
             callback, auth_token);
@@ -151,36 +146,13 @@ public class FeHandledOfflineHandlerTest {
     }
 
     private Object[] generateSscsCaseDataScenariosToHandleEvent() {
-        SscsDocument noIssuedDoc = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .evidenceIssued("No")
-                .build())
-            .build();
-        SscsDocument issuedDoc = SscsDocument.builder()
-            .value(SscsDocumentDetails.builder()
-                .evidenceIssued("Yes")
-                .build())
-            .build();
-
-        SscsCaseData sscsCaseDataWithNoIssuedDocs = SscsCaseData.builder()
-            .hmctsDwpState("failedSendingFurtherEvidence")
-            .sscsDocument(Arrays.asList(noIssuedDoc, noIssuedDoc))
-            .build();
-
         SscsCaseData sscsCaseDataWithIssuedAndNoIssuedDocs = SscsCaseData.builder()
             .hmctsDwpState("failedSendingFurtherEvidence")
             .sscsDocument(Arrays.asList(noIssuedDoc, issuedDoc))
             .build();
 
-        SscsCaseData sscsCaseDataWithNullDocs = SscsCaseData.builder()
-            .hmctsDwpState("failedSendingFurtherEvidence")
-            .sscsDocument(null)
-            .build();
-
         return new Object[]{
-            new Object[]{"caseData with issued and no issued evidence", sscsCaseDataWithIssuedAndNoIssuedDocs},
-            new Object[]{"caseData with null sscsDocument object", sscsCaseDataWithNullDocs},
-            new Object[]{"caseData with no issued evidence", sscsCaseDataWithNoIssuedDocs},
+            new Object[]{sscsCaseDataWithIssuedAndNoIssuedDocs}
         };
     }
 
