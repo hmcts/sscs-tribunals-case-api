@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fehandledoffline;
 
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -14,6 +15,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.FURTHER_EVIDENCE_HAN
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -48,12 +50,19 @@ public class FeHandledOfflineHandlerTest {
     private final FeHandledOfflineHandler feHandledOfflineHandler = new FeHandledOfflineHandler();
     private final SscsDocument noIssuedDoc = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
+            .documentType("Appellant evidence")
             .evidenceIssued("No")
             .build())
         .build();
     private final SscsDocument issuedDoc = SscsDocument.builder()
         .value(SscsDocumentDetails.builder()
+            .documentType("Representative evidence")
             .evidenceIssued("Yes")
+            .build())
+        .build();
+    private final SscsDocument dl16Doc = SscsDocument.builder()
+        .value(SscsDocumentDetails.builder()
+            .documentType("DL16")
             .build())
         .build();
 
@@ -137,22 +146,37 @@ public class FeHandledOfflineHandlerTest {
             callback, auth_token);
 
         assertNull(currentCallback.getData().getHmctsDwpState());
-        verifyEvidenceIssuedIsYes(currentCallback);
+        verifyEvidenceIssuedIsYes(currentCallback.getData().getSscsDocument());
     }
 
-    private void verifyEvidenceIssuedIsYes(PreSubmitCallbackResponse<SscsCaseData> currentCallback) {
-        List<SscsDocument> sscsDocument = currentCallback.getData().getSscsDocument();
-        sscsDocument.forEach(doc -> assertThat(doc.getValue().getEvidenceIssued(), equalTo("Yes")));
+    private void verifyEvidenceIssuedIsYes(List<SscsDocument> sscsDocuments) {
+        List<SscsDocument> evidenceDocs = sscsDocuments.stream()
+            .filter(doc -> "Yes".equals(doc.getValue().getEvidenceIssued()))
+            .collect(Collectors.toList());
+
+        SscsDocument expectedDoc = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentType("Appellant evidence")
+                .evidenceIssued("Yes")
+                .build())
+            .build();
+        assertThat(evidenceDocs, hasItems(expectedDoc, issuedDoc));
+
+        List<SscsDocument> noEvidenceDocs = sscsDocuments.stream()
+            .filter(doc -> null == doc.getValue().getEvidenceIssued())
+            .collect(Collectors.toList());
+        assertThat(noEvidenceDocs, hasItem(dl16Doc));
     }
 
     private Object[] generateSscsCaseDataScenariosToHandleEvent() {
-        SscsCaseData sscsCaseDataWithIssuedAndNoIssuedDocs = SscsCaseData.builder()
+
+        SscsCaseData sscsCaseDataWithIssuedAndNoIssuedAndDl16Docs = SscsCaseData.builder()
             .hmctsDwpState("failedSendingFurtherEvidence")
-            .sscsDocument(Arrays.asList(noIssuedDoc, issuedDoc))
+            .sscsDocument(Arrays.asList(noIssuedDoc, issuedDoc, dl16Doc))
             .build();
 
         return new Object[]{
-            new Object[]{sscsCaseDataWithIssuedAndNoIssuedDocs}
+            new Object[]{sscsCaseDataWithIssuedAndNoIssuedAndDl16Docs}
         };
     }
 

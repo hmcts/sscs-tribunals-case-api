@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fehandledoffline;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -37,8 +39,21 @@ public class FeHandledOfflineHandler implements PreSubmitCallbackHandler<SscsCas
             throw new IllegalStateException("Cannot handle callback");
         }
         callback.getCaseDetails().getCaseData().setHmctsDwpState(null);
-        List<SscsDocument> docs = callback.getCaseDetails().getCaseData().getSscsDocument();
-        docs.forEach(doc -> doc.getValue().setEvidenceIssued("Yes"));
+        setEvidenceIssuedFlag(callback);
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+    }
+
+    private void setEvidenceIssuedFlag(Callback<SscsCaseData> callback) {
+        List<SscsDocument> sscsDocument = callback.getCaseDetails().getCaseData().getSscsDocument();
+        List<SscsDocument> noIssuedEvidenceDocs = getNoIssuedEvidenceDocs(sscsDocument);
+        noIssuedEvidenceDocs.forEach(doc -> doc.getValue().setEvidenceIssued("Yes"));
+    }
+
+    @NotNull
+    private List<SscsDocument> getNoIssuedEvidenceDocs(List<SscsDocument> sscsDocument) {
+        return sscsDocument.stream()
+            .filter(doc -> "No".equals(doc.getValue().getEvidenceIssued()))
+            .collect(Collectors.toList());
+
     }
 }
