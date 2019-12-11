@@ -60,6 +60,11 @@ public class TrackYourAppealJsonBuilder {
 
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
+        return build(caseData, regionalProcessingCenter,caseId, false);
+    }
+
+    public ObjectNode build(SscsCaseData caseData,
+                            RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya) {
 
         // Create appealReceived eventType for appealCreated CCD event
         List<Event> eventList = caseData.getEvents();
@@ -93,7 +98,11 @@ public class TrackYourAppealJsonBuilder {
         if (appellantSubscription != null) {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
-        caseNode.put("status", getAppealStatus(caseData.getEvents()));
+        if (mya) {
+            caseNode.put("status", caseData.getState().toString());
+        } else {
+            caseNode.put("status", getAppealStatus(caseData.getEvents()));
+        }
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
         if (StringUtils.isNotBlank(caseData.getCreatedInGapsFrom())) {
@@ -106,7 +115,7 @@ public class TrackYourAppealJsonBuilder {
             if (caseData.getAppeal().getAppellant().getContact() != null) {
 
 
-                caseNode.put("contact", getContactNode(caseData));
+                caseNode.set("contact", getContactNode(caseData));
             }
         }
 
@@ -285,6 +294,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private String getAppealStatus(List<Event> events) {
+
         String appealStatus = "";
 
         if (null != events && !events.isEmpty()) {

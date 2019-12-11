@@ -71,10 +71,10 @@ public class TyaControllerTest {
     public void testToReturnAppealForGivenCaseReference() throws CcdException {
         ObjectNode node = JsonNodeFactory.instance.objectNode();
         //Given
-        when(tribunalsService.findAppeal(CASE_ID)).thenReturn(node);
+        when(tribunalsService.findAppeal(CASE_ID, false)).thenReturn(node);
 
         //When
-        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID);
+        ResponseEntity<String> receivedAppeal = controller.getAppealByCaseId(CASE_ID, false);
 
         //Then
         assertThat(receivedAppeal.getStatusCode(), equalTo(HttpStatus.OK));

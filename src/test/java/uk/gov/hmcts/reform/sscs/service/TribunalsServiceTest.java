@@ -109,7 +109,7 @@ public class TribunalsServiceTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(CASE_ID).data(getCaseData()).build();
         given(sscsCcdConvertService.getCaseDetails(caseDetails)).willReturn(sscsCaseDetails);
         ObjectNode objectNode = mock(ObjectNode.class);
-        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID))).willReturn(objectNode);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(false))).willReturn(objectNode);
 
         ObjectNode appeal = tribunalsService.findAppeal(CASE_ID);
         assertThat(appeal, is(objectNode));
