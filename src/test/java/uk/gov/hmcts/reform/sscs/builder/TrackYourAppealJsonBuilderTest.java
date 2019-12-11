@@ -318,6 +318,15 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(APPEAL_RECEIVED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void shouldReturnCaseIdInTheMyaAppealResponse() {
+        SscsCaseData caseData = APPEAL_RECEIVED_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true);
+        assertJsonEquals(APPEAL_RECEIVED_MYA.getSerializedMessage(), objectNode);
+    }
+
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
             .name("LIVERPOOL")
