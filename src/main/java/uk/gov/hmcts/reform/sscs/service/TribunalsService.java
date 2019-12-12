@@ -46,7 +46,6 @@ public class TribunalsService {
 
     public ObjectNode findAppeal(String appealNumber) {
         SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(appealNumber, idamService.getIdamTokens());
-        log.info("caseByAppealNumber" + caseByAppealNumber);
 
         if (caseByAppealNumber == null) {
             log.info("Appeal does not exist for appeal number: " + appealNumber);
@@ -67,7 +66,9 @@ public class TribunalsService {
 
     public ObjectNode findAppeal(Long caseId, boolean mya) {
         CaseDetails caseDetails = ccdClient.readForCaseworker(idamService.getIdamTokens(), caseId);
+        log.info("caseDetails" + caseDetails);
         SscsCaseDetails sscsCaseDetails = sscsCcdConvertService.getCaseDetails(caseDetails);
+        log.info("sscsCaseDetails" + sscsCaseDetails);
 
         if (sscsCaseDetails == null) {
             log.info("Appeal does not exist for case id: " + caseId);
