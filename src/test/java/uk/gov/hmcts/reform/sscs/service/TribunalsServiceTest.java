@@ -111,7 +111,7 @@ public class TribunalsServiceTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(CASE_ID).data(getCaseData()).build();
         given(sscsCcdConvertService.getCaseDetails(caseDetails)).willReturn(sscsCaseDetails);
         ObjectNode objectNode = mock(ObjectNode.class);
-        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(true), eq("appealReceived"))).willReturn(objectNode);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(true), eq("withDwp"))).willReturn(objectNode);
 
         ObjectNode appeal = tribunalsService.findAppeal(CASE_ID, true);
         assertThat(appeal, is(objectNode));
@@ -124,7 +124,7 @@ public class TribunalsServiceTest {
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(CASE_ID).data(getCaseData()).build();
         given(sscsCcdConvertService.getCaseDetails(caseDetails)).willReturn(sscsCaseDetails);
         ObjectNode objectNode = mock(ObjectNode.class);
-        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(false), eq("appealReceived"))).willReturn(objectNode);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(false), eq(null))).willReturn(objectNode);
 
         ObjectNode appeal = tribunalsService.findAppeal(CASE_ID);
         assertThat(appeal, is(objectNode));
@@ -162,7 +162,7 @@ public class TribunalsServiceTest {
     public void shouldAddRegionalProcessingCenterFromCcdIfItsPresent() {
         SscsCaseDetails caseDetailsWithRpc = getCaseDetailsWithRpc();
         when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(caseDetailsWithRpc);
-        given(trackYourAppealJsonBuilder.build(eq(caseDetailsWithRpc.getData()), any(), eq(caseDetailsWithRpc.getId()), true, "appealReceived")).willReturn(rootObjectNode);
+        given(trackYourAppealJsonBuilder.build(eq(caseDetailsWithRpc.getData()), any(), eq(caseDetailsWithRpc.getId()))).willReturn(rootObjectNode);
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
@@ -175,7 +175,7 @@ public class TribunalsServiceTest {
 
         SscsCaseDetails caseDetails = getCaseDetails();
         when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(caseDetails);
-        given(trackYourAppealJsonBuilder.build(eq(caseDetails.getData()), any(), eq(caseDetails.getId()), true, "appealReceived")).willReturn(rootObjectNode);
+        given(trackYourAppealJsonBuilder.build(eq(caseDetails.getData()), any(), eq(caseDetails.getId()))).willReturn(rootObjectNode);
 
         tribunalsService.findAppeal(APPEAL_NUMBER);
 
@@ -187,7 +187,7 @@ public class TribunalsServiceTest {
 
         final String appealNumber = "trueppealNumber";
         when(ccdService.findCaseByAppealNumber(appealNumber, idamTokens)).thenReturn(sscsCaseDetails);
-        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(sscsCaseDetails.getId()), true, "appealReceived")).willReturn(rootObjectNode);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(sscsCaseDetails.getId()))).willReturn(rootObjectNode);
 
         ObjectNode objectNode = tribunalsService.findAppeal(appealNumber);
         assertEquals(appealNumber, objectNode.findValue("appeal").get("appealNumber").asText());
