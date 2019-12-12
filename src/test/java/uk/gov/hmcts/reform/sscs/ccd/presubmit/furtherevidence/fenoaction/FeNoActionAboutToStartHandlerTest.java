@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.fenoaction;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.fenoaction;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
