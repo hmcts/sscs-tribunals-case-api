@@ -89,10 +89,9 @@ public class TrackYourAppealJsonBuilder {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
         }
 
-
+        LOG.info("CaseNode=" + caseData.toString());
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
-        LOG.info("CaseNode=" + caseNode.toPrettyString());
         caseNode.put("caseId", String.valueOf(caseId));
         caseNode.put("caseReference", caseData.getCaseReference());
         Subscription appellantSubscription = caseData.getSubscriptions().getAppellantSubscription();
