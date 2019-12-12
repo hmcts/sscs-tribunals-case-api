@@ -66,6 +66,8 @@ public class TrackYourAppealJsonBuilder {
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya) {
 
+        LOG.info("CaseNode=" + caseData.toString());
+
         // Create appealReceived eventType for appealCreated CCD event
         List<Event> eventList = caseData.getEvents();
         if (eventList == null || eventList.isEmpty()) {
@@ -89,7 +91,7 @@ public class TrackYourAppealJsonBuilder {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
         }
 
-        LOG.info("CaseNode=" + caseData.toString());
+
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
