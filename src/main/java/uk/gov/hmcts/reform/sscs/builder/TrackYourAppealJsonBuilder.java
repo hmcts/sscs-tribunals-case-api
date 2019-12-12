@@ -60,11 +60,11 @@ public class TrackYourAppealJsonBuilder {
 
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
-        return build(caseData, regionalProcessingCenter,caseId, false);
+        return build(caseData, regionalProcessingCenter,caseId, false, null);
     }
 
     public ObjectNode build(SscsCaseData caseData,
-                            RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya) {
+                            RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya, String state) {
 
         LOG.info("CaseNode=" + caseData.toString());
 
@@ -101,7 +101,7 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
         if (mya) {
-            caseNode.put("status", caseData.getState().toString());
+            caseNode.put("status", state);
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
         }

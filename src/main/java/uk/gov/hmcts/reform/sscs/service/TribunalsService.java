@@ -66,16 +66,15 @@ public class TribunalsService {
 
     public ObjectNode findAppeal(Long caseId, boolean mya) {
         CaseDetails caseDetails = ccdClient.readForCaseworker(idamService.getIdamTokens(), caseId);
-        log.info("caseDetails" + caseDetails);
         SscsCaseDetails sscsCaseDetails = sscsCcdConvertService.getCaseDetails(caseDetails);
-        log.info("sscsCaseDetails" + sscsCaseDetails);
 
         if (sscsCaseDetails == null) {
             log.info("Appeal does not exist for case id: " + caseId);
             throw new AppealNotFoundException(caseId);
         }
 
-        return trackYourAppealJsonBuilder.build(sscsCaseDetails.getData(), getRegionalProcessingCenter(sscsCaseDetails.getData()), sscsCaseDetails.getId(), mya);
+        return trackYourAppealJsonBuilder.build(sscsCaseDetails.getData(),
+                getRegionalProcessingCenter(sscsCaseDetails.getData()), sscsCaseDetails.getId(), mya, caseDetails.getState());
     }
 
     private RegionalProcessingCenter getRegionalProcessingCenter(SscsCaseData caseByAppealNumber) {
