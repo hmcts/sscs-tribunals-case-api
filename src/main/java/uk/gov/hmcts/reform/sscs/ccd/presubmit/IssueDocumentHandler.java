@@ -54,7 +54,7 @@ public class IssueDocumentHandler {
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .noticeBody(caseData.getBodyContent())
                 .userName(caseData.getSignedBy())
-                .noticeType(documentTypeLabel)
+                .noticeType(documentTypeLabel.toUpperCase())
                 .userRole(caseData.getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(LocalDate.now())
