@@ -7,7 +7,7 @@
     "appealNumber": "abcde12345",
     "benefitType": "pip",
     "hearingType": "oral",
-    "status": "appealCreated",
+    "status": "APPEAL_RECEIVED",
     "regionalProcessingCenter": {
       "name":"LIVERPOOL",
       "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
