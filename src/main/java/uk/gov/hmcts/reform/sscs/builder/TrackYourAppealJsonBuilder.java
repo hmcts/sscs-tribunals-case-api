@@ -36,11 +36,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.apache.commons.lang.StringUtils;
@@ -101,7 +98,10 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
         if (mya) {
-            if (state.equals("appealCreated")) {
+            List<String> appealReceivedStates = Arrays.asList("appealCreated", "incompleteApplication",
+                    "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal",
+                    "validAppeal", "withDwp");
+            if (appealReceivedStates.contains(state)) {
                 caseNode.put("status", "APPEAL_RECEIVED");
             }
 
