@@ -101,7 +101,7 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
         if (mya) {
-            if (state.equals("appealReceived")) {
+            if (state.equals("appealCreated")) {
                 caseNode.put("status", "APPEAL_RECEIVED");
             }
 
