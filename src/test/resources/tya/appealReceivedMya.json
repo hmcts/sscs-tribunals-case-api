@@ -8,21 +8,6 @@
     "benefitType": "pip",
     "hearingType": "oral",
     "status": "appealCreated",
-    "latestEvents": [
-      {
-        "evidenceType": "General",
-        "evidenceProvidedBy": "Appellant",
-        "date": "2017-03-10T01:00:00.000Z",
-        "type": "EVIDENCE_RECEIVED",
-        "contentKey": "status.evidenceReceived"
-      },
-      {
-        "date": "2017-03-08T12:01:47.620Z",
-        "type": "APPEAL_RECEIVED",
-        "dwpResponseDate": "2017-04-12T11:01:47.620Z",
-        "contentKey": "status.appealReceived"
-      }
-    ],
     "regionalProcessingCenter": {
       "name":"LIVERPOOL",
       "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",

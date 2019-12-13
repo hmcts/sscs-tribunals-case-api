@@ -29,7 +29,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void createdInGapsFromTest() {
         SscsCaseData caseData = APPEAL_CREATED_WITH_CREATEDINGAPSFROM_FIELD_CCD_RESPONSE.getDeserializeMessage();
 
-        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData, populateRegionalProcessingCenter(), 1L, true, null);
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData, populateRegionalProcessingCenter(), 1L, false, null);
 
         String actualValue = String.valueOf(objectNode.findValue("createdInGapsFrom"));
         assertJsonEquals("readyToList", actualValue);
