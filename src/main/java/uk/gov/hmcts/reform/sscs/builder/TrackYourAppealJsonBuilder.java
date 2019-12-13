@@ -69,29 +69,29 @@ public class TrackYourAppealJsonBuilder {
         LOG.info("CaseNode=" + caseData.toString());
 
         // Create appealReceived eventType for appealCreated CCD event
-        List<Event> eventList = caseData.getEvents();
-        if (eventList == null || eventList.isEmpty()) {
-            if (caseData.getCaseCreated() != null) {
-                caseData = createAppealReceivedEventTypeForAppealCreatedEvent(caseData);
-            } else {
-                String message = "No events exist for this appeal with case id: " + caseId;
-                CcdException ccdException = new CcdException(message);
-                LOG.error(message, ccdException);
-                throw ccdException;
+        if (!mya) {
+            List<Event> eventList = caseData.getEvents();
+            if (eventList == null || eventList.isEmpty()) {
+                if (caseData.getCaseCreated() != null) {
+                    caseData = createAppealReceivedEventTypeForAppealCreatedEvent(caseData);
+                } else {
+                    String message = "No events exist for this appeal with case id: " + caseId;
+                    CcdException ccdException = new CcdException(message);
+                    LOG.error(message, ccdException);
+                    throw ccdException;
+                }
+            }
+            createEvidenceResponseEvents(caseData);
+            caseData.getEvents().removeIf(a -> a.getValue().getDate() == null);
+            eventList = caseData.getEvents();
+            eventList.sort(Comparator.reverseOrder());
+            processExceptions(eventList, getHearingType(caseData).equals(PAPER));
+
+            if (getHearingType(caseData).equals(PAPER)) {
+                PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
             }
         }
-
-        createEvidenceResponseEvents(caseData);
-        caseData.getEvents().removeIf(a -> a.getValue().getDate() == null);
-        eventList = caseData.getEvents();
-        eventList.sort(Comparator.reverseOrder());
-        processExceptions(eventList, getHearingType(caseData).equals(PAPER));
-
-        if (getHearingType(caseData).equals(PAPER)) {
-            PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
-        }
-
-
+        
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
