@@ -34,6 +34,7 @@ public class IssueDocumentHandler {
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
+        caseData.setExtensionNextEventDl(null);
 
         if (!DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType()) || !State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
             caseData.setDirectionType(null);
