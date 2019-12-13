@@ -133,10 +133,10 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+        verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Directions notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertEquals(DirectionType.APPEAL_TO_PROCEED, response.getData().getDirectionType());
-        verify(footerService).createFooterDocument(any(), eq("Direction notice"), any(), any(), any(), any());
+        verify(footerService).createFooterDocument(any(), eq("Directions notice"), any(), any(), any(), any());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterDocument(eq(theDocument.getDocumentLink()), eq("Direction notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+        verify(footerService).createFooterDocument(eq(theDocument.getDocumentLink()), eq("Directions notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
         assertEquals(2, response.getData().getSscsDocument().size());
         assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());

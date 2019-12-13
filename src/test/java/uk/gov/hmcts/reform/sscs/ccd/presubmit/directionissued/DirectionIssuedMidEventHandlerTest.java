@@ -106,7 +106,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         assertNotNull(response.getData().getPreviewDocument());
         assertEquals(DocumentLink.builder()
-                .documentFilename(String.format("Direction Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+                .documentFilename(String.format("Directions Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
                 .documentBinaryUrl(URL + "/binary")
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
@@ -152,7 +152,7 @@ public class DirectionIssuedMidEventHandlerTest {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
-        assertEquals("DIRECTION NOTICE", payload.getNoticeType());
+        assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
     }
 }
