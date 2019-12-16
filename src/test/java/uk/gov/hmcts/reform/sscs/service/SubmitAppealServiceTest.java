@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -72,7 +73,7 @@ public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
 
     @Rule
-    public MockitoRule rule =  MockitoJUnit.rule().strictness(Strictness.LENIENT);
+    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
 
     @Mock
     private CcdService ccdService;
@@ -284,20 +285,29 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly() throws JsonProcessingException {
+    @Parameters(method = "generateDifferentRpcScenarios")
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String rpc, String appellantPostCode)
+        throws JsonProcessingException {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
+        appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
 
-        assertEquals("BIRMINGHAM", caseData.getRegion());
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
-        RegionalProcessingCenter expectedRpc = getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC);
+        RegionalProcessingCenter expectedRpc = getRpcObjectForGivenJsonRpc(rpc);
         assertThat(actualRpc, is(expectedRpc));
+        assertEquals(expectedRpc.getName(), caseData.getRegion());
     }
 
     private RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String birminghamRpc) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(birminghamRpc, RegionalProcessingCenter.class);
+    }
+
+    public Object[] generateDifferentRpcScenarios() {
+        return new Object[]{
+            new Object[]{BIRMINGHAM_RPC, "TN32 6PL"}
+        };
     }
 
     @Test
