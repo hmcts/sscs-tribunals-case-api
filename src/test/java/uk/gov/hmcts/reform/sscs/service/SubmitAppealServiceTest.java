@@ -31,17 +31,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import junitparams.JUnitParamsRunner;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -64,9 +67,12 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(JUnitParamsRunner.class)
 public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
+
+    @Rule
+    public MockitoRule rule =  MockitoJUnit.rule().strictness(Strictness.LENIENT);
 
     @Mock
     private CcdService ccdService;
@@ -431,8 +437,6 @@ public class SubmitAppealServiceTest {
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(citizenCcdService).draftArchived(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
-
-
     }
 
     @Test
@@ -451,7 +455,6 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void addNoAssociatedCases() {
-        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
         SscsCaseData caseData = submitAppealService.addAssociatedCases(
@@ -464,7 +467,7 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void getMatchedCases() {
-        given(ccdService.findCaseBy(any(), any())).willReturn(Arrays.asList(
+        given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
             SscsCaseDetails.builder().id(12345678L).build()
         ));
         List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
