@@ -116,17 +116,20 @@ public class SubmitAppealServiceTest {
         "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\"\n" +
         "  }";
 
+    private static final RegionalProcessingCenterService regionalProcessingCenterService;
+
+    static {
+        AirLookupService airLookupService = new AirLookupService();
+        airLookupService.init();
+        regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
+        regionalProcessingCenterService.init();
+    }
+
     @Before
     public void setUp() {
         submitYourAppealEmailTemplate =
             new SubmitYourAppealEmailTemplate("from", "to", "message");
 
-        AirLookupService airLookupService = new AirLookupService();
-        airLookupService.init();
-
-        RegionalProcessingCenterService regionalProcessingCenterService =
-            new RegionalProcessingCenterService(airLookupService);
-        regionalProcessingCenterService.init();
 
         List<String> offices = new ArrayList<>();
         offices.add("DWP PIP (1)");
