@@ -59,10 +59,7 @@ public class SubmitAppealService {
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
-        String firstHalfOfPostcode = regionalProcessingCenterService
-            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
-        SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
-
+        SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
@@ -121,8 +118,10 @@ public class SubmitAppealService {
         }
     }
 
-    SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
+    SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
+        String firstHalfOfPostcode = regionalProcessingCenterService
+            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData;
         if (rpc == null) {
