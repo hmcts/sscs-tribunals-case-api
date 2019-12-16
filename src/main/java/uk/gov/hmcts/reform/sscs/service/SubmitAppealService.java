@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
+import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
 @Service
 @Slf4j
@@ -37,7 +37,7 @@ public class SubmitAppealService {
     private final SscsPdfService sscsPdfService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
-    private final ConvertAintoBService convertAintoBService;
+    private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final List<String> offices;
 
     @Autowired
@@ -46,7 +46,7 @@ public class SubmitAppealService {
                         SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        ConvertAintoBService convertAintoBService,
+                        ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
@@ -54,7 +54,7 @@ public class SubmitAppealService {
         this.sscsPdfService = sscsPdfService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
-        this.convertAintoBService = convertAintoBService;
+        this.convertAIntoBService = convertAIntoBService;
         this.offices = offices;
     }
 
@@ -88,11 +88,10 @@ public class SubmitAppealService {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
-            SessionDraft sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetailsList.get(0));
+            SessionDraft sessionDraft = convertAIntoBService.convert(caseDetailsList.get(0));
             return Optional.of(sessionDraft);
         }
         return Optional.empty();

@@ -47,7 +47,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
+import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SubmitAppealServiceTest {
@@ -100,7 +100,7 @@ public class SubmitAppealServiceTest {
     @Mock
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
     @Mock
-    private ConvertAintoBService convertAintoBService;
+    private ConvertAIntoBService convertAintoBService;
 
     private List<String> offices;
 
