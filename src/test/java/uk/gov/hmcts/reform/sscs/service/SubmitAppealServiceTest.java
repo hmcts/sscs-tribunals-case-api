@@ -68,9 +68,6 @@ public class SubmitAppealServiceTest {
     @Mock
     private EmailService emailService;
 
-    @Mock
-    private AirLookupService airLookupService;
-
     @SuppressWarnings("PMD.UnusedPrivateField")
     @Mock
     private PdfStoreService pdfStoreService;
@@ -100,22 +97,21 @@ public class SubmitAppealServiceTest {
     @Mock
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
     @Mock
-    private ConvertAIntoBService convertAintoBService;
-
-    private List<String> offices;
+    private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
 
     @Before
     public void setUp() {
-        when(airLookupService.lookupRegionalCentre("CF10")).thenReturn("Cardiff");
-
         submitYourAppealEmailTemplate =
             new SubmitYourAppealEmailTemplate("from", "to", "message");
+
+        AirLookupService airLookupService = new AirLookupService();
+        airLookupService.init();
 
         RegionalProcessingCenterService regionalProcessingCenterService =
             new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
 
-        offices = new ArrayList<>();
+        List<String> offices = new ArrayList<>();
         offices.add("DWP PIP (1)");
         offices.add("Balham DRT");
         offices.add("Watford DRT");
@@ -125,7 +121,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAintoBService, offices);
+            idamService, convertAIntoBService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -223,7 +219,7 @@ public class SubmitAppealServiceTest {
     @Test
     public void shouldGetADraftIfItExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
-        when(convertAintoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
+        when(convertAIntoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertTrue(optionalSessionDraft.isPresent());
     }
@@ -275,8 +271,8 @@ public class SubmitAppealServiceTest {
     @Test
     public void testPrepareCaseForCcd() {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
-        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
-        assertEquals("CARDIFF", caseData.getRegion());
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+        assertEquals("BIRMINGHAM", caseData.getRegion());
     }
 
     @Test
@@ -289,7 +285,7 @@ public class SubmitAppealServiceTest {
         mrn.setDwpIssuingOffice("1");
         appealData.setMrn(mrn);
 
-        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
@@ -303,7 +299,7 @@ public class SubmitAppealServiceTest {
         mrn.setDwpIssuingOffice("2");
         appealData.setMrn(mrn);
 
-        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(State.VALID_APPEAL.getId(), caseData.getCreatedInGapsFrom());
     }
 
@@ -317,7 +313,7 @@ public class SubmitAppealServiceTest {
         mrn.setDwpIssuingOffice("Watford DRT");
         appealData.setMrn(mrn);
 
-        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(READY_TO_LIST.getId(), caseData.getCreatedInGapsFrom());
     }
 
@@ -331,7 +327,7 @@ public class SubmitAppealServiceTest {
         mrn.setDwpIssuingOffice("Chesterfield DRT");
         appealData.setMrn(mrn);
 
-        SscsCaseData caseData = submitAppealService.prepareCaseForCcd(appealData, "CF10");
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(State.VALID_APPEAL.getId(), caseData.getCreatedInGapsFrom());
     }
 

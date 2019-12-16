@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 
@@ -17,7 +18,7 @@ public final class SyaServiceHelper {
     public static SyaCaseWrapper getSyaCaseWrapper() {
         URL resource = SyaServiceHelper.class.getClassLoader().getResource("json/sya.json");
         try {
-            return mapper.readValue(resource, SyaCaseWrapper.class);
+            return mapper.readValue(Objects.requireNonNull(resource), SyaCaseWrapper.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
