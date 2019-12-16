@@ -1,31 +1,43 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.*;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import feign.FeignException;
 import java.time.LocalDate;
-import java.util.*;
-
-import org.json.JSONObject;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
@@ -35,8 +47,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
-import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
-import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
 import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
@@ -68,15 +78,8 @@ public class SubmitAppealServiceTest {
     @Mock
     private EmailService emailService;
 
-    @SuppressWarnings("PMD.UnusedPrivateField")
-    @Mock
-    private PdfStoreService pdfStoreService;
-
     @Mock
     private IdamService idamService;
-
-    @Captor
-    private ArgumentCaptor<Email> emailCaptor;
 
     private SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
 
@@ -84,18 +87,8 @@ public class SubmitAppealServiceTest {
 
     private final SyaCaseWrapper appealData = getSyaCaseWrapper();
 
-    private final JSONObject json = new JSONObject();
+    private final String userToken = "user token";
 
-    private final String userToken = null;
-
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
-    @Mock
-    private DocumentUploadClientApi documentUploadClientApi;
-    @Mock
-    private EvidenceDownloadClientApi evidenceDownloadClientApi;
-    @Mock
-    private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
     @Mock
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
 
