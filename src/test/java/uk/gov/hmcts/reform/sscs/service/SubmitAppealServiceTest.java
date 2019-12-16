@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -24,6 +26,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -41,6 +45,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -91,6 +96,18 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
+    public static final String BIRMINGHAM_RPC = "{\n" +
+        "    \"name\" : \"BIRMINGHAM\",\n" +
+        "    \"address1\" : \"HM Courts & Tribunals Service\",\n" +
+        "    \"address2\" : \"Social Security & Child Support Appeals\",\n" +
+        "    \"address3\" : \"Administrative Support Centre\",\n" +
+        "    \"address4\" : \"PO Box 14620\",\n" +
+        "    \"city\" : \"BIRMINGHAM\",\n" +
+        "    \"postcode\" : \"B16 6FR\",\n" +
+        "    \"phoneNumber\" : \"0300 123 1142\",\n" +
+        "    \"faxNumber\" : \"0126 434 7983\",\n" +
+        "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\"\n" +
+        "  }";
 
     @Before
     public void setUp() {
@@ -110,7 +127,7 @@ public class SubmitAppealServiceTest {
         offices.add("Watford DRT");
 
         SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
-                submitYourAppealEmailTemplate, ccdPdfService);
+            submitYourAppealEmailTemplate, ccdPdfService);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
@@ -187,7 +204,7 @@ public class SubmitAppealServiceTest {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(404);
         given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
-                .willThrow(feignException);
+            .willThrow(feignException);
 
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
@@ -200,7 +217,7 @@ public class SubmitAppealServiceTest {
         FeignException feignException = mock(FeignException.class);
         given(feignException.status()).willReturn(409);
         given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
-                .willThrow(feignException);
+            .willThrow(feignException);
 
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
@@ -208,7 +225,6 @@ public class SubmitAppealServiceTest {
         Assert.assertFalse(result.isPresent());
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void shouldGetADraftIfItExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
@@ -262,10 +278,20 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void testPrepareCaseForCcd() {
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly() throws JsonProcessingException {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
+
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+
         assertEquals("BIRMINGHAM", caseData.getRegion());
+        RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
+        RegionalProcessingCenter expectedRpc = getRpcObjectForGivenJsonRpc(BIRMINGHAM_RPC);
+        assertThat(actualRpc, is(expectedRpc));
+    }
+
+    private RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String birminghamRpc) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(birminghamRpc, RegionalProcessingCenter.class);
     }
 
     @Test
@@ -429,8 +455,8 @@ public class SubmitAppealServiceTest {
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
         SscsCaseData caseData = submitAppealService.addAssociatedCases(
-                SscsCaseData.builder().caseReference("00000000").build(),
-                matchedByNinoCases);
+            SscsCaseData.builder().caseReference("00000000").build(),
+            matchedByNinoCases);
 
         assertNull(caseData.getAssociatedCase());
         assertEquals("No", caseData.getLinkedCasesBoolean());
@@ -438,8 +464,8 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void getMatchedCases() {
-        given(ccdService.findCaseBy(any(),any())).willReturn(Arrays.asList(
-                SscsCaseDetails.builder().id(12345678L).build()
+        given(ccdService.findCaseBy(any(), any())).willReturn(Arrays.asList(
+            SscsCaseDetails.builder().id(12345678L).build()
         ));
         List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
 
