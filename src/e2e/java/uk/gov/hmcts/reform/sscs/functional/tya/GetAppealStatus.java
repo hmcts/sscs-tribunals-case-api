@@ -47,6 +47,6 @@ public class GetAppealStatus extends BaseHandler {
                 .statusCode(HttpStatus.OK.value())
                 .and()
                 .extract().body().asString();
-        assertThat(response).contains("status\":\"DWP_RESPOND");
+        assertThat(response).contains("status\":\"APPEAL_RECEIVED");
     }
 }
