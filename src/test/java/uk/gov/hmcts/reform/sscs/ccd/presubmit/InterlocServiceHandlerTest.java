@@ -79,11 +79,13 @@ public class InterlocServiceHandlerTest {
     @Test
     @Parameters({
         "TCW_DIRECTION_ISSUED, awaitingInformation",
-        "JUDGE_DECISION_APPEAL_TO_PROCEED, none",
+        "INTERLOC_INFORMATION_RECEIVED, awaitingAdminAction",
+        "JUDGE_DIRECTION_ISSUED, awaitingInformation",
+        "REINSTATE_APPEAL, awaitingAdminAction",
+        "UPLOAD_FURTHER_EVIDENCE, awaitingAdminAction",
         "TCW_DECISION_APPEAL_TO_PROCEED, none",
-        "UPLOAD_FURTHER_EVIDENCE, interlocutoryReview",
-        "SEND_TO_ADMIN, awaitingAdminAction",
-        "DWP_CHALLENGE_VALIDITY, reviewByJudge"
+        "JUDGE_DECISION_APPEAL_TO_PROCEED, none",
+        "SEND_TO_ADMIN, awaitingAdminAction"
     })
     public void givenEvent_thenSetInterlocReviewStateToExpected(EventType eventType,
                                                                 String expectedInterlocReviewState) {
@@ -95,6 +97,23 @@ public class InterlocServiceHandlerTest {
 
     }
 
+    @Test
+    @Parameters({
+        "NON_COMPLIANT, reviewByTcw",
+        "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
+        "INTERLOC_SEND_TO_TCW, reviewByTcw",
+        "TCW_REFER_TO_JUDGE, reviewByJudge",
+        "DWP_CHALLENGE_VALIDITY, reviewByJudge"
+    })
+    public void givenEvent_thenSetInterlocReviewStateToExpectedAndSetInterlocReferralDate(EventType eventType, String expectedInterlocReviewState) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwExceptionIfCannotHandleEventType() {
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
@@ -103,15 +122,6 @@ public class InterlocServiceHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-    }
-
-    @Test
-    public void checkInterlocDateIsSet() {
-        when(callback.getEvent()).thenReturn(EventType.NON_COMPLIANT);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
     }
 
 }
