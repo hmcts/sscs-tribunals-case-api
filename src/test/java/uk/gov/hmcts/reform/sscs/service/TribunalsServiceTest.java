@@ -185,7 +185,7 @@ public class TribunalsServiceTest {
     @Test
     public void findAppealWillReturnTheCalledAppealNumberInResponse() {
 
-        final String appealNumber = "trueppealNumber";
+        final String appealNumber = "MyAppealNumber";
         when(ccdService.findCaseByAppealNumber(appealNumber, idamTokens)).thenReturn(sscsCaseDetails);
         given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(sscsCaseDetails.getId()))).willReturn(rootObjectNode);
 
