@@ -103,6 +103,15 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
+
+    private static final RegionalProcessingCenterService regionalProcessingCenterService;
+    static {
+        AirLookupService airLookupService = new AirLookupService();
+        airLookupService.init();
+        regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
+        regionalProcessingCenterService.init();
+    }
+
     public static final String BIRMINGHAM_RPC = "{\n" +
         "    \"name\" : \"BIRMINGHAM\",\n" +
         "    \"address1\" : \"HM Courts & Tribunals Service\",\n" +
@@ -116,14 +125,18 @@ public class SubmitAppealServiceTest {
         "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\"\n" +
         "  }";
 
-    private static final RegionalProcessingCenterService regionalProcessingCenterService;
-
-    static {
-        AirLookupService airLookupService = new AirLookupService();
-        airLookupService.init();
-        regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
-        regionalProcessingCenterService.init();
-    }
+    public static final String BRADFORD_RPC = "{\n" +
+        "    \"name\" : \"BRADFORD\",\n" +
+        "    \"address1\": \"HM Courts & Tribunals Service\",\n" +
+        "    \"address2\": \"Social Security & Child Support Appeals\",\n" +
+        "    \"address3\": \"Phoenix House\",\n" +
+        "    \"address4\": \"Rushton Avenue\",\n" +
+        "    \"city\": \"BRADFORD\",\n" +
+        "    \"postcode\": \"BD3 7BH\",\n" +
+        "    \"phoneNumber\" : \"0300 123 1142\",\n" +
+        "    \"faxNumber\" : \"0126 434 7983\",\n" +
+        "    \"email\" : \"SSCS_Bradford@justice.gov.uk\"\n" +
+        "  }";
 
     @Before
     public void setUp() {
@@ -309,7 +322,9 @@ public class SubmitAppealServiceTest {
 
     public Object[] generateDifferentRpcScenarios() {
         return new Object[]{
-            new Object[]{BIRMINGHAM_RPC, "TN32 6PL"}
+            new Object[]{BRADFORD_RPC, "TN32 6PL"},
+            new Object[]{BRADFORD_RPC, "OX1 1AE"},
+            new Object[]{BIRMINGHAM_RPC, "B1 1AA"}
         };
     }
 
