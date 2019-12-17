@@ -49,12 +49,15 @@ public class BaseHandler {
         idamTokens = idamService.getIdamTokens();
     }
 
-    protected SscsCaseDetails createCaseInResponseReceivedState(String filePath) throws IOException {
+    protected CaseDetails<SscsCaseData> createCaseInResponseReceivedState(String filePath) throws IOException {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
-                EventType.DWP_RESPOND.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+                EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
-        return caseDetails;
+        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
+                CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
+
+        return createCaseDetailsUsingGivenCallback(caseDetails.getId(), filePath);
     }
 
     protected CaseDetails<SscsCaseData> createCaseInWithDwpStateUsingGivenCallback(String filePath) throws IOException {
