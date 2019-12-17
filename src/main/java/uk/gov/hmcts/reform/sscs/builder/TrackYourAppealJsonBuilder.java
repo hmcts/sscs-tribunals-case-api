@@ -104,7 +104,8 @@ public class TrackYourAppealJsonBuilder {
             List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived");
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
             List<String> dormantStates = Arrays.asList("dormantAppealState");
-            List<String> closedStates = Arrays.asList("closed");
+            List<String> closedStates = Arrays.asList("closed", "incompleteApplicationVoidState",
+                    "voidState");
 
             if (appealReceivedStates.contains(state)) {
                 caseNode.put("status", "APPEAL_RECEIVED");
