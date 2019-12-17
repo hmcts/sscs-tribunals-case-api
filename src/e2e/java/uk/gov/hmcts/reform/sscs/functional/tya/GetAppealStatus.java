@@ -29,7 +29,7 @@ public class GetAppealStatus extends BaseHandler {
 
     @Before
     public void setUp() {
-        setUp();
+        super.setUp();
     }
 
     @Test
