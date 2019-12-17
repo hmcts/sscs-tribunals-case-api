@@ -49,6 +49,14 @@ public class BaseHandler {
         idamTokens = idamService.getIdamTokens();
     }
 
+    protected SscsCaseDetails createCaseInResponseReceivedState(String filePath) throws IOException {
+        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
+                EventType.DWP_RESPOND.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+                CREATED_BY_FUNCTIONAL_TEST, idamTokens);
+
+        return caseDetails;
+    }
+
     protected CaseDetails<SscsCaseData> createCaseInWithDwpStateUsingGivenCallback(String filePath) throws IOException {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
             EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,

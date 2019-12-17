@@ -14,6 +14,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
 
@@ -48,5 +49,24 @@ public class GetAppealStatus extends BaseHandler {
                 .and()
                 .extract().body().asString();
         assertThat(response).contains("status\":\"APPEAL_RECEIVED");
+    }
+
+    @Test
+    public void testResponseReceived() throws IOException {
+        SscsCaseDetails caseDetails = createCaseInResponseReceivedState("handlers/uploaddocument/uploadDocumentCallback.json");
+
+        RestAssured.baseURI = testUrl;
+        RestAssured.useRelaxedHTTPSValidation();
+
+        String response = RestAssured
+                .given()
+                .when()
+                .get("appeals?mya=true&caseId=" + caseDetails.getId())
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .and()
+                .extract().body().asString();
+        assertThat(response).contains("status\":\"DWP_RESPOND");
+
     }
 }
