@@ -105,6 +105,7 @@ public class SubmitAppealServiceTest {
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
 
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
+
     static {
         AirLookupService airLookupService = new AirLookupService();
         airLookupService.init();
@@ -112,31 +113,31 @@ public class SubmitAppealServiceTest {
         regionalProcessingCenterService.init();
     }
 
-    public static final String BIRMINGHAM_RPC = "{\n" +
-        "    \"name\" : \"BIRMINGHAM\",\n" +
-        "    \"address1\" : \"HM Courts & Tribunals Service\",\n" +
-        "    \"address2\" : \"Social Security & Child Support Appeals\",\n" +
-        "    \"address3\" : \"Administrative Support Centre\",\n" +
-        "    \"address4\" : \"PO Box 14620\",\n" +
-        "    \"city\" : \"BIRMINGHAM\",\n" +
-        "    \"postcode\" : \"B16 6FR\",\n" +
-        "    \"phoneNumber\" : \"0300 123 1142\",\n" +
-        "    \"faxNumber\" : \"0126 434 7983\",\n" +
-        "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\"\n" +
-        "  }";
+    public static final String BIRMINGHAM_RPC = "{\n"
+        + "    \"name\" : \"BIRMINGHAM\",\n"
+        + "    \"address1\" : \"HM Courts & Tribunals Service\",\n"
+        + "    \"address2\" : \"Social Security & Child Support Appeals\",\n"
+        + "    \"address3\" : \"Administrative Support Centre\",\n"
+        + "    \"address4\" : \"PO Box 14620\",\n"
+        + "    \"city\" : \"BIRMINGHAM\",\n"
+        + "    \"postcode\" : \"B16 6FR\",\n"
+        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
+        + "    \"faxNumber\" : \"0126 434 7983\",\n"
+        + "    \"email\" : \"Birmingham-SYA-Receipts@justice.gov.uk\"\n"
+        + "  }";
 
-    public static final String BRADFORD_RPC = "{\n" +
-        "    \"name\" : \"BRADFORD\",\n" +
-        "    \"address1\": \"HM Courts & Tribunals Service\",\n" +
-        "    \"address2\": \"Social Security & Child Support Appeals\",\n" +
-        "    \"address3\": \"Phoenix House\",\n" +
-        "    \"address4\": \"Rushton Avenue\",\n" +
-        "    \"city\": \"BRADFORD\",\n" +
-        "    \"postcode\": \"BD3 7BH\",\n" +
-        "    \"phoneNumber\" : \"0300 123 1142\",\n" +
-        "    \"faxNumber\" : \"0126 434 7983\",\n" +
-        "    \"email\" : \"SSCS_Bradford@justice.gov.uk\"\n" +
-        "  }";
+    public static final String BRADFORD_RPC = "{\n"
+        + "    \"name\" : \"BRADFORD\",\n"
+        + "    \"address1\": \"HM Courts & Tribunals Service\",\n"
+        + "    \"address2\": \"Social Security & Child Support Appeals\",\n"
+        + "    \"address3\": \"Phoenix House\",\n"
+        + "    \"address4\": \"Rushton Avenue\",\n"
+        + "    \"city\": \"BRADFORD\",\n"
+        + "    \"postcode\": \"BD3 7BH\",\n"
+        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
+        + "    \"faxNumber\" : \"0126 434 7983\",\n"
+        + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\"\n"
+        + "  }";
 
     @Before
     public void setUp() {
