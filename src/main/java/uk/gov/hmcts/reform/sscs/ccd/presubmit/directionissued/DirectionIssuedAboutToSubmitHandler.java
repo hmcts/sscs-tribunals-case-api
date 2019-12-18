@@ -65,17 +65,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
         } else if (DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
-            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
-            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-            caseData.setState(State.RESPONSE_RECEIVED);
-        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
-            caseData.setHmctsDwpState("sentToDwp");
             caseData.setDateSentToDwp(LocalDate.now().toString());
-            caseData.setInterlocReviewState(null);
-            caseData.setState(State.WITH_DWP);
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionTypeDl()) && ExtensionNextEvent.SEND_TO_LISTING.equals(caseData.getExtensionNextEventDl())) {
+            updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
+        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionTypeDl()) && ExtensionNextEvent.SEND_TO_VALID_APPEAL.equals(caseData.getExtensionNextEventDl())) {
+            updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
         } else {
             caseData.setInterlocReviewState(null);
         }
@@ -94,6 +89,13 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
+    }
+
+    private void updateCaseAfterExtensionRefused(SscsCaseData caseData, String interlocReviewState, State state) {
+        caseData.setHmctsDwpState("sentToDwp");
+        caseData.setDateSentToDwp(LocalDate.now().toString());
+        caseData.setInterlocReviewState(interlocReviewState);
+        caseData.setState(state);
     }
 
     private void createFooter(DocumentLink url, SscsCaseData caseData) {
