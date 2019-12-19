@@ -179,6 +179,7 @@
       "region": "BIRMINGHAM",
       "generatedDOB": "1900-01-01",
       "evidencePresent": "No",
+      "responseRequired": "Yes",
       "events": [
         {
           "value": {
