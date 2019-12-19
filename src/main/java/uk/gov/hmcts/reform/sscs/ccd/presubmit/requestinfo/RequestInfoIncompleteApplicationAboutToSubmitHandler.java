@@ -36,8 +36,6 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements Pre
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         log.info(String.format("Handling request info incomplete application event for caseId %s", sscsCaseData.getCcdCaseId()));
 
         if ("yes".equalsIgnoreCase(sscsCaseData.getResponseRequired())) {
@@ -53,6 +51,8 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandler implements Pre
         }
 
         sscsCaseData.setResponseRequired(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return callbackResponse;
     }
