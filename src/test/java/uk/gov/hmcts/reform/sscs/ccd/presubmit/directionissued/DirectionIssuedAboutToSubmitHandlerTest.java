@@ -244,7 +244,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction() {
         callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.REFUSE_EXTENSION);
-        callback.getCaseDetails().getCaseData().setExtensionNextEvent(ExtensionNextEvent.SEND_TO_LISTING);
+        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
@@ -256,7 +257,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState() {
         callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.REFUSE_EXTENSION);
-        callback.getCaseDetails().getCaseData().setExtensionNextEvent(ExtensionNextEvent.SEND_TO_VALID_APPEAL);
+        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getInterlocReviewState());

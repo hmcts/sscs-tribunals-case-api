@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
@@ -79,7 +78,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                REVIEW_BY_JUDGE.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
+                AWAITING_ADMIN_ACTION.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
                 EventType.INTERLOC_INFORMATION_RECEIVED, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
