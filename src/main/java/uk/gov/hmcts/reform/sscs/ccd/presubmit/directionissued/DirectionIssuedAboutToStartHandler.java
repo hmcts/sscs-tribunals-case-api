@@ -47,7 +47,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
 
         if (state.equals(INCOMPLETE_APPLICATION)
-                || state.equals(INCOMPLATE_APPLICATION_INFORMATION_REQUESTED)
+                || state.equals(INCOMPLETE_APPLICATION_INFORMATION_REQUESTED)
                 || state.equals(INTERLOCUTORY_REVIEW_STATE)) {
             listOptions.add(new DynamicListItem(SEND_TO_VALID_APPEAL.getCode(), SEND_TO_VALID_APPEAL.getLabel()));
         }
