@@ -331,7 +331,7 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "responseReceived");
-        assertJsonEquals(DWP_RESPOND_MYA.getSerializedMessage(), objectNode);
+        assertJsonEquals(DWP_RESPOND.getSerializedMessage(), objectNode);
     }
 
     @Test
