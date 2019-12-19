@@ -140,17 +140,16 @@ public class TrackYourAppealJsonBuilder {
 
         boolean isDigitalCase = isCaseStateReadyToList(caseData);
 
-        if (!mya) {
-            List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
+
+        List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
 
 
-            Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
-            Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
-            caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
-            List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
-            if (!historicalEvents.isEmpty()) {
-                caseNode.set("historicalEvents", buildEventArray(historicalEvents, eventDocumentMap, eventHearingMap));
-            }
+        Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
+        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+        caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
+        List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
+        if (!historicalEvents.isEmpty()) {
+            caseNode.set("historicalEvents", buildEventArray(historicalEvents, eventDocumentMap, eventHearingMap));
         }
 
         ObjectNode root = JsonNodeFactory.instance.objectNode();
