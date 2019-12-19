@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.INTERLOCUTORY_REVIEW;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
@@ -29,17 +28,18 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         Map<EventType, String> eventTypeToSecondaryStatus = new HashMap<>();
         eventTypeToSecondaryStatus.put(EventType.INTERLOC_SEND_TO_TCW, REVIEW_BY_TCW.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_DIRECTION_ISSUED, AWAITING_INFORMATION.getId());
-        eventTypeToSecondaryStatus.put(EventType.INTERLOC_INFORMATION_RECEIVED, INTERLOCUTORY_REVIEW.getId());
+        eventTypeToSecondaryStatus.put(EventType.INTERLOC_INFORMATION_RECEIVED, AWAITING_ADMIN_ACTION.getId());
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DIRECTION_ISSUED, AWAITING_INFORMATION.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_REFER_TO_JUDGE, REVIEW_BY_JUDGE.getId());
-        eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT, INTERLOCUTORY_REVIEW.getId());
-        eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT_SEND_TO_INTERLOC, INTERLOCUTORY_REVIEW.getId());
-        eventTypeToSecondaryStatus.put(EventType.REINSTATE_APPEAL, INTERLOCUTORY_REVIEW.getId());
-        eventTypeToSecondaryStatus.put(EventType.UPLOAD_FURTHER_EVIDENCE, INTERLOCUTORY_REVIEW.getId());
+        eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT, REVIEW_BY_TCW.getId());
+        eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT_SEND_TO_INTERLOC, REVIEW_BY_TCW.getId());
+        eventTypeToSecondaryStatus.put(EventType.REINSTATE_APPEAL, AWAITING_ADMIN_ACTION.getId());
+        eventTypeToSecondaryStatus.put(EventType.UPLOAD_FURTHER_EVIDENCE, AWAITING_ADMIN_ACTION.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_DECISION_APPEAL_TO_PROCEED, NONE.getId());
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED, NONE.getId());
         eventTypeToSecondaryStatus.put(EventType.SEND_TO_ADMIN, AWAITING_ADMIN_ACTION.getId());
-        eventTypeToSecondaryStatus.put(EventType.DWP_CHALLENGE_VALIDITY, "reviewByJudge");
+        eventTypeToSecondaryStatus.put(EventType.DWP_CHALLENGE_VALIDITY, REVIEW_BY_JUDGE.getId());
+        eventTypeToSecondaryStatus.put(EventType.DWP_REQUEST_TIME_EXTENSION, REVIEW_BY_TCW.getId());
         return eventTypeToSecondaryStatus;
     }
 
@@ -47,8 +47,13 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         log.info("Case({}): Setting interloc review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
         newSscsCaseData.setInterlocReviewState(newValue);
 
-        if (eventType.equals(EventType.NON_COMPLIANT) || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)) {
-            log.info("Setting interloc referral date to " + LocalDate.now().toString());
+        if (eventType.equals(EventType.NON_COMPLIANT)
+            || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)
+            || eventType.equals(EventType.INTERLOC_SEND_TO_TCW)
+            || eventType.equals(EventType.TCW_REFER_TO_JUDGE)
+            || eventType.equals(EventType.DWP_REQUEST_TIME_EXTENSION)
+            || eventType.equals(EventType.DWP_CHALLENGE_VALIDITY)) {
+            log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now().toString(), newSscsCaseData.getCcdCaseId());
             newSscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
         }
 
