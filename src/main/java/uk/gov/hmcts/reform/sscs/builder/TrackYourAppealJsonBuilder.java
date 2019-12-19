@@ -132,8 +132,6 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
             caseNode.put("surname", caseData.getAppeal().getAppellant().getName().getLastName());
             if (caseData.getAppeal().getAppellant().getContact() != null) {
-
-
                 caseNode.set("contact", getContactNode(caseData));
             }
         }
