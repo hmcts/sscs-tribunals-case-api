@@ -39,6 +39,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED, NONE.getId());
         eventTypeToSecondaryStatus.put(EventType.SEND_TO_ADMIN, AWAITING_ADMIN_ACTION.getId());
         eventTypeToSecondaryStatus.put(EventType.DWP_CHALLENGE_VALIDITY, REVIEW_BY_JUDGE.getId());
+        eventTypeToSecondaryStatus.put(EventType.DWP_REQUEST_TIME_EXTENSION, REVIEW_BY_TCW.getId());
         return eventTypeToSecondaryStatus;
     }
 
@@ -50,6 +51,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
             || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)
             || eventType.equals(EventType.INTERLOC_SEND_TO_TCW)
             || eventType.equals(EventType.TCW_REFER_TO_JUDGE)
+            || eventType.equals(EventType.DWP_REQUEST_TIME_EXTENSION)
             || eventType.equals(EventType.DWP_CHALLENGE_VALIDITY)) {
             log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now().toString(), newSscsCaseData.getCcdCaseId());
             newSscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
