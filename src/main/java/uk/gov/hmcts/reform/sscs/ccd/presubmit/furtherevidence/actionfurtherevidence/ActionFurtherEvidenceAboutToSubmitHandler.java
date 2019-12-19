@@ -1,12 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.actionfurtherevidence.OriginalSenderItemList.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -137,7 +136,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
 
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
-            String documentFooterText = APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
+            String documentFooterText = OriginalSenderItemList.APPELLANT.getCode().equals(originalSenderCode) ? "Appellant evidence" : "Representative evidence";
 
             bundleAddition = footerService.getNextBundleAddition(sscsCaseData.getSscsDocument());
 
@@ -158,13 +157,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(furtherEvidenceActionItemCode)) {
             return OTHER_DOCUMENT;
         }
-        if (APPELLANT.getCode().equals(originalSenderCode)) {
+        if (OriginalSenderItemList.APPELLANT.getCode().equals(originalSenderCode)) {
             return APPELLANT_EVIDENCE;
         }
-        if (REPRESENTATIVE.getCode().equals(originalSenderCode)) {
+        if (OriginalSenderItemList.REPRESENTATIVE.getCode().equals(originalSenderCode)) {
             return REPRESENTATIVE_EVIDENCE;
         }
-        if (DWP.getCode().equals(originalSenderCode)) {
+        if (OriginalSenderItemList.DWP.getCode().equals(originalSenderCode)) {
             return DWP_EVIDENCE;
         }
         throw new IllegalStateException("document Type could not be worked out");

@@ -46,13 +46,15 @@ public class IssueDocumentHandler {
 
         LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
 
+        String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+
         DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .caseId(caseData.getCcdCaseId())
                 .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
                 .noticeBody(caseData.getBodyContent())
                 .userName(caseData.getSignedBy())
-                .noticeType(documentType.getValue().toUpperCase())
+                .noticeType(documentTypeLabel.toUpperCase())
                 .userRole(caseData.getSignedRole())
                 .dateAdded(dateAdded)
                 .generatedDate(LocalDate.now())
@@ -71,11 +73,11 @@ public class IssueDocumentHandler {
                 .userAuthentication(userAuthorisation)
                 .build();
 
-        log.info(String.format("Generating %s document isScottish = %s", documentType.getValue(), isScottish));
+        log.info(String.format("Generating %s document isScottish = %s", documentTypeLabel, isScottish));
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        final String filename = String.format("%s issued on %s.pdf", documentType.getValue(), dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        final String filename = String.format("%s issued on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)
