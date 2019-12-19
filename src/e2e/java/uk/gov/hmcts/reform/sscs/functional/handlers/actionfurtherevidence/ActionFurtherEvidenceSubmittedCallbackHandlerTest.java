@@ -41,7 +41,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
 
     @Test
     @Parameters({
-        "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, reviewByJudge",
+        "NON_COMPLIANT, informationReceivedForInterlocJudge, interlocutoryReviewState, awaitingAdminAction",
         "VALID_APPEAL_CREATED, sendToInterlocReviewByJudge, validAppeal, reviewByJudge",
         "VALID_APPEAL_CREATED, sendToInterlocReviewByTcw, validAppeal, reviewByTcw"
     })
