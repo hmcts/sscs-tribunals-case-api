@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwplapse;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class DwpLapseCaseHandler implements PreSubmitCallbackHandler<SscsCaseDat
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         log.info("Setting interloc review field to " + "awaitingAdminAction");
-        caseData.setInterlocReviewState("awaitingAdminAction");
+        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         caseData.setDwpState("lapsed");
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);

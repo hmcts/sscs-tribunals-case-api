@@ -98,10 +98,10 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
             String bundleAddition = footerService.getNextBundleAddition(caseData.getSscsDocument());
 
-            String bundleFileName = footerService.buildBundleAdditionFileName(bundleAddition, "Direction notice issued on "
+            String bundleFileName = footerService.buildBundleAdditionFileName(bundleAddition, "Directions notice issued on "
                     + Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
 
-            SscsDocument sscsDocument = footerService.createFooterDocument(url, "Direction notice", bundleAddition, bundleFileName,
+            SscsDocument sscsDocument = footerService.createFooterDocument(url, "Directions notice", bundleAddition, bundleFileName,
                     caseData.getDateAdded(), DocumentType.DIRECTION_NOTICE);
 
             List<SscsDocument> documents = new ArrayList<>();
