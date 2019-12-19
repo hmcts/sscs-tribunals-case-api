@@ -18,7 +18,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart.SelectWhoReviewsCaseDropdownHandler;
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToStartHandlerTest {
@@ -79,12 +78,13 @@ public class DirectionIssuedAboutToStartHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(state);
 
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem("sendToListing", "List for hearing"));
         listOptions.add(new DynamicListItem("noFurtherAction", "No further action"));
         listOptions.add(new DynamicListItem("sendToValidAppeal", "Make valid appeal"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getExtensionNextEventDl());
         assertEquals(3, listOptions.size());
