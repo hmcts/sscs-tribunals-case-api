@@ -98,9 +98,9 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
         if (mya) {
-            List<String> appealReceivedStates = Arrays.asList("appealCreated", "incompleteApplication",
-                    "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal",
-                    "validAppeal", "withDwp");
+            List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
+            List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
+                    "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal");
             List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived");
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
             List<String> dormantStates = Arrays.asList("dormantAppealState");
@@ -109,6 +109,8 @@ public class TrackYourAppealJsonBuilder {
 
             if (appealReceivedStates.contains(state)) {
                 caseNode.put("status", "APPEAL_RECEIVED");
+            } else if (withDwpStates.contains(state)) {
+                caseNode.put("status", "WITH_DWP");
             } else if (dwpRespondStates.contains(state)) {
                 caseNode.put("status", "DWP_RESPOND");
             } else if (hearingStates.contains(state)) {
