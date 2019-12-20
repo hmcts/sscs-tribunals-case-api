@@ -49,7 +49,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
             listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
         }
-        sscsCaseData.setDirectionTypeDl(new DynamicList(listOptions.get(0), listOptions));
+        sscsCaseData.setDirectionTypeDl(new DynamicList(new DynamicListItem("", ""), listOptions));
 
     }
 

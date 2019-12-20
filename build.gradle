@@ -260,7 +260,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.2.1'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.1.6-RC-SSCS-7014-2'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.1.6-RC-SSCS-7014-3'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
