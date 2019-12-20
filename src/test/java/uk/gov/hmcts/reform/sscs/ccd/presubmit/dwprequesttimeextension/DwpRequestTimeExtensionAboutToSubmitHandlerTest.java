@@ -81,7 +81,6 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
 
         assertTl1FromToSscsDocument(actualCallback);
         assertEquals("extensionRequested", actualCallback.getData().getDwpState());
-        assertEquals("reviewByTcw", actualCallback.getData().getInterlocReviewState());
         assertEquals("timeExtension", actualCallback.getData().getInterlocReferralReason());
     }
 

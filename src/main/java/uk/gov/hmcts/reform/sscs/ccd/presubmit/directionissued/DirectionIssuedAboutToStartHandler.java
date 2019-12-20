@@ -53,6 +53,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
 
     }
 
+
     private void setExtensionNextEventDropdown(State state, SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
 
@@ -65,6 +66,6 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(SEND_TO_VALID_APPEAL.getCode(), SEND_TO_VALID_APPEAL.getLabel()));
         }
 
-        sscsCaseData.setExtensionNextEventDl(new DynamicList(listOptions.get(0), listOptions));
+        sscsCaseData.setExtensionNextEventDl(new DynamicList(new DynamicListItem("", ""), listOptions));
     }
 }
