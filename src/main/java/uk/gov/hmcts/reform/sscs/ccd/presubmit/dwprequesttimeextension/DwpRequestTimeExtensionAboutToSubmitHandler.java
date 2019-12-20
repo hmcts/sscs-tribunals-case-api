@@ -40,6 +40,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.EXTENSION_REQUESTED.getId());
         callback.getCaseDetails().getCaseData().setInterlocReviewState(InterlocReviewState.REVIEW_BY_TCW.getId());
         callback.getCaseDetails().getCaseData().setInterlocReferralReason(InterlocReferralReason.TIME_EXTENSION.getId());
+        callback.getCaseDetails().getCaseData().setTimeExtensionRequested("Yes");
         return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 
