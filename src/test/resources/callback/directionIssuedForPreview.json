@@ -238,7 +238,8 @@
         }
       ],
       "originalSender": {},
-      "furtherEvidenceAction": {}
+      "furtherEvidenceAction": {},
+      "extensionNextEventDl": "sendToListing"
     },
     "data_classification": {
       "dwpTimeExtension": {

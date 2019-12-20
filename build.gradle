@@ -18,7 +18,7 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.25.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.4.0'
-    id 'au.com.dius.pact' version '4.0.0'
+    id 'au.com.dius.pact' version '4.0.4'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -260,7 +260,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.2.1'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.1.4'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.1.7'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
