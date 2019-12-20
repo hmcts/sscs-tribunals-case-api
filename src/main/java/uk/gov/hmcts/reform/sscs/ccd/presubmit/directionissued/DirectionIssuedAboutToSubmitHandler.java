@@ -88,6 +88,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
 
+        caseData.setTimeExtensionRequested("No");
+
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
