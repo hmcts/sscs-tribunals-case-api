@@ -7,7 +7,7 @@
     "appealNumber": "abcde12345",
     "benefitType": "pip",
     "hearingType": "oral",
-    "status": "APPEAL_RECEIVED",
+    "status": "WITH_DWP",
     "latestEvents": [
       {
         "evidenceType": "General",
