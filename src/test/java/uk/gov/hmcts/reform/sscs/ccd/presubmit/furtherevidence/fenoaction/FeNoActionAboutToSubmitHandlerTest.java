@@ -7,6 +7,7 @@ import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
+import net.javacrumbs.jsonunit.core.Option;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -48,7 +49,9 @@ public class FeNoActionAboutToSubmitHandlerTest extends BaseHandlerTest {
                 "dl6", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("fenoaction/expectedFeNoActionAboutToSubmitCallbackResponse.json");
-        assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
+        assertThatJson(actualCaseData)
+            .when(Option.TREATING_NULL_AS_ABSENT)
+            .isEqualTo(expectedCaseData);
         assertEquals("feActionedNR", actualCaseData.getData().getDwpState());
     }
 
