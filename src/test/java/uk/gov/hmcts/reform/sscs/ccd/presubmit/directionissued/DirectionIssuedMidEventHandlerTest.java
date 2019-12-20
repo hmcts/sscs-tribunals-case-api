@@ -57,7 +57,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
-                .directionType(DirectionType.APPEAL_TO_PROCEED)
+                .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
                 .appeal(Appeal.builder()
                         .appellant(Appellant.builder()
@@ -140,7 +140,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
     @Test
     public void givenDirectionTypeIsNull_displayAnError() {
-        callback.getCaseDetails().getCaseData().setDirectionType(null);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());

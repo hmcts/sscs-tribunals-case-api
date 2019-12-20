@@ -125,9 +125,9 @@ public class FeHandledOfflineHandlerTest {
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithEmptyDocs, false},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedDocs, false},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_SUBMIT, sscsCaseDataWithIssuedDocsAndHmctsDwpStateToClear, true},
-            new Object[]{APPEAL_RECEIVED, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
+            new Object[]{APPEAL_RECEIVED, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, true},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, ABOUT_TO_START, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
-            new Object[]{null, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
+            new Object[]{null, ABOUT_TO_SUBMIT, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, true},
             new Object[]{FURTHER_EVIDENCE_HANDLED_OFFLINE, null, sscsCaseDataWitNoIssuedDocsAndHmctsDwpStateFlagToClear, false},
         };
     }

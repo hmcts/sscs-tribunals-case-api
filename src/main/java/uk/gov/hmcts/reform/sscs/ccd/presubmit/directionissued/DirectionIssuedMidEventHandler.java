@@ -39,8 +39,8 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
-        log.info("Direction Type is " + callback.getCaseDetails().getCaseData().getDirectionType());
-        if (callback.getCaseDetails().getCaseData().getDirectionType() == null) {
+        log.info("Direction Type is " + callback.getCaseDetails().getCaseData().getDirectionTypeDl());
+        if (callback.getCaseDetails().getCaseData().getDirectionTypeDl() == null) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;

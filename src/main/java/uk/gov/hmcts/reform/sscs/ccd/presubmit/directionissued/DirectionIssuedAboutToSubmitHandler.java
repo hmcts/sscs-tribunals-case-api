@@ -46,7 +46,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (caseData.getDirectionType() == null) {
+        if (caseData.getDirectionTypeDl() == null || caseData.getDirectionTypeDl().getValue() == null) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;
@@ -62,14 +62,16 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
         }
 
-        if (DirectionType.PROVIDE_INFORMATION.equals(caseData.getDirectionType())) {
+        if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
-        } else if (DirectionType.APPEAL_TO_PROCEED.equals(caseData.getDirectionType())) {
+        } else if (DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionType()) && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
             caseData.setState(State.RESPONSE_RECEIVED);
-        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionType()) && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData.setHmctsDwpState("sentToDwp");
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setInterlocReviewState(null);
