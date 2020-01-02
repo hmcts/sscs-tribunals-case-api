@@ -35,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
+import uk.gov.hmcts.reform.sscs.config.VerifyTokenService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
+import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -101,6 +103,8 @@ public class SubmitAppealServiceTest {
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
     @Mock
     private ConvertAintoBService convertAintoBService;
+    @Mock
+    private VerifyTokenService verifyTokenService;
 
     private List<String> offices;
 
@@ -125,7 +129,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAintoBService, offices);
+            idamService, convertAintoBService, verifyTokenService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -133,6 +137,8 @@ public class SubmitAppealServiceTest {
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
+
+        given(verifyTokenService.verifyTokenSignature(any())).willReturn(true);
 
     }
 
@@ -190,6 +196,16 @@ public class SubmitAppealServiceTest {
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
         Assert.assertTrue(result.isPresent());
+
+    }
+
+    @Test(expected = InvalidSubscriptionTokenException.class)
+    public void shouldThrowInvalidTokenExceptionWhileCreatingDraftCase() {
+        given(verifyTokenService.verifyTokenSignature(any())).willReturn(false);
+
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+
+        Assert.assertTrue(false);
 
     }
 
