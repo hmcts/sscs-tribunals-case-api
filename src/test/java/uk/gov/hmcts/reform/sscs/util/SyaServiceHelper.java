@@ -36,7 +36,7 @@ public final class SyaServiceHelper {
     public static RegionalProcessingCenter getRegionalProcessingCenter() {
         URL resource = SyaServiceHelper.class.getClassLoader().getResource("json/rpc.json");
         try {
-            return mapper.readValue(resource, RegionalProcessingCenter.class);
+            return mapper.readValue(Objects.requireNonNull(resource), RegionalProcessingCenter.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

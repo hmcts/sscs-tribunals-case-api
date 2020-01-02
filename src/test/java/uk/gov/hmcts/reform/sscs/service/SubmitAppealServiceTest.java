@@ -139,6 +139,19 @@ public class SubmitAppealServiceTest {
         + "    \"email\" : \"SSCS_Bradford@justice.gov.uk\"\n"
         + "  }";
 
+    public static final String SUTTON_RPC = "{\n"
+        + "    \"name\" : \"SUTTON\",\n"
+        + "    \"address1\" : \"HM Courts & Tribunals Service\",\n"
+        + "    \"address2\" : \"Social Security & Child Support Appeals\",\n"
+        + "    \"address3\" : \"Copthall House\",\n"
+        + "    \"address4\" : \"9 The Pavement, Grove Road\",\n"
+        + "    \"city\" : \"SUTTON\",\n"
+        + "    \"postcode\" : \"SM1 1DA\",\n"
+        + "    \"phoneNumber\" : \"0300 123 1142\",\n"
+        + "    \"faxNumber\" : \"0870 739 4229\",\n"
+        + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\"\n"
+        + "  }";
+
     @Before
     public void setUp() {
         submitYourAppealEmailTemplate =
@@ -303,7 +316,7 @@ public class SubmitAppealServiceTest {
 
     @Test
     @Parameters(method = "generateDifferentRpcScenarios")
-    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String rpc, String appellantPostCode)
+    public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode)
         throws JsonProcessingException {
         SyaCaseWrapper appealData = getSyaCaseWrapper();
         appealData.getAppellant().getContactDetails().setPostCode(appellantPostCode);
@@ -311,21 +324,24 @@ public class SubmitAppealServiceTest {
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
 
         RegionalProcessingCenter actualRpc = caseData.getRegionalProcessingCenter();
-        RegionalProcessingCenter expectedRpc = getRpcObjectForGivenJsonRpc(rpc);
-        assertThat(actualRpc, is(expectedRpc));
-        assertEquals(expectedRpc.getName(), caseData.getRegion());
+        RegionalProcessingCenter expectedRpcObject = getRpcObjectForGivenJsonRpc(expectedRpc);
+        assertThat(actualRpc, is(expectedRpcObject));
+        assertEquals(expectedRpcObject.getName(), caseData.getRegion());
     }
 
-    private RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String birminghamRpc) throws JsonProcessingException {
+    private RegionalProcessingCenter getRpcObjectForGivenJsonRpc(String jsonRpc) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(birminghamRpc, RegionalProcessingCenter.class);
+        return mapper.readValue(jsonRpc, RegionalProcessingCenter.class);
     }
 
     public Object[] generateDifferentRpcScenarios() {
         return new Object[]{
             new Object[]{BRADFORD_RPC, "TN32 6PL"},
             new Object[]{BRADFORD_RPC, "OX1 1AE"},
-            new Object[]{BIRMINGHAM_RPC, "B1 1AA"}
+            new Object[]{BIRMINGHAM_RPC, "B1 1AA"},
+            new Object[]{SUTTON_RPC, "EN1 1AA"},
+            new Object[]{SUTTON_RPC, "KT19 0SZ"},
+            new Object[]{BIRMINGHAM_RPC, "DE23 2PD"}
         };
     }
 
