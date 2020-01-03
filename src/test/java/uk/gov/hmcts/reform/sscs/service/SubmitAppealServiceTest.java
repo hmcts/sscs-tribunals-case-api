@@ -195,6 +195,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(verifyTokenService).verifyTokenSignature(any());
         Assert.assertTrue(result.isPresent());
 
     }
@@ -219,6 +220,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(verifyTokenService).verifyTokenSignature(any());
         Assert.assertFalse(result.isPresent());
     }
 
@@ -232,6 +234,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(verifyTokenService).verifyTokenSignature(any());
         Assert.assertFalse(result.isPresent());
     }
 
@@ -242,6 +245,7 @@ public class SubmitAppealServiceTest {
         when(convertAintoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertTrue(optionalSessionDraft.isPresent());
+        verify(verifyTokenService).verifyTokenSignature(any());
     }
 
     @Test
@@ -249,6 +253,7 @@ public class SubmitAppealServiceTest {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertFalse(optionalSessionDraft.isPresent());
+        verify(verifyTokenService).verifyTokenSignature(any());
     }
 
     @Test
