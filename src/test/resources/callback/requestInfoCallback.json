@@ -2,7 +2,7 @@
   "case_details": {
     "id": 12345656789,
     "jurisdiction": "SSCS",
-    "state": "interlocutoryReviewState",
+    "state": "STATE_TO_UPDATE",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -24,16 +24,6 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "directionTypeDl": "provideInformation",
-      "generateNotice" : "Yes",
-      "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
-      "signedBy": "Maple Magoo",
-      "signedRole": "Proxy Judge",
-      "previewDocument" : {
-        "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
-        "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
-        "document_filename": "directionIssued.pdf"
-      },
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -101,20 +91,6 @@
               "document_url" : "http://www.itv.com",
               "document_binary_url" : "http://www.itv.com/binary",
               "document_filename" : "myfile2.jpg"
-            }
-          }
-        },
-        {
-          "value" : {
-            "documentType" : "directionIssued",
-            "documentFileName" : "oldDirectionIssued.pdf",
-            "documentDateAdded" : "2018-10-12",
-            "evidenceIssued": "Yes",
-            "bundleAddition": "A",
-            "documentLink" : {
-              "document_url" : "http://www.itv3.com",
-              "document_binary_url" : "http://www.itv3.com/binary",
-              "document_filename" : "myfile3.jpg"
             }
           }
         }],
@@ -203,6 +179,7 @@
       "region": "BIRMINGHAM",
       "generatedDOB": "1900-01-01",
       "evidencePresent": "No",
+      "responseRequired": "Yes",
       "events": [
         {
           "value": {
@@ -238,8 +215,7 @@
         }
       ],
       "originalSender": {},
-      "furtherEvidenceAction": {},
-      "extensionNextEventDl": "sendToListing"
+      "furtherEvidenceAction": {}
     },
     "data_classification": {
       "dwpTimeExtension": {
@@ -653,5 +629,5 @@
       }
     }
   },
-  "event_id": "directionIssued"
+  "event_id": "requestInfoIncompleteApplication"
 }
