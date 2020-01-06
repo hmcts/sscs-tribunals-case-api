@@ -145,13 +145,14 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"strikeOut, struckOut", "null, struckOut", ",struckOut"})
-    public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValue(@Nullable String decisionType,
+    public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValueAndInterlocReviewState(@Nullable String decisionType,
                                                                     @Nullable String expectedDwpState) {
         sscsCaseData.setDecisionType(decisionType);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         String currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
         assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
+        assertNull(response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -225,6 +226,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
         assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
+        assertNull(response.getData().getInterlocReviewState());
     }
 
     @Test
