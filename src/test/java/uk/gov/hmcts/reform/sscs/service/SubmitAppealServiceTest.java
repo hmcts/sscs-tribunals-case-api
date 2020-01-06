@@ -35,7 +35,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
-import uk.gov.hmcts.reform.sscs.config.VerifyTokenService;
 import uk.gov.hmcts.reform.sscs.document.EvidenceDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.document.EvidenceMetadataDownloadClientApi;
 import uk.gov.hmcts.reform.sscs.domain.email.Email;
@@ -103,8 +102,7 @@ public class SubmitAppealServiceTest {
     private EvidenceMetadataDownloadClientApi evidenceMetadataDownloadClientApi;
     @Mock
     private ConvertAintoBService convertAintoBService;
-    @Mock
-    private VerifyTokenService verifyTokenService;
+
 
     private List<String> offices;
 
@@ -129,7 +127,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAintoBService, verifyTokenService, offices);
+            idamService, convertAintoBService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -138,7 +136,7 @@ public class SubmitAppealServiceTest {
 
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
-        given(verifyTokenService.verifyTokenSignature(any())).willReturn(true);
+        given(idamService.verifyTokenSignature(any())).willReturn(true);
 
     }
 
@@ -195,14 +193,14 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
-        verify(verifyTokenService).verifyTokenSignature(any());
+        verify(idamService).verifyTokenSignature(any());
         Assert.assertTrue(result.isPresent());
 
     }
 
     @Test(expected = InvalidSubscriptionTokenException.class)
     public void shouldThrowInvalidTokenExceptionWhileCreatingDraftCase() {
-        given(verifyTokenService.verifyTokenSignature(any())).willReturn(false);
+        given(idamService.verifyTokenSignature(any())).willReturn(false);
 
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
@@ -220,7 +218,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
-        verify(verifyTokenService).verifyTokenSignature(any());
+        verify(idamService).verifyTokenSignature(any());
         Assert.assertFalse(result.isPresent());
     }
 
@@ -234,7 +232,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
-        verify(verifyTokenService).verifyTokenSignature(any());
+        verify(idamService).verifyTokenSignature(any());
         Assert.assertFalse(result.isPresent());
     }
 
@@ -245,7 +243,7 @@ public class SubmitAppealServiceTest {
         when(convertAintoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertTrue(optionalSessionDraft.isPresent());
-        verify(verifyTokenService).verifyTokenSignature(any());
+        verify(idamService).verifyTokenSignature(any());
     }
 
     @Test
@@ -253,7 +251,7 @@ public class SubmitAppealServiceTest {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertFalse(optionalSessionDraft.isPresent());
-        verify(verifyTokenService).verifyTokenSignature(any());
+        verify(idamService).verifyTokenSignature(any());
     }
 
     @Test
