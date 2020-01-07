@@ -90,11 +90,17 @@ public class SubmitAppealService {
 
     @SuppressWarnings("unchecked")
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
-        List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
+        SscsCaseData caseDetails = null;
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+        List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
-            SessionDraft sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetailsList.get(0));
+            caseDetails = caseDetailsList.get(0);
+            SessionDraft sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetails);
             return Optional.of(sessionDraft);
         }
+        log.info("GET Draft case with CCD Id {} and IDAM Id {} ",
+                (caseDetails == null) ? null : caseDetails.getCcdCaseId(),
+                idamTokens.getUserId());
         return Optional.empty();
     }
 
@@ -217,6 +223,7 @@ public class SubmitAppealService {
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
+        log.info("POST Draft case with CCD Id {} and IDAM id {} ", result.getCaseDetailsId(), idamTokens.getUserId());
         log.info("Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
         return result;
     }
