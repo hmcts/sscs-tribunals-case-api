@@ -6,8 +6,8 @@ import lombok.Getter;
 public enum DirectionTypeItemList {
     APPEAL_TO_PROCEED("appealToProceed", "Appeal to Proceed"),
     PROVIDE_INFORMATION("provideInformation", "Provide information"),
-    GRANT_EXTENSION("grantExtension", "Grant extension"),
-    REFUSE_EXTENSION("refuseExtension", "Refuse extension");
+    GRANT_EXTENSION("grantExtension", "Allow time extension"),
+    REFUSE_EXTENSION("refuseExtension", "Refuse time extension");
 
     private String code;
     private String label;
