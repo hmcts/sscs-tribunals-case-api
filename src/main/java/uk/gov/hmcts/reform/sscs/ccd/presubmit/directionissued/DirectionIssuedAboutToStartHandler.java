@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionTy
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -16,6 +17,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    List<State> preValidStates = new ArrayList<>(Arrays.asList(INCOMPLETE_APPLICATION, INCOMPLETE_APPLICATION_INFORMATION_REQUESTED, INTERLOCUTORY_REVIEW_STATE, PENDING_APPEAL, INCOMPLETE_APPLICATION_VOID_STATE, VOID_STATE));
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -35,14 +38,18 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        setDirectionTypeDropDown(sscsCaseData);
+        setDirectionTypeDropDown(callback.getCaseDetails().getState(), sscsCaseData);
         setExtensionNextEventDropdown(callback.getCaseDetails().getState(), sscsCaseData);
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
-    private void setDirectionTypeDropDown(SscsCaseData sscsCaseData) {
+    private void setDirectionTypeDropDown(State state, SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
+
+        if (preValidStates.contains(state)) {
+            listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
+        }
+
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
 
         if ("Yes".equalsIgnoreCase(sscsCaseData.getTimeExtensionRequested())) {
@@ -50,9 +57,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
         }
         sscsCaseData.setDirectionTypeDl(new DynamicList(new DynamicListItem("", ""), listOptions));
-
     }
-
 
     private void setExtensionNextEventDropdown(State state, SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -60,9 +65,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         listOptions.add(new DynamicListItem(SEND_TO_LISTING.getCode(), SEND_TO_LISTING.getLabel()));
         listOptions.add(new DynamicListItem(NO_FURTHER_ACTION.getCode(), NO_FURTHER_ACTION.getLabel()));
 
-        if (state.equals(INCOMPLETE_APPLICATION)
-                || state.equals(INCOMPLETE_APPLICATION_INFORMATION_REQUESTED)
-                || state.equals(INTERLOCUTORY_REVIEW_STATE)) {
+        if (preValidStates.contains(state)) {
             listOptions.add(new DynamicListItem(SEND_TO_VALID_APPEAL.getCode(), SEND_TO_VALID_APPEAL.getLabel()));
         }
 
