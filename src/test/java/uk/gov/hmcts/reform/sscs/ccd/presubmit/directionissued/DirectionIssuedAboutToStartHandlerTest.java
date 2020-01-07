@@ -98,8 +98,8 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem("provideInformation", "Provide information"));
-        listOptions.add(new DynamicListItem("grantExtension", "Grant extension"));
-        listOptions.add(new DynamicListItem("refuseExtension", "Refuse extension"));
+        listOptions.add(new DynamicListItem("grantExtension", "Allow time extension"));
+        listOptions.add(new DynamicListItem("refuseExtension", "Refuse time extension"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
@@ -118,8 +118,8 @@ public class DirectionIssuedAboutToStartHandlerTest {
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem("appealToProceed", "Appeal to Proceed"));
         listOptions.add(new DynamicListItem("provideInformation", "Provide information"));
-        listOptions.add(new DynamicListItem("grantExtension", "Grant extension"));
-        listOptions.add(new DynamicListItem("refuseExtension", "Refuse extension"));
+        listOptions.add(new DynamicListItem("grantExtension", "Allow time extension"));
+        listOptions.add(new DynamicListItem("refuseExtension", "Refuse time extension"));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
