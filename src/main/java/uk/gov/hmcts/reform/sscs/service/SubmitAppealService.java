@@ -92,18 +92,18 @@ public class SubmitAppealService {
     @SuppressWarnings("unchecked")
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         SscsCaseData caseDetails = null;
+        SessionDraft sessionDraft = null;
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
             caseDetails = caseDetailsList.get(0);
-            SessionDraft sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetails);
-            return Optional.of(sessionDraft);
+            sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetails);
         }
         log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
                 (caseDetails == null) ? null : caseDetails.getCcdCaseId(),
                 idamTokens.getUserId(),
                 idamTokens.getRoles());
-        return Optional.empty();
+        return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {
