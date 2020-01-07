@@ -67,9 +67,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         } else if (DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionTypeDl()) && ExtensionNextEvent.SEND_TO_LISTING.equals(caseData.getExtensionNextEventDl())) {
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+            && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
-        } else if (DirectionType.REFUSE_EXTENSION.equals(caseData.getDirectionTypeDl()) && ExtensionNextEvent.SEND_TO_VALID_APPEAL.equals(caseData.getExtensionNextEventDl())) {
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+            && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
         } else {
             caseData.setInterlocReviewState(null);
