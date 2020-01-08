@@ -100,6 +100,7 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
         if (mya) {
+            LOG.info("Is MYA case with state " + state);
             List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
             List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
                     "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal");
