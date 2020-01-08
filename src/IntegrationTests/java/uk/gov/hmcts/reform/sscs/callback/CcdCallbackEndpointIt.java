@@ -213,7 +213,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     private void mockCcd() {
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
             eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
-            eq("interlocInformationReceived")))
+            eq("interlocInformationReceivedActionFurtherEvidence")))
             .willReturn(StartEventResponse.builder().build());
 
         Map<String, Object> data = new HashMap<>();
