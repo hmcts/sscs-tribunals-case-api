@@ -136,8 +136,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     @Parameters({
-        "informationReceivedForInterlocJudge, awaitingAdminAction, interlocInformationReceived",
-        "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceived",
+        "informationReceivedForInterlocJudge, awaitingAdminAction, interlocInformationReceivedActionFurtherEvidence",
+        "informationReceivedForInterlocTcw, reviewByTcw, interlocInformationReceivedActionFurtherEvidence",
         "sendToInterlocReviewByJudge, reviewByJudge, validSendToInterloc",
         "sendToInterlocReviewByTcw, reviewByTcw, validSendToInterloc"
     })
