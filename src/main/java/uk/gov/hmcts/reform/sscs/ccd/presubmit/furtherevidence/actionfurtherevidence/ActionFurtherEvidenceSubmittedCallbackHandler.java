@@ -79,13 +79,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE)) {
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                 AWAITING_ADMIN_ACTION.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE,
-                EventType.INTERLOC_INFORMATION_RECEIVED, "Interloc information received event");
+                EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             INFORMATION_RECEIVED_FOR_INTERLOC_TCW)) {
             return setInterlocReviewStateFieldAndTriggerEvent(caseData, callback.getCaseDetails().getId(),
                 REVIEW_BY_TCW.getId(), INFORMATION_RECEIVED_FOR_INTERLOC_TCW,
-                EventType.INTERLOC_INFORMATION_RECEIVED, "Interloc information received event");
+                EventType.INTERLOC_INFORMATION_RECEIVED_ACTION_FURTHER_EVIDENCE, "Interloc information received event");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(),
             SEND_TO_INTERLOC_REVIEW_BY_JUDGE)) {
