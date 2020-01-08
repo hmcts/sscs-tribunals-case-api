@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.builder;
 import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
-import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
@@ -38,20 +37,20 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
+@Slf4j
 @Service
 public class TrackYourAppealJsonBuilder {
     public static final String ORAL = "oral";
-    private static final Logger LOG = getLogger(TrackYourAppealJsonBuilder.class);
     public static final String YES = "Yes";
     public static final String PAPER = "paper";
 
@@ -63,11 +62,9 @@ public class TrackYourAppealJsonBuilder {
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya, String state) {
 
-        LOG.info("CaseNode=" + caseData.toString());
+        log.info("CaseNode= {}", caseData.toString());
 
         // Create appealReceived eventType for appealCreated CCD event
-
-        LOG.info("aseData.getCaseCreated()" + caseData.getCaseCreated());
 
         List<Event> eventList = caseData.getEvents();
         if (eventList == null || eventList.isEmpty()) {
@@ -76,7 +73,7 @@ public class TrackYourAppealJsonBuilder {
             } else {
                 String message = "No events exist for this appeal with case id: " + caseId;
                 CcdException ccdException = new CcdException(message);
-                LOG.error(message, ccdException);
+                log.error(message, ccdException);
                 throw ccdException;
             }
         }
@@ -100,7 +97,7 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
         if (mya) {
-            LOG.info("Is MYA case with state " + state);
+            log.info("Is MYA case with state {}", state);
             List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
                     "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal");
 
