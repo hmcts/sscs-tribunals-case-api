@@ -159,6 +159,8 @@ public class TrackYourAppealJsonBuilder {
 
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
 
+        log.info("ROOT = {}", root.toPrettyString());
+
         return root;
     }
 
