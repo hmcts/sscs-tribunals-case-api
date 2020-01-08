@@ -246,6 +246,13 @@ public class SubmitAppealServiceTest {
         verify(idamService).verifyTokenSignature(any());
     }
 
+    @Test(expected = InvalidSubscriptionTokenException.class)
+    public void shouldThrowInvalidTokenExceptionWhenGetADraftCase() {
+        given(idamService.verifyTokenSignature(any())).willReturn(false);
+        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
+        assertTrue(false);
+    }
+
     @Test
     public void shouldGetNoDraftIfNoneExists() {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
