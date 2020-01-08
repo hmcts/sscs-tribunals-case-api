@@ -144,14 +144,17 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"strikeOut, struckOut", "null, struckOut", ",struckOut"})
-    public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValue(@Nullable String decisionType,
-                                                                    @Nullable String expectedDwpState) {
+    @Parameters({"strikeOut, struckOut, null", "null, struckOut, interlocutoryReviewState", ",struckOut, interlocutoryReviewState"})
+    public void givenDecisionTypeIsStrikeOut_shouldSetDwpStateValueAndInterlocReviewState(@Nullable String decisionType,
+                                                                    @Nullable String expectedDwpState,
+                                                                    @Nullable String expectedInterlocReviewState) {
         sscsCaseData.setDecisionType(decisionType);
+        sscsCaseData.setInterlocReviewState(State.INTERLOCUTORY_REVIEW_STATE.getId());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         String currentDwpState = response.getData().getDwpState();
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
         assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
+        assertEquals(expectedInterlocReviewState, response.getData().getInterlocReviewState());
     }
 
     @Test
@@ -221,10 +224,11 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDecisionIssuedAndCaseIsPreValidInterloc_setDwpStateToStruckOutAndOutcomeToNonCompliantAppealStruckout() {
+        sscsCaseData.setInterlocReviewState(State.INTERLOCUTORY_REVIEW_STATE.getId());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
         assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
         assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
+        assertNull(response.getData().getInterlocReviewState());
     }
 
     @Test
