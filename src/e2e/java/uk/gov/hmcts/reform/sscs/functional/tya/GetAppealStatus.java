@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import java.io.IOException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +31,7 @@ public class GetAppealStatus extends BaseHandler {
     public void setUp() {
         super.setUp();
     }
-    
+
     @Test
     public void testDwpRespond() throws IOException {
         caseDetails = createCaseInWithDwpStateUsingGivenCallback("handlers/uploaddocument/uploadDocumentCallback.json");
