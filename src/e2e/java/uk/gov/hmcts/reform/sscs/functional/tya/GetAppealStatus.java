@@ -51,8 +51,7 @@ public class GetAppealStatus extends BaseHandler {
                 .extract().body().asString();
         assertThat(response).contains("status\":\"APPEAL_RECEIVED");
     }
-
-    @Ignore
+    
     @Test
     public void testResponseReceived() throws IOException {
         caseDetails = createCaseInResponseReceivedState("handlers/uploaddocument/uploadDocumentCallback.json");
