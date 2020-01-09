@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
 import java.io.IOException;
+
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 
-
+@Slf4j
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
@@ -38,6 +40,8 @@ public class GetAppealStatus extends BaseHandler {
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
+
+        log.info("Get appeals for case {}", caseDetails.getId());
 
         String response = RestAssured
                 .given()
