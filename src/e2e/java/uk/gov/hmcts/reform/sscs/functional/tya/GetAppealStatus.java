@@ -28,7 +28,6 @@ public class GetAppealStatus extends BaseHandler {
     @Value("${test-url}")
     private String testUrl;
 
-    protected CaseDetails<SscsCaseData> caseDetails;
     SscsCaseDetails sscsCaseDetails;
 
     @Before
@@ -58,17 +57,17 @@ public class GetAppealStatus extends BaseHandler {
 
     @Test
     public void testResponseReceived() throws IOException {
-        caseDetails = createCaseInResponseReceivedState("handlers/uploaddocument/uploadDocumentCallback.json");
+        sscsCaseDetails = createCaseInResponseReceivedState("handlers/uploaddocument/uploadDocumentCallback.json");
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
-        log.info("Get appeals for case {}", caseDetails.getId());
+        log.info("Get appeals for case {}", sscsCaseDetails.getId());
 
         String response = RestAssured
                 .given()
                 .when()
-                .get("appeals?mya=true&caseId=" + caseDetails.getId())
+                .get("appeals?mya=true&caseId=" + sscsCaseDetails.getId())
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .and()

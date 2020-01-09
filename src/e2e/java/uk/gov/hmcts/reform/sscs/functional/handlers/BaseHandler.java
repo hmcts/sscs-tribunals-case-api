@@ -50,17 +50,6 @@ public class BaseHandler {
         idamTokens = idamService.getIdamTokens();
     }
 
-    protected CaseDetails<SscsCaseData> createCaseInResponseReceivedState(String filePath) throws IOException {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting(),
-                EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
-                CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-
-        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
-                CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
-
-        return createCaseDetailsUsingGivenCallback(caseDetails.getId(), filePath);
-    }
-
     protected CaseDetails<SscsCaseData> createCaseInWithDwpStateUsingGivenCallback(String filePath) throws IOException {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
             EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
@@ -70,6 +59,15 @@ public class BaseHandler {
             CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
         return createCaseDetailsUsingGivenCallback(caseDetails.getId(), filePath);
+    }
+
+    protected SscsCaseDetails createCaseInResponseReceivedState(String filePath) throws IOException {
+        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
+                EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+                CREATED_BY_FUNCTIONAL_TEST, idamTokens);
+
+        return ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
+                CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
     protected SscsCaseDetails createCaseInWithDwpState() throws IOException {
