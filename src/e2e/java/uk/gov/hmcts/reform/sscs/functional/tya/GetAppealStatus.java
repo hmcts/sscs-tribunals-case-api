@@ -32,8 +32,7 @@ public class GetAppealStatus extends BaseHandler {
     public void setUp() {
         super.setUp();
     }
-
-    @Ignore
+    
     @Test
     public void testDwpRespond() throws IOException {
         caseDetails = createCaseInWithDwpStateUsingGivenCallback("handlers/uploaddocument/uploadDocumentCallback.json");
@@ -51,7 +50,7 @@ public class GetAppealStatus extends BaseHandler {
                 .extract().body().asString();
         assertThat(response).contains("status\":\"APPEAL_RECEIVED");
     }
-    
+
     @Test
     public void testResponseReceived() throws IOException {
         caseDetails = createCaseInResponseReceivedState("handlers/uploaddocument/uploadDocumentCallback.json");
