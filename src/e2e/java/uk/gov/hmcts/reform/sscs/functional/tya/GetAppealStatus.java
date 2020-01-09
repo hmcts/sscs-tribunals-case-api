@@ -61,6 +61,8 @@ public class GetAppealStatus extends BaseHandler {
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
+        log.info("Get appeals for case {}", caseDetails.getId());
+
         String response = RestAssured
                 .given()
                 .when()
