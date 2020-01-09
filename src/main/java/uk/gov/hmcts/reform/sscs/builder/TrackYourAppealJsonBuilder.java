@@ -62,8 +62,6 @@ public class TrackYourAppealJsonBuilder {
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya, String state) {
 
-        log.info("CaseNode= {}", caseData.toString());
-
         // Create appealReceived eventType for appealCreated CCD event
 
         List<Event> eventList = caseData.getEvents();
@@ -158,8 +156,6 @@ public class TrackYourAppealJsonBuilder {
         root.set("appeal", caseNode);
 
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
-
-        log.info("ROOT = {}", root.toPrettyString());
 
         return root;
     }
@@ -319,7 +315,6 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private String getAppealStatus(List<Event> events) {
-
         String appealStatus = "";
 
         if (null != events && !events.isEmpty()) {

@@ -39,7 +39,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void appealReceivedTest() throws CcdException {
         SscsCaseData caseData = APPEAL_RECEIVED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_RECEIVED.getSerializedMessage(), objectNode);
     }
 
@@ -47,7 +47,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void dwpRespondTest() throws CcdException {
         SscsCaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(DWP_RESPOND.getSerializedMessage(), objectNode);
     }
 
@@ -55,7 +55,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void dwpRespondWhenPaperCaseOlderThan8WeeksTest() throws CcdException {
         SscsCaseData caseData = DWP_RESPOND_PAPER_CASE_OLDER_THAN_8_WEEKS_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(DWP_RESPOND_PAPER_CASE_OLDER_THAN_8_WEEKS.getSerializedMessage(), objectNode);
     }
 
@@ -63,7 +63,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void hearingBookedTest() throws CcdException {
         SscsCaseData caseData = HEARING_BOOKED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(HEARING_BOOKED.getSerializedMessage(), objectNode);
     }
 
@@ -71,7 +71,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void adjournedTest() throws CcdException {
         SscsCaseData caseData = ADJOURNED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(ADJOURNED.getSerializedMessage(), objectNode);
     }
 
@@ -79,7 +79,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void dormantTest() throws CcdException {
         SscsCaseData caseData = DORMANT_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(DORMANT.getSerializedMessage(), objectNode);
     }
 
@@ -87,7 +87,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void hearingTest() throws CcdException {
         SscsCaseData caseData = HEARING_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(HEARING.getSerializedMessage(), objectNode);
     }
 
@@ -95,7 +95,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void newHearingBookedTest() throws CcdException {
         SscsCaseData caseData = NEW_HEARING_BOOKED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(NEW_HEARING_BOOKED.getSerializedMessage(), objectNode);
     }
 
@@ -113,7 +113,7 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = buildHearingBookedEvent(PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
 
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
 
         String updatedString = PAST_HEARING_BOOKED.getSerializedMessage()
             .replace("2017-06-29T11:50:11.987Z", dwpResponseDateUtc)
@@ -135,7 +135,7 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = buildHearingBookedEvent(NOT_PAST_HEARING_BOOKED_CCD.getDeserializeMessage(), dwpResponseDateCcd);
 
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
 
         String updatedString = NOT_PAST_HEARING_BOOKED.getSerializedMessage()
             .replace("2017-06-29T11:50:11.987Z", dwpResponseDateUtc)
@@ -160,7 +160,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void dwpRespondOverdueTest() throws CcdException {
         SscsCaseData caseData = DWP_RESPOND_OVERDUE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(DWP_RESPOND_OVERDUE.getSerializedMessage(), objectNode);
     }
 
@@ -168,7 +168,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void postponedTest() throws CcdException {
         SscsCaseData caseData = POSTPONED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(POSTPONED.getSerializedMessage(), objectNode);
     }
 
@@ -176,7 +176,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void withdrawnTest() throws CcdException {
         SscsCaseData caseData = WITHDRAWN_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(WITHDRAWN.getSerializedMessage(), objectNode);
     }
 
@@ -184,7 +184,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void closedTest() throws CcdException {
         SscsCaseData caseData = CLOSED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(CLOSED.getSerializedMessage(), objectNode);
     }
 
@@ -192,7 +192,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void lapsedRevisedTest() throws CcdException {
         SscsCaseData caseData = LAPSED_REVISED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
     }
 
@@ -200,21 +200,21 @@ public class TrackYourAppealJsonBuilderTest {
     public void emptyEventDateShouldBeIgnoredTest() throws CcdException {
         SscsCaseData caseData = EMPTY_EVENT_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(LAPSED_REVISED.getSerializedMessage(), objectNode);
     }
 
     @Test(expected = CcdException.class)
     public void noEventsTest() throws CcdException {
         SscsCaseData caseData = NO_EVENTS_CCD.getDeserializeMessage();
-        trackYourAppealJsonBuilder.build(caseData, populateRegionalProcessingCenter(), 1L, false, null);
+        trackYourAppealJsonBuilder.build(caseData, populateRegionalProcessingCenter(), 1L);
     }
 
     @Test
     public void appealCreatedTest() throws CcdException {
         SscsCaseData caseData = APPEAL_CREATED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_CREATED.getSerializedMessage(), objectNode);
     }
 
@@ -222,7 +222,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void appealCreatedWithSubscriptionTest() throws CcdException {
         SscsCaseData caseData = APPEAL_CREATED_WITH_SUBSCRIPTION_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-                populateRegionalProcessingCenter(), 1L, false, null);
+                populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_CREATED_WITH_SUBSCRIPTION.getSerializedMessage(), objectNode);
     }
 
@@ -239,7 +239,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void appealCreatedWithContactDetails() throws CcdException {
         SscsCaseData caseData = APPEAL_CREATED_WITH_SUBSCRIPTION_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-                populateRegionalProcessingCenter(), 1L, false, null);
+                populateRegionalProcessingCenter(), 1L);
 
         assertJsonEquals(APPEAL_CREATED_WITH_SUBSCRIPTION.getSerializedMessage(), objectNode);
     }
@@ -248,7 +248,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldHandleMissingHearings() throws CcdException {
         SscsCaseData caseData = MISSING_HEARING_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(MISSING_HEARING.getSerializedMessage(), objectNode);
 
     }
@@ -257,7 +257,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnHearingTypeIfPresentInCcd() {
         SscsCaseData caseData = APPEAL_WITH_HEARING_TYPE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_WITH_HEARING_TYPE.getSerializedMessage(), objectNode);
     }
 
@@ -265,7 +265,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnHearingTypeAndExelaAddressIfPresentInCcd() {
         SscsCaseData caseData = APPEAL_WITH_HEARING_TYPE_AND_STATE_READY_TO_LIST_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-                populateRegionalProcessingCenter(), 1L, false, null);
+                populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_WITH_HEARING_TYPE_AND_STATE_READY_TO_LIST.getSerializedMessage(), objectNode);
     }
 
@@ -273,7 +273,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnOralHearingTypeIfNoHearingTypeInCcdAndWantsToAttendIsYes() {
         SscsCaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_YES_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_YES.getSerializedMessage(), objectNode);
     }
 
@@ -281,7 +281,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnPaperlHearingTypeIfNoHearingTypeInCcdAndWantsToAttendIsNo() {
         SscsCaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_NO_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_NO.getSerializedMessage(), objectNode);
     }
 
@@ -289,7 +289,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnOralHearingTypeIfThereIsNoHearingTypeOrWantsToAttendFieldInCcd() {
         SscsCaseData caseData = APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_WITH_WANTS_TO_ATTEND_IS_NOT_PRESENT.getSerializedMessage(), objectNode);
     }
 
@@ -297,7 +297,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnOralHearingTypeIfThereIsNoHearingOptionsFieldInCcd() {
         SscsCaseData caseData = APPEAL_WITH_NO_HEARING_OPTIONS_IN_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_WITH_NO_HEARING_OPTIONS.getSerializedMessage(), objectNode);
     }
 
@@ -305,7 +305,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldNotReturnHearingrRelatedEventsForPaperCase() {
         SscsCaseData caseData = HEARING_BOOKED_PAPER_CASE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(HEARING_BOOKED_PAPER_CASE.getSerializedMessage(), objectNode);
     }
 
@@ -314,7 +314,7 @@ public class TrackYourAppealJsonBuilderTest {
     public void shouldReturnCaseIdInTheAppealResponse() {
         SscsCaseData caseData = APPEAL_RECEIVED_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
-            populateRegionalProcessingCenter(), 1L, false, null);
+            populateRegionalProcessingCenter(), 1L);
         assertJsonEquals(APPEAL_RECEIVED.getSerializedMessage(), objectNode);
     }
 
