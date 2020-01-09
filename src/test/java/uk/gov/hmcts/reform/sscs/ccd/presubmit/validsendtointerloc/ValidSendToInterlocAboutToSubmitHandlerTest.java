@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
@@ -78,6 +79,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
         assertEquals(code, response.getData().getInterlocReviewState());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getSelectWhoReviewsCase());
     }
 
