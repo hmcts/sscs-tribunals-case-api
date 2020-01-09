@@ -69,6 +69,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             } else {
                 caseData.setOutcome("struckOut");
             }
+            caseData.setInterlocReviewState(null);
         }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
