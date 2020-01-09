@@ -253,6 +253,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDirectionTypeDl());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getState(), is(State.RESPONSE_RECEIVED));
+        assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
+        assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
     }
 
     @Test
