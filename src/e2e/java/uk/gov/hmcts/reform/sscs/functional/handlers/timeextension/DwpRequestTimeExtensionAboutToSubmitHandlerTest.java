@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.timeextension;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.*;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -41,7 +39,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest extends BaseHandler
             .assertThat().body("interlocReviewState", equalTo("reviewByTcw"))
             .assertThat().body("dwpState", equalTo("extensionRequested"))
             .assertThat().body("interlocReferralReason", equalTo("timeExtension"))
-            .assertThat().body("sscsDocument.value", hasItem(hasEntry("documentType", "tl1Form")));
+            .assertThat().body("tl1Form.documentLink.document_url", notNullValue());
     }
 
     private String getJsonCallbackForTest() throws IOException {

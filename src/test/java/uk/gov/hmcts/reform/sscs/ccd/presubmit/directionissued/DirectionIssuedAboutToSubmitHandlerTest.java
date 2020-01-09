@@ -72,7 +72,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
                 .generateNotice("Yes")
                 .signedBy("User")
-                .directionType(DirectionType.APPEAL_TO_PROCEED)
+                .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
                 .signedRole("Judge")
                 .dateAdded(LocalDate.now().minusDays(1))
                 .sscsDocument(docs)
@@ -135,7 +135,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Directions notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
-        assertEquals(DirectionType.APPEAL_TO_PROCEED, response.getData().getDirectionType());
+        assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
         verify(footerService).createFooterDocument(any(), eq("Directions notice"), any(), any(), any(), any());
     }
 
@@ -193,7 +193,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDirectionTypeIsNull_displayAnError() {
-        callback.getCaseDetails().getCaseData().setDirectionType(null);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(1, response.getErrors().size());
@@ -203,65 +203,68 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void givenDirectionTypeOfProvideInformation_setInterlocStateToAwaitingInformationAndDirectionTypeIsNull() {
-        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.PROVIDE_INFORMATION);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.PROVIDE_INFORMATION.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_INFORMATION.getId(), response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionType());
+        assertNull(response.getData().getDirectionTypeDl());
     }
 
     @Test
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
-        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.APPEAL_TO_PROCEED);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
-        assertEquals(DirectionType.APPEAL_TO_PROCEED, response.getData().getDirectionType());
+        assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
     }
 
     @Test
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPostValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
-        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.APPEAL_TO_PROCEED);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionType());
+        assertNull(response.getData().getDirectionTypeDl());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
     public void givenDirectionTypeOfGrantExtension_setDwpStateAndDirectionTypeIsNotSet() {
-        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.GRANT_EXTENSION);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.GRANT_EXTENSION.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionType());
+        assertNull(response.getData().getDirectionTypeDl());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToListing_setResponseReceivedStateAndInterlocStateToAwaitingAdminAction() {
-        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.REFUSE_EXTENSION);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
+
         callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_LISTING.toString()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionType());
+        assertNull(response.getData().getDirectionTypeDl());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getState(), is(State.RESPONSE_RECEIVED));
+        assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
+        assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
     }
 
     @Test
     public void givenDirectionTypeOfRefuseExtensionAndExtensionNextEventIsSendToValidAppeal_setWithDwpStateAndDoNotSetInterlocState() {
-        callback.getCaseDetails().getCaseData().setDirectionType(DirectionType.REFUSE_EXTENSION);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
         callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionType());
+        assertNull(response.getData().getDirectionTypeDl());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getState(), is(State.WITH_DWP));
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
