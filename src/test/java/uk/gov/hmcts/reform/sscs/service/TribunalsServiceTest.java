@@ -103,13 +103,28 @@ public class TribunalsServiceTest {
     }
 
     @Test
+    public void shouldLoadCaseForCaseIdWithAppealState() throws CcdException {
+        CaseDetails caseDetails = CaseDetails.builder().state("withDwp").build();
+        given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(caseDetails);
+
+
+        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(CASE_ID).data(getCaseData()).build();
+        given(sscsCcdConvertService.getCaseDetails(caseDetails)).willReturn(sscsCaseDetails);
+        ObjectNode objectNode = mock(ObjectNode.class);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(true), eq("withDwp"))).willReturn(objectNode);
+
+        ObjectNode appeal = tribunalsService.findAppeal(CASE_ID, true);
+        assertThat(appeal, is(objectNode));
+    }
+
+    @Test
     public void shouldLoadCaseForCaseId() throws CcdException {
         CaseDetails caseDetails = CaseDetails.builder().build();
         given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(caseDetails);
         SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(CASE_ID).data(getCaseData()).build();
         given(sscsCcdConvertService.getCaseDetails(caseDetails)).willReturn(sscsCaseDetails);
         ObjectNode objectNode = mock(ObjectNode.class);
-        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID))).willReturn(objectNode);
+        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(false), eq(null))).willReturn(objectNode);
 
         ObjectNode appeal = tribunalsService.findAppeal(CASE_ID);
         assertThat(appeal, is(objectNode));
