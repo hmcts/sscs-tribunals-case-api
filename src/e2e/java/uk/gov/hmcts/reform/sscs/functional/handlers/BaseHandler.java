@@ -61,7 +61,7 @@ public class BaseHandler {
         return createCaseDetailsUsingGivenCallback(caseDetails.getId(), filePath);
     }
 
-    protected SscsCaseDetails createCaseInResponseReceivedState(String filePath) throws IOException {
+    protected SscsCaseDetails createCaseInResponseReceivedState() throws IOException {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
                 EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);

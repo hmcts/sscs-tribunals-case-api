@@ -55,7 +55,7 @@ public class GetAppealStatus extends BaseHandler {
 
     @Test
     public void testResponseReceived() throws IOException {
-        sscsCaseDetails = createCaseInResponseReceivedState("handlers/uploaddocument/uploadDocumentCallback.json");
+        sscsCaseDetails = createCaseInResponseReceivedState();
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
