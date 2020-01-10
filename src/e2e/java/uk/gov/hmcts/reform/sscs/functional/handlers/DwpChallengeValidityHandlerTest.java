@@ -28,7 +28,7 @@ public class DwpChallengeValidityHandlerTest extends BaseHandler {
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
-            .assertThat().body("data.interlocReviewState", equalTo("reviewByJudge"));
+            .assertThat().body("data.interlocReviewState", equalTo("reviewByTcw"));
     }
 
 
