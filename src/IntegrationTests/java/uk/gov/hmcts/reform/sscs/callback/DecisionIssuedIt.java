@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.STRUCK_OUT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.*;
 
 import java.io.IOException;
