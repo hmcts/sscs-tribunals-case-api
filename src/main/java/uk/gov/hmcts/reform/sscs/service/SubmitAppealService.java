@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
@@ -73,6 +74,10 @@ public class SubmitAppealService {
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
+        if (!idamService.verifyTokenSignature(oauth2Token)) {
+            throw new InvalidSubscriptionTokenException(new Exception());
+        }
+
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         try {
             return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens));
@@ -86,10 +91,15 @@ public class SubmitAppealService {
                 throw e;
             }
         }
+
     }
 
     @SuppressWarnings("unchecked")
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
+        if (!idamService.verifyTokenSignature(oauth2Token)) {
+            throw new InvalidSubscriptionTokenException(new Exception());
+        }
+
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
             SessionDraft sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetailsList.get(0));
