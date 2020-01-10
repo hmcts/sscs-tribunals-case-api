@@ -62,7 +62,7 @@ public class BaseHandler {
     }
 
     protected SscsCaseDetails createCaseInResponseReceivedState() throws IOException {
-        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
+        SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting(),
                 EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
