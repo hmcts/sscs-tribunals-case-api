@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.builder;
 import static java.time.LocalDateTime.of;
 import static java.time.LocalDateTime.parse;
 import static java.util.stream.Collectors.toList;
-import static org.slf4j.LoggerFactory.getLogger;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_1;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.ADDRESS_LINE_2;
@@ -36,32 +35,35 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import lombok.extern.slf4j.Slf4j;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.service.event.PaperCaseEventFilterUtil;
 import uk.gov.hmcts.reform.sscs.util.DateTimeUtils;
 
+@Slf4j
 @Service
 public class TrackYourAppealJsonBuilder {
     public static final String ORAL = "oral";
-    private static final Logger LOG = getLogger(TrackYourAppealJsonBuilder.class);
     public static final String YES = "Yes";
     public static final String PAPER = "paper";
 
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
+        return build(caseData, regionalProcessingCenter,caseId, false, null);
+    }
+
+    public ObjectNode build(SscsCaseData caseData,
+                            RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya, String state) {
 
         // Create appealReceived eventType for appealCreated CCD event
+
         List<Event> eventList = caseData.getEvents();
         if (eventList == null || eventList.isEmpty()) {
             if (caseData.getCaseCreated() != null) {
@@ -69,11 +71,10 @@ public class TrackYourAppealJsonBuilder {
             } else {
                 String message = "No events exist for this appeal with case id: " + caseId;
                 CcdException ccdException = new CcdException(message);
-                LOG.error(message, ccdException);
+                log.error(message, ccdException);
                 throw ccdException;
             }
         }
-
         createEvidenceResponseEvents(caseData);
         caseData.getEvents().removeIf(a -> a.getValue().getDate() == null);
         eventList = caseData.getEvents();
@@ -84,7 +85,7 @@ public class TrackYourAppealJsonBuilder {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
         }
 
-
+        
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
@@ -93,7 +94,35 @@ public class TrackYourAppealJsonBuilder {
         if (appellantSubscription != null) {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
-        caseNode.put("status", getAppealStatus(caseData.getEvents()));
+        if (mya) {
+            log.info("Is MYA case with state {}", state);
+            List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
+                    "incompleteApplicationInformationReqsted", "interlocutoryReviewState", "pendingAppeal");
+
+            List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
+
+            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived");
+
+            List<String> hearingStates = Arrays.asList("hearing", "outcome");
+
+            List<String> closedStates = Arrays.asList("closed", "incompleteApplicationVoidState",
+                    "voidState", "dormantAppealState");
+
+            if (appealReceivedStates.contains(state)) {
+                caseNode.put("status", "APPEAL_RECEIVED");
+            } else if (withDwpStates.contains(state)) {
+                caseNode.put("status", "WITH_DWP");
+            } else if (dwpRespondStates.contains(state)) {
+                caseNode.put("status", "DWP_RESPOND");
+            } else if (hearingStates.contains(state)) {
+                caseNode.put("status", "HEARING_BOOKED");
+            }  else if (closedStates.contains(state)) {
+                caseNode.put("status", "CLOSED");
+            }
+
+        } else {
+            caseNode.put("status", getAppealStatus(caseData.getEvents()));
+        }
         caseNode.put("benefitType", caseData.getAppeal().getBenefitType().getCode().toLowerCase());
         caseNode.put("hearingType", getHearingType(caseData));
         if (StringUtils.isNotBlank(caseData.getCreatedInGapsFrom())) {
@@ -104,14 +133,15 @@ public class TrackYourAppealJsonBuilder {
             caseNode.put("name", caseData.getAppeal().getAppellant().getName().getFullName());
             caseNode.put("surname", caseData.getAppeal().getAppellant().getName().getLastName());
             if (caseData.getAppeal().getAppellant().getContact() != null) {
-
-
-                caseNode.put("contact", getContactNode(caseData));
+                caseNode.set("contact", getContactNode(caseData));
             }
         }
 
-        List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
         boolean isDigitalCase = isCaseStateReadyToList(caseData);
+
+
+        List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
+
 
         Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
         Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);

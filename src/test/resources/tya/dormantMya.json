@@ -1,0 +1,30 @@
+{
+  "appeal": {
+    "caseId" : "1",
+    "caseReference": "SC333/33/33333",
+    "appealNumber": "abcde12345",
+    "benefitType": "pip",
+    "hearingType": "oral",
+    "name": "Mr. C Charlie",
+    "surname": "Charlie",
+    "status": "CLOSED",
+    "latestEvents": [
+      {
+        "decisionLetterReceiveByDate": "2099-06-01T11:50:11.437Z",
+        "date": "2099-05-21T11:50:11.437Z",
+        "type": "DORMANT",
+        "contentKey": "status.dormant"
+      }
+    ],
+    "regionalProcessingCenter": {
+      "name":"LIVERPOOL",
+      "addressLines":["HM Courts & Tribunals Service","Social Security & Child Support Appeals",
+        "Prudential Buildings","36 Dale Street"],
+      "city":"LIVERPOOL",
+      "postcode":"L2 5UZ",
+      "phoneNumber":"0300 123 1142",
+      "faxNumber":"0870 324 0109"
+    }
+  },
+  "subscriptions":{}
+}
