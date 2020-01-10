@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -61,6 +62,7 @@ import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
+import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -152,6 +154,8 @@ public class SubmitAppealServiceTest {
         + "    \"email\" : \"Sutton_SYA_Respons@justice.gov.uk\"\n"
         + "  }";
 
+    private List<String> offices;
+
     @Before
     public void setUp() {
         submitYourAppealEmailTemplate =
@@ -176,6 +180,8 @@ public class SubmitAppealServiceTest {
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
+
+        given(idamService.verifyTokenSignature(any())).willReturn(true);
 
     }
 
@@ -232,7 +238,18 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(idamService).verifyTokenSignature(any());
         Assert.assertTrue(result.isPresent());
+
+    }
+
+    @Test(expected = InvalidSubscriptionTokenException.class)
+    public void shouldThrowInvalidTokenExceptionWhileCreatingDraftCase() {
+        given(idamService.verifyTokenSignature(any())).willReturn(false);
+
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+
+        Assert.fail();
 
     }
 
@@ -246,6 +263,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(idamService).verifyTokenSignature(any());
         Assert.assertFalse(result.isPresent());
     }
 
@@ -259,6 +277,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        verify(idamService).verifyTokenSignature(any());
         Assert.assertFalse(result.isPresent());
     }
 
@@ -268,6 +287,14 @@ public class SubmitAppealServiceTest {
         when(convertAIntoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertTrue(optionalSessionDraft.isPresent());
+        verify(idamService).verifyTokenSignature(any());
+    }
+
+    @Test(expected = InvalidSubscriptionTokenException.class)
+    public void shouldThrowInvalidTokenExceptionWhenGetADraftCase() {
+        given(idamService.verifyTokenSignature(any())).willReturn(false);
+        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
+        fail();
     }
 
     @Test
@@ -275,6 +302,7 @@ public class SubmitAppealServiceTest {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertFalse(optionalSessionDraft.isPresent());
+        verify(idamService).verifyTokenSignature(any());
     }
 
     @Test

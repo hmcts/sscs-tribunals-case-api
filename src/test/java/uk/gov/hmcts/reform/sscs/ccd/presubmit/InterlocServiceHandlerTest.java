@@ -103,10 +103,13 @@ public class InterlocServiceHandlerTest {
         "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
         "INTERLOC_SEND_TO_TCW, reviewByTcw",
         "TCW_REFER_TO_JUDGE, reviewByJudge",
-        "DWP_CHALLENGE_VALIDITY, reviewByJudge",
+        "DWP_CHALLENGE_VALIDITY, reviewByTcw",
         "DWP_REQUEST_TIME_EXTENSION, reviewByTcw"
     })
-    public void givenEvent_thenSetInterlocReviewStateToExpectedAndSetInterlocReferralDate(EventType eventType, String expectedInterlocReviewState) {
+    public void givenEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpected(
+        EventType eventType,
+        String expectedInterlocReviewState) {
+
         when(callback.getEvent()).thenReturn(eventType);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

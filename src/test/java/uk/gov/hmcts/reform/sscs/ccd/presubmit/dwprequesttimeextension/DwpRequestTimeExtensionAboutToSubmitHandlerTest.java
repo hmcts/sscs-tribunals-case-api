@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +21,7 @@ import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
@@ -79,31 +71,12 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> actualCallback = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
             callback, "user token");
 
-        assertTl1FromToSscsDocument(actualCallback);
+        assertNotNull(actualCallback.getData().getTl1Form());
+        DwpResponseDocument tl1FormDoc = actualCallback.getData().getTl1Form();
+        assertEquals(expectedDocumentLink, tl1FormDoc.getDocumentLink());
+        assertEquals(expectedDocumentLink.getDocumentFilename(), tl1FormDoc.getDocumentLink().getDocumentFilename());
         assertEquals("extensionRequested", actualCallback.getData().getDwpState());
         assertEquals("timeExtension", actualCallback.getData().getInterlocReferralReason());
-    }
-
-    private void assertTl1FromToSscsDocument(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
-        assertNull(actualCallback.getData().getTl1Form());
-        assertNumberOfTl1FormDocsIsOne(actualCallback);
-        SscsDocumentDetails tl1FormDoc = getTl1FormFromTheSscsDocuments(actualCallback).getValue();
-        assertEquals(expectedDocumentLink, tl1FormDoc.getDocumentLink());
-        assertEquals(LocalDate.now().toString(), tl1FormDoc.getDocumentDateAdded());
-        assertEquals(expectedDocumentLink.getDocumentFilename(), tl1FormDoc.getDocumentFileName());
-    }
-
-    private SscsDocument getTl1FormFromTheSscsDocuments(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
-        return actualCallback.getData().getSscsDocument().stream()
-            .filter(doc -> "tl1Form".equals(doc.getValue().getDocumentType()))
-            .findFirst().orElse(null);
-    }
-
-    private void assertNumberOfTl1FormDocsIsOne(PreSubmitCallbackResponse<SscsCaseData> actualCallback) {
-        int tl1FormNumber = (int) actualCallback.getData().getSscsDocument().stream()
-            .filter(doc -> "tl1Form".equals(doc.getValue().getDocumentType()))
-            .count();
-        assertEquals(1, tl1FormNumber);
     }
 
     private void createTestData(List<SscsDocument> sscsDocuments) {

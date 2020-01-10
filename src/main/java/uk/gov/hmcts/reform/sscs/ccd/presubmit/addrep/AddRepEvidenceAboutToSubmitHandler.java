@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.addrep;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.REP_ADDED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.REP_ADDED;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

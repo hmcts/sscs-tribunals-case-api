@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.DwpState.STRIKE_OUT_ACTIONED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRIKE_OUT_ACTIONED;
 
 import java.util.HashMap;
 import java.util.Map;
