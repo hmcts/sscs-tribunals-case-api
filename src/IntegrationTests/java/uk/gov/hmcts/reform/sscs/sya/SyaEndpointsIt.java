@@ -148,7 +148,8 @@ public class SyaEndpointsIt {
             .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
-        given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId"));
+        given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId",
+                Arrays.asList("caseworker", "citizen")));
 
         UploadResponse uploadResponse = createUploadResponse();
         given(documentUploadClientApi.upload(eq(DUMMY_OAUTH_2_TOKEN), eq(AUTH_TOKEN), eq("sscs"),

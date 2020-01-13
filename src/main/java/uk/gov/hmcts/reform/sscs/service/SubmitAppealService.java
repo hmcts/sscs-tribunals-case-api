@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
@@ -96,23 +97,32 @@ public class SubmitAppealService {
 
     @SuppressWarnings("unchecked")
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
+        SscsCaseData caseDetails = null;
+        SessionDraft sessionDraft = null;
         if (!idamService.verifyTokenSignature(oauth2Token)) {
             throw new InvalidSubscriptionTokenException(new Exception());
         }
-
-        List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(getUserTokens(oauth2Token));
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+        List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
+        
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
-            SessionDraft sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetailsList.get(0));
-            return Optional.of(sessionDraft);
+            caseDetails = caseDetailsList.get(0);
+            sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetails);
         }
-        return Optional.empty();
+        log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
+                (caseDetails == null) ? null : caseDetails.getCcdCaseId(),
+                idamTokens.getUserId(),
+                idamTokens.getRoles());
+        return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {
+        UserDetails userDetails = idamService.getUserDetails(oauth2Token);
         return IdamTokens.builder()
             .idamOauth2Token(oauth2Token)
             .serviceAuthorization(idamService.generateServiceAuthorization())
-            .userId(idamService.getUserId(oauth2Token))
+            .userId(userDetails.getId())
+            .roles(userDetails.getRoles())
             .build();
     }
 
@@ -227,6 +237,10 @@ public class SubmitAppealService {
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
+        log.info("POST Draft case with CCD Id {} , IDAM id {} and roles {} ",
+                result.getCaseDetailsId(),
+                idamTokens.getUserId(),
+                idamTokens.getRoles());
         log.info("Draft Case {} successfully {} in CCD", result.getCaseDetailsId(), result.getSaveCaseOperation().name());
         return result;
     }
