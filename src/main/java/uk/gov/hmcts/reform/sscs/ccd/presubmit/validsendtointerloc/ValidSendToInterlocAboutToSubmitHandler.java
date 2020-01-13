@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.validsendtointerloc;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -46,6 +47,9 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
         final String code = sscsCaseData.getSelectWhoReviewsCase().getValue().getCode();
         sscsCaseData.setInterlocReviewState(code);
         sscsCaseData.setSelectWhoReviewsCase(null);
+
+        log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now().toString(), sscsCaseData.getCcdCaseId());
+        sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
 
         return preSubmitCallbackResponse;
     }

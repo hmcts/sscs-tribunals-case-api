@@ -58,7 +58,8 @@ public class TyaController {
         response = String.class, responseContainer = "Appeal details")
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Appeal", response = String.class)})
     @RequestMapping(value = "/appeals", method = GET, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAppealByCaseId(@RequestParam(value = "caseId") Long caseId) {
-        return ok(tribunalsService.findAppeal(caseId).toString());
+    public ResponseEntity<String> getAppealByCaseId(@RequestParam(value = "caseId") Long caseId,
+            @RequestParam(value = "mya", required = false, defaultValue = "false") boolean mya) {
+        return ok(tribunalsService.findAppeal(caseId, mya).toString());
     }
 }

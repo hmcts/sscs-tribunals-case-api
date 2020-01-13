@@ -1,23 +1,20 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.addrep;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminsendtowithdwp;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.REP_ADDED;
 
+import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
-@Component
+@Service
 @Slf4j
-public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
+public class AdminSendToWithDwpAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -25,7 +22,7 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.ADD_REPRESENTATIVE;
+                && callback.getEvent() == EventType.ADMIN_SEND_TO_WITH_DWP;
     }
 
     @Override
@@ -34,13 +31,13 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        log.info("Setting date sent to dwp for case id {} for AdminSendToWithDwpHandler" + callback.getCaseDetails().getId());
+        caseData.setDateSentToDwp(LocalDate.now().toString());
 
-        sscsCaseData.setDwpState(REP_ADDED.getId());
+        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        return preSubmitCallbackResponse;
+        return sscsCaseDataPreSubmitCallbackResponse;
     }
 }

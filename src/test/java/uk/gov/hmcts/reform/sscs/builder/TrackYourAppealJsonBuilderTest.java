@@ -318,6 +318,38 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(APPEAL_RECEIVED.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void shouldReturnCaseIdInTheMyaAppealResponse() {
+        SscsCaseData caseData = APPEAL_RECEIVED_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "appealCreated");
+        assertJsonEquals(APPEAL_RECEIVED_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnCaseIdInTheMyaDwpResponse() {
+        SscsCaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "responseReceived");
+        assertJsonEquals(DWP_RESPOND.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnCaseIdInTheMyaHearingResponse() {
+        SscsCaseData caseData = HEARING_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "hearing");
+        assertJsonEquals(HEARING_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnCaseIdInTheMyaDormantResponse() {
+        SscsCaseData caseData = DORMANT_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "dormantAppealState");
+        assertJsonEquals(DORMANT_MYA.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
             .name("LIVERPOOL")

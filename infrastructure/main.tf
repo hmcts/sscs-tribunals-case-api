@@ -125,6 +125,7 @@ module "tribunals-case-api" {
 
   app_settings = {
     IDAM_API_URL = "${data.azurerm_key_vault_secret.idam_api.value}"
+    IDAM_API_JWK_URL = "${data.azurerm_key_vault_secret.idam_api.value}/jwks"
 
     EMAIL_FROM = "${data.azurerm_key_vault_secret.appeal_email_from.value}"
     EMAIL_TO = "${data.azurerm_key_vault_secret.appeal_email_to.value}"
