@@ -16,39 +16,39 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
-public class UploadDocumentHandlerTest extends BaseHandlerTest {
+public class UploadDocumentFEHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String UPLOAD_DOCUMENT_CALLBACK_JSON = "uploaddocument/uploadDocumentCallback.json";
-    private UploadDocumentHandler handler = new UploadDocumentHandler();
+    private static final String UPLOAD_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadDocumentFECallback.json";
+    private UploadDocumentFEHandler handler = new UploadDocumentFEHandler();
 
     @Test
     @Parameters({
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,Medical evidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,Other evidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,appellantEvidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,representativeEvidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,sscs1,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,Decision Notice,false",
-        "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp,representativeEvidence,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,Medical evidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,Other evidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,appellantEvidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,representativeEvidence,true",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,dl6,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,appealCreated,DWP response,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,Medical evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,Other evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,appellantEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,sscs1,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,Decision Notice,false",
+        "ABOUT_TO_START,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,Medical evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,Other evidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,appellantEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,representativeEvidence,true",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,dl6,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,appealCreated,DWP response,false",
         "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,representativeEvidence,false",
         "ABOUT_TO_SUBMIT,APPEAL_RECEIVED,withDwp,dl6,false",
-        "null,UPLOAD_DOCUMENT,withDwp,appellantEvidence,false",
+        "null,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,appellantEvidence,false",
         "ABOUT_TO_SUBMIT,null,withDwp,appellantEvidence,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullSscsDocuments,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullDocumentType,false",
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT,withDwp,nullSscsDocument,false"
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,nullSscsDocuments,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,nullDocumentType,false",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,nullSscsDocument,false"
     })
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
                           @Nullable String documentType, boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenData(eventType, state,
-            documentType, UPLOAD_DOCUMENT_CALLBACK_JSON));
+            documentType, UPLOAD_DOCUMENT_FE_CALLBACK_JSON));
 
         assertEquals(expectedResult, actualResult);
     }
@@ -57,7 +57,7 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
             buildTestCallbackGivenData(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
-                "representativeEvidence", UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
+                "representativeEvidence", UPLOAD_DOCUMENT_FE_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
@@ -74,6 +74,6 @@ public class UploadDocumentHandlerTest extends BaseHandlerTest {
                                           @Nullable String state)
         throws IOException {
         handler.handle(callbackType, buildTestCallbackGivenData(eventType, state, "representativeEvidence",
-            UPLOAD_DOCUMENT_CALLBACK_JSON), USER_AUTHORISATION);
+            UPLOAD_DOCUMENT_FE_CALLBACK_JSON), USER_AUTHORISATION);
     }
 }

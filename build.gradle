@@ -259,7 +259,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.2.1'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.1.14'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: 'DEV-SNAPSHOT'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
@@ -311,7 +311,7 @@ pact {
     }
 }
 
-def getCheckedOutGitCommitHash() {
+static def getCheckedOutGitCommitHash() {
     'git rev-parse --verify --short HEAD'.execute().text.trim()
 }
 

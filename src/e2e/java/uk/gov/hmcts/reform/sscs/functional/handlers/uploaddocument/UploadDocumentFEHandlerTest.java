@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 @RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
-public class UploadDocumentHandlerTest extends BaseHandler {
+public class UploadDocumentFEHandlerTest extends BaseHandler {
 
     @Test
     public void givenUploadDocumentEventIsTriggered_shouldUploadDocument() throws IOException {

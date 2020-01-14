@@ -12,12 +12,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class UploadDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class UploadDocumentFEHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT)
+            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
             && isValidDocumentType(callback.getCaseDetails().getCaseData().getSscsDocument());
     }
 
