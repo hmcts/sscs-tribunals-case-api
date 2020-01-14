@@ -107,41 +107,26 @@
         }
       },
       "generatedEmail": "mail@example.com",
-      "sscsDocument": [{
-        "value": {
-          "documentType": "dl6",
-          "documentEmailContent": null,
-          "documentLink": {
-            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
-            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
-            "document_filename": "dl6-1567775849641360.pdf"
-          },
-          "documentDateAdded": "2019-09-06",
-          "documentFileName": "dl6-1567775849641360.pdf",
-          "controlNumber": null,
-          "documentComment": null,
-          "evidenceIssued": null,
-          "bundleAddition": null
-        },
-        "id": "ceedc25b-35e6-45f8-b33f-776699e429a7"
-      }, {
-        "value": {
-          "documentType": "DOCUMENT_TYPE_PLACEHOLDER",
-          "documentEmailContent": null,
-          "documentLink": {
-            "document_url": "http://dm-store:5005/documents/88a100bf-75f4-40f3-8f3e-73e04607ffbf",
-            "document_binary_url": "http://dm-store:5005/documents/88a100bf-75f4-40f3-8f3e-73e04607ffbf/binary",
-            "document_filename": "Screenshot 2019-09-05 at 11.18.54.pdf"
-          },
-          "documentDateAdded": null,
-          "documentFileName": null,
-          "controlNumber": null,
-          "documentComment": null,
-          "evidenceIssued": null,
-          "bundleAddition": null
-        },
-        "id": "a8f7e08f-7cfb-4d07-ba7d-d79c9f487910"
-      }],
+      "draftSscsFEDocument": [
+        {
+          "value": {
+            "documentType": "DOCUMENT_TYPE_PLACEHOLDER",
+            "documentEmailContent": null,
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+              "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+              "document_filename": "some-name.pdf"
+            },
+            "documentDateAdded": "2019-09-06",
+            "documentFileName": "some-name.pdf",
+            "controlNumber": null,
+            "documentComment": null,
+            "evidenceIssued": null,
+            "bundleAddition": null
+          }
+        }
+      ],
+      "sscsDocument": null,
       "dateSentToDwp": "2019-09-06",
       "dwpTimeExtension": [],
       "hearings": [{

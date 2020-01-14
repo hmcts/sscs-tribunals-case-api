@@ -62,19 +62,19 @@ public class BaseHandlerTest {
 
     private void configureTestDataForEdgeCaseScenarios(String documentType, Callback<SscsCaseData> sscsCaseDataCallback) {
         if (documentType.equals("nullSscsDocuments")) {
-            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(null);
+            sscsCaseDataCallback.getCaseDetails().getCaseData().setDraftSscsFEDocument(null);
         }
         if (documentType.equals("nullDocumentType")) {
             List<SscsDocument> sscsDocumentsWithNullDocTypes = sscsCaseDataCallback.getCaseDetails()
-                .getCaseData().getSscsDocument().stream()
+                .getCaseData().getDraftSscsFEDocument().stream()
                 .map(doc -> new SscsDocument(SscsDocumentDetails.builder().build()))
                 .collect(Collectors.toList());
-            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocumentsWithNullDocTypes);
+            sscsCaseDataCallback.getCaseDetails().getCaseData().setDraftSscsFEDocument(sscsDocumentsWithNullDocTypes);
         }
         if (documentType.equals("nullSscsDocument")) {
             List<SscsDocument> sscsDocuments = new ArrayList<>();
             sscsDocuments.add(SscsDocument.builder().build());
-            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocuments);
+            sscsCaseDataCallback.getCaseDetails().getCaseData().setDraftSscsFEDocument(sscsDocuments);
         }
     }
 

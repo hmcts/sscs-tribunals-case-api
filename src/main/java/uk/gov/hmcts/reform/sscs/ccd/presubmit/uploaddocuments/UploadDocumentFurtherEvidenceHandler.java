@@ -18,12 +18,12 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
-            && isValidDocumentType(callback.getCaseDetails().getCaseData().getSscsDocument());
+            && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFEDocument());
     }
 
-    private boolean isValidDocumentType(List<SscsDocument> sscsDocuments) {
-        if (sscsDocuments != null) {
-            return sscsDocuments.stream()
+    private boolean isValidDocumentType(List<SscsDocument> draftSscsFEDocuments) {
+        if (draftSscsFEDocuments != null) {
+            return draftSscsFEDocuments.stream()
                 .anyMatch(doc -> {
                     String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
                     return DocumentType.MEDICAL_EVIDENCE.getId().equals(docType)
