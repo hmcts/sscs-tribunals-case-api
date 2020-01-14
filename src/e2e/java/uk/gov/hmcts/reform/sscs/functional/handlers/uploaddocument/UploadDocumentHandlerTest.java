@@ -21,7 +21,8 @@ public class UploadDocumentHandlerTest extends BaseHandler {
 
     @Test
     public void givenUploadDocumentEventIsTriggered_shouldUploadDocument() throws IOException {
-        caseDetails = createCaseInWithDwpStateUsingGivenCallback("handlers/uploaddocument/uploadDocumentCallback.json");
+        caseDetails = createCaseInWithDwpStateUsingGivenCallback(
+            "handlers/uploaddocument/uploadDocumentCallback.json");
 
         SscsCaseDetails actualCase = ccdService.updateCase(caseDetails.getCaseData(), caseDetails.getId(),
             EventType.UPLOAD_DOCUMENT.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);

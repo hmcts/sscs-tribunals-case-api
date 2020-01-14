@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,8 @@ public class BaseHandler {
     protected CaseDetails<SscsCaseData> caseDetails;
     @Value("${test-url}")
     private String testUrl;
+    @Value("${document_management.url}")
+    private String documentManagementUrl;
 
     @Before
     public void setUp() {
@@ -79,8 +82,8 @@ public class BaseHandler {
                 CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
-    private CaseDetails<SscsCaseData> createCaseDetailsUsingGivenCallback(
-        Long id, String filePath) throws IOException {
+    private CaseDetails<SscsCaseData> createCaseDetailsUsingGivenCallback(Long id, String filePath)
+        throws IOException {
         Jackson2ObjectMapperBuilder objectMapperBuilder =
             new Jackson2ObjectMapperBuilder()
                 .featuresToEnable(READ_ENUMS_USING_TO_STRING)
@@ -99,7 +102,16 @@ public class BaseHandler {
         String path = Objects.requireNonNull(getClass().getClassLoader()
             .getResource(filePath)).getFile();
         String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-        return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetailsId));
+        jsonCallback = jsonCallback.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetailsId));
+        if (testUrl.contains("localhost")) {
+            return setValidDocMgmDomainForEnv(jsonCallback);
+        }
+        return jsonCallback;
+    }
+
+    private String setValidDocMgmDomainForEnv(String jsonCallback) {
+        return jsonCallback.replace("dm-store-aat.service.core-compute-aat.internal",
+            StringUtils.substringAfter(documentManagementUrl, "http://"));
     }
 
     public static String getJsonCallbackForTest(String path) throws IOException {
