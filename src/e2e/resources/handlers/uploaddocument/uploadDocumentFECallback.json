@@ -1,6 +1,6 @@
 {
   "case_details": {
-    "id": "CASE_ID_TO_BE_REPLACED",
+    "id": 1573207127632814,
     "jurisdiction": "SSCS",
     "state": "withDwp",
     "version": 3,
@@ -1557,6 +1557,6 @@
       "generatedMobile": "PUBLIC"
     }
   },
-  "event_id": "uploadDocument",
+  "event_id": "uploadDocumentFurtherEvidence",
   "ignore_warning": false
 }

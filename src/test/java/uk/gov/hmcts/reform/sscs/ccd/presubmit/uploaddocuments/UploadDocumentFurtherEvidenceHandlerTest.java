@@ -16,10 +16,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
-public class UploadDocumentFEHandlerTest extends BaseHandlerTest {
+public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String UPLOAD_DOCUMENT_FE_CALLBACK_JSON = "uploaddocument/uploadDocumentFECallback.json";
-    private UploadDocumentFEHandler handler = new UploadDocumentFEHandler();
+    private UploadDocumentFurtherEvidenceHandler handler = new UploadDocumentFurtherEvidenceHandler();
 
     @Test
     @Parameters({
