@@ -56,10 +56,10 @@ public class UploadDocumentFEHandlerTest extends BaseHandlerTest {
     @Test
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
-            buildTestCallbackGivenData(EventType.UPLOAD_DOCUMENT, State.WITH_DWP.getId(),
+            buildTestCallbackGivenData(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE, State.WITH_DWP.getId(),
                 "representativeEvidence", UPLOAD_DOCUMENT_FE_CALLBACK_JSON), USER_AUTHORISATION);
 
-        String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentCallbackResponse.json");
+        String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentFECallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
     }
