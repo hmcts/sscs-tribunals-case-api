@@ -30,7 +30,6 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandler {
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
-            .assertThat().body("data.state", equalTo("withDwp"))
             .assertThat().body("data.dwpState", equalTo("feReceived"));
     }
 
