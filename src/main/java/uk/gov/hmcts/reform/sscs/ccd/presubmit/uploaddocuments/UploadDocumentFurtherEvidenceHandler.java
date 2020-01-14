@@ -42,7 +42,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.getDraftSscsFEDocument().forEach(draftDoc -> caseData.getSscsDocument().add(draftDoc));
         caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+        caseData.setDraftSscsFEDocument(null);
         return new PreSubmitCallbackResponse<>(caseData);
     }
 }

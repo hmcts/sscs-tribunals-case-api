@@ -197,10 +197,12 @@
         "value": {
           "documentType": "representativeEvidence",
           "documentLink": {
-            "document_url": "http://dm-store:5005/documents/88a100bf-75f4-40f3-8f3e-73e04607ffbf",
-            "document_binary_url": "http://dm-store:5005/documents/88a100bf-75f4-40f3-8f3e-73e04607ffbf/binary",
-            "document_filename": "Screenshot 2019-09-05 at 11.18.54.pdf"
-          }
+            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+            "document_filename": "some-name.pdf"
+          },
+          "documentDateAdded": "2019-09-06",
+          "documentFileName": "some-name.pdf"
         }
       }
     ],

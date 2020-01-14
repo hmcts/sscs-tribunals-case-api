@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
@@ -62,6 +63,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentFECallbackResponse.json");
         assertThatJson(actualCaseData).isEqualTo(expectedCaseData);
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
+        assertNull(actualCaseData.getData().getDraftSscsFEDocument());
     }
 
     @Test(expected = IllegalStateException.class)

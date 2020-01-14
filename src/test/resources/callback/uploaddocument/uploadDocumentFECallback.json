@@ -126,7 +126,20 @@
           }
         }
       ],
-      "sscsDocument": null,
+      "sscsDocument": [
+        {
+          "value": {
+            "documentType": "dl6",
+            "documentFileName": "dl6-1567775849641360.pdf",
+            "documentDateAdded": "2019-09-06",
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+              "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+              "document_filename": "dl6-1567775849641360.pdf"
+            }
+          }
+        }
+      ],
       "dateSentToDwp": "2019-09-06",
       "dwpTimeExtension": [],
       "hearings": [{
