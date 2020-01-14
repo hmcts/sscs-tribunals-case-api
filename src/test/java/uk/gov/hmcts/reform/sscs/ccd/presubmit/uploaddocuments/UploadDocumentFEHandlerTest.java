@@ -66,9 +66,9 @@ public class UploadDocumentFEHandlerTest extends BaseHandlerTest {
 
     @Test(expected = IllegalStateException.class)
     @Parameters({
-        "ABOUT_TO_START,UPLOAD_DOCUMENT,withDwp",
+        "ABOUT_TO_START,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp",
         "ABOUT_TO_SUBMIT,null,withDwp",
-        "null,UPLOAD_DOCUMENT,withDwp"
+        "null,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp"
     })
     public void handleCornerCaseScenarios(@Nullable CallbackType callbackType, @Nullable EventType eventType,
                                           @Nullable String state)
