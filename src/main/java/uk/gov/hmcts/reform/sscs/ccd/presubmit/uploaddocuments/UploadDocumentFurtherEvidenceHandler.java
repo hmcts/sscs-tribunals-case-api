@@ -18,16 +18,15 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        if (callbackType != null && callback != null) {
-            boolean canBeHandle = callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
-                && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFEDocument());
-            if (!canBeHandle) {
-                initDraftSscsFEDocument(callback.getCaseDetails().getCaseData());
-            }
-            return canBeHandle;
+        boolean canBeHandled = callbackType != null && callback != null
+            && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
+            && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFEDocument());
+
+        if (!canBeHandled && callback != null) {
+            initDraftSscsFEDocument(callback.getCaseDetails().getCaseData());
         }
-        return false;
+        return canBeHandled;
     }
 
     private boolean isValidDocumentType(List<SscsDocument> draftSscsFEDocuments) {
