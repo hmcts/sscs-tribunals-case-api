@@ -204,7 +204,20 @@
           "documentDateAdded": "2019-09-06",
           "documentFileName": "some-name.pdf"
         }
+      },
+      {
+        "value": {
+          "documentType": "appellantEvidence",
+          "documentLink": {
+            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+            "document_filename": "some-name.pdf"
+          },
+          "documentDateAdded": "DOCUMENT_DATE_ADDED_PLACEHOLDER",
+          "documentFileName": "some-name.pdf"
+        }
       }
+
     ],
     "generatedNino": "JT 12 34 56 D",
     "generatedSurname": "Test",

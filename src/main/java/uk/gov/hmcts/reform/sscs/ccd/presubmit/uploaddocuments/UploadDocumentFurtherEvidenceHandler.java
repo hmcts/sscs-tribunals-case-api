@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
+import java.time.LocalDate;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -42,9 +44,18 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        caseData.getDraftSscsFEDocument().forEach(draftDoc -> caseData.getSscsDocument().add(draftDoc));
-        caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+        moveDraftsToSscsDocs(caseData);
         caseData.setDraftSscsFEDocument(null);
+        caseData.setDwpState(DwpState.FE_RECEIVED.getId());
         return new PreSubmitCallbackResponse<>(caseData);
+    }
+
+    private void moveDraftsToSscsDocs(SscsCaseData caseData) {
+        caseData.getDraftSscsFEDocument().forEach(draftDoc -> {
+            if (StringUtils.isBlank(draftDoc.getValue().getDocumentDateAdded())) {
+                draftDoc.getValue().setDocumentDateAdded(LocalDate.now().toString());
+            }
+            caseData.getSscsDocument().add(draftDoc);
+        });
     }
 }

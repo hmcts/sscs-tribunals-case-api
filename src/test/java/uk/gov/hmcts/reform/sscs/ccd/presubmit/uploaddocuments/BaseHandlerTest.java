@@ -41,7 +41,8 @@ public class BaseHandlerTest {
     }
 
     protected Callback<SscsCaseData> buildTestCallbackGivenData(EventType eventType, String state,
-                                                                String documentType, String filePath)
+                                                                String documentType, String documentType2,
+                                                                String filePath)
         throws IOException {
         //edge case test scenario: callback is null
         if (eventType == null) {
@@ -50,6 +51,7 @@ public class BaseHandlerTest {
         String json = fetchData(filePath);
         json = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         json = json.replace("STATE_ID_PLACEHOLDER", state);
+        json = json.replace("DOCUMENT_TYPE2_PLACEHOLDER", documentType2);
         json = json.replace("DOCUMENT_TYPE_PLACEHOLDER",
             (!documentType.equals("nullSscsDocuments")) ? documentType : "it will be null");
 
