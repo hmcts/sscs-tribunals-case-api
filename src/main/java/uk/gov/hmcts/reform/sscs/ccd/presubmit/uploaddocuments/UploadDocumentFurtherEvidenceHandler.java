@@ -91,11 +91,16 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         return ScannedDocument.builder()
                     .value(ScannedDocumentDetails.builder()
                         .fileName(draftDoc.getValue().getDocumentFileName())
-                        .type(draftDoc.getValue().getDocumentType())
-                        .scannedDate(draftDoc.getValue().getDocumentDateAdded())
+                        .type("other")
+                        .scannedDate(parseLocalDateToLocalDateTime(draftDoc.getValue().getDocumentDateAdded()))
                         .url(draftDoc.getValue().getDocumentLink())
                         .build())
                     .build();
+    }
+
+    @NotNull
+    private String parseLocalDateToLocalDateTime(String documentDateAdded) {
+        return LocalDate.parse(documentDateAdded).atStartOfDay().toString();
     }
 
     private void setDateIfNotProvided(SscsDocument draftDoc) {

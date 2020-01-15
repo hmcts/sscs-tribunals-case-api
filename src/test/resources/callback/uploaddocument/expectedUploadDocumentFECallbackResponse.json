@@ -188,9 +188,9 @@
             "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
             "document_filename": "reps-some-name.pdf"
           },
-          "scannedDate": "2019-09-06",
+          "scannedDate": "2019-09-06T00:00",
           "fileName": "reps-some-name.pdf",
-          "type": "representativeEvidence"
+          "type": "other"
         }
       },
       {
@@ -202,7 +202,7 @@
           },
           "scannedDate": "DOCUMENT_DATE_ADDED_PLACEHOLDER",
           "fileName": "appellant-some-name.pdf",
-          "type": "appellantEvidence"
+          "type": "other"
         }
       }
     ],

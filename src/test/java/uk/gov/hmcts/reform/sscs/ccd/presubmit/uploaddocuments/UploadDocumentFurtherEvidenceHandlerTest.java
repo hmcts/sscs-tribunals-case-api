@@ -77,7 +77,8 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
 
     private String getExpectedCaseData() throws IOException {
         String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentFECallbackResponse.json");
-        return expectedCaseData.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().toString());
+        return expectedCaseData.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay()
+            .toString());
     }
 
     @Test(expected = IllegalStateException.class)
