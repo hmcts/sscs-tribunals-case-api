@@ -180,6 +180,32 @@
       "city": "BIRMINGHAM",
       "email": "Birmingham-SYA-Receipts@justice.gov.uk"
     },
+    "scannedDocuments": [
+      {
+        "value": {
+          "url": {
+            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+            "document_filename": "reps-some-name.pdf"
+          },
+          "scannedDate": "2019-09-06",
+          "fileName": "reps-some-name.pdf",
+          "type": "representativeEvidence"
+        }
+      },
+      {
+        "value": {
+          "url": {
+            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+            "document_filename": "appellant-some-name.pdf"
+          },
+          "scannedDate": "DOCUMENT_DATE_ADDED_PLACEHOLDER",
+          "fileName": "appellant-some-name.pdf",
+          "type": "appellantEvidence"
+        }
+      }
+    ],
     "sscsDocument": [
       {
         "value": {
@@ -192,32 +218,7 @@
             "document_filename": "dl6-1567775849641360.pdf"
           }
         }
-      },
-      {
-        "value": {
-          "documentType": "representativeEvidence",
-          "documentLink": {
-            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
-            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
-            "document_filename": "some-name.pdf"
-          },
-          "documentDateAdded": "2019-09-06",
-          "documentFileName": "some-name.pdf"
-        }
-      },
-      {
-        "value": {
-          "documentType": "appellantEvidence",
-          "documentLink": {
-            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
-            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
-            "document_filename": "some-name.pdf"
-          },
-          "documentDateAdded": "DOCUMENT_DATE_ADDED_PLACEHOLDER",
-          "documentFileName": "some-name.pdf"
-        }
       }
-
     ],
     "generatedNino": "JT 12 34 56 D",
     "generatedSurname": "Test",

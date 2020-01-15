@@ -1,14 +1,18 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -61,11 +65,42 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
     }
 
     private void moveDraftsToSscsDocs(SscsCaseData caseData) {
+        List<ScannedDocument> newScannedDocs = getNewScannedDocuments(caseData);
+        mergeNewScannedDocs(caseData, newScannedDocs);
+    }
+
+    private void mergeNewScannedDocs(SscsCaseData caseData, List<ScannedDocument> newScannedDocs) {
+        if (caseData.getScannedDocuments() == null) {
+            caseData.setScannedDocuments(newScannedDocs);
+        } else {
+            caseData.getScannedDocuments().addAll(newScannedDocs);
+        }
+    }
+
+    @NotNull
+    private List<ScannedDocument> getNewScannedDocuments(SscsCaseData caseData) {
+        List<ScannedDocument> newScannedDocs = new ArrayList<>();
         caseData.getDraftSscsFurtherEvidenceDocument().forEach(draftDoc -> {
-            if (StringUtils.isBlank(draftDoc.getValue().getDocumentDateAdded())) {
-                draftDoc.getValue().setDocumentDateAdded(LocalDate.now().toString());
-            }
-            caseData.getSscsDocument().add(draftDoc);
+            setDateIfNotProvided(draftDoc);
+            newScannedDocs.add(buildNewScannedDoc(draftDoc));
         });
+        return newScannedDocs;
+    }
+
+    private ScannedDocument buildNewScannedDoc(SscsDocument draftDoc) {
+        return ScannedDocument.builder()
+                    .value(ScannedDocumentDetails.builder()
+                        .fileName(draftDoc.getValue().getDocumentFileName())
+                        .type(draftDoc.getValue().getDocumentType())
+                        .scannedDate(draftDoc.getValue().getDocumentDateAdded())
+                        .url(draftDoc.getValue().getDocumentLink())
+                        .build())
+                    .build();
+    }
+
+    private void setDateIfNotProvided(SscsDocument draftDoc) {
+        if (StringUtils.isBlank(draftDoc.getValue().getDocumentDateAdded())) {
+            draftDoc.getValue().setDocumentDateAdded(LocalDate.now().toString());
+        }
     }
 }
