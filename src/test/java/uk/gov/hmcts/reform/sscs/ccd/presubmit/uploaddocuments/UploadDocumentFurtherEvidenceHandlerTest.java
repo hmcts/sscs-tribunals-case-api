@@ -59,7 +59,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         assertEquals(expectedResult, actualResult);
 
         if (expectToInitDrafts) {
-            assertNull(actualCallback.getCaseDetails().getCaseData().getDraftSscsFEDocument());
+            assertNull(actualCallback.getCaseDetails().getCaseData().getDraftSscsFurtherEvidenceDocument());
         }
     }
 
@@ -72,7 +72,7 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
 
         assertThatJson(actualCaseData).isEqualTo(getExpectedCaseData());
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
-        assertNull(actualCaseData.getData().getDraftSscsFEDocument());
+        assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
 
     private String getExpectedCaseData() throws IOException {

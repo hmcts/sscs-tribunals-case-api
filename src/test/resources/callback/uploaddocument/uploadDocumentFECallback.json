@@ -107,7 +107,7 @@
         }
       },
       "generatedEmail": "mail@example.com",
-      "draftSscsFEDocument": [
+      "draftSscsFurtherEvidenceDocument": [
         {
           "value": {
             "documentType": "DOCUMENT_TYPE_PLACEHOLDER",

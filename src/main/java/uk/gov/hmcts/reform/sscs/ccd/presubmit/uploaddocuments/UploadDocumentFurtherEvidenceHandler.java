@@ -21,17 +21,17 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         boolean canBeHandled = callbackType != null && callback != null
             && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
             && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
-            && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFEDocument());
+            && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFurtherEvidenceDocument());
 
         if (!canBeHandled && callback != null) {
-            initDraftSscsFEDocument(callback.getCaseDetails().getCaseData());
+            initDraftSscsFurtherEvidenceDocument(callback.getCaseDetails().getCaseData());
         }
         return canBeHandled;
     }
 
-    private boolean isValidDocumentType(List<SscsDocument> draftSscsFEDocuments) {
-        if (draftSscsFEDocuments != null) {
-            return draftSscsFEDocuments.stream()
+    private boolean isValidDocumentType(List<SscsDocument> draftSscsFurtherEvidenceDocuments) {
+        if (draftSscsFurtherEvidenceDocuments != null) {
+            return draftSscsFurtherEvidenceDocuments.stream()
                 .anyMatch(doc -> {
                     String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
                     return DocumentType.MEDICAL_EVIDENCE.getId().equals(docType)
@@ -51,17 +51,17 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         moveDraftsToSscsDocs(caseData);
-        initDraftSscsFEDocument(caseData);
+        initDraftSscsFurtherEvidenceDocument(caseData);
         caseData.setDwpState(DwpState.FE_RECEIVED.getId());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private void initDraftSscsFEDocument(SscsCaseData caseData) {
-        caseData.setDraftSscsFEDocument(null);
+    private void initDraftSscsFurtherEvidenceDocument(SscsCaseData caseData) {
+        caseData.setDraftSscsFurtherEvidenceDocument(null);
     }
 
     private void moveDraftsToSscsDocs(SscsCaseData caseData) {
-        caseData.getDraftSscsFEDocument().forEach(draftDoc -> {
+        caseData.getDraftSscsFurtherEvidenceDocument().forEach(draftDoc -> {
             if (StringUtils.isBlank(draftDoc.getValue().getDocumentDateAdded())) {
                 draftDoc.getValue().setDocumentDateAdded(LocalDate.now().toString());
             }

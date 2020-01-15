@@ -36,7 +36,7 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     public void canHandle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
                           boolean expectedResult) throws IOException {
         boolean actualResult = handler.canHandle(callbackType, buildTestCallbackGivenData(eventType, state,
-            "appellantEvidence",null, FE_NO_ACTION_CALLBACK_JSON));
+            "appellantEvidence","", FE_NO_ACTION_CALLBACK_JSON));
 
         assertEquals(expectedResult, actualResult);
     }
@@ -45,7 +45,7 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
     public void handle() throws IOException {
         PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(CallbackType.ABOUT_TO_START,
             buildTestCallbackGivenData(EventType.FE_NO_ACTION, State.WITH_DWP.getId(),
-                "appellantEvidence", null, FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
+                "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
 
         String expectedCaseData = fetchData("fenoaction/expectedFeNoActionAboutToStartCallbackResponse.json");
         assertThatJson(actualCaseData)
@@ -70,7 +70,7 @@ public class FeNoActionAboutToStartHandlerTest extends BaseHandlerTest {
                                           @Nullable String state)
         throws IOException {
         handler.handle(callbackType, buildTestCallbackGivenData(eventType, state,
-            "appellantEvidence", null, FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
+            "appellantEvidence", "", FE_NO_ACTION_CALLBACK_JSON), USER_AUTHORISATION);
     }
 
 }
