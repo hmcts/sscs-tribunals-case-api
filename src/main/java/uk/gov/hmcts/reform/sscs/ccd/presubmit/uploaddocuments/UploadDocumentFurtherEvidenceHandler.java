@@ -18,9 +18,16 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callbackType != null && callback != null && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
-            && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFEDocument());
+        if (callbackType != null && callback != null) {
+            boolean canBeHandle = callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+                && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
+                && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFEDocument());
+            if (!canBeHandle) {
+                initDraftSscsFEDocument(callback.getCaseDetails().getCaseData());
+            }
+            return canBeHandle;
+        }
+        return false;
     }
 
     private boolean isValidDocumentType(List<SscsDocument> draftSscsFEDocuments) {
@@ -45,9 +52,13 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         moveDraftsToSscsDocs(caseData);
-        caseData.setDraftSscsFEDocument(null);
+        initDraftSscsFEDocument(caseData);
         caseData.setDwpState(DwpState.FE_RECEIVED.getId());
         return new PreSubmitCallbackResponse<>(caseData);
+    }
+
+    private void initDraftSscsFEDocument(SscsCaseData caseData) {
+        caseData.setDraftSscsFEDocument(null);
     }
 
     private void moveDraftsToSscsDocs(SscsCaseData caseData) {
