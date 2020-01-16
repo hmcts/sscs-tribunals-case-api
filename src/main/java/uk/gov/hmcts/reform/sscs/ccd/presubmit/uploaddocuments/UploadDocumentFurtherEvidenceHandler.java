@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -14,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDoc;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -33,7 +32,7 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         return canBeHandled;
     }
 
-    private boolean isValidDocumentType(List<SscsDocument> draftSscsFurtherEvidenceDocuments) {
+    private boolean isValidDocumentType(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
         if (draftSscsFurtherEvidenceDocuments != null) {
             return draftSscsFurtherEvidenceDocuments.stream()
                 .anyMatch(doc -> {
@@ -81,31 +80,20 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
     private List<ScannedDocument> getNewScannedDocuments(SscsCaseData caseData) {
         List<ScannedDocument> newScannedDocs = new ArrayList<>();
         caseData.getDraftSscsFurtherEvidenceDocument().forEach(draftDoc -> {
-            setDateIfNotProvided(draftDoc);
             newScannedDocs.add(buildNewScannedDoc(draftDoc));
         });
         return newScannedDocs;
     }
 
-    private ScannedDocument buildNewScannedDoc(SscsDocument draftDoc) {
+    private ScannedDocument buildNewScannedDoc(SscsFurtherEvidenceDoc draftDoc) {
         return ScannedDocument.builder()
                     .value(ScannedDocumentDetails.builder()
                         .fileName(draftDoc.getValue().getDocumentFileName())
                         .type("other")
-                        .scannedDate(parseLocalDateToLocalDateTime(draftDoc.getValue().getDocumentDateAdded()))
+                        .scannedDate(LocalDate.now().atStartOfDay().toString())
                         .url(draftDoc.getValue().getDocumentLink())
                         .build())
                     .build();
     }
 
-    @NotNull
-    private String parseLocalDateToLocalDateTime(String documentDateAdded) {
-        return LocalDate.parse(documentDateAdded).atStartOfDay().toString();
-    }
-
-    private void setDateIfNotProvided(SscsDocument draftDoc) {
-        if (StringUtils.isBlank(draftDoc.getValue().getDocumentDateAdded())) {
-            draftDoc.getValue().setDocumentDateAdded(LocalDate.now().toString());
-        }
-    }
 }

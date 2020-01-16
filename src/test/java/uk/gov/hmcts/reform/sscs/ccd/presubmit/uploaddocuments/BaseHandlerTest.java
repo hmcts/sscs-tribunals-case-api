@@ -21,8 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDoc;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDocDetails;
 
 public class BaseHandlerTest {
     private ObjectMapper mapper;
@@ -68,17 +68,18 @@ public class BaseHandlerTest {
             sscsCaseDataCallback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(null);
         }
         if (documentType.equals("nullDocumentType")) {
-            List<SscsDocument> sscsDocumentsWithNullDocTypes = sscsCaseDataCallback.getCaseDetails()
+            List<SscsFurtherEvidenceDoc> sscsDocumentsWithNullDocTypes = sscsCaseDataCallback.getCaseDetails()
                 .getCaseData().getDraftSscsFurtherEvidenceDocument().stream()
-                .map(doc -> new SscsDocument(SscsDocumentDetails.builder().build()))
+                .map(doc -> new SscsFurtherEvidenceDoc(SscsFurtherEvidenceDocDetails.builder().build()))
                 .collect(Collectors.toList());
             sscsCaseDataCallback.getCaseDetails().getCaseData()
                 .setDraftSscsFurtherEvidenceDocument(sscsDocumentsWithNullDocTypes);
         }
         if (documentType.equals("nullSscsDocument")) {
-            List<SscsDocument> sscsDocuments = new ArrayList<>();
-            sscsDocuments.add(SscsDocument.builder().build());
-            sscsCaseDataCallback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(sscsDocuments);
+            List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocs = new ArrayList<>();
+            sscsFurtherEvidenceDocs.add(SscsFurtherEvidenceDoc.builder().build());
+            sscsCaseDataCallback.getCaseDetails().getCaseData()
+                .setDraftSscsFurtherEvidenceDocument(sscsFurtherEvidenceDocs);
         }
     }
 
