@@ -111,34 +111,23 @@
         {
           "value": {
             "documentType": "appellantEvidence",
-            "documentEmailContent": null,
             "documentLink": {
               "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
               "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
               "document_filename": "appellant-some-name.pdf"
             },
-            "documentFileName": "appellant-some-name.pdf",
-            "controlNumber": null,
-            "documentComment": null,
-            "evidenceIssued": null,
-            "bundleAddition": null
+            "documentFileName": "appellant-some-name.pdf"
           }
         },
         {
           "value": {
             "documentType": "representativeEvidence",
-            "documentEmailContent": null,
             "documentLink": {
               "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
               "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
               "document_filename": "reps-some-name.pdf"
             },
-            "documentDateAdded": null,
-            "documentFileName": "reps-some-name.pdf",
-            "controlNumber": null,
-            "documentComment": null,
-            "evidenceIssued": null,
-            "bundleAddition": null
+            "documentFileName": "reps-some-name.pdf"
           }
         }
       ],

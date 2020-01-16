@@ -37,13 +37,14 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandler {
             .log().all(true)
             .assertThat().body("data.dwpState", equalTo("feReceived"))
             .assertThat().body("data", not(hasKey("draftSscsFurtherEvidenceDocument")))
-            .assertThat().body("data.sscsDocument", hasSize(4))
-            .assertThat().body("data.sscsDocument[2].value.documentType", is("appellantEvidence"))
-            .assertThat().body("data.sscsDocument[2].value.documentFileName", is("appellant-some-name.pdf"))
-            .assertThat().body("data.sscsDocument[2].value.documentDateAdded", is(LocalDate.now().toString()))
-            .assertThat().body("data.sscsDocument[3].value.documentType", is("representativeEvidence"))
-            .assertThat().body("data.sscsDocument[3].value.documentFileName", is("reps-some-name.pdf"))
-            .assertThat().body("data.sscsDocument[3].value.documentDateAdded", is(LocalDate.now().toString()));
+            .assertThat().body("data.sscsDocument", hasSize(2))
+            .assertThat().body("data.scannedDocuments", hasSize(2))
+            .assertThat().body("data.scannedDocuments[0].value.type", is("other"))
+            .assertThat().body("data.scannedDocuments[0].value.fileName", is("appellant-some-name.pdf"))
+            .assertThat().body("data.scannedDocuments[0].value.scannedDate", is(LocalDate.now().atStartOfDay().toString()))
+            .assertThat().body("data.scannedDocuments[1].value.type", is("other"))
+            .assertThat().body("data.scannedDocuments[1].value.fileName", is("reps-some-name.pdf"))
+            .assertThat().body("data.scannedDocuments[1].value.scannedDate", is(LocalDate.now().atStartOfDay().toString()));
     }
 
 }
