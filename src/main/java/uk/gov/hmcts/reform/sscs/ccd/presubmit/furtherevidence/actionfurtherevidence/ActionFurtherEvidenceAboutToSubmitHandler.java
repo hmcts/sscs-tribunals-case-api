@@ -142,15 +142,26 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
             url = footerService.addFooter(url, documentFooterText, bundleAddition);
         }
+
+        String fileName = buildAdditionFileName(scannedDocument.getValue(), bundleAddition);
+
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
-                .documentFileName(scannedDocument.getValue().getFileName())
+                .documentName(fileName)
                 .bundleAddition(bundleAddition)
                 .documentLink(url)
                 .documentDateAdded(scannedDate)
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued("No")
                 .build()).build();
+    }
+
+    private String buildAdditionFileName(ScannedDocumentDetails value, String bundleAddition) {
+        String bundleText = "";
+        if (bundleAddition != null) {
+            bundleText = "Addition " + bundleAddition + " - ";
+        }
+        return bundleText + value.getSubtype() + " received on " + value.getScannedDate();
     }
 
     private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {

@@ -657,7 +657,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                     .map(syaEvidence -> {
                         DocumentLink documentLink = DocumentLink.builder().documentUrl(syaEvidence.getUrl()).build();
                         SscsDocumentDetails sscsDocumentDetails = SscsDocumentDetails.builder()
-                                .documentFileName(syaEvidence.getFileName())
+                                .documentName(syaEvidence.getFileName())
                                 .documentDateAdded(syaEvidence.getUploadedDate().format(DateTimeFormatter.ISO_DATE))
                                 .documentLink(documentLink)
                                 .documentType("appellantEvidence")

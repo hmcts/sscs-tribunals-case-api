@@ -87,9 +87,9 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument document : caseData.getSscsDocument()) {
                 log.info("Existing document {} for case {} ",
-                        document != null ? document.getValue().getDocumentFileName() : null,
+                        document != null ? document.getValue().getDocumentName() : null,
                         caseData.getCcdCaseId());
-                if (document != null && fileName.equalsIgnoreCase(document.getValue().getDocumentFileName())) {
+                if (document != null && fileName.equalsIgnoreCase(document.getValue().getDocumentName())) {
                     return true;
                 }
             }
@@ -101,7 +101,7 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
         String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument document : caseData.getSscsDocument()) {
-                if (document != null && !fileName.equals(document.getValue().getDocumentFileName())) {
+                if (document != null && !fileName.equals(document.getValue().getDocumentName())) {
                     return "Yes";
                 }
             }
