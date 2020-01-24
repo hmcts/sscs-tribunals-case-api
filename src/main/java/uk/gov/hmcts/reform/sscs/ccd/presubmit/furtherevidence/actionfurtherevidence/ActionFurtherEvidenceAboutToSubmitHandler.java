@@ -147,7 +147,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
-                .documentName(fileName)
+                .documentFileName(fileName)
                 .bundleAddition(bundleAddition)
                 .documentLink(url)
                 .documentDateAdded(scannedDate)

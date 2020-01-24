@@ -47,6 +47,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
+        sscsCaseData.getDwpResponseDocument().setDocumentFileName("Blaa");
+
         return preSubmitCallbackResponse;
     }
 }

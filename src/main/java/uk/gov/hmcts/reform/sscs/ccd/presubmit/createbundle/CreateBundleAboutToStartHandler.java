@@ -46,10 +46,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callbackType == CallbackType.ABOUT_TO_START
-                && callback.getEvent() == EventType.CREATE_BUNDLE
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+        return false;
     }
 
     @Override
@@ -66,7 +63,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 //        List<Bundle> bundles = new ArrayList<>();
 //        caseData.setCaseBundles();
 
-        caseData.setBundleConfiguration("sscs-demo-bundle.yaml");
+//        caseData.setBundleConfiguration("sscs-demo-bundle.yaml");
 
 //        try {
 //            createBundle(callback);

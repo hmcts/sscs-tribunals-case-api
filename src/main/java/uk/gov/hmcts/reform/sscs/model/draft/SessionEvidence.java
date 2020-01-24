@@ -18,7 +18,7 @@ public class SessionEvidence {
     }
 
     public SessionEvidence(Long size, SscsDocumentDetails documentDetails) {
-        this.uploadEv = documentDetails.getDocumentName();
+        this.uploadEv = documentDetails.getDocumentFileName();
         this.link = documentDetails.getDocumentLink().getDocumentUrl();
         this.size = size.toString();
     }

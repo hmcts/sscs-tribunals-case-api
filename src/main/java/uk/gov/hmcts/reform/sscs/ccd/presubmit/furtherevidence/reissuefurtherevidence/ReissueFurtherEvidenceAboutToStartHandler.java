@@ -66,7 +66,7 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
         for (SscsDocument doc: availableDocumentsToReIssue) {
-            String label = String.format("%s -  %s", doc.getValue().getDocumentName(), userFriendlyName(doc.getValue().getDocumentType()));
+            String label = String.format("%s -  %s", doc.getValue().getDocumentFileName(), userFriendlyName(doc.getValue().getDocumentType()));
             if (doc.getValue().getDocumentLink() != null) {
                 listCostOptions.add(new DynamicListItem(doc.getValue().getDocumentLink().getDocumentUrl(), label));
             }

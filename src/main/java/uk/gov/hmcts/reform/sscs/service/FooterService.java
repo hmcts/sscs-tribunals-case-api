@@ -43,7 +43,7 @@ public class FooterService {
         url = addFooter(url, leftText, bundleAddition);
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentName(documentFileName)
+                .documentFileName(documentFileName)
                 .documentLink(url)
                 .bundleAddition(bundleAddition)
                 .documentDateAdded(Optional.ofNullable(dateAdded).orElse(LocalDate.now()).format(DateTimeFormatter.ISO_DATE))
