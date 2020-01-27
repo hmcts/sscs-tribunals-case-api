@@ -125,7 +125,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
             assertNull(result.getData().getScannedDocuments());
             assertEquals("appellantEvidence", documentList.get(0).getValue().getDocumentType());
             assertEquals("3", documentList.get(0).getValue().getControlNumber());
-            assertEquals("scanned.pdf", documentList.get(0).getValue().getDocumentFileName());
+            assertEquals("Addition A - Appellant evidence received on 2010-10-25", documentList.get(0).getValue().getDocumentFileName());
             assertEquals("some location", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
         }
     }

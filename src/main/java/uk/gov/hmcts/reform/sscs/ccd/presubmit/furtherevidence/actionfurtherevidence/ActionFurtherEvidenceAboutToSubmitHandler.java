@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -143,7 +144,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             url = footerService.addFooter(url, documentFooterText, bundleAddition);
         }
 
-        String fileName = buildAdditionFileName(scannedDocument.getValue(), bundleAddition);
+        String fileName = buildAdditionFileName(documentType, bundleAddition, scannedDocument.getValue().getScannedDate());
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
@@ -156,12 +157,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .build()).build();
     }
 
-    private String buildAdditionFileName(ScannedDocumentDetails value, String bundleAddition) {
+    private String buildAdditionFileName(DocumentType documentType, String bundleAddition, String scannedDate) {
         String bundleText = "";
         if (bundleAddition != null) {
             bundleText = "Addition " + bundleAddition + " - ";
         }
-        return bundleText + value.getSubtype() + " received on " + value.getScannedDate();
+        scannedDate = scannedDate != null ? LocalDateTime.parse(scannedDate).format(DateTimeFormatter.ISO_DATE) : LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+
+        String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+
+        return bundleText + label + " received on " + scannedDate;
     }
 
     private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {

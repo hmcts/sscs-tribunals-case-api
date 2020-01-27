@@ -3,16 +3,16 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.model.AppConstants;
 
 @Component
 @Slf4j
@@ -47,8 +47,38 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
-        sscsCaseData.getDwpResponseDocument().setDocumentFileName("Blaa");
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        if (sscsCaseData.getDwpAT38Document() != null) {
+            sscsCaseData.setDwpAT38Document(buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpAT38Document().getDocumentLink()));
+        }
+        if (sscsCaseData.getDwpEvidenceBundleDocument() != null) {
+            sscsCaseData.setDwpEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
+        }
+        if (sscsCaseData.getDwpResponseDocument() != null) {
+            sscsCaseData.setDwpResponseDocument(buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpResponseDocument().getDocumentLink()));
+        }
 
         return preSubmitCallbackResponse;
+    }
+
+    private DwpResponseDocument buildDwpResponseDocumentWithDate(String documentType, String dateForFile, DocumentLink documentLink) {
+        String fileExtension = documentLink.getDocumentFilename().substring(documentLink.getDocumentFilename().lastIndexOf("."));
+        return (DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl(documentLink.getDocumentBinaryUrl())
+                                .documentUrl(documentLink.getDocumentUrl())
+                                .documentFilename(documentType + dateForFile + fileExtension)
+                                .build()
+                ).build());
     }
 }
