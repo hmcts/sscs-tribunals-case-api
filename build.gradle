@@ -13,7 +13,7 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '2.8'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.2.0.RELEASE'
+    id 'org.springframework.boot' version '2.2.3.RELEASE'
     id 'org.owasp.dependencycheck' version '5.2.2'
     id 'com.github.ben-manes.versions' version '0.25.0'
     id 'net.ltgt.apt' version '0.21'
@@ -266,7 +266,7 @@ dependencies {
     compile 'org.projectlombok:lombok:1.18.10'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.0.RELEASE'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.3.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.11.1'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.10.0'
