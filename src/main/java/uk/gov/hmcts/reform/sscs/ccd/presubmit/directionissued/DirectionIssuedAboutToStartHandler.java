@@ -25,7 +25,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
+        return (callbackType.equals(CallbackType.ABOUT_TO_START)
+                || callbackType.equals(CallbackType.MID_EVENT))
             && callback.getEvent() == EventType.DIRECTION_ISSUED;
     }
 
@@ -56,7 +57,10 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
             listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
         }
-        sscsCaseData.setDirectionTypeDl(new DynamicList(new DynamicListItem("", ""), listOptions));
+
+        DynamicListItem selectedValue = null != sscsCaseData.getDirectionTypeDl() && sscsCaseData.getDirectionTypeDl().getValue() != null
+                ? sscsCaseData.getDirectionTypeDl().getValue() : new DynamicListItem("", "");
+        sscsCaseData.setDirectionTypeDl(new DynamicList(selectedValue, listOptions));
     }
 
     private void setExtensionNextEventDropdown(State state, SscsCaseData sscsCaseData) {
@@ -69,6 +73,8 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(SEND_TO_VALID_APPEAL.getCode(), SEND_TO_VALID_APPEAL.getLabel()));
         }
 
-        sscsCaseData.setExtensionNextEventDl(new DynamicList(new DynamicListItem("", ""), listOptions));
+        DynamicListItem selectedValue = null != sscsCaseData.getExtensionNextEventDl() && sscsCaseData.getExtensionNextEventDl().getValue() != null
+                ? sscsCaseData.getExtensionNextEventDl().getValue() : new DynamicListItem("", "");
+        sscsCaseData.setExtensionNextEventDl(new DynamicList(selectedValue, listOptions));
     }
 }
