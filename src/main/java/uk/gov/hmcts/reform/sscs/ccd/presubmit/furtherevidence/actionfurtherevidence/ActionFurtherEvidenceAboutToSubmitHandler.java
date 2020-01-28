@@ -162,7 +162,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (bundleAddition != null) {
             bundleText = "Addition " + bundleAddition + " - ";
         }
-        scannedDate = scannedDate != null ? LocalDateTime.parse(scannedDate).format(DateTimeFormatter.ISO_DATE) : LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        scannedDate = scannedDate != null ? LocalDateTime.parse(scannedDate).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
         String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 

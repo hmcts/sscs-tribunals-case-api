@@ -47,7 +47,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
-        String todayDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         if (sscsCaseData.getDwpAT38Document() != null) {
             sscsCaseData.setDwpAT38Document(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_AT38_FILENAME_PREFIX,
@@ -73,6 +73,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     private DwpResponseDocument buildDwpResponseDocumentWithDate(String documentType, String dateForFile, DocumentLink documentLink) {
         String fileExtension = documentLink.getDocumentFilename().substring(documentLink.getDocumentFilename().lastIndexOf("."));
         return (DwpResponseDocument.builder()
+                .documentFileName(documentType + dateForFile)
                 .documentLink(
                         DocumentLink.builder()
                                 .documentBinaryUrl(documentLink.getDocumentBinaryUrl())
