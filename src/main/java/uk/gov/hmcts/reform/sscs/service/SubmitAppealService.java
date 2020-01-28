@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
-import uk.gov.hmcts.reform.sscs.service.converter.ConvertAintoBService;
+import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 
 @Service
 @Slf4j
@@ -39,7 +39,7 @@ public class SubmitAppealService {
     private final SscsPdfService sscsPdfService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
-    private final ConvertAintoBService convertAintoBService;
+    private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final List<String> offices;
 
     @Autowired
@@ -48,7 +48,7 @@ public class SubmitAppealService {
                         SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
-                        ConvertAintoBService convertAintoBService,
+                        ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
@@ -56,15 +56,12 @@ public class SubmitAppealService {
         this.sscsPdfService = sscsPdfService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
-        this.convertAintoBService = convertAintoBService;
+        this.convertAIntoBService = convertAIntoBService;
         this.offices = offices;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
-        String firstHalfOfPostcode = regionalProcessingCenterService
-            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
-        SscsCaseData caseData = prepareCaseForCcd(appeal, firstHalfOfPostcode);
-
+        SscsCaseData caseData = convertAppealToSscsCaseData(appeal);
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
@@ -95,7 +92,6 @@ public class SubmitAppealService {
 
     }
 
-    @SuppressWarnings("unchecked")
     public Optional<SessionDraft> getDraftAppeal(String oauth2Token) {
         SscsCaseData caseDetails = null;
         SessionDraft sessionDraft = null;
@@ -107,12 +103,11 @@ public class SubmitAppealService {
         
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
             caseDetails = caseDetailsList.get(0);
-            sessionDraft = (SessionDraft) convertAintoBService.convert(caseDetails);
+            sessionDraft = convertAIntoBService.convert(caseDetails);
         }
         log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
-                (caseDetails == null) ? null : caseDetails.getCcdCaseId(),
-                idamTokens.getUserId(),
-                idamTokens.getRoles());
+                (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
+            idamTokens.getRoles());
         return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
     }
 
@@ -142,8 +137,10 @@ public class SubmitAppealService {
         }
     }
 
-    SscsCaseData prepareCaseForCcd(SyaCaseWrapper appeal, String postcode) {
-        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(postcode);
+    SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
+        String firstHalfOfPostcode = regionalProcessingCenterService
+            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
+        RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData;
         if (rpc == null) {
