@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionTypeItemList.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionTypeItemList.REFUSE_EXTENSION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 
 import java.util.ArrayList;
@@ -144,6 +143,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
 
         List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
         listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
         listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
@@ -152,7 +152,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         DynamicList expected = new DynamicList(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getCode()), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(3, listOptions.size());
+        assertEquals(4, listOptions.size());
     }
 
     @Test
