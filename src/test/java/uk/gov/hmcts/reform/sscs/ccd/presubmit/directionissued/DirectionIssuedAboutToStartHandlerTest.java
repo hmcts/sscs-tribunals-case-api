@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionTypeItemList.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionTypeItemList.REFUSE_EXTENSION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
 
 import java.util.ArrayList;
@@ -99,7 +98,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters({"INCOMPLETE_APPLICATION", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED", "INTERLOCUTORY_REVIEW_STATE", "PENDING_APPEAL", "INCOMPLETE_APPLICATION_VOID_STATE", "VOID_STATE"})
+    @Parameters({"INCOMPLETE_APPLICATION", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED", "INTERLOCUTORY_REVIEW_STATE", "INCOMPLETE_APPLICATION_VOID_STATE"})
     public void givenNonValidAppeal_populateExtensionNextEventDropdown(State state) {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(state);
@@ -117,47 +116,9 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenValidAppealWithTimeExtension_populateDirectionTypeDropdown() {
-        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setTimeExtensionRequested("Yes");
-
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
-        listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
-        listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
-        assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(3, listOptions.size());
-    }
-
-    @Test
-    public void givenValidAppealWithTimeExtensionAndDirectionTypeDropdownAlreadyPopulated_thenAutomaticallySelectDirectionTypeDropdownValue() {
-        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-
-        sscsCaseData = SscsCaseData.builder().timeExtensionRequested("Yes").directionTypeDl(new DynamicList(GRANT_EXTENSION.getCode())).appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-
-        List<DynamicListItem> listOptions = new ArrayList<>();
-        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
-        listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
-        listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        DynamicList expected = new DynamicList(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getCode()), listOptions);
-        assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(3, listOptions.size());
-    }
-
-    @Test
-    @Parameters({"INCOMPLETE_APPLICATION", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED", "INTERLOCUTORY_REVIEW_STATE", "PENDING_APPEAL", "INCOMPLETE_APPLICATION_VOID_STATE", "VOID_STATE"})
-    public void givenNonValidAppealWithTimeExtension_populateDirectionTypeDropdown(State state) {
+    public void givenAppealWithTimeExtension_populateDirectionTypeDropdown() {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
-        when(callback.getCaseDetails().getState()).thenReturn(state);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
         sscsCaseData.setTimeExtensionRequested("Yes");
 
         List<DynamicListItem> listOptions = new ArrayList<>();
@@ -174,25 +135,30 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenValidAppealWithNoTimeExtension_populateDirectionTypeDropdown() {
-        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+    public void givenValidAppealWithTimeExtensionAndDirectionTypeDropdownAlreadyPopulated_thenAutomaticallySelectDirectionTypeDropdownValue() {
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
 
+        sscsCaseData = SscsCaseData.builder().timeExtensionRequested("Yes").directionTypeDl(new DynamicList(GRANT_EXTENSION.getCode())).appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+
         List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
+        listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        DynamicList expected = new DynamicList(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getCode()), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
-        assertEquals(1, listOptions.size());
+        assertEquals(4, listOptions.size());
     }
 
     @Test
-    @Parameters({"INCOMPLETE_APPLICATION", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED", "INTERLOCUTORY_REVIEW_STATE", "PENDING_APPEAL", "INCOMPLETE_APPLICATION_VOID_STATE", "VOID_STATE"})
-    public void givenNonValidAppealWithNoTimeExtension_populateDirectionTypeDropdown(State state) {
+    public void givenAppealWithNoTimeExtension_populateDirectionTypeDropdown() {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
-        when(callback.getCaseDetails().getState()).thenReturn(state);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
@@ -204,5 +170,4 @@ public class DirectionIssuedAboutToStartHandlerTest {
         assertEquals(expected, response.getData().getDirectionTypeDl());
         assertEquals(2, listOptions.size());
     }
-
 }
