@@ -258,7 +258,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.1.17-RC-SSCS-7079'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.1.18'
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.2.4'
 
