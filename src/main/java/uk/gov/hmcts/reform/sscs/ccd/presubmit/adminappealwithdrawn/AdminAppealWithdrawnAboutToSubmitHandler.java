@@ -33,7 +33,7 @@ public class AdminAppealWithdrawnAboutToSubmitHandler implements PreSubmitCallba
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        log.info("Setting InterlocReviewState to N/A for case id {} "
+        log.info("Setting InterlocReviewState to null for case id {} "
                 + "for AdminAppealWithdrawnAboutToSubmitHandler" + callback.getCaseDetails().getId());
         caseData.setInterlocReviewState(null);
 

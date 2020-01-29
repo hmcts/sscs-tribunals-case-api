@@ -33,7 +33,7 @@ public class HmctsLapseCaseAboutToSubmitHandler implements PreSubmitCallbackHand
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        log.info("Setting InterlocReviewState to N/A for case id {} "
+        log.info("Setting InterlocReviewState to null for case id {} "
                 + "for HmctsLapseCaseAboutToSubmitHandler" + callback.getCaseDetails().getId());
         caseData.setInterlocReviewState(null);
 

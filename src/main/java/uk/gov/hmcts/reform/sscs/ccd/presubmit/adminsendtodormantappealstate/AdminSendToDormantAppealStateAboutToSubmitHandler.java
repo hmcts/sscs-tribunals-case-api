@@ -32,7 +32,7 @@ public class AdminSendToDormantAppealStateAboutToSubmitHandler implements PreSub
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        log.info("Setting InterlocReviewState to N/A for case id {} "
+        log.info("Setting InterlocReviewState to null for case id {} "
                 + "for AdminSendToDormantAppealStateAboutToSubmitHandler" + callback.getCaseDetails().getId());
         caseData.setInterlocReviewState(null);
 

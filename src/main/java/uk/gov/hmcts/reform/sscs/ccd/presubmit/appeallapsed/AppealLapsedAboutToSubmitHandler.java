@@ -33,7 +33,7 @@ public class AppealLapsedAboutToSubmitHandler implements PreSubmitCallbackHandle
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        log.info("Setting InterlocReviewState to N/A for case id {} "
+        log.info("Setting InterlocReviewState to null for case id {} "
                 + "for AppealLapsedAboutToSubmitHandler" + callback.getCaseDetails().getId());
         caseData.setInterlocReviewState(null);
 
