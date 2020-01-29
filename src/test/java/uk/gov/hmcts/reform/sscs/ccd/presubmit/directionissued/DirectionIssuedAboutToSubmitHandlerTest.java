@@ -133,7 +133,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
         verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Directions notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
-        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNull(response.getData().getInterlocReviewState());
         assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
         verify(footerService).createFooterDocument(any(), eq("Directions notice"), any(), any(), any(), any());
     }
@@ -212,6 +212,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
@@ -225,7 +226,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDateSentToDwp());
         assertNull(response.getData().getDirectionTypeDl());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }

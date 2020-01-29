@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -63,7 +64,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
-        } else if (DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+        } else if (getPreValidStates().contains(callback.getCaseDetails().getState()) && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
