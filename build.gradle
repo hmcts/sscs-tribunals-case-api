@@ -15,7 +15,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.2.4.RELEASE'
     id 'org.owasp.dependencycheck' version '5.2.2'
-    id 'com.github.ben-manes.versions' version '0.25.0'
+    id 'com.github.ben-manes.versions' version '0.27.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.4.0'
     id 'au.com.dius.pact' version '4.0.4'
