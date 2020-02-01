@@ -15,7 +15,7 @@ plugins {
     id 'jacoco'
     id 'org.springframework.boot' version '2.2.4.RELEASE'
     id 'org.owasp.dependencycheck' version '5.2.2'
-    id 'com.github.ben-manes.versions' version '0.25.0'
+    id 'com.github.ben-manes.versions' version '0.27.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.4.0'
     id 'au.com.dius.pact' version '4.0.4'
@@ -248,7 +248,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '10.0.1'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.3.1'
 
     compile group: 'uk.gov.hmcts.reform', name: 'health-spring-boot-starter', version:'0.0.5'
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version:'0.0.4'
