@@ -12,9 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUploadResponse;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
@@ -125,7 +123,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
             assertNull(result.getData().getScannedDocuments());
             assertEquals("appellantEvidence", documentList.get(0).getValue().getDocumentType());
             assertEquals("3", documentList.get(0).getValue().getControlNumber());
-            assertEquals("Addition A - Appellant evidence received on 2010-10-25", documentList.get(0).getValue().getDocumentFileName());
+            assertEquals("Addition A - Appellant evidence received on 25-10-2010", documentList.get(0).getValue().getDocumentFileName());
             assertEquals("some location", documentList.get(0).getValue().getDocumentLink().getDocumentUrl());
         }
     }
@@ -142,10 +140,11 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertEquals(3, result.getData().getOriginalSender().getListItems().size());
-        assertEquals(3, result.getData().getFurtherEvidenceAction().getListItems().size());
-        assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
-        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
-        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
+        assertEquals(4, result.getData().getFurtherEvidenceAction().getListItems().size());
+        assertEquals(ISSUE_FURTHER_EVIDENCE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(0).getCode());
+        assertEquals(OTHER_DOCUMENT_MANUAL.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(1).getCode());
+        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(2).getCode());
+        assertEquals(SEND_TO_INTERLOC_REVIEW_BY_TCW.getCode(), result.getData().getFurtherEvidenceAction().getListItems().get(3).getCode());
     }
 
     @Test
