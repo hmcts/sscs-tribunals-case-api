@@ -156,7 +156,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                                   PreSubmitCallbackResponse<SscsCaseData> response) {
 
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(1).getValue();
-        assertEquals((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 2019-06-13", sscsDocumentDetail.getDocumentFileName());
+        assertEquals((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 13-06-2019", sscsDocumentDetail.getDocumentFileName());
         assertEquals(expectedDocumentType.getValue(), sscsDocumentDetail.getDocumentType());
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-13", sscsDocumentDetail.getDocumentDateAdded());
@@ -250,8 +250,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("Other document received on 2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("Other document received on 2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("Other document received on 12-06-2019", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Other document received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
         assertNull(response.getData().getScannedDocuments());
     }

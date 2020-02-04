@@ -145,7 +145,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        String todayDate = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         assertAll("DwpUploadResponseDocument fileName modified but URL remains same",
             () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh", response.getData().getDwpAT38Document().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/abcd-0123-xyzabcdefgh/binary",response.getData().getDwpAT38Document().getDocumentLink().getDocumentBinaryUrl()),

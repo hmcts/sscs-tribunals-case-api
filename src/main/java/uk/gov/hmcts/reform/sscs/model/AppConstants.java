@@ -31,8 +31,8 @@ public class AppConstants {
     public static final int PAST_HEARING_BOOKED_IN_WEEKS = 8;
 
     public static final String DWP_DOCUMENT_AT38_FILENAME_PREFIX = "AT38 received on ";
-    public static final String DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX = "Secretary of State Response received on ";
-    public static final String DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX = "Evidence Bundle received on ";
+    public static final String DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX = "DWP response received on ";
+    public static final String DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX = "DWP evidence received on ";
 
     private AppConstants(){
         //
