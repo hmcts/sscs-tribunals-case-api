@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -23,27 +24,11 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         boolean canBeHandled = callbackType != null && callback != null
             && callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE)
-            && isValidDocumentType(callback.getCaseDetails().getCaseData().getDraftSscsFurtherEvidenceDocument());
-
+            && callback.getEvent().equals(EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE);
         if (!canBeHandled && callback != null) {
             initDraftSscsFurtherEvidenceDocument(callback.getCaseDetails().getCaseData());
         }
         return canBeHandled;
-    }
-
-    private boolean isValidDocumentType(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
-        if (draftSscsFurtherEvidenceDocuments != null) {
-            return draftSscsFurtherEvidenceDocuments.stream()
-                .anyMatch(doc -> {
-                    String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
-                    return DocumentType.MEDICAL_EVIDENCE.getId().equals(docType)
-                        || DocumentType.OTHER_EVIDENCE.getId().equals(docType)
-                        || DocumentType.APPELLANT_EVIDENCE.getId().equals(docType)
-                        || DocumentType.REPRESENTATIVE_EVIDENCE.getId().equals(docType);
-                });
-        }
-        return false;
     }
 
     @Override
@@ -53,10 +38,39 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        if (!validDraftFurtherEvidenceDocument(caseData.getDraftSscsFurtherEvidenceDocument())) {
+            initDraftSscsFurtherEvidenceDocument(caseData);
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+            response.addError("You need to provide a file and a document type");
+            return response;
+        }
         moveDraftsToSscsDocs(caseData);
         initDraftSscsFurtherEvidenceDocument(caseData);
         caseData.setDwpState(DwpState.FE_RECEIVED.getId());
         return new PreSubmitCallbackResponse<>(caseData);
+    }
+
+    private boolean validDraftFurtherEvidenceDocument(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
+        if (draftSscsFurtherEvidenceDocuments != null) {
+            return draftSscsFurtherEvidenceDocuments.stream()
+                .anyMatch(doc -> {
+                    String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
+                    return isValidDocumentType(docType) && isFileUploaded(doc);
+                });
+        }
+        return false;
+    }
+
+    private boolean isFileUploaded(SscsFurtherEvidenceDoc doc) {
+        return doc.getValue().getDocumentLink() != null
+        && StringUtils.isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl());
+    }
+
+    private boolean isValidDocumentType(String docType) {
+        return DocumentType.MEDICAL_EVIDENCE.getId().equals(docType)
+            || DocumentType.OTHER_EVIDENCE.getId().equals(docType)
+            || DocumentType.APPELLANT_EVIDENCE.getId().equals(docType)
+            || DocumentType.REPRESENTATIVE_EVIDENCE.getId().equals(docType);
     }
 
     private void initDraftSscsFurtherEvidenceDocument(SscsCaseData caseData) {
