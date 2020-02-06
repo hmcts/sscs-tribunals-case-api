@@ -63,7 +63,7 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
 
     private boolean isFileUploaded(SscsFurtherEvidenceDoc doc) {
         return doc.getValue().getDocumentLink() != null
-        && StringUtils.isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl());
+            && StringUtils.isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl());
     }
 
     private boolean isValidDocumentType(String docType) {
