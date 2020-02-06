@@ -51,9 +51,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
     }
 
     private boolean validDraftFurtherEvidenceDocument(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
-        if (draftSscsFurtherEvidenceDocuments != null) {
+        if (draftSscsFurtherEvidenceDocuments != null && !draftSscsFurtherEvidenceDocuments.isEmpty()) {
             return draftSscsFurtherEvidenceDocuments.stream()
-                .anyMatch(doc -> {
+                .allMatch(doc -> {
                     String docType = doc.getValue() != null ? doc.getValue().getDocumentType() : null;
                     return isValidDocumentType(docType) && isFileUploaded(doc);
                 });

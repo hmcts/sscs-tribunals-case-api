@@ -3,9 +3,14 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.FILE_UPLOAD_IS_EMPTY;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.FILE_UPLOAD_IS_NULL;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -63,26 +68,58 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
     }
 
     @Test
-    @Parameters({
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,true, false"
-    })
-    public void handle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
-                       @Nullable String documentType,@Nullable String documentType2, boolean expectedResult,
-                       boolean expectToInitDrafts) throws IOException {
-        Callback<SscsCaseData> callback = buildTestCallbackGivenData(eventType,state, documentType, documentType2,
-            UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+    public void handleHappyPathWhenAllFieldsAreProvided() throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,"withDwp",
+            "representativeEvidence", "appellantEvidence", UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
 
-        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(callbackType, callback,
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(ABOUT_TO_SUBMIT, callback,
             USER_AUTHORISATION);
 
-        assertThatJson(actualCaseData).isEqualTo(getExpectedCaseData());
+        assertThatJson(actualCaseData).isEqualTo(getExpectedResponse());
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
         assertNull(actualCaseData.getData().getDraftSscsFurtherEvidenceDocument());
     }
 
-    private String getExpectedCaseData() throws IOException {
-        String expectedCaseData = fetchData("uploaddocument/expectedUploadDocumentFECallbackResponse.json");
-        return expectedCaseData.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay()
+    @Test
+    @Parameters({
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_EMPTY",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,FILE_UPLOAD_IS_NULL",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,appellantEvidence,null",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,representativeEvidence,null",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,,null",
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,,,FILE_UPLOAD_IS_NULL"
+    })
+    public void handleErrorScenariosWhenSomeFieldsAreNotProvided(@Nullable CallbackType callbackType,
+                                                                 @Nullable EventType eventType, String state,
+                                                                 @Nullable String documentType,
+                                                                 @Nullable String documentType2,
+                                                                 @Nullable FileUploadScenario fileUploadScenario)
+        throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(eventType,state, documentType, documentType2,
+            UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+
+        if (FILE_UPLOAD_IS_EMPTY.equals(fileUploadScenario)) {
+            callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(Collections.emptyList());
+        }
+        if (FILE_UPLOAD_IS_NULL.equals(fileUploadScenario)) {
+            callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(null);
+        }
+
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(callbackType, callback,
+            USER_AUTHORISATION);
+
+        assertThatJson(actualResponse.getData()).isEqualTo(callback.getCaseDetails().getCaseData());
+        assertNull(actualResponse.getData().getDwpState());
+        assertNull(actualResponse.getData().getDraftSscsFurtherEvidenceDocument());
+        long numberOfExpectedError = actualResponse.getErrors().stream()
+            .filter(error -> error.equalsIgnoreCase("You need to provide a file and a document type"))
+            .count();
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    private String getExpectedResponse() throws IOException {
+        String expectedResponse = fetchData("uploaddocument/" + "expectedUploadDocumentFECallbackResponse.json");
+        return expectedResponse.replace("DOCUMENT_DATE_ADDED_PLACEHOLDER", LocalDate.now().atStartOfDay()
             .toString());
     }
 
