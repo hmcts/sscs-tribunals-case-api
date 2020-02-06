@@ -16,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
@@ -65,15 +64,16 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
 
     @Test
     @Parameters({
-        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,Medical evidence,appellantEvidence,true, false"
+        "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE,withDwp,representativeEvidence,appellantEvidence,true, false"
     })
     public void handle(@Nullable CallbackType callbackType, @Nullable EventType eventType, String state,
                        @Nullable String documentType,@Nullable String documentType2, boolean expectedResult,
                        boolean expectToInitDrafts) throws IOException {
-        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(callbackType,
-            buildTestCallbackGivenData(eventType, State.WITH_DWP.getId(),
-                "representativeEvidence", "appellantEvidence",
-                UPLOAD_DOCUMENT_FE_CALLBACK_JSON), USER_AUTHORISATION);
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(eventType,state, documentType, documentType2,
+            UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+
+        PreSubmitCallbackResponse<SscsCaseData> actualCaseData = handler.handle(callbackType, callback,
+            USER_AUTHORISATION);
 
         assertThatJson(actualCaseData).isEqualTo(getExpectedCaseData());
         assertEquals("feReceived", actualCaseData.getData().getDwpState());
