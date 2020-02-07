@@ -90,6 +90,11 @@ data "azurerm_key_vault_secret" "pdf_service_access_key" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
+  name      = "AppInsightsInstrumentationKey"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 locals {
   local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
