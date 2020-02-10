@@ -79,8 +79,8 @@ public class BaseHandler {
                 CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
-    private CaseDetails<SscsCaseData> createCaseDetailsUsingGivenCallback(
-        Long id, String filePath) throws IOException {
+    private CaseDetails<SscsCaseData> createCaseDetailsUsingGivenCallback(Long id, String filePath)
+        throws IOException {
         Jackson2ObjectMapperBuilder objectMapperBuilder =
             new Jackson2ObjectMapperBuilder()
                 .featuresToEnable(READ_ENUMS_USING_TO_STRING)
@@ -101,6 +101,7 @@ public class BaseHandler {
         String jsonCallback = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
         return jsonCallback.replace("CASE_ID_TO_BE_REPLACED", String.valueOf(caseDetailsId));
     }
+
 
     public static String getJsonCallbackForTest(String path) throws IOException {
         String pathName = Objects.requireNonNull(BaseHandler.class.getClassLoader().getResource(path)).getFile();

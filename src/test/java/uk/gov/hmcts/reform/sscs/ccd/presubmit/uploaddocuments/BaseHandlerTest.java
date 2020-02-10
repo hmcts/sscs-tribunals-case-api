@@ -21,8 +21,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDoc;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDocDetails;
 
 public class BaseHandlerTest {
     private ObjectMapper mapper;
@@ -41,7 +41,8 @@ public class BaseHandlerTest {
     }
 
     protected Callback<SscsCaseData> buildTestCallbackGivenData(EventType eventType, String state,
-                                                                String documentType, String filePath)
+                                                                String documentType, String documentType2,
+                                                                String filePath)
         throws IOException {
         //edge case test scenario: callback is null
         if (eventType == null) {
@@ -50,6 +51,7 @@ public class BaseHandlerTest {
         String json = fetchData(filePath);
         json = json.replace("EVENT_ID_PLACEHOLDER", eventType.getCcdType());
         json = json.replace("STATE_ID_PLACEHOLDER", state);
+        json = json.replace("DOCUMENT_TYPE2_PLACEHOLDER", documentType2);
         json = json.replace("DOCUMENT_TYPE_PLACEHOLDER",
             (!documentType.equals("nullSscsDocuments")) ? documentType : "it will be null");
 
@@ -60,21 +62,24 @@ public class BaseHandlerTest {
         return sscsCaseDataCallback;
     }
 
-    private void configureTestDataForEdgeCaseScenarios(String documentType, Callback<SscsCaseData> sscsCaseDataCallback) {
+    private void configureTestDataForEdgeCaseScenarios(String documentType,
+                                                       Callback<SscsCaseData> sscsCaseDataCallback) {
         if (documentType.equals("nullSscsDocuments")) {
-            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(null);
+            sscsCaseDataCallback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(null);
         }
         if (documentType.equals("nullDocumentType")) {
-            List<SscsDocument> sscsDocumentsWithNullDocTypes = sscsCaseDataCallback.getCaseDetails()
-                .getCaseData().getSscsDocument().stream()
-                .map(doc -> new SscsDocument(SscsDocumentDetails.builder().build()))
+            List<SscsFurtherEvidenceDoc> sscsDocumentsWithNullDocTypes = sscsCaseDataCallback.getCaseDetails()
+                .getCaseData().getDraftSscsFurtherEvidenceDocument().stream()
+                .map(doc -> new SscsFurtherEvidenceDoc(SscsFurtherEvidenceDocDetails.builder().build()))
                 .collect(Collectors.toList());
-            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocumentsWithNullDocTypes);
+            sscsCaseDataCallback.getCaseDetails().getCaseData()
+                .setDraftSscsFurtherEvidenceDocument(sscsDocumentsWithNullDocTypes);
         }
         if (documentType.equals("nullSscsDocument")) {
-            List<SscsDocument> sscsDocuments = new ArrayList<>();
-            sscsDocuments.add(SscsDocument.builder().build());
-            sscsCaseDataCallback.getCaseDetails().getCaseData().setSscsDocument(sscsDocuments);
+            List<SscsFurtherEvidenceDoc> sscsFurtherEvidenceDocs = new ArrayList<>();
+            sscsFurtherEvidenceDocs.add(SscsFurtherEvidenceDoc.builder().build());
+            sscsCaseDataCallback.getCaseDetails().getCaseData()
+                .setDraftSscsFurtherEvidenceDocument(sscsFurtherEvidenceDocs);
         }
     }
 
