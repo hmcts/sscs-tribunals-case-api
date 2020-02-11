@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
