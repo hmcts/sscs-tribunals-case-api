@@ -119,9 +119,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
 
-        String scannedDateTime = null;
+        String scannedDate = null;
         if (scannedDocument.getValue().getScannedDate() != null) {
-            scannedDateTime = LocalDateTime.parse(scannedDocument.getValue().getScannedDate()).toString() + "Z";
+            scannedDate = LocalDateTime.parse(scannedDocument.getValue().getScannedDate()).toLocalDate().format(DateTimeFormatter.ISO_DATE);
         }
 
         DocumentLink url = scannedDocument.getValue().getUrl();
@@ -151,7 +151,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .documentFileName(fileName)
                 .bundleAddition(bundleAddition)
                 .documentLink(url)
-                .documentDateAdded(scannedDateTime)
+                .documentDateAdded(scannedDate)
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued("No")
                 .build()).build();

@@ -78,7 +78,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                         DocumentLink.builder()
                                 .documentBinaryUrl(documentLink.getDocumentBinaryUrl())
                                 .documentUrl(documentLink.getDocumentUrl())
-                                .documentFilename(documentType + dateForFile + fileExtension)
+                                .documentFilename(documentType + " on " + dateForFile + fileExtension)
                                 .build()
                 ).build());
     }
