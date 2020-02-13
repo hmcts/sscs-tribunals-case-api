@@ -28,7 +28,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent() == EventType.CREATE_BUNDLE;
     }
 
@@ -58,8 +58,6 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
         }
 
         return bundleRequestExecutor.post(callback, "http://localhost:4623/api/new-bundle");
-
-//        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
 }
