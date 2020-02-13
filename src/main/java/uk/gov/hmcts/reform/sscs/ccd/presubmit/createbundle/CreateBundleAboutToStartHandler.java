@@ -8,9 +8,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -40,6 +38,14 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 
         if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
             sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
+        }
+
+        if (sscsCaseData.getSscsDocument() != null) {
+            for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
+                if (sscsDocument.getValue() != null && sscsDocument.getValue().getDocumentFileName() == null) {
+                    sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename());
+                }
+            }
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
