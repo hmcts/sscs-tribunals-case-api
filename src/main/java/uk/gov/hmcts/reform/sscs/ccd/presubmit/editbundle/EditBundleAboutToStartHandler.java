@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
@@ -9,17 +9,20 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Bundle;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
 
 @Service
-public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private BundleRequestExecutor bundleRequestExecutor;
 
     @Autowired
-    public CreateBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor) {
+    public EditBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor) {
         this.bundleRequestExecutor = bundleRequestExecutor;
     }
 
@@ -28,8 +31,8 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
-        return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.CREATE_BUNDLE;
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
+                && callback.getEvent() == EventType.EDIT_BUNDLE;
     }
 
     @Override
@@ -41,25 +44,19 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        if (sscsCaseData.getDwpResponseDocument() != null && sscsCaseData.getDwpResponseDocument().getDocumentFileName() == null) {
-            sscsCaseData.getDwpResponseDocument().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
-        }
-
-        if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
-            sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
-        }
-
-        if (sscsCaseData.getSscsDocument() != null) {
-            for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
-                if (sscsDocument.getValue() != null && sscsDocument.getValue().getDocumentFileName() == null) {
-                    sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename());
-                }
+        for (Bundle bundle : sscsCaseData.getCaseBundles()) {
+            if ("Yes".equals(bundle.getValue().getEligibleForStitching())) {
+                bundle.getValue().setFileName("SscsBundle.pdf");
+                bundle.getValue().setCoverpageTemplate("SSCS-cover-page.docx");
+                bundle.getValue().setHasTableOfContents("Yes");
+                bundle.getValue().setHasCoversheets("Yes");
+                bundle.getValue().setPaginationStyle("topCenter");
+                bundle.getValue().setPageNumberFormat("numberOfPages");
+                bundle.getValue().setStitchedDocument(null);
             }
         }
 
-        return bundleRequestExecutor.post(callback, "http://localhost:4623/api/new-bundle");
-
-//        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        return bundleRequestExecutor.post(callback, "http://localhost:4623/api/stitch-ccd-bundles");
     }
 
 }
