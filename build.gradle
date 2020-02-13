@@ -258,7 +258,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'http-proxy-spring-boot-autoconfigure', version: '1.1.0'
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.2.1-RC3'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.2.1-RC4'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.2.4'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -268,7 +268,7 @@ dependencies {
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.4.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.1.0'
-    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.11.1'
+    testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', verssscs-corion: '2.11.1'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.10.0'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
