@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

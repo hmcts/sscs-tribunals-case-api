@@ -1,7 +1,6 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
-  aadIdentityName:
   readinessDelay: 45
   environment:
     PDF_API_URL: "http://cmc-pdf-service-aat.service.core-compute-aat.internal"

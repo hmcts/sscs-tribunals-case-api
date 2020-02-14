@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
 
 import java.util.*;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
