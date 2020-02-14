@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

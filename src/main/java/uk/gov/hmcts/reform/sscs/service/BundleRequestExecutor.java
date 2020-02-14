@@ -16,8 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.exceptions.DocumentServiceResponseException;
 
 @Slf4j
@@ -28,13 +26,11 @@ public class BundleRequestExecutor {
 
     private final RestTemplate restTemplate;
     private final AuthTokenGenerator serviceAuthTokenGenerator;
-//    private final UserDetailsProvider userDetailsProvider;
     private final IdamService idamService;
 
     public BundleRequestExecutor(RestTemplate restTemplate, AuthTokenGenerator serviceAuthTokenGenerator, IdamService idamService) {
         this.restTemplate = restTemplate;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
-//        this.userDetailsProvider = userDetailsProvider;
         this.idamService = idamService;
     }
 
@@ -47,9 +43,6 @@ public class BundleRequestExecutor {
         requireNonNull(endpoint, "endpoint must not be null");
 
         final String serviceAuthorizationToken = serviceAuthTokenGenerator.generate();
-//        final UserDetails userDetails = userDetailsProvider.getUserDetails();
-//        final String accessToken = userDetails.getAccessToken();
-//        idamService.
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -75,8 +68,7 @@ public class BundleRequestExecutor {
         } catch (RestClientResponseException e) {
 
             throw new DocumentServiceResponseException(
-                "Couldn't create bundle using API: " ,
-                e
+                "Couldn't create bundle using API: ", e
             );
         }
 
