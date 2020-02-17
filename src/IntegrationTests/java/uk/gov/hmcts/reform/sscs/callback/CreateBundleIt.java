@@ -13,12 +13,18 @@ import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -26,7 +32,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,7 +45,13 @@ public class CreateBundleIt extends AbstractEventIt {
     private IdamService idamService;
 
     @MockBean
-    private BundleRequestExecutor bundleRequestExecutor;
+    private RestTemplate restTemplate;
+
+    @Mock
+    private ResponseEntity responseEntity;
+
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
 
     @Before
     public void setup() throws IOException {
@@ -55,15 +66,14 @@ public class CreateBundleIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmitHandler_willCallExternalCreateBundleService() throws Exception {
         SscsCaseData caseData = SscsCaseData.builder().build();
-        PreSubmitCallbackResponse mockedResponse = new PreSubmitCallbackResponse<CaseData>(caseData);
-        when(bundleRequestExecutor.post(any(), any())).thenReturn(mockedResponse);
+        when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
+
+        when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
         assertHttpStatus(response, HttpStatus.OK);
 
-        deserialize(response.getContentAsString());
-
-        verify(bundleRequestExecutor).post(any(), eq("/api/new-bundle"));
+        verify(restTemplate).exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class));
     }
 }
