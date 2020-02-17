@@ -99,7 +99,7 @@ public class SubmitAppealService {
         }
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
-        
+
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
             caseDetails = caseDetailsList.get(0);
             sessionDraft = convertAIntoBService.convert(caseDetails);
@@ -132,7 +132,9 @@ public class SubmitAppealService {
             }
             if (StringUtils.isNotEmpty(userToken)) {
                 citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
+                citizenCcdService.associateCaseToCitizen(idamTokens, caseDetails.getData());
             }
+
         }
     }
 

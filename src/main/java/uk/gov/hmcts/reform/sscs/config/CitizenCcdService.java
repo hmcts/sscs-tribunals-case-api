@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static java.util.stream.Stream.of;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -99,6 +101,32 @@ public class CitizenCcdService {
         CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(caseData, startEventResponse, summary, description);
         caseDetails = citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
         return caseDetails;
+    }
+
+    public void associateCaseToCitizen(IdamTokens citizenIdamTokens, SscsCaseData caseData) {
+        if (caseData != null) {
+            if (hasAppellantPostcode(caseData)) {
+                if (caseHasSubscriptionWithTyaAndEmail(caseData)) {
+                    citizenCcdClient.addUserToCase(citizenIdamTokens, citizenIdamTokens.getUserId(), Long.valueOf(caseData.getCcdCaseId()));
+                } else {
+                    log.info("Associate case: Subscription does not match id {}", caseData.getCcdCaseId());
+                }
+            } else {
+                log.info("Associate case: Postcode does not match id {}", caseData.getCcdCaseId());
+            }
+        }
+    }
+
+    private boolean hasAppellantPostcode(SscsCaseData caseData) {
+        return caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null
+                && caseData.getAppeal().getAppellant().getAddress() != null
+                && caseData.getAppeal().getAppellant().getAddress().getPostcode() != null;
+    }
+
+    private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseData caseData) {
+        Subscriptions subscriptions = caseData.getSubscriptions();
+        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
+                .anyMatch(subscription -> subscription != null && subscription.getEmail() != null);
     }
 
 }
