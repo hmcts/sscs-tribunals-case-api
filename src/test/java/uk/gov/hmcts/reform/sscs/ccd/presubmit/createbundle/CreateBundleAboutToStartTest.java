@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.print.Doc;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;

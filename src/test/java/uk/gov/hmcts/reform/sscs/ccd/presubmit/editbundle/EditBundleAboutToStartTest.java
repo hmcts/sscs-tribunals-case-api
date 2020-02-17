@@ -6,8 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
-import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,6 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle.CreateBundleAboutToStartHandler;
 import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
@@ -94,7 +91,6 @@ public class EditBundleAboutToStartTest {
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         BundleDetails bundleResult1 = result.getData().getCaseBundles().get(0).getValue();
-        BundleDetails bundleResult2 = result.getData().getCaseBundles().get(1).getValue();
 
         assertEquals("SscsBundle.pdf", bundleResult1.getFileName());
         assertEquals("SSCS-cover-page.docx", bundleResult1.getCoverpageTemplate());
@@ -103,6 +99,8 @@ public class EditBundleAboutToStartTest {
         assertEquals("topCenter", bundleResult1.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult1.getPageNumberFormat());
         assertNull(bundleResult1.getStitchStatus());
+
+        BundleDetails bundleResult2 = result.getData().getCaseBundles().get(1).getValue();
 
         assertNull(bundleResult2.getFileName());
         assertNull(bundleResult2.getCoverpageTemplate());
