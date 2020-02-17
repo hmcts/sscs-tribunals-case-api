@@ -2,12 +2,16 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
+import java.util.ArrayList;
+import java.util.List;
+import javax.print.Doc;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,5 +79,26 @@ public class CreateBundleAboutToStartTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX, response.getData().getDwpEvidenceBundleDocument().getDocumentFileName());
+    }
+
+    @Test
+    public void givenSscsDocumentHasEmptyFileName_thenPopulateFileName() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName(null).documentLink(
+                DocumentLink.builder().documentFilename("test.com").build()).build()).build();
+        List<SscsDocument> docs = new ArrayList<>();
+
+        docs.add(sscsDocument);
+
+        callback.getCaseDetails().getCaseData().setSscsDocument(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+    }
+
+    @Test
+    public void givenCreateBundleEvent_thenTriggerTheExternalCreateBundleEvent() {
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
     }
 }

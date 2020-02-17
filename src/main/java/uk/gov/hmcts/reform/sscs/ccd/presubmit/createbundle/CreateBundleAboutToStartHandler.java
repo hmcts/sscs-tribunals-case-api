@@ -21,6 +21,8 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 
     private String bundleUrl;
 
+    private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
+
     @Autowired
     public CreateBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor,
                                            @Value("${bundle.url}") String bundleUrl) {
@@ -61,8 +63,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                 }
             }
         }
-
-        return bundleRequestExecutor.post(callback, bundleUrl + "/api/new-bundle");
+        return bundleRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
     }
 
 }
