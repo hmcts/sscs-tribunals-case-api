@@ -5,6 +5,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,9 +19,13 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 
     private BundleRequestExecutor bundleRequestExecutor;
 
+    private String bundleUrl;
+
     @Autowired
-    public CreateBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor) {
+    public CreateBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor,
+                                           @Value("${bundle.url}") String bundleUrl) {
         this.bundleRequestExecutor = bundleRequestExecutor;
+        this.bundleUrl = bundleUrl;
     }
 
     @Override
@@ -57,7 +62,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
             }
         }
 
-        return bundleRequestExecutor.post(callback, "http://localhost:4623/api/new-bundle");
+        return bundleRequestExecutor.post(callback, bundleUrl + "/api/new-bundle");
     }
 
 }

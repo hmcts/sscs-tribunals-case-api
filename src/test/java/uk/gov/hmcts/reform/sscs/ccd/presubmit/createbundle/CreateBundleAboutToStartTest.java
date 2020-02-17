@@ -38,7 +38,7 @@ public class CreateBundleAboutToStartTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new CreateBundleAboutToStartHandler(bundleRequestExecutor);
+        handler = new CreateBundleAboutToStartHandler(bundleRequestExecutor, "bundleUrl.com");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 

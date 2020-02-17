@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 import static java.util.Objects.requireNonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,10 +19,13 @@ import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
 public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private BundleRequestExecutor bundleRequestExecutor;
+    private String bundleUrl;
 
     @Autowired
-    public EditBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor) {
+    public EditBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor,
+                                         @Value("${bundle.url}") String bundleUrl) {
         this.bundleRequestExecutor = bundleRequestExecutor;
+        this.bundleUrl = bundleUrl;
     }
 
     @Override
@@ -54,7 +58,7 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
             }
         }
 
-        return bundleRequestExecutor.post(callback, "http://localhost:4623/api/stitch-ccd-bundles");
+        return bundleRequestExecutor.post(callback, bundleUrl + "/api/stitch-ccd-bundles");
     }
 
 }

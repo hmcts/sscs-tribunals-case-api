@@ -178,5 +178,7 @@ module "tribunals-case-api" {
     MAX_REQUEST_SIZE = "${var.max_request_size}"
 
     READY_TO_LIST_OFFICES = "${var.ready_to_list_offices}"
+
+    BUNDLE_URL = "${var.bundle_url}"
   }
 }

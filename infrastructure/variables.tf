@@ -110,3 +110,8 @@ variable "ready_to_list_offices" {
   default = ""
 }
 
+variable "bundle_url" {
+  type    = "string"
+  default = ""
+}
+
