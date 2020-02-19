@@ -117,6 +117,7 @@ public class SubmitAppealService {
             .serviceAuthorization(idamService.generateServiceAuthorization())
             .userId(userDetails.getId())
             .roles(userDetails.getRoles())
+            .email(userDetails.getEmail())
             .build();
     }
 
@@ -132,7 +133,7 @@ public class SubmitAppealService {
             }
             if (StringUtils.isNotEmpty(userToken)) {
                 citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
-                citizenCcdService.associateCaseToCitizen(idamTokens, caseDetails.getData());
+                citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
             }
 
         }

@@ -103,16 +103,19 @@ public class CitizenCcdService {
         return caseDetails;
     }
 
-    public void associateCaseToCitizen(IdamTokens citizenIdamTokens, SscsCaseData caseData) {
-        if (caseData != null) {
+    public void associateCaseToCitizen(IdamTokens citizenIdamTokens, Long caseId, IdamTokens idamTokens) {
+        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
+        if (sscsCaseDetails != null && sscsCaseDetails.getData() != null) {
+            SscsCaseData caseData = sscsCaseDetails.getData();
             if (hasAppellantPostcode(caseData)) {
-                if (caseHasSubscriptionWithTyaAndEmail(caseData)) {
-                    citizenCcdClient.addUserToCase(citizenIdamTokens, citizenIdamTokens.getUserId(), Long.valueOf(caseData.getCcdCaseId()));
+                if (caseHasSubscriptionWithEmail(citizenIdamTokens, caseData)) {
+                    log.info("Associate case: Found matching subscription email for case id {}", caseId);
+                    citizenCcdClient.addUserToCase(idamTokens, citizenIdamTokens.getUserId(), caseId);
                 } else {
-                    log.info("Associate case: Subscription does not match id {}", caseData.getCcdCaseId());
+                    log.info("Associate case: Subscription email does not match id {}", caseId);
                 }
             } else {
-                log.info("Associate case: Postcode does not match id {}", caseData.getCcdCaseId());
+                log.info("Associate case: Postcode does not exists for case id {}", caseId);
             }
         }
     }
@@ -123,10 +126,10 @@ public class CitizenCcdService {
                 && caseData.getAppeal().getAppellant().getAddress().getPostcode() != null;
     }
 
-    private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseData caseData) {
+    private boolean caseHasSubscriptionWithEmail(IdamTokens citizenIdamTokens, SscsCaseData caseData) {
         Subscriptions subscriptions = caseData.getSubscriptions();
         return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
-                .anyMatch(subscription -> subscription != null && subscription.getEmail() != null);
+                .anyMatch(subscription -> subscription != null && citizenIdamTokens.getEmail().equalsIgnoreCase(subscription.getEmail()));
     }
 
 }
