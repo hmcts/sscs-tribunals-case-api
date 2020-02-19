@@ -63,6 +63,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                 }
             }
         }
+
         return bundleRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
     }
 
