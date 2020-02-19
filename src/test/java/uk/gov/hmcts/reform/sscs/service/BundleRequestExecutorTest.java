@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.exceptions.DocumentServiceResponseException;
@@ -39,6 +40,7 @@ public class BundleRequestExecutorTest {
 
     @Mock private IdamService idamService;
     @Mock private Callback<SscsCaseData> callback;
+    @Mock private CaseDetails<SscsCaseData> caseDetails;
     @Mock private PreSubmitCallbackResponse<SscsCaseData> callbackResponse;
     @Mock private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> responseEntity;
 
@@ -55,6 +57,8 @@ public class BundleRequestExecutorTest {
 
         when(serviceAuthTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
         when(idamService.getIdamOauth2Token()).thenReturn(ACCESS_TOKEN);
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getId()).thenReturn(1234L);
     }
 
     @Test
