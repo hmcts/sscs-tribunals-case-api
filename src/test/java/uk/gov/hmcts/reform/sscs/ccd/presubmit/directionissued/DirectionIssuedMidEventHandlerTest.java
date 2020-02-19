@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;

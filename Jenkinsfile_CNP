@@ -24,6 +24,7 @@ def secrets = [
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
         secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
+        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
     ]
 ]
 
@@ -37,7 +38,6 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-    enableDockerBuild()
     installCharts()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')

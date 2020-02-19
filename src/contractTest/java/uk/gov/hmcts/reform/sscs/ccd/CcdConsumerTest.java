@@ -13,7 +13,6 @@ import com.google.common.collect.Maps;
 import io.restassured.RestAssured;
 import io.restassured.config.EncoderConfig;
 import io.restassured.parsing.Parser;
-
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;

@@ -90,6 +90,11 @@ data "azurerm_key_vault_secret" "pdf_service_access_key" {
   vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
 }
 
+data "azurerm_key_vault_secret" "appinsights_instrumentation_key" {
+  name      = "AppInsightsInstrumentationKey"
+  vault_uri = "${data.azurerm_key_vault.sscs_key_vault.vault_uri}"
+}
+
 locals {
   local_ase = "${data.terraform_remote_state.core_apps_compute.ase_name[0]}"
 
@@ -138,8 +143,6 @@ module "tribunals-case-api" {
     ROBOTICS_EMAIL_SUBJECT = "${var.robotics_email_subject}"
     ROBOTICS_EMAIL_MESSAGE = "${var.robotics_email_message}"
 
-    ISSUE_FURTHER_EVIDENCE_ENABLED = "${var.issue_further_evidence_enabled}"
-
     EMAIL_SERVER_HOST = "${data.azurerm_key_vault_secret.smtp_host.value}"
     EMAIL_SERVER_PORT = "${data.azurerm_key_vault_secret.smtp_port.value}"
     EMAIL_SMTP_TLS_ENABLED = "${var.appeal_email_smtp_tls_enabled}"
@@ -175,5 +178,7 @@ module "tribunals-case-api" {
     MAX_REQUEST_SIZE = "${var.max_request_size}"
 
     READY_TO_LIST_OFFICES = "${var.ready_to_list_offices}"
+
+    BUNDLE_URL = "${var.bundle_url}"
   }
 }

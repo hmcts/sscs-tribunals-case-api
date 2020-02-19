@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.healthcheck;
 
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.health.Health;

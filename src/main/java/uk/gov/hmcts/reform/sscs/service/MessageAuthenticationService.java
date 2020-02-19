@@ -11,23 +11,16 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.crypto.Mac;
-
 import javax.crypto.spec.SecretKeySpec;
-
 import org.slf4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import uk.gov.hmcts.reform.sscs.exception.InvalidSubscriptionTokenException;
 import uk.gov.hmcts.reform.sscs.exception.MacException;
 import uk.gov.hmcts.reform.sscs.exception.TokenException;

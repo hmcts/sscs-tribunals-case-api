@@ -9,13 +9,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
-import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
 
@@ -77,11 +74,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             return null;
         }
         DwpAddressLookupService dwpAddressLookupService = new DwpAddressLookupService();
-        Optional<OfficeMapping> officeMapping = dwpAddressLookupService.getDwpMappingByOffice(
-                benefitTypeCode, dwpIssuingOffice);
-        return "PIP".equals(benefitTypeCode)
-                ? officeMapping.map(mapping -> mapping.getMapping().getDwpRegionCentre()).orElse(null) :
-                officeMapping.map(mapping -> mapping.getMapping().getCcd()).orElse(null);
+        return dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(benefitTypeCode, dwpIssuingOffice);
     }
 
     private static boolean isDraft(SyaCaseWrapper syaCaseWrapper) {

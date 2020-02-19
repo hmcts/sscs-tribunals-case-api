@@ -1,6 +1,6 @@
 {
   "case_details": {
-    "id": "CASE_ID_TO_BE_REPLACED",
+    "id": 1573207127632814,
     "jurisdiction": "SSCS",
     "state": "withDwp",
     "version": 3,
@@ -107,40 +107,50 @@
         }
       },
       "generatedEmail": "mail@example.com",
+      "draftSscsFurtherEvidenceDocument": [
+        {
+          "value": {
+            "documentType": "appellantEvidence",
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+              "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+              "document_filename": "appellant-some-name.pdf"
+            },
+            "documentFileName": "appellant-some-name.pdf"
+          }
+        },
+        {
+          "value": {
+            "documentType": "representativeEvidence",
+            "documentLink": {
+              "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+              "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+              "document_filename": "reps-some-name.pdf"
+            },
+            "documentFileName": "reps-some-name.pdf"
+          }
+        }
+      ],
       "sscsDocument": [{
         "value": {
           "documentType": "appellantEvidence",
-          "documentEmailContent": null,
           "documentLink": {
-            "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
-            "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
-            "document_filename": "dl6-1567775849641360.pdf"
+            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+            "document_filename": "some-name1.pdf"
           },
-          "documentDateAdded": "2019-09-06",
-          "documentFileName": "dl6-1567775849641360.pdf",
-          "controlNumber": null,
-          "documentComment": null,
-          "evidenceIssued": null,
-          "bundleAddition": null
-        },
-        "id": "ceedc25b-35e6-45f8-b33f-776699e429a7"
+          "documentFileName": "some-name1.pdf"
+        }
       }, {
         "value": {
-          "documentType": null,
-          "documentEmailContent": null,
+          "documentType": "representativeEvidence",
           "documentLink": {
-            "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/88a100bf-75f4-40f3-8f3e-73e04607ffbf",
-            "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/88a100bf-75f4-40f3-8f3e-73e04607ffbf/binary",
-            "document_filename": "Screenshot 2019-09-05 at 11.18.54.pdf"
+            "document_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655",
+            "document_binary_url": "http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655/binary",
+            "document_filename": "some-name2.pdf"
           },
-          "documentDateAdded": null,
-          "documentFileName": null,
-          "controlNumber": null,
-          "documentComment": null,
-          "evidenceIssued": null,
-          "bundleAddition": null
-        },
-        "id": "a8f7e08f-7cfb-4d07-ba7d-d79c9f487910"
+          "documentFileName": "some-name2.pdf"
+        }
       }],
       "dateSentToDwp": "2019-09-06",
       "dwpTimeExtension": [],
@@ -1557,6 +1567,6 @@
       "generatedMobile": "PUBLIC"
     }
   },
-  "event_id": "uploadDocument",
+  "event_id": "uploadDocumentFurtherEvidence",
   "ignore_warning": false
 }

@@ -512,6 +512,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService.submitAppeal(appealData, userToken);
 
+
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(citizenCcdService).draftArchived(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
     }

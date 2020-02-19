@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
@@ -14,16 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceAboutToStartHandlerTest {
@@ -51,7 +42,6 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", false);
     }
 
     @Test
@@ -68,15 +58,11 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     @Parameters({
-        "true, any, 4, true, true, true, true, false, false",
-        "true, null, 4, true, true, false, false, true, true",
-        "true,, 4, true, true, false, false, true, true",
-        "false, null, 3, false, true, false, false, true, true",
-        "false,, 3, false, true, false, false, true, true",
-        "false, any, 3, false, true, true, true, false, false"
+        "any, 4, true, true, true, true, false, false",
+        "null, 4, true, true, false, false, true, true",
+        ", 4, true, true, false, false, true, true"
     })
     public void givenActionFurtherEvidenceAboutToStart_populateFurtherEvidenceDropdown(
-        boolean issueFurtherEvidenceFeature,
         @Nullable String interlocReviewState,
         int expectedListItemSize,
         boolean issueFurtherEvidenceItem,
@@ -90,7 +76,6 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
             .interlocReviewState(interlocReviewState).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        ReflectionTestUtils.setField(handler, "issueFurtherEvidenceFeature", issueFurtherEvidenceFeature);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
