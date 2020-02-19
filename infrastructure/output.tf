@@ -9,7 +9,3 @@ output "vaultName" {
 output "sscs-output" {
   value = "sscs-output"
 }
-
-output "issue_further_evidence_enabled" {
-  value = "${var.issue_further_evidence_enabled}"
-}

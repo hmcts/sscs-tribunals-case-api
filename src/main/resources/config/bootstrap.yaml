@@ -21,3 +21,4 @@ spring:
         appeal-email-from: EMAIL_FROM
         docmosis-api-key: PDF_SERVICE_ACCESS_KEY
         AppInsightsInstrumentationKey: azure.application-insights.instrumentation-key
+        bundle-url: BUNDLE_URL
