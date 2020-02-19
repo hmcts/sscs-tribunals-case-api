@@ -101,16 +101,16 @@ variable "appinsights_instrumentation_key" {
   default     = ""
 }
 
-variable "issue_further_evidence_enabled" {
-  type    = "string"
-  default = "false"
-}
-
 variable "enable_ase" {
   default = false
 }
 
 variable "ready_to_list_offices" {
+  type    = "string"
+  default = ""
+}
+
+variable "bundle_url" {
   type    = "string"
   default = ""
 }

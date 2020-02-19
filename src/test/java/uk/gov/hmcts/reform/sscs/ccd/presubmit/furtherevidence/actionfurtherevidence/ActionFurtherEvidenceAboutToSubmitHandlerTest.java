@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler;
@@ -59,7 +60,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 .fileName("bla.pdf")
                 .subtype("sscs1")
                 .url(DocumentLink.builder().documentUrl("www.test.com").build())
-                .scannedDate("2019-06-12T00:00:00.000")
+                .scannedDate("2019-06-13T00:00:00.000")
                 .controlNumber("123")
                 .build()).build();
 
@@ -109,7 +110,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
                                                                          @Nullable DynamicList originalSender,
                                                                          @Nullable String evidenceHandle,
-                                                                         String expectedDocumentType) {
+                                                                         DocumentType expectedDocumentType) {
         sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
         sscsCaseData.setOriginalSender(originalSender);
         sscsCaseData.setEvidenceHandled(evidenceHandle);
@@ -151,13 +152,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("Yes", response.getData().getEvidenceHandled());
     }
 
-    private void assertHappyPaths(String expectedDocumentType,
+    private void assertHappyPaths(DocumentType expectedDocumentType,
                                   PreSubmitCallbackResponse<SscsCaseData> response) {
+
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(1).getValue();
-        assertEquals("bla.pdf", sscsDocumentDetail.getDocumentFileName());
-        assertEquals(expectedDocumentType, sscsDocumentDetail.getDocumentType());
+        assertEquals((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 13-06-2019", sscsDocumentDetail.getDocumentFileName());
+        assertEquals(expectedDocumentType.getValue(), sscsDocumentDetail.getDocumentType());
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
-        assertEquals("2019-06-12", sscsDocumentDetail.getDocumentDateAdded());
+        assertEquals("2019-06-13", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
         assertEquals("No", response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
@@ -186,38 +188,38 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         return new Object[]{
             //other options scenarios
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "No", "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Yes", "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "No", "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, "Other document"},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "Yes", "Other document"},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "No", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Yes", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "No", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "Yes", OTHER_DOCUMENT},
             //issue parties scenarios
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, "appellantEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "No", "appellantEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "Yes", "appellantEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", "representativeEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "Yes", "representativeEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, "representativeEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "No", "dwpEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "Yes", "dwpEvidence"},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, null, "dwpEvidence"},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "No", APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "Yes", APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "Yes", REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "No", DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "Yes", DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, null, DWP_EVIDENCE},
             //interloc scenarios
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, "appellantEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", "appellantEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "Yes", "appellantEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, "representativeEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "No", "representativeEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "Yes", "representativeEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, null, "dwpEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "No", "dwpEvidence"},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "Yes", "dwpEvidence"},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "Yes", APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "No", REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "Yes", REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, null, DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "No", DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "Yes", DWP_EVIDENCE},
             //edge cases scenarios
-            new Object[]{null, representativeOriginalSender, "", ""}, //edge case: furtherEvidenceActionOption is null
-            new Object[]{furtherEvidenceActionListIssueParties, null, null, ""} //edge case: originalSender is null
+            new Object[]{null, representativeOriginalSender, "", null}, //edge case: furtherEvidenceActionOption is null
+            new Object[]{furtherEvidenceActionListIssueParties, null, null, null} //edge case: originalSender is null
         };
     }
 
@@ -248,8 +250,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("bla2.pdf", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
-        assertEquals("bla.pdf", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("Other document received on 12-06-2019", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Other document received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
         assertNull(response.getData().getScannedDocuments());
     }
