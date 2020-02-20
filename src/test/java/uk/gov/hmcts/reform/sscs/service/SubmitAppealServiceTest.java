@@ -50,11 +50,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -548,7 +544,8 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
             SscsCaseDetails.builder().id(12345678L).build()
         ));
-        List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
+        List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases(
+                Appeal.builder().appellant(Appellant.builder().identity(Identity.builder().nino("ABCDEFG").build()).build()).build(), idamService.getIdamTokens());
 
         assertEquals(1, matchedCases.size());
     }

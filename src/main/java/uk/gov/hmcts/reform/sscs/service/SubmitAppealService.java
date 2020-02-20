@@ -172,9 +172,9 @@ public class SubmitAppealService {
         try {
             caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);;
 
-            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getGeneratedNino(), idamTokens);
+            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getAppeal(), idamTokens);
 
-            log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getGeneratedNino());
+            log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getAppeal().getAppellant().getIdentity().getNino());
 
             if (caseDetails == null) {
                 caseData = addAssociatedCases(caseData, matchedByNinoCases);
@@ -192,7 +192,7 @@ public class SubmitAppealService {
             } else {
                 log.info("Duplicate case {} found for Nino {} and benefit type {}. "
                         + "No need to continue with post create case processing.",
-                    caseDetails.getId(), caseData.getGeneratedNino(),
+                    caseDetails.getId(), caseData.getAppeal().getAppellant().getIdentity().getNino(),
                     caseData.getAppeal().getBenefitType().getCode());
                 return null;
             }
@@ -200,15 +200,15 @@ public class SubmitAppealService {
             throw new CcdException(
                 String.format("Error found in the creating case process for case with Id - %s"
                         + " and Nino - %s and Benefit type - %s and exception: %s",
-                    caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
+                    caseDetails != null ? caseDetails.getId() : "", caseData.getAppeal().getAppellant().getIdentity().getNino(),
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
     }
 
-    protected List<SscsCaseDetails> getMatchedCases(String generatedNino, IdamTokens idamTokens) {
+    protected List<SscsCaseDetails> getMatchedCases(Appeal appeal, IdamTokens idamTokens) {
         HashMap<String, String> map = new HashMap<String, String>();
 
-        map.put("case.generatedNino", generatedNino);
+        map.put("case.appeal.appellant.identity.nino", appeal.getAppellant().getIdentity().getNino());
 
         return ccdService.findCaseBy(map, idamTokens);
     }
