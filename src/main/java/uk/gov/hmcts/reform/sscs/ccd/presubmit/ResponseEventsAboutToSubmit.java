@@ -19,6 +19,10 @@ public class ResponseEventsAboutToSubmit {
     }
 
     private String buildCaseCode(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
+        if (sscsCaseData.getBenefitCode() != null && sscsCaseData.getIssueCode() != null) {
+            return sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
+        } else {
+            return null;
+        }
     }
 }
