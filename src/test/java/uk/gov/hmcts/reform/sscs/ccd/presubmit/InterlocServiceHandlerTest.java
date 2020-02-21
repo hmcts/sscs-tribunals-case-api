@@ -59,7 +59,6 @@ public class InterlocServiceHandlerTest {
         "REINSTATE_APPEAL, ABOUT_TO_SUBMIT, true",
         "TCW_DECISION_APPEAL_TO_PROCEED, ABOUT_TO_SUBMIT, true",
         "JUDGE_DECISION_APPEAL_TO_PROCEED, ABOUT_TO_SUBMIT, true",
-        "UPLOAD_FURTHER_EVIDENCE, ABOUT_TO_SUBMIT, true",
         "SEND_TO_ADMIN, ABOUT_TO_SUBMIT, true",
         "DWP_CHALLENGE_VALIDITY, ABOUT_TO_SUBMIT, true",
         "DWP_CHALLENGE_VALIDITY, ABOUT_TO_START, false",
@@ -82,7 +81,6 @@ public class InterlocServiceHandlerTest {
         "INTERLOC_INFORMATION_RECEIVED, awaitingAdminAction",
         "JUDGE_DIRECTION_ISSUED, awaitingInformation",
         "REINSTATE_APPEAL, awaitingAdminAction",
-        "UPLOAD_FURTHER_EVIDENCE, awaitingAdminAction",
         "TCW_DECISION_APPEAL_TO_PROCEED, none",
         "JUDGE_DECISION_APPEAL_TO_PROCEED, none",
         "SEND_TO_ADMIN, awaitingAdminAction"
