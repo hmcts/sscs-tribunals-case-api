@@ -90,5 +90,4 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
-
 }
