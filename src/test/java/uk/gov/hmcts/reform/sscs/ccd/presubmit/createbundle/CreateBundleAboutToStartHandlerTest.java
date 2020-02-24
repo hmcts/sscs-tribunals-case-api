@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
-public class CreateBundleAboutToStartTest {
+public class CreateBundleAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private CreateBundleAboutToStartHandler handler;
@@ -66,6 +66,7 @@ public class CreateBundleAboutToStartTest {
 
     @Test
     public void givenDwpResponseDocumentHasEmptyFileName_thenPopulateFileName() {
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -75,6 +76,7 @@ public class CreateBundleAboutToStartTest {
     @Test
     public void givenDwpEvidenceDocumentHasEmptyFileName_thenPopulateFileName() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX, response.getData().getDwpEvidenceBundleDocument().getDocumentFileName());
@@ -89,6 +91,9 @@ public class CreateBundleAboutToStartTest {
         docs.add(sscsDocument);
 
         callback.getCaseDetails().getCaseData().setSscsDocument(docs);
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("test.com", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
@@ -96,8 +101,39 @@ public class CreateBundleAboutToStartTest {
 
     @Test
     public void givenCreateBundleEvent_thenTriggerTheExternalCreateBundleEvent() {
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+    }
+
+    @Test
+    public void givenEmptyDwpEvidenceBundleDocumentLink_thenReturnError() {
+
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream()
+                .findFirst()
+                .orElse("");
+        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
+    }
+
+    @Test
+    public void givenEmptyDwpResponseDocumentLink_thenReturnError() {
+
+        callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream()
+                .findFirst()
+                .orElse("");
+        assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
     }
 }
