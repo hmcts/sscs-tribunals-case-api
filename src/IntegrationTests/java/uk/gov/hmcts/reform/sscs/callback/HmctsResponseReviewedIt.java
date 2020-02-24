@@ -79,7 +79,7 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        assertEquals("002DD", result.getData().getCaseCode());
+        assertEquals("002CC", result.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), result.getData().getDwpResponseDate());
     }
 
