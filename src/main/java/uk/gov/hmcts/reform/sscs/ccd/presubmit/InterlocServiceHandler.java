@@ -34,7 +34,6 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT, REVIEW_BY_TCW.getId());
         eventTypeToSecondaryStatus.put(EventType.NON_COMPLIANT_SEND_TO_INTERLOC, REVIEW_BY_TCW.getId());
         eventTypeToSecondaryStatus.put(EventType.REINSTATE_APPEAL, AWAITING_ADMIN_ACTION.getId());
-        eventTypeToSecondaryStatus.put(EventType.UPLOAD_FURTHER_EVIDENCE, AWAITING_ADMIN_ACTION.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_DECISION_APPEAL_TO_PROCEED, NONE.getId());
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DECISION_APPEAL_TO_PROCEED, NONE.getId());
         eventTypeToSecondaryStatus.put(EventType.SEND_TO_ADMIN, AWAITING_ADMIN_ACTION.getId());
