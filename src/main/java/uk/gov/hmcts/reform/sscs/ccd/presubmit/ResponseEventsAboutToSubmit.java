@@ -11,6 +11,8 @@ public class ResponseEventsAboutToSubmit {
         }
         if (sscsCaseData.getIssueCode() == null) {
             preSubmitCallbackResponse.addError("Issue code cannot be empty");
+        } else if (sscsCaseData.getIssueCode().equals("DD")) {
+            preSubmitCallbackResponse.addError("Issue code cannot be set to the default value of DD");
         }
     }
 
