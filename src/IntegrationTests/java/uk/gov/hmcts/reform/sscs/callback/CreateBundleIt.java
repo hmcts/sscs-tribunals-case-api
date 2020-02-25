@@ -27,6 +27,8 @@ import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpResponseDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
@@ -65,7 +67,9 @@ public class CreateBundleIt extends AbstractEventIt {
 
     @Test
     public void callToAboutToSubmitHandler_willCallExternalCreateBundleService() throws Exception {
-        SscsCaseData caseData = SscsCaseData.builder().build();
+        SscsCaseData caseData = SscsCaseData.builder()
+                .dwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build())
+                .dwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build()).build();
         when(restTemplate.exchange(eq("/api/new-bundle"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class))).thenReturn(responseEntity);
 
         when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));

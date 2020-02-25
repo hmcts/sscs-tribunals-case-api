@@ -15,7 +15,9 @@ public class ResponseEventsAboutToSubmit {
     }
 
     public void setCaseCode(SscsCaseData sscsCaseData) {
-        sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
+        if (sscsCaseData.getBenefitCode() != null && sscsCaseData.getIssueCode() != null) {
+            sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
+        }
     }
 
     private String buildCaseCode(SscsCaseData sscsCaseData) {
