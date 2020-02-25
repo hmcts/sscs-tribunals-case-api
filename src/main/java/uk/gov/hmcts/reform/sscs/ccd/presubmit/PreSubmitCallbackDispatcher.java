@@ -43,6 +43,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
                 callbackResponse.setData(callbackResponseFromHandler.getData());
                 callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
+                callbackResponse.addWarnings(callbackResponseFromHandler.getWarnings());
             }
         }
     }

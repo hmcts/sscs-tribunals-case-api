@@ -49,8 +49,10 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         if (sscsCaseData.getCaseBundles() != null) {
+            boolean eligibleForStitching = false;
             for (Bundle bundle : sscsCaseData.getCaseBundles()) {
                 if ("Yes".equals(bundle.getValue().getEligibleForStitching())) {
+                    eligibleForStitching = true;
                     bundle.getValue().setFileName("SscsBundle.pdf");
                     bundle.getValue().setCoverpageTemplate("SSCS-cover-page.docx");
                     bundle.getValue().setHasTableOfContents("Yes");
@@ -60,7 +62,13 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
                     bundle.getValue().setStitchedDocument(null);
                 }
             }
-            return bundleRequestExecutor.post(callback, bundleUrl + EDIT_BUNDLE_ENDPOINT);
+            if (!eligibleForStitching && !callback.isIgnoreWarnings()) {
+                PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+                preSubmitCallbackResponse.addWarning("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?");
+                return preSubmitCallbackResponse;
+            } else {
+                return bundleRequestExecutor.post(callback, bundleUrl + EDIT_BUNDLE_ENDPOINT);
+            }
         } else {
             return null;
         }

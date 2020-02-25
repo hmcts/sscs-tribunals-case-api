@@ -90,8 +90,7 @@ public class CcdCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
             new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
-            Optional.empty(),
-            ACTION_FURTHER_EVIDENCE));
+            Optional.empty(), ACTION_FURTHER_EVIDENCE, false));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().originalSender(
             new DynamicList(new DynamicListItem("1", "2"), null)).build());
@@ -116,8 +115,7 @@ public class CcdCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
             new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
-            Optional.empty(),
-            INTERLOC_INFORMATION_RECEIVED));
+            Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
         when(dispatcher.handle(any(CallbackType.class), any(), anyString()))
@@ -156,7 +154,7 @@ public class CcdCallbackControllerTest {
     private Callback<SscsCaseData> buildCallbackForTestScenarioForGivenEvent() {
         CaseDetails<SscsCaseData> caseDetail = new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE,
             SscsCaseData.builder().build(), LocalDateTime.now());
-        return new Callback<>(caseDetail, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE);
+        return new Callback<>(caseDetail, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -77,5 +78,22 @@ public class EditBundleIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
 
         verify(restTemplate).exchange(eq("/api/stitch-ccd-bundles"), eq(HttpMethod.POST), any(), any(ParameterizedTypeReference.class));
+    }
+
+    @Test
+    public void callToAboutToSubmitHandlerWithNoBundleSelectedToAmend_willReturnWarningToCaseworker() throws Exception {
+        json = getJson("callback/editBundleCallbackNoBundleToAmend.json");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertHttpStatus(response, HttpStatus.OK);
+
+        String warning = result.getWarnings().stream()
+                .findFirst()
+                .orElse("");
+        assertEquals("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?", warning);
+
     }
 }
