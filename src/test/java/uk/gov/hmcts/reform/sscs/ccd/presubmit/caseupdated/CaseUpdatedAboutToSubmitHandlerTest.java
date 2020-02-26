@@ -75,6 +75,16 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals("002DD", response.getData().getCaseCode());
     }
 
+    @Test
+    public void givenACaseUpdatedEventWithEmptyBenefitCodeAndCaseCode_thenDoNotOverrideCaseCode() {
+        callback.getCaseDetails().getCaseData().setBenefitCode(null);
+        callback.getCaseDetails().getCaseData().setIssueCode(null);
+        callback.getCaseDetails().getCaseData().setCaseCode("002DD");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("002DD", response.getData().getCaseCode());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);

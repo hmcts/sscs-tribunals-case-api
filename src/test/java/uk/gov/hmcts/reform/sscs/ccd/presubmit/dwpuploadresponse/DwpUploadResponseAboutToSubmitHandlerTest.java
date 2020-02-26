@@ -41,7 +41,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode("002")
-            .issueCode("DD")
+            .issueCode("CC")
             .dwpFurtherInfo("Yes")
             .build();
 
@@ -66,7 +66,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenADwpUploadResponseEvent_thenSetCaseCode() {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("002DD", response.getData().getCaseCode());
+        assertEquals("002CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpResponseDate());
     }
 
@@ -111,6 +111,18 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenADwpUploadResponseEventWithIssueCodeSetToDD_displayAnError() {
+        callback.getCaseDetails().getCaseData().setIssueCode("DD");
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("Issue code cannot be set to the default value of DD", error);
+        }
     }
 
     @Test
