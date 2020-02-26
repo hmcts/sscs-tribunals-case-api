@@ -211,7 +211,7 @@ dependencyManagement {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.3.60') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.3.61') {
             entry 'kotlin-stdlib'
         }
 
