@@ -19,8 +19,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -31,7 +30,7 @@ public class CitizenCcdServiceTest {
 
     private static final String CREATE_DRAFT = "createDraft";
     private static final String UPDATE_DRAFT = "updateDraft";
-    private static final IdamTokens IDAM_TOKENS = IdamTokens.builder().build();
+    private static final IdamTokens IDAM_TOKENS = IdamTokens.builder().email("dummy@email.com").build();
 
     private CitizenCcdService citizenCcdService;
 
@@ -102,5 +101,96 @@ public class CitizenCcdServiceTest {
 
         assertNotNull(sscsCaseDetails);
         assertTrue(sscsCaseDetails.isPresent());
+    }
+
+    @Test
+    public void shouldNotAssociateCaseToCitizenWhenCaseDetailsIsNull() {
+        Long caseId = 1234L;
+        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(null);
+
+        citizenCcdService.associateCaseToCitizen(IDAM_TOKENS, caseId, IDAM_TOKENS);
+
+        verifyNoMoreInteractions(citizenCcdClient);
+    }
+
+    @Test
+    public void shouldNotAssociateCaseToCitizenWhenCaseDataIsNull() {
+        Long caseId = 1234L;
+        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(null).build());
+
+        citizenCcdService.associateCaseToCitizen(IDAM_TOKENS, caseId, IDAM_TOKENS);
+
+        verifyNoMoreInteractions(citizenCcdClient);
+    }
+
+    @Test
+    public void shouldNotAssociateCaseToCitizenWhenPostcodeIsNull() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .address(Address.builder().postcode(null).build())
+                                .build()).build())
+                .build();
+        Long caseId = 1234L;
+        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
+        citizenCcdService.associateCaseToCitizen(IDAM_TOKENS, caseId, IDAM_TOKENS);
+
+        verifyNoMoreInteractions(citizenCcdClient);
+    }
+
+    @Test
+    public void shouldNotAssociateCaseToCitizenWhenSubscriptionIsNull() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .address(Address.builder().postcode("TS1 1ST").build())
+                                .build()).build())
+                .subscriptions(null)
+                .build();
+        Long caseId = 1234L;
+        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
+        citizenCcdService.associateCaseToCitizen(IDAM_TOKENS, caseId, IDAM_TOKENS);
+
+        verifyNoMoreInteractions(citizenCcdClient);
+    }
+
+    @Test
+    public void shouldNotAssociateCaseToCitizenWhenEmailIsNotSame() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .address(Address.builder().postcode("TS1 1ST").build())
+                                .build()).build())
+                .subscriptions(Subscriptions.builder()
+                        .appellantSubscription(Subscription.builder()
+                                .email("notmatching@email.com").build()).build())
+                .build();
+        Long caseId = 1234L;
+        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
+        citizenCcdService.associateCaseToCitizen(IDAM_TOKENS, caseId, IDAM_TOKENS);
+
+        verifyNoMoreInteractions(citizenCcdClient);
+    }
+
+    @Test
+    public void shouldAssociateCaseToCitizenWhenSubscriptionEmailIsSame() {
+        SscsCaseData caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .appellant(Appellant.builder()
+                                .address(Address.builder().postcode("TS1 1ST").build())
+                                .build()).build())
+                .subscriptions(Subscriptions.builder()
+                        .appellantSubscription(Subscription.builder()
+                                .email("dummy@email.com").build()).build())
+                .build();
+        Long caseId = 1234L;
+        when(ccdService.getByCaseId(caseId,IDAM_TOKENS)).thenReturn(SscsCaseDetails.builder().data(caseData).build());
+
+        citizenCcdService.associateCaseToCitizen(IDAM_TOKENS, caseId, IDAM_TOKENS);
+
+        verify(citizenCcdClient).addUserToCase(eq(IDAM_TOKENS), eq(IDAM_TOKENS.getUserId()), eq(caseId));
     }
 }

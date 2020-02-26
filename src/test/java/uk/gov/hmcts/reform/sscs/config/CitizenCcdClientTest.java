@@ -10,6 +10,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -25,12 +26,15 @@ public class CitizenCcdClientTest {
     private CoreCaseDataApi coreCaseDataApi;
 
     @Mock
+    private CaseAccessApi caseAccessApi;
+
+    @Mock
     private IdamTokens idamTokens;
 
     @Before
     public void setup() {
         initMocks(this);
-        citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi);
+        citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi, caseAccessApi);
         when(idamTokens.getIdamOauth2Token()).thenReturn("token");
         when(idamTokens.getServiceAuthorization()).thenReturn("s2s");
         when(idamTokens.getUserId()).thenReturn("1");
