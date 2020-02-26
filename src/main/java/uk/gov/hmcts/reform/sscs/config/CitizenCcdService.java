@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
+import static java.util.stream.Stream.of;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -99,6 +101,35 @@ public class CitizenCcdService {
         CaseDataContent caseDataContent = sscsCcdConvertService.getCaseDataContent(caseData, startEventResponse, summary, description);
         caseDetails = citizenCcdClient.submitEventForCitizen(idamTokens, caseId, caseDataContent);
         return caseDetails;
+    }
+
+    public void associateCaseToCitizen(IdamTokens citizenIdamTokens, Long caseId, IdamTokens idamTokens) {
+        SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(caseId, idamTokens);
+        if (sscsCaseDetails != null && sscsCaseDetails.getData() != null) {
+            SscsCaseData caseData = sscsCaseDetails.getData();
+            if (hasAppellantPostcode(caseData)) {
+                if (caseHasSubscriptionWithEmail(citizenIdamTokens, caseData)) {
+                    log.info("Associate case: Found matching subscription email for case id {}", caseId);
+                    citizenCcdClient.addUserToCase(idamTokens, citizenIdamTokens.getUserId(), caseId);
+                } else {
+                    log.info("Associate case: Subscription email does not match id {}", caseId);
+                }
+            } else {
+                log.info("Associate case: Postcode does not exists for case id {}", caseId);
+            }
+        }
+    }
+
+    private boolean hasAppellantPostcode(SscsCaseData caseData) {
+        return caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null
+                && caseData.getAppeal().getAppellant().getAddress() != null
+                && caseData.getAppeal().getAppellant().getAddress().getPostcode() != null;
+    }
+
+    private boolean caseHasSubscriptionWithEmail(IdamTokens citizenIdamTokens, SscsCaseData caseData) {
+        Subscriptions subscriptions = caseData.getSubscriptions();
+        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
+                .anyMatch(subscription -> subscription != null && citizenIdamTokens.getEmail().equalsIgnoreCase(subscription.getEmail()));
     }
 
 }

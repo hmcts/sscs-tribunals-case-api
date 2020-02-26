@@ -6,10 +6,12 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.ccd.client.CaseAccessApi;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.ccd.client.model.UserId;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -19,12 +21,15 @@ class CitizenCcdClient {
 
     private final CcdRequestDetails ccdRequestDetails;
     private final CoreCaseDataApi coreCaseDataApi;
+    private final CaseAccessApi caseAccessApi;
 
     @Autowired
     CitizenCcdClient(CcdRequestDetails ccdRequestDetails,
-                     CoreCaseDataApi coreCaseDataApi) {
+                     CoreCaseDataApi coreCaseDataApi,
+                     CaseAccessApi caseAccessApi) {
         this.ccdRequestDetails = ccdRequestDetails;
         this.coreCaseDataApi = coreCaseDataApi;
+        this.caseAccessApi = caseAccessApi;
     }
 
     StartEventResponse startCaseForCitizen(IdamTokens idamTokens, String eventId) {
@@ -85,6 +90,30 @@ class CitizenCcdClient {
             ccdRequestDetails.getCaseTypeId(),
             caseId,
             eventType
+        );
+    }
+
+    void addUserToCase(IdamTokens idamTokens, String userIdToAdd, Long caseId) {
+        caseAccessApi.grantAccessToCase(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                idamTokens.getUserId(),
+                ccdRequestDetails.getJurisdictionId(),
+                ccdRequestDetails.getCaseTypeId(),
+                caseId.toString(),
+                new UserId(userIdToAdd)
+        );
+    }
+
+    void removeUserFromCase(IdamTokens idamTokens, String userIdToRemove, Long caseId) {
+        caseAccessApi.revokeAccessToCase(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                idamTokens.getUserId(),
+                ccdRequestDetails.getJurisdictionId(),
+                ccdRequestDetails.getCaseTypeId(),
+                caseId.toString(),
+                userIdToRemove
         );
     }
 }
