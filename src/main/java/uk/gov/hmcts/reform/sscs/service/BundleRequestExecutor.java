@@ -58,7 +58,7 @@ public class BundleRequestExecutor {
             response =
                 restTemplate
                     .exchange(
-                            endpoint,
+                        endpoint,
                         HttpMethod.POST,
                         requestEntity,
                         new ParameterizedTypeReference<PreSubmitCallbackResponse<SscsCaseData>>() {
@@ -66,10 +66,7 @@ public class BundleRequestExecutor {
                     ).getBody();
 
         } catch (RestClientResponseException e) {
-
-            throw new DocumentServiceResponseException(
-                "Couldn't create bundle using API: ", e
-            );
+            throw new DocumentServiceResponseException("Couldn't create bundle using API: ", e);
         }
 
         return response;

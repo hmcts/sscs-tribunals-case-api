@@ -27,7 +27,7 @@
       "dwpTimeExtension": [
       ],
       "createdInGapsFrom": "readyToList",
-      "issueCode": "CC",
+      "issueCode": "DD",
       "benefitCode": "002",
       "isInterlocRequired": "IS_INTERLOC_REQUIRED_VALUE",
       "generatedNino": "JT 12 34 56 D",
@@ -110,7 +110,24 @@
             }
           }
         }],
-      "reissueFurtherEvidenceDocument": {},
+      "caseBundles" : [ {
+        "value" : {
+          "description" : "My bundle",
+          "documents" : [{
+            "value" : {
+              "name": "My document",
+              "sourceDocument" : {
+                "document_url": "http://www.bbc.com",
+                "document_binary_url": "http://www.bbc.com/binary",
+                "document_filename": "myfile1.jpg"
+              }
+            }
+          }],
+          "eligibleForStitching" : "Yes"
+        }
+      }],
+
+"reissueFurtherEvidenceDocument": {},
       "resendToAppellant": "NO",
       "resendToRepresentative": "NO",
       "resendToDwp": "NO",
@@ -649,5 +666,5 @@
       }
     }
   },
-  "event_id": "hmctsResponseReviewed"
+  "event_id": "editBundle"
 }
