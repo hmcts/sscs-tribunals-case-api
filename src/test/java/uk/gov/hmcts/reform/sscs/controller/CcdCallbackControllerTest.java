@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
@@ -16,12 +17,11 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -46,7 +46,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @SuppressWarnings("unchecked")
 @RunWith(JUnitParamsRunner.class)
-@WebMvcTest(CcdCallbackController.class)
 public class CcdCallbackControllerTest {
 
     // begin: needed to use spring runner and junitparamsRunner together
@@ -60,7 +59,6 @@ public class CcdCallbackControllerTest {
 
     // end
 
-    @Autowired
     private MockMvc mockMvc;
 
     @SuppressWarnings("PMD.UnusedPrivateField")
@@ -81,6 +79,14 @@ public class CcdCallbackControllerTest {
 
     @MockBean
     private IdamService idamService;
+
+    private CcdCallbackController controller;
+
+    @Before
+    public void setUp() {
+        controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        mockMvc = standaloneSetup(controller).build();
+    }
 
     @Test
     public void handleCcdAboutToStartCallbackAndUpdateCaseData() throws Exception {
