@@ -104,7 +104,7 @@ public class SubmitDraftTest {
         useRelaxedHTTPSValidation();
         citizenToken = getIdamOauth2Token(username, password);
         UserDetails userDetails = idamService.getUserDetails(citizenToken);
-                citizenIdamTokens = IdamTokens.builder()
+        citizenIdamTokens = IdamTokens.builder()
             .idamOauth2Token(citizenToken)
             .serviceAuthorization(authTokenGenerator.generate())
             .userId(userDetails.getId())
