@@ -54,6 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/tokens/**").permitAll()
                 .antMatchers("/appeals").permitAll()
                 .antMatchers("/appeals/**").permitAll()
+                .antMatchers("/evidence/upload").permitAll()
                 .anyRequest().authenticated()
             .and()
         ;
