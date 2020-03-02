@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -99,9 +100,12 @@ public class SubmitAppealService {
         }
         IdamTokens idamTokens = getUserTokens(oauth2Token);
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
-
-        if (CollectionUtils.isNotEmpty(caseDetailsList)) {
-            caseDetails = caseDetailsList.get(0);
+        List<SscsCaseData> filteredCaseDetails = caseDetailsList.stream().filter(caseData ->
+                CREATE_DRAFT.getCcdType().equalsIgnoreCase(caseData.getLatestEventType())
+                        || UPDATE_DRAFT.getCcdType().equalsIgnoreCase(caseData.getLatestEventType()))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(filteredCaseDetails)) {
+            caseDetails = filteredCaseDetails.get(0);
             sessionDraft = convertAIntoBService.convert(caseDetails);
         }
         log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",

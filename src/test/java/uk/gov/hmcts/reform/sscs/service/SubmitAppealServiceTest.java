@@ -20,10 +20,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
@@ -50,11 +47,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
@@ -287,12 +280,35 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void shouldGetADraftIfItExists() {
-        when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder().build()));
+        List<Event> events = new ArrayList<>();
+        Event draftEvent = Event.builder().value(EventDetails.builder()
+                .type(UPDATE_DRAFT.getCcdType()).build()).build();
+        events.add(draftEvent);
+        when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder()
+                .events(events).build()));
         when(convertAIntoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertTrue(optionalSessionDraft.isPresent());
         verify(idamService).verifyTokenSignature(any());
     }
+
+    @Test
+    public void shouldGetADraftAndFilterOnlyCurrentDraftIfItExists() {
+        List<Event> events = new ArrayList<>();
+        Event draftEvent = Event.builder().value(EventDetails.builder()
+                .type(UPDATE_DRAFT.getCcdType()).build()).build();
+        Event archivedDraftEvent = Event.builder().value(EventDetails.builder()
+                .type(DRAFT_ARCHIVED.getCcdType()).build()).build();
+        events.add(draftEvent);
+        events.add(archivedDraftEvent);
+        when(citizenCcdService.findCase(any())).thenReturn(Collections.singletonList(SscsCaseData.builder()
+                .events(events).build()));
+        when(convertAIntoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
+        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
+        assertTrue(optionalSessionDraft.isPresent());
+        verify(idamService).verifyTokenSignature(any());
+    }
+
 
     @Test(expected = InvalidSubscriptionTokenException.class)
     public void shouldThrowInvalidTokenExceptionWhenGetADraftCase() {
