@@ -148,7 +148,7 @@ public class SyaEndpointsIt {
             .willReturn(authorize);
 
         given(authTokenGenerator.generate()).willReturn("authToken");
-        given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId",
+        given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId", "dummy@email.com",
                 Arrays.asList("caseworker", "citizen")));
 
         UploadResponse uploadResponse = createUploadResponse();

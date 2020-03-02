@@ -40,7 +40,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null))
                 .benefitCode("002")
-                .issueCode("DD")
+                .issueCode("CC")
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -61,7 +61,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
     public void givenAHmctsResponseReviewedEventWithNoDwpResponseDate_thenSetCaseCodeAndDefaultDwpResponseDateToToday() {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("002DD", response.getData().getCaseCode());
+        assertEquals("002CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), response.getData().getDwpResponseDate());
     }
 
@@ -71,7 +71,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("002DD", response.getData().getCaseCode());
+        assertEquals("002CC", response.getData().getCaseCode());
         assertEquals(LocalDate.now().minusDays(1).toString(), response.getData().getDwpResponseDate());
     }
 
@@ -96,6 +96,18 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
 
         for (String error : response.getErrors()) {
             assertEquals("Issue code cannot be empty", error);
+        }
+    }
+
+    @Test
+    public void givenAHmctsResponseReviewedWithIssueCodeSetToDD_displayAnError() {
+        callback.getCaseDetails().getCaseData().setIssueCode("DD");
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("Issue code cannot be set to the default value of DD", error);
         }
     }
 
