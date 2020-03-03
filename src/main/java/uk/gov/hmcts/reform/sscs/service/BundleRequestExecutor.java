@@ -54,6 +54,8 @@ public class BundleRequestExecutor {
 
         PreSubmitCallbackResponse<SscsCaseData> response;
 
+        log.info("About to hit bundling service with url: " + endpoint + " for case id: " + payload.getCaseDetails().getId());
+
         try {
             response =
                 restTemplate
