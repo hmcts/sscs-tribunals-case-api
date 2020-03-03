@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -50,7 +51,7 @@ public class SscsPdfServiceTest {
         service.generateAndSendPdf(caseData, 1L, IdamTokens.builder().build(), "appellantEvidence");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(emailService).sendEmail(any());
+        verify(emailService).sendEmail(eq(1L), any());
         verify(ccdPdfService).mergeDocIntoCcd(any(), any(), any(), any(), any(), any());
     }
 
@@ -64,7 +65,7 @@ public class SscsPdfServiceTest {
         service.generateAndSendPdf(caseData, 1L, IdamTokens.builder().build(), "appellantEvidence");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(emailService).sendEmail(any());
+        verify(emailService).sendEmail(eq(1L), any());
         verify(ccdPdfService).mergeDocIntoCcd(any(), any(), any(), any(), any(), any());
     }
 
@@ -78,7 +79,7 @@ public class SscsPdfServiceTest {
         service.generateAndSendPdf(caseData, 1L, IdamTokens.builder().build(), "appellantEvidence");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(emailService).sendEmail(any());
+        verify(emailService).sendEmail(eq(1L), any());
         verify(ccdPdfService).mergeDocIntoCcd(any(), any(), any(), any(), any(), any());
     }
 }
