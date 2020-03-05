@@ -321,7 +321,7 @@ public class SubmitAppealServiceTest {
             "Bloggs_33C",
             newArrayList(pdf(expected, "Bloggs_33C.pdf"))
         );
-        verify(emailService).sendEmail(expectedEmail);
+        verify(emailService).sendEmail(123L, expectedEmail);
     }
 
     @Test
