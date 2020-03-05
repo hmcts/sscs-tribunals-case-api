@@ -90,7 +90,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             State.INTERLOCUTORY_REVIEW_STATE, SscsCaseData.builder().build(), LocalDateTime.now());
 
         Callback<SscsCaseData> callbackWithRightEventAndNullField = new Callback<>(caseDetails, Optional.empty(),
-            ACTION_FURTHER_EVIDENCE);
+            ACTION_FURTHER_EVIDENCE, false);
 
         return new Object[]{
             new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, true},
@@ -113,7 +113,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
-        return new Callback<>(caseDetails, Optional.empty(), eventType);
+        return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
     @Test
