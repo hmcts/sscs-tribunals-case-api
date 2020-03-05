@@ -299,7 +299,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
-        return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE);
+        return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
     @Test
