@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.ccd.client.model.UserId;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
@@ -56,6 +57,7 @@ class CitizenCcdClient {
 
     List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("state", State.DRAFT.getId());
         searchCriteria.put("sortDirection", "desc");
         return coreCaseDataApi.searchForCitizen(
             idamTokens.getIdamOauth2Token(),
