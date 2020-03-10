@@ -103,11 +103,11 @@ public class SubmitDraftTest {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
         citizenToken = getIdamOauth2Token(username, password);
-        UserDetails userDetails = idamService.getUserDetails(citizenToken);
+        UserDetails userDetails = getUserDetails(citizenToken);
         userIdamTokens = idamService.getIdamTokens();
         citizenIdamTokens = IdamTokens.builder()
             .idamOauth2Token(citizenToken)
-            .serviceAuthorization(userIdamTokens.getIdamOauth2Token())
+            .serviceAuthorization(authTokenGenerator.generate())
             .userId(userDetails.getId())
             .roles(userDetails.getRoles())
             .email(userDetails.getEmail())
@@ -124,8 +124,8 @@ public class SubmitDraftTest {
         }
     }
 
-    private String getUserId(String userToken) {
-        return idamApiClient.getUserDetails(userToken).getId();
+    private UserDetails getUserDetails(String userToken) {
+        return idamApiClient.getUserDetails(userToken);
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
