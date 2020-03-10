@@ -152,7 +152,7 @@ public class SubmitDraftTest {
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, citizenToken))
+            .header(new Header(AUTHORIZATION, citizenIdamTokens.getIdamOauth2Token()))
             .body(body)
             .put("/drafts");
 
@@ -181,7 +181,7 @@ public class SubmitDraftTest {
     public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
         saveDraft(draftAppeal);
         RestAssured.given()
-            .header(new Header(AUTHORIZATION, citizenToken))
+            .header(new Header(AUTHORIZATION, citizenIdamTokens.getIdamOauth2Token()))
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.SC_OK)
@@ -214,7 +214,7 @@ public class SubmitDraftTest {
         return RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, citizenToken))
+            .header(new Header(AUTHORIZATION, citizenIdamTokens.getIdamOauth2Token()))
             .body(SyaServiceHelper.asJsonString(draftAppeal))
             .put("/drafts");
     }
