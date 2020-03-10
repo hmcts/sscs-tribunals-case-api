@@ -153,7 +153,6 @@ public class SubmitDraftTest {
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(AUTHORIZATION, citizenToken)
-            .header("ServiceAuthorization", userIdamTokens.getServiceAuthorization())
             .body(body)
             .put("/drafts");
 
@@ -183,7 +182,6 @@ public class SubmitDraftTest {
         saveDraft(draftAppeal);
         RestAssured.given()
             .header(AUTHORIZATION, citizenToken)
-            .header("ServiceAuthorization", userIdamTokens.getServiceAuthorization())
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.SC_OK)
@@ -194,7 +192,6 @@ public class SubmitDraftTest {
     public void givenGetDraftsIsCalledWithWrongCredentials_shouldReturn500Unauthorised() {
         RestAssured.given()
             .header(AUTHORIZATION, "thisTokenIsIncorrect")
-            .header("ServiceAuthorization", userIdamTokens.getServiceAuthorization())
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.SC_FORBIDDEN);
@@ -218,7 +215,6 @@ public class SubmitDraftTest {
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(AUTHORIZATION, citizenToken)
-            .header("ServiceAuthorization", userIdamTokens.getServiceAuthorization())
             .body(SyaServiceHelper.asJsonString(draftAppeal))
             .put("/drafts");
     }
@@ -248,7 +244,7 @@ public class SubmitDraftTest {
             " "
         );
 
-        return "Bearer " + authorizeToken.getAccessToken();
+        return authorizeToken.getAccessToken();
     }
 
 }
