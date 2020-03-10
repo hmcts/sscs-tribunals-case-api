@@ -104,15 +104,14 @@ public class SubmitDraftTest {
         useRelaxedHTTPSValidation();
         citizenToken = getIdamOauth2Token(username, password);
         UserDetails userDetails = idamService.getUserDetails(citizenToken);
+        userIdamTokens = idamService.getIdamTokens();
         citizenIdamTokens = IdamTokens.builder()
             .idamOauth2Token(citizenToken)
-            .serviceAuthorization(authTokenGenerator.generate())
+            .serviceAuthorization(userIdamTokens.getIdamOauth2Token())
             .userId(userDetails.getId())
             .roles(userDetails.getRoles())
             .email(userDetails.getEmail())
             .build();
-
-        userIdamTokens = idamService.getIdamTokens();
         draftAppeal = buildTestDraftAppeal();
     }
 
