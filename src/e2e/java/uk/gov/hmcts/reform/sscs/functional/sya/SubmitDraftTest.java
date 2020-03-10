@@ -40,7 +40,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.idam.*;
+import uk.gov.hmcts.reform.sscs.idam.Authorize;
+import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
@@ -103,15 +106,13 @@ public class SubmitDraftTest {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
         citizenToken = getIdamOauth2Token(username, password);
-        UserDetails userDetails = getUserDetails(citizenToken);
-        userIdamTokens = idamService.getIdamTokens();
         citizenIdamTokens = IdamTokens.builder()
             .idamOauth2Token(citizenToken)
             .serviceAuthorization(authTokenGenerator.generate())
-            .userId(userDetails.getId())
-            .roles(userDetails.getRoles())
-            .email(userDetails.getEmail())
+            .userId(getUserId(citizenToken))
             .build();
+
+        userIdamTokens = idamService.getIdamTokens();
         draftAppeal = buildTestDraftAppeal();
     }
 
@@ -124,8 +125,8 @@ public class SubmitDraftTest {
         }
     }
 
-    private UserDetails getUserDetails(String userToken) {
-        return idamApiClient.getUserDetails(userToken);
+    private String getUserId(String userToken) {
+        return idamApiClient.getUserDetails(userToken).getId();
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
@@ -152,7 +153,7 @@ public class SubmitDraftTest {
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, citizenIdamTokens.getIdamOauth2Token()))
+            .header(new Header(AUTHORIZATION, citizenToken))
             .body(body)
             .put("/drafts");
 
@@ -181,7 +182,7 @@ public class SubmitDraftTest {
     public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
         saveDraft(draftAppeal);
         RestAssured.given()
-            .header(new Header(AUTHORIZATION, citizenIdamTokens.getIdamOauth2Token()))
+            .header(new Header(AUTHORIZATION, citizenToken))
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.SC_OK)
@@ -214,7 +215,7 @@ public class SubmitDraftTest {
         return RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, citizenIdamTokens.getIdamOauth2Token()))
+            .header(new Header(AUTHORIZATION, citizenToken))
             .body(SyaServiceHelper.asJsonString(draftAppeal))
             .put("/drafts");
     }
