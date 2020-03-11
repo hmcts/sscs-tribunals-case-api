@@ -234,7 +234,6 @@ configurations.all {
 dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-security'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator'
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
