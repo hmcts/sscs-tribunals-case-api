@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.ALL_DETAILS
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.http.Header;
 import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.util.Base64;
@@ -152,7 +153,7 @@ public class SubmitDraftTest {
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
-            .header(AUTHORIZATION, citizenToken)
+            .header(new Header(AUTHORIZATION, citizenToken))
             .body(body)
             .put("/drafts");
 
@@ -181,7 +182,7 @@ public class SubmitDraftTest {
     public void givenADraftExistsAndTheGetIsCalled_shouldReturn200AndTheDraft() {
         saveDraft(draftAppeal);
         RestAssured.given()
-            .header(AUTHORIZATION, citizenToken)
+            .header(new Header(AUTHORIZATION, citizenToken))
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.SC_OK)
@@ -191,7 +192,7 @@ public class SubmitDraftTest {
     @Test
     public void givenGetDraftsIsCalledWithWrongCredentials_shouldReturn500Unauthorised() {
         RestAssured.given()
-            .header(AUTHORIZATION, "thisTokenIsIncorrect")
+            .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
             .get("/drafts")
             .then()
             .statusCode(HttpStatus.SC_FORBIDDEN);
@@ -214,7 +215,7 @@ public class SubmitDraftTest {
         return RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
-            .header(AUTHORIZATION, citizenToken)
+            .header(new Header(AUTHORIZATION, citizenToken))
             .body(SyaServiceHelper.asJsonString(draftAppeal))
             .put("/drafts");
     }
@@ -244,7 +245,7 @@ public class SubmitDraftTest {
             " "
         );
 
-        return authorizeToken.getAccessToken();
+        return "Bearer " + authorizeToken.getAccessToken();
     }
 
 }
