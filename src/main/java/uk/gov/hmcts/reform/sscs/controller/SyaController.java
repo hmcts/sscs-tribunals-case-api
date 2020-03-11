@@ -68,7 +68,6 @@ public class SyaController {
             @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
             @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
     @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
         Optional<SessionDraft> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
@@ -82,7 +81,6 @@ public class SyaController {
     @ApiResponses(value =
         {@ApiResponse(code = 201, message = "Submitted draft appeal successfully", response = Draft.class)})
     @PutMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<Draft> createDraftAppeal(
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestBody SyaCaseWrapper syaCaseWrapper) {
