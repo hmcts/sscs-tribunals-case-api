@@ -127,7 +127,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocuments() {
+    @Parameters({"true", "false"})
+    public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .type("coversheet")
@@ -146,10 +147,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             "Appellant (or Appointee)"));
         sscsCaseData.setEvidenceHandled("No");
 
+        when(callback.isIgnoreWarnings()).thenReturn(ignoreWarnings);
+
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
         assertEquals("Yes", response.getData().getEvidenceHandled());
+
+        if (ignoreWarnings) {
+            assertEquals(0, response.getWarnings().size());
+        } else {
+            String warning = response.getWarnings().stream().findFirst().orElse("");
+            assertEquals("Coversheet will be ignored, are you happy to proceed?", warning);
+        }
     }
 
     private void assertHappyPaths(DocumentType expectedDocumentType,
