@@ -32,8 +32,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        AuthCheckerUserOnlyFilter authCheckerUserOnlyFilter =
-            new AuthCheckerUserOnlyFilter(userRequestAuthorizer);
+        AuthCheckerUserOnlyFilter<User> authCheckerUserOnlyFilter =
+            new AuthCheckerUserOnlyFilter<>(userRequestAuthorizer);
 
         authCheckerUserOnlyFilter.setAuthenticationManager(authenticationManager);
 
