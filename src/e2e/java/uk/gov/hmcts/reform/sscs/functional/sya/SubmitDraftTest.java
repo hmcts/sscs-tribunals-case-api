@@ -35,10 +35,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.idam.Authorize;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.*;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
@@ -95,10 +92,13 @@ public class SubmitDraftTest {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
         citizenToken = getIdamOauth2Token(username, password);
+        UserDetails userDetails = getUserDetails(citizenToken);
         citizenIdamTokens = IdamTokens.builder()
             .idamOauth2Token(citizenToken)
             .serviceAuthorization(authTokenGenerator.generate())
-            .userId(getUserId(citizenToken))
+            .userId(userDetails.getId())
+            .roles(userDetails.getRoles())
+            .email(userDetails.getEmail())
             .build();
 
         userIdamTokens = idamService.getIdamTokens();
@@ -110,12 +110,12 @@ public class SubmitDraftTest {
         List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
 
         if (savedDrafts.size() > 0) {
-            archiveDraft(savedDrafts.get(0));
+            savedDrafts.stream().forEach(d -> archiveDraft(d));
         }
     }
 
-    private String getUserId(String userToken) {
-        return idamApiClient.getUserDetails(userToken).getId();
+    private UserDetails getUserDetails(String userToken) {
+        return idamApiClient.getUserDetails(userToken);
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
