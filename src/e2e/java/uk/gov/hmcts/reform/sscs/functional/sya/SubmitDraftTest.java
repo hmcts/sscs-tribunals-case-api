@@ -127,21 +127,13 @@ public class SubmitDraftTest {
 
     @Test
     public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToNewcastle() {
-        String benefitCode = "PIP";
-        String dwpIssuingOffice = "DWP PIP (1)";
         String expectedDwpRegionalCentre = "Newcastle";
-        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
-        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
-        body = submitHelper.setBenefitCode(body, benefitCode);
 
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, citizenToken))
-            .body(body)
+            .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (1)"))
             .put("/drafts");
 
         SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
@@ -150,21 +142,13 @@ public class SubmitDraftTest {
 
     @Test
     public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToGlasgow() {
-        String benefitCode = "PIP";
-        String dwpIssuingOffice = "DWP PIP (2)";
         String expectedDwpRegionalCentre = "Glasgow";
-        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
-        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
-        body = submitHelper.setBenefitCode(body, benefitCode);
 
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
                 .header(new Header(AUTHORIZATION, citizenToken))
-                .body(body)
+                .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (2)"))
                 .put("/drafts");
 
         SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
@@ -172,22 +156,14 @@ public class SubmitDraftTest {
     }
 
     @Test
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToInvernessDRT() {
-        String benefitCode = "ESA";
-        String dwpIssuingOffice = "Inverness DRT";
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToInvernessDrt() {
         String expectedDwpRegionalCentre = "Inverness DRT";
-        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
-        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
-        body = submitHelper.setBenefitCode(body, benefitCode);
 
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
                 .header(new Header(AUTHORIZATION, citizenToken))
-                .body(body)
+                .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
                 .put("/drafts");
 
         SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
@@ -196,21 +172,13 @@ public class SubmitDraftTest {
 
     @Test
     public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToCoatbridgeBenefitCentre() {
-        String benefitCode = "ESA";
-        String dwpIssuingOffice = "Coatbridge Benefit Centre";
         String expectedDwpRegionalCentre = "Coatbridge Benefit Centre";
-        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
-        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
-        body = submitHelper.setBenefitCode(body, benefitCode);
 
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
                 .header(new Header(AUTHORIZATION, citizenToken))
-                .body(body)
+                .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
                 .put("/drafts");
 
         SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
@@ -219,21 +187,12 @@ public class SubmitDraftTest {
 
     @Test
     public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToUniversalCredit() {
-        String benefitCode = "UC";
-        String dwpIssuingOffice = "";
         String expectedDwpRegionalCentre = "Universal Credit";
-        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
-        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
-        body = submitHelper.setBenefitCode(body, benefitCode);
-
         RestAssured.given()
                 .log().method().log().headers().log().uri().log().body(true)
                 .contentType(ContentType.JSON)
                 .header(new Header(AUTHORIZATION, citizenToken))
-                .body(body)
+                .body(getAllDetailsDwpRegionalCentre("UC", ""))
                 .put("/drafts");
 
         SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
@@ -288,6 +247,16 @@ public class SubmitDraftTest {
         archiveDraft(caseData);
 
         assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
+
+    private String getAllDetailsDwpRegionalCentre(String benefitCode, String dwpIssuingOffice) {
+        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
+        String nino = submitHelper.getRandomNino();
+        body = submitHelper.setNino(body, nino);
+        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
+        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
+        body = submitHelper.setBenefitCode(body, benefitCode);
+        return body;
     }
 
     private Response saveDraft(SyaCaseWrapper draftAppeal) {
