@@ -116,7 +116,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
 
-        if (scannedDocument.getValue().getFileName() == null) {
+        if (scannedDocument.getValue().getFileName() == null || scannedDocument.getValue().getFileName().trim().equalsIgnoreCase("")) {
             preSubmitCallbackResponse.addError("No document file name so could not process");
         }
 

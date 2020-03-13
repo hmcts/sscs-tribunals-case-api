@@ -360,11 +360,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse() {
+    @Parameters({"null", " ", "    "})
+    public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(@Nullable String filename) {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                ScannedDocumentDetails.builder().fileName(filename).url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
 
         docs.add(scannedDocument);
 
