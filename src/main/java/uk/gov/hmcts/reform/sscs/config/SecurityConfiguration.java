@@ -43,6 +43,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .formLogin().disable()
             .logout().disable()
             .authorizeRequests()
-            .antMatchers().permitAll();
+            .antMatchers("/health").permitAll()
+            .antMatchers("/health/liveness").permitAll()
+            .antMatchers("/loggers/**").permitAll()
+            .antMatchers("/swagger-ui.html").permitAll()
+            .antMatchers("/swagger-resources/**").permitAll()
+            .antMatchers("/v2/api-docs").permitAll()
+            .antMatchers("/regionalcentre/**").permitAll()
+            .antMatchers("/tokens/**").permitAll()
+            .antMatchers("/appeals").permitAll()
+            .antMatchers("/appeals/**").permitAll()
+            .antMatchers("/evidence/upload").permitAll()
+            .antMatchers("/drafts").authenticated();
     }
 }
