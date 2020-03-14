@@ -95,7 +95,7 @@ public class SubmitDraftTest {
         UserDetails userDetails = getUserDetails(citizenToken);
         citizenIdamTokens = IdamTokens.builder()
             .idamOauth2Token(citizenToken)
-            .serviceAuthorization(authTokenGenerator.generate())
+            .serviceAuthorization(idamService.generateServiceAuthorization())
             .userId(userDetails.getId())
             .roles(userDetails.getRoles())
             .email(userDetails.getEmail())
