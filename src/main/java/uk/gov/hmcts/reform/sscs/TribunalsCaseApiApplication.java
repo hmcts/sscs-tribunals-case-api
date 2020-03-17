@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
                 "uk.gov.hmcts.reform.authorisation",
                 "uk.gov.hmcts.reform.sscs.idam",
                 "uk.gov.hmcts.reform.sscs.document",
-                "uk.gov.hmcts.reform.docassembly",
+                "uk.gov.hmcts.reform.docassembly"
         })
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableScheduling
