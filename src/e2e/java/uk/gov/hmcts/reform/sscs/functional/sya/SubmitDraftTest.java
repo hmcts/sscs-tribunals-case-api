@@ -229,7 +229,7 @@ public class SubmitDraftTest {
             .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
             .get("/drafts")
             .then()
-            .statusCode(HttpStatus.SC_FORBIDDEN);
+            .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test
