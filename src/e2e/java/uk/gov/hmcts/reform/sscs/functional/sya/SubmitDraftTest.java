@@ -5,7 +5,7 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
+import static org.hamcrest.Matchers.anything;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -38,8 +38,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.*;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
-@TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @RunWith(SpringRunner.class)
+@TestPropertySource(locations = "classpath:config/application_e2e.properties")
 @SpringBootTest
 public class SubmitDraftTest {
 
@@ -204,13 +204,13 @@ public class SubmitDraftTest {
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
-            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
+            .assertThat().header(LOCATION_HEADER_NAME, not(anything())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
         response2.then()
             .statusCode(HttpStatus.SC_OK)
-            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
+            .assertThat().header(LOCATION_HEADER_NAME, not(anything())).log().all(true);
         String response2Header = response.getHeader(LOCATION_HEADER_NAME);
 
         assertEquals("the draft updated is not the same", responseHeader, response2Header);
