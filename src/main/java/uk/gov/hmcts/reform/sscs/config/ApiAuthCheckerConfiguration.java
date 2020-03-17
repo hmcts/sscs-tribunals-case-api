@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "security")
-public class AuthCheckerConfiguration {
+public class ApiAuthCheckerConfiguration {
 
     @Value("#{'${security.authorisedRoles}'.split(',')}")
     private List<String> authorisedRoles;
