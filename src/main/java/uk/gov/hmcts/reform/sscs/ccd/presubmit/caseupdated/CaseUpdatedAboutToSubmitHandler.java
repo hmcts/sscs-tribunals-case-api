@@ -3,19 +3,29 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Component
 @Slf4j
 public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final RegionalProcessingCenterService regionalProcessingCenterService;
+
+    @Autowired
+    CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService) {
+        this.regionalProcessingCenterService = regionalProcessingCenterService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -38,6 +48,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         setCaseCode(sscsCaseData);
+
+        if (sscsCaseData.getAppeal().getAppellant() != null && sscsCaseData.getAppeal().getAppellant().getAddress() != null && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
+            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+            sscsCaseData.setRegionalProcessingCenter(rpc);
+
+            if (rpc != null) {
+                sscsCaseData.setRegion(rpc.getName());
+            }
+        }
 
         return preSubmitCallbackResponse;
     }
