@@ -2,11 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.anything;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -204,13 +200,13 @@ public class SubmitDraftTest {
         Response response = saveDraft(draftAppeal);
         response.then()
             .statusCode(anyOf(is(HttpStatus.SC_OK), is(HttpStatus.SC_CREATED)))
-            .assertThat().header(LOCATION_HEADER_NAME, not(anything())).log().all(true);
+            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String responseHeader = response.getHeader(LOCATION_HEADER_NAME);
 
         Response response2 = saveDraft(draftAppeal);
         response2.then()
             .statusCode(HttpStatus.SC_OK)
-            .assertThat().header(LOCATION_HEADER_NAME, not(anything())).log().all(true);
+            .assertThat().header(LOCATION_HEADER_NAME, not(isEmptyOrNullString())).log().all(true);
         String response2Header = response.getHeader(LOCATION_HEADER_NAME);
 
         assertEquals("the draft updated is not the same", responseHeader, response2Header);
