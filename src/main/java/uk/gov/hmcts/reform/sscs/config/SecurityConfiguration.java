@@ -30,17 +30,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().mvcMatchers("/health",
-                "/health/liveness",
-                "/loggers/**",
-                "/swagger-ui.html",
-                "/swagger-resources/**",
-                "/v2/api-docs",
-                "/regionalcentre/**",
-                "/tokens/**",
-                "/appeals",
-                "/appeals/**",
-                "/evidence/upload");
+        web.ignoring().anyRequest();
     }
 
     @Override
