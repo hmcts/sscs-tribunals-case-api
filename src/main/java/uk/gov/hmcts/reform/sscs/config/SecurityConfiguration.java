@@ -5,6 +5,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import uk.gov.hmcts.reform.auth.checker.core.RequestAuthorizer;
@@ -25,6 +26,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     ) {
         this.userRequestAuthorizer = userRequestAuthorizer;
         this.authenticationManager = authenticationManager;
+    }
+
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().mvcMatchers("/health",
+                "/health/liveness",
+                "/loggers/**",
+                "/swagger-ui.html",
+                "/swagger-resources/**",
+                "/v2/api-docs",
+                "/regionalcentre/**",
+                "/tokens/**",
+                "/appeals",
+                "/appeals/**",
+                "/evidence/upload");
     }
 
     @Override
