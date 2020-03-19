@@ -80,7 +80,6 @@ public class InterlocServiceHandlerTest {
         "TCW_DIRECTION_ISSUED, awaitingInformation",
         "INTERLOC_INFORMATION_RECEIVED, awaitingAdminAction",
         "JUDGE_DIRECTION_ISSUED, awaitingInformation",
-        "REINSTATE_APPEAL, awaitingAdminAction",
         "TCW_DECISION_APPEAL_TO_PROCEED, none",
         "JUDGE_DECISION_APPEAL_TO_PROCEED, none",
         "SEND_TO_ADMIN, awaitingAdminAction"
@@ -92,7 +91,6 @@ public class InterlocServiceHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
-
     }
 
     @Test
@@ -102,7 +100,8 @@ public class InterlocServiceHandlerTest {
         "INTERLOC_SEND_TO_TCW, reviewByTcw",
         "TCW_REFER_TO_JUDGE, reviewByJudge",
         "DWP_CHALLENGE_VALIDITY, reviewByTcw",
-        "DWP_REQUEST_TIME_EXTENSION, reviewByTcw"
+        "DWP_REQUEST_TIME_EXTENSION, reviewByTcw",
+        "REINSTATE_APPEAL, awaitingAdminAction"
     })
     public void givenEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpected(
         EventType eventType,
