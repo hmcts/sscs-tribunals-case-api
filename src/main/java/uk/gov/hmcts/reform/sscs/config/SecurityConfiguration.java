@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             new AuthCheckerUserOnlyFilter<>(userRequestAuthorizer);
 
         authCheckerUserOnlyFilter.setAuthenticationManager(authenticationManager);
-
+        // @formatter:off
         http
             .addFilter(authCheckerUserOnlyFilter)
             .sessionManagement().sessionCreationPolicy(STATELESS)
@@ -61,5 +61,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/appeals/**").permitAll()
             .antMatchers("/evidence/upload").permitAll()
             .antMatchers("/drafts").authenticated();
+        // @formatter:on
     }
 }

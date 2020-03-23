@@ -135,6 +135,7 @@
         "wantSmsNotifications": "Yes",
         "tya": "NpmhpYaFLa",
         "email": "sscstest+notify@greencroftconsulting.com",
+        "lastLoggedIntoMya":null,
         "mobile": "07398785050",
         "subscribeEmail": "Yes",
         "subscribeSms": "Yes",
@@ -147,12 +148,14 @@
         "mobile": null,
         "subscribeEmail": null,
         "subscribeSms": null,
-        "reason": null
+        "reason": null,
+        "lastLoggedIntoMya":null
       },
       "representativeSubscription": {
         "wantSmsNotifications": null,
         "tya": "",
         "email": "",
+        "lastLoggedIntoMya":null,
         "mobile": "",
         "subscribeEmail": "No",
         "subscribeSms": "No",
@@ -162,6 +165,7 @@
         "wantSmsNotifications": null,
         "tya": null,
         "email": null,
+        "lastLoggedIntoMya":null,
         "mobile": null,
         "subscribeEmail": null,
         "subscribeSms": null,

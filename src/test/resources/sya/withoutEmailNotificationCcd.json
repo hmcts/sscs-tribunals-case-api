@@ -146,7 +146,8 @@
       "mobile": "+447411222222",
       "subscribeEmail": "No",
       "subscribeSms": "No",
-      "reason": null
+      "reason": null,
+      "lastLoggedIntoMya": null
     },
     "supporterSubscription": null,
     "appointeeSubscription": null,
@@ -157,7 +158,8 @@
       "mobile":"+447411999999",
       "subscribeEmail":"Yes",
       "subscribeSms":"Yes",
-      "reason":null
+      "reason":null,
+      "lastLoggedIntoMya": null
     }
   },
   "evidencePresent" : "No",
