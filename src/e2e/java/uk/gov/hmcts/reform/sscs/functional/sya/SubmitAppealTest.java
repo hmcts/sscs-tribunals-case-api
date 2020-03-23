@@ -61,6 +61,7 @@ public class SubmitAppealTest {
     public void setup() {
         baseURI = testUrl;
         idamTokens = idamService.getIdamTokens();
+        RestAssured.useRelaxedHTTPSValidation();
     }
 
 
