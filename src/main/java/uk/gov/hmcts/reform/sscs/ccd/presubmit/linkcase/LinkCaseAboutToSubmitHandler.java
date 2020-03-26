@@ -3,9 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.linkcase;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.collect.Lists;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -49,40 +47,43 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        Set<CaseLink> linkedCaseSet = new HashSet<>();
-        linkedCaseSet.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference(sscsCaseData.getCcdCaseId()).build()).build());
-        linkedCaseSet.addAll(preSubmitCallbackResponse.getData().getLinkedCase());
+        Map<CaseLink, SscsCaseData> linkedCaseMap = new HashMap<>();
 
-        linkedCaseSet = buildUniqueSetOfLinkedCases(preSubmitCallbackResponse.getData().getLinkedCase(), linkedCaseSet);
+        linkedCaseMap.put(CaseLink.builder().value(CaseLinkDetails.builder().caseReference(sscsCaseData.getCcdCaseId()).build()).build(), caseDetails.getCaseData());
 
-        updateLinkedCases(linkedCaseSet);
+        linkedCaseMap = buildUniqueSetOfLinkedCases(preSubmitCallbackResponse.getData().getLinkedCase(), linkedCaseMap);
+
+        updateLinkedCases(linkedCaseMap);
         return preSubmitCallbackResponse;
     }
 
-    private Set<CaseLink> buildUniqueSetOfLinkedCases(List<CaseLink> caseLinks, Set<CaseLink> linkedCaseSet) {
-        for (CaseLink caseLink : caseLinks) {
+    private Map<CaseLink, SscsCaseData> buildUniqueSetOfLinkedCases(List<CaseLink> caseLinks, Map<CaseLink, SscsCaseData> linkedCaseMap) {
+        if (caseLinks != null) {
+            for (CaseLink caseLink : caseLinks) {
 
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseLink.getValue().getCaseReference()), idamService.getIdamTokens());
+                SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseLink.getValue().getCaseReference()), idamService.getIdamTokens());
 
-            if (sscsCaseDetails.getData().getLinkedCase() != null && !linkedCaseSet.containsAll(sscsCaseDetails.getData().getLinkedCase())) {
-                linkedCaseSet.addAll(sscsCaseDetails.getData().getLinkedCase());
+                if (!linkedCaseMap.containsKey(caseLink)) {
+                    linkedCaseMap.put(caseLink, sscsCaseDetails.getData());
+                    buildUniqueSetOfLinkedCases(sscsCaseDetails.getData().getLinkedCase(), linkedCaseMap);
+                }
             }
         }
 
-        return linkedCaseSet;
+        return linkedCaseMap;
     }
 
-    private void updateLinkedCases(Set<CaseLink> linkedCaseSet) {
-        for (CaseLink caseLink : linkedCaseSet) {
+    private void updateLinkedCases(Map<CaseLink, SscsCaseData> linkedCaseMap) {
+        for (CaseLink caseLink : linkedCaseMap.keySet()) {
 
-            SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseLink.getValue().getCaseReference()), idamService.getIdamTokens());
+            SscsCaseData sscsCaseData = linkedCaseMap.get(caseLink);
 
-            List<CaseLink> linkedCaseList = Lists.newArrayList(linkedCaseSet);
+            List<CaseLink> linkedCaseList = Lists.newArrayList(linkedCaseMap.keySet());
             linkedCaseList.remove(caseLink);
 
-            if (sscsCaseDetails != null && (sscsCaseDetails.getData().getLinkedCase() == null || !sscsCaseDetails.getData().getLinkedCase().containsAll(linkedCaseList))) {
-                sscsCaseDetails.getData().setLinkedCase(linkedCaseList);
-                ccdService.updateCase(sscsCaseDetails.getData(), sscsCaseDetails.getId(), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens());
+            if (sscsCaseData!= null && (sscsCaseData.getLinkedCase() == null || !sscsCaseData.getLinkedCase().containsAll(linkedCaseList))) {
+                sscsCaseData.setLinkedCase(linkedCaseList);
+                ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens());
             }
         }
     }

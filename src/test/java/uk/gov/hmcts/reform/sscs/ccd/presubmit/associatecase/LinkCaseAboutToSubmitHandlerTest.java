@@ -232,6 +232,46 @@ public class LinkCaseAboutToSubmitHandlerTest {
         assertEquals("3", capture.getAllValues().get(3).getLinkedCase().get(2).getValue().getCaseReference());
     }
 
+    @Test
+    public void givenCaseAWithLinkedCaseBAndCaseBLinkedToCaseCAndCaseCLinkedToCaseD_thenLinkAllCasesTest2() {
+        List<CaseLink> linkedCasesA = new ArrayList<>();
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("2").build()).build());
+
+        List<CaseLink> linkedCasesB = new ArrayList<>();
+        linkedCasesB.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("3").build()).build());
+
+        List<CaseLink> linkedCasesC = new ArrayList<>();
+        linkedCasesC.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("4").build()).build());
+
+        sscsCaseDataA.setLinkedCase(linkedCasesA);
+        sscsCaseDataB.setLinkedCase(linkedCasesB);
+        sscsCaseDataC.setLinkedCase(linkedCasesC);
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(ccdService).updateCase(capture.capture(), eq(1L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        verify(ccdService).updateCase(capture.capture(), eq(2L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        verify(ccdService).updateCase(capture.capture(), eq(3L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        verify(ccdService).updateCase(capture.capture(), eq(4L), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        verify(ccdService, times(4)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+        assertEquals(3, capture.getAllValues().get(0).getLinkedCase().size());
+        assertEquals(3, capture.getAllValues().get(1).getLinkedCase().size());
+        assertEquals(3, capture.getAllValues().get(2).getLinkedCase().size());
+        assertEquals(3, capture.getAllValues().get(3).getLinkedCase().size());
+        assertEquals("2", capture.getAllValues().get(0).getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("3", capture.getAllValues().get(0).getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("4", capture.getAllValues().get(0).getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals("1", capture.getAllValues().get(1).getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("3", capture.getAllValues().get(1).getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("4", capture.getAllValues().get(1).getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals("1", capture.getAllValues().get(2).getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", capture.getAllValues().get(2).getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("4", capture.getAllValues().get(2).getLinkedCase().get(2).getValue().getCaseReference());
+        assertEquals("1", capture.getAllValues().get(3).getLinkedCase().get(0).getValue().getCaseReference());
+        assertEquals("2", capture.getAllValues().get(3).getLinkedCase().get(1).getValue().getCaseReference());
+        assertEquals("3", capture.getAllValues().get(3).getLinkedCase().get(2).getValue().getCaseReference());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
