@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.confirmlapsed;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.interlocsendtotcw;
 
 import static java.util.Objects.requireNonNull;
 
@@ -11,9 +11,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
+
 @Service
 @Slf4j
-public class ConfirmLapsedAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class InterlocSendToTcwAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -21,7 +22,8 @@ public class ConfirmLapsedAboutToSubmitHandler implements PreSubmitCallbackHandl
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CONFIRM_LAPSED;
+                && (callback.getEvent() == EventType.INTERLOC_SEND_TO_TCW
+            );
     }
 
     @Override
@@ -32,9 +34,9 @@ public class ConfirmLapsedAboutToSubmitHandler implements PreSubmitCallbackHandl
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        log.info("Setting InterlocReviewState to null for case id {} "
-                + "for ConfirmLapsedAboutToSubmitHandler" + callback.getCaseDetails().getId());
-        caseData.setInterlocReviewState(null);
+        log.info("Handling {} event for case id {}", callback.getEvent(), callback.getCaseDetails().getId());
+
+        caseData.setDirectionDueDate(null);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 

@@ -62,6 +62,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         caseData.setDwpState(DwpState.STRUCK_OUT.getId());
 
+        caseData.setDirectionDueDate(null);
+
         if (STRIKE_OUT.getValue().equals(caseData.getDecisionType())) {
             if (State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
                 caseData.setOutcome("nonCompliantAppealStruckout");

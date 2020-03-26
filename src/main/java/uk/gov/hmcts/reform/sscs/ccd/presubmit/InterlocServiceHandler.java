@@ -26,7 +26,6 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
 
     private static Map<EventType, String> createMappings() {
         Map<EventType, String> eventTypeToSecondaryStatus = new HashMap<>();
-        eventTypeToSecondaryStatus.put(EventType.INTERLOC_SEND_TO_TCW, REVIEW_BY_TCW.getId());
         eventTypeToSecondaryStatus.put(EventType.TCW_DIRECTION_ISSUED, AWAITING_INFORMATION.getId());
         eventTypeToSecondaryStatus.put(EventType.INTERLOC_INFORMATION_RECEIVED, AWAITING_ADMIN_ACTION.getId());
         eventTypeToSecondaryStatus.put(EventType.JUDGE_DIRECTION_ISSUED, AWAITING_INFORMATION.getId());
@@ -46,17 +45,31 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
         log.info("Case({}): Setting interloc review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
         newSscsCaseData.setInterlocReviewState(newValue);
 
-        if (eventType.equals(EventType.NON_COMPLIANT)
-            || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)
-            || eventType.equals(EventType.INTERLOC_SEND_TO_TCW)
-            || eventType.equals(EventType.TCW_REFER_TO_JUDGE)
-            || eventType.equals(EventType.DWP_REQUEST_TIME_EXTENSION)
-            || eventType.equals(EventType.DWP_CHALLENGE_VALIDITY)
-            || eventType.equals(EventType.REINSTATE_APPEAL)) {
-            log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now().toString(), newSscsCaseData.getCcdCaseId());
-            newSscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
-        }
+        setInterlocReferralDate(newSscsCaseData, eventType);
+
+        clearDirectionDueDate(newSscsCaseData, eventType);
 
         return newSscsCaseData;
+    }
+
+    private void setInterlocReferralDate(SscsCaseData newSscsCaseData, EventType eventType) {
+        if (eventType.equals(EventType.NON_COMPLIANT)
+                || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)
+                || eventType.equals(EventType.TCW_REFER_TO_JUDGE)
+                || eventType.equals(EventType.DWP_REQUEST_TIME_EXTENSION)
+                || eventType.equals(EventType.DWP_CHALLENGE_VALIDITY)
+                || eventType.equals(EventType.REINSTATE_APPEAL)) {
+            log.info("Setting interloc referral date to {} for caseId {}", LocalDate.now().toString(), newSscsCaseData.getCcdCaseId());
+            newSscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+        }
+    }
+
+    private void clearDirectionDueDate(SscsCaseData newSscsCaseData, EventType eventType) {
+        if (eventType.equals(EventType.NON_COMPLIANT)
+                || eventType.equals(EventType.NON_COMPLIANT_SEND_TO_INTERLOC)
+                || eventType.equals(EventType.REINSTATE_APPEAL)) {
+            log.info("Clearing direction due date for caseId {}", newSscsCaseData.getCcdCaseId());
+            newSscsCaseData.setDirectionDueDate(null);
+        }
     }
 }

@@ -84,6 +84,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
                 .dateAdded(LocalDate.now().minusDays(1))
                 .sscsDocument(docs)
                 .decisionType(STRIKE_OUT.getValue())
+                .directionDueDate("01/02/2020")
                 .previewDocument(DocumentLink.builder()
                         .documentUrl(DOCUMENT_URL)
                         .documentBinaryUrl(DOCUMENT_URL + "/binary")
@@ -141,6 +142,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         String assertionMsg = "dwpState value (%s) is not as expected (%s)";
         assertEquals(String.format(assertionMsg, currentDwpState, expectedDwpState), expectedDwpState, currentDwpState);
         assertEquals(expectedInterlocReviewState, response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test

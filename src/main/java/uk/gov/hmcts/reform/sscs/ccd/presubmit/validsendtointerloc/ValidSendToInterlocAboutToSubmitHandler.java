@@ -50,6 +50,7 @@ public class ValidSendToInterlocAboutToSubmitHandler implements PreSubmitCallbac
 
         log.info("Setting interloc referral date to {}  for caseId {}", LocalDate.now().toString(), sscsCaseData.getCcdCaseId());
         sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+        sscsCaseData.setDirectionDueDate(null);
 
         return preSubmitCallbackResponse;
     }
