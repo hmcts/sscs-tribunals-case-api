@@ -65,11 +65,13 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         if (caseLinks != null) {
             for (CaseLink caseLink : caseLinks) {
 
-                SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseLink.getValue().getCaseReference()), idamService.getIdamTokens());
+                if (!linkedCaseMap.containsKey(caseLink)) {
+                    SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseLink.getValue().getCaseReference()), idamService.getIdamTokens());
 
-                if (sscsCaseDetails != null && !linkedCaseMap.containsKey(caseLink)) {
-                    linkedCaseMap.put(caseLink, sscsCaseDetails.getData());
-                    buildUniqueSetOfLinkedCases(sscsCaseDetails.getData().getLinkedCase(), linkedCaseMap);
+                    if (sscsCaseDetails != null) {
+                        linkedCaseMap.put(caseLink, sscsCaseDetails.getData());
+                        buildUniqueSetOfLinkedCases(sscsCaseDetails.getData().getLinkedCase(), linkedCaseMap);
+                    }
                 }
             }
         }
