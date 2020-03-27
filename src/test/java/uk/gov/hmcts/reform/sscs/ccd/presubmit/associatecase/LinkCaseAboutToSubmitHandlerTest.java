@@ -20,6 +20,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.linkcase.LinkCaseAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -270,6 +271,43 @@ public class LinkCaseAboutToSubmitHandlerTest {
         assertEquals("1", capture.getAllValues().get(3).getLinkedCase().get(0).getValue().getCaseReference());
         assertEquals("2", capture.getAllValues().get(3).getLinkedCase().get(1).getValue().getCaseReference());
         assertEquals("3", capture.getAllValues().get(3).getLinkedCase().get(2).getValue().getCaseReference());
+    }
+
+    @Test
+    public void givenCaseExceedsNumberOfAllowedLinkedCases_thenShowAnError() {
+        List<CaseLink> linkedCasesA = new ArrayList<>();
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("2").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("3").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("4").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("5").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("6").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("7").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("8").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("9").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("10").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("11").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("12").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("13").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("14").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("15").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("16").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("17").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("18").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("19").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("20").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("21").build()).build());
+        linkedCasesA.add(CaseLink.builder().value(CaseLinkDetails.builder().caseReference("22").build()).build());
+
+        when(ccdService.getByCaseId(any(), any())).thenReturn(sscsCaseDetailsA);
+
+        sscsCaseDataA.setLinkedCase(linkedCasesA);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(ccdService, times(0)).updateCase(any(), any(), eq(CASE_UPDATED.getCcdType()), eq("Case updated"), eq("Linked case added"), any());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Case cannot be linked as number of linked cases exceeds the limit", error);
     }
 
     @Test(expected = IllegalStateException.class)

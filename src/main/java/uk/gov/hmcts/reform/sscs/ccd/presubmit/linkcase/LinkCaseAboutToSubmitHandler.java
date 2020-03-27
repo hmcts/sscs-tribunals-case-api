@@ -53,7 +53,11 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         linkedCaseMap = buildUniqueSetOfLinkedCases(preSubmitCallbackResponse.getData().getLinkedCase(), linkedCaseMap);
 
-        updateLinkedCases(linkedCaseMap);
+        if (linkedCaseMap.keySet().size() > 20) {
+            preSubmitCallbackResponse.addError("Case cannot be linked as number of linked cases exceeds the limit");
+        } else {
+            updateLinkedCases(linkedCaseMap);
+        }
         return preSubmitCallbackResponse;
     }
 
@@ -63,7 +67,7 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
                 SscsCaseDetails sscsCaseDetails = ccdService.getByCaseId(Long.valueOf(caseLink.getValue().getCaseReference()), idamService.getIdamTokens());
 
-                if (!linkedCaseMap.containsKey(caseLink)) {
+                if (sscsCaseDetails != null && !linkedCaseMap.containsKey(caseLink)) {
                     linkedCaseMap.put(caseLink, sscsCaseDetails.getData());
                     buildUniqueSetOfLinkedCases(sscsCaseDetails.getData().getLinkedCase(), linkedCaseMap);
                 }
