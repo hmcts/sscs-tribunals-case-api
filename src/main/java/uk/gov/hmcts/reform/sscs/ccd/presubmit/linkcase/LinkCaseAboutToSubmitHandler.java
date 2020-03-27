@@ -53,10 +53,10 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
         linkedCaseMap = buildUniqueSetOfLinkedCases(preSubmitCallbackResponse.getData().getLinkedCase(), linkedCaseMap);
 
-        if (linkedCaseMap.keySet().size() > 20) {
+        if (linkedCaseMap.keySet().size() > 10) {
             preSubmitCallbackResponse.addError("Case cannot be linked as number of linked cases exceeds the limit");
         } else {
-            updateLinkedCases(linkedCaseMap);
+            updateLinkedCases(linkedCaseMap, sscsCaseData.getCcdCaseId());
         }
         return preSubmitCallbackResponse;
     }
@@ -77,7 +77,7 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         return linkedCaseMap;
     }
 
-    private void updateLinkedCases(Map<CaseLink, SscsCaseData> linkedCaseMap) {
+    private void updateLinkedCases(Map<CaseLink, SscsCaseData> linkedCaseMap, String caseInCallback) {
         for (CaseLink caseLink : linkedCaseMap.keySet()) {
 
             SscsCaseData sscsCaseData = linkedCaseMap.get(caseLink);
@@ -87,7 +87,10 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
 
             if (sscsCaseData!= null && (sscsCaseData.getLinkedCase() == null || !sscsCaseData.getLinkedCase().containsAll(linkedCaseList))) {
                 sscsCaseData.setLinkedCase(linkedCaseList);
-                ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens());
+
+                if (!sscsCaseData.getCcdCaseId().equals(caseInCallback)) {
+                    ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.CASE_UPDATED.getCcdType(), "Case updated", "Linked case added", idamService.getIdamTokens());
+                }
             }
         }
     }
