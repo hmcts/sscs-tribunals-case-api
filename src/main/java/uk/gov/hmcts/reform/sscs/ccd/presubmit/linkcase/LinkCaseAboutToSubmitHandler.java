@@ -87,7 +87,7 @@ public class LinkCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
             List<CaseLink> linkedCaseList = Lists.newArrayList(linkedCaseMap.keySet());
             linkedCaseList.remove(caseLink);
 
-            if (sscsCaseData!= null && (sscsCaseData.getLinkedCase() == null || !sscsCaseData.getLinkedCase().containsAll(linkedCaseList))) {
+            if (sscsCaseData != null && (sscsCaseData.getLinkedCase() == null || !sscsCaseData.getLinkedCase().containsAll(linkedCaseList))) {
                 sscsCaseData.setLinkedCase(linkedCaseList);
 
                 if (!sscsCaseData.getCcdCaseId().equals(caseInCallback)) {
