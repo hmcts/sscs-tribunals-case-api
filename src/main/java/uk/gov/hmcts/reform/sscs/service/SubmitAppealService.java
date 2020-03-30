@@ -210,19 +210,41 @@ public class SubmitAppealService {
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
-        log.info("Adding " + matchedByNinoCases.size() + " associated cases");
+        log.info("Adding " + matchedByNinoCases.size() + " associated cases for case id {}", caseData.getCcdCaseId());
+
+        backLinkAssociatedCases(caseData.getCcdCaseId(), matchedByNinoCases);
+
         List<CaseLink> associatedCases = new ArrayList<>();
 
         for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
             log.info("Linking case " + sscsCaseDetails.getId().toString());
-            CaseLink caseLink = CaseLink.builder().value(
-                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
-            associatedCases.add(caseLink);
+            associatedCases.add(CaseLink.builder().value(
+                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build());
         }
-        if (associatedCases.size() > 0) {
+
+        if (matchedByNinoCases.size() > 0) {
             return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean("Yes").build();
         } else {
             return caseData.toBuilder().linkedCasesBoolean("No").build();
+        }
+    }
+
+    private void backLinkAssociatedCases(String caseId, List<SscsCaseDetails> matchedByNinoCases) {
+        if (matchedByNinoCases.size() > 0 && matchedByNinoCases.size() < 10) {
+            CaseLink caseLink = CaseLink.builder().value(
+                    CaseLinkDetails.builder().caseReference(caseId).build()).build();
+
+            for (SscsCaseDetails matchedCase : matchedByNinoCases) {
+                List<CaseLink> caseLinks = matchedCase.getData().getAssociatedCase() != null ?  matchedCase.getData().getAssociatedCase() : new ArrayList<>();
+
+                caseLinks.add(caseLink);
+                matchedCase.getData().setAssociatedCase(caseLinks);
+                matchedCase.getData().setLinkedCasesBoolean("Yes");
+
+                log.info("Back linking case id {} to case id {}", caseId, matchedCase.getId().toString());
+
+                ccdService.updateCase(matchedCase.getData(), matchedCase.getId(), ASSOCIATE_CASE.getCcdType(), "Associate case", "Associated case added", idamService.getIdamTokens());
+            }
         }
     }
 
