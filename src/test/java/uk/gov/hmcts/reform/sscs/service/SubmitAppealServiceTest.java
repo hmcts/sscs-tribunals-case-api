@@ -494,7 +494,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenAssociatedCase_thenAddAssociatedCaseLinkToCaseAndBackLink() {
+    public void givenAssociatedCase_thenAddAssociatedCaseLinkToCase() {
         SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
         matchedByNinoCases.add(matchingCase);
@@ -506,13 +506,10 @@ public class SubmitAppealServiceTest {
         assertEquals(1, caseData.getAssociatedCase().size());
         assertEquals("Yes", caseData.getLinkedCasesBoolean());
         assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
-
-        verify(ccdService).updateCase(capture.capture(), eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-        assertEquals("00000000", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 
     @Test
-    public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCaseAndBackLinkToAllCases() {
+    public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
@@ -527,59 +524,6 @@ public class SubmitAppealServiceTest {
         assertEquals("Yes", caseData.getLinkedCasesBoolean());
         assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals("56765676", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
-
-        verify(ccdService).updateCase(capture.capture(), eq(12345678L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-        verify(ccdService).updateCase(capture.capture(), eq(56765676L), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-        assertEquals("00000000", capture.getAllValues().get(0).getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("00000000", capture.getAllValues().get(1).getAssociatedCase().get(0).getValue().getCaseReference());
-    }
-
-    @Test
-    public void givenMoreThan10AssociatedCases_thenAddAllAssociatedCaseLinksToCaseButDoNotBackLinkToAllCases() {
-        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765671L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase3 = SscsCaseDetails.builder().id(56765672L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase4 = SscsCaseDetails.builder().id(56765673L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase5 = SscsCaseDetails.builder().id(56765674L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase6 = SscsCaseDetails.builder().id(56765675L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase7 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase8 = SscsCaseDetails.builder().id(56765677L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase9 = SscsCaseDetails.builder().id(56765678L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase10 = SscsCaseDetails.builder().id(56765679L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase11 = SscsCaseDetails.builder().id(567656710L).data(SscsCaseData.builder().build()).build();
-
-        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
-        matchedByNinoCases.add(matchingCase1);
-        matchedByNinoCases.add(matchingCase2);
-        matchedByNinoCases.add(matchingCase3);
-        matchedByNinoCases.add(matchingCase4);
-        matchedByNinoCases.add(matchingCase5);
-        matchedByNinoCases.add(matchingCase6);
-        matchedByNinoCases.add(matchingCase7);
-        matchedByNinoCases.add(matchingCase8);
-        matchedByNinoCases.add(matchingCase9);
-        matchedByNinoCases.add(matchingCase10);
-        matchedByNinoCases.add(matchingCase11);
-
-        SscsCaseData caseData = submitAppealService.addAssociatedCases(
-                SscsCaseData.builder().ccdCaseId("00000000").build(),
-                matchedByNinoCases);
-
-        assertEquals(11, caseData.getAssociatedCase().size());
-        assertEquals("Yes", caseData.getLinkedCasesBoolean());
-        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("56765671", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
-        assertEquals("56765672", caseData.getAssociatedCase().get(2).getValue().getCaseReference());
-        assertEquals("56765673", caseData.getAssociatedCase().get(3).getValue().getCaseReference());
-        assertEquals("56765674", caseData.getAssociatedCase().get(4).getValue().getCaseReference());
-        assertEquals("56765675", caseData.getAssociatedCase().get(5).getValue().getCaseReference());
-        assertEquals("56765676", caseData.getAssociatedCase().get(6).getValue().getCaseReference());
-        assertEquals("56765677", caseData.getAssociatedCase().get(7).getValue().getCaseReference());
-        assertEquals("56765678", caseData.getAssociatedCase().get(8).getValue().getCaseReference());
-        assertEquals("56765679", caseData.getAssociatedCase().get(9).getValue().getCaseReference());
-        assertEquals("567656710", caseData.getAssociatedCase().get(10).getValue().getCaseReference());
-
-        verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
     }
 
     @Test

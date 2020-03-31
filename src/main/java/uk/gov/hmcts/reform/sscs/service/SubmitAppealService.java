@@ -168,12 +168,20 @@ public class SubmitAppealService {
         try {
             caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);;
 
-            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getGeneratedNino(), idamTokens);
-
-            log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getGeneratedNino());
-
             if (caseDetails == null) {
-                caseData = addAssociatedCases(caseData, matchedByNinoCases);
+
+                if (caseData.getAppeal().getAppellant().getIdentity() != null
+                    && !StringUtils.isEmpty(caseData.getAppeal().getAppellant().getIdentity().getNino())) {
+
+                    String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
+                    List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
+
+                    if (matchedByNinoCases.size() > 0) {
+                        log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
+
+                        caseData = addAssociatedCases(caseData, matchedByNinoCases);
+                    }
+                }
 
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
@@ -201,18 +209,16 @@ public class SubmitAppealService {
         }
     }
 
-    protected List<SscsCaseDetails> getMatchedCases(String generatedNino, IdamTokens idamTokens) {
+    protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
         HashMap<String, String> map = new HashMap<String, String>();
 
-        map.put("case.generatedNino", generatedNino);
+        map.put("case.appeal.appellant.identity.nino", nino);
 
         return ccdService.findCaseBy(map, idamTokens);
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
         log.info("Adding " + matchedByNinoCases.size() + " associated cases for case id {}", caseData.getCcdCaseId());
-
-        backLinkAssociatedCases(caseData.getCcdCaseId(), matchedByNinoCases);
 
         List<CaseLink> associatedCases = new ArrayList<>();
 
@@ -228,26 +234,6 @@ public class SubmitAppealService {
             return caseData.toBuilder().linkedCasesBoolean("No").build();
         }
     }
-
-    private void backLinkAssociatedCases(String caseId, List<SscsCaseDetails> matchedByNinoCases) {
-        if (matchedByNinoCases.size() > 0 && matchedByNinoCases.size() < 10) {
-            CaseLink caseLink = CaseLink.builder().value(
-                    CaseLinkDetails.builder().caseReference(caseId).build()).build();
-
-            for (SscsCaseDetails matchedCase : matchedByNinoCases) {
-                List<CaseLink> caseLinks = matchedCase.getData().getAssociatedCase() != null ?  matchedCase.getData().getAssociatedCase() : new ArrayList<>();
-
-                caseLinks.add(caseLink);
-                matchedCase.getData().setAssociatedCase(caseLinks);
-                matchedCase.getData().setLinkedCasesBoolean("Yes");
-
-                log.info("Back linking case id {} to case id {}", caseId, matchedCase.getId().toString());
-
-                ccdService.updateCase(matchedCase.getData(), matchedCase.getId(), ASSOCIATE_CASE.getCcdType(), "Associate case", "Associated case added", idamService.getIdamTokens());
-            }
-        }
-    }
-
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
