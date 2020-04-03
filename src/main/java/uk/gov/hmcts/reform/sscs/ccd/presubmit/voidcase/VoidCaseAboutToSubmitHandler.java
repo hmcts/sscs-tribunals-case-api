@@ -22,7 +22,8 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && (callback.getEvent() == EventType.VOID_CASE || callback.getEvent() == EventType.ADMIN_SEND_TO_VOID_STATE);
+                && (callback.getEvent() == EventType.VOID_CASE
+                || callback.getEvent() == EventType.ADMIN_SEND_TO_VOID_STATE);
     }
 
     @Override
@@ -37,6 +38,7 @@ public class VoidCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<Ss
         log.info(String.format("Handling send to void state for case id %s", sscsCaseData.getCcdCaseId()));
 
         sscsCaseData.setDirectionDueDate(null);
+        sscsCaseData.setInterlocReviewState(null);
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
