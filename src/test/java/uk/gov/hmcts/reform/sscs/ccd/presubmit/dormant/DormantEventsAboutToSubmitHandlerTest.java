@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.appealdormant;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -21,11 +21,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
-
 @RunWith(JUnitParamsRunner.class)
-public class AppealDormantAboutToSubmitHandlerTest {
+public class DormantEventsAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    private AppealDormantAboutToSubmitHandler handler;
+    private DormantEventsAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -34,13 +33,11 @@ public class AppealDormantAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
 
-
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new AppealDormantAboutToSubmitHandler();
+        handler = new DormantEventsAboutToSubmitHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.DORMANT);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .interlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId()).build();
@@ -54,7 +51,9 @@ public class AppealDormantAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void setsInterlocReviewStateForAppealDormantEvent() {
+    @Parameters({"HMCTS_LAPSE_CASE", "CONFIRM_LAPSED", "WITHDRAWN", "LAPSED_REVISED", "DORMANT", "ADMIN_SEND_TO_DORMANT_APPEAL_STATE", "ADMIN_APPEAL_WITHDRAWN"})
+    public void clearInterlocReviewStateAndDirectionDueDateForDormantEvents(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -63,6 +62,7 @@ public class AppealDormantAboutToSubmitHandlerTest {
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
         assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test(expected = IllegalStateException.class)

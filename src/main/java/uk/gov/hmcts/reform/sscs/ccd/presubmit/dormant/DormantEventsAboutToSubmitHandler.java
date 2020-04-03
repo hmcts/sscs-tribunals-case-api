@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.adminsendtodormantappealstate;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
 import static java.util.Objects.requireNonNull;
 
@@ -11,9 +11,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
+
 @Service
 @Slf4j
-public class AdminSendToDormantAppealStateAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -21,7 +22,14 @@ public class AdminSendToDormantAppealStateAboutToSubmitHandler implements PreSub
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.ADMIN_SEND_TO_DORMANT_APPEAL_STATE;
+                && (callback.getEvent() == EventType.HMCTS_LAPSE_CASE
+                || callback.getEvent() == EventType.CONFIRM_LAPSED
+                || callback.getEvent() == EventType.WITHDRAWN
+                || callback.getEvent() == EventType.LAPSED_REVISED
+                || callback.getEvent() == EventType.DORMANT
+                || callback.getEvent() == EventType.ADMIN_SEND_TO_DORMANT_APPEAL_STATE
+                || callback.getEvent() == EventType.ADMIN_APPEAL_WITHDRAWN
+            );
     }
 
     @Override
@@ -32,9 +40,10 @@ public class AdminSendToDormantAppealStateAboutToSubmitHandler implements PreSub
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        log.info("Setting InterlocReviewState to null for case id {} "
-                + "for AdminSendToDormantAppealStateAboutToSubmitHandler" + callback.getCaseDetails().getId());
+        log.info("Handling {} event for case id {}", callback.getEvent(), callback.getCaseDetails().getId());
+
         caseData.setInterlocReviewState(null);
+        caseData.setDirectionDueDate(null);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 

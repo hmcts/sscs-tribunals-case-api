@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.appeallapsed;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.interlocsendtotcw;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -21,11 +21,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 
-
 @RunWith(JUnitParamsRunner.class)
-public class AppealLapsedAboutToSubmitHandlerTest {
+public class InterlocSendToTcwAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    private AppealLapsedAboutToSubmitHandler handler;
+    private InterlocSendToTcwAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -34,14 +33,14 @@ public class AppealLapsedAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
     private SscsCaseData sscsCaseData;
 
-
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new AppealLapsedAboutToSubmitHandler();
+        handler = new InterlocSendToTcwAboutToSubmitHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.LAPSED_REVISED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getEvent()).thenReturn(EventType.INTERLOC_SEND_TO_TCW);
+
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .interlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -54,15 +53,14 @@ public class AppealLapsedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void setsInterlocReviewStateForAdminAppealLapsedEvent() {
-
+    public void clearDirectionDueDateForInterlocSendToTcwEvent() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
 
-        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test(expected = IllegalStateException.class)
