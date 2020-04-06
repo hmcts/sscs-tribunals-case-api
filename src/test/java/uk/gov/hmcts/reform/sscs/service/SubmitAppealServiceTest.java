@@ -19,10 +19,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INCOMPLETE_APPLICATION_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.NON_COMPLIANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.SEND_TO_DWP;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.VALID_APPEAL_CREATED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
@@ -43,6 +40,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -102,6 +101,9 @@ public class SubmitAppealServiceTest {
     private final SyaCaseWrapper appealData = getSyaCaseWrapper();
 
     private final String userToken = "user token";
+
+    @Captor
+    private ArgumentCaptor<SscsCaseData> capture;
 
     @Mock
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
@@ -195,6 +197,24 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenAssociatedCaseAlreadyExistsInCcd_shouldCreateCaseWithAppealDetailsAndAssociatedCase() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
+                SscsCaseDetails.builder().id(12345678L).build()
+        ));
+
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals(1, capture.getValue().getAssociatedCase().size());
+        assertEquals("12345678", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
+
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
     }
 
@@ -492,17 +512,36 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void addAssociatedCases() {
-        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).build();
+    public void givenAssociatedCase_thenAddAssociatedCaseLinkToCase() {
+        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
         matchedByNinoCases.add(matchingCase);
 
         SscsCaseData caseData = submitAppealService.addAssociatedCases(
-            SscsCaseData.builder().caseReference("00000000").build(),
+            SscsCaseData.builder().ccdCaseId("00000000").build(),
             matchedByNinoCases);
 
         assertEquals(1, caseData.getAssociatedCase().size());
         assertEquals("Yes", caseData.getLinkedCasesBoolean());
+        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
+    }
+
+    @Test
+    public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
+        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
+        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().build()).build();
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+        matchedByNinoCases.add(matchingCase1);
+        matchedByNinoCases.add(matchingCase2);
+
+        SscsCaseData caseData = submitAppealService.addAssociatedCases(
+                SscsCaseData.builder().ccdCaseId("00000000").build(),
+                matchedByNinoCases);
+
+        assertEquals(2, caseData.getAssociatedCase().size());
+        assertEquals("Yes", caseData.getLinkedCasesBoolean());
+        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("56765676", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
     }
 
     @Test
@@ -510,11 +549,12 @@ public class SubmitAppealServiceTest {
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
 
         SscsCaseData caseData = submitAppealService.addAssociatedCases(
-            SscsCaseData.builder().caseReference("00000000").build(),
+            SscsCaseData.builder().ccdCaseId("00000000").build(),
             matchedByNinoCases);
 
         assertNull(caseData.getAssociatedCase());
         assertEquals("No", caseData.getLinkedCasesBoolean());
+        verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
     }
 
     @Test

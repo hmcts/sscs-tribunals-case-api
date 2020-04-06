@@ -166,14 +166,22 @@ public class SubmitAppealService {
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);;
-
-            List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(caseData.getGeneratedNino(), idamTokens);
-
-            log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + caseData.getGeneratedNino());
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
 
             if (caseDetails == null) {
-                caseData = addAssociatedCases(caseData, matchedByNinoCases);
+
+                if (caseData.getAppeal().getAppellant().getIdentity() != null
+                    && !StringUtils.isEmpty(caseData.getAppeal().getAppellant().getIdentity().getNino())) {
+
+                    String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
+                    List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
+
+                    if (!matchedByNinoCases.isEmpty()) {
+                        log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
+
+                        caseData = addAssociatedCases(caseData, matchedByNinoCases);
+                    }
+                }
 
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
@@ -201,31 +209,31 @@ public class SubmitAppealService {
         }
     }
 
-    protected List<SscsCaseDetails> getMatchedCases(String generatedNino, IdamTokens idamTokens) {
+    protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
         HashMap<String, String> map = new HashMap<String, String>();
 
-        map.put("case.generatedNino", generatedNino);
+        map.put("case.appeal.appellant.identity.nino", nino);
 
         return ccdService.findCaseBy(map, idamTokens);
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
-        log.info("Adding " + matchedByNinoCases.size() + " associated cases");
+        log.info("Adding " + matchedByNinoCases.size() + " associated cases for case id {}", caseData.getCcdCaseId());
+
         List<CaseLink> associatedCases = new ArrayList<>();
 
         for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
             log.info("Linking case " + sscsCaseDetails.getId().toString());
-            CaseLink caseLink = CaseLink.builder().value(
-                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build();
-            associatedCases.add(caseLink);
+            associatedCases.add(CaseLink.builder().value(
+                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build());
         }
-        if (associatedCases.size() > 0) {
+
+        if (!matchedByNinoCases.isEmpty()) {
             return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean("Yes").build();
         } else {
             return caseData.toBuilder().linkedCasesBoolean("No").build();
         }
     }
-
 
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
