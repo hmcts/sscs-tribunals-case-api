@@ -166,7 +166,7 @@ public class SubmitAppealService {
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);;
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
 
             if (caseDetails == null) {
 
@@ -176,7 +176,7 @@ public class SubmitAppealService {
                     String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
                     List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
 
-                    if (matchedByNinoCases.size() > 0) {
+                    if (!matchedByNinoCases.isEmpty()) {
                         log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
 
                         caseData = addAssociatedCases(caseData, matchedByNinoCases);
@@ -228,7 +228,7 @@ public class SubmitAppealService {
                     CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build());
         }
 
-        if (matchedByNinoCases.size() > 0) {
+        if (!matchedByNinoCases.isEmpty()) {
             return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean("Yes").build();
         } else {
             return caseData.toBuilder().linkedCasesBoolean("No").build();

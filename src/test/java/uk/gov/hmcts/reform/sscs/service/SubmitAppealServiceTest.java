@@ -201,6 +201,24 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
+    public void givenAssociatedCaseAlreadyExistsInCcd_shouldCreateCaseWithAppealDetailsAndAssociatedCase() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
+                SscsCaseDetails.builder().id(12345678L).build()
+        ));
+
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        assertEquals(1, capture.getValue().getAssociatedCase().size());
+        assertEquals("12345678", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
+
+        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
+    }
+
+    @Test
     public void givenCaseDoesNotExistInCcdAndMrnDateIsMissing_shouldCreateCaseWithAppealDetailsWithIncompleteApplicationEvent() {
         byte[] expected = {};
         appealData.getMrn().setDate(null);
