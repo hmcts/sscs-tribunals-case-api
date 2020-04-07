@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
@@ -41,19 +38,19 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
 
         Subscription appellantSubscription = sscsCaseData.getSubscriptions().getAppellantSubscription();
 
-        if (appellantSubscription != null) {
+        if (appellantSubscription != null && !appellantSubscription.isEmpty()) {
             appellantSubscription.setTya(getTyaNumber(appellantSubscription));
         }
 
         Subscription appointeeSubscription = sscsCaseData.getSubscriptions().getAppointeeSubscription();
 
-        if (appointeeSubscription != null) {
+        if (appointeeSubscription != null && !appointeeSubscription.isEmpty()) {
             appointeeSubscription.setTya(getTyaNumber(appointeeSubscription));
         }
 
         Subscription repSubscription = sscsCaseData.getSubscriptions().getRepresentativeSubscription();
 
-        if (repSubscription != null) {
+        if (repSubscription != null && !repSubscription.isEmpty()) {
             repSubscription.setTya(getTyaNumber(repSubscription));
         }
 

@@ -125,6 +125,22 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
         assertEquals("email", response.getData().getSubscriptions().getRepresentativeSubscription().getEmail());
     }
 
+    @Test
+    public void givenEmptySubscriptions_thenDoNotUpdateTyaNumber() {
+        Subscription repSubscription = Subscription.builder().build();
+        Subscription appellantSubscription = Subscription.builder().build();
+        Subscription appointeeSubscription = Subscription.builder().build();
+        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).appointeeSubscription(appointeeSubscription).representativeSubscription(repSubscription).build();
+
+        sscsCaseData.setSubscriptions(subscriptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSubscriptions().getAppellantSubscription().getTya());
+        assertNull(response.getData().getSubscriptions().getAppointeeSubscription().getTya());
+        assertNull(response.getData().getSubscriptions().getRepresentativeSubscription().getTya());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
