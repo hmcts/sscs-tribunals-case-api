@@ -24,6 +24,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "directionDueDate": "2020-06-01",
       "dwpTimeExtension": [
       ],
       "linkedCasesBoolean": "No",

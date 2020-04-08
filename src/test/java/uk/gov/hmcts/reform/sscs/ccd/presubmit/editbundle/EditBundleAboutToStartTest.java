@@ -2,8 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
@@ -116,6 +115,37 @@ public class EditBundleAboutToStartTest {
         List<Bundle> bundles = new ArrayList<>();
         bundles.add(bundle);
 
+        callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
+    }
+
+    @Test
+    public void givenEditBundleEventWithNoAmendedBundleOptionSelectedAndIgnoreWarningsFalse_thenReturnAWarningToCaseworker() {
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("No").build()).build();
+        List<Bundle> bundles = new ArrayList<>();
+        bundles.add(bundle);
+
+        when(callback.isIgnoreWarnings()).thenReturn(false);
+        callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String warning = result.getWarnings().stream()
+                .findFirst()
+                .orElse("");
+        assertEquals("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?", warning);
+
+        verifyNoInteractions(bundleRequestExecutor);
+    }
+
+    @Test
+    public void givenEditBundleEventWithNoAmendedBundleOptionSelectedAndIgnoreWarningsTrue_thenTriggerTheExternalEditBundleEvent() {
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("No").build()).build();
+        List<Bundle> bundles = new ArrayList<>();
+        bundles.add(bundle);
+
+        when(callback.isIgnoreWarnings()).thenReturn(true);
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

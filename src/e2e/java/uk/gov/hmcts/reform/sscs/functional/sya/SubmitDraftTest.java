@@ -2,11 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.sya;
 
 import static io.restassured.RestAssured.baseURI;
 import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -19,35 +15,27 @@ import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
-import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.rules.SpringClassRule;
-import org.springframework.test.context.junit4.rules.SpringMethodRule;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
-import uk.gov.hmcts.reform.sscs.idam.Authorize;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.idam.*;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
 
+@RunWith(SpringRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
-@RunWith(JUnitParamsRunner.class)
 @SpringBootTest
 public class SubmitDraftTest {
 
@@ -56,12 +44,6 @@ public class SubmitDraftTest {
     private static final String AUTHORIZATION_CODE = "authorization_code";
     private static final String RESPONSE_TYPE = "code";
     private static final String LOCATION_HEADER_NAME = "Location";
-
-    @ClassRule
-    public static final SpringClassRule SPRING_CLASS_RULE = new SpringClassRule();
-
-    @Rule
-    public final SpringMethodRule springMethodRule = new SpringMethodRule();
 
     @Value("${test-url}")
     private String testUrl;
@@ -106,10 +88,13 @@ public class SubmitDraftTest {
         baseURI = testUrl;
         useRelaxedHTTPSValidation();
         citizenToken = getIdamOauth2Token(username, password);
+        UserDetails userDetails = getUserDetails(citizenToken);
         citizenIdamTokens = IdamTokens.builder()
             .idamOauth2Token(citizenToken)
-            .serviceAuthorization(authTokenGenerator.generate())
-            .userId(getUserId(citizenToken))
+            .serviceAuthorization(idamService.generateServiceAuthorization())
+            .userId(userDetails.getId())
+            .roles(userDetails.getRoles())
+            .email(userDetails.getEmail())
             .build();
 
         userIdamTokens = idamService.getIdamTokens();
@@ -121,12 +106,12 @@ public class SubmitDraftTest {
         List<SscsCaseData> savedDrafts = citizenCcdService.findCase(citizenIdamTokens);
 
         if (savedDrafts.size() > 0) {
-            archiveDraft(savedDrafts.get(0));
+            savedDrafts.stream().forEach(d -> archiveDraft(d));
         }
     }
 
-    private String getUserId(String userToken) {
-        return idamApiClient.getUserDetails(userToken).getId();
+    private UserDetails getUserDetails(String userToken) {
+        return idamApiClient.getUserDetails(userToken);
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
@@ -137,25 +122,74 @@ public class SubmitDraftTest {
     }
 
     @Test
-    @Parameters({
-        "PIP,DWP PIP (1),Newcastle", "PIP,DWP PIP (2),Glasgow", "ESA,Inverness DRT,Inverness DRT",
-        "ESA,Coatbridge Benefit Centre,Coatbridge Benefit Centre", "UC,,Universal Credit"
-    })
-    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentre(String benefitCode, String dwpIssuingOffice,
-                                                                  String expectedDwpRegionalCentre) {
-        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
-        String nino = submitHelper.getRandomNino();
-        body = submitHelper.setNino(body, nino);
-        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
-        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
-        body = submitHelper.setBenefitCode(body, benefitCode);
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToNewcastle() {
+        String expectedDwpRegionalCentre = "Newcastle";
 
         RestAssured.given()
             .log().method().log().headers().log().uri().log().body(true)
             .contentType(ContentType.JSON)
             .header(new Header(AUTHORIZATION, citizenToken))
-            .body(body)
+            .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (1)"))
             .put("/drafts");
+
+        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
+    }
+
+    @Test
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToGlasgow() {
+        String expectedDwpRegionalCentre = "Glasgow";
+
+        RestAssured.given()
+                .log().method().log().headers().log().uri().log().body(true)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, citizenToken))
+                .body(getAllDetailsDwpRegionalCentre("PIP", "DWP PIP (2)"))
+                .put("/drafts");
+
+        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
+    }
+
+    @Test
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToInvernessDrt() {
+        String expectedDwpRegionalCentre = "Inverness DRT";
+
+        RestAssured.given()
+                .log().method().log().headers().log().uri().log().body(true)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, citizenToken))
+                .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
+                .put("/drafts");
+
+        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
+    }
+
+    @Test
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToCoatbridgeBenefitCentre() {
+        String expectedDwpRegionalCentre = "Coatbridge Benefit Centre";
+
+        RestAssured.given()
+                .log().method().log().headers().log().uri().log().body(true)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, citizenToken))
+                .body(getAllDetailsDwpRegionalCentre("ESA", expectedDwpRegionalCentre))
+                .put("/drafts");
+
+        SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
+        assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
+    }
+
+    @Test
+    public void givenAppealIsSubmitted_shouldSetDwpRegionalCentreToUniversalCredit() {
+        String expectedDwpRegionalCentre = "Universal Credit";
+        RestAssured.given()
+                .log().method().log().headers().log().uri().log().body(true)
+                .contentType(ContentType.JSON)
+                .header(new Header(AUTHORIZATION, citizenToken))
+                .body(getAllDetailsDwpRegionalCentre("UC", ""))
+                .put("/drafts");
 
         SscsCaseData draft = citizenCcdService.findCase(citizenIdamTokens).get(0);
         assertEquals(expectedDwpRegionalCentre, draft.getDwpRegionalCentre());
@@ -195,7 +229,7 @@ public class SubmitDraftTest {
             .header(new Header(AUTHORIZATION, "thisTokenIsIncorrect"))
             .get("/drafts")
             .then()
-            .statusCode(HttpStatus.SC_BAD_REQUEST);
+            .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -209,6 +243,16 @@ public class SubmitDraftTest {
         archiveDraft(caseData);
 
         assertEquals(0, citizenCcdService.findCase(citizenIdamTokens).size());
+    }
+
+    private String getAllDetailsDwpRegionalCentre(String benefitCode, String dwpIssuingOffice) {
+        String body = ALL_DETAILS_DWP_REGIONAL_CENTRE.getSerializedMessage();
+        String nino = submitHelper.getRandomNino();
+        body = submitHelper.setNino(body, nino);
+        body = submitHelper.setLatestMrnDate(body, LocalDate.now());
+        body = submitHelper.setDwpIssuingOffice(body, dwpIssuingOffice);
+        body = submitHelper.setBenefitCode(body, benefitCode);
+        return body;
     }
 
     private Response saveDraft(SyaCaseWrapper draftAppeal) {

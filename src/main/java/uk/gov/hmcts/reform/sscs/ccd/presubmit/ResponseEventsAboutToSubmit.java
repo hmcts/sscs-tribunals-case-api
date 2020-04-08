@@ -11,11 +11,15 @@ public class ResponseEventsAboutToSubmit {
         }
         if (sscsCaseData.getIssueCode() == null) {
             preSubmitCallbackResponse.addError("Issue code cannot be empty");
+        } else if (sscsCaseData.getIssueCode().equals("DD")) {
+            preSubmitCallbackResponse.addError("Issue code cannot be set to the default value of DD");
         }
     }
 
     public void setCaseCode(SscsCaseData sscsCaseData) {
-        sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
+        if (sscsCaseData.getBenefitCode() != null && sscsCaseData.getIssueCode() != null) {
+            sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
+        }
     }
 
     private String buildCaseCode(SscsCaseData sscsCaseData) {

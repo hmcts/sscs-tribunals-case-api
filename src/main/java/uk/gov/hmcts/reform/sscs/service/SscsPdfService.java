@@ -93,7 +93,7 @@ public class SscsPdfService {
 
     private void sendPdfByEmail(Appeal appeal, byte[] pdf, Long caseDetailsId) {
         String appellantUniqueId = emailService.generateUniqueEmailId(appeal.getAppellant());
-        emailService.sendEmail(submitYourAppealEmailTemplate.generateEmail(
+        emailService.sendEmail(caseDetailsId, submitYourAppealEmailTemplate.generateEmail(
                 appellantUniqueId,
                 newArrayList(pdf(pdf, appellantUniqueId + ".pdf")))
         );

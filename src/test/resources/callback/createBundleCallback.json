@@ -31,6 +31,20 @@
       "benefitCode": "002",
       "isInterlocRequired": "IS_INTERLOC_REQUIRED_VALUE",
       "generatedNino": "JT 12 34 56 D",
+      "dwpResponseDocument": {
+        "documentLink": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c68120b8-12db-4b4c-8551-72ebdfe84c5b",
+          "document_filename": "screencapture-localhost-3451-case-SSCS-Benefit-1573057985760516-2019-11-06-16_44_11.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c68120b8-12db-4b4c-8551-72ebdfe84c5b/binary"
+        }
+      },
+      "dwpEvidenceBundleDocument": {
+        "documentLink": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c68120b8-12db-4b4c-8551-72ebdfe84c5b",
+          "document_filename": "screencapture-localhost-3451-case-SSCS-Benefit-1573057985760516-2019-11-06-16_44_11.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c68120b8-12db-4b4c-8551-72ebdfe84c5b/binary"
+        }
+      },
       "hearings": [
         {
           "value": {

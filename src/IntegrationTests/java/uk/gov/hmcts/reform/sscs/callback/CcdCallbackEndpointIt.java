@@ -271,7 +271,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(((MockHttpServletResponse) response).getContentAsString());
 
         assertEquals("No", result.getData().getLinkedCasesBoolean());
-        assertEquals("reviewByTcw", result.getData().getInterlocReviewState());
+        assertNull(result.getData().getDirectionDueDate());
     }
 
     @Test

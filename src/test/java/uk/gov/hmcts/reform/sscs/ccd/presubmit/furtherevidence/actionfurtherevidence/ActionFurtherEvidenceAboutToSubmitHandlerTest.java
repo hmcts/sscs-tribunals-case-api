@@ -127,7 +127,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocuments() {
+    @Parameters({"true", "false"})
+    public void givenACaseWithScannedDocumentOfTypeCoversheet_shouldNotMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder()
                 .type("coversheet")
@@ -146,10 +147,19 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             "Appellant (or Appointee)"));
         sscsCaseData.setEvidenceHandled("No");
 
+        when(callback.isIgnoreWarnings()).thenReturn(ignoreWarnings);
+
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
         assertEquals("Yes", response.getData().getEvidenceHandled());
+
+        if (ignoreWarnings) {
+            assertEquals(0, response.getWarnings().size());
+        } else {
+            String warning = response.getWarnings().stream().findFirst().orElse("");
+            assertEquals("Coversheet will be ignored, are you happy to proceed?", warning);
+        }
     }
 
     private void assertHappyPaths(DocumentType expectedDocumentType,
@@ -299,7 +309,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
-        return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE);
+        return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
     @Test
@@ -350,11 +360,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse() {
+    @Parameters({"null", " ", "    "})
+    public void givenADocumentWithNoDocFileName_thenAddAnErrorToResponse(@Nullable String filename) {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+                ScannedDocumentDetails.builder().fileName(filename).url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
 
         docs.add(scannedDocument);
 

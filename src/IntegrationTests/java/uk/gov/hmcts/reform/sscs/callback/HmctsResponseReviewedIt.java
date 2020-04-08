@@ -64,9 +64,9 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        assertEquals(25, result.getData().getDwpPresentingOffice().getListItems().size());
+        assertEquals(24, result.getData().getDwpPresentingOffice().getListItems().size());
         assertEquals(listItem, result.getData().getDwpPresentingOffice().getValue());
-        assertEquals(25, result.getData().getDwpOriginatingOffice().getListItems().size());
+        assertEquals(24, result.getData().getDwpOriginatingOffice().getListItems().size());
         assertEquals(listItem, result.getData().getDwpOriginatingOffice().getValue());
     }
 
@@ -79,7 +79,7 @@ public class HmctsResponseReviewedIt extends AbstractEventIt {
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
-        assertEquals("002DD", result.getData().getCaseCode());
+        assertEquals("002CC", result.getData().getCaseCode());
         assertEquals(LocalDate.now().toString(), result.getData().getDwpResponseDate());
     }
 

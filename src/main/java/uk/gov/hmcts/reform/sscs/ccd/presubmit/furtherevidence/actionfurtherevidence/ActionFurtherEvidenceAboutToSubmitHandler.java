@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -64,7 +65,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
         }
 
-        buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState());
+        buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings());
 
         return preSubmitCallbackResponse;
     }
@@ -77,19 +78,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         return false;
     }
 
-    private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState) {
+    private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState, Boolean ignoreWarnings) {
 
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
 
-                    if (scannedDocument.getValue().getUrl() == null) {
-                        preSubmitCallbackResponse.addError("No document URL so could not process");
-                    }
-
-                    if (scannedDocument.getValue().getFileName() == null) {
-                        preSubmitCallbackResponse.addError("No document file name so could not process");
-                    }
+                    checkWarningsAndErrors(scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings);
 
                     List<SscsDocument> documents = new ArrayList<>();
 
@@ -115,6 +110,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         sscsCaseData.setScannedDocuments(null);
 
+    }
+
+    private void checkWarningsAndErrors(ScannedDocument scannedDocument, String caseId, boolean ignoreWarnings) {
+        if (scannedDocument.getValue().getUrl() == null) {
+            preSubmitCallbackResponse.addError("No document URL so could not process");
+        }
+
+        if (StringUtils.isBlank(scannedDocument.getValue().getFileName())) {
+            preSubmitCallbackResponse.addError("No document file name so could not process");
+        }
+
+        if (equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
+            if (!ignoreWarnings) {
+                preSubmitCallbackResponse.addWarning("Coversheet will be ignored, are you happy to proceed?");
+            } else {
+                log.info("Coversheet not moved over for {}} - {}}", caseId, scannedDocument.getValue().getUrl().getDocumentUrl());
+            }
+        }
     }
 
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {

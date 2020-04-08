@@ -89,7 +89,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "sscs", State.WITH_DWP, caseData,
             LocalDateTime.now());
-        callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_REQUEST_TIME_EXTENSION);
+        callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_REQUEST_TIME_EXTENSION, false);
     }
 
     public Object[] generateSscsCaseDataWithDifferentSscsDocumentLength() {

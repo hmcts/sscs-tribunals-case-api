@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -41,7 +41,7 @@ public class InterlocServiceHandlerTest {
         initMocks(this);
         handler = new InterlocServiceHandler();
 
-        sscsCaseData = SscsCaseData.builder().build();
+        sscsCaseData = SscsCaseData.builder().directionDueDate("01/02/2020").build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -49,7 +49,6 @@ public class InterlocServiceHandlerTest {
 
     @Test
     @Parameters({
-        "INTERLOC_SEND_TO_TCW, ABOUT_TO_SUBMIT, true",
         "TCW_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, true",
         "INTERLOC_INFORMATION_RECEIVED, ABOUT_TO_SUBMIT, true",
         "JUDGE_DIRECTION_ISSUED, ABOUT_TO_SUBMIT, true",
@@ -59,7 +58,6 @@ public class InterlocServiceHandlerTest {
         "REINSTATE_APPEAL, ABOUT_TO_SUBMIT, true",
         "TCW_DECISION_APPEAL_TO_PROCEED, ABOUT_TO_SUBMIT, true",
         "JUDGE_DECISION_APPEAL_TO_PROCEED, ABOUT_TO_SUBMIT, true",
-        "UPLOAD_FURTHER_EVIDENCE, ABOUT_TO_SUBMIT, true",
         "SEND_TO_ADMIN, ABOUT_TO_SUBMIT, true",
         "DWP_CHALLENGE_VALIDITY, ABOUT_TO_SUBMIT, true",
         "DWP_CHALLENGE_VALIDITY, ABOUT_TO_START, false",
@@ -81,8 +79,6 @@ public class InterlocServiceHandlerTest {
         "TCW_DIRECTION_ISSUED, awaitingInformation",
         "INTERLOC_INFORMATION_RECEIVED, awaitingAdminAction",
         "JUDGE_DIRECTION_ISSUED, awaitingInformation",
-        "REINSTATE_APPEAL, awaitingAdminAction",
-        "UPLOAD_FURTHER_EVIDENCE, awaitingAdminAction",
         "TCW_DECISION_APPEAL_TO_PROCEED, none",
         "JUDGE_DECISION_APPEAL_TO_PROCEED, none",
         "SEND_TO_ADMIN, awaitingAdminAction"
@@ -94,19 +90,15 @@ public class InterlocServiceHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
-
     }
 
     @Test
     @Parameters({
-        "NON_COMPLIANT, reviewByTcw",
-        "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
-        "INTERLOC_SEND_TO_TCW, reviewByTcw",
         "TCW_REFER_TO_JUDGE, reviewByJudge",
         "DWP_CHALLENGE_VALIDITY, reviewByTcw",
         "DWP_REQUEST_TIME_EXTENSION, reviewByTcw"
     })
-    public void givenEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpected(
+    public void givenEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpectedAndDoNotClearDirectionDueDate(
         EventType eventType,
         String expectedInterlocReviewState) {
 
@@ -116,6 +108,26 @@ public class InterlocServiceHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+        assertThat(response.getData().getDirectionDueDate(), is("01/02/2020"));
+    }
+
+    @Test
+    @Parameters({
+            "NON_COMPLIANT, reviewByTcw",
+            "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
+            "REINSTATE_APPEAL, awaitingAdminAction"
+    })
+    public void givenEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpectedAndClearDirectionDueDate(
+            EventType eventType,
+            String expectedInterlocReviewState) {
+
+        when(callback.getEvent()).thenReturn(eventType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getInterlocReviewState(), is(expectedInterlocReviewState));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+        assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test(expected = IllegalStateException.class)

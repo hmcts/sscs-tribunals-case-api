@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,12 +22,11 @@ import java.util.Objects;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -65,7 +65,6 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionTheHearing;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(JUnitParamsRunner.class)
-@WebMvcTest(SyaController.class)
 public class SyaControllerTest {
 
     // being: it needed to run springRunner and junitParamsRunner
@@ -77,11 +76,18 @@ public class SyaControllerTest {
     // end
 
 
-    @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private SubmitAppealService submitAppealService;
+
+    private SyaController controller;
+
+    @Before
+    public void setUp() {
+        controller = new SyaController(submitAppealService);
+        mockMvc = standaloneSetup(controller).build();
+    }
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedAppeal() throws Exception {

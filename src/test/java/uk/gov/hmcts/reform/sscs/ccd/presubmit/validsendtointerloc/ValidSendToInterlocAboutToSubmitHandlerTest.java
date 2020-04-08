@@ -43,6 +43,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
                 .selectWhoReviewsCase(new DynamicList(new DynamicListItem("reviewByTcw", "Review by TCW"), null))
+                .directionDueDate("01/02/2020")
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -81,6 +82,7 @@ public class ValidSendToInterlocAboutToSubmitHandlerTest {
         assertEquals(code, response.getData().getInterlocReviewState());
         assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
         assertNull(response.getData().getSelectWhoReviewsCase());
+        assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test

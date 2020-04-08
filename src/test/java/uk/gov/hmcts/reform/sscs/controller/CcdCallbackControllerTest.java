@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ACTION_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION_RECEIVED;
 
@@ -16,12 +17,11 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.apache.commons.io.FileUtils;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -46,7 +46,6 @@ import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @SuppressWarnings("unchecked")
 @RunWith(JUnitParamsRunner.class)
-@WebMvcTest(CcdCallbackController.class)
 public class CcdCallbackControllerTest {
 
     // begin: needed to use spring runner and junitparamsRunner together
@@ -60,7 +59,6 @@ public class CcdCallbackControllerTest {
 
     // end
 
-    @Autowired
     private MockMvc mockMvc;
 
     @SuppressWarnings("PMD.UnusedPrivateField")
@@ -82,6 +80,14 @@ public class CcdCallbackControllerTest {
     @MockBean
     private IdamService idamService;
 
+    private CcdCallbackController controller;
+
+    @Before
+    public void setUp() {
+        controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
+        mockMvc = standaloneSetup(controller).build();
+    }
+
     @Test
     public void handleCcdAboutToStartCallbackAndUpdateCaseData() throws Exception {
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
@@ -90,8 +96,7 @@ public class CcdCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
             new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
-            Optional.empty(),
-            ACTION_FURTHER_EVIDENCE));
+            Optional.empty(), ACTION_FURTHER_EVIDENCE, false));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().originalSender(
             new DynamicList(new DynamicListItem("1", "2"), null)).build());
@@ -116,8 +121,7 @@ public class CcdCallbackControllerTest {
         SscsCaseData sscsCaseData = SscsCaseData.builder().build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
             new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
-            Optional.empty(),
-            INTERLOC_INFORMATION_RECEIVED));
+            Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
         when(dispatcher.handle(any(CallbackType.class), any(), anyString()))
@@ -156,7 +160,7 @@ public class CcdCallbackControllerTest {
     private Callback<SscsCaseData> buildCallbackForTestScenarioForGivenEvent() {
         CaseDetails<SscsCaseData> caseDetail = new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE,
             SscsCaseData.builder().build(), LocalDateTime.now());
-        return new Callback<>(caseDetail, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE);
+        return new Callback<>(caseDetail, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
     @Test

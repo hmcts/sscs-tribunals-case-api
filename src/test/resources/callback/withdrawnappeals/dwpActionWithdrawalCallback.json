@@ -16,6 +16,7 @@
         "appellantSubscription": {
           "tya": "NpmhpYaFLa",
           "email": "sscstest+notify@greencroftconsulting.com",
+          "lastLoggedIntoMya":null,
           "mobile": "07398785050",
           "reason": "",
           "subscribeSms": "Yes",
@@ -25,6 +26,7 @@
         "appointeeSubscription": {
           "tya": null,
           "email": null,
+          "lastLoggedIntoMya":null,
           "mobile": null,
           "reason": null,
           "subscribeSms": null,
@@ -34,6 +36,7 @@
         "supporterSubscription": {
           "tya": null,
           "email": null,
+          "lastLoggedIntoMya":null,
           "mobile": null,
           "reason": null,
           "subscribeSms": null,
@@ -43,6 +46,7 @@
         "representativeSubscription": {
           "tya": "",
           "email": "",
+          "lastLoggedIntoMya":null,
           "mobile": "",
           "reason": null,
           "subscribeSms": "No",
