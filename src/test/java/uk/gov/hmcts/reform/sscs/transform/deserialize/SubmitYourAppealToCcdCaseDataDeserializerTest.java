@@ -113,10 +113,10 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     @Test
     public void syaDwpIssuingOfficeTest() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
-        syaCaseWrapper.getMrn().setDwpIssuingOffice("DWP PIP ( 10)");
+        syaCaseWrapper.getMrn().setDwpIssuingOffice("DWP PIP ( 9)");
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper,
             regionalProcessingCenter.getName(), regionalProcessingCenter);
-        assertEquals("DWP PIP (10)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
+        assertEquals("DWP PIP (9)", caseData.getAppeal().getMrnDetails().getDwpIssuingOffice());
     }
 
     @Test
@@ -146,7 +146,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     @Parameters({
         "DWP PIP (1),PIP,Newcastle", "DWP PIP (2),PIP,Glasgow", "DWP PIP (3),PIP,Bellevale", "DWP PIP (4),PIP,Glasgow",
         "DWP PIP (5),PIP,Springburn", "DWP PIP (6),PIP,Blackpool", "DWP PIP (7),PIP,Blackpool", "DWP PIP (8),PIP,Blackpool",
-        "DWP PIP (9),PIP,Blackpool", "DWP PIP (10),PIP,Newport", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
+        "DWP PIP (9),PIP,Blackpool", "Inverness DRT,ESA,Inverness DRT","DWP PIP (),PIP,null",
         "DWP PIP (11),PIP,null", "null,UC,Universal Credit", ",UC,Universal Credit", "null,PIP,null"
     })
     @Test
