@@ -558,8 +558,7 @@ public class SubmitAppealServiceTest {
         given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
             SscsCaseDetails.builder().id(12345678L).build()
         ));
-        List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases(
-                Appeal.builder().appellant(Appellant.builder().identity(Identity.builder().nino("ABCDEFG").build()).build()).build(), idamService.getIdamTokens());
+        List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
 
         assertEquals(1, matchedCases.size());
     }
