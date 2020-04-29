@@ -41,6 +41,7 @@ public class SubmitAppealService {
     private final List<String> offices;
     private final boolean bulkScanMigrated;
 
+    @SuppressWarnings("squid:S107")
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
@@ -49,7 +50,7 @@ public class SubmitAppealService {
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
                         @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices,
-                        @Value("${feature.bulk-scan.migration}") boolean bulkScanMigrated) {
+                        @Value("${feature.bulk-scan.migrated}") boolean bulkScanMigrated) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -122,12 +123,10 @@ public class SubmitAppealService {
                                             String userToken) {
         if (null != caseDetails) {
             sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
-            if (!bulkScanMigrated) {
-                if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
-                    log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
-                    ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
-                    log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
-                }
+            if (!bulkScanMigrated && (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED))) {
+                log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
+                ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
+                log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
             }
             if (StringUtils.isNotEmpty(userToken)) {
                 citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
