@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.ActionFurtherEvidenceAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -87,6 +86,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .scannedDocuments(scannedDocumentList)
             .furtherEvidenceAction(furtherEvidenceActionList)
             .originalSender(originalSender)
+            .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").build()).build()).build())
             .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -306,6 +306,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 .originalSender(dynamicList)
                 .furtherEvidenceAction(dynamicList)
                 .scannedDocuments(Collections.singletonList(ScannedDocument.builder().build()))
+                .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").build()).build()).build())
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
@@ -319,6 +320,36 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("furtherEvidenceReceived", updated.getData().getDwpFurtherEvidenceStates());
+    }
+
+    @Test
+    @Parameters(method = "generateIssueFurtherEvidenceAddressEmptyScenarios")
+    public void givenIssueFurtherEvidenceAndEmptyAppellantAddress_shouldReturnAnErrorToUser(Appeal appeal, String... parties) {
+        Callback<SscsCaseData> callback = buildCallback(ISSUE_FURTHER_EVIDENCE.getCode());
+
+        callback.getCaseDetails().getCaseData().setAppeal(appeal);
+        PreSubmitCallbackResponse<SscsCaseData> result = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        for (String party : parties) {
+            String expectedError = "Address details are missing for the " + party + ", please validate or process manually";
+            assertTrue(result.getErrors().contains(expectedError));
+        }
+    }
+
+    private Object[] generateIssueFurtherEvidenceAddressEmptyScenarios() {
+
+        return new Object[]{
+            new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().build()).build()).build(), "Appellant"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().address(null).build()).build(), "Appellant"},
+            new Object[]{Appeal.builder().appellant(null).build(), "Appellant"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().build()).build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().address(Address.builder().build()).build()).build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().address(null).build()).build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().rep(Representative.builder().address(Address.builder().build()).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
+            new Object[]{Appeal.builder().rep(Representative.builder().address(null).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
+            new Object[]{Appeal.builder().rep(Representative.builder().address(Address.builder().build()).build()).appellant(Appellant.builder().address(null).build()).build(), "Appellant", "Representative"},
+        };
     }
 
     @Test
