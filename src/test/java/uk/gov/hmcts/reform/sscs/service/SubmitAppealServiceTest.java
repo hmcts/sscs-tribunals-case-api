@@ -110,6 +110,8 @@ public class SubmitAppealServiceTest {
 
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
+    private SscsPdfService sscsPdfService;
+
     static {
         AirLookupService airLookupService = new AirLookupService();
         airLookupService.init();
@@ -163,18 +165,17 @@ public class SubmitAppealServiceTest {
         submitYourAppealEmailTemplate =
             new SubmitYourAppealEmailTemplate("from", "to", "message");
 
-
-        List<String> offices = new ArrayList<>();
+        offices = new ArrayList<>();
         offices.add("DWP PIP (1)");
         offices.add("Balham DRT");
         offices.add("Watford DRT");
 
-        SscsPdfService sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
+        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
             submitYourAppealEmailTemplate, ccdPdfService);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, offices);
+            idamService, convertAIntoBService, offices, false);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -188,7 +189,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndTriggerSentToDwpEvent() {
+    public void givenCaseDoesNotExistInCcdAndBulkScanMigratedFeatureOff_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndTriggerSentToDwpEvent() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
@@ -198,6 +199,23 @@ public class SubmitAppealServiceTest {
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenCaseDoesNotExistInCcdAndBulkScanMigratedFeatureOn_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndDoNotTriggerSentToDwpEvent() {
+        submitAppealService = new SubmitAppealService(
+                ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
+                idamService, convertAIntoBService, offices, true);
+
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+
+        submitAppealService.submitAppeal(appealData, userToken);
+
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test

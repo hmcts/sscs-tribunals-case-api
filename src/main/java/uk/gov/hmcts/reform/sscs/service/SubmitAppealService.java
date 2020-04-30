@@ -39,7 +39,9 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final List<String> offices;
+    private final boolean bulkScanMigrated;
 
+    @SuppressWarnings("squid:S107")
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
@@ -47,7 +49,8 @@ public class SubmitAppealService {
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
-                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
+                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices,
+                        @Value("${feature.bulk-scan.migrated}") boolean bulkScanMigrated) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -56,6 +59,7 @@ public class SubmitAppealService {
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
         this.offices = offices;
+        this.bulkScanMigrated = bulkScanMigrated;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -119,7 +123,7 @@ public class SubmitAppealService {
                                             String userToken) {
         if (null != caseDetails) {
             sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
-            if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
+            if (!bulkScanMigrated && (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED))) {
                 log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
                 ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
                 log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
