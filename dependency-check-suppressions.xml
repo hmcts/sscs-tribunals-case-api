@@ -16,20 +16,4 @@
         ]]></notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: log4j-api-2.12.1.jar
-        Not sending logs over email so safe to suppress
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-api@.*$</packageUrl>
-        <cve>CVE-2020-9488</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: log4j-to-slf4j-2.12.1.jar
-        Not sending logs over email so safe to suppress
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-to\-slf4j@.*$</packageUrl>
-        <cve>CVE-2020-9488</cve>
-    </suppress>
 </suppressions>
