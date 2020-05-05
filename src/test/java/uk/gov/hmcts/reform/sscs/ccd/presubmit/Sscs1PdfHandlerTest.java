@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -96,7 +97,7 @@ public class Sscs1PdfHandlerTest {
 
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
-        PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
         verify(sscsPdfService).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), any(), any());
@@ -117,6 +118,15 @@ public class Sscs1PdfHandlerTest {
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
         verify(sscsPdfService, never()).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
+    public void givenPdfServiceExceptionThrown_thenCarryOnWithCaseCreation() {
+        when(sscsPdfService.generateAndSendPdf(eq(caseDetails.getCaseData()), any(), any(), any())).thenThrow(new PDFServiceClientException(new Exception("Error")));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("1234567890", response.getData().getCcdCaseId());
     }
 
     private SscsCaseData buildCaseDataWithoutPdf() {

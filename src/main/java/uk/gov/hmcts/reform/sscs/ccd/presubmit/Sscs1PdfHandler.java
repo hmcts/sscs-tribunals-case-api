@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import uk.gov.hmcts.reform.pdf.service.client.exception.PDFServiceClientException;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -61,7 +62,11 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
         if (!hasPdf) {
             log.info("Existing pdf document not found, start generating pdf for caseId {}", caseData.getCcdCaseId());
 
-            sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),"sscs1", fileName);
+            try {
+                sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()), "sscs1", fileName);
+            } catch (PDFServiceClientException pdfServiceClientException) {
+                log.error("Sscs1 form could not be generated for caseId {} for exception ", caseData.getCcdCaseId(), pdfServiceClientException);
+            }
         }
     }
 
