@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
-class CitizenCcdClient {
+public class CitizenCcdClient {
 
     private final CcdRequestDetails ccdRequestDetails;
     private final CoreCaseDataApi coreCaseDataApi;
@@ -95,7 +95,7 @@ class CitizenCcdClient {
         );
     }
 
-    void addUserToCase(IdamTokens idamTokens, String userIdToAdd, Long caseId) {
+    public void addUserToCase(IdamTokens idamTokens, String userIdToAdd, Long caseId) {
         caseAccessApi.grantAccessToCase(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
@@ -107,7 +107,7 @@ class CitizenCcdClient {
         );
     }
 
-    void removeUserFromCase(IdamTokens idamTokens, String userIdToRemove, Long caseId) {
+    public void removeUserFromCase(IdamTokens idamTokens, String userIdToRemove, Long caseId) {
         caseAccessApi.revokeAccessToCase(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
