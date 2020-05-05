@@ -8,30 +8,30 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.service.EmailService;
+import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.service.SscsPdfService;
 
 @Component
 @Slf4j
-public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final SscsPdfService sscsPdfService;
-    private final EmailService emailService;
-    private final IdamService idamService;
+    private final EmailHelper emailHelper;
 
     @Autowired
-    public RecreateAppealPdfHandler(SscsPdfService sscsPdfService, EmailService emailService, IdamService idamService) {
+    public Sscs1PdfHandler(SscsPdfService sscsPdfService, EmailHelper emailHelper) {
         this.sscsPdfService = sscsPdfService;
-        this.emailService = emailService;
-        this.idamService = idamService;
+        this.emailHelper = emailHelper;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        boolean canHandle = callbackType == CallbackType.SUBMITTED
-                && callback.getEvent() == EventType.CREATE_APPEAL_PDF;
+        boolean canHandle = callbackType == CallbackType.ABOUT_TO_SUBMIT
+                && (!"Paper".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getReceivedVia())
+                && (callback.getEvent() == EventType.VALID_APPEAL_CREATED
+                || callback.getEvent() == EventType.NON_COMPLIANT
+                || callback.getEvent() == EventType.INCOMPLETE_APPLICATION_RECEIVED)
+                || callback.getEvent() == EventType.CREATE_APPEAL_PDF);
         return canHandle;
     }
 
@@ -47,40 +47,25 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
-        createAppealPdfAndSendToRobotics(caseData);
+        createAppealPdf(caseData);
 
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
+    private void createAppealPdf(SscsCaseData caseData) {
+        String fileName = emailHelper.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
 
-    private void createAppealPdfAndSendToRobotics(SscsCaseData caseData) {
-        //FIXME: This code should be refactored to use the PDF generation for SYA
-        boolean hasPdf = hasPdfDocument(caseData);
+        boolean hasPdf = hasPdfDocument(caseData, fileName);
 
         log.info("Does case have pdf {}", hasPdf);
         if (!hasPdf) {
             log.info("Existing pdf document not found, start generating pdf ");
-            updateAppointeeNullIfNotPresent(caseData);
-            caseData.setEvidencePresent(hasEvidence(caseData));
 
-            IdamTokens idamTokens = idamService.getIdamTokens();
-
-            sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),
-                    idamTokens,"sscs1");
+            sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),"sscs1", fileName);
         }
     }
 
-    private void updateAppointeeNullIfNotPresent(SscsCaseData caseData) {
-        if (caseData != null && caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null) {
-            Appointee appointee = caseData.getAppeal().getAppellant().getAppointee();
-            if (appointee != null && appointee.getName() == null) {
-                caseData.getAppeal().getAppellant().setAppointee(null);
-            }
-        }
-    }
-
-    private boolean hasPdfDocument(SscsCaseData caseData) {
-        String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
+    private boolean hasPdfDocument(SscsCaseData caseData, String fileName) {
         log.info("Case does have document {} and Pdf file name to check {} ",
                 !CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
 
@@ -95,17 +80,5 @@ public class RecreateAppealPdfHandler implements PreSubmitCallbackHandler<SscsCa
             }
         }
         return false;
-    }
-
-    private String hasEvidence(SscsCaseData caseData) {
-        String fileName = emailService.generateUniqueEmailId(caseData.getAppeal().getAppellant()) + ".pdf";
-        if (caseData.getSscsDocument() != null) {
-            for (SscsDocument document : caseData.getSscsDocument()) {
-                if (document != null && !fileName.equals(document.getValue().getDocumentFileName())) {
-                    return "Yes";
-                }
-            }
-        }
-        return "No";
     }
 }
