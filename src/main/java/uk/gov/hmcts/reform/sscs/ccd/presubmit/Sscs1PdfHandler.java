@@ -57,17 +57,17 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
         boolean hasPdf = hasPdfDocument(caseData, fileName);
 
-        log.info("Does case have pdf {}", hasPdf);
+        log.info("Does case have pdf {} for caseId {}", hasPdf, caseData.getCcdCaseId());
         if (!hasPdf) {
-            log.info("Existing pdf document not found, start generating pdf ");
+            log.info("Existing pdf document not found, start generating pdf for caseId {}", caseData.getCcdCaseId());
 
             sscsPdfService.generateAndSendPdf(caseData, Long.parseLong(caseData.getCcdCaseId()),"sscs1", fileName);
         }
     }
 
     private boolean hasPdfDocument(SscsCaseData caseData, String fileName) {
-        log.info("Case does have document {} and Pdf file name to check {} ",
-                !CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName);
+        log.info("Case does have document {} and Pdf file name to check {} for caseId {}",
+                !CollectionUtils.isEmpty(caseData.getSscsDocument()), fileName, caseData.getCcdCaseId());
 
         if (caseData.getSscsDocument() != null) {
             for (SscsDocument document : caseData.getSscsDocument()) {
