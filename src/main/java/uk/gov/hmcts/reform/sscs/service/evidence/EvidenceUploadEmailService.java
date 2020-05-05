@@ -4,11 +4,9 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CorDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.QuestionSummary;
 import uk.gov.hmcts.reform.sscs.service.DocumentDownloadService;
 import uk.gov.hmcts.reform.sscs.service.email.CorEmailService;
 import uk.gov.hmcts.reform.sscs.service.email.EmailMessageBuilder;
@@ -34,18 +32,6 @@ public class EvidenceUploadEmailService {
 
         sendFileToDwp(
                 newEvidence.stream().map(SscsDocument::getValue).collect(toList()),
-                message,
-                subject,
-                sscsCaseDetails.getId()
-        );
-    }
-
-    public void sendToDwp(QuestionSummary question, List<CorDocument> newEvidence, SscsCaseDetails sscsCaseDetails) {
-        String message = emailMessageBuilder.getQuestionEvidenceSubmittedMessage(sscsCaseDetails, question);
-        String subject = "Evidence uploaded (" + sscsCaseDetails.getData().getCaseReference() + ")";
-
-        sendFileToDwp(
-                newEvidence.stream().map(evidence -> evidence.getValue().getDocument()).collect(toList()),
                 message,
                 subject,
                 sscsCaseDetails.getId()

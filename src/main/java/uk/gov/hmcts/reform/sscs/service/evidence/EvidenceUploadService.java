@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.Question;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
@@ -377,34 +376,6 @@ public class EvidenceUploadService {
         evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
     }
 
-    public boolean submitQuestionEvidence(String onlineHearingId, Question question) {
-        return onlineHearingService.getCcdCase(onlineHearingId)
-                .map(caseDetails -> {
-                    Long ccdCaseId = caseDetails.getId();
-                    log.info("Submitting draft document for case [" + ccdCaseId + "] and question [" + question.getQuestionId() + "]");
-
-                    SscsCaseData sscsCaseData = caseDetails.getData();
-
-
-                    List<CorDocument> draftCorDocument = sscsCaseData.getDraftCorDocument();
-
-                    if (draftCorDocument != null && !draftCorDocument.isEmpty()) {
-                        Map<Boolean, List<CorDocument>> draftCorDocumentsForQuestionId = draftCorDocument.stream()
-                                .collect(partitioningBy(corDocument -> corDocument.getValue().getQuestionId().equals(question.getQuestionId())));
-
-                        List<CorDocument> newCorDocumentList = union(
-                                emptyIfNull(sscsCaseData.getCorDocument()),
-                                emptyIfNull(draftCorDocumentsForQuestionId.get(true))
-                        );
-                        sscsCaseData.setCorDocument(newCorDocumentList);
-                        sscsCaseData.setDraftCorDocument(draftCorDocumentsForQuestionId.get(false));
-                        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
-                    }
-                    return true;
-                })
-                .orElse(false);
-    }
-
     private List<String> getFileNames(SscsCaseData sscsCaseData) {
         return sscsCaseData.getDraftSscsDocument().stream()
                 .map(document -> document.getValue().getDocumentFileName())
@@ -415,26 +386,6 @@ public class EvidenceUploadService {
         return loadEvidence(identifier)
                 .map(LoadedEvidence::getDraftHearingEvidence)
                 .orElse(emptyList());
-    }
-
-    public List<Evidence> listQuestionEvidence(String onlineHearingId, String questionId) {
-        return listQuestionEvidence(onlineHearingId).getOrDefault(questionId, emptyList());
-    }
-
-    public Map<String, List<Evidence>> listQuestionEvidence(String onlineHearingId) {
-        Optional<LoadedEvidence> loadedEvidence = loadEvidence(onlineHearingId);
-
-        Map<String, List<Evidence>> draftEvidence = loadedEvidence
-                .map(LoadedEvidence::getDraftQuestionEvidence)
-                .orElse(emptyMap());
-        Map<String, List<Evidence>> evidence = loadedEvidence
-                .map(LoadedEvidence::getQuestionEvidence)
-                .orElse(emptyMap());
-        HashMap<String, List<Evidence>> combinedEvidence = new HashMap<>();
-        combinedEvidence.putAll(draftEvidence);
-        combinedEvidence.putAll(evidence);
-
-        return combinedEvidence;
     }
 
     private Optional<LoadedEvidence> loadEvidence(String identifier) {
