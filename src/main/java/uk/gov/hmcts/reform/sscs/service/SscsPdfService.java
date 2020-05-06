@@ -22,27 +22,25 @@ public class SscsPdfService {
 
     private String appellantTemplatePath;
     private PDFServiceClient pdfServiceClient;
-    private PdfStoreService pdfStoreService;
+    private CcdPdfService ccdPdfService;
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
                           PDFServiceClient pdfServiceClient,
-                          PdfStoreService pdfStoreService) {
+                          CcdPdfService ccdPdfService) {
         this.pdfServiceClient = pdfServiceClient;
         this.appellantTemplatePath = appellantTemplatePath;
-        this.pdfStoreService = pdfStoreService;
+        this.ccdPdfService = ccdPdfService;
     }
 
-    public byte[] generateAndSendPdf(SscsCaseData sscsCaseData, Long caseDetailsId, String documentType, String fileName) {
+    public SscsCaseData generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId, String documentType, String fileName) {
         byte[] pdf = generatePdf(sscsCaseData, caseDetailsId);
 
         log.info("Case {} PDF successfully created for benefit type {}",
                 caseDetailsId,
                 sscsCaseData.getAppeal().getBenefitType().getCode());
 
-        pdfStoreService.store(pdf, fileName, documentType);
-
-        return pdf;
+        return ccdPdfService.updateDoc(fileName, pdf, caseDetailsId, sscsCaseData, documentType);
     }
 
     private byte[] generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId) {
