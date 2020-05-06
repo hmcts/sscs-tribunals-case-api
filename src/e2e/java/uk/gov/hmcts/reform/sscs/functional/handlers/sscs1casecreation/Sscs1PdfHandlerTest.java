@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.sscs1casecreation;
 
 import static io.restassured.RestAssured.*;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.http.ContentType;
 import java.io.File;
@@ -44,21 +44,18 @@ public class Sscs1PdfHandlerTest {
 
         String body = getJsonCallbackForTest();
 
-        String response = given()
-                .contentType(ContentType.JSON)
-                .header("Authorization", idamTokens.getIdamOauth2Token())
-                .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
-                .body(body)
-                .expect()
-                .statusCode(200)
-                .when()
-                .post("/ccdAboutToSubmit/")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .and()
-                .extract().body().jsonPath().get("data");
-
-        assertEquals("validAppealCreation", response);
+        given()
+            .contentType(ContentType.JSON)
+            .header("Authorization", idamTokens.getIdamOauth2Token())
+            .header("ServiceAuthorization", idamTokens.getServiceAuthorization())
+            .body(body)
+            .expect()
+            .statusCode(200)
+            .when()
+            .post("/ccdAboutToSubmit/")
+            .then()
+            .statusCode(HttpStatus.OK.value())
+            .assertThat().body("data.sscsDocument[0].value.documentType", equalTo("sscs1"));
     }
 
     private String getJsonCallbackForTest() throws IOException {

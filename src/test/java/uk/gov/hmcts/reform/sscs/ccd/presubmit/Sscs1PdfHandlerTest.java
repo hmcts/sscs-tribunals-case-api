@@ -97,10 +97,10 @@ public class Sscs1PdfHandlerTest {
 
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
-        sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
     }
 
     @Test
@@ -117,12 +117,12 @@ public class Sscs1PdfHandlerTest {
         assertNull(caseDetails.getCaseData().getEvidencePresent());
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
-        verify(sscsPdfService, never()).generateAndSendPdf(eq(caseDetails.getCaseData()), any(), any(), any());
+        verify(sscsPdfService, never()).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
     }
 
     @Test
     public void givenPdfServiceExceptionThrown_thenCarryOnWithCaseCreation() {
-        when(sscsPdfService.generateAndSendPdf(eq(caseDetails.getCaseData()), any(), any(), any())).thenThrow(new PDFServiceClientException(new Exception("Error")));
+        when(sscsPdfService.generatePdf(eq(caseDetails.getCaseData()), any(), any(), any())).thenThrow(new PDFServiceClientException(new Exception("Error")));
 
         PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

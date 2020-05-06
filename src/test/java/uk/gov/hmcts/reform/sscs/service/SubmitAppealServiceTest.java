@@ -71,9 +71,6 @@ public class SubmitAppealServiceTest {
     private EmailHelper emailHelper;
 
     @Mock
-    private PdfStoreService pdfStoreService;
-
-    @Mock
     private IdamService idamService;
 
     private SubmitAppealService submitAppealService;
@@ -147,7 +144,7 @@ public class SubmitAppealServiceTest {
         offices.add("Balham DRT");
         offices.add("Watford DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, pdfStoreService);
+        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
