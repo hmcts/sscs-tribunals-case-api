@@ -97,7 +97,54 @@ public class Sscs1PdfHandlerTest {
 
         when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
 
+        sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
+    public void shouldCallPdfServiceWhenNoAppointee() throws CcdException {
+
+        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
+
+        caseDetails.getCaseData().getAppeal().getAppellant().getAppointee().setName(null);
+
         PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getAppeal().getAppellant().getAppointee());
+
+        verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
+    public void shouldCallPdfServiceWhenSscsDocumentIsNull() {
+        SscsCaseData caseDataWithNullSscsDocument = buildCaseDataWithNullSscsDocument();
+
+        when(caseDetails.getCaseData()).thenReturn(caseDataWithNullSscsDocument);
+
+        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Test");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("No", response.getData().getEvidencePresent());
+
+        verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
+        verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
+    }
+
+    @Test
+    public void shouldCallPdfServiceWhenSscsDocumentIsPopulated() {
+        SscsCaseData caseDataWithSscsDocument = buildCaseDataWithPdf();
+
+        when(caseDetails.getCaseData()).thenReturn(caseDataWithSscsDocument);
+
+        when(emailHelper.generateUniqueEmailId(caseDetails.getCaseData().getAppeal().getAppellant())).thenReturn("Bla");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Yes", response.getData().getEvidencePresent());
 
         verify(emailHelper).generateUniqueEmailId(eq(caseDetails.getCaseData().getAppeal().getAppellant()));
         verify(sscsPdfService).generatePdf(eq(caseDetails.getCaseData()), any(), any(), any());
@@ -129,6 +176,12 @@ public class Sscs1PdfHandlerTest {
         assertEquals("1234567890", response.getData().getCcdCaseId());
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void throwsExceptionIfItCannotHandleTheAppeal() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        sscs1PdfHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
     private SscsCaseData buildCaseDataWithoutPdf() {
         SscsCaseData caseData = CaseDataUtils.buildCaseData();
         caseData.setSscsDocument(Collections.emptyList());
@@ -139,6 +192,13 @@ public class Sscs1PdfHandlerTest {
     private SscsCaseData buildCaseDataWithPdf() {
         SscsCaseData caseData = buildCaseDataWithoutPdf();
         caseData.setSscsDocument(buildDocuments());
+        return caseData;
+    }
+
+    private SscsCaseData buildCaseDataWithNullSscsDocument() {
+        SscsCaseData caseData = CaseDataUtils.buildCaseData();
+        caseData.setSscsDocument(null);
+        caseData.setCcdCaseId(CCD_CASE_ID.toString());
         return caseData;
     }
 

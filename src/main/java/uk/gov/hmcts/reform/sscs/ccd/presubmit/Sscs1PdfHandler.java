@@ -58,11 +58,13 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
         boolean hasPdf = hasPdfDocument(caseData, fileName);
 
-        log.info("Does case have pdf {} for caseId {}", hasPdf, caseData.getCcdCaseId());
+        log.info("Does case have sscs1 pdf {} for caseId {}", hasPdf, caseData.getCcdCaseId());
         if (!hasPdf) {
             log.info("Existing pdf document not found, start generating pdf for caseId {}", caseData.getCcdCaseId());
 
             try {
+                updateAppointeeNullIfNotPresent(caseData);
+                caseData.setEvidencePresent(hasEvidence(caseData, fileName));
                 sscsPdfService.generatePdf(caseData, Long.parseLong(caseData.getCcdCaseId()), "sscs1", fileName);
 
             } catch (PDFServiceClientException pdfServiceClientException) {
@@ -86,5 +88,25 @@ public class Sscs1PdfHandler implements PreSubmitCallbackHandler<SscsCaseData> {
             }
         }
         return false;
+    }
+
+    private void updateAppointeeNullIfNotPresent(SscsCaseData caseData) {
+        if (caseData != null && caseData.getAppeal() != null && caseData.getAppeal().getAppellant() != null) {
+            Appointee appointee = caseData.getAppeal().getAppellant().getAppointee();
+            if (appointee != null && appointee.getName() == null) {
+                caseData.getAppeal().getAppellant().setAppointee(null);
+            }
+        }
+    }
+
+    private String hasEvidence(SscsCaseData caseData, String fileName) {
+        if (caseData.getSscsDocument() != null) {
+            for (SscsDocument document : caseData.getSscsDocument()) {
+                if (!fileName.equals(document.getValue().getDocumentFileName())) {
+                    return "Yes";
+                }
+            }
+        }
+        return "No";
     }
 }

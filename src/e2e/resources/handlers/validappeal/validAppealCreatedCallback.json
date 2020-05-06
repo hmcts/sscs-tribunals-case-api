@@ -26,7 +26,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "caseCode": "002DD",
-      "evidencePresent": "No",
       "generatedNino": "JWYBTSNOW",
       "subscriptions": {
         "appellantSubscription": {
@@ -124,23 +123,7 @@
             "dob": "1990-02-26",
             "nino": "JWYBTSNOW"
           },
-          "appointee": {
-            "name": {
-              "title": null,
-              "lastName": null,
-              "firstName": null
-            },
-            "address": {},
-            "contact": {
-              "email": null,
-              "phone": null,
-              "mobile": null
-            },
-            "identity": {
-              "dob": null,
-              "nino": null
-            }
-          },
+          "appointee": {},
           "isAppointee": "No",
           "isAddressSameAsAppointee": "No"
         },
@@ -912,7 +895,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "caseCode": "002DD",
-      "evidencePresent": "No",
       "generatedNino": "JWYBTSNOW",
       "subscriptions": {
         "appellantSubscription": {
@@ -1009,23 +991,6 @@
           "identity": {
             "dob": "1990-02-26",
             "nino": "JWYBTSNOW"
-          },
-          "appointee": {
-            "name": {
-              "title": null,
-              "lastName": null,
-              "firstName": null
-            },
-            "address": {},
-            "contact": {
-              "email": null,
-              "phone": null,
-              "mobile": null
-            },
-            "identity": {
-              "dob": null,
-              "nino": null
-            }
           },
           "isAppointee": "No",
           "isAddressSameAsAppointee": "No"
