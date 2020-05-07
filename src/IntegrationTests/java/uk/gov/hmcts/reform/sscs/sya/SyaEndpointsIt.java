@@ -149,8 +149,6 @@ public class SyaEndpointsIt {
 
         verify(ccdClient).startCaseForCaseworker(any(), eq(VALID_APPEAL_CREATED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
-        verify(ccdClient).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
-        verify(ccdClient).submitEventForCaseworker(any(), any(), any());
     }
 
     @Test

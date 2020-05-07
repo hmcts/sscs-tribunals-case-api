@@ -161,20 +161,7 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenCaseDoesNotExistInCcdAndBulkScanMigratedFeatureOff_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndTriggerSentToDwpEvent() {
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
-
-        submitAppealService.submitAppeal(appealData, userToken);
-
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
-    }
-
-    @Test
-    public void givenCaseDoesNotExistInCcdAndBulkScanMigratedFeatureOn_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndDoNotTriggerSentToDwpEvent() {
+    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndDoNotTriggerSentToDwpEvent() {
         submitAppealService = new SubmitAppealService(
                 ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
                 idamService, convertAIntoBService, offices, true);
@@ -187,7 +174,6 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
@@ -204,8 +190,6 @@ public class SubmitAppealServiceTest {
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals(1, capture.getValue().getAssociatedCase().size());
         assertEquals("12345678", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
-
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
     }
 
     @Test
