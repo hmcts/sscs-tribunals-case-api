@@ -148,7 +148,7 @@ public class SubmitAppealServiceTest {
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, offices, false);
+            idamService, convertAIntoBService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -161,10 +161,10 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndDoNotTriggerSentToDwpEvent() {
+    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
         submitAppealService = new SubmitAppealService(
                 ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-                idamService, convertAIntoBService, offices, true);
+                idamService, convertAIntoBService, offices);
 
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
