@@ -1,9 +1,5 @@
 package uk.gov.hmcts.reform.sscs.sya;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -19,7 +15,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -36,7 +31,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
@@ -49,7 +43,6 @@ import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
-import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
 import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
@@ -90,9 +83,6 @@ public class SyaEndpointsIt {
     @MockBean
     private DocumentUploadClientApi documentUploadClientApi;
 
-    @MockBean
-    private JavaMailSender mailSender;
-
     @Captor
     private ArgumentCaptor<Map<String, Object>> captor;
 
@@ -109,24 +99,13 @@ public class SyaEndpointsIt {
     @Value("${appellant.appeal.html.template.path}")
     private String templateName;
 
-    @Value("${appeal.email.from}")
-    private String emailFrom;
-
-    @Value("${appeal.email.to}")
-    private String emailTo;
-
     private SyaCaseWrapper caseWrapper;
-
-    private MimeMessage message;
 
     @Before
     public void setup() throws IOException {
         mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
         caseWrapper = getCaseWrapper();
-
-        message = new MimeMessage(session);
-        when(mailSender.createMimeMessage()).thenReturn(message);
 
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
             .willReturn(PDF.getBytes());
@@ -158,9 +137,8 @@ public class SyaEndpointsIt {
     }
 
     @Test
-    public void givenAValidAppeal_createAppealCreatedCaseAndGeneratePdfAndSend() throws Exception {
+    public void givenAValidAppeal_createAppealCreatedCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
-
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
 
@@ -169,24 +147,12 @@ public class SyaEndpointsIt {
             .content(getCase("json/sya.json")))
             .andExpect(status().isCreated());
 
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
         verify(ccdClient).startCaseForCaseworker(any(), eq(VALID_APPEAL_CREATED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
-        verify(mailSender, times(1)).send(message);
-        verify(ccdClient).startEvent(any(), any(), eq("uploadDocument"));
-        verify(ccdClient).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
-        verify(ccdClient, times(2)).submitEventForCaseworker(any(), any(), any());
-
-        assertNotNull(getPdfWrapper().getCcdCaseId());
     }
 
     @Test
-    public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
+    public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
@@ -196,22 +162,13 @@ public class SyaEndpointsIt {
             .content(getCase("json/syaWithNoMrnDate.json")))
             .andExpect(status().isCreated());
 
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
         verify(ccdClient).startCaseForCaseworker(any(), eq(INCOMPLETE_APPLICATION_RECEIVED.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
-        verify(mailSender).send(message);
         verify(ccdClient, times(0)).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
-
-        assertNotNull(getPdfWrapper().getCcdCaseId());
     }
 
     @Test
-    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCaseAndSendPdfAndDoNotSendRobotics() throws Exception {
+    public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
@@ -221,18 +178,9 @@ public class SyaEndpointsIt {
             .content(getCase("json/syaWithMrnDateMoreThan13Months.json")))
             .andExpect(status().isCreated());
 
-        verify(pdfServiceClient).generateFromHtml(eq(getTemplate()), captor.capture());
-
-        assertThat(message.getFrom()[0].toString(), containsString(emailFrom));
-        assertThat(message.getAllRecipients()[0].toString(), containsString(emailTo));
-        assertThat(message.getSubject(), is("Bloggs_33C"));
-
         verify(ccdClient).startCaseForCaseworker(any(), eq(NON_COMPLIANT.getCcdType()));
         verify(ccdClient).submitForCaseworker(any(), any());
-        verify(mailSender).send(message);
         verify(ccdClient, times(0)).startEvent(any(), any(), eq(SEND_TO_DWP.getCcdType()));
-
-        assertNotNull(getPdfWrapper().getCcdCaseId());
     }
 
     @Test
@@ -248,11 +196,6 @@ public class SyaEndpointsIt {
 
         verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
-    }
-
-    private PdfWrapper getPdfWrapper() {
-        Map<String, Object> placeHolders = captor.getAllValues().get(0);
-        return (PdfWrapper) placeHolders.get("PdfWrapper");
     }
 
     private byte[] getTemplate() throws IOException {

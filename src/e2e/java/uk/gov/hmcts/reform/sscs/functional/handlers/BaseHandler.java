@@ -63,7 +63,7 @@ public class BaseHandler {
 
     protected SscsCaseDetails createCaseInResponseReceivedState() throws IOException {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting(),
-                EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+                EventType.SYA_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
         return ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.DWP_RESPOND.getCcdType(),
@@ -72,7 +72,7 @@ public class BaseHandler {
 
     protected SscsCaseDetails createCaseInWithDwpState() throws IOException {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting(),
-                EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
+                EventType.SYA_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);
 
         return ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), EventType.SENT_TO_DWP.getCcdType(),
