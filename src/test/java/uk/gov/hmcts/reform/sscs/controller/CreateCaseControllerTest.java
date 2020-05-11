@@ -17,18 +17,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.thirdparty.ccd.CorCcdService;
 
 public class CreateCaseControllerTest {
 
-    private CorCcdService ccdService;
+    private CcdService ccdService;
     private IdamService idamService;
 
     @Before
     public void setUp() {
-        ccdService = mock(CorCcdService.class);
+        ccdService = mock(CcdService.class);
 
         idamService = mock(IdamService.class);
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());

@@ -25,8 +25,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
-import uk.gov.hmcts.reform.sscs.thirdparty.ccd.CorCcdService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CorIdamService.class})
@@ -50,7 +50,7 @@ public abstract class BaseFunctionTest {
     @Autowired
     protected CorIdamService corIdamService;
     @Autowired
-    protected CorCcdService corCcdService;
+    protected CcdService ccdService;
 
     @Value("${idam.url}")
     private String idamApiUrl;
@@ -101,7 +101,7 @@ public abstract class BaseFunctionTest {
     }
 
     protected SscsCaseDetails getCaseDetails(String caseId) {
-        return corCcdService.getByCaseId(valueOf(caseId), idamService.getIdamTokens());
+        return ccdService.getByCaseId(valueOf(caseId), idamService.getIdamTokens());
     }
 
     public static void waitUntil(Supplier<Boolean> condition, long timeoutInSeconds, String timeoutMessage) throws InterruptedException {

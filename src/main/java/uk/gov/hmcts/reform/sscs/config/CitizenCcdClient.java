@@ -55,7 +55,7 @@ public class CitizenCcdClient {
         );
     }
 
-    List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
+    public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("state", State.DRAFT.getId());
         searchCriteria.put("sortDirection", "desc");

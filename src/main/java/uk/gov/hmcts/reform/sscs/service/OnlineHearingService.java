@@ -10,19 +10,19 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.thirdparty.ccd.CorCcdService;
 
 @Slf4j
 @Service
 public class OnlineHearingService {
-    private final CorCcdService ccdService;
+    private final CcdService ccdService;
     private final IdamService idamService;
 
     public OnlineHearingService(
-            @Autowired CorCcdService ccdService,
+            @Autowired CcdService ccdService,
             @Autowired IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;

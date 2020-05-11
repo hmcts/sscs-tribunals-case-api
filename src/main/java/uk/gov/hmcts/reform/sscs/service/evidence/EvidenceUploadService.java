@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Evidence;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.EvidenceDescription;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -39,14 +40,13 @@ import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
-import uk.gov.hmcts.reform.sscs.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
 
 @Slf4j
 @Service
 public class EvidenceUploadService {
     private final DocumentManagementService documentManagementService;
-    private final CorCcdService ccdService;
+    private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
     private final StoreEvidenceDescriptionService storeEvidenceDescriptionService;
@@ -62,7 +62,7 @@ public class EvidenceUploadService {
     private static final QuestionDocumentExtractor questionDocumentExtractor = new QuestionDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CorCcdService ccdService,
+    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService, EvidenceUploadEmailService evidenceUploadEmailService,
                                  FileToPdfConversionService fileToPdfConversionService,

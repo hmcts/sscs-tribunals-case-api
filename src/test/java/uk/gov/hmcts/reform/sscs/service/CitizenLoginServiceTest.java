@@ -16,11 +16,12 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
+import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.thirdparty.ccd.CorCcdService;
 import uk.gov.hmcts.reform.sscs.util.PostcodeUtil;
 
 public class CitizenLoginServiceTest {
@@ -28,7 +29,8 @@ public class CitizenLoginServiceTest {
     private static final String SUBSCRIPTION_EMAIL_ADDRESS = "someEmail@exaple.com";
     private static final String APPEAL_POSTCODE = "CM11 1AB";
 
-    private CorCcdService corCcdService;
+    private CitizenCcdService citizenCcdService;
+    private CcdService ccdService;
     private CaseDetails case1;
     private CaseDetails case2;
     private SscsCcdConvertService sscsCcdConvertService;
@@ -46,11 +48,12 @@ public class CitizenLoginServiceTest {
                 .userId("someUserId")
                 .email("someEmail@exaple.com")
                 .build();
-        corCcdService = mock(CorCcdService.class);
+        citizenCcdService = mock(CitizenCcdService.class);
+        ccdService = mock(CcdService.class);
         case1 = mock(CaseDetails.class);
         case2 = mock(CaseDetails.class);
         List<CaseDetails> cases = Arrays.asList(case1, case2);
-        when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(cases);
+        when(citizenCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(cases);
         sscsCcdConvertService = mock(SscsCcdConvertService.class);
 
         IdamService idamService = mock(IdamService.class);
@@ -60,7 +63,7 @@ public class CitizenLoginServiceTest {
         when(postcodeUtil.hasAppellantPostcode(any(SscsCaseDetails.class), eq(APPEAL_POSTCODE))).thenReturn(true);
         onlineHearingService = mock(OnlineHearingService.class);
 
-        underTest = new CitizenLoginService(corCcdService, sscsCcdConvertService, idamService, postcodeUtil, onlineHearingService);
+        underTest = new CitizenLoginService(citizenCcdService, ccdService, sscsCcdConvertService, idamService, postcodeUtil, onlineHearingService);
         sscsCaseDetailsWithDifferentTya = createSscsCaseDetailsWithAppellantSubscription("anotherTya");
         tya = "123-123-123-123";
     }
@@ -101,7 +104,7 @@ public class CitizenLoginServiceTest {
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
         when(case1.getState()).thenReturn(State.DRAFT.getId());
         when(case2.getState()).thenReturn(State.APPEAL_CREATED.getId());
-        when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
@@ -120,7 +123,7 @@ public class CitizenLoginServiceTest {
         SscsCaseDetails sscsCaseDetails2 = SscsCaseDetails.builder().id(222L).build();
         when(case1.getState()).thenReturn(State.DRAFT_ARCHIVED.getId());
         when(case2.getState()).thenReturn(State.READY_TO_LIST.getId());
-        when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(eq(case2))).thenReturn(sscsCaseDetails2);
         OnlineHearing onlineHearing2 = someOnlineHearing(222L);
         when(onlineHearingService.loadHearing(sscsCaseDetails2)).thenReturn(Optional.of(onlineHearing2));
@@ -137,7 +140,7 @@ public class CitizenLoginServiceTest {
         caseDetails.add(case1);
         caseDetails.add(case2);
         SscsCaseDetails sscsCaseDetailsWithTya = createSscsCaseDetailsWithAppellantSubscription(tya);
-        when(corCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
+        when(citizenCcdService.searchForCitizen(citizenIdamTokens)).thenReturn(caseDetails);
         when(sscsCcdConvertService.getCaseDetails(case1)).thenReturn(sscsCaseDetailsWithDifferentTya);
         when(sscsCcdConvertService.getCaseDetails(case2)).thenReturn(sscsCaseDetailsWithTya);
         OnlineHearing onlineHearing = someOnlineHearing(111L);
@@ -180,7 +183,7 @@ public class CitizenLoginServiceTest {
     @Test
     public void associatesUserWithCaseAppellant() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
-        when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         OnlineHearing expectedOnlineHearing = someOnlineHearing(123L);
         when(onlineHearingService.loadHearing(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
@@ -189,7 +192,7 @@ public class CitizenLoginServiceTest {
         );
 
         long expectedCaseId = expectedCase.getId();
-        verify(corCcdService).addUserToCase(citizenIdamTokens.getUserId(), expectedCaseId);
+        verify(citizenCcdService).addUserToCase(serviceIdamTokens, citizenIdamTokens.getUserId(), expectedCaseId);
         assertThat(sscsCaseDetails.isPresent(), is(true));
         assertThat(sscsCaseDetails.get(), is(expectedOnlineHearing));
     }
@@ -197,7 +200,7 @@ public class CitizenLoginServiceTest {
     @Test
     public void associatesUserWithCaseAppointee() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppointeeSubscription(tya);
-        when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         OnlineHearing expectedOnlineHearing = someOnlineHearing(123L);
         when(onlineHearingService.loadHearing(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
@@ -206,7 +209,7 @@ public class CitizenLoginServiceTest {
         );
 
         long expectedCaseId = expectedCase.getId();
-        verify(corCcdService).addUserToCase(citizenIdamTokens.getUserId(), expectedCaseId);
+        verify(citizenCcdService).addUserToCase(serviceIdamTokens, citizenIdamTokens.getUserId(), expectedCaseId);
         assertThat(sscsCaseDetails.isPresent(), is(true));
         assertThat(sscsCaseDetails.get(), is(expectedOnlineHearing));
     }
@@ -214,7 +217,7 @@ public class CitizenLoginServiceTest {
     @Test
     public void associatesUserWithCaseRep() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithRepSubscription(tya);
-        when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         OnlineHearing expectedOnlineHearing = someOnlineHearing(123L);
         when(onlineHearingService.loadHearing(expectedCase)).thenReturn(Optional.of(expectedOnlineHearing));
@@ -223,7 +226,7 @@ public class CitizenLoginServiceTest {
         );
 
         long expectedCaseId = expectedCase.getId();
-        verify(corCcdService).addUserToCase(citizenIdamTokens.getUserId(), expectedCaseId);
+        verify(citizenCcdService).addUserToCase(serviceIdamTokens, citizenIdamTokens.getUserId(), expectedCaseId);
         assertThat(sscsCaseDetails.isPresent(), is(true));
         assertThat(sscsCaseDetails.get(), is(expectedOnlineHearing));
     }
@@ -232,49 +235,50 @@ public class CitizenLoginServiceTest {
     public void findAndUpdateCaseLastLoggedIntoMya() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithRepSubscription(tya);
         long expectedCaseId = expectedCase.getId();
-        when(corCcdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
+        when(ccdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
         underTest.findAndUpdateCaseLastLoggedIntoMya(citizenIdamTokens, String.valueOf(expectedCaseId));
 
-        verify(corCcdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
-        verify(corCcdService).updateCase(eq(expectedCase.getData()), eq(expectedCaseId),
-                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), anyString(), anyString(), eq(serviceIdamTokens));
+        verify(ccdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
+        verify(citizenCcdService).updateCase(eq(expectedCase.getData()), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                anyString(), anyString(), eq(serviceIdamTokens), eq(String.valueOf(expectedCaseId)));
     }
 
     @Test
     public void findAndShouldNotUpdateCaseLastLoggedIntoMyaWhenCaseDetailsIsNull() {
         SscsCaseDetails expectedCase = null;
         long expectedCaseId = 1234L;
-        when(corCcdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
+        when(ccdService.getByCaseId(expectedCaseId, serviceIdamTokens)).thenReturn(expectedCase);
         underTest.findAndUpdateCaseLastLoggedIntoMya(citizenIdamTokens, String.valueOf(expectedCaseId));
 
-        verify(corCcdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
-        verify(corCcdService, times(0)).updateCase(any(), eq(expectedCaseId),
-                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), anyString(), anyString(), eq(serviceIdamTokens));
+        verify(ccdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
+        verify(citizenCcdService, times(0)).updateCase(any(),
+                eq(EventType.UPDATE_CASE_ONLY.getCcdType()), anyString(), anyString(),
+                eq(serviceIdamTokens), eq(String.valueOf(expectedCaseId)));
     }
 
     @Test
     public void cannotAssociatesUserWithCaseAsEmailIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
-        when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
                 citizenIdamTokens, tya, "someOtherEmail@example.com", APPEAL_POSTCODE
         );
 
-        verify(corCcdService, never()).addUserToCase(any(String.class), anyLong());
+        verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
     }
 
     @Test
     public void cannotAssociatesUserWithCaseAsPostcodeIncorrect() {
         SscsCaseDetails expectedCase = createSscsCaseDetailsWithAppellantSubscription(tya);
-        when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(expectedCase);
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
                 citizenIdamTokens, tya, SUBSCRIPTION_EMAIL_ADDRESS, "someOtherPostcode"
         );
 
-        verify(corCcdService, never()).addUserToCase(any(String.class), anyLong());
+        verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
     }
 
@@ -283,13 +287,13 @@ public class CitizenLoginServiceTest {
         String someOtherPostcode = "someOtherPostcode";
         when(postcodeUtil.hasAppellantPostcode(any(SscsCaseDetails.class), eq(someOtherPostcode))).thenReturn(false);
 
-        when(corCcdService.findCaseByAppealNumber(tya, serviceIdamTokens))
+        when(ccdService.findCaseByAppealNumber(tya, serviceIdamTokens))
                 .thenReturn(null);
         Optional<OnlineHearing> sscsCaseDetails = underTest.associateCaseToCitizen(
                 citizenIdamTokens, tya, SUBSCRIPTION_EMAIL_ADDRESS, someOtherPostcode
         );
 
-        verify(corCcdService, never()).addUserToCase(any(String.class), anyLong());
+        verify(citizenCcdService, never()).addUserToCase(any(IdamTokens.class), any(String.class), anyLong());
         assertThat(sscsCaseDetails.isPresent(), is(false));
     }
 

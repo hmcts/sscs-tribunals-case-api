@@ -42,10 +42,14 @@ public class CitizenCcdService {
 
 
     public List<SscsCaseData> findCase(IdamTokens idamTokens) {
-        return citizenCcdClient.searchForCitizen(idamTokens)
+        return searchForCitizen(idamTokens)
             .stream()
             .map(f -> sscsCcdConvertService.getCaseData(f.getData()))
             .collect(Collectors.toList());
+    }
+
+    public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
+        return citizenCcdClient.searchForCitizen(idamTokens);
     }
 
     public SaveCaseResult saveCase(SscsCaseData caseData, IdamTokens idamTokens) {
@@ -94,7 +98,7 @@ public class CitizenCcdService {
         return caseDetails;
     }
 
-    private CaseDetails updateCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens, String caseId) {
+    public CaseDetails updateCase(SscsCaseData caseData, String eventType, String summary, String description, IdamTokens idamTokens, String caseId) {
         log.info("Updating a draft with caseId {}.", caseId);
         CaseDetails caseDetails;
         StartEventResponse startEventResponse = citizenCcdClient.startEventForCitizen(idamTokens, caseId, eventType);
@@ -118,6 +122,10 @@ public class CitizenCcdService {
                 log.info("Associate case: Postcode does not exists for case id {}", caseId);
             }
         }
+    }
+
+    public void addUserToCase(IdamTokens idamTokens, String userIdToAdd, Long caseId) {
+        citizenCcdClient.addUserToCase(idamTokens, userIdToAdd, caseId);
     }
 
     private boolean hasAppellantPostcode(SscsCaseData caseData) {

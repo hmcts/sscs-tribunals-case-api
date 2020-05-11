@@ -12,13 +12,13 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-import uk.gov.hmcts.reform.sscs.thirdparty.ccd.CorCcdService;
 
 public class OnlineHearingServiceTest {
-    private CorCcdService ccdService;
+    private CcdService ccdService;
 
     private OnlineHearingService underTest;
 
@@ -28,7 +28,7 @@ public class OnlineHearingServiceTest {
 
     @Before
     public void setUp() {
-        ccdService = mock(CorCcdService.class);
+        ccdService = mock(CcdService.class);
         idamTokens = IdamTokens.builder().build();
         idamService = mock(IdamService.class);
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
