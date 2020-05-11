@@ -7,7 +7,10 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import feign.FeignException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,7 +42,6 @@ public class SubmitAppealService {
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final List<String> offices;
-    private final boolean bulkScanMigrated;
 
     @SuppressWarnings("squid:S107")
     @Autowired
@@ -49,8 +51,7 @@ public class SubmitAppealService {
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
-                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices,
-                        @Value("${feature.bulk-scan.migrated}") boolean bulkScanMigrated) {
+                        @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
@@ -59,7 +60,6 @@ public class SubmitAppealService {
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
         this.offices = offices;
-        this.bulkScanMigrated = bulkScanMigrated;
     }
 
     public Long submitAppeal(SyaCaseWrapper appeal, String userToken) {
@@ -67,7 +67,7 @@ public class SubmitAppealService {
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, event, userToken);
+        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken);
         // in case of duplicate case the caseDetails will be null
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
@@ -119,18 +119,11 @@ public class SubmitAppealService {
     }
 
     private void postCreateCaseInCcdProcess(SscsCaseData caseData,
-                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails,
                                             String userToken) {
-        if (null != caseDetails) {
-            if (!bulkScanMigrated && (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED))) {
-                log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
-                ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
-                log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
-            }
-            if (StringUtils.isNotEmpty(userToken)) {
-                citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
-                citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
-            }
+        if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
+            citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
+            citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
         }
     }
 
