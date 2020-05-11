@@ -1,27 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.domain.email.EmailAttachment.pdf;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getSyaCaseWrapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +17,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -46,21 +31,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
-import uk.gov.hmcts.reform.sscs.domain.email.Email;
-import uk.gov.hmcts.reform.sscs.domain.email.SubmitYourAppealEmailTemplate;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
+import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -89,12 +68,10 @@ public class SubmitAppealServiceTest {
     private PDFServiceClient pdfServiceClient;
 
     @Mock
-    private EmailService emailService;
+    private EmailHelper emailHelper;
 
     @Mock
     private IdamService idamService;
-
-    private SubmitYourAppealEmailTemplate submitYourAppealEmailTemplate;
 
     private SubmitAppealService submitAppealService;
 
@@ -162,20 +139,16 @@ public class SubmitAppealServiceTest {
 
     @Before
     public void setUp() {
-        submitYourAppealEmailTemplate =
-            new SubmitYourAppealEmailTemplate("from", "to", "message");
-
         offices = new ArrayList<>();
         offices.add("DWP PIP (1)");
         offices.add("Balham DRT");
         offices.add("Watford DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, emailService,
-            submitYourAppealEmailTemplate, ccdPdfService);
+        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, offices, false);
+            idamService, convertAIntoBService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -183,29 +156,15 @@ public class SubmitAppealServiceTest {
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build());
-
-        given(emailService.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
+        given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
     }
 
     @Test
-    public void givenCaseDoesNotExistInCcdAndBulkScanMigratedFeatureOff_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndTriggerSentToDwpEvent() {
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
-
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
-
-        submitAppealService.submitAppeal(appealData, userToken);
-
-        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
-    }
-
-    @Test
-    public void givenCaseDoesNotExistInCcdAndBulkScanMigratedFeatureOn_shouldCreateCaseWithAppealDetailsWithAppealCreatedEventAndDoNotTriggerSentToDwpEvent() {
+    public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
         submitAppealService = new SubmitAppealService(
                 ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-                idamService, convertAIntoBService, offices, true);
+                idamService, convertAIntoBService, offices);
 
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -215,7 +174,6 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(ccdService, times(0)).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
     }
 
     @Test
@@ -232,8 +190,6 @@ public class SubmitAppealServiceTest {
         verify(ccdService).createCase(capture.capture(), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
         assertEquals(1, capture.getValue().getAssociatedCase().size());
         assertEquals("12345678", capture.getValue().getAssociatedCase().get(0).getValue().getCaseReference());
-
-        verify(ccdService).updateCase(any(SscsCaseData.class), eq(123L), eq(SEND_TO_DWP.getCcdType()), eq("Send to DWP"), eq("Send to DWP event has been triggered from Tribunals service"), any(IdamTokens.class));
     }
 
     @Test
@@ -319,21 +275,6 @@ public class SubmitAppealServiceTest {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertFalse(optionalSessionDraft.isPresent());
-    }
-
-    @Test
-    public void shouldCreatePdfWithAppealDetails() {
-        byte[] expected = {};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-            any())).willReturn(expected);
-
-        submitAppealService.submitAppeal(appealData, userToken);
-
-        Email expectedEmail = submitYourAppealEmailTemplate.generateEmail(
-            "Bloggs_33C",
-            newArrayList(pdf(expected, "Bloggs_33C.pdf"))
-        );
-        verify(emailService).sendEmail(123L, expectedEmail);
     }
 
     @Test
@@ -443,35 +384,6 @@ public class SubmitAppealServiceTest {
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(State.VALID_APPEAL.getId(), caseData.getCreatedInGapsFrom());
-    }
-
-    @Test
-    public void shouldUpdateCcdWithPdf() {
-        Document stubbedDocument = new Document();
-        Document.Link stubbedLink = new Document.Link();
-        stubbedLink.href = "http://localhost:4506/documents/eb8cbfaa-37c3-4644-aa77-b9a2e2c72332";
-        Document.Links stubbedLinks = new Document.Links();
-        stubbedLinks.binary = stubbedLink;
-        stubbedDocument.links = stubbedLinks;
-
-        byte[] expected = {1, 2, 3};
-        given(pdfServiceClient.generateFromHtml(any(byte[].class),
-            any(Map.class))).willReturn(expected);
-        long ccdId = 987L;
-        given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class))).willReturn(SscsCaseDetails.builder().id(ccdId)
-            .build());
-        SyaCaseWrapper appealData = getSyaCaseWrapper("json/sya_with_evidence.json");
-
-        submitAppealService.submitAppeal(appealData, null);
-
-        verify(ccdPdfService).mergeDocIntoCcd(
-            eq("Bloggs_33C.pdf"),
-            any(),
-            eq(ccdId),
-            argThat(caseData -> caseData.getSscsDocument().size() == 2),
-            any(),
-            eq("sscs1")
-        );
     }
 
     @Test(expected = CcdException.class)
