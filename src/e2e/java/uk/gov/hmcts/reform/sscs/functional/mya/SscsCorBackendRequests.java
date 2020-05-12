@@ -43,7 +43,7 @@ public class SscsCorBackendRequests {
     }
 
     public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
-        String uri = (StringUtils.isNotBlank(tya)) ? "/citizen/" + tya : "/citizen";
+        String uri = (StringUtils.isNotBlank(tya)) ? "/api/citizen/" + tya : "/citizen";
         HttpResponse getOnlineHearingResponse = getRequest(uri, email);
 
         assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
@@ -56,7 +56,7 @@ public class SscsCorBackendRequests {
     public JSONObject assignCaseToUser(String tya, String email, String postcode) throws IOException {
         StringEntity entity = new StringEntity("{\"email\":\"" + email + "\", \"postcode\":\"" + postcode + "\"}", APPLICATION_JSON);
 
-        HttpResponse response = postRequest("/citizen/" + tya, entity, email);
+        HttpResponse response = postRequest("/api/citizen/" + tya, entity, email);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(response.getEntity());
@@ -65,7 +65,7 @@ public class SscsCorBackendRequests {
     }
 
     public CreatedCcdCase createOralCase(String emailAddress) throws IOException {
-        HttpResponse createCaseResponse = client.execute(post(baseUrl + "/case?hearingType=oral&email=" + emailAddress)
+        HttpResponse createCaseResponse = client.execute(post(baseUrl + "/api/case?hearingType=oral&email=" + emailAddress)
                 .setHeader("Content-Length", "0")
                 .build());
 
@@ -94,7 +94,7 @@ public class SscsCorBackendRequests {
     }
 
     public void submitHearingEvidence(String hearingId, String description) throws IOException {
-        HttpResponse response = postRequest("/continuous-online-hearings/" + hearingId + "/evidence",
+        HttpResponse response = postRequest("/api/continuous-online-hearings/" + hearingId + "/evidence",
             new StringEntity("{\n"
                 + "  \"body\": \"" + description + "\",\n"
                 + "  \"idamEmail\": \"mya-sscs-6920@mailinator.com\"\n"
@@ -104,7 +104,7 @@ public class SscsCorBackendRequests {
     }
 
     public JSONArray getDraftHearingEvidence(String hearingId) throws IOException {
-        HttpResponse response = getRequest("/continuous-online-hearings/" + hearingId + "/evidence");
+        HttpResponse response = getRequest("/api/continuous-online-hearings/" + hearingId + "/evidence");
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
 
         String responseBody = EntityUtils.toString(response.getEntity());
@@ -113,7 +113,7 @@ public class SscsCorBackendRequests {
     }
 
     public void uploadAppellantStatement(String hearingId, String statement) throws IOException {
-        String uri = "/continuous-online-hearings/" + hearingId + "/statement";
+        String uri = "/api/continuous-online-hearings/" + hearingId + "/statement";
         String stringEntity = "{\n"
             + "  \"body\": \"statement\",\n"
             + "  \"tya\": \"Q9jE2FQuRR\"\n"
@@ -124,7 +124,7 @@ public class SscsCorBackendRequests {
     }
 
     public String getCoversheet(String caseId) throws IOException {
-        CloseableHttpResponse getCoverSheetResponse = getRequest("/continuous-online-hearings/" + caseId + "/evidence/coversheet");
+        CloseableHttpResponse getCoverSheetResponse = getRequest("/api/continuous-online-hearings/" + caseId + "/evidence/coversheet");
 
         assertThat(getCoverSheetResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
         Header fileNameHeader = getCoverSheetResponse.getFirstHeader("Content-Disposition");
@@ -160,12 +160,6 @@ public class SscsCorBackendRequests {
                 .build());
     }
 
-    private CloseableHttpResponse postRequestNoBody(String url) throws IOException {
-        return client.execute(addHeaders(post(baseUrl + url)
-                .setHeader("Content-Length", "0"))
-                .build());
-    }
-
     private CloseableHttpResponse postRequest(String url, HttpEntity body) throws IOException {
         return client.execute(addHeaders(post(baseUrl + url))
                 .setEntity(body)
@@ -175,22 +169,6 @@ public class SscsCorBackendRequests {
     private CloseableHttpResponse postRequest(String url, HttpEntity body, String email) throws IOException {
         return client.execute(addHeaders(post(baseUrl + url), email)
                 .setEntity(body)
-                .build());
-    }
-
-    private CloseableHttpResponse patchRequestNoBody(String url) throws IOException {
-        return client.execute(addHeaders(patch(baseUrl + url))
-                .build());
-    }
-
-    private CloseableHttpResponse patchRequest(String url, StringEntity body) throws IOException {
-        return client.execute(addHeaders(patch(baseUrl + url))
-                .setEntity(body)
-                .build());
-    }
-
-    private CloseableHttpResponse deleteRequest(String url) throws IOException {
-        return client.execute(addHeaders(delete(baseUrl + url))
                 .build());
     }
 }

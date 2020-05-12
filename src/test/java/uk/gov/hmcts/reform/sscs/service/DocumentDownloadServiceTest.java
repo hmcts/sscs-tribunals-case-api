@@ -1,9 +1,13 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -16,9 +20,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 
 @RunWith(JUnitParamsRunner.class)
 public class DocumentDownloadServiceTest {
@@ -78,6 +85,36 @@ public class DocumentDownloadServiceTest {
         long size = documentDownloadService
             .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
         assertEquals(0L, size);
+    }
+
+    @Test
+    public void canDownloadFile() {
+        Resource expectedResource = mock(Resource.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        String filename = "filename";
+        headers.add("originalfilename", filename);
+        String contentType = "application/pdf";
+        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+        ResponseEntity<Resource> expectedResponse = new ResponseEntity<>(expectedResource, headers, HttpStatus.OK);
+
+        when(documentDownloadClientApi.downloadBinary("oauth2Token", "someToken", "", "sscs", "/documents/someDocId/binary"))
+                .thenReturn(expectedResponse);
+
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        UploadedEvidence downloadFile = documentDownloadService.downloadFile(urlString);
+
+        assertThat(downloadFile, is(new UploadedEvidence(expectedResource, filename, contentType)));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void cannotDownloadFile() {
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        ResponseEntity<Resource> expectedResponse = new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        when(documentDownloadClientApi.downloadBinary("oauth2Token", "someToken", "", "sscs", "/documents/someDocId/binary"))
+                .thenReturn(expectedResponse);
+
+        documentDownloadService.downloadFile(urlString);
     }
 
 

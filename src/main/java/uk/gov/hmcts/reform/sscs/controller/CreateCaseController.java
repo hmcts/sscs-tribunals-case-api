@@ -51,7 +51,7 @@ public class CreateCaseController {
             @ApiResponse(code = 201, message = "Case has been created")
     })
     @ResponseStatus(value = HttpStatus.CREATED)
-    @RequestMapping(value = "/api/case", method = RequestMethod.POST, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/api/case", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> createCase(
             @ApiParam(value = "email address of the appellant must be unique in CCD", example = "foo@bar.com", required = true)
             @RequestParam("email")String email,

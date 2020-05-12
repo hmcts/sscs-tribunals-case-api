@@ -49,9 +49,8 @@ public class EvidenceUploadController {
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
             @ApiResponse(code = 422, message = "The file cannot be added to the document store")
     })
-    @RequestMapping(
+    @PutMapping(
             value = "{identifier}/evidence",
-            method = RequestMethod.PUT,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -71,9 +70,8 @@ public class EvidenceUploadController {
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
             @ApiResponse(code = 422, message = "The file cannot be added to the document store")
     })
-    @RequestMapping(
+    @PostMapping(
             value = "{onlineHearingId}/questions/{questionId}/evidence",
-            method = RequestMethod.POST,
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -102,9 +100,8 @@ public class EvidenceUploadController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "List of draft evidence")
     })
-    @RequestMapping(
+    @GetMapping(
             value = "{identifier}/evidence",
-            method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<List<Evidence>> listDraftEvidence(
@@ -122,9 +119,8 @@ public class EvidenceUploadController {
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(
+    @DeleteMapping(
             value = "{identifier}/evidence/{evidenceId}",
-            method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity deleteEvidence(
@@ -144,9 +140,8 @@ public class EvidenceUploadController {
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
     })
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    @RequestMapping(
+    @DeleteMapping(
             value = "{onlineHearingId}/questions/{questionId}/evidence/{evidenceId}",
-            method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity deleteEvidence(
@@ -168,9 +163,8 @@ public class EvidenceUploadController {
             @ApiResponse(code = 204, message = "Evidence has been submitted to the appeal"),
             @ApiResponse(code = 404, message = "No online hearing found with online hearing id")
     })
-    @RequestMapping(
+    @PostMapping(
             value = "{identifier}/evidence",
-            method = RequestMethod.POST,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity submitEvidence(

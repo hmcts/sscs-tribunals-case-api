@@ -37,7 +37,7 @@ public class CitizenController {
         this.idamService = idamService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     @ApiOperation(value = "Loads cases associated with a citizen",
             notes = "Loads the cases that have been associated with a citizen in CCD. Gets the user from the token "
                     + "in the Authorization header."
@@ -51,7 +51,7 @@ public class CitizenController {
         return getOnlineHearingsForTyaNumber(authorisation, "");
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "{tya}")
+    @GetMapping(value = "{tya}")
     @ApiOperation(value = "Loads cases associated with a citizen",
             notes = "Loads the cases that have been associated with a citizen in CCD. If a tya parameter is provided "
                     + "then the list will be limited to the case with the tya number or be empty if the case has not "
@@ -80,7 +80,7 @@ public class CitizenController {
                 .build();
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "{tya}")
+    @PostMapping(value = "{tya}")
     @ApiOperation(value = "Associates a case with a citizen",
             notes = "Associates a case in CCD with a citizen idam user. Checks the TYA number, email and postcode are "
                     + "all match the case before associating the case with the idam user."
