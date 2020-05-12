@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -89,7 +90,7 @@ public class CreateCaseController {
 
             sscsCaseData = sscsCaseData.toBuilder()
                     .events(Collections.singletonList(events))
-                    .caseReference("SC285/17/" + new Random().nextInt(90000) + 10000)
+                    .caseReference("SC285/17/" + new SecureRandom().nextInt(90000) + 10000)
                     .subscriptions(
                             Subscriptions.builder()
                                     .appellantSubscription(

@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.AssociateCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.OnlineHearing;
@@ -46,7 +45,6 @@ public class CitizenController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "A list of the hearings associated with a citizen.")
     })
-    @PreAuthorize("hasAuthority('citizen')")
     public ResponseEntity<java.util.List<OnlineHearing>> getOnlineHearings(
             @ApiParam(value = "user authorisation header", example = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdW") @RequestHeader(AUTHORIZATION) String authorisation
     ) {
