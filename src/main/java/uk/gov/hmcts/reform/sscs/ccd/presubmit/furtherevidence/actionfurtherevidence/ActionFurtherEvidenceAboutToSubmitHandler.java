@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
@@ -95,24 +94,28 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isAppellantOrAppointeeAddressInvalid(SscsCaseData caseData) {
-        if (null != caseData.getAppeal().getAppellant() && "yes".equals(caseData.getAppeal().getAppellant().getIsAppointee())) {
-            return (null != caseData.getAppeal().getAppellant().getAppointee()
-                    && (null == caseData.getAppeal().getAppellant().getAppointee().getAddress()
-                    || caseData.getAppeal().getAppellant().getAppointee().getAddress().isAddressEmpty()));
+        if (null != caseData.getAppeal().getAppellant() && "yes".equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
+            return null == caseData.getAppeal().getAppellant().getAppointee()
+                    || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
         } else {
             return null == caseData.getAppeal().getAppellant()
-                    || null == caseData.getAppeal().getAppellant().getAddress()
-                    || caseData.getAppeal().getAppellant().getAddress().isAddressEmpty();
+                || isAddressInvalid(caseData.getAppeal().getAppellant().getAddress());
         }
     }
 
     private boolean isRepAddressInvalid(SscsCaseData caseData) {
         Representative rep = caseData.getAppeal().getRep();
 
-        return (null != rep
-                && (null == rep.getAddress()
-                || rep.getAddress().isAddressEmpty()));
+        return null != rep
+                && "yes".equalsIgnoreCase(rep.getHasRepresentative())
+                && isAddressInvalid(rep.getAddress());
+    }
 
+    private boolean isAddressInvalid(Address address) {
+        return null == address
+            || address.isAddressEmpty()
+            || isBlank(address.getLine1())
+            || isBlank(address.getPostcode());
     }
 
     private String buildErrorMessage(String party, String caseId) {

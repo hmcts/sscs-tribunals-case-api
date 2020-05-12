@@ -86,7 +86,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .scannedDocuments(scannedDocumentList)
             .furtherEvidenceAction(furtherEvidenceActionList)
             .originalSender(originalSender)
-            .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").build()).build()).build())
+            .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
             .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -306,7 +306,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 .originalSender(dynamicList)
                 .furtherEvidenceAction(dynamicList)
                 .scannedDocuments(Collections.singletonList(ScannedDocument.builder().build()))
-                .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").build()).build()).build())
+                .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
@@ -340,15 +340,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         return new Object[]{
             new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().build()).build()).build(), "Appellant"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("Line1").build()).build()).build(), "Appellant"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().postcode("TS1 2BA").build()).build()).build(), "Appellant"},
             new Object[]{Appeal.builder().appellant(Appellant.builder().address(null).build()).build(), "Appellant"},
             new Object[]{Appeal.builder().appellant(null).build(), "Appellant"},
             new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").build()).build(), "Appointee"},
             new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().build()).build()).build(), "Appointee"},
             new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().address(Address.builder().build()).build()).build()).build(), "Appointee"},
             new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().address(null).build()).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().rep(Representative.builder().address(Address.builder().build()).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
-            new Object[]{Appeal.builder().rep(Representative.builder().address(null).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
-            new Object[]{Appeal.builder().rep(Representative.builder().address(Address.builder().build()).build()).appellant(Appellant.builder().address(null).build()).build(), "Appellant", "Representative"},
+            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").address(Address.builder().build()).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
+            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").address(null).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
+            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").address(Address.builder().build()).build()).appellant(Appellant.builder().address(null).build()).build(), "Appellant", "Representative"},
         };
     }
 
