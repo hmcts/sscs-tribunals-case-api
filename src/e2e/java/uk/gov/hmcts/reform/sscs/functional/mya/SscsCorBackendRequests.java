@@ -43,7 +43,7 @@ public class SscsCorBackendRequests {
     }
 
     public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
-        String uri = (StringUtils.isNotBlank(tya)) ? "/api/citizen/" + tya : "/citizen";
+        String uri = (StringUtils.isNotBlank(tya)) ? "/api/citizen/" + tya : "/api/citizen";
         HttpResponse getOnlineHearingResponse = getRequest(uri, email);
 
         assertThat(getOnlineHearingResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
@@ -89,7 +89,7 @@ public class SscsCorBackendRequests {
                 fileName)
             .build();
 
-        HttpResponse response = putRequest("/continuous-online-hearings/" + hearingId + "/evidence", data);
+        HttpResponse response = putRequest("/api/continuous-online-hearings/" + hearingId + "/evidence", data);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
