@@ -171,11 +171,20 @@ sonarqube {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
         property "sonar.projectKey", "SSCSTCA"
         property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.exclusions", "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
+        property "sonar.exclusions", "**/SscsCorBackendException.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/model/**"
+                "src/main/java/uk/gov/hmcts/reform/sscs/model/**" +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/EvidenceUploadService.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/OnlineHearingService.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StoreAppellantStatementService.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/StorePdfService.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/coversheet/PdfCoverSheet.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/controllers/CreateCaseController.java," +
+                "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/PdfData.java"
         property "sonar.pitest.mode", "reuseReport"
         property "sonar.pitest.reportsDirectory", "build/reports/pitest"
     }
