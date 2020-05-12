@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -43,15 +42,13 @@ public class DocumentDownloadServiceTest {
     public void setUp() {
         documentDownloadService = new DocumentDownloadService(documentDownloadClientApi,
             authTokenGenerator, "http://dm-store:4506");
-
-        //noinspection unchecked
-        ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
-        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
-            .willReturn(response);
     }
 
     @Test
     public void givenDocumentUrl_shouldReturnFileSize() {
+        ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willReturn(response);
         long size = documentDownloadService
             .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
         assertEquals(4L, size);
@@ -59,6 +56,9 @@ public class DocumentDownloadServiceTest {
 
     @Test
     public void givenUrl_shouldGetDownLoadUrl() {
+        ResponseEntity<Resource> response = ResponseEntity.ok(new ByteArrayResource("test".getBytes()));
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willReturn(response);
         documentDownloadService
             .getFileSize("http://dm-store:4506/documents/19cd94a8-4280-406b-92c7-090b735159ca");
 
@@ -98,25 +98,14 @@ public class DocumentDownloadServiceTest {
         headers.add(HttpHeaders.CONTENT_TYPE, contentType);
         ResponseEntity<Resource> expectedResponse = new ResponseEntity<>(expectedResource, headers, HttpStatus.OK);
 
-        when(documentDownloadClientApi.downloadBinary("oauth2Token", "someToken", "", "sscs", "/documents/someDocId/binary"))
-                .thenReturn(expectedResponse);
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willReturn(expectedResponse);
 
         String urlString = "http://somedomain/documents/someDocId/binary";
         UploadedEvidence downloadFile = documentDownloadService.downloadFile(urlString);
 
         assertThat(downloadFile, is(new UploadedEvidence(expectedResource, filename, contentType)));
     }
-
-    @Test(expected = IllegalStateException.class)
-    public void cannotDownloadFile() {
-        String urlString = "http://somedomain/documents/someDocId/binary";
-        ResponseEntity<Resource> expectedResponse = new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        when(documentDownloadClientApi.downloadBinary("oauth2Token", "someToken", "", "sscs", "/documents/someDocId/binary"))
-                .thenReturn(expectedResponse);
-
-        documentDownloadService.downloadFile(urlString);
-    }
-
 
     @SuppressWarnings("unused")
     private Object[][] getDifferentResponseScenarios() {
