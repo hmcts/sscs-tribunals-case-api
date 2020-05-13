@@ -31,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CorIdamService.class})
 @Slf4j
 public abstract class BaseFunctionTest {
-    private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8090";
+    private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8080";
 
     private CloseableHttpClient client;
     private HttpClient cohClient;
