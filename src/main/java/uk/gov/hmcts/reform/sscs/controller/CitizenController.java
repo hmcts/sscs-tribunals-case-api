@@ -24,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.service.CitizenLoginService;
 
 @Slf4j
 @RestController
-@RequestMapping("/api//citizen")
+@RequestMapping("/api/citizen")
 public class CitizenController {
 
     private final CitizenLoginService citizenLoginService;
