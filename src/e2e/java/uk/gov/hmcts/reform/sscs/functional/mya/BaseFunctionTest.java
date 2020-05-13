@@ -30,12 +30,6 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CorIdamService.class})
-@TestPropertySource(properties = {
-        "idam.s2s-auth.url=http://rpe-service-auth-provider-aat.service.core-compute-aat.internal",
-        "idam.url=https://idam-api.aat.platform.hmcts.net",
-        "idam.oauth2.redirectUrl=https://evidence-sharing-preprod.sscs.reform.hmcts.net",
-        "core_case_data.api.url=http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-})
 @Slf4j
 public abstract class BaseFunctionTest {
     private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8090";
