@@ -23,7 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.exception.SscsCorBackendException;
+import uk.gov.hmcts.reform.sscs.exception.CreateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RestController
@@ -106,7 +106,7 @@ public class CreateCaseController {
                     .build();
             sscsCaseData.getAppeal().setHearingType(hearingType);
         } catch (IOException e) {
-            throw new SscsCorBackendException(e);
+            throw new CreateCaseException(e);
         }
 
         return sscsCaseData;

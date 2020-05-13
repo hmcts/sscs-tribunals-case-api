@@ -171,7 +171,7 @@ sonarqube {
         property "sonar.projectName", "SSCS - Tribunals Case Api"
         property "sonar.projectKey", "SSCSTCA"
         property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-        property "sonar.exclusions", "**/SscsCorBackendException.java," +
+        property "sonar.exclusions", "**/CreateCaseException.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/domain/**," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
