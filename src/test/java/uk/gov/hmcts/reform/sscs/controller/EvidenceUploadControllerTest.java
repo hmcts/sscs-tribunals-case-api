@@ -75,42 +75,6 @@ public class EvidenceUploadControllerTest {
     }
 
     @Test
-    public void canUploadEvidenceToQuestion() {
-        MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenReturn(of(evidence));
-
-        ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
-                someOnlineHearingId, someQuestionId, file
-        );
-
-        assertThat(evidenceResponseEntity.getStatusCode(), is(OK));
-    }
-
-    @Test
-    public void cannotUploadEvidenceToQuestionWhenOnlineHearingDoesNotExist() {
-        MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenReturn(empty());
-
-        ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
-                someOnlineHearingId, someQuestionId, file
-        );
-
-        assertThat(evidenceResponseEntity.getStatusCode(), is(NOT_FOUND));
-    }
-
-    @Test
-    public void cannotUploadDocumentsToQuestionThatDocumentStoreDoesNotSupport() {
-        MultipartFile file = mock(MultipartFile.class);
-        when(evidenceUploadService.uploadDraftQuestionEvidence(someOnlineHearingId, someQuestionId, file)).thenThrow(new IllegalFileTypeException("someFile.bad"));
-
-        ResponseEntity<Evidence> evidenceResponseEntity = evidenceUploadController.uploadEvidence(
-                someOnlineHearingId, someQuestionId, file
-        );
-
-        assertThat(evidenceResponseEntity.getStatusCode(), is(UNPROCESSABLE_ENTITY));
-    }
-
-    @Test
     public void submitEvidence() {
         EvidenceDescription description = new EvidenceDescription("some description", "idamEmail");
         when(evidenceUploadService.submitHearingEvidence(someOnlineHearingId, description)).thenReturn(true);

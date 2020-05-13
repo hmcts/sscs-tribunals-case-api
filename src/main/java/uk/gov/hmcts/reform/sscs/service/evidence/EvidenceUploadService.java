@@ -40,17 +40,14 @@ import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.CohEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
-import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
 
 @Slf4j
 @Service
 public class EvidenceUploadService {
-    private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
     private final StoreEvidenceDescriptionService storeEvidenceDescriptionService;
-    private final EvidenceUploadEmailService evidenceUploadEmailService;
     private final FileToPdfConversionService fileToPdfConversionService;
     private final EvidenceManagementService evidenceManagementService;
     private final PdfStoreService pdfStoreService;
@@ -59,20 +56,17 @@ public class EvidenceUploadService {
     public static final String DM_STORE_USER_ID = "sscs";
 
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
-    private static final QuestionDocumentExtractor questionDocumentExtractor = new QuestionDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(DocumentManagementService documentManagementService, CcdService ccdService,
+    public EvidenceUploadService(CcdService ccdService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
-                                 StoreEvidenceDescriptionService storeEvidenceDescriptionService, EvidenceUploadEmailService evidenceUploadEmailService,
+                                 StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
                                  EvidenceManagementService evidenceManagementService, PdfStoreService pdfStoreService) {
-        this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
         this.storeEvidenceDescriptionService = storeEvidenceDescriptionService;
-        this.evidenceUploadEmailService = evidenceUploadEmailService;
         this.fileToPdfConversionService = fileToPdfConversionService;
         this.evidenceManagementService = evidenceManagementService;
         this.pdfStoreService = pdfStoreService;
@@ -82,12 +76,6 @@ public class EvidenceUploadService {
         return uploadEvidence(identifier, file, draftHearingDocumentExtractor,
             document -> new SscsDocument(createNewDocumentDetails(document)), UPLOAD_DRAFT_DOCUMENT,
             "SSCS - upload document from MYA");
-    }
-
-    public Optional<Evidence> uploadDraftQuestionEvidence(String identifier, String questionId, MultipartFile file) {
-        return uploadEvidence(identifier, file, questionDocumentExtractor, document ->
-            new CorDocument(new CorDocumentDetails(createNewDocumentDetails(document), questionId)),
-            UPLOAD_COR_DOCUMENT, "SSCS - cor evidence uploaded");
     }
 
     private SscsDocumentDetails createNewDocumentDetails(Document document) {
@@ -143,13 +131,9 @@ public class EvidenceUploadService {
                         getFileNames(sscsCaseData));
                     CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
                         ccdCaseId, identifier, data);
-                    if (sscsCaseData.getAppeal() == null || sscsCaseData.getAppeal().getHearingType() == null
-                        || sscsCaseData.getAppeal().getHearingType().equals("cor")) {
-                        submitHearingForACorCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext);
-                    } else {
-                        submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
-                            data.getDescription().getIdamEmail());
-                    }
+                    submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
+                        data.getDescription().getIdamEmail());
+
                     return true;
                 })
                 .orElse(false);
@@ -272,34 +256,10 @@ public class EvidenceUploadService {
         }
     }
 
-    private void removeUniqueIdAndSetFilenameForTheEvidenceDesc(SscsDocument evidenceDescriptionDocument) {
-        String fileNameCleanOfUniqueId = removeTemporalUniqueIdFromGivenString(evidenceDescriptionDocument.getValue()
-            .getDocumentFileName());
-        evidenceDescriptionDocument.getValue().setDocumentFileName(fileNameCleanOfUniqueId);
-        DocumentLink dlFilename = evidenceDescriptionDocument.getValue().getDocumentLink();
-        DocumentLink newDocLink = dlFilename.toBuilder()
-            .documentFilename(fileNameCleanOfUniqueId)
-            .documentUrl(dlFilename.getDocumentUrl())
-            .documentBinaryUrl(dlFilename.getDocumentBinaryUrl())
-            .build();
-        evidenceDescriptionDocument.getValue().setDocumentLink(newDocLink);
-    }
-
-    @NotNull
-    private String removeTemporalUniqueIdFromGivenString(String filename) {
-        return filename.replace(TEMP_UNIQUE_ID, "").trim();
-    }
-
     private void removeStatementDocFromDocumentTab(SscsCaseData sscsCaseData, List<SscsDocument> sscsDocument) {
         sscsDocument.removeIf(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID)
                 || doc.getValue().getDocumentLink().getDocumentFilename().startsWith(TEMP_UNIQUE_ID));
         sscsCaseData.setSscsDocument(sscsDocument);
-    }
-
-    private SscsDocument findAndReturnTheNewEvidenceDescDoc(List<SscsDocument> sscsDocument) {
-        return sscsDocument.stream()
-                .filter(doc -> doc.getValue().getDocumentFileName().startsWith(TEMP_UNIQUE_ID))
-                .findFirst().orElseThrow(() -> new RuntimeException("Evidence description file cannot be found"));
     }
 
     private long getCountOfNextUploadDoc(List<ScannedDocument> scannedDocuments, List<SscsDocument> sscsDocument) {
@@ -356,26 +316,6 @@ public class EvidenceUploadService {
         return fileNamePrefix;
     }
 
-    private void submitHearingForACorCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
-                                          CohEventActionContext storePdfContext) {
-        log.info("Submitting draft document for case [" + ccdCaseId + "]");
-        List<SscsDocument> draftSscsDocument = storePdfContext.getDocument().getData()
-            .getDraftSscsDocument();
-        List<SscsDocument> newSscsDocumentsList = union(
-                emptyIfNull(storePdfContext.getDocument().getData().getSscsDocument()),
-                emptyIfNull(draftSscsDocument)
-        );
-        SscsDocument evidenceDescriptionDocument = findAndReturnTheNewEvidenceDescDoc(newSscsDocumentsList);
-        removeUniqueIdAndSetFilenameForTheEvidenceDesc(evidenceDescriptionDocument);
-        sscsCaseData.setSscsDocument(newSscsDocumentsList);
-        sscsCaseData.setDraftSscsDocument(Collections.emptyList());
-
-        ccdService.updateCase(sscsCaseData, ccdCaseId, UPLOAD_COR_DOCUMENT.getCcdType(),
-            "SSCS - cor evidence uploaded", UPDATED_SSCS, idamService.getIdamTokens());
-
-        evidenceUploadEmailService.sendToDwp(storePdfContext.getPdf(), draftSscsDocument, caseDetails);
-    }
-
     private List<String> getFileNames(SscsCaseData sscsCaseData) {
         return sscsCaseData.getDraftSscsDocument().stream()
                 .map(document -> document.getValue().getDocumentFileName())
@@ -393,56 +333,10 @@ public class EvidenceUploadService {
                 .map(LoadedEvidence::new);
     }
 
-    public boolean deleteQuestionEvidence(String onlineHearingId, String evidenceId) {
-        return deleteEvidence(onlineHearingId, evidenceId, questionDocumentExtractor);
-    }
-
-    public boolean deleteDraftHearingEvidence(String identifier, String evidenceId) {
-        return deleteEvidence(identifier, evidenceId, draftHearingDocumentExtractor);
-    }
-
-    private <E> boolean deleteEvidence(String identifier, String evidenceId, DocumentExtract<E> documentExtract) {
-        return onlineHearingService.getCcdCaseByIdentifier(identifier)
-                .map(caseDetails -> {
-                    List<E> documents = documentExtract.getDocuments().apply(caseDetails.getData());
-
-                    if (documents != null) {
-                        List<E> newDocuments = documents.stream()
-                                .filter(corDocument -> !documentExtract.findDocument().apply(corDocument).getDocumentLink().getDocumentUrl().endsWith(evidenceId))
-                                .collect(toList());
-                        documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
-
-                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
-
-                        documentManagementService.delete(evidenceId);
-                    }
-                    return true;
-                }).orElse(false);
-    }
-
     private interface DocumentExtract<E> {
         Function<SscsCaseData, List<E>> getDocuments();
 
         BiConsumer<SscsCaseData, List<E>> setDocuments();
-
-        Function<E, SscsDocumentDetails> findDocument();
-    }
-
-    private static class QuestionDocumentExtractor implements DocumentExtract<CorDocument> {
-        @Override
-        public Function<SscsCaseData, List<CorDocument>> getDocuments() {
-            return SscsCaseData::getDraftCorDocument;
-        }
-
-        @Override
-        public BiConsumer<SscsCaseData, List<CorDocument>> setDocuments() {
-            return SscsCaseData::setDraftCorDocument;
-        }
-
-        @Override
-        public Function<CorDocument, SscsDocumentDetails> findDocument() {
-            return document -> document.getValue().getDocument();
-        }
     }
 
     private static class DraftHearingDocumentExtractor implements DocumentExtract<SscsDocument> {
@@ -455,26 +349,15 @@ public class EvidenceUploadService {
         public BiConsumer<SscsCaseData, List<SscsDocument>> setDocuments() {
             return SscsCaseData::setDraftSscsDocument;
         }
-
-        @Override
-        public Function<SscsDocument, SscsDocumentDetails> findDocument() {
-            return SscsDocument::getValue;
-        }
     }
 
     private static class LoadedEvidence {
         private final SscsCaseDetails caseDetails;
         private final List<Evidence> draftHearingEvidence;
-        private final List<Evidence> hearingEvidence;
-        private final Map<String, List<Evidence>> draftQuestionEvidence;
-        private final Map<String, List<Evidence>> questionEvidence;
 
         LoadedEvidence(SscsCaseDetails caseDetails) {
             this.caseDetails = caseDetails;
             draftHearingEvidence = extractHearingEvidences(caseDetails.getData().getDraftSscsDocument());
-            hearingEvidence = extractHearingEvidences(caseDetails.getData().getSscsDocument());
-            draftQuestionEvidence = extractQuestionEvidence(caseDetails.getData().getDraftCorDocument());
-            questionEvidence = extractQuestionEvidence(caseDetails.getData().getCorDocument());
         }
 
         public SscsCaseDetails getCaseDetails() {
@@ -485,34 +368,9 @@ public class EvidenceUploadService {
             return draftHearingEvidence;
         }
 
-        public List<Evidence> getHearingEvidence() {
-            return hearingEvidence;
-        }
-
-        public Map<String, List<Evidence>> getDraftQuestionEvidence() {
-            return draftQuestionEvidence;
-        }
-
-        public Map<String, List<Evidence>> getQuestionEvidence() {
-            return questionEvidence;
-        }
-
         private List<Evidence> extractHearingEvidences(List<SscsDocument> sscsDocuments) {
             List<SscsDocument> hearingDocuments = emptyIfNull(sscsDocuments);
             return hearingDocuments.stream().map(sscsDocumentToEvidence()).collect(toList());
-        }
-
-        private Map<String, List<Evidence>> extractQuestionEvidence(List<CorDocument> corDocument) {
-            List<CorDocument> questionDocuments = emptyIfNull(corDocument);
-            return questionDocuments.stream()
-                    .collect(groupingBy(corDocumentDetails -> corDocumentDetails.getValue().getQuestionId(), mapping(corDocumentToEvidence(), toList())));
-        }
-
-        private Function<CorDocument, Evidence> corDocumentToEvidence() {
-            return corDocument -> {
-                SscsDocumentDetails sscsDocumentDetails = corDocument.getValue().getDocument();
-                return extractEvidence(sscsDocumentDetails);
-            };
         }
 
         private Function<SscsDocument, Evidence> sscsDocumentToEvidence() {

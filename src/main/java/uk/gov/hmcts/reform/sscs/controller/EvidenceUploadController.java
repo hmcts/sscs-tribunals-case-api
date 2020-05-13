@@ -60,28 +60,6 @@ public class EvidenceUploadController {
         return uploadEvidence(() -> evidenceUploadService.uploadDraftHearingEvidence(identifier, file));
     }
 
-    @ApiOperation(value = "Upload COR evidence to a question",
-            notes = "Uploads evidence for a COR appeal. You need to have an appeal in CCD and an online hearing in COH "
-                    + "that references the appeal in CCD."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Evidence has been added to the appeal"),
-            @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
-            @ApiResponse(code = 422, message = "The file cannot be added to the document store")
-    })
-    @PostMapping(
-            value = "{onlineHearingId}/questions/{questionId}/evidence",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Evidence> uploadEvidence(
-            @PathVariable("onlineHearingId") String onlineHearingId,
-            @PathVariable("questionId") String questionId,
-            @RequestParam("file") MultipartFile file
-    ) {
-        return uploadEvidence(() -> evidenceUploadService.uploadDraftQuestionEvidence(onlineHearingId, questionId, file));
-    }
-
     private ResponseEntity<Evidence> uploadEvidence(Supplier<Optional<Evidence>> uploadEvidence) {
         try {
             Optional<Evidence> evidenceOptional = uploadEvidence.get();
