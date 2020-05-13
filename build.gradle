@@ -270,7 +270,7 @@ dependencies {
     compile 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.6.RELEASE'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.2.7.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.3.3'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.17.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.17.0'
