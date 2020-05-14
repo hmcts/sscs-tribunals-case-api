@@ -143,6 +143,7 @@ public class SubmitAppealServiceTest {
         offices.add("DWP PIP (1)");
         offices.add("Balham DRT");
         offices.add("Watford DRT");
+        offices.add("Sheffield DRT");
 
         sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
 
