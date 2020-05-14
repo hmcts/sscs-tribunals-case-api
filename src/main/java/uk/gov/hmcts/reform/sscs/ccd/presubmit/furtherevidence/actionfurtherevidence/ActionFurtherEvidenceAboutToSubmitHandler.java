@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
@@ -62,6 +61,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
+            checkAddressesValidToIssueEvidenceToAllParties(sscsCaseData);
+
+            if (preSubmitCallbackResponse.getErrors().size() > 0) {
+                return preSubmitCallbackResponse;
+            }
+
             sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
         }
 
@@ -76,6 +81,47 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             return furtherEvidenceActionList.getValue().getCode().equals(ISSUE_FURTHER_EVIDENCE.getCode());
         }
         return false;
+    }
+
+    public void checkAddressesValidToIssueEvidenceToAllParties(SscsCaseData sscsCaseData) {
+        if (isAppellantOrAppointeeAddressInvalid(sscsCaseData)) {
+            String party = null != sscsCaseData.getAppeal().getAppellant() && "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) ? "Appointee" : "Appellant";
+            preSubmitCallbackResponse.addError(buildErrorMessage(party, sscsCaseData.getCcdCaseId()));
+        }
+        if (isRepAddressInvalid(sscsCaseData)) {
+            preSubmitCallbackResponse.addError((buildErrorMessage("Representative", sscsCaseData.getCcdCaseId())));
+        }
+    }
+
+    private boolean isAppellantOrAppointeeAddressInvalid(SscsCaseData caseData) {
+        if (null != caseData.getAppeal().getAppellant() && "yes".equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
+            return null == caseData.getAppeal().getAppellant().getAppointee()
+                    || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
+        } else {
+            return null == caseData.getAppeal().getAppellant()
+                || isAddressInvalid(caseData.getAppeal().getAppellant().getAddress());
+        }
+    }
+
+    private boolean isRepAddressInvalid(SscsCaseData caseData) {
+        Representative rep = caseData.getAppeal().getRep();
+
+        return null != rep
+                && "yes".equalsIgnoreCase(rep.getHasRepresentative())
+                && isAddressInvalid(rep.getAddress());
+    }
+
+    private boolean isAddressInvalid(Address address) {
+        return null == address
+            || address.isAddressEmpty()
+            || isBlank(address.getLine1())
+            || isBlank(address.getPostcode());
+    }
+
+    private String buildErrorMessage(String party, String caseId) {
+        log.info("Issuing further evidence to all parties rejected, {} is missing address details for caseId {}", party, caseId);
+
+        return "Address details are missing for the " + party + ", please validate or process manually";
     }
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState, Boolean ignoreWarnings) {
