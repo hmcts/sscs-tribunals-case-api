@@ -33,6 +33,7 @@ java:
     REFORM_ENVIRONMENT: preview
     ROOT_LOGGING_LEVEL: INFO
     LOG_OUTPUT: single
+    CREATE_CCD_ENDPOINT: false
     MAX_FILE_SIZE: "10MB"
     MAX_REQUEST_SIZE: "10MB"
     PDF_SERVICE_CONVERT_URL: https://docmosis-development.platform.hmcts.net/rs/convert
