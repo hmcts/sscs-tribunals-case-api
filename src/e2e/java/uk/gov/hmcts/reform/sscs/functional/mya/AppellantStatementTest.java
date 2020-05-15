@@ -9,6 +9,6 @@ public class AppellantStatementTest extends BaseFunctionTest {
     public void canUploadAnAppellantStatementForDigital() throws IOException {
         CreatedCcdCase createdCase = createCase();
 
-        sscsCorBackendRequests.uploadAppellantStatement(createdCase.getCaseId(), "statement");
+        sscsMyaBackendRequests.uploadAppellantStatement(createdCase.getCaseId(), "statement");
     }
 }

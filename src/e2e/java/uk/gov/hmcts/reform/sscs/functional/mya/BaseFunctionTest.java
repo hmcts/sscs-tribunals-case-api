@@ -28,20 +28,20 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {TribunalsCaseApiApplication.class, CorIdamService.class})
+@SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
 @Slf4j
 public abstract class BaseFunctionTest {
     private final String baseUrl = System.getenv("TEST_URL") != null ? System.getenv("TEST_URL") : "http://localhost:8080";
 
     private CloseableHttpClient client;
-    private HttpClient cohClient;
+    private HttpClient myaClient;
 
-    protected SscsCorBackendRequests sscsCorBackendRequests;
+    protected SscsMyaBackendRequests sscsMyaBackendRequests;
 
     @Autowired
     private IdamService idamService;
     @Autowired
-    protected CorIdamService corIdamService;
+    protected CitizenIdamService citizenIdamService;
     @Autowired
     protected CcdService ccdService;
 
@@ -51,10 +51,10 @@ public abstract class BaseFunctionTest {
 
     @Before
     public void setUp() throws Exception {
-        cohClient = buildClient("USE_COH_PROXY");
+        myaClient = buildClient("USE_MYA_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
-        sscsCorBackendRequests = new SscsCorBackendRequests(idamService, corIdamService, baseUrl, client);
-        idamTestApiRequests = new IdamTestApiRequests(cohClient, idamApiUrl);
+        sscsMyaBackendRequests = new SscsMyaBackendRequests(idamService, citizenIdamService, baseUrl, client);
+        idamTestApiRequests = new IdamTestApiRequests(myaClient, idamApiUrl);
     }
 
     protected String createRandomEmail() {
@@ -68,13 +68,13 @@ public abstract class BaseFunctionTest {
         String emailAddress = createRandomEmail();
 
         CreatedCcdCase createdCcdCase = null;
-        createdCcdCase = sscsCorBackendRequests.createOralCase(emailAddress);
+        createdCcdCase = sscsMyaBackendRequests.createOralCase(emailAddress);
 
         return createdCcdCase;
     }
 
     protected CreatedCcdCase createCcdCase(String emailAddress) throws IOException {
-        CreatedCcdCase createdCcdCase = sscsCorBackendRequests.createOralCase(emailAddress);
+        CreatedCcdCase createdCcdCase = sscsMyaBackendRequests.createOralCase(emailAddress);
         System.out.println("Case id " + createdCcdCase.getCaseId());
         return createdCcdCase;
     }

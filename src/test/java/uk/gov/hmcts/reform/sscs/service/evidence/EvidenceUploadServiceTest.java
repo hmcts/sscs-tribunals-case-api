@@ -42,7 +42,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
-import uk.gov.hmcts.reform.sscs.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
@@ -176,7 +176,7 @@ public class EvidenceUploadServiceTest {
             someOnlineHearingId,
             new EvidenceDescriptionPdfData(sscsCaseDetails, someDescription,
                 singletonList("someFileName.txt"))
-        )).thenReturn(new CohEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
+        )).thenReturn(new MyaEventActionContext(evidenceDescriptionPdf, sscsCaseDetails));
 
         byte[] dummyFileContentInBytes = getDummyFileContentInBytes();
         when(evidenceManagementService.download(ArgumentMatchers.any(), eq("sscs"))).thenReturn(dummyFileContentInBytes);

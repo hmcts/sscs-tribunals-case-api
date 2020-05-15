@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
-import uk.gov.hmcts.reform.sscs.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreAppellantStatementService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.AppellantStatementPdfData;
 
@@ -21,7 +21,7 @@ public class AppellantStatementService {
         this.onlineHearingService = onlineHearingService;
     }
 
-    public Optional<CohEventActionContext> handleAppellantStatement(String identifier, Statement statement) {
+    public Optional<MyaEventActionContext> handleAppellantStatement(String identifier, Statement statement) {
         return onlineHearingService.getCcdCaseByIdentifier(identifier).map(caseDetails ->
                 storeAppellantStatementService.storePdf(
                 caseDetails.getId(),

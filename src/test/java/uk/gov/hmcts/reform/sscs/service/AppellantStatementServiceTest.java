@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreAppellantStatementService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.AppellantStatementPdfData;
 
@@ -47,7 +47,7 @@ public class AppellantStatementServiceTest {
         long id = 1234L;
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
         when(storeAppellantStatementService.storePdf(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
-                .thenReturn(mock(CohEventActionContext.class));
+                .thenReturn(mock(MyaEventActionContext.class));
         Optional handled = appellantStatementService.handleAppellantStatement(someOnlineHearing, someStatement());
 
         assertThat(handled.isPresent(), is(true));
@@ -57,9 +57,9 @@ public class AppellantStatementServiceTest {
     public void generatesAndSavesPdf() {
         long id = 1234L;
         when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearing)).thenReturn(Optional.of(SscsCaseDetails.builder().id(id).build()));
-        CohEventActionContext cohEventActionContext = mock(CohEventActionContext.class);
+        MyaEventActionContext myaEventActionContext = mock(MyaEventActionContext.class);
         when(storeAppellantStatementService.storePdf(eq(id), eq(someOnlineHearing), any(AppellantStatementPdfData.class)))
-                .thenReturn(cohEventActionContext);
+                .thenReturn(myaEventActionContext);
         Optional handled = appellantStatementService.handleAppellantStatement(someOnlineHearing, someStatement());
 
         assertThat(handled.isPresent(), is(true));

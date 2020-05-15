@@ -45,7 +45,7 @@ public class CreateCaseController {
             notes = "Creates a case in CCD with an online panel which can the be used for a online hearing. This "
                     + "endpoint is just for test and should only be present in test environments. The email address "
                     + "used will need to be unique for all other cases in CCD with an online panel if we want to load "
-                    + "it for the COR process."
+                    + "it for the MYA process."
     )
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Case has been created")
@@ -57,7 +57,7 @@ public class CreateCaseController {
             @RequestParam("email")String email,
             @ApiParam(value = "mobile number of appellant. Optional if not set will not subscribe for sms.")
             @RequestParam(value = "mobile", required = false) String mobile,
-            @RequestParam(value = "hearingType", defaultValue = "cor") String hearingType
+            @RequestParam(value = "hearingType", defaultValue = "oral") String hearingType
     ) throws URISyntaxException {
         SscsCaseDetails caseDetails = ccdService.createCase(
                 createSscsCase(email, mobile, hearingType),

@@ -87,10 +87,10 @@ public class EvidenceUploadController {
         return ResponseEntity.ok(evidenceUploadService.listDraftHearingEvidence(identifier));
     }
 
-    @ApiOperation(value = "Submit COR evidence",
+    @ApiOperation(value = "Submit MYA evidence",
             notes = "Submits the evidence that has already been uploaded in a draft state. This means it will be "
-                    + "visible in CCD by a caseworker and JUI by the panel members. You need to have an appeal in CCD "
-                    + "and an online hearing in COH that references the appeal in CCD. Will create a cover sheet for the "
+                    + "visible in CCD by a caseworker. You need to have an appeal in CCD "
+                    + "and an online hearing in the references the appeal in CCD. Will create a cover sheet for the "
                     + "evidence uploaded containing the file names and a description from the appellant."
     )
     @ApiResponses(value = {

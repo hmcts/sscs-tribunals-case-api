@@ -28,16 +28,16 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Slf4j
-public class SscsCorBackendRequests {
+public class SscsMyaBackendRequests {
     private final IdamTokens idamTokens;
-    private final CorIdamService corIdamService;
+    private final CitizenIdamService citizenIdamService;
     private String baseUrl;
     private CloseableHttpClient client;
 
 
-    public SscsCorBackendRequests(IdamService idamService, CorIdamService corIdamService, String baseUrl, CloseableHttpClient client) {
+    public SscsMyaBackendRequests(IdamService idamService, CitizenIdamService citizenIdamService, String baseUrl, CloseableHttpClient client) {
         this.idamTokens = idamService.getIdamTokens();
-        this.corIdamService = corIdamService;
+        this.citizenIdamService = citizenIdamService;
         this.baseUrl = baseUrl;
         this.client = client;
     }
@@ -138,7 +138,7 @@ public class SscsCorBackendRequests {
     }
 
     private RequestBuilder addHeaders(RequestBuilder requestBuilder, String email) {
-        String userToken = corIdamService.getUserToken(email, "Apassword123");
+        String userToken = citizenIdamService.getUserToken(email, "Apassword123");
         return requestBuilder
                 .setHeader(HttpHeaders.AUTHORIZATION, userToken)
                 .setHeader("ServiceAuthorization", idamTokens.getServiceAuthorization());

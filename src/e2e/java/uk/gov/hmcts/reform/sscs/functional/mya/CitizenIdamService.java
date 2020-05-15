@@ -10,7 +10,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 
 @Service
 @Slf4j
-public class CorIdamService {
+public class CitizenIdamService {
     private final IdamApiClient idamApiClient;
 
     private final String idamOauth2ClientId;
@@ -18,10 +18,10 @@ public class CorIdamService {
     private final String idamOauth2RedirectUrl;
 
     @Autowired
-    CorIdamService(IdamApiClient idamApiClient,
-                   @Value("${idam.oauth2.client.id}") String idamOauth2ClientId,
-                   @Value("${idam.oauth2.client.secret}") String idamOauth2ClientSecret,
-                   @Value("${idam.oauth2.redirectUrl}") String idamOauth2RedirectUrl
+    CitizenIdamService(IdamApiClient idamApiClient,
+                       @Value("${idam.oauth2.client.id}") String idamOauth2ClientId,
+                       @Value("${idam.oauth2.client.secret}") String idamOauth2ClientSecret,
+                       @Value("${idam.oauth2.redirectUrl}") String idamOauth2RedirectUrl
     ) {
         this.idamApiClient = idamApiClient;
         this.idamOauth2ClientId = idamOauth2ClientId;

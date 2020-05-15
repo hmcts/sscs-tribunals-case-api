@@ -37,7 +37,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
-import uk.gov.hmcts.reform.sscs.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
 
@@ -129,7 +129,7 @@ public class EvidenceUploadService {
                     Long ccdCaseId = caseDetails.getId();
                     EvidenceDescriptionPdfData data = new EvidenceDescriptionPdfData(caseDetails, description,
                         getFileNames(sscsCaseData));
-                    CohEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
+                    MyaEventActionContext storePdfContext = storeEvidenceDescriptionService.storePdf(
                         ccdCaseId, identifier, data);
                     submitHearingWhenNoCoreCase(caseDetails, sscsCaseData, ccdCaseId, storePdfContext,
                         data.getDescription().getIdamEmail());
@@ -140,7 +140,7 @@ public class EvidenceUploadService {
     }
 
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
-                                             CohEventActionContext storePdfContext, String idamEmail) {
+                                             MyaEventActionContext storePdfContext, String idamEmail) {
 
         String filename = getFilenameForTheNextUploadEvidence(caseDetails, ccdCaseId, storePdfContext, idamEmail);
         ScannedDocument mergedEvidencesDoc = appendEvidenceUploadsToStatementAndStoreIt(sscsCaseData, storePdfContext,
@@ -154,7 +154,7 @@ public class EvidenceUploadService {
     }
 
     private String getFilenameForTheNextUploadEvidence(SscsCaseDetails caseDetails, Long ccdCaseId,
-                                                       CohEventActionContext storePdfContext, String idamEmail) {
+                                                       MyaEventActionContext storePdfContext, String idamEmail) {
         String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
         SscsCaseData data = storePdfContext.getDocument().getData();
         long uploadCounter = getCountOfNextUploadDoc(data.getScannedDocuments(), data.getSscsDocument());
@@ -170,7 +170,7 @@ public class EvidenceUploadService {
     }
 
     private ScannedDocument appendEvidenceUploadsToStatementAndStoreIt(SscsCaseData sscsCaseData,
-                                                                       CohEventActionContext storePdfContext,
+                                                                       MyaEventActionContext storePdfContext,
                                                                        String filename) {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
@@ -180,11 +180,11 @@ public class EvidenceUploadService {
         return buildScannedDocumentByGivenSscsDoc(combinedPdfEvidence);
     }
 
-    private ByteArrayResource getContentFromTheStatement(CohEventActionContext storePdfContext) {
+    private ByteArrayResource getContentFromTheStatement(MyaEventActionContext storePdfContext) {
         return (ByteArrayResource) storePdfContext.getPdf().getContent();
     }
 
-    private List<byte[]> getContentListFromTheEvidenceUploads(CohEventActionContext storePdfContext) {
+    private List<byte[]> getContentListFromTheEvidenceUploads(MyaEventActionContext storePdfContext) {
         List<byte[]> draftPdfContentList = new ArrayList<>();
         List<SscsDocument> drafts = storePdfContext.getDocument().getData().getDraftSscsDocument();
         drafts.forEach(draft -> {

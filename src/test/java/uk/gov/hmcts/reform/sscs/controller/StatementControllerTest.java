@@ -13,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
 import uk.gov.hmcts.reform.sscs.service.AppellantStatementService;
-import uk.gov.hmcts.reform.sscs.service.pdf.CohEventActionContext;
+import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 
 public class StatementControllerTest {
 
@@ -38,7 +38,7 @@ public class StatementControllerTest {
     @Test
     public void canUploadAStatement() {
         when(appellantStatementService.handleAppellantStatement(onlineHearingId, statement))
-                .thenReturn(Optional.of(mock(CohEventActionContext.class)));
+                .thenReturn(Optional.of(mock(MyaEventActionContext.class)));
 
         ResponseEntity responseEntity = statementController.uploadStatement(onlineHearingId, statement);
 

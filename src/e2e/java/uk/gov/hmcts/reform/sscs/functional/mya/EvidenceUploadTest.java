@@ -17,18 +17,18 @@ public class EvidenceUploadTest extends BaseFunctionTest {
     public void uploadThenSubmitEvidenceToAppeal() throws IOException, JSONException {
         CreatedCcdCase createdCcdCase = createCase();
 
-        JSONArray draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
+        JSONArray draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
         assertThat(draftHearingEvidence.length(), is(0));
 
-        sscsCorBackendRequests.uploadHearingEvidence(createdCcdCase.getCaseId(), "evidence.png");
+        sscsMyaBackendRequests.uploadHearingEvidence(createdCcdCase.getCaseId(), "evidence.png");
 
-        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
+        draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
         assertThat(draftHearingEvidence.length(), is(1));
         assertThat(draftHearingEvidence.getJSONObject(0).getString("file_name"), is("evidence.pdf"));
 
-        sscsCorBackendRequests.submitHearingEvidence(createdCcdCase.getCaseId(), "some description");
+        sscsMyaBackendRequests.submitHearingEvidence(createdCcdCase.getCaseId(), "some description");
 
-        draftHearingEvidence = sscsCorBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
+        draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
         assertThat(draftHearingEvidence.length(), is(0));
 
         SscsCaseDetails caseDetails = getCaseDetails(createdCcdCase.getCaseId());
@@ -43,7 +43,7 @@ public class EvidenceUploadTest extends BaseFunctionTest {
     public void getEvidenceCoverSheet() throws IOException {
         CreatedCcdCase createdCcdCase = createCase();
 
-        String coversheet = sscsCorBackendRequests.getCoversheet(createdCcdCase.getCaseId());
+        String coversheet = sscsMyaBackendRequests.getCoversheet(createdCcdCase.getCaseId());
         assertThat(coversheet, is("evidence_cover_sheet.pdf"));
     }
 }

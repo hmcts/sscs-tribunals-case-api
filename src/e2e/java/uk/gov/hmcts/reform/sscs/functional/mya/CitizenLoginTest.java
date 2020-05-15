@@ -18,14 +18,14 @@ public class CitizenLoginTest extends BaseFunctionTest {
 
         String appellantTya = ccdCase.getAppellantTya();
 
-        JSONArray onlineHearingForTya = sscsCorBackendRequests.getOnlineHearingForCitizen(appellantTya, userEmail);
+        JSONArray onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen(appellantTya, userEmail);
         assertThat(onlineHearingForTya.length(), is(0));
 
-        JSONObject jsonObject = sscsCorBackendRequests.assignCaseToUser(appellantTya, userEmail, "TN32 6PL");
+        JSONObject jsonObject = sscsMyaBackendRequests.assignCaseToUser(appellantTya, userEmail, "TN32 6PL");
         Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
         assertThat(jsonObject.getLong("case_id"), is(expectedCaseId));
 
-        onlineHearingForTya = sscsCorBackendRequests.getOnlineHearingForCitizen("", userEmail);
+        onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen("", userEmail);
         assertThat(onlineHearingForTya.length(), is(1));
         assertThat(onlineHearingForTya.getJSONObject(0).get("case_id"), is(expectedCaseId));
     }

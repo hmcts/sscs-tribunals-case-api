@@ -73,12 +73,12 @@ public class StorePdfServiceTest {
         when(sscsPdfService.mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence"))
                 .thenReturn(SscsCaseData.builder().ccdCaseId(expectedCaseId).build());
 
-        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
+        MyaEventActionContext myaEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
 
         verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence");
-        assertThat(cohEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
-        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
-        assertThat(cohEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));
+        assertThat(myaEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
+        assertThat(myaEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
+        assertThat(myaEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));
     }
 
     @Test
@@ -103,12 +103,12 @@ public class StorePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(evidenceManagementService.download(new URI(documentUrl), "sscs")).thenReturn(expectedPdfBytes);
 
-        CohEventActionContext cohEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(sscsCaseDetails));
+        MyaEventActionContext myaEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(sscsCaseDetails));
 
         verify(sscsPdfService, never()).mergeDocIntoCcd(anyString(), any(), anyLong(), any(), any());
-        assertThat(cohEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
-        assertThat(cohEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
-        assertThat(cohEventActionContext.getDocument(), is(sscsCaseDetails));
+        assertThat(myaEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
+        assertThat(myaEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
+        assertThat(myaEventActionContext.getDocument(), is(sscsCaseDetails));
     }
 
     private SscsCaseDetails createCaseDetails() {

@@ -44,7 +44,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         this.evidenceManagementService = evidenceManagementService;
     }
 
-    public CohEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
+    public MyaEventActionContext storePdf(Long caseId, String onlineHearingId, D data) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         String documentNamePrefix = documentNamePrefix(caseDetails, onlineHearingId, data);
         if (pdfHasNotAlreadyBeenCreated(caseDetails, documentNamePrefix)) {
@@ -52,11 +52,11 @@ public abstract class StorePdfService<E, D extends PdfData> {
             return storePdf(caseId, onlineHearingId, idamService.getIdamTokens(), data, documentNamePrefix);
         } else {
             log.info("Loading pdf for [" + caseId + "]");
-            return new CohEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
+            return new MyaEventActionContext(loadPdf(caseDetails, documentNamePrefix), caseDetails);
         }
     }
 
-    private CohEventActionContext storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data,
+    private MyaEventActionContext storePdf(Long caseId, String onlineHearingId, IdamTokens idamTokens, D data,
                                            String documentNamePrefix) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
@@ -69,7 +69,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         SscsCaseData sscsCaseData = ccdPdfService.mergeDocIntoCcd(pdfName, pdfBytes, caseId, caseData, idamTokens,
             "Other evidence");
 
-        return new CohEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder()
+        return new MyaEventActionContext(pdf(pdfBytes, pdfName), data.getCaseDetails().toBuilder()
             .data(sscsCaseData).build());
     }
 
