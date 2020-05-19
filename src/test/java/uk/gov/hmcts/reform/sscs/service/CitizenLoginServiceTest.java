@@ -239,8 +239,8 @@ public class CitizenLoginServiceTest {
         underTest.findAndUpdateCaseLastLoggedIntoMya(citizenIdamTokens, String.valueOf(expectedCaseId));
 
         verify(ccdService).getByCaseId(eq(expectedCaseId), eq(serviceIdamTokens));
-        verify(citizenCcdService).updateCase(eq(expectedCase.getData()), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
-                anyString(), anyString(), eq(serviceIdamTokens), eq(String.valueOf(expectedCaseId)));
+        verify(ccdService).updateCase(eq(expectedCase.getData()), eq(expectedCaseId), eq(EventType.UPDATE_CASE_ONLY.getCcdType()),
+                anyString(), anyString(), eq(serviceIdamTokens));
     }
 
     @Test

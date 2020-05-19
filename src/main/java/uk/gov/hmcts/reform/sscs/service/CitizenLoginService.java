@@ -117,7 +117,7 @@ public class CitizenLoginService {
 
     private void updateCaseWithLastLoggedIntoMya(String email, SscsCaseDetails caseByAppealNumber) {
         updateSubscriptionWithLastLoggedIntoMya(caseByAppealNumber, email);
-        citizenCcdService.updateCase(caseByAppealNumber.getData(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens(), String.valueOf(caseByAppealNumber.getId()));
+        ccdService.updateCase(caseByAppealNumber.getData(), caseByAppealNumber.getId(), EventType.UPDATE_CASE_ONLY.getCcdType(), "SSCS - update last logged in MYA", UPDATED_SSCS, idamService.getIdamTokens());
     }
 
     private Predicate<SscsCaseDetails> casesWithSubscriptionMatchingTya(String tya) {
