@@ -352,7 +352,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void sysWithRepHavingALandLineWillNotReceiveSmsNotifications() {
+    public void syaWithRepHavingALandLineWillNotReceiveSmsNotifications() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS
             .getDeserializeMessage();
         syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("0203 444 4432");
@@ -363,7 +363,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
     }
 
     @Test
-    public void sysWithRepHavingAMobileNumberWillReceiveSmsNotifications() {
+    public void syaWithRepHavingAMobileNumberWillReceiveSmsNotifications() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS
             .getDeserializeMessage();
         syaCaseWrapper.getRepresentative().getContactDetails().setPhoneNumber("07404621944");
@@ -373,4 +373,16 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertEquals("mobile numbers should be equal", "+447404621944",
             caseData.getSubscriptions().getRepresentativeSubscription().getMobile());
     }
+
+    @Test
+    public void syaWithRepNameUndefinedWillMapToNull() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS_BUT_NO_APPELLANT_CONTACT_DETAILS
+                .getDeserializeMessage();
+        syaCaseWrapper.getRepresentative().setFirstName("Undefined");
+        syaCaseWrapper.getRepresentative().setLastName("Undefined");
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, regionalProcessingCenter.getName(), regionalProcessingCenter);
+        assertNull(caseData.getAppeal().getRep().getName().getFirstName());
+        assertNull(caseData.getAppeal().getRep().getName().getLastName());
+    }
+
 }

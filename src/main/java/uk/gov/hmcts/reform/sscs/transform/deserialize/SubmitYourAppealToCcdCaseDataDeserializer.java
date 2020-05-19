@@ -596,10 +596,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                             .build();
                 }
 
+                String repFirstName = "undefined".equalsIgnoreCase(syaRepresentative.getFirstName()) ? null : syaRepresentative.getFirstName();
+                String repLastName = "undefined".equalsIgnoreCase(syaRepresentative.getLastName()) ? null : syaRepresentative.getLastName();
+
                 Name name = Name.builder()
                         .title(syaRepresentative.getTitle())
-                        .firstName(syaRepresentative.getFirstName())
-                        .lastName(syaRepresentative.getLastName())
+                        .firstName(repFirstName)
+                        .lastName(repLastName)
                         .build();
 
                 Address address = Address.builder()
