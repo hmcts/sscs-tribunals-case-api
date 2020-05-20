@@ -52,7 +52,7 @@ public class WriteFinalDecisionMidEventHandler implements PreSubmitCallbackHandl
     }
 
     private boolean isDecisionNoticeDecisionDateInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getPipWriteFinalDecisionDecisionDate()!= null) {
+        if (sscsCaseData.getPipWriteFinalDecisionDecisionDate() != null) {
             LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionDecisionDate());
             LocalDate today = LocalDate.now();
             return decisionNoticeDecisionDate.isAfter(today);
