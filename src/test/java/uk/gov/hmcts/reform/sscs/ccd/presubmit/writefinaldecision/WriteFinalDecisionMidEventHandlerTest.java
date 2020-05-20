@@ -1,9 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
@@ -14,16 +15,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class WriteFinalDecisionAboutToSubmitHandlerTest {
+public class WriteFinalDecisionMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    private WriteFinalDecisionAboutToSubmitHandler handler;
+    private WriteFinalDecisionMidEventHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -31,14 +32,12 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private DecisionNoticeQuestionService decisionNoticeQuestionService;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() throws IOException {
         initMocks(this);
-        decisionNoticeQuestionService = new DecisionNoticeQuestionService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService);
+        handler = new WriteFinalDecisionMidEventHandler();
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -51,18 +50,43 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     @Test
     public void givenANonWriteFinalDecisionEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+        assertFalse(handler.canHandle(MID_EVENT, callback));
     }
 
     @Test
-    @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
+    @Parameters({"ABOUT_TO_START", "ABOUT_TO_SUBMIT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
+    }
+
+    @Test
+    public void givenAnEndDateIsBeforeStartDate_thenDisplayAnError() {
+        sscsCaseData.setPipWriteFinalDecisionStartDate("2020-01-01");
+        sscsCaseData.setPipWriteFinalDecisionEndDate("2019-01-01");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Decision notice start date cannot be after decision notice end date", error);
+    }
+
+    @Test
+    public void givenAnEndDateIsAfterStartDate_thenDoNotDisplayAnError() {
+        sscsCaseData.setPipWriteFinalDecisionStartDate("2019-01-01");
+        sscsCaseData.setPipWriteFinalDecisionEndDate("2020-01-01");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
     }
 }
