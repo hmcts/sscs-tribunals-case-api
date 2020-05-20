@@ -36,6 +36,9 @@ public class WriteFinalDecisionMidEventHandler implements PreSubmitCallbackHandl
         if (isDecisionNoticeDatesInvalid(sscsCaseData)) {
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
         }
+        if (isDecisionNoticeDecisionDateInvalid(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("Decision notice decision date must not be in the future");
+        }
         return preSubmitCallbackResponse;
     }
 
@@ -44,6 +47,15 @@ public class WriteFinalDecisionMidEventHandler implements PreSubmitCallbackHandl
             LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionStartDate());
             LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionEndDate());
             return !decisionNoticeStartDate.isBefore(decisionNoticeEndDate);
+        }
+        return false;
+    }
+
+    private boolean isDecisionNoticeDecisionDateInvalid(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getPipWriteFinalDecisionDecisionDate()!= null) {
+            LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionDecisionDate());
+            LocalDate today = LocalDate.now();
+            return decisionNoticeDecisionDate.isAfter(today);
         }
         return false;
     }

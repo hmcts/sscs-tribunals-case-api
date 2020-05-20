@@ -7,6 +7,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAmount;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -70,6 +72,46 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Decision notice end date must be after decision notice start date", error);
+    }
+
+    @Test
+    public void givenADecisionDateIsInFuture_thenDisplayAnError() {
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        sscsCaseData.setPipWriteFinalDecisionDecisionDate(tomorrow.toString());
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Decision notice decision date must not be in the future", error);
+    }
+
+    @Test
+    public void givenADecisionDateIsToday_thenDoNotDisplayAnError() {
+
+        LocalDate today = LocalDate.now();
+        sscsCaseData.setPipWriteFinalDecisionDecisionDate(today.toString());
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenADecisionDateIsInPast_thenDoNotDisplayAnError() {
+
+        LocalDate yesterday = LocalDate.now().plusDays(-1);
+        sscsCaseData.setPipWriteFinalDecisionDecisionDate(yesterday.toString());
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test
