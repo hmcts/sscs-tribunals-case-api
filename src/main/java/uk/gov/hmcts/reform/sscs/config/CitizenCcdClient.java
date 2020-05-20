@@ -70,6 +70,20 @@ public class CitizenCcdClient {
 
     }
 
+    public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("sortDirection", "desc");
+        return coreCaseDataApi.searchForCitizen(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                idamTokens.getUserId(),
+                ccdRequestDetails.getJurisdictionId(),
+                ccdRequestDetails.getCaseTypeId(),
+                searchCriteria
+        );
+
+    }
+
     CaseDetails submitEventForCitizen(IdamTokens idamTokens, String caseId, CaseDataContent caseDataContent) {
         return coreCaseDataApi.submitEventForCitizen(
             idamTokens.getIdamOauth2Token(),
