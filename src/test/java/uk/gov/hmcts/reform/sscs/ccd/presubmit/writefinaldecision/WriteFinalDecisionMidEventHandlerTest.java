@@ -69,7 +69,20 @@ public class WriteFinalDecisionMidEventHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Decision notice start date cannot be after decision notice end date", error);
+        assertEquals("Decision notice end date must be after decision notice start date", error);
+    }
+
+    @Test
+    public void givenAnEndDateIsSameAsStartDate_thenDisplayAnError() {
+        sscsCaseData.setPipWriteFinalDecisionStartDate("2020-01-01");
+        sscsCaseData.setPipWriteFinalDecisionEndDate("2020-01-01");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Decision notice end date must be after decision notice start date", error);
     }
 
     @Test
