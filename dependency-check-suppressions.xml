@@ -16,4 +16,32 @@
         ]]></notes>
         <cve>CVE-2018-1258</cve>
     </suppress>
+    <suppress until="2020-06-30">
+        <notes><![CDATA[
+   file name: spring-security-config-5.2.2.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-config@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress until="2020-06-30">
+        <notes><![CDATA[
+   file name: spring-security-core-5.2.2.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-core@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress until="2020-06-30">
+        <notes><![CDATA[
+   file name: spring-security-crypto-5.2.2.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-crypto@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
+    <suppress until="2020-06-30">
+        <notes><![CDATA[
+   file name: spring-security-web-5.2.2.RELEASE.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-web@.*$</packageUrl>
+        <cpe>cpe:/a:pivotal_software:spring_security</cpe>
+    </suppress>
 </suppressions>
