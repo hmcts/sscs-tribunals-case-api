@@ -77,21 +77,21 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenADecisionDateIsInFuture_thenDisplayAnError() {
 
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        sscsCaseData.setPipWriteFinalDecisionDecisionDate(tomorrow.toString());
+        sscsCaseData.setPipWriteFinalDecisionDateOfDecision(tomorrow.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Decision notice decision date must not be in the future", error);
+        assertEquals("Decision notice date of decision must not be in the future", error);
     }
 
     @Test
     public void givenADecisionDateIsToday_thenDoNotDisplayAnError() {
 
         LocalDate today = LocalDate.now();
-        sscsCaseData.setPipWriteFinalDecisionDecisionDate(today.toString());
+        sscsCaseData.setPipWriteFinalDecisionDateOfDecision(today.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -104,7 +104,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenADecisionDateIsInPast_thenDoNotDisplayAnError() {
 
         LocalDate yesterday = LocalDate.now().plusDays(-1);
-        sscsCaseData.setPipWriteFinalDecisionDecisionDate(yesterday.toString());
+        sscsCaseData.setPipWriteFinalDecisionDateOfDecision(yesterday.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
