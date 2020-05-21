@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ComparatorUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
@@ -86,8 +86,8 @@ public class FooterService {
         String[] appendixArray = sscsDocument.stream().filter(s -> StringUtils.isNotEmpty(s.getValue().getBundleAddition())).map(s -> StringUtils.stripToEmpty(s.getValue().getBundleAddition())).toArray(String[]::new);
         Arrays.sort(appendixArray, (o1, o2) -> {
             if (StringUtils.isNotEmpty(o1) && StringUtils.isNotEmpty(o2) && o1.length() > 1 && o2.length() > 1) {
-                Integer n1 = NumberUtils.isNumber(o1.substring(1)) ? Integer.parseInt(o1.substring(1)) : 0;
-                Integer n2 = NumberUtils.isNumber(o2.substring(1)) ? Integer.parseInt(o2.substring(1)) : 0;
+                Integer n1 = NumberUtils.isCreatable(o1.substring(1)) ? Integer.parseInt(o1.substring(1)) : 0;
+                Integer n2 = NumberUtils.isCreatable(o2.substring(1)) ? Integer.parseInt(o2.substring(1)) : 0;
                 return ComparatorUtils.<Integer>naturalComparator().compare(n1, n2);
             }
             return ComparatorUtils.<String>naturalComparator().compare(o1, o2);
@@ -98,7 +98,7 @@ public class FooterService {
             if (nextChar > 'Z') {
                 if (lastAppendix.length() == 1) {
                     return "Z1";
-                } else if (NumberUtils.isNumber(lastAppendix.substring(1))) {
+                } else if (NumberUtils.isCreatable(lastAppendix.substring(1))) {
                     return "Z" + (Integer.valueOf(lastAppendix.substring(1)) + 1);
                 }
             }
