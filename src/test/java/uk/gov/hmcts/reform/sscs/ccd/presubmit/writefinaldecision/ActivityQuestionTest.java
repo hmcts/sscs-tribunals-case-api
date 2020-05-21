@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
-
 import java.util.function.Function;
 import junitparams.JUnitParamsRunner;
 import org.junit.Assert;

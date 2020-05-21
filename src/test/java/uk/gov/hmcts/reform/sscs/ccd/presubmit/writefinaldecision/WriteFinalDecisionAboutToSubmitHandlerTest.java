@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
-
 import java.io.IOException;
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;

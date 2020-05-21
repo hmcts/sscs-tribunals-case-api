@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
-
 import java.io.IOException;
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;

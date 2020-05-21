@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
-
 import junitparams.JUnitParamsRunner;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,7 +22,7 @@ public class PointsConditionTest {
     }
 
     /**
-     * Test the continuity of boundaries between point ranges for daily living conditions
+     * Test the continuity of boundaries between point ranges for daily living conditions.
      */
     @Test
     public void testThatAtLeastOneDailyPointsConditionPassesForPossiblePointValues() {
@@ -45,7 +44,7 @@ public class PointsConditionTest {
     }
 
     /**
-     * Test the continuity of boundaries between point ranges for daily living conditions
+     * Test the continuity of boundaries between point ranges for daily living conditions.
      */
     @Test
     public void testThatAtLeastOneMobilityConditionPassesForPossiblePointValues() {
