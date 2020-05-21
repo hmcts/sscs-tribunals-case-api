@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
+
 import java.io.IOException;
 import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionMidEventHandlerTest {
+
     private static final String USER_AUTHORISATION = "Bearer token";
     private WriteFinalDecisionMidEventHandler handler;
 
@@ -43,8 +45,8 @@ public class WriteFinalDecisionMidEventHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .appeal(Appeal.builder().build())
-                .build();
+            .appeal(Appeal.builder().build())
+            .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 

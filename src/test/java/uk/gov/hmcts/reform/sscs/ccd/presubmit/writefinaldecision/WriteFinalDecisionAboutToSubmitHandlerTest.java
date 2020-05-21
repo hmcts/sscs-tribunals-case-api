@@ -5,10 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -27,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionAboutToSubmitHandlerTest {
+
     private static final String USER_AUTHORISATION = "Bearer token";
     private WriteFinalDecisionAboutToSubmitHandler handler;
 
@@ -48,8 +48,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-                .appeal(Appeal.builder().build())
-                .build();
+            .appeal(Appeal.builder().build())
+            .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 

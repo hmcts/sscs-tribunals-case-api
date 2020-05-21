@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.mockito.MockitoAnnotations.initMocks;
 
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -18,56 +19,56 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 public class ActivityTypeTest {
 
 
-  @Mock
-  private SscsCaseData sscsCaseData;
+    @Mock
+    private SscsCaseData sscsCaseData;
 
-  @Before
-  public void setUp() {
-    initMocks(this);
-  }
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-  @Test
-  public void testDailyLivingAwardTypeExtractor() {
+    @Test
+    public void testDailyLivingAwardTypeExtractor() {
 
-    Function<SscsCaseData, String> awardTypeExtractor  = ActivityType.DAILY_LIVING.getAwardTypeExtractor();
-    Assert.assertNotNull(awardTypeExtractor);
+        Function<SscsCaseData, String> awardTypeExtractor = ActivityType.DAILY_LIVING.getAwardTypeExtractor();
+        Assert.assertNotNull(awardTypeExtractor);
 
-    Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("dailyLivingAnswer");
-    String awardType = awardTypeExtractor.apply(sscsCaseData);
-    Assert.assertEquals("dailyLivingAnswer", awardType);
-  }
+        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("dailyLivingAnswer");
+        String awardType = awardTypeExtractor.apply(sscsCaseData);
+        Assert.assertEquals("dailyLivingAnswer", awardType);
+    }
 
-  @Test
-  public void testMobilityAwardTypeExtractor() {
+    @Test
+    public void testMobilityAwardTypeExtractor() {
 
-    Function<SscsCaseData, String> awardTypeExtractor  = ActivityType.MOBILITY.getAwardTypeExtractor();
-    Assert.assertNotNull(awardTypeExtractor);
+        Function<SscsCaseData, String> awardTypeExtractor = ActivityType.MOBILITY.getAwardTypeExtractor();
+        Assert.assertNotNull(awardTypeExtractor);
 
-    Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("mobilityAnswer");
-    String awardType = awardTypeExtractor.apply(sscsCaseData);
-    Assert.assertEquals("mobilityAnswer", awardType);
-  }
+        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("mobilityAnswer");
+        String awardType = awardTypeExtractor.apply(sscsCaseData);
+        Assert.assertEquals("mobilityAnswer", awardType);
+    }
 
-  @Test
-  public void testDailyLivingAnswersExtractor() {
+    @Test
+    public void testDailyLivingAnswersExtractor() {
 
-    Function<SscsCaseData, List<String>> answersExtractor  = ActivityType.DAILY_LIVING.getAnswersExtractor();
-    Assert.assertNotNull(answersExtractor);
+        Function<SscsCaseData, List<String>> answersExtractor = ActivityType.DAILY_LIVING.getAnswersExtractor();
+        Assert.assertNotNull(answersExtractor);
 
-    Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion()).thenReturn(Arrays.asList("dailyLivingAnswer1", "dailyLivingAnswer2"));
-    List<String> answers = answersExtractor.apply(sscsCaseData);
-    Assert.assertEquals(Arrays.asList("dailyLivingAnswer1", "dailyLivingAnswer2"), answers);
-  }
+        Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion()).thenReturn(Arrays.asList("dailyLivingAnswer1", "dailyLivingAnswer2"));
+        List<String> answers = answersExtractor.apply(sscsCaseData);
+        Assert.assertEquals(Arrays.asList("dailyLivingAnswer1", "dailyLivingAnswer2"), answers);
+    }
 
-  @Test
-  public void testMobilityAnswersExtractor() {
+    @Test
+    public void testMobilityAnswersExtractor() {
 
-    Function<SscsCaseData, List<String>> answersExtractor  = ActivityType.MOBILITY.getAnswersExtractor();
-    Assert.assertNotNull(answersExtractor);
+        Function<SscsCaseData, List<String>> answersExtractor = ActivityType.MOBILITY.getAnswersExtractor();
+        Assert.assertNotNull(answersExtractor);
 
-    Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion()).thenReturn(Arrays.asList("mobilityAnswer1", "mobilityAnswer2"));
-    List<String> answers = answersExtractor.apply(sscsCaseData);
-    Assert.assertEquals(Arrays.asList("mobilityAnswer1", "mobilityAnswer2"), answers);
-  }
+        Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion()).thenReturn(Arrays.asList("mobilityAnswer1", "mobilityAnswer2"));
+        List<String> answers = answersExtractor.apply(sscsCaseData);
+        Assert.assertEquals(Arrays.asList("mobilityAnswer1", "mobilityAnswer2"), answers);
+    }
 
 }

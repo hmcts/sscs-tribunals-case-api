@@ -31,9 +31,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && callback.getEvent() == EventType.WRITE_FINAL_DECISION
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+            && callback.getEvent() == EventType.WRITE_FINAL_DECISION
+            && Objects.nonNull(callback.getCaseDetails())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -59,12 +59,12 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         // If so, extract any error messages generated
         return Arrays.stream(PointsCondition.values())
             .filter(pointsCondition -> pointsCondition.isApplicable(sscsCaseData))
-                .map(pointsCondition ->
-                    getOptionalErrorMessage(pointsCondition, sscsCaseData))
+            .map(pointsCondition ->
+                getOptionalErrorMessage(pointsCondition, sscsCaseData))
             .filter(optionalErrorMessage ->
                 optionalErrorMessage.isPresent())
-                .map(optionalErrorMessage -> optionalErrorMessage.get())
-                .collect(Collectors.toList());
+            .map(optionalErrorMessage -> optionalErrorMessage.get())
+            .collect(Collectors.toList());
 
     }
 
@@ -85,13 +85,11 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     /**
-     * Given a points condition, and an SscsCaseData instance, obtain an error message for that condition
-     * if the condition has failed to be satified, or an empty optional if the condition is met.
+     * Given a points condition, and an SscsCaseData instance, obtain an error message for that condition if the condition has failed to be satified, or an empty optional if the condition is met.
      *
      * @param pointsCondition The condition to evaluate against the SscsCaseData
      * @param sscsCaseData The SscsCaseData to evaluate against the condition.
-     * @return An optional error message if the condition has failed to be satified,
-     * or an empty optional if the condition is met.
+     * @return An optional error message if the condition has failed to be satified, or an empty optional if the condition is met.
      */
     private Optional<String> getOptionalErrorMessage(PointsCondition pointsCondition, SscsCaseData sscsCaseData) {
 
