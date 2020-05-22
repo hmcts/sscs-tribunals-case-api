@@ -10,15 +10,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
  */
 public enum ActivityType {
 
-    DAILY_LIVING(SscsCaseData::getPipWriteFinalDecisionDailyLivingQuestion,
+    DAILY_LIVING("Daily Living", SscsCaseData::getPipWriteFinalDecisionDailyLivingQuestion,
         SscsCaseData::getPipWriteFinalDecisionDailyLivingActivitiesQuestion),
-    MOBILITY(SscsCaseData::getPipWriteFinalDecisionMobilityQuestion,
+    MOBILITY("Mobility", SscsCaseData::getPipWriteFinalDecisionMobilityQuestion,
         SscsCaseData::getPipWriteFinalDecisionMobilityActivitiesQuestion);
 
+    final String name;
     final Function<SscsCaseData, String> awardTypeExtractor;
     final Function<SscsCaseData, List<String>> answersExtractor;
 
-    ActivityType(Function<SscsCaseData, String> awardTypeExtractor, Function<SscsCaseData, List<String>> answersExtractor) {
+    ActivityType(String name, Function<SscsCaseData, String> awardTypeExtractor, Function<SscsCaseData, List<String>> answersExtractor) {
+        this.name = name;
         this.awardTypeExtractor = awardTypeExtractor;
         this.answersExtractor = answersExtractor;
     }
@@ -29,5 +31,9 @@ public enum ActivityType {
 
     public Function<SscsCaseData, List<String>> getAnswersExtractor() {
         return answersExtractor;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -28,6 +28,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionPreparingFoodQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("preparingFood");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -37,6 +39,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionTakingNutritionQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("takingNutrition");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -46,6 +50,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionManagingTherapyQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("managingTherapy");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -55,6 +61,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionWashAndBatheQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("washingAndBathing");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -64,6 +72,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionManagingToiletNeedsQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("managingToiletNeeds");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -73,6 +83,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionDressingAndUndressingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("dressingAndUndressing");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -82,6 +94,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionCommunicatingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("communicating");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -91,6 +105,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionReadingUnderstandingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("readingUnderstanding");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -100,6 +116,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionEngagingWithOthersQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("engagingWithOthers");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -109,6 +127,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("budgetingDecisions");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.DAILY_LIVING, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -118,6 +138,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("planningAndFollowing");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.MOBILITY, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
@@ -127,6 +149,8 @@ public class ActivityQuestionTest {
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion()).thenReturn("testAnswer");
         ActivityQuestion activityQuestion = ActivityQuestion.getByKey("movingAround");
         Assert.assertNotNull(activityQuestion);
+        Assert.assertNotNull(activityQuestion.activityType);
+        Assert.assertEquals(ActivityType.MOBILITY, activityQuestion.activityType);
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }

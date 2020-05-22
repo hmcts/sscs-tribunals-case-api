@@ -27,6 +27,16 @@ public class ActivityTypeTest {
     }
 
     @Test
+    public void testDailyLivingGetName() {
+        Assert.assertEquals("Daily Living", ActivityType.DAILY_LIVING.getName());
+    }
+
+    @Test
+    public void testMobilityGetName() {
+        Assert.assertEquals("Mobility", ActivityType.MOBILITY.getName());
+    }
+
+    @Test
     public void testDailyLivingAwardTypeExtractor() {
 
         Function<SscsCaseData, String> awardTypeExtractor = ActivityType.DAILY_LIVING.getAwardTypeExtractor();

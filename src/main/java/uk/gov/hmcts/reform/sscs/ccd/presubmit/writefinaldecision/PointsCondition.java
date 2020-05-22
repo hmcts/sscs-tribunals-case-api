@@ -11,34 +11,22 @@ public enum PointsCondition {
 
     DAILY_LIVING_STANDARD(AwardType.STANDARD_RATE,
         ActivityType.DAILY_LIVING,
-        points -> points >= 8 && points <= 11,
-        "You have previously selected a standard rate award for Daily Living. "
-            + "The points awarded don't match. Please review your previous selection."),
+        points -> points >= 8 && points <= 11),
     DAILY_LIVING_ENHANCED(AwardType.ENHANCED_RATE,
         ActivityType.DAILY_LIVING,
-        points -> points >= 12,
-        "You have previously selected an enhanced rate award for Daily Living. "
-            + "The points awarded don't match. Please review your previous selection."),
+        points -> points >= 12),
     DAILY_LIVING_NO_AWARD(AwardType.NO_AWARD,
         ActivityType.DAILY_LIVING,
-        points -> points <= 7,
-        "You have previously selected No Award for Daily Living. "
-            + "The points awarded don't match. Please review your previous selection."),
+        points -> points <= 7),
     MOBILITY_STANDARD(AwardType.STANDARD_RATE,
         ActivityType.MOBILITY,
-        points -> points >= 8 && points <= 11,
-        "You have previously selected a standard rate award for Mobility. "
-            + "The points awarded don't match. Please review your previous selection."),
+        points -> points >= 8 && points <= 11),
     MOBILITY_ENHANCED(AwardType.ENHANCED_RATE,
         ActivityType.MOBILITY,
-        points -> points >= 12,
-        "You have previously selected an enhanced rate award for Mobility. "
-            + "The points awarded don't match. Please review your previous selection."),
+        points -> points >= 12),
     MOBILITY_NO_AWARD(AwardType.NO_AWARD,
         ActivityType.MOBILITY,
-        points -> points <= 7,
-        "You have previously selected No Award for Mobility. "
-            + "The points awarded don't match. Please review your previous selection.");
+        points -> points <= 7);
 
     final AwardType awardType;
     final String errorMessage;
@@ -46,11 +34,11 @@ public enum PointsCondition {
     final IntPredicate pointsRequirementCondition;
 
     PointsCondition(AwardType awardType, ActivityType activityType,
-        IntPredicate pointsRequirementCondition, String errorMessage) {
+        IntPredicate pointsRequirementCondition) {
         this.awardType = awardType;
         this.pointsRequirementCondition = pointsRequirementCondition;
         this.activityType = activityType;
-        this.errorMessage = errorMessage;
+        this.errorMessage = getStandardErrorMessage(awardType, activityType);
     }
 
     public boolean isApplicable(SscsCaseData sscsCaseData) {
@@ -69,5 +57,12 @@ public enum PointsCondition {
 
     public IntPredicate getPointsRequirementCondition() {
         return pointsRequirementCondition;
+    }
+
+    private static String getStandardErrorMessage(AwardType awardType, ActivityType activityType) {
+        String awardDescription = awardType == AwardType.NO_AWARD ? "No Award" :
+            awardType == AwardType.STANDARD_RATE ? "a standard rate award" : "an enhanced rate award";
+        return "You have previously selected " + awardDescription + " for " + activityType.getName()
+            + ". The points awarded don't match. Please review your previous selection.";
     }
 }

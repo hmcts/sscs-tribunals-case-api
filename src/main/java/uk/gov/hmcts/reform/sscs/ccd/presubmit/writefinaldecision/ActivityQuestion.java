@@ -8,25 +8,27 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
  */
 public enum ActivityQuestion {
 
-    PREPARING_FOOD("preparingFood", SscsCaseData::getPipWriteFinalDecisionPreparingFoodQuestion),
-    TAKING_NUTRITION("takingNutrition", SscsCaseData::getPipWriteFinalDecisionTakingNutritionQuestion),
-    MANAGING_THERAPY("managingTherapy", SscsCaseData::getPipWriteFinalDecisionManagingTherapyQuestion),
-    WASHING_AND_BATHING("washingAndBathing", SscsCaseData::getPipWriteFinalDecisionWashAndBatheQuestion),
-    MANAGING_TOILET_NEEDS("managingToiletNeeds", SscsCaseData::getPipWriteFinalDecisionManagingToiletNeedsQuestion),
-    DRESSING_AND_UNDRESSING("dressingAndUndressing", SscsCaseData::getPipWriteFinalDecisionDressingAndUndressingQuestion),
-    COMMUNICATING("communicating", SscsCaseData::getPipWriteFinalDecisionCommunicatingQuestion),
-    READING_AND_UNDERSTANDING("readingUnderstanding", SscsCaseData::getPipWriteFinalDecisionReadingUnderstandingQuestion),
-    ENGAGING_WITH_OTHERS("engagingWithOthers", SscsCaseData::getPipWriteFinalDecisionEngagingWithOthersQuestion),
-    MAKING_BUDGETING_DECISIONS("budgetingDecisions", SscsCaseData::getPipWriteFinalDecisionBudgetingDecisionsQuestion),
-    PLANNING_AND_FOLLOWING_JOURNEYS("planningAndFollowing", SscsCaseData::getPipWriteFinalDecisionPlanningAndFollowingQuestion),
-    MOVING_AROUND("movingAround", SscsCaseData::getPipWriteFinalDecisionMovingAroundQuestion);
+    PREPARING_FOOD("preparingFood", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionPreparingFoodQuestion),
+    TAKING_NUTRITION("takingNutrition", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionTakingNutritionQuestion),
+    MANAGING_THERAPY("managingTherapy", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionManagingTherapyQuestion),
+    WASHING_AND_BATHING("washingAndBathing", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionWashAndBatheQuestion),
+    MANAGING_TOILET_NEEDS("managingToiletNeeds", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionManagingToiletNeedsQuestion),
+    DRESSING_AND_UNDRESSING("dressingAndUndressing", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionDressingAndUndressingQuestion),
+    COMMUNICATING("communicating", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionCommunicatingQuestion),
+    READING_AND_UNDERSTANDING("readingUnderstanding", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionReadingUnderstandingQuestion),
+    ENGAGING_WITH_OTHERS("engagingWithOthers", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionEngagingWithOthersQuestion),
+    MAKING_BUDGETING_DECISIONS("budgetingDecisions", ActivityType.DAILY_LIVING, SscsCaseData::getPipWriteFinalDecisionBudgetingDecisionsQuestion),
+    PLANNING_AND_FOLLOWING_JOURNEYS("planningAndFollowing", ActivityType.MOBILITY, SscsCaseData::getPipWriteFinalDecisionPlanningAndFollowingQuestion),
+    MOVING_AROUND("movingAround", ActivityType.MOBILITY, SscsCaseData::getPipWriteFinalDecisionMovingAroundQuestion);
 
     final String key;
+    final ActivityType activityType;
     final Function<SscsCaseData, String> answerExtractor;
 
-    ActivityQuestion(String key, Function<SscsCaseData, String> answerExtractor) {
+    ActivityQuestion(String key, ActivityType activityType, Function<SscsCaseData, String> answerExtractor) {
         this.key = key;
         this.answerExtractor = answerExtractor;
+        this.activityType = activityType;
     }
 
     public static ActivityQuestion getByKey(String key) {

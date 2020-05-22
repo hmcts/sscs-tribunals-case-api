@@ -47,8 +47,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         // Obtain the list of points validation error messages (if any), and add to the response.
-        getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(errorMessage
-            -> preSubmitCallbackResponse.addError(errorMessage));
+        getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
         return preSubmitCallbackResponse;
     }
@@ -61,9 +60,8 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .filter(pointsCondition -> pointsCondition.isApplicable(sscsCaseData))
             .map(pointsCondition ->
                 getOptionalErrorMessage(pointsCondition, sscsCaseData))
-            .filter(optionalErrorMessage ->
-                optionalErrorMessage.isPresent())
-            .map(optionalErrorMessage -> optionalErrorMessage.get())
+            .filter(Optional::isPresent)
+            .map(Optional::get)
             .collect(Collectors.toList());
 
     }
