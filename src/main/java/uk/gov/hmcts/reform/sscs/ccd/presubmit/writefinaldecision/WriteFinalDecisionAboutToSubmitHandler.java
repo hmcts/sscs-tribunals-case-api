@@ -46,7 +46,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        // Obtain the list of points validation error messages (if any), and add to the response.
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
         return preSubmitCallbackResponse;
@@ -54,8 +53,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private List<String> getDecisionNoticePointsValidationErrorMessages(SscsCaseData sscsCaseData) {
 
-        // For each PointsCondition, check if applicable for this submission.
-        // If so, extract any error messages generated
         return Arrays.stream(PointsCondition.values())
             .filter(pointsCondition -> pointsCondition.isApplicable(sscsCaseData))
             .map(pointsCondition ->
@@ -74,8 +71,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
      * @return The points awarded for that question, given the SscsCaseData instance provided.
      */
     private int getPointsForActivityQuestionKey(SscsCaseData sscsCaseData, String activityQuestionKey) {
-        // Given an activity question key, obtain the answer to the activity question, and
-        // obtain the points.
+
         Function<SscsCaseData, String> answerExtractor =
             ActivityQuestion.getByKey(activityQuestionKey).getAnswerExtractor();
         return decisionNoticeQuestionService
@@ -91,15 +87,10 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
      */
     private Optional<String> getOptionalErrorMessage(PointsCondition pointsCondition, SscsCaseData sscsCaseData) {
 
-        // For each answer to the points condition question
-
-        // Obtain all the answers to the activity type question ( a list of activity question keys)
-        // and for each, lookup the points awarded for the answer to that question.
         int totalPoints = pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData)
             .stream().mapToInt(answerText -> getPointsForActivityQuestionKey(sscsCaseData,
                 answerText)).sum();
 
-        // Test the points total against the condition, and the points don't meet the test, return the error message
         return pointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
             Optional.of(pointsCondition.getErrorMessage());
 

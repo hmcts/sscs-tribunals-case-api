@@ -42,8 +42,6 @@ public enum PointsCondition {
     }
 
     public boolean isApplicable(SscsCaseData sscsCaseData) {
-        // Extract the relevant award rate from the sscsCaseData and compare with the key specified
-        // for this condition.
         return awardType.getKey().equals(activityType.getAwardTypeExtractor().apply(sscsCaseData));
     }
 
