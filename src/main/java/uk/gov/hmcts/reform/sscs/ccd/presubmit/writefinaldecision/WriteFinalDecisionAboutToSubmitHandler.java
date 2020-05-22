@@ -76,10 +76,10 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private int getPointsForActivityQuestionKey(SscsCaseData sscsCaseData, String activityQuestionKey) {
         // Given an activity question key, obtain the answer to the activity question, and
         // obtain the points.
-        Function<SscsCaseData, String> questionExtractor =
+        Function<SscsCaseData, String> answerExtractor =
             ActivityQuestion.getByKey(activityQuestionKey).getAnswerExtractor();
         return decisionNoticeQuestionService
-            .extractPointsFromSelectedValue(questionExtractor.apply(sscsCaseData));
+            .extractPointsFromSelectedValue(answerExtractor.apply(sscsCaseData));
     }
 
     /**
