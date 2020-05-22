@@ -60,8 +60,14 @@ public enum PointsCondition {
     }
 
     private static String getStandardErrorMessage(AwardType awardType, ActivityType activityType) {
-        String awardDescription = awardType == AwardType.NO_AWARD ? "No Award" :
-            awardType == AwardType.STANDARD_RATE ? "a standard rate award" : "an enhanced rate award";
+        final String awardDescription;
+        if (awardType == AwardType.NO_AWARD) {
+            awardDescription = "No Award";
+        } else if (awardType == AwardType.STANDARD_RATE) {
+            awardDescription = "a standard rate award";
+        } else {
+            awardDescription = "an enhanced rate award";
+        }
         return "You have previously selected " + awardDescription + " for " + activityType.getName()
             + ". The points awarded don't match. Please review your previous selection.";
     }

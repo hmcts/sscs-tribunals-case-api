@@ -39,8 +39,9 @@ public class PointsConditionTest {
                     }
                 }
             }
-            Assert.assertTrue("Expected 1 condition to be satisfied for points:" + points + " for activity type DAILY_LIVING but " + pointsConditionSatisfiedCount + " were satisfied",
-                pointsConditionSatisfiedCount == 1);
+
+            Assert.assertEquals("Expected 1 condition to be satisfied for points:" + points + " for activity type DAILY_LIVING but " + pointsConditionSatisfiedCount + " were satisfied",
+                1, pointsConditionSatisfiedCount);
         }
     }
 
@@ -62,8 +63,8 @@ public class PointsConditionTest {
                     }
                 }
             }
-            Assert.assertTrue("Expected 1 condition to be satisfied for points:" + points + " for activity type MOBILITY but " + pointsConditionSatisfiedCount + " were satisfied",
-                pointsConditionSatisfiedCount == 1);
+            Assert.assertEquals("Expected 1 condition to be satisfied for points:" + points + " for activity type MOBILITY but " + pointsConditionSatisfiedCount + " were satisfied",
+                1, pointsConditionSatisfiedCount);
         }
     }
 
