@@ -44,4 +44,22 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework\.security/spring\-security\-web@.*$</packageUrl>
         <cpe>cpe:/a:pivotal_software:spring_security</cpe>
     </suppress>
+    <suppress until="2020-06-01">
+        <notes><![CDATA[
+   file name: tomcat-embed-core-9.0.33.jar
+   Tomcat version 9.0.35 (with the fix for this vulnerability) will be imported with Spring boot 2.3.0.
+   To upgrade to this version, we need to upgrade jackson first so temporary suppressing to get the PR through.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-core@.*$</packageUrl>
+        <cve>CVE-2020-9484</cve>
+    </suppress>
+    <suppress until="2020-06-01">
+        <notes><![CDATA[
+   file name: tomcat-embed-websocket-9.0.33.jar
+   Tomcat version 9.0.35 (with the fix for this vulnerability) will be imported with Spring boot 2.3.0.
+   To upgrade to this version, we need to upgrade jackson first so temporary suppressing to get the PR through.
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat\-embed\-websocket@.*$</packageUrl>
+        <cve>CVE-2020-9484</cve>
+    </suppress>
 </suppressions>
