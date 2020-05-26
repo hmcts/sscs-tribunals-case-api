@@ -1,0 +1,338 @@
+{
+  "tribunalView": {
+    "activities":  {
+      "dailyLiving": {
+        "preparingFood": {
+          "name": "Preparing food",
+          "scores": {
+            "0": {
+              "text": "Can prepare and cook a simple meal unaided",
+              "score": 0
+            },
+            "4": {
+              "text": "Needs supervision or assistance to either prepare or cook a simple meal",
+              "score": 4
+            },
+            "8": {
+              "text": "Cannot prepare and cook food",
+              "score": 8
+            },
+            "2.0": {
+              "text": "Needs to use an aid or appliance to be able to either prepare or cook a simple meal",
+              "score": 2
+            },
+            "2.1": {
+              "text": "Cannot cook a simple meal using a conventional cooker but is able to do so using a microwave",
+              "score": 2
+            },
+            "2.2": {
+              "text": "Needs prompting to be able to either prepare or cook a simple meal",
+              "score": 2
+            }
+          }
+        },
+        "takingNutrition": {
+          "name": "Taking nutrition",
+          "scores": {
+            "0": {
+              "text": "Can take nutrition unaided",
+              "score": 0
+            },
+            "4": {
+              "text": "Needs prompting to be able to take nutrition",
+              "score": 4
+            },
+            "6": {
+              "text": "Needs assistance to be able to manage a therapeutic source to take nutrition",
+              "score": 6
+            },
+            "8": {
+              "text": "Cannot convey food and drink to their mouth and needs another person to do so",
+              "score": 8
+            },
+            "2.0": {
+              "text": "Needs either:<ul><li>to use an aid or appliance to be able to take nutrition</li><li>supervision to be able to take nutrition</li><li>assistance to be able to cut up food</li></ul>",
+              "score": 2
+            },
+            "2.1": {
+              "text": "Needs a therapeutic source to be able to take nutrition",
+              "score": 2
+            }
+          }
+        },
+        "managingTherapy": {
+          "name": "Managing therapy or monitoring a health condition",
+          "scores": {
+            "0": {
+              "text": "Either:<ul><li>does not receive medication or therapy or need to monitor a health condition</li><li>or can manage medication or therapy or monitor a health condition unaided</li></ul>",
+              "score": 0
+            },
+            "1": {
+              "text": "Needs either:<ul><li>to use an aid or appliance to be able to manage medication</li><li>supervision, prompting or assistance to be able to manage medication or monitor a health condition</li><li>supervision, prompting or assistance to be able to monitor a health condition</li></ul>",
+              "score": 1
+            },
+            "2": {
+              "text": "Needs supervision, prompting or assistance to be able to manage therapy that takes no more than 3.5 hours a week",
+              "score": 2
+            },
+            "4": {
+              "text": "Needs supervision, prompting or assistance to be able to manage therapy that takes more than 3.5 but no more than 7 hours a week",
+              "score": 4
+            },
+            "6": {
+              "text": "Needs supervision, prompting or assistance to be able to manage therapy that takes more than 7 but no more than 14 hours a week",
+              "score": 6
+            },
+            "8": {
+              "text": "Needs supervision, prompting or assistance to be able to manage therapy that takes more than 14 hours a week",
+              "score": 8
+            }
+          }
+        },
+        "washingBathing": {
+          "name": "Washing and bathing",
+          "scores": {
+            "0": {
+              "text": "Can wash and bathe unaided",
+              "score": 0
+            },
+            "3": {
+              "text": "Needs assistance to be able to get in or out of a bath or shower",
+              "score": 3
+            },
+            "4": {
+              "text": "Needs assistance to be able to wash their body between the shoulders and waist",
+              "score": 4
+            },
+            "8": {
+              "text": "Cannot wash and bathe at all and needs another person to wash their entire body",
+              "score": 8
+            },
+            "2.0": {
+              "text": "Needs to use an aid or appliance to be able to wash or bathe",
+              "score": 2
+            },
+            "2.1": {
+              "text": "Needs supervision or prompting to be able to wash or bathe",
+              "score": 2
+            },
+            "2.2": {
+              "text": "Needs assistance to be able to wash either their hair or body below the waist",
+              "score": 2
+            }
+          }
+        },
+        "managingToilet": {
+          "name": "Managing toilet needs or incontinence",
+          "scores": {
+            "0": {
+              "text": "Can manage toilet needs or incontinence unaided",
+              "score": 0
+            },
+            "4": {
+              "text": "Needs assistance to be able to manage toilet needs",
+              "score": 4
+            },
+            "6": {
+              "text": "Needs assistance to be able to manage incontinence of either bladder and bowel",
+              "score": 6
+            },
+            "8": {
+              "text": "Needs assistance to be able to manage incontinence of both bladder and bowel",
+              "score": 8
+            },
+            "2.0": {
+              "text": "Needs to use an aid or appliance to be able to manage toilet needs or incontinence",
+              "score": 2
+            },
+            "2.1": {
+              "text": "Needs supervision or prompting to be able to manage toilet needs",
+              "score": 2
+            }
+          }
+        },
+        "dressingUndressing": {
+          "name": "Dressing and undressing",
+          "scores": {
+            "0": {
+              "text": "Can dress and undress unaided",
+              "score": 0
+            },
+            "4": {
+              "text": "Needs assistance to be able to dress or undress their upper body",
+              "score": 4
+            },
+            "8": {
+              "text": "Cannot dress or undress at all",
+              "score": 8
+            },
+            "2.0": {
+              "text": "Needs to use an aid or appliance to be able to dress or undress",
+              "score": 2
+            },
+            "2.1": {
+              "text": "Needs either:<ul><li>prompting to be able to dress, undress or determine appropriate circumstances for remaining clothed</li><li>prompting or assistance to be able to select appropriate clothing</li></ul>",
+              "score": 2
+            },
+            "2.2": {
+              "text": "Needs assistance to be able to dress or undress their lower body",
+              "score": 2
+            }
+          }
+        },
+        "communicatingVerbally": {
+          "name": "Communicating verbally",
+          "scores": {
+            "0": {
+              "text": "Can express and understand verbal information unaided",
+              "score": 0
+            },
+            "2": {
+              "text": "Needs to use an aid or appliance to be able to speak or hear",
+              "score": 2
+            },
+            "4": {
+              "text": "Needs communication support to be able to express or understand complex verbal information",
+              "score": 4
+            },
+            "8": {
+              "text": "Needs communication support to be able to express or understand basic verbal information",
+              "score": 8
+            },
+            "12": {
+              "text": "Cannot express or understand verbal information at all even with communication support",
+              "score": 12
+            }
+          }
+        },
+        "readingAndUnderstanding": {
+          "name": "Reading and understanding signs, symbols and words",
+          "scores": {
+            "0": {
+              "text": "Can read and understand basic and complex written information either unaided or using spectacles or contact lenses",
+              "score": 0
+            },
+            "4": {
+              "text": "Needs prompting to be able to read or understand basic written information",
+              "score": 4
+            },
+            "8": {
+              "text": "Cannot read or understand signs, symbols or words at all",
+              "score": 8
+            },
+            "2.0": {
+              "text": "Needs to use an aid or appliance, other than spectacles or contact lenses, to be able to read or understand either basic or complex written information",
+              "score": 2
+            },
+            "2.1": {
+              "text": "Needs prompting to be able to read or understand complex written information",
+              "score": 2
+            }
+          }
+        },
+        "engagingWithOtherPeople": {
+          "name": "Engaging with other people face to face",
+          "scores": {
+            "0": {
+              "text": "Can engage with other people unaided",
+              "score": 0
+            },
+            "2": {
+              "text": "Needs prompting to be able to engage with other people",
+              "score": 2
+            },
+            "4": {
+              "text": "Needs social support to be able to engage with other people",
+              "score": 4
+            },
+            "8": {
+              "text": "Cannot engage with other people due to such engagement causing either:<ul><li>overwhelming psychological distress to the claimant</li><li>the claimant to exhibit behaviour which would result in a substantial risk of harm to the claimant or another person</li></ul>",
+              "score": 8
+            }
+          }
+        },
+        "makingBudgetingDecisions": {
+          "name": "Making budgeting decisions",
+          "scores": {
+            "0": {
+              "text": "Can manage complex budgeting decisions unaided",
+              "score": 0
+            },
+            "4": {
+              "text": "Needs prompting or assistance to be able to make simple budgeting decisions",
+              "score": 4
+            },
+            "6": {
+              "text": "Cannot make any budgeting decisions at all",
+              "score": 6
+            },
+            "2": {
+              "text": "Needs prompting or assistance to be able to make complex budgeting decisions",
+              "score": 2
+            }
+          }
+        }
+      },
+      "mobility": {
+        "planningFollowingJourneys": {
+          "name": "Planning and following journeys",
+          "scores": {
+            "0": {
+              "text": "Can plan and follow the route of a journey unaided",
+              "score": 0
+            },
+            "4": {
+              "text": "Needs prompting to be able to undertake any journey to avoid overwhelming psychological distress to the claimant",
+              "score": 4
+            },
+            "8": {
+              "text": "Cannot plan the route of a journey",
+              "score": 8
+            },
+            "10.0": {
+              "text": "Cannot follow the route of an unfamiliar journey without another person, assistance dog or orientation aid",
+              "score": 10
+            },
+            "10.1": {
+              "text": "Cannot undertake any journey because it would cause overwhelming psychological distress to the claimant",
+              "score": 10
+            },
+            "12": {
+              "text": "Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid",
+              "score": 12
+            }
+          }
+        },
+        "movingAround": {
+          "name": "Moving around",
+          "scores": {
+            "0": {
+              "text": "Can stand and then move more than 200 metres, either aided or unaided",
+              "score": 0
+            },
+            "4": {
+              "text": "Can stand and then move more than 50 metres but no more than 200 metres, either aided or unaided",
+              "score": 4
+            },
+            "8": {
+              "text": "Can stand and then move unaided more than 20 metres but no more than 50 metres",
+              "score": 8
+            },
+            "10": {
+              "text": "Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres",
+              "score": 10
+            },
+            "12.0": {
+              "text": "Can stand and then move more than 1 metre but no more than 20 metres, either aided or unaided",
+              "score": 12
+            },
+            "12.1": {
+              "text": "Cannot, either aided or unaided:<ul><li>stand</li><li>move more than 1 metre</li></ul>",
+              "score": 12
+            }
+          }
+        }
+      }
+    }
+  }
+}

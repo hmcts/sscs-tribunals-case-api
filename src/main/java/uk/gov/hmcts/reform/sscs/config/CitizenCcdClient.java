@@ -18,7 +18,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @Service
 @Slf4j
-class CitizenCcdClient {
+public class CitizenCcdClient {
 
     private final CcdRequestDetails ccdRequestDetails;
     private final CoreCaseDataApi coreCaseDataApi;
@@ -55,7 +55,7 @@ class CitizenCcdClient {
         );
     }
 
-    List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
+    public List<CaseDetails> searchForCitizen(IdamTokens idamTokens) {
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("state", State.DRAFT.getId());
         searchCriteria.put("sortDirection", "desc");
@@ -66,6 +66,20 @@ class CitizenCcdClient {
             ccdRequestDetails.getJurisdictionId(),
             ccdRequestDetails.getCaseTypeId(),
             searchCriteria
+        );
+
+    }
+
+    public List<CaseDetails> searchForCitizenAllCases(IdamTokens idamTokens) {
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("sortDirection", "desc");
+        return coreCaseDataApi.searchForCitizen(
+                idamTokens.getIdamOauth2Token(),
+                idamTokens.getServiceAuthorization(),
+                idamTokens.getUserId(),
+                ccdRequestDetails.getJurisdictionId(),
+                ccdRequestDetails.getCaseTypeId(),
+                searchCriteria
         );
 
     }
@@ -95,7 +109,7 @@ class CitizenCcdClient {
         );
     }
 
-    void addUserToCase(IdamTokens idamTokens, String userIdToAdd, Long caseId) {
+    public void addUserToCase(IdamTokens idamTokens, String userIdToAdd, Long caseId) {
         caseAccessApi.grantAccessToCase(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
@@ -107,7 +121,7 @@ class CitizenCcdClient {
         );
     }
 
-    void removeUserFromCase(IdamTokens idamTokens, String userIdToRemove, Long caseId) {
+    public void removeUserFromCase(IdamTokens idamTokens, String userIdToRemove, Long caseId) {
         caseAccessApi.revokeAccessToCase(
                 idamTokens.getIdamOauth2Token(),
                 idamTokens.getServiceAuthorization(),
