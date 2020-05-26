@@ -17,8 +17,8 @@ plugins {
     id 'org.owasp.dependencycheck' version '5.3.2.1'
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'net.ltgt.apt' version '0.21'
-    id "info.solidsoft.pitest" version '1.4.0'
-    id 'au.com.dius.pact' version '4.0.10'
+    id "info.solidsoft.pitest" version '1.5.1'
+    id 'au.com.dius.pact' version '4.1.0'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -256,7 +256,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.3'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.0'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
@@ -274,8 +274,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '6.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.2.28'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.2-RC-SSCS-7545'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.2.29'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.1'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
