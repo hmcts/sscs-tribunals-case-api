@@ -13,6 +13,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -216,6 +217,7 @@ public class StoreAppellantStatementServiceTest {
     }
 
     @Test
+    @Ignore
     public void givenCaseDataWithPdfStatementAlreadyCreated_shouldCallTheLoadPdf() throws Exception {
         doReturn(APPELLANT_STATEMENT_1_1234_5678_9012_3456_PDF).when(storeAppellantStatementService,
             "documentNamePrefix", any(SscsCaseDetails.class), anyString(),
