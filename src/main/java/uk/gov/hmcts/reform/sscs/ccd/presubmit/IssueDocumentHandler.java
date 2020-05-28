@@ -21,7 +21,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 @Slf4j
 public class IssueDocumentHandler {
 
-    private static final String GLASGOW = "GLASGOW";
+    protected static final String GLASGOW = "GLASGOW";
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
@@ -91,7 +91,7 @@ public class IssueDocumentHandler {
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private String buildFullName(SscsCaseData caseData) {
+    protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
         if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
             fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
