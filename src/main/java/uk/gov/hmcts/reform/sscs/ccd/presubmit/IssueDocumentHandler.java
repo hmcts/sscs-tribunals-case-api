@@ -10,10 +10,7 @@ import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -88,9 +85,10 @@ public class IssueDocumentHandler {
                 .build();
         caseData.setPreviewDocument(previewFile);
 
-        if (callback.getCaseDetailsBefore().isPresent()
-                && (callback.getCaseDetailsBefore().get().getCaseData().getCreatedInGapsFrom() != null)) {
-            caseData.setCreatedInGapsFrom(callback.getCaseDetailsBefore().get().getCaseData().getCreatedInGapsFrom());
+        Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
+        if (caseDetailsBefore.isPresent()
+                && (caseDetailsBefore.get().getCaseData().getCreatedInGapsFrom() != null)) {
+            caseData.setCreatedInGapsFrom(caseDetailsBefore.get().getCaseData().getCreatedInGapsFrom());
         }
 
         return new PreSubmitCallbackResponse<>(caseData);
