@@ -88,6 +88,11 @@ public class IssueDocumentHandler {
                 .build();
         caseData.setPreviewDocument(previewFile);
 
+        if (callback.getCaseDetailsBefore().isPresent()
+                && (callback.getCaseDetailsBefore().get().getCaseData().getCreatedInGapsFrom() != null)) {
+            caseData.setCreatedInGapsFrom(callback.getCaseDetailsBefore().get().getCaseData().getCreatedInGapsFrom());
+        }
+
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
