@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +14,13 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody.DirectionOrDecisionIssuedTemplateBodyBuilder;
 
 @Component
 @Slf4j
@@ -81,8 +86,52 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     }
 
     @Override
-    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish) {
-        DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, isScottish);
-        return formPayload;
+    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish,
+        String userAuthorisation) {
+        DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
+
+        DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
+
+        builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
+
+        if (caseData.getHearings() != null) {
+            Hearing finalHearing = caseData.getHearings().get(caseData.getHearings().size() - 1);
+            if (finalHearing != null && finalHearing.getValue() != null) {
+                if (finalHearing.getValue().getHearingDate() != null) {
+                    builder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
+                }
+                if (finalHearing.getValue().getVenue()  != null) {
+                    builder.heldAt(finalHearing.getValue().getVenue().getName());
+                }
+            }
+        }
+
+        return builder.build();
+    }
+
+
+    private String buildSignedInJudgeName(String userAuthorisation) {
+        // TODO
+        return "Judge Name Placeholder";
+    }
+
+    private String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String> names = new ArrayList<>();
+        names.add(buildSignedInJudgeName(userAuthorisation));
+        if (caseData.getPipDisabilityQualifiedPanelMemberName() != null) {
+            names.add(caseData.getPipDisabilityQualifiedPanelMemberName());
+        }
+        if (caseData.getPipMedicallyQualifiedPanelMemberName() != null) {
+            names.add(caseData.getPipMedicallyQualifiedPanelMemberName());
+        }
+        Iterator<String> nameIterator = names.iterator();
+        while (nameIterator.hasNext()) {
+            stringBuilder.append(nameIterator.next());
+            if (nameIterator.hasNext()) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
     }
 }

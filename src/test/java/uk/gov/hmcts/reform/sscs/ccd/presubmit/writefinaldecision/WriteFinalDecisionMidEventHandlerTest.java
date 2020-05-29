@@ -219,7 +219,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
 
         sscsCaseData.setPipWriteFinalDecisionGenerateNotice("Yes");
-
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
             .name(Name.builder().firstName("APPOINTEE")

@@ -22,7 +22,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 @Slf4j
 public class IssueDocumentHandler {
 
-    protected static final String GLASGOW = "GLASGOW";
+    private static final String GLASGOW = "GLASGOW";
 
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
@@ -43,7 +43,7 @@ public class IssueDocumentHandler {
         }
     }
 
-    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish) {
+    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish, String userAuthorisation) {
         DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
             .appellantFullName(buildFullName(caseData))
             .caseId(caseData.getCcdCaseId())
@@ -72,7 +72,7 @@ public class IssueDocumentHandler {
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
-        FormPayload formPayload = createPayload(caseData, documentTypeLabel, dateAdded, isScottish);
+        FormPayload formPayload = createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(documentUrl)
