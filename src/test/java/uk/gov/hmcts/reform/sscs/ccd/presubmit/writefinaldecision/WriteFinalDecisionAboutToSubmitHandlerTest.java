@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -57,6 +58,16 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     public void givenANonWriteFinalDecisionEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    @Parameters({"Higher, decisionInFavourOfAppellant", "Lower, decisionUpheld", "Same, decisionUpheld"})
+    public void givenFinalDecisionComparedToDwpQuestion_thenSetOutcomeAndDwpStateAppropriately(String comparedRate, String expectedOutcome) {
+        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpQuestion(comparedRate);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedOutcome, response.getData().getOutcome());
+        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
     }
 
     @Test
