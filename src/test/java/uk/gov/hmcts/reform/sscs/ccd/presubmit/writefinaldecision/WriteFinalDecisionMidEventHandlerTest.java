@@ -38,7 +38,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
-import uk.gov.hmcts.reform.sscs.model.docassembly.IssueFinalDecisionTemplateBody;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionMidEventHandlerTest {
@@ -237,7 +236,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
     private void verifyTemplateBody(String image, String expectedName) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
-        IssueFinalDecisionTemplateBody payload = (IssueFinalDecisionTemplateBody) capture.getValue().getFormPayload();
+        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
         assertEquals("DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
