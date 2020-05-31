@@ -158,7 +158,7 @@ public class EvidenceUploadService {
                                 .collect(toList());
                         documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
 
-                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
+                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_DRAFT_DOCUMENT.getCcdType(), "SSCS - evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
 
                         documentManagementService.delete(evidenceId);
                     }

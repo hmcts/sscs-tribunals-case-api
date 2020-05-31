@@ -216,8 +216,8 @@ public class EvidenceUploadServiceTest {
         verify(ccdService).updateCase(
                 doesNotHaveDraftSscsDocuments(),
                 eq(someCcdCaseId),
-                eq("uploadCorDocument"),
-                eq("SSCS - cor evidence deleted"),
+                eq("uploadDraftDocument"),
+                eq("SSCS - evidence deleted"),
                 eq("Updated SSCS"),
                 eq(idamTokens)
         );
