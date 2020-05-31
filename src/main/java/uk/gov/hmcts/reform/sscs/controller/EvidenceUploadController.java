@@ -101,7 +101,7 @@ public class EvidenceUploadController {
             value = "{identifier}/evidence/{evidenceId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity deleteEvidence(
+    public ResponseEntity<Void> deleteEvidence(
             @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx")
             @PathVariable("identifier") String identifier,
             @PathVariable("evidenceId") String evidenceId
