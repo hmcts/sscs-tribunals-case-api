@@ -66,8 +66,7 @@
         <notes><![CDATA[
          file name: sentiment-analysis-parser-0.1.jar
         ]]></notes>
-        <packageUrl regex="true">^pkg:maven/edu\.usc\.ir\sentiment-analysis-parser@0.*$</packageUrl>
-        <cpe>cpe:/a:data_tools_project:data_tools</cpe>
+        <packageUrl regex="true">^pkg:maven/edu\.usc\.ir/sentiment-analysis-parser@0.*$</packageUrl>
         <cve>CVE-2018-18749</cve>
     </suppress>
 </suppressions>
