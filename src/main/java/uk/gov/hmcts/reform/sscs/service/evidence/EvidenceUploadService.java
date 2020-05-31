@@ -40,10 +40,12 @@ import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
 
 @Slf4j
 @Service
 public class EvidenceUploadService {
+    private final DocumentManagementService documentManagementService;
     private final CcdService ccdService;
     private final IdamService idamService;
     private final OnlineHearingService onlineHearingService;
@@ -58,11 +60,13 @@ public class EvidenceUploadService {
     private static final DraftHearingDocumentExtractor draftHearingDocumentExtractor = new DraftHearingDocumentExtractor();
 
     @Autowired
-    public EvidenceUploadService(CcdService ccdService,
+    public EvidenceUploadService(DocumentManagementService documentManagementService,
+                                 CcdService ccdService,
                                  IdamService idamService, OnlineHearingService onlineHearingService,
                                  StoreEvidenceDescriptionService storeEvidenceDescriptionService,
                                  FileToPdfConversionService fileToPdfConversionService,
                                  EvidenceManagementService evidenceManagementService, PdfStoreService pdfStoreService) {
+        this.documentManagementService = documentManagementService;
         this.ccdService = ccdService;
         this.idamService = idamService;
         this.onlineHearingService = onlineHearingService;
@@ -137,6 +141,29 @@ public class EvidenceUploadService {
                     return true;
                 })
                 .orElse(false);
+    }
+
+    public boolean deleteDraftHearingEvidence(String identifier, String evidenceId) {
+        return deleteEvidence(identifier, evidenceId, draftHearingDocumentExtractor);
+    }
+
+    private <E> boolean deleteEvidence(String identifier, String evidenceId, DocumentExtract<E> documentExtract) {
+        return onlineHearingService.getCcdCaseByIdentifier(identifier)
+                .map(caseDetails -> {
+                    List<E> documents = documentExtract.getDocuments().apply(caseDetails.getData());
+
+                    if (documents != null) {
+                        List<E> newDocuments = documents.stream()
+                                .filter(corDocument -> !documentExtract.findDocument().apply(corDocument).getDocumentLink().getDocumentUrl().endsWith(evidenceId))
+                                .collect(toList());
+                        documentExtract.setDocuments().accept(caseDetails.getData(), newDocuments);
+
+                        ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), UPLOAD_COR_DOCUMENT.getCcdType(), "SSCS - cor evidence deleted", UPDATED_SSCS, idamService.getIdamTokens());
+
+                        documentManagementService.delete(evidenceId);
+                    }
+                    return true;
+                }).orElse(false);
     }
 
     private void submitHearingWhenNoCoreCase(SscsCaseDetails caseDetails, SscsCaseData sscsCaseData, Long ccdCaseId,
@@ -337,6 +364,8 @@ public class EvidenceUploadService {
         Function<SscsCaseData, List<E>> getDocuments();
 
         BiConsumer<SscsCaseData, List<E>> setDocuments();
+
+        Function<E, SscsDocumentDetails> findDocument();
     }
 
     private static class DraftHearingDocumentExtractor implements DocumentExtract<SscsDocument> {
@@ -348,6 +377,11 @@ public class EvidenceUploadService {
         @Override
         public BiConsumer<SscsCaseData, List<SscsDocument>> setDocuments() {
             return SscsCaseData::setDraftSscsDocument;
+        }
+
+        @Override
+        public Function<SscsDocument, SscsDocumentDetails> findDocument() {
+            return SscsDocument::getValue;
         }
     }
 
