@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @Component
@@ -48,6 +51,13 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
+        sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+
+        if (null != sscsCaseData.getPipWriteFinalDecisionComparedToDwpQuestion()) {
+            sscsCaseData.setOutcome(sscsCaseData.getPipWriteFinalDecisionComparedToDwpQuestion().equals(ComparedRate.Higher.name())
+                    ? "decisionInFavourOfAppellant" : "decisionUpheld");
+        }
+
         return preSubmitCallbackResponse;
     }
 
@@ -60,7 +70,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
-
     }
 
     /**
