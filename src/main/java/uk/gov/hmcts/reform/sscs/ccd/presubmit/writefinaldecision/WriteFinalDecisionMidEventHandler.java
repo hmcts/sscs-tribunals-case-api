@@ -43,17 +43,17 @@ public class WriteFinalDecisionMidEventHandler implements PreSubmitCallbackHandl
     }
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getPipWriteFinalDecisionStartDate() != null && sscsCaseData.getPipWriteFinalDecisionEndDate() != null) {
-            LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionStartDate());
-            LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionEndDate());
+        if (sscsCaseData.getWriteFinalDecisionStartDate() != null && sscsCaseData.getWriteFinalDecisionEndDate() != null) {
+            LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionStartDate());
+            LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionEndDate());
             return !decisionNoticeStartDate.isBefore(decisionNoticeEndDate);
         }
         return false;
     }
 
     private boolean isDecisionNoticeDateOfDecisionInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getPipWriteFinalDecisionDateOfDecision() != null) {
-            LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionDateOfDecision());
+        if (sscsCaseData.getWriteFinalDecisionDateOfDecision() != null) {
+            LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionDateOfDecision());
             LocalDate today = LocalDate.now();
             return decisionNoticeDecisionDate.isAfter(today);
         }
