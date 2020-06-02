@@ -67,7 +67,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                     ? DECISION_IN_FAVOUR_OF_APPELLANT.getId() : DECISION_UPHELD.getId();
         }
 
-        if (DECISION_UPHELD.getId().equals(outcome) && null != sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion()) {
+        if (!DECISION_IN_FAVOUR_OF_APPELLANT.getId().equals(outcome) && null != sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion()) {
             outcome = sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion().equals(ComparedRate.Higher.name())
                     ? DECISION_IN_FAVOUR_OF_APPELLANT.getId() : DECISION_UPHELD.getId();
         }
