@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_UPHELD;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @Component
@@ -48,7 +53,32 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
+        sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+
+        calculateOutcomeCode(sscsCaseData, preSubmitCallbackResponse);
+
         return preSubmitCallbackResponse;
+    }
+
+    private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        String outcome = null;
+        if (null != sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion()) {
+            outcome = sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion().equals(ComparedRate.Higher.name())
+                    ? DECISION_IN_FAVOUR_OF_APPELLANT.getId() : DECISION_UPHELD.getId();
+        }
+
+        if (!DECISION_IN_FAVOUR_OF_APPELLANT.getId().equals(outcome) && null != sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion()) {
+            outcome = sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion().equals(ComparedRate.Higher.name())
+                    ? DECISION_IN_FAVOUR_OF_APPELLANT.getId() : DECISION_UPHELD.getId();
+        }
+
+        if (outcome != null) {
+            sscsCaseData.setOutcome(outcome);
+        } else {
+            log.error("Outcome cannot be empty when generating final decision. Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
+            preSubmitCallbackResponse.addError("Outcome cannot be empty. Please check case data. If problem continues please contact support");
+        }
+
     }
 
     private List<String> getDecisionNoticePointsValidationErrorMessages(SscsCaseData sscsCaseData) {
@@ -60,7 +90,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
-
     }
 
     /**
