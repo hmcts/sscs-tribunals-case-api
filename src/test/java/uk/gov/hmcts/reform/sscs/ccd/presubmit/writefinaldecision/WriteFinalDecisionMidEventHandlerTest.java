@@ -104,8 +104,8 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
     @Test
     public void givenAnEndDateIsBeforeStartDate_thenDisplayAnError() {
-        sscsCaseData.setPipWriteFinalDecisionStartDate("2020-01-01");
-        sscsCaseData.setPipWriteFinalDecisionEndDate("2019-01-01");
+        sscsCaseData.setWriteFinalDecisionStartDate("2020-01-01");
+        sscsCaseData.setWriteFinalDecisionEndDate("2019-01-01");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -119,7 +119,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenADecisionDateIsInFuture_thenDisplayAnError() {
 
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        sscsCaseData.setPipWriteFinalDecisionDateOfDecision(tomorrow.toString());
+        sscsCaseData.setWriteFinalDecisionDateOfDecision(tomorrow.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -133,7 +133,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenADecisionDateIsToday_thenDoNotDisplayAnError() {
 
         LocalDate today = LocalDate.now();
-        sscsCaseData.setPipWriteFinalDecisionDateOfDecision(today.toString());
+        sscsCaseData.setWriteFinalDecisionDateOfDecision(today.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -146,7 +146,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenADecisionDateIsInPast_thenDoNotDisplayAnError() {
 
         LocalDate yesterday = LocalDate.now().plusDays(-1);
-        sscsCaseData.setPipWriteFinalDecisionDateOfDecision(yesterday.toString());
+        sscsCaseData.setWriteFinalDecisionDateOfDecision(yesterday.toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -157,8 +157,8 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
     @Test
     public void givenAnEndDateIsSameAsStartDate_thenDisplayAnError() {
-        sscsCaseData.setPipWriteFinalDecisionStartDate("2020-01-01");
-        sscsCaseData.setPipWriteFinalDecisionEndDate("2020-01-01");
+        sscsCaseData.setWriteFinalDecisionStartDate("2020-01-01");
+        sscsCaseData.setWriteFinalDecisionEndDate("2020-01-01");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -170,8 +170,8 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
     @Test
     public void givenAnEndDateIsAfterStartDate_thenDoNotDisplayAnError() {
-        sscsCaseData.setPipWriteFinalDecisionStartDate("2019-01-01");
-        sscsCaseData.setPipWriteFinalDecisionEndDate("2020-01-01");
+        sscsCaseData.setWriteFinalDecisionStartDate("2019-01-01");
+        sscsCaseData.setWriteFinalDecisionEndDate("2020-01-01");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -189,7 +189,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     @Test
     public void willSetPreviewFile() {
 
-        sscsCaseData.setPipWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -206,7 +206,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     @Test
     public void scottishRpcWillShowAScottishImage() {
 
-        sscsCaseData.setPipWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
 
@@ -218,7 +218,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
 
-        sscsCaseData.setPipWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
             .name(Name.builder().firstName("APPOINTEE")

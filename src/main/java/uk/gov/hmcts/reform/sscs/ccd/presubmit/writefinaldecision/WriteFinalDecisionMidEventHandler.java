@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -60,7 +61,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             preSubmitCallbackResponse.addError("Decision notice date of decision must not be in the future");
         }
 
-        if (sscsCaseData.isPipWriteFinalDecisionGenerateNotice()) {
+        if (sscsCaseData.isWriteFinalDecisionGenerateNotice()) {
             return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
         }
 
@@ -68,17 +69,17 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     }
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getPipWriteFinalDecisionStartDate() != null && sscsCaseData.getPipWriteFinalDecisionEndDate() != null) {
-            LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionStartDate());
-            LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionEndDate());
+        if (sscsCaseData.getWriteFinalDecisionStartDate() != null && sscsCaseData.getWriteFinalDecisionEndDate() != null) {
+            LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionStartDate());
+            LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionEndDate());
             return !decisionNoticeStartDate.isBefore(decisionNoticeEndDate);
         }
         return false;
     }
 
     private boolean isDecisionNoticeDateOfDecisionInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getPipWriteFinalDecisionDateOfDecision() != null) {
-            LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getPipWriteFinalDecisionDateOfDecision());
+        if (sscsCaseData.getWriteFinalDecisionDateOfDecision() != null) {
+            LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionDateOfDecision());
             LocalDate today = LocalDate.now();
             return decisionNoticeDecisionDate.isAfter(today);
         }
@@ -106,7 +107,12 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             }
         }
 
-        return builder.build();
+        return formPayload;
+    }
+
+    @Override
+    protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
+        caseData.setWriteFinalDecisionPreviewDocument(file);
     }
 
 
@@ -119,11 +125,11 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         StringBuilder stringBuilder = new StringBuilder();
         List<String> names = new ArrayList<>();
         names.add(buildSignedInJudgeName(userAuthorisation));
-        if (caseData.getPipDisabilityQualifiedPanelMemberName() != null) {
-            names.add(caseData.getPipDisabilityQualifiedPanelMemberName());
+        if (caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName() != null) {
+            names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         }
-        if (caseData.getPipMedicallyQualifiedPanelMemberName() != null) {
-            names.add(caseData.getPipMedicallyQualifiedPanelMemberName());
+        if (caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName() != null) {
+            names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
         Iterator<String> nameIterator = names.iterator();
         while (nameIterator.hasNext()) {

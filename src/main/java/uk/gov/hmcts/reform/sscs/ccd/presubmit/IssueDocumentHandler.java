@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTempl
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 
 @Slf4j
-public class IssueDocumentHandler {
+public abstract class IssueDocumentHandler {
 
     private static final String GLASGOW = "GLASGOW";
 
@@ -63,6 +63,7 @@ public class IssueDocumentHandler {
     }
 
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         String documentUrl = Optional.ofNullable(caseData.getPreviewDocument()).map(DocumentLink::getDocumentUrl).orElse(null);
 
@@ -92,10 +93,13 @@ public class IssueDocumentHandler {
                 .documentBinaryUrl(generatedFileUrl + "/binary")
                 .documentUrl(generatedFileUrl)
                 .build();
-        caseData.setPreviewDocument(previewFile);
+
+        setDocumentOnCaseData(caseData, previewFile);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
+
+    protected abstract void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file);
 
     protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();

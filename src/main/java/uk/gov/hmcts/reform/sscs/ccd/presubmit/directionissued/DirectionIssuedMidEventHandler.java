@@ -9,6 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
@@ -47,6 +48,11 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
         }
         log.info("Direction Type is " + callback.getCaseDetails().getCaseData().getDirectionTypeDl().getValue());
         return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
+    }
+
+    @Override
+    protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
+        caseData.setPreviewDocument(file);
     }
 
 }
