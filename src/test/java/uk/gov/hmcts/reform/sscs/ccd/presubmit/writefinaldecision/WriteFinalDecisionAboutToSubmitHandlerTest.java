@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate.Higher;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -50,6 +51,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
+            .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(Higher.name())
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(Higher.name())
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -61,13 +64,33 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"Higher, decisionInFavourOfAppellant", "Lower, decisionUpheld", "Same, decisionUpheld"})
-    public void givenFinalDecisionComparedToDwpQuestion_thenSetOutcomeAndDwpStateAppropriately(String comparedRate, String expectedOutcome) {
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpQuestion(comparedRate);
+    @Parameters({
+            "Higher, Higher, decisionInFavourOfAppellant",
+            "Higher, Same, decisionInFavourOfAppellant",
+            "Higher, Lower, decisionInFavourOfAppellant",
+            "Same, Higher, decisionInFavourOfAppellant",
+            "Same, Same, decisionUpheld",
+            "Same, Lower, decisionUpheld",
+            "Lower, Higher, decisionInFavourOfAppellant",
+            "Lower, Same, decisionUpheld",
+            "Lower, Lower, decisionUpheld"})
+    public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigher_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility, String expectedOutcome) {
+        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving);
+        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(expectedOutcome, response.getData().getOutcome());
         assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenFinalDecisionComparedToDwpQuestionComparedRatesAreNull_thenDisplayAnError() {
+        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
     }
 
     @Test
