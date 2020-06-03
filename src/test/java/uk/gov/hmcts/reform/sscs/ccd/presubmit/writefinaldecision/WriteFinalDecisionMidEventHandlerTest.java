@@ -367,6 +367,35 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
+    public void givenCaseWithMultipleHearingsWillSecondHearingNull_thenCorrectlyDoNotSetHeldAt() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+
+        List<Hearing> hearings = new ArrayList<>();
+
+        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
+            .venue(Venue.builder().name("venue 1 name").build()).build()).build();
+
+        Hearing hearing2 = null;
+
+        sscsCaseData.setHearings(Arrays.asList(hearing1, hearing2));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+
+        Assert.assertNull(payload.getHeldAt());
+
+    }
+
+    @Test
     public void givenCaseWithNullHearingsList_thenCorrectlyDoNotSetHeldAt() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
@@ -444,6 +473,38 @@ public class WriteFinalDecisionMidEventHandlerTest {
         Assert.assertNull("2019-01-02", payload.getHeldOn());
 
     }
+
+    @Test
+    public void givenCaseWithMultipleHearingsWithSecondHearingNull_thenCorrectlyDoNotSetSetTheHeldOn() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+
+        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").build()).build();
+
+        Hearing hearing2 = null;
+
+        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        sscsCaseData.setHearings(hearings);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+
+        Assert.assertNull("2019-01-02", payload.getHeldOn());
+
+    }
+
+
+
+
 
     @Test
     public void givenCaseWithEmptyHearingsList_thenCorrectlyDoNotSetSetTheHeldOn() {
