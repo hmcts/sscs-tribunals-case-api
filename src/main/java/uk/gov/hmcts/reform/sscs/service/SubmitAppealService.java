@@ -7,7 +7,10 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import feign.FeignException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +43,7 @@ public class SubmitAppealService {
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final List<String> offices;
 
+    @SuppressWarnings("squid:S107")
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
@@ -63,7 +67,7 @@ public class SubmitAppealService {
         EventType event = findEventType(caseData);
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
-        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, event, userToken);
+        postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken);
         // in case of duplicate case the caseDetails will be null
         return (caseDetails != null) ? caseDetails.getId() : null;
     }
@@ -115,20 +119,11 @@ public class SubmitAppealService {
     }
 
     private void postCreateCaseInCcdProcess(SscsCaseData caseData,
-                                            IdamTokens idamTokens, SscsCaseDetails caseDetails, EventType event,
+                                            IdamTokens idamTokens, SscsCaseDetails caseDetails,
                                             String userToken) {
-        if (null != caseDetails) {
-            sscsPdfService.generateAndSendPdf(caseData, caseDetails.getId(), idamTokens, "sscs1");
-            if (event.equals(SYA_APPEAL_CREATED) || event.equals(VALID_APPEAL_CREATED)) {
-                log.info("About to update case with sendToDwp event for id {}", caseDetails.getId());
-                ccdService.updateCase(caseData, caseDetails.getId(), SEND_TO_DWP.getCcdType(), "Send to DWP", "Send to DWP event has been triggered from Tribunals service", idamTokens);
-                log.info("Case updated with sendToDwp event for id {}", caseDetails.getId());
-            }
-            if (StringUtils.isNotEmpty(userToken)) {
-                citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
-                citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
-            }
-
+        if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
+            citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
+            citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
         }
     }
 

@@ -38,7 +38,6 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 }
 
 withPipeline(type, product, component) {
-    installCharts()
     loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableAksStagingDeployment()

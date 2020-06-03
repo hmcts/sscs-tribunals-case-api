@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -587,10 +587,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                             .build();
                 }
 
+                String repFirstName = "undefined".equalsIgnoreCase(syaRepresentative.getFirstName()) ? null : syaRepresentative.getFirstName();
+                String repLastName = "undefined".equalsIgnoreCase(syaRepresentative.getLastName()) ? null : syaRepresentative.getLastName();
+
                 Name name = Name.builder()
                         .title(syaRepresentative.getTitle())
-                        .firstName(syaRepresentative.getFirstName())
-                        .lastName(syaRepresentative.getLastName())
+                        .firstName(repFirstName)
+                        .lastName(repLastName)
                         .build();
 
                 Address address = Address.builder()
