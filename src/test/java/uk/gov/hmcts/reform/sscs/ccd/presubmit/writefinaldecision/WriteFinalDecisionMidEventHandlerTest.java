@@ -211,6 +211,24 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
+    public void givenGenerateNoticeSetToNo_willNotSetPreviewFile() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("No");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenGenerateNoticeNotSet_willNotSetPreviewFile() {
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheLastHearingInList() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");

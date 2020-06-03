@@ -123,9 +123,4 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             log.info("Could not find direction issued document for caseId {} so skipping generating footer", caseData.getCcdCaseId());
         }
     }
-
-    @Override
-    protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
-        caseData.setPreviewDocument(file);
-    }
 }

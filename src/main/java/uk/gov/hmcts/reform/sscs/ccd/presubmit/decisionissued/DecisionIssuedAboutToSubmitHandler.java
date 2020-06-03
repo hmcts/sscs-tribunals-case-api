@@ -102,9 +102,4 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             log.info("Could not find decision issued document for caseId {} so skipping generating footer", caseData.getCcdCaseId());
         }
     }
-
-    @Override
-    protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
-        caseData.setPreviewDocument(file);
-    }
 }

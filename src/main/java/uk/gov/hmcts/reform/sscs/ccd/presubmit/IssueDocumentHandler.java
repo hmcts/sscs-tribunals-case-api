@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTempl
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 
 @Slf4j
-public abstract class IssueDocumentHandler {
+public class IssueDocumentHandler {
 
     private static final String GLASGOW = "GLASGOW";
 
@@ -99,7 +99,10 @@ public abstract class IssueDocumentHandler {
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    protected abstract void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file);
+
+    protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
+        caseData.setPreviewDocument(file);
+    }
 
     protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
