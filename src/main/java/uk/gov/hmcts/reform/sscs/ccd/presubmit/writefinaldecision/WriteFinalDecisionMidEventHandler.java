@@ -27,6 +27,9 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTempl
 @Slf4j
 public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    // FIXME
+    private static final String JUDGE_NAME_PLACEHOLDER = "Judge Name Placeholder";
+
     private final GenerateFile generateFile;
     private final String templateId;
 
@@ -95,7 +98,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
         builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        if (caseData.getHearings() != null) {
+        if (caseData.getHearings() != null && !caseData.getHearings().isEmpty()) {
             Hearing finalHearing = caseData.getHearings().get(caseData.getHearings().size() - 1);
             if (finalHearing != null && finalHearing.getValue() != null) {
                 if (finalHearing.getValue().getHearingDate() != null) {
@@ -107,7 +110,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             }
         }
 
-        return formPayload;
+        return builder.build();
     }
 
     @Override
@@ -116,9 +119,10 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     }
 
 
+    @SuppressWarnings("squid:S1172")
     private String buildSignedInJudgeName(String userAuthorisation) {
-        // TODO
-        return "Judge Name Placeholder";
+        // FIXME
+        return JUDGE_NAME_PLACEHOLDER;
     }
 
     private String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
