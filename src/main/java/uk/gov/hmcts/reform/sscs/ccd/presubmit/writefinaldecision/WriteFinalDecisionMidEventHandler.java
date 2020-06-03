@@ -89,6 +89,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         return false;
     }
 
+    @SuppressWarnings("squid:S1172")
     @Override
     protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish,
         String userAuthorisation) {
