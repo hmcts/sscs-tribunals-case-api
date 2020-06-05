@@ -103,10 +103,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
         builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
-
-        builder.heldOn(LocalDate.now());
-        builder.heldAt("Birmingham");
-
+        
         if (caseData.getHearings() != null && !caseData.getHearings().isEmpty()) {
             Hearing finalHearing = caseData.getHearings().get(caseData.getHearings().size() - 1);
             if (finalHearing != null && finalHearing.getValue() != null) {
