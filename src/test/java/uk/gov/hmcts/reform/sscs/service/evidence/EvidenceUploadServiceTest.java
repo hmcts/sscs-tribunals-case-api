@@ -46,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
+import uk.gov.hmcts.reform.sscs.thirdparty.documentmanagement.DocumentManagementService;
 
 @RunWith(JUnitParamsRunner.class)
 public class EvidenceUploadServiceTest {
@@ -91,8 +92,10 @@ public class EvidenceUploadServiceTest {
         FileToPdfConversionService fileToPdfConversionService = mock(FileToPdfConversionService.class);
         evidenceManagementService = mock(EvidenceManagementService.class);
         pdfStoreService = mock(PdfStoreService.class);
+        DocumentManagementService documentManagementService = mock(DocumentManagementService.class);
 
         evidenceUploadService = new EvidenceUploadService(
+                documentManagementService,
                 ccdService,
                 idamService,
                 onlineHearingService,
@@ -200,6 +203,45 @@ public class EvidenceUploadServiceTest {
             eq("Uploaded a further evidence document"),
             eq(idamTokens)
         );
+    }
+
+    @Test
+    public void deleteEvidenceFromCcd() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName, documentUrl, evidenceCreatedOn);
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
+
+        assertThat(hearingFound, is(true));
+        verify(ccdService).updateCase(
+                doesNotHaveDraftSscsDocuments(),
+                eq(someCcdCaseId),
+                eq("uploadDraftDocument"),
+                eq("SSCS - evidence deleted"),
+                eq("Updated SSCS"),
+                eq(idamTokens)
+        );
+    }
+
+    @Test
+    public void deleteEvidenceIfCaseHadNoEvidence() {
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetailsWithoutCcdDocuments();
+        when(onlineHearingService.getCcdCaseByIdentifier(someOnlineHearingId)).thenReturn(Optional.of(sscsCaseDetails));
+
+        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId);
+
+        assertThat(hearingFound, is(true));
+        verify(ccdService, never()).updateCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    public void deleteEvidenceForAHearingThatDoesNotExist() {
+        String nonExistentHearingId = "nonExistentHearingId";
+        when(onlineHearingService.getCcdCase(nonExistentHearingId)).thenReturn(Optional.empty());
+
+        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(nonExistentHearingId, someEvidenceId);
+
+        assertThat(hearingFound, is(false));
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
