@@ -104,6 +104,9 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
         builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
+        builder.heldOn(LocalDate.now());
+        builder.heldAt("Birmingham");
+
         if (caseData.getHearings() != null && !caseData.getHearings().isEmpty()) {
             Hearing finalHearing = caseData.getHearings().get(caseData.getHearings().size() - 1);
             if (finalHearing != null && finalHearing.getValue() != null) {
@@ -119,11 +122,9 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         DirectionOrDecisionIssuedTemplateBody payload = builder.build();
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
             throw new IllegalStateException("Unable to determine hearing date or venue");
-        }
-        else if (payload.getHeldOn() == null) {
+        } else if (payload.getHeldOn() == null) {
             throw new IllegalStateException("Unable to determine hearing date");
-        }
-        else if (payload.getHeldAt() == null) {
+        } else if (payload.getHeldAt() == null) {
             throw new IllegalStateException("Unable to determine hearing venue");
         }
         return payload;
