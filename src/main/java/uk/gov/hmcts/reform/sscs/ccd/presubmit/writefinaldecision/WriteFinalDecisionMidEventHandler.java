@@ -2,9 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody.DirectionOrDecisionIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
@@ -65,7 +66,11 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         }
 
         if (sscsCaseData.isWriteFinalDecisionGenerateNotice()) {
-            return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+            try {
+                return issueDocument(callback, DocumentType.DRAFT_DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+            } catch (IllegalStateException e) {
+                preSubmitCallbackResponse.addError(e.getMessage());
+            }
         }
 
         return preSubmitCallbackResponse;
@@ -105,13 +110,23 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
                 if (finalHearing.getValue().getHearingDate() != null) {
                     builder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
                 }
-                if (finalHearing.getValue().getVenue()  != null) {
+                if (finalHearing.getValue().getVenue() != null) {
                     builder.heldAt(finalHearing.getValue().getVenue().getName());
                 }
             }
         }
 
-        return builder.build();
+        DirectionOrDecisionIssuedTemplateBody payload = builder.build();
+        if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
+            throw new IllegalStateException("Unable to determine hearing date or venue");
+        }
+        else if (payload.getHeldOn() == null) {
+            throw new IllegalStateException("Unable to determine hearing date");
+        }
+        else if (payload.getHeldAt() == null) {
+            throw new IllegalStateException("Unable to determine hearing venue");
+        }
+        return payload;
     }
 
     @Override
@@ -136,13 +151,21 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         if (caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName() != null) {
             names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
-        Iterator<String> nameIterator = names.iterator();
-        while (nameIterator.hasNext()) {
-            stringBuilder.append(nameIterator.next());
-            if (nameIterator.hasNext()) {
-                stringBuilder.append(", ");
-            }
+        return StringUtils.getGramaticallyJoinedStrings(names);
+    }
+
+    private String getGramaticallyJoinedStrings(List<String> strings) {
+
+        StringBuffer result = new StringBuffer();
+        if (strings.size() == 1) {
+            return strings.get(0);
+        } else if (strings.size() > 1) {
+            result.append(strings.subList(0, strings.size() - 1)
+                .stream().collect(Collectors.joining(", ")));
+            result.append(" and ");
+            result.append(strings.get(strings.size() - 1));
         }
-        return stringBuilder.toString();
+        return result.toString();
+
     }
 }
