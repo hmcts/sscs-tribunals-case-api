@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -103,7 +102,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
         builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
-        
+
         if (caseData.getHearings() != null && !caseData.getHearings().isEmpty()) {
             Hearing finalHearing = caseData.getHearings().get(caseData.getHearings().size() - 1);
             if (finalHearing != null && finalHearing.getValue() != null) {
@@ -140,7 +139,6 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     }
 
     private String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        StringBuilder stringBuilder = new StringBuilder();
         List<String> names = new ArrayList<>();
         names.add(buildSignedInJudgeName(userAuthorisation));
         if (caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName() != null) {
@@ -150,20 +148,5 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
-    }
-
-    private String getGramaticallyJoinedStrings(List<String> strings) {
-
-        StringBuffer result = new StringBuffer();
-        if (strings.size() == 1) {
-            return strings.get(0);
-        } else if (strings.size() > 1) {
-            result.append(strings.subList(0, strings.size() - 1)
-                .stream().collect(Collectors.joining(", ")));
-            result.append(" and ");
-            result.append(strings.get(strings.size() - 1));
-        }
-        return result.toString();
-
     }
 }

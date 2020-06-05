@@ -10,7 +10,7 @@ public final class StringUtils {
     }
 
     public static String getGramaticallyJoinedStrings(List<String> strings) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         if (strings.size() == 1) {
             return strings.get(0);
         } else if (strings.size() > 1) {
