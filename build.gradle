@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath("net.serenity-bdd:serenity-gradle-plugin:2.2.8")
+        classpath("net.serenity-bdd:serenity-gradle-plugin:2.2.9")
     }
 }
 
@@ -274,8 +274,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.4'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '6.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.2.31'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.2-RC-SSCS-7560'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.2.35'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.4'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 

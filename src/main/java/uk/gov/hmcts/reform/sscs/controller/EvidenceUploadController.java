@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,6 +86,28 @@ public class EvidenceUploadController {
             @PathVariable("identifier") String identifier
     ) {
         return ResponseEntity.ok(evidenceUploadService.listDraftHearingEvidence(identifier));
+    }
+
+    @ApiOperation(value = "Delete MYA evidence",
+            notes = "Deletes evidence for a MYA appeal. You need to have an appeal in CCD and an online hearing in MYA "
+                    + "that references the appeal in CCD."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "Evidence deleted "),
+            @ApiResponse(code = 404, message = "No online hearing found with online hearing id"),
+    })
+    @ResponseStatus(value = HttpStatus.NO_CONTENT)
+    @DeleteMapping(
+            value = "{identifier}/evidence/{evidenceId}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Void> deleteEvidence(
+            @ApiParam(value = "either the online hearing or CCD case id", example = "xxxxx-xxxx-xxxx-xxxx")
+            @PathVariable("identifier") String identifier,
+            @PathVariable("evidenceId") String evidenceId
+    ) {
+        boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(identifier, evidenceId);
+        return hearingFound ? ResponseEntity.noContent().build() : notFound().build();
     }
 
     @ApiOperation(value = "Submit MYA evidence",

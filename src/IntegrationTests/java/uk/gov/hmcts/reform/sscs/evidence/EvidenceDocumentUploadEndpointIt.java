@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -44,9 +43,6 @@ public class EvidenceDocumentUploadEndpointIt {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
-
-    @MockBean
-    private IdamApiClient idamApiClient;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;

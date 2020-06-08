@@ -124,4 +124,24 @@ public class EvidenceUploadControllerTest {
 
         assertThat(response.getStatusCode(), is(NOT_FOUND));
     }
+
+    @Test
+    public void canDeleteEvidence() {
+        when(evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(true);
+
+        ResponseEntity evidenceResponseEntity = evidenceUploadController
+                .deleteEvidence(someOnlineHearingId, someEvidenceId);
+
+        assertThat(evidenceResponseEntity.getStatusCode(), is(NO_CONTENT));
+    }
+
+    @Test
+    public void cannotDeleteEvidenceWhenOnlineHearingDoesNotExist() {
+        when(evidenceUploadService.deleteDraftHearingEvidence(someOnlineHearingId, someEvidenceId)).thenReturn(false);
+
+        ResponseEntity evidenceResponseEntity = evidenceUploadController
+                .deleteEvidence(someOnlineHearingId, someEvidenceId);
+
+        assertThat(evidenceResponseEntity.getStatusCode(), is(NOT_FOUND));
+    }
 }
