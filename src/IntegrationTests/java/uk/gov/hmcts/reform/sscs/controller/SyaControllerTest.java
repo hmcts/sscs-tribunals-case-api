@@ -25,13 +25,14 @@ import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.model.draft.Draft;
 import uk.gov.hmcts.reform.sscs.util.SyaServiceHelper;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -43,7 +44,7 @@ public class SyaControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private IdamApiClient idamApiClient;
+    private IdamClient idamApiClient;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -77,12 +78,11 @@ public class SyaControllerTest {
                 .code("idam code")
                 .accessToken("idam token")
                 .build();
-        given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString(), anyString()))
-                .willReturn(authorize);
-        given(idamApiClient.authorizeToken(
-                anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-                .willReturn(authorize);
-        given(idamApiClient.getUserDetails(anyString())).willReturn(UserDetails.builder().id("idam user Id").build());
+
+        given(idamApiClient.getAccessToken(anyString(), anyString())).willReturn(authorize.getAccessToken());
+
+        given(idamApiClient.getUserDetails(anyString()))
+                .willReturn(new UserDetails("idam user Id", "", "", "", null));
     }
 
     @Test
