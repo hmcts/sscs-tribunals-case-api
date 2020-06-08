@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
+import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -42,7 +43,27 @@ public class IssueDocumentHandler {
         }
     }
 
+    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish, String userAuthorisation) {
+        DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
+            .appellantFullName(buildFullName(caseData))
+            .caseId(caseData.getCcdCaseId())
+            .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+            .noticeBody(caseData.getBodyContent())
+            .userName(caseData.getSignedBy())
+            .noticeType(documentTypeLabel.toUpperCase())
+            .userRole(caseData.getSignedRole())
+            .dateAdded(dateAdded)
+            .generatedDate(LocalDate.now())
+            .build();
+
+        if (isScottish) {
+            formPayload = formPayload.toBuilder().image(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE).build();
+        }
+        return formPayload;
+    }
+
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
+
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         String documentUrl = Optional.ofNullable(caseData.getPreviewDocument()).map(DocumentLink::getDocumentUrl).orElse(null);
 
@@ -50,23 +71,9 @@ public class IssueDocumentHandler {
 
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 
-        DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
-                .appellantFullName(buildFullName(caseData))
-                .caseId(caseData.getCcdCaseId())
-                .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-                .noticeBody(caseData.getBodyContent())
-                .userName(caseData.getSignedBy())
-                .noticeType(documentTypeLabel.toUpperCase())
-                .userRole(caseData.getSignedRole())
-                .dateAdded(dateAdded)
-                .generatedDate(LocalDate.now())
-                .build();
-
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
-        if (isScottish) {
-            formPayload = formPayload.toBuilder().image(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE).build();
-        }
+        FormPayload formPayload = createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(documentUrl)
@@ -86,12 +93,18 @@ public class IssueDocumentHandler {
                 .documentBinaryUrl(generatedFileUrl + "/binary")
                 .documentUrl(generatedFileUrl)
                 .build();
-        caseData.setPreviewDocument(previewFile);
+
+        setDocumentOnCaseData(caseData, previewFile);
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-    private String buildFullName(SscsCaseData caseData) {
+
+    protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
+        caseData.setPreviewDocument(file);
+    }
+
+    protected String buildFullName(SscsCaseData caseData) {
         StringBuilder fullNameText = new StringBuilder();
         if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
             fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));

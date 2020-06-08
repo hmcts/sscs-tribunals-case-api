@@ -42,5 +42,4 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
 
         return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
     }
-
 }
