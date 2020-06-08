@@ -9,6 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -16,28 +17,31 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody.DirectionOrDecisionIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
 public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    // FIXME
-    private static final String JUDGE_NAME_PLACEHOLDER = "Judge Name Placeholder";
-
     private final GenerateFile generateFile;
     private final String templateId;
+    private final IdamClient idamClient;
+    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
     @Autowired
-    public WriteFinalDecisionMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.issue_final_decision}") String templateId) {
+    public WriteFinalDecisionMidEventHandler(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService, @Value("${doc_assembly.issue_final_decision}") String templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
+        this.idamClient = idamClient;
+        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
 
     @Override
@@ -94,7 +98,6 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         return false;
     }
 
-    @SuppressWarnings("squid:S1172")
     @Override
     protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish,
         String userAuthorisation) {
@@ -116,6 +119,12 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             }
         }
 
+        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
+        if (Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome)) {
+            builder.isAllowed(true);
+            builder.isSetAside(true);
+        }
+
         DirectionOrDecisionIssuedTemplateBody payload = builder.build();
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
             throw new IllegalStateException("Unable to determine hearing date or venue");
@@ -124,6 +133,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         } else if (payload.getHeldAt() == null) {
             throw new IllegalStateException("Unable to determine hearing venue");
         }
+
         return payload;
     }
 
@@ -133,10 +143,8 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     }
 
 
-    @SuppressWarnings("squid:S1172")
     private String buildSignedInJudgeName(String userAuthorisation) {
-        // FIXME
-        return JUDGE_NAME_PLACEHOLDER;
+        return idamClient.getUserDetails(userAuthorisation).getFullName();
     }
 
     private String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {

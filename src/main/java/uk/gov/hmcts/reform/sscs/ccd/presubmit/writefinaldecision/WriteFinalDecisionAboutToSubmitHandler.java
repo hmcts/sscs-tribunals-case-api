@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_UPHELD;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,9 +15,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @Component
@@ -27,10 +26,13 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
     @Autowired
-    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService) {
+    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService,
+        DecisionNoticeOutcomeService decisionNoticeOutcomeService) {
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
 
     @Override
@@ -61,19 +63,11 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        String outcome = null;
-        if (null != sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion()) {
-            outcome = sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion().equals(ComparedRate.Higher.name())
-                    ? DECISION_IN_FAVOUR_OF_APPELLANT.getId() : DECISION_UPHELD.getId();
-        }
 
-        if (!DECISION_IN_FAVOUR_OF_APPELLANT.getId().equals(outcome) && null != sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion()) {
-            outcome = sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion().equals(ComparedRate.Higher.name())
-                    ? DECISION_IN_FAVOUR_OF_APPELLANT.getId() : DECISION_UPHELD.getId();
-        }
+        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(sscsCaseData);
 
         if (outcome != null) {
-            sscsCaseData.setOutcome(outcome);
+            sscsCaseData.setOutcome(outcome.getId());
         } else {
             log.error("Outcome cannot be empty when generating final decision. Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError("Outcome cannot be empty. Please check case data. If problem continues please contact support");

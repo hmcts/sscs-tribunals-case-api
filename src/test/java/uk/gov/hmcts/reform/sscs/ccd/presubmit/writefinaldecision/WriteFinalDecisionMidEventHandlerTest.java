@@ -24,6 +24,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -45,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionMidEventHandlerTest {
@@ -63,18 +66,30 @@ public class WriteFinalDecisionMidEventHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private IdamClient idamClient;
+
+    @Mock
+    private UserDetails userDetails;
+
     private ArgumentCaptor<GenerateFileParams> capture;
 
     private SscsCaseData sscsCaseData;
 
+    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+
     @Before
     public void setUp() throws IOException {
         initMocks(this);
-        handler = new WriteFinalDecisionMidEventHandler(generateFile, TEMPLATE_ID);
+        this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
+        handler = new WriteFinalDecisionMidEventHandler(generateFile, idamClient, decisionNoticeOutcomeService, TEMPLATE_ID);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
+        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+
+        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -502,7 +517,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
 
-        assertEquals("Judge Name Placeholder, Mr Panel Member 1 and Ms Panel Member 2", payload.getHeldBefore());
+        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", payload.getHeldBefore());
 
     }
 
@@ -527,7 +542,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
 
-        assertEquals("Judge Name Placeholder and Mr Panel Member 1", payload.getHeldBefore());
+        assertEquals("Judge Full Name and Mr Panel Member 1", payload.getHeldBefore());
 
     }
 
@@ -550,7 +565,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
 
-        assertEquals("Judge Name Placeholder", payload.getHeldBefore());
+        assertEquals("Judge Full Name", payload.getHeldBefore());
 
     }
 
