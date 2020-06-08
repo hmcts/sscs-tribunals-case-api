@@ -82,5 +82,9 @@ public class FinalDecisionIssuedForPreviewIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
+
+
     }
 }
