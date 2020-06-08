@@ -233,7 +233,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheLastHearingInList() {
+    public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -243,7 +243,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-02").venue(Venue.builder().name("venue 2 name").build()).build()).build();
 
-        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -262,7 +262,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithSecondWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -272,7 +272,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-02").venue(Venue.builder().build()).build()).build();
 
-        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -286,7 +286,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithSecondWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -296,7 +296,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").build()).build();
 
-        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -310,7 +310,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithSecondHearingNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -319,7 +319,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         Hearing hearing2 = null;
 
-        sscsCaseData.setHearings(Arrays.asList(hearing1, hearing2));
+        sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -330,7 +330,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithSecondWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -339,7 +339,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         Hearing hearing2 = Hearing.builder().build();
 
-        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -386,7 +386,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheLastHearingInList() {
+    public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -396,7 +396,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-02").venue(Venue.builder().name("Venue Name").build()).build()).build();
 
-        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -415,7 +415,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithSecondWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -426,7 +426,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .venue(Venue.builder().name("Venue Name").build())
             .build()).build();
 
-        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -440,7 +440,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithMultipleHearingsWithSecondHearingNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
+    public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
 
@@ -450,7 +450,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         Hearing hearing2 = null;
 
-        List<Hearing> hearings = Arrays.asList(hearing1, hearing2);
+        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);

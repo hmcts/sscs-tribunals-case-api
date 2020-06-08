@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -103,8 +104,8 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
         builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        if (caseData.getHearings() != null && !caseData.getHearings().isEmpty()) {
-            Hearing finalHearing = caseData.getHearings().get(caseData.getHearings().size() - 1);
+        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
+            Hearing finalHearing = caseData.getHearings().get(0);
             if (finalHearing != null && finalHearing.getValue() != null) {
                 if (finalHearing.getValue().getHearingDate() != null) {
                     builder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
