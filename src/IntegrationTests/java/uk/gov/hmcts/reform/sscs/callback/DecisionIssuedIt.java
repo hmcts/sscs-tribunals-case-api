@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -40,9 +39,6 @@ public class DecisionIssuedIt extends AbstractEventIt {
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
-
-    @MockBean
-    private IdamApiClient idamApiClient;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;

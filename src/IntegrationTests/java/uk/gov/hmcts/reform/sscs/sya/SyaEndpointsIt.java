@@ -41,12 +41,11 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.idam.Authorize;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.SubmitAppealService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -71,7 +70,7 @@ public class SyaEndpointsIt {
     private CcdClient ccdClient;
 
     @MockBean
-    private IdamApiClient idamApiClient;
+    private IdamClient idamClient;
 
     @MockBean
     @Qualifier("authTokenGenerator")
@@ -121,13 +120,15 @@ public class SyaEndpointsIt {
                 .build());
 
         Authorize authorize = new Authorize("redirectUrl/", "code", "token");
-        given(idamApiClient.authorizeCodeType(anyString(), anyString(), anyString(), anyString(), anyString()))
-            .willReturn(authorize);
-        given(idamApiClient.authorizeToken(anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-            .willReturn(authorize);
+
+        given(idamClient.getAccessToken(anyString(), anyString())).willReturn(authorize.getAccessToken());
+
+        given(idamClient.getAccessToken(anyString(), anyString())).willReturn(authorize.getAccessToken());
 
         given(authTokenGenerator.generate()).willReturn("authToken");
-        given(idamApiClient.getUserDetails(anyString())).willReturn(new UserDetails("userId", "dummy@email.com",
+
+        given(idamClient.getUserDetails(anyString()))
+                .willReturn(new uk.gov.hmcts.reform.idam.client.models.UserDetails("userId", "dummy@email.com", "test", "test",
                 Arrays.asList("caseworker", "citizen")));
 
         UploadResponse uploadResponse = createUploadResponse();
