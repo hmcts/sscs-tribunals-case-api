@@ -73,6 +73,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             try {
                 return issueDocument(callback, DocumentType.DRAFT_DECISION_NOTICE, templateId, generateFile, userAuthorisation);
             } catch (IllegalStateException e) {
+                log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
                 preSubmitCallbackResponse.addError(e.getMessage());
             }
         }
@@ -120,10 +121,17 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         }
 
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
-        if (Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome)) {
+        if (outcome == null) {
+            throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
+        } else if (Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome)) {
             builder.isAllowed(true);
             builder.isSetAside(true);
+        } else {
+            builder.isAllowed(false);
+            builder.isSetAside(false);
         }
+
+        builder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
 
         DirectionOrDecisionIssuedTemplateBody payload = builder.build();
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
@@ -132,6 +140,9 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             throw new IllegalStateException("Unable to determine hearing date");
         } else if (payload.getHeldAt() == null) {
             throw new IllegalStateException("Unable to determine hearing venue");
+        }
+        if (payload.getDateOfDecision() == null) {
+            throw new IllegalStateException("Unable to determine date of decision");
         }
 
         return payload;

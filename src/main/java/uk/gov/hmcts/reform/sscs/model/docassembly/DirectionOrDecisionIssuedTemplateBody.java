@@ -54,5 +54,7 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     private boolean isAllowed;
     @JsonProperty("is_set_aside")
     private boolean isSetAside;
+    @JsonProperty("date_of_decision")
+    private String dateOfDecision;
 
 }
