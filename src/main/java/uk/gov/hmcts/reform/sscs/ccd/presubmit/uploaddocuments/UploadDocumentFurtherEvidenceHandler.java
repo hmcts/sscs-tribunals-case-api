@@ -1,9 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments;
 
+import static org.apache.commons.io.FilenameUtils.getExtension;
+import static org.apache.commons.lang3.StringUtils.equalsAnyIgnoreCase;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -44,6 +47,12 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             response.addError("You need to provide a file and a document type");
             return response;
         }
+        if (!isFileUploadedAPdf(caseData.getDraftSscsFurtherEvidenceDocument())) {
+            initDraftSscsFurtherEvidenceDocument(caseData);
+            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+            response.addError("You need to upload PDF documents only");
+            return response;
+        }
         moveDraftsToSscsDocs(caseData);
         initDraftSscsFurtherEvidenceDocument(caseData);
         caseData.setDwpState(DwpState.FE_RECEIVED.getId());
@@ -61,9 +70,23 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         return false;
     }
 
+    private boolean isFileUploadedAPdf(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
+        if (draftSscsFurtherEvidenceDocuments != null && !draftSscsFurtherEvidenceDocuments.isEmpty()) {
+            return draftSscsFurtherEvidenceDocuments.stream()
+                    .allMatch(this::isFileAPdf);
+        }
+        return false;
+    }
+
+    private boolean isFileAPdf(SscsFurtherEvidenceDoc doc) {
+        return doc.getValue().getDocumentLink() != null
+                && isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl())
+                && equalsAnyIgnoreCase("pdf", getExtension(doc.getValue().getDocumentLink().getDocumentFilename()));
+    }
+
     private boolean isFileUploaded(SscsFurtherEvidenceDoc doc) {
         return doc.getValue().getDocumentLink() != null
-            && StringUtils.isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl());
+            && isNotBlank(doc.getValue().getDocumentLink().getDocumentUrl());
     }
 
     private boolean isValidDocumentType(String docType) {
