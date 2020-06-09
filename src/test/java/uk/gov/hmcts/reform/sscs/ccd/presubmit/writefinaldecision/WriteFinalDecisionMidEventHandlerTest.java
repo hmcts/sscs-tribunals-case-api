@@ -24,6 +24,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -45,6 +47,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionMidEventHandlerTest {
@@ -63,18 +66,30 @@ public class WriteFinalDecisionMidEventHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private IdamClient idamClient;
+
+    @Mock
+    private UserDetails userDetails;
+
     private ArgumentCaptor<GenerateFileParams> capture;
 
     private SscsCaseData sscsCaseData;
 
+    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+
     @Before
     public void setUp() throws IOException {
         initMocks(this);
-        handler = new WriteFinalDecisionMidEventHandler(generateFile, TEMPLATE_ID);
+        this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
+        handler = new WriteFinalDecisionMidEventHandler(generateFile, idamClient, decisionNoticeOutcomeService, TEMPLATE_ID);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
+        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+
+        when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
@@ -194,9 +209,12 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void willSetPreviewFile() {
+    public void willSetPreviewFile_whenAppealAllowed() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -211,7 +229,160 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+    }
+
+    @Test
+    public void willSetPreviewFile_whenAppealRefused() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("lower");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("lower");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", false);
+    }
+
+    @Test
+    public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Unable to determine date of decision", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        when(userDetails.getFullName()).thenReturn(null);
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Unable to obtain signed in user name", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        when(idamClient.getUserDetails("Bearer token")).thenReturn(null);
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Unable to obtain signed in user details", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -236,6 +407,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
@@ -255,7 +429,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
         assertEquals("venue 2 name", payload.getHeldAt());
 
@@ -265,6 +439,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
@@ -289,6 +466,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
@@ -313,6 +493,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .venue(Venue.builder().name("venue 1 name").build()).build()).build();
@@ -333,6 +516,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .venue(Venue.builder().name("venue 1 name").build()).build()).build();
@@ -356,6 +542,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithEmptyHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         List<Hearing> hearings = new ArrayList<>();
         sscsCaseData.setHearings(hearings);
@@ -374,6 +563,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithNullHearingsList_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -389,6 +581,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build();
@@ -408,7 +603,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
         assertEquals("2019-01-02", payload.getHeldOn().toString());
 
@@ -418,6 +613,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build();
@@ -443,6 +641,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01")
@@ -468,6 +669,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithNullHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -483,6 +687,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
         sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
@@ -500,9 +707,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals("Judge Name Placeholder, Mr Panel Member 1 and Ms Panel Member 2", payload.getHeldBefore());
+        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", payload.getHeldBefore());
 
     }
 
@@ -510,6 +717,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
 
@@ -525,9 +735,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals("Judge Name Placeholder and Mr Panel Member 1", payload.getHeldBefore());
+        assertEquals("Judge Full Name and Mr Panel Member 1", payload.getHeldBefore());
 
     }
 
@@ -535,6 +745,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void givenCaseWithNoPanelMembers_thenCorrectlySetTheHeldBefore() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -548,9 +761,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals("Judge Name Placeholder", payload.getHeldBefore());
+        assertEquals("Judge Full Name", payload.getHeldBefore());
 
     }
 
@@ -558,6 +771,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
     public void scottishRpcWillShowAScottishImage() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
 
@@ -566,13 +782,16 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname");
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
     }
 
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
             .name(Name.builder().firstName("APPOINTEE")
@@ -587,15 +806,19 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname");
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "2018-10-10", true);
     }
 
-    private DirectionOrDecisionIssuedTemplateBody verifyTemplateBody(String image, String expectedName) {
+    private DirectionOrDecisionIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String dateOfDecision, boolean allowed) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
+        assertEquals(dateOfDecision, payload.getDateOfDecision());
+        assertEquals(allowed, payload.isAllowed());
+        assertEquals(allowed, payload.isSetAside());
+
         return payload;
     }
 }

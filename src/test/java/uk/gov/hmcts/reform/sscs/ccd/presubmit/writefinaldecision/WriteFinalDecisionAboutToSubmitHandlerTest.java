@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -38,20 +39,23 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() throws IOException {
         initMocks(this);
         decisionNoticeQuestionService = new DecisionNoticeQuestionService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService);
+        decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService,
+            decisionNoticeOutcomeService);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
-            .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(Higher.name())
-            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(Higher.name())
+            .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(Higher.getKey())
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(Higher.getKey())
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -64,16 +68,16 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "Higher, Higher, decisionInFavourOfAppellant",
-            "Higher, Same, decisionInFavourOfAppellant",
-            "Higher, Lower, decisionInFavourOfAppellant",
-            "Same, Higher, decisionInFavourOfAppellant",
-            "Same, Same, decisionUpheld",
-            "Same, Lower, decisionUpheld",
-            "Lower, Higher, decisionInFavourOfAppellant",
-            "Lower, Same, decisionUpheld",
-            "Lower, Lower, decisionUpheld"})
-    public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigher_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility, String expectedOutcome) {
+            "higher, higher, decisionInFavourOfAppellant",
+            "higher, same, decisionInFavourOfAppellant",
+            "higher, lower, decisionUpheld",
+            "same, higher, decisionInFavourOfAppellant",
+            "same, same, decisionUpheld",
+            "same, lower, decisionUpheld",
+            "lower, higher, decisionUpheld",
+            "lower, same, decisionUpheld",
+            "lower, lower, decisionUpheld"})
+    public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigherAndNeitherIsLower_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility, String expectedOutcome) {
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving);
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);

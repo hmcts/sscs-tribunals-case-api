@@ -28,6 +28,7 @@
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
       "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "higher",
+      "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "2018-10-10",
       "writeFinalDecisionEndDate": "2018-10-10",
       "writeFinalDecisionGenerateNotice": "Yes",
@@ -763,6 +764,7 @@
     "case_data": {
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
+      "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "2018-10-10",
       "writeFinalDecisionEndDate": "2018-10-10",
       "writeFinalDecisionGenerateNotice": "Yes",
