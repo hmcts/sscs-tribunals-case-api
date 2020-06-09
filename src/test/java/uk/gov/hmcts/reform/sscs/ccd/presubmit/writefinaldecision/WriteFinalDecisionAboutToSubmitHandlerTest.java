@@ -5,7 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate.Higher;
 
 import java.io.IOException;
@@ -84,7 +83,6 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(expectedOutcome, response.getData().getOutcome());
-        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
     }
 
     @Test
