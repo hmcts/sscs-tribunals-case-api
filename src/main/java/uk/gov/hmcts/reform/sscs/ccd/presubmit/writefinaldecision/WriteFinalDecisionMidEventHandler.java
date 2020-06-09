@@ -124,17 +124,22 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
-        } else if (Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome)) {
-            builder.isAllowed(true);
-            builder.isSetAside(true);
         } else {
-            builder.isAllowed(false);
-            builder.isSetAside(false);
+            builder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+            builder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
         }
 
-        builder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
+        if (caseData.getWriteFinalDecisionDateOfDecision() != null) {
+            builder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
+        }
 
         DirectionOrDecisionIssuedTemplateBody payload = builder.build();
+        validateRequiredProperties(payload);
+        return payload;
+    }
+
+
+    private void validateRequiredProperties(DirectionOrDecisionIssuedTemplateBody payload) {
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
             throw new IllegalStateException("Unable to determine hearing date or venue");
         } else if (payload.getHeldOn() == null) {
@@ -145,8 +150,6 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         if (payload.getDateOfDecision() == null) {
             throw new IllegalStateException("Unable to determine date of decision");
         }
-
-        return payload;
     }
 
     @Override
