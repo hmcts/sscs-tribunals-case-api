@@ -71,11 +71,7 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
     }
 
     private boolean isFileUploadedAPdf(List<SscsFurtherEvidenceDoc> draftSscsFurtherEvidenceDocuments) {
-        if (draftSscsFurtherEvidenceDocuments != null && !draftSscsFurtherEvidenceDocuments.isEmpty()) {
-            return draftSscsFurtherEvidenceDocuments.stream()
-                    .allMatch(this::isFileAPdf);
-        }
-        return false;
+        return draftSscsFurtherEvidenceDocuments.stream().allMatch(this::isFileAPdf);
     }
 
     private boolean isFileAPdf(SscsFurtherEvidenceDoc doc) {
