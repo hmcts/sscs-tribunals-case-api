@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_UPHELD;
 
@@ -52,8 +51,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
-
-        sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
 
         calculateOutcomeCode(sscsCaseData, preSubmitCallbackResponse);
 
