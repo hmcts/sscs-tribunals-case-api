@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -155,12 +156,20 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
 
     private String buildSignedInJudgeName(String userAuthorisation) {
-        return idamClient.getUserDetails(userAuthorisation).getFullName();
+        UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
+        if (userDetails == null) {
+            throw new IllegalStateException("Unable to obtain signed in user details");
+        }
+        return userDetails.getFullName();
     }
 
     private String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
         List<String> names = new ArrayList<>();
-        names.add(buildSignedInJudgeName(userAuthorisation));
+        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
+        if (signedInJudgeName == null) {
+            throw new IllegalStateException("Unable to obtain signed in user name");
+        }
+        names.add(signedInJudgeName);
         if (caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName() != null) {
             names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         }

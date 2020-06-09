@@ -233,6 +233,135 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
+    public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Unable to determine date of decision", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        when(userDetails.getFullName()).thenReturn(null);
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Unable to obtain signed in user name", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        when(idamClient.getUserDetails("Bearer token")).thenReturn(null);
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Unable to obtain signed in user details", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
+    public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
+        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+    }
+
+    @Test
     public void givenGenerateNoticeSetToNo_willNotSetPreviewFile() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("No");
