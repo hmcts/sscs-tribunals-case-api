@@ -21,22 +21,29 @@ public class DecisionNoticeOutcomeService {
             return null;
         } else {
 
-            ComparedRate dailyLivingComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-            ComparedRate mobilityComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+            try {
 
-            Set<ComparedRate> comparedRates = new HashSet<>();
-            comparedRates.add(dailyLivingComparedRate);
-            comparedRates.add(mobilityComparedRate);
+                ComparedRate dailyLivingComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+                ComparedRate mobilityComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
 
-            // At least one higher,  and non lower, means the decision is in favour of appellant
-            if (comparedRates.contains(ComparedRate.Higher)
-                && !comparedRates.contains(ComparedRate.Lower)) {
-                return DECISION_IN_FAVOUR_OF_APPELLANT;
-            } else {
-                // Otherwise, decision upheld
-                return DECISION_UPHELD;
+                Set<ComparedRate> comparedRates = new HashSet<>();
+                comparedRates.add(dailyLivingComparedRate);
+                comparedRates.add(mobilityComparedRate);
+
+                // At least one higher,  and non lower, means the decision is in favour of appellant
+                if (comparedRates.contains(ComparedRate.Higher)
+                    && !comparedRates.contains(ComparedRate.Lower)) {
+                    return DECISION_IN_FAVOUR_OF_APPELLANT;
+                } else {
+                    // Otherwise, decision upheld
+                    return DECISION_UPHELD;
+                }
+
+            } catch (IllegalArgumentException e) {
+                log.error(e.getMessage());
+                return null;
             }
-        }
 
+        }
     }
 }
