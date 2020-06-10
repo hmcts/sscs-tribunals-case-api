@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,7 +16,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
@@ -109,18 +107,6 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
         builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            Hearing finalHearing = caseData.getHearings().get(0);
-            if (finalHearing != null && finalHearing.getValue() != null) {
-                if (finalHearing.getValue().getHearingDate() != null) {
-                    builder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
-                }
-                if (finalHearing.getValue().getVenue() != null) {
-                    builder.heldAt(finalHearing.getValue().getVenue().getName());
-                }
-            }
-        }
-
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
@@ -140,13 +126,6 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
 
     private void validateRequiredProperties(DirectionOrDecisionIssuedTemplateBody payload) {
-        if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
-            throw new IllegalStateException("Unable to determine hearing date or venue");
-        } else if (payload.getHeldOn() == null) {
-            throw new IllegalStateException("Unable to determine hearing date");
-        } else if (payload.getHeldAt() == null) {
-            throw new IllegalStateException("Unable to determine hearing venue");
-        }
         if (payload.getDateOfDecision() == null) {
             throw new IllegalStateException("Unable to determine date of decision");
         }

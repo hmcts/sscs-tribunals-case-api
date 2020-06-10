@@ -13,9 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;
@@ -216,10 +214,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
@@ -239,10 +233,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("lower");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("lower");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -285,10 +275,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         when(userDetails.getFullName()).thenReturn(null);
 
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
@@ -307,10 +293,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         when(idamClient.getUserDetails("Bearer token")).thenReturn(null);
 
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
@@ -326,10 +308,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
@@ -349,11 +327,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
@@ -370,11 +343,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -401,286 +369,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
-
-        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-02").venue(Venue.builder().name("venue 2 name").build()).build()).build();
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
-
-        assertEquals("venue 2 name", payload.getHeldAt());
-
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
-
-        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-02").venue(Venue.builder().build()).build()).build();
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("venue 1 name").build()).build()).build();
-
-        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").build()).build();
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .venue(Venue.builder().name("venue 1 name").build()).build()).build();
-
-        Hearing hearing2 = null;
-
-        sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .venue(Venue.builder().name("venue 1 name").build()).build()).build();
-
-        Hearing hearing2 = Hearing.builder().build();
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithEmptyHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        List<Hearing> hearings = new ArrayList<>();
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithNullHearingsList_thenDisplayAnErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build();
-
-        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-02").venue(Venue.builder().name("Venue Name").build()).build()).build();
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
-
-        assertEquals("2019-01-02", payload.getHeldOn().toString());
-
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build();
-
-        Hearing hearing2 = Hearing.builder().value(HearingDetails.builder()
-            .venue(Venue.builder().name("Venue Name").build())
-            .build()).build();
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01")
-            .venue(Venue.builder().name("Venue Name").build()).build()).build();
-
-        Hearing hearing2 = null;
-
-        List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
-        sscsCaseData.setHearings(hearings);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithNullHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
     }
 
     @Test

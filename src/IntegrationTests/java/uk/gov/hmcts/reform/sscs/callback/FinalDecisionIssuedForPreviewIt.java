@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpSt
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,8 +78,6 @@ public class FinalDecisionIssuedForPreviewIt extends AbstractEventIt {
         assertEquals("An Test", payload.getAppellantFullName());
         assertEquals("12345656789", payload.getCaseId());
         assertEquals("JT 12 34 56 D", payload.getNino());
-        assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
-        assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
