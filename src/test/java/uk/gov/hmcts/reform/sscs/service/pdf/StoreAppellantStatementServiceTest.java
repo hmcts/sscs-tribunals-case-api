@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.pdf;
 
 import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.powermock.api.mockito.PowerMockito.doReturn;
@@ -15,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.quality.Strictness;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.Statement;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -34,10 +34,10 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.AppellantStatementPdfData;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockRunnerDelegate(JUnitParamsRunner.class)
+@RunWith(JUnitParamsRunner.class)
 @PrepareForTest(value = {StoreAppellantStatementService.class})
 @PowerMockIgnore({"javax.net.ssl.*", "javax.security.*"})
+@ExtendWith(MockitoExtension.class)
 public class StoreAppellantStatementServiceTest {
 
     private static final String APPELLANT_STATEMENT_1 = "Appellant statement 1 - ";
@@ -50,7 +50,7 @@ public class StoreAppellantStatementServiceTest {
     private static final String OTHER_EVIDENCE = "Other evidence";
 
     @Rule
-    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
+    public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.WARN);
 
     @Mock
     private PdfService pdfService;
