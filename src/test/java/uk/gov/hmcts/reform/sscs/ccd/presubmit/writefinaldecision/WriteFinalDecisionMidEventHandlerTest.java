@@ -229,6 +229,13 @@ public class WriteFinalDecisionMidEventHandlerTest {
     @Test
     public void willSetPreviewFile_whenAppealAllowed() {
 
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround",
+            "planningAndFollowing"));
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
+        sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion("planningAndFollowing11f");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
@@ -247,7 +254,33 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody body = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        assertEquals("2018-10-10",body.getStartDate());
+        assertEquals("2018-11-10",body.getEndDate());
+        assertEquals(false, body.isIndefinite());
+        assertEquals(true, body.isMobilityIsEntited());
+        assertEquals(true, body.isMobilityIsSeverelyLimited());
+        assertEquals("enhanced rate", body.getMobilityAwardRate());
+        Assert.assertNotNull(body.getMobilityDescriptors());
+        assertEquals(2, body.getMobilityDescriptors().size());
+        Assert.assertNotNull(body.getMobilityDescriptors().get(0));
+        assertEquals(12, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("f", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
+        Assert.assertNotNull(body.getMobilityDescriptors().get(1));
+        assertEquals(12, body.getMobilityDescriptors().get(1).getActivityAnswerPoints());
+        assertEquals("f", body.getMobilityDescriptors().get(1).getActivityAnswerLetter());
+        assertEquals("Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid.", body.getMobilityDescriptors().get(1).getActivityAnswerValue());
+        assertEquals("Planning and following journeys", body.getMobilityDescriptors().get(1).getActivityQuestionValue());
+        assertEquals("11", body.getMobilityDescriptors().get(1).getActivityQuestionNumber());
+        Assert.assertNotNull(body.getMobilityNumberOfPoints());
+        assertEquals(24, body.getMobilityNumberOfPoints().intValue());
+        assertEquals(false, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        Assert.assertNull(body.getDailyLivingAwardRate());
+        Assert.assertNull(body.getDailyLivingDescriptors());
     }
 
     @Test

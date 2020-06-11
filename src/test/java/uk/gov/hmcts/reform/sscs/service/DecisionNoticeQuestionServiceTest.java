@@ -19,11 +19,14 @@ public class DecisionNoticeQuestionServiceTest {
     }
 
     @Test
-    public void givenASelectedAnswerForADecisionNoticeQuestion_thenExtractThePointsFromTheText() {
+    public void givenASelectedAnswerForADecisionNoticeQuestion_thenExtractTheAnswerFromTheText() {
         Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue("preparingFood1f");
         Assert.assertNotNull(answer);
         Assert.assertTrue(answer.isPresent());
         assertEquals(8, answer.get().getActivityAnswerPoints());
+        assertEquals("1", answer.get().getActivityAnswerNumber());
+        assertEquals("f", answer.get().getActivityAnswerLetter());
+        assertEquals("Cannot prepare and cook food.", answer.get().getActivityAnswerValue());
     }
 
     @Test

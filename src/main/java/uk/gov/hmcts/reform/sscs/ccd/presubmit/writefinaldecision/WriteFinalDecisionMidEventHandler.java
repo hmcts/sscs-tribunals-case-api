@@ -149,6 +149,18 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         builder.startDate(caseData.getWriteFinalDecisionStartDate());
         builder.appellantName(buildName(caseData));
 
+        setEntitlements(builder, caseData);
+
+        setDescriptorsAndPoints(builder, caseData);
+
+        DirectionOrDecisionIssuedTemplateBody payload = builder.build();
+        validateRequiredProperties(payload);
+
+        return payload;
+    }
+
+    private void setEntitlements(DirectionOrDecisionIssuedTemplateBodyBuilder builder, SscsCaseData caseData) {
+
         String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
         String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
 
@@ -177,13 +189,6 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             builder.mobilityIsEntited(false);
             builder.mobilityIsSeverelyLimited(false);
         }
-
-        setDescriptorsAndPoints(builder, caseData);
-
-        DirectionOrDecisionIssuedTemplateBody payload = builder.build();
-        validateRequiredProperties(payload);
-
-        return payload;
     }
 
     protected void setDescriptorsAndPoints(DirectionOrDecisionIssuedTemplateBodyBuilder builder, SscsCaseData caseData) {
