@@ -15,7 +15,6 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -546,7 +545,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
         assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
-        assertEquals("In-chambers", payload.getHeldAt());
+        assertEquals("In chambers", payload.getHeldAt());
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
@@ -565,7 +564,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
         assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
-        assertEquals("In-chambers", payload.getHeldAt());
+        assertEquals("In chambers", payload.getHeldAt());
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }

@@ -123,7 +123,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             }
         } else {
             builder.heldOn(LocalDate.now());
-            builder.heldAt("In-chambers");
+            builder.heldAt("In chambers");
         }
 
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
