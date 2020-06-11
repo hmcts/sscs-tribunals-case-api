@@ -17,8 +17,8 @@ public class CitizenIdamService {
 
     @Autowired
     CitizenIdamService(IdamClient idamApiClient,
-                       @Value("${idam.oauth2.client.id}") String idamOauth2ClientId,
-                       @Value("${idam.oauth2.client.secret}") String idamOauth2ClientSecret,
+                       @Value("${idam.client.id}") String idamOauth2ClientId,
+                       @Value("${idam.client.secret}") String idamOauth2ClientSecret,
                        @Value("${idam.oauth2.redirectUrl}") String idamOauth2RedirectUrl
     ) {
         this.idamApiClient = idamApiClient;

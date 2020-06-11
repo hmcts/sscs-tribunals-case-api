@@ -1,8 +1,8 @@
 {
   "case_details": {
-    "id": 12345656789,
+    "id": "1234567899",
     "jurisdiction": "SSCS",
-    "state": "dormantAppealState",
+    "state": "validAppeal",
     "case_type_id": "Benefit",
     "created_date": [
       2018,
@@ -24,17 +24,42 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
-      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
-      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "higher",
-      "writeFinalDecisionStartDate": "2018-10-10",
-      "writeFinalDecisionEndDate": "2018-10-10",
+      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "same",
+      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "same",
+      "pipWriteFinalDecisionDailyLivingActivitiesQuestion": [
+        "preparingFood",
+        "takingNutrition"
+      ],
+      "pipWriteFinalDecisionDailyLivingQuestion": "standardRate",
+      "pipWriteFinalDecisionMobilityActivitiesQuestion": [
+        "planningAndFollowing"
+      ],
+      "pipWriteFinalDecisionMobilityQuestion": "standardRate",
+      "pipWriteFinalDecisionPlanningAndFollowingQuestion": "planningAndFollowing11d",
+      "pipWriteFinalDecisionPreparingFoodQuestion": "preparingFood1f",
+      "pipWriteFinalDecisionTakingNutritionQuestion": "takingNutrition2b",
+      "writeFinalDecisionDateOfDecision": "2020-06-01",
+      "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Fred",
+      "writeFinalDecisionEndDate": "2020-10-10",
+      "writeFinalDecisionEndDateType": "setEndDate",
       "writeFinalDecisionGenerateNotice": "Yes",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Ted",
+      "writeFinalDecisionPageSectionReference": "B2",
+      "writeFinalDecisionPresentingAppellantAttendedQuestion": "Yes",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
+      "writeFinalDecisionReasonsForDecision": "Because appellant has trouble walking",
+      "writeFinalDecisionStartDate": "2019-10-10",
+      "writeFinalDecisionTypeOfHearing": "telephone",
       "writeFinalDecisionPreviewDocument": {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
         "document_filename": "decisionIssued.pdf"
+      },
+      "subscriptions": {
+        "appellantSubscription": {},
+        "appointeeSubscription": {},
+        "representativeSubscription": {},
+        "supporterSubscription": {}
       },
       "dwpTimeExtension": [
       ],
@@ -116,20 +141,6 @@
               "document_url": "http://www.itv.com",
               "document_binary_url": "http://www.itv.com/binary",
               "document_filename": "myfile2.jpg"
-            }
-          }
-        },
-        {
-          "value": {
-            "documentType": "decisionIssued",
-            "documentFileName": "oldDecisionIssued.pdf",
-            "documentDateAdded": "2018-10-12",
-            "evidenceIssued": "Yes",
-            "bundleAddition": "A",
-            "documentLink": {
-              "document_url": "http://www.itv3.com",
-              "document_binary_url": "http://www.itv3.com/binary",
-              "document_filename": "myfile3.jpg"
             }
           }
         }
@@ -853,20 +864,6 @@
               "document_url": "http://www.itv.com",
               "document_binary_url": "http://www.itv.com/binary",
               "document_filename": "myfile2.jpg"
-            }
-          }
-        },
-        {
-          "value": {
-            "documentType": "decisionIssued",
-            "documentFileName": "oldDecisionIssued.pdf",
-            "documentDateAdded": "2018-10-12",
-            "evidenceIssued": "Yes",
-            "bundleAddition": "A",
-            "documentLink": {
-              "document_url": "http://www.itv3.com",
-              "document_binary_url": "http://www.itv3.com/binary",
-              "document_filename": "myfile3.jpg"
             }
           }
         }
