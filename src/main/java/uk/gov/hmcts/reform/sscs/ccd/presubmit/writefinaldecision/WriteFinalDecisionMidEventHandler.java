@@ -181,7 +181,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             builder.mobilityIsEntited(true);
             builder.mobilityAwardRate("enhanced rate");
             builder.mobilityIsSeverelyLimited(true);
-        } else if (AwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
+        } else if (AwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
             builder.mobilityIsEntited(true);
             builder.mobilityAwardRate("standard rate");
             builder.mobilityIsSeverelyLimited(false);
