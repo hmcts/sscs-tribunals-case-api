@@ -48,6 +48,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionMidEventHandlerTest {
@@ -77,12 +78,16 @@ public class WriteFinalDecisionMidEventHandlerTest {
     private SscsCaseData sscsCaseData;
 
     private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    private DecisionNoticeQuestionService decisionNoticeQuestionService;
+
 
     @Before
     public void setUp() throws IOException {
         initMocks(this);
         this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
-        handler = new WriteFinalDecisionMidEventHandler(generateFile, idamClient, decisionNoticeOutcomeService, TEMPLATE_ID);
+        this.decisionNoticeQuestionService = new DecisionNoticeQuestionService();
+        handler = new WriteFinalDecisionMidEventHandler(generateFile, idamClient, decisionNoticeOutcomeService,
+            decisionNoticeQuestionService, TEMPLATE_ID);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

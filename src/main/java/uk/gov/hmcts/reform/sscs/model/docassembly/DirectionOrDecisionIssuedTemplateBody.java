@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
@@ -56,5 +57,32 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     private boolean isSetAside;
     @JsonProperty("date_of_decision")
     private String dateOfDecision;
-
+    @JsonProperty("is_indefinite")
+    private boolean isIndefinite;
+    @JsonProperty("appellant_name")
+    private String appellantName;
+    @JsonProperty("start_date")
+    private String startDate;
+    @JsonProperty("end_date")
+    private String endDate;
+    @JsonProperty("daily_living_is_entitled")
+    private boolean dailyLivingIsEntited;
+    @JsonProperty("daily_living_is_severely_limited")
+    private boolean dailyLivingIsSeverelyLimited;
+    @JsonProperty("daily_living_award_rate")
+    private String dailyLivingAwardRate;
+    @JsonProperty("daily_living_number_of_points")
+    private Integer dailyLivingNumberOfPoints;
+    @JsonProperty("mobility_is_entitled")
+    private boolean mobilityIsEntited;
+    @JsonProperty("mobility_is_severely_limited")
+    private boolean mobilityIsSeverelyLimited;
+    @JsonProperty("mobility_award_rate")
+    private String mobilityAwardRate;
+    @JsonProperty("mobility_number_of_points")
+    private Integer mobilityNumberOfPoints;
+    @JsonProperty("daily_living_descriptors")
+    private List<Descriptor> dailyLivingDescriptors;
+    @JsonProperty("mobility_descriptors")
+    private List<Descriptor> mobilityDescriptors;
 }

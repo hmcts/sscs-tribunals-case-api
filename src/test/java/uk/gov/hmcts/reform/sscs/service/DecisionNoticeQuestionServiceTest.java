@@ -3,8 +3,11 @@ package uk.gov.hmcts.reform.sscs.service;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.util.Optional;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 
 public class DecisionNoticeQuestionServiceTest {
 
@@ -17,22 +20,23 @@ public class DecisionNoticeQuestionServiceTest {
 
     @Test
     public void givenASelectedAnswerForADecisionNoticeQuestion_thenExtractThePointsFromTheText() {
-        int points = service.extractPointsFromSelectedValue("preparingFood1f");
-
-        assertEquals(8, points);
+        Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue("preparingFood1f");
+        Assert.assertNotNull(answer);
+        Assert.assertTrue(answer.isPresent());
+        assertEquals(8, answer.get().getActivityAnswerPoints());
     }
 
     @Test
-    public void givenANonMatchedNumber_thenReturn0Points() {
-        int points = service.extractPointsFromSelectedValue("random");
-
-        assertEquals(0, points);
+    public void givenANonMatchedNumber_thenReturnEmptyAnswer() {
+        Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue("random");
+        Assert.assertNotNull(answer);
+        Assert.assertFalse(answer.isPresent());
     }
 
     @Test
-    public void givenANullNumber_thenReturn0Points() {
-        int points = service.extractPointsFromSelectedValue(null);
-
-        assertEquals(0, points);
+    public void givenANullNumber_thenReturnEmptyAnswer() {
+        Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue(null);
+        Assert.assertNotNull(answer);
+        Assert.assertFalse(answer.isPresent());
     }
 }
