@@ -9,12 +9,11 @@ buildscript {
 
 plugins {
     id 'application'
-    id 'checkstyle'
     id 'pmd'
     id 'org.sonarqube' version '2.8'
     id 'jacoco'
     id 'org.springframework.boot' version '2.3.0.RELEASE'
-    id 'org.owasp.dependencycheck' version '5.3.2.1'
+    id 'uk.gov.hmcts.java' version '0.5.0'
     id 'com.github.ben-manes.versions' version '0.28.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.5.1'
@@ -39,13 +38,6 @@ compileTestJava {
 }
 
 mainClassName = 'uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication'
-
-checkstyle {
-    maxWarnings = 0
-    toolVersion = '8.29'
-    // need to set configDir to rootDir otherwise submodule will use submodule/config/checkstyle
-    configDir = new File(rootDir, 'config/checkstyle')
-}
 
 pmd {
     toolVersion = "6.5.0"
@@ -130,14 +122,7 @@ dependencyUpdates.resolutionStrategy = {
 
 // https://jeremylong.github.io/DependencyCheck/dependency-check-gradle/configuration.html
 dependencyCheck {
-    // Specifies if the build should be failed if a CVSS score above a specified level is identified.
-    // range of 0-10 fails the build, anything greater and it doesn't fail the build
-    failBuildOnCVSS = System.getProperty('dependencyCheck.failBuild') == 'true' ? 0 : 11
     suppressionFile = 'dependency-check-suppressions.xml'
-    analyzers {
-        // Disable scanning of .NET related binaries
-        assemblyEnabled = false
-    }
 }
 
 repositories {
