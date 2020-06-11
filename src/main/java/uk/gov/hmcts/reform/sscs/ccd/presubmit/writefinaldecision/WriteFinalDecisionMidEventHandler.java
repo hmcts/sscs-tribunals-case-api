@@ -178,12 +178,21 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
             builder.mobilityIsSeverelyLimited(false);
         }
 
+        setDescriptorsAndPoints(builder, caseData);
+
+        DirectionOrDecisionIssuedTemplateBody payload = builder.build();
+        validateRequiredProperties(payload);
+
+        return payload;
+    }
+
+    protected void setDescriptorsAndPoints(DirectionOrDecisionIssuedTemplateBodyBuilder builder, SscsCaseData caseData) {
         List<String> dailyLivingAnswers = ActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
         if (dailyLivingAnswers != null) {
 
             List<Descriptor> dailyLivingDescriptors = getDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
 
-            builder.dailyLivingNumberOfPoints(dailyLivingDescriptors.stream().mapToInt(descriptor -> descriptor.getActivityAnswerPoints()).sum());
+            builder.dailyLivingNumberOfPoints(dailyLivingDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
 
             builder.dailyLivingDescriptors(dailyLivingDescriptors);
         }
@@ -194,13 +203,8 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
             builder.mobilityDescriptors(mobilityDescriptors);
 
-            builder.mobilityNumberOfPoints(mobilityDescriptors.stream().mapToInt(descriptor -> descriptor.getActivityAnswerPoints()).sum());
+            builder.mobilityNumberOfPoints(mobilityDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
         }
-
-        DirectionOrDecisionIssuedTemplateBody payload = builder.build();
-        validateRequiredProperties(payload);
-
-        return payload;
     }
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {

@@ -51,12 +51,16 @@ public class DecisionNoticeQuestionService {
             Pattern p = Pattern.compile("(\\d+)([a-z])\\. (.*)\\((\\d+)(?!.*\\d)");
             Matcher m = p.matcher(answerText);
             if (m.find()) {
-                ActivityAnswer answer = ActivityAnswer.builder()
-                    .activityAnswerNumber(m.group(1))
-                    .activityAnswerLetter(m.group(2))
-                    .activityAnswerValue(m.group(3))
-                    .activityAnswerPoints(Integer.parseInt(m.group(4))).build();
-                return Optional.of(answer);
+                if (m.groupCount() == 4) {
+                    ActivityAnswer answer = ActivityAnswer.builder()
+                        .activityAnswerNumber(m.group(1))
+                        .activityAnswerLetter(m.group(2))
+                        .activityAnswerValue(m.group(3).trim())
+                        .activityAnswerPoints(Integer.parseInt(m.group(4))).build();
+                    return Optional.of(answer);
+                } else {
+                    throw new IllegalStateException("Unable to extract answer from submission");
+                }
             }
         }
         return Optional.empty();
@@ -65,7 +69,6 @@ public class DecisionNoticeQuestionService {
     private String findSelectedAnswerInJson(String selectedValue) {
         for (int i = 0; i < decisionNoticeJson.length(); ++i) {
             JSONObject obj = decisionNoticeJson.getJSONObject(i);
-            System.out.println(obj);
             String id = obj.getString("ListElementCode");
             if (id.equals(selectedValue)) {
                 return obj.getString("ListElement");

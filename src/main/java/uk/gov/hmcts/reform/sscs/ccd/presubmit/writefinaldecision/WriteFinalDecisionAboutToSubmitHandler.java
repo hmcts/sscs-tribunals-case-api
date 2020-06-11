@@ -92,7 +92,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         int totalPoints = pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData)
             .stream().map(answerText -> decisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
-                answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(answer -> answer.getActivityAnswerPoints()).sum();
+                answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
 
         return pointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
             Optional.of(pointsCondition.getErrorMessage());
