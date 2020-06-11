@@ -130,6 +130,9 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
                     builder.heldAt(finalHearing.getValue().getVenue().getName());
                 }
             }
+        } else {
+            builder.heldOn(LocalDate.now());
+            builder.heldAt("In chambers");
         }
 
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);

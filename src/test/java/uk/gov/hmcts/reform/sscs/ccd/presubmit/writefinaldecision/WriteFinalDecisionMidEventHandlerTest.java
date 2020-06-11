@@ -1,13 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
@@ -20,7 +15,6 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -262,21 +256,20 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(true, body.isMobilityIsEntited());
         assertEquals(true, body.isMobilityIsSeverelyLimited());
         assertEquals("enhanced rate", body.getMobilityAwardRate());
-        Assert.assertNotNull(body.getMobilityDescriptors());
-        assertEquals(2, body.getMobilityDescriptors().size());
-        Assert.assertNotNull(body.getMobilityDescriptors().get(0));
+        assertNotNull(body.getMobilityDescriptors());
+        assertNotNull(body.getMobilityDescriptors().get(0));
         assertEquals(12, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
         assertEquals("f", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
         assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
         assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(body.getMobilityDescriptors().get(1));
+        assertNotNull(body.getMobilityDescriptors().get(1));
         assertEquals(12, body.getMobilityDescriptors().get(1).getActivityAnswerPoints());
         assertEquals("f", body.getMobilityDescriptors().get(1).getActivityAnswerLetter());
         assertEquals("Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid.", body.getMobilityDescriptors().get(1).getActivityAnswerValue());
         assertEquals("Planning and following journeys", body.getMobilityDescriptors().get(1).getActivityQuestionValue());
         assertEquals("11", body.getMobilityDescriptors().get(1).getActivityQuestionNumber());
-        Assert.assertNotNull(body.getMobilityNumberOfPoints());
+        assertNotNull(body.getMobilityNumberOfPoints());
         assertEquals(24, body.getMobilityNumberOfPoints().intValue());
         assertEquals(false, body.isDailyLivingIsEntited());
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
@@ -317,15 +310,15 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(true, body.isMobilityIsEntited());
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertEquals("standard rate", body.getMobilityAwardRate());
-        Assert.assertNotNull(body.getMobilityDescriptors());
+        assertNotNull(body.getMobilityDescriptors());
         assertEquals(1, body.getMobilityDescriptors().size());
-        Assert.assertNotNull(body.getMobilityDescriptors().get(0));
+        assertNotNull(body.getMobilityDescriptors().get(0));
         assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
         assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
         assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
         assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
         assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(body.getMobilityNumberOfPoints());
+        assertNotNull(body.getMobilityNumberOfPoints());
         assertEquals(10, body.getMobilityNumberOfPoints().intValue());
         assertEquals(false, body.isDailyLivingIsEntited());
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
@@ -368,21 +361,21 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(true, body.isMobilityIsEntited());
         assertEquals(true, body.isMobilityIsSeverelyLimited());
         assertEquals("enhanced rate", body.getMobilityAwardRate());
-        Assert.assertNotNull(body.getMobilityDescriptors());
+        assertNotNull(body.getMobilityDescriptors());
         assertEquals(2, body.getMobilityDescriptors().size());
-        Assert.assertNotNull(body.getMobilityDescriptors().get(0));
+        assertNotNull(body.getMobilityDescriptors().get(0));
         assertEquals(12, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
         assertEquals("f", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
         assertEquals("Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
         assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
         assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(body.getMobilityDescriptors().get(1));
+        assertNotNull(body.getMobilityDescriptors().get(1));
         assertEquals(12, body.getMobilityDescriptors().get(1).getActivityAnswerPoints());
         assertEquals("f", body.getMobilityDescriptors().get(1).getActivityAnswerLetter());
         assertEquals("Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid.", body.getMobilityDescriptors().get(1).getActivityAnswerValue());
         assertEquals("Planning and following journeys", body.getMobilityDescriptors().get(1).getActivityQuestionValue());
         assertEquals("11", body.getMobilityDescriptors().get(1).getActivityQuestionNumber());
-        Assert.assertNotNull(body.getMobilityNumberOfPoints());
+        assertNotNull(body.getMobilityNumberOfPoints());
         assertEquals(24, body.getMobilityNumberOfPoints().intValue());
         assertEquals(false, body.isDailyLivingIsEntited());
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
@@ -422,15 +415,15 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(true, body.isMobilityIsEntited());
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertEquals("standard rate", body.getMobilityAwardRate());
-        Assert.assertNotNull(body.getMobilityDescriptors());
+        assertNotNull(body.getMobilityDescriptors());
         assertEquals(1, body.getMobilityDescriptors().size());
-        Assert.assertNotNull(body.getMobilityDescriptors().get(0));
+        assertNotNull(body.getMobilityDescriptors().get(0));
         assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
         assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
         assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
         assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
         assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(body.getMobilityNumberOfPoints());
+        assertNotNull(body.getMobilityNumberOfPoints());
         assertEquals(10, body.getMobilityNumberOfPoints().intValue());
         assertEquals(false, body.isDailyLivingIsEntited());
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
@@ -479,7 +472,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine date of decision", error);
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -496,8 +488,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user name", error);
@@ -519,8 +509,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user details", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
@@ -539,8 +527,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
@@ -561,8 +547,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
@@ -588,7 +572,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -660,8 +643,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
@@ -686,8 +667,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setHearings(hearings);
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
@@ -736,8 +715,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
@@ -745,7 +722,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void givenCaseWithEmptyHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithEmptyHearingsList_thenDefaultHearingData() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
@@ -757,16 +734,17 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertTrue(response.getErrors().isEmpty());
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
+        assertEquals("In chambers", payload.getHeldAt());
 
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
-    public void givenCaseWithNullHearingsList_thenDisplayAnErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithNullHearingsList_thenDefaultHearingData() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
@@ -775,12 +753,14 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertTrue(response.getErrors().isEmpty());
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
+        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
+        assertEquals("In chambers", payload.getHeldAt());
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -835,12 +815,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
     }
 
     @Test
@@ -867,24 +844,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithNullHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
     }
