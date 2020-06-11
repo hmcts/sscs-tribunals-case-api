@@ -37,8 +37,6 @@ public class IssueFinalDecisionIt extends AbstractEventIt {
 
     @Test
     public void callToAboutToSubmitHandler_willMoveDraftDecisionToDecisionNotice() throws Exception {
-        String documentUrl = "document.url";
-
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());

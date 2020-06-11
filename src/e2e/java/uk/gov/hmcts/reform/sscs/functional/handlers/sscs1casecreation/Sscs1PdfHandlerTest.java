@@ -4,11 +4,7 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.http.ContentType;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -42,7 +39,7 @@ public class Sscs1PdfHandlerTest {
     @Test
     public void hitCallback() throws IOException {
 
-        String body = getJsonCallbackForTest();
+        String body = BaseHandler.getJsonCallbackForTest("handlers/validappeal/validAppealCreatedCallback.json");
 
         given()
             .contentType(ContentType.JSON)
@@ -58,9 +55,4 @@ public class Sscs1PdfHandlerTest {
             .assertThat().body("data.sscsDocument[0].value.documentType", equalTo("sscs1"));
     }
 
-    private String getJsonCallbackForTest() throws IOException {
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("handlers/validappeal/validAppealCreatedCallback.json")).getFile();
-        return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
-    }
 }

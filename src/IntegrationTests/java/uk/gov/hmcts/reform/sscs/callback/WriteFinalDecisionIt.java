@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -31,7 +32,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class FinalDecisionIssuedForPreviewIt extends AbstractEventIt {
+public class WriteFinalDecisionIt extends AbstractEventIt {
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
@@ -53,7 +54,7 @@ public class FinalDecisionIssuedForPreviewIt extends AbstractEventIt {
 
     @Before
     public void setup() throws IOException {
-        setup("callback/finalDecisionIssuedForPreview.json");
+        setup("callback/writeFinalDecision.json");
     }
 
     @Test
@@ -85,8 +86,16 @@ public class FinalDecisionIssuedForPreviewIt extends AbstractEventIt {
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
+    }
 
+    @Test
+    public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCase() throws Exception {
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
 
+        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
     }
 }
