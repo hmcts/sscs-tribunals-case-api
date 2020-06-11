@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils.isBlank;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +103,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     }
 
     private boolean isDecisionNoticeDateOfDecisionInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWriteFinalDecisionDateOfDecision() != null) {
+        if (!isBlank(sscsCaseData.getWriteFinalDecisionDateOfDecision())) {
             LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionDateOfDecision());
             LocalDate today = LocalDate.now();
             return decisionNoticeDecisionDate.isAfter(today);

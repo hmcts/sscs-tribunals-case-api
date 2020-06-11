@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -174,6 +175,18 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         LocalDate yesterday = LocalDate.now().plusDays(-1);
         sscsCaseData.setWriteFinalDecisionDateOfDecision(yesterday.toString());
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    @Parameters({"null", ""})
+    public void givenAnFinalDecisionDateIsEmpty_thenIgnoreEndDate(@Nullable String endDate) {
+        sscsCaseData.setWriteFinalDecisionDateOfDecision(endDate);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
