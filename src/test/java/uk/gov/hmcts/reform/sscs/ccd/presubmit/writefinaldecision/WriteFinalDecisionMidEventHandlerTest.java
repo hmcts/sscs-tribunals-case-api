@@ -1,12 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
@@ -19,7 +15,6 @@ import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -282,11 +277,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine date of decision", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -304,11 +297,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user name", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -326,11 +317,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user details", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -347,11 +336,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -369,11 +356,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -391,11 +376,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -405,7 +388,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -413,7 +396,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -467,11 +450,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
     }
 
@@ -494,11 +475,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
     }
 
@@ -521,7 +500,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
     }
 
@@ -543,16 +522,14 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
     }
 
     @Test
-    public void givenCaseWithEmptyHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithEmptyHearingsList_thenDefaultHearingData() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
@@ -564,16 +541,17 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertTrue(response.getErrors().isEmpty());
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
+        assertEquals("In chambers", payload.getHeldAt());
 
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
-    public void givenCaseWithNullHearingsList_thenDisplayAnErrorAndDoNotGenerateDocument() {
+    public void givenCaseWithNullHearingsList_thenDefaultHearingData() {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
@@ -582,12 +560,13 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertTrue(response.getErrors().isEmpty());
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
+        assertEquals("In chambers", payload.getHeldAt());
 
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -642,12 +621,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -669,31 +645,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-    }
-
-    @Test
-    public void givenCaseWithNullHearingsList_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine hearing date or venue", error);
-        Assert.assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
-
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
