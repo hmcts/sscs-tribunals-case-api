@@ -48,7 +48,7 @@ public class DecisionNoticeQuestionService {
         String answerText = findSelectedAnswerInJson(selectedValue);
 
         if (answerText != null) {
-            @SuppressWarnings(value = "squid:S4784")
+            @SuppressWarnings(value = "java:S4784")
             Pattern p = Pattern.compile("(\\d+)([a-z])\\. (.*)\\((\\d+)(?!.*\\d)");
             Matcher m = p.matcher(answerText);
             if (m.find()) {
