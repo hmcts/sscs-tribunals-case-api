@@ -119,8 +119,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
-
-        DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
+        final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
