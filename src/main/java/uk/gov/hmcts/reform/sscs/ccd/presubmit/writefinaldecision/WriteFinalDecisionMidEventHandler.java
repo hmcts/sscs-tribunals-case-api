@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTempl
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.util.StringUtils;
+
 
 @Component
 @Slf4j
@@ -167,26 +170,32 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
         String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
 
+        if (dailyLivingAwardType != null) {
+            builder.dailyLivingAwardRate(join(
+                splitByCharacterTypeCamelCase(dailyLivingAwardType), ' ').toLowerCase());
+        }
+
         if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
             builder.dailyLivingIsEntited(true);
-            builder.dailyLivingAwardRate("enhanced rate");
             builder.dailyLivingIsSeverelyLimited(true);
         } else if (AwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
             builder.dailyLivingIsEntited(true);
-            builder.dailyLivingAwardRate("standard rate");
             builder.dailyLivingIsSeverelyLimited(false);
         } else {
             builder.dailyLivingIsEntited(false);
             builder.dailyLivingIsSeverelyLimited(false);
         }
 
+        if (mobilityAwardType != null) {
+            builder.mobilityAwardRate(join(
+                splitByCharacterTypeCamelCase(mobilityAwardType), ' ').toLowerCase());
+        }
+
         if (AwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
             builder.mobilityIsEntited(true);
-            builder.mobilityAwardRate("enhanced rate");
             builder.mobilityIsSeverelyLimited(true);
         } else if (AwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
             builder.mobilityIsEntited(true);
-            builder.mobilityAwardRate("standard rate");
             builder.mobilityIsSeverelyLimited(false);
         } else {
             builder.mobilityIsEntited(false);
