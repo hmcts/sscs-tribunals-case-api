@@ -326,6 +326,55 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertNull(body.getDailyLivingDescriptors());
     }
 
+    @Test
+    public void willSetPreviewFile_whenAppealAllowedAtDailyLivingFiniteTimeStandardRate() {
+
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
+        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody body = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        assertEquals("2018-10-10",body.getStartDate());
+        assertEquals("2018-11-10",body.getEndDate());
+        assertEquals(false, body.isIndefinite());
+        assertEquals(true, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertEquals("standard rate", body.getDailyLivingAwardRate());
+        assertNotNull(body.getDailyLivingDescriptors());
+        assertEquals(1, body.getDailyLivingDescriptors().size());
+        assertNotNull(body.getDailyLivingDescriptors().get(0));
+        assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getDailyLivingNumberOfPoints());
+        assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
+        assertEquals(false, body.isMobilityIsEntited());
+        assertEquals(false, body.isMobilityIsSeverelyLimited());
+        assertNull(body.getMobilityAwardRate());
+        assertNull(body.getMobilityDescriptors());
+    }
+
 
     @Test
     public void willSetPreviewFile_whenAppealAllowedAtIndefiniteEnhancedRate() {
