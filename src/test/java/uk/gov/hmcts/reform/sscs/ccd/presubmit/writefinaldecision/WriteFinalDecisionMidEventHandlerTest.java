@@ -43,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
@@ -249,7 +250,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody body = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
         assertEquals("2018-10-10",body.getStartDate());
         assertEquals("2018-11-10",body.getEndDate());
         assertEquals(false, body.isIndefinite());
@@ -303,7 +306,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody body = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
         assertEquals("2018-10-10",body.getStartDate());
         assertEquals("2018-11-10",body.getEndDate());
         assertEquals(false, body.isIndefinite());
@@ -352,7 +358,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody body = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
         assertEquals("2018-10-10",body.getStartDate());
         assertEquals("2018-11-10",body.getEndDate());
         assertEquals(false, body.isIndefinite());
@@ -403,7 +411,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody body = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
         assertEquals("2018-10-10",body.getStartDate());
         assertNull(body.getEndDate());
         assertEquals(true, body.isIndefinite());
@@ -457,7 +468,9 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody body = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
         assertEquals("2018-10-10",body.getStartDate());
         assertNull(body.getEndDate());
         assertEquals(true, body.isIndefinite());
@@ -668,8 +681,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
 
-        assertEquals("venue 2 name", payload.getHeldAt());
+        assertEquals("venue 2 name", body.getHeldAt());
 
     }
 
@@ -786,8 +801,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertTrue(response.getErrors().isEmpty());
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
-        assertEquals("In chambers", payload.getHeldAt());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals(LocalDate.now().toString(), body.getHeldOn().toString());
+        assertEquals("In chambers", body.getHeldAt());
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
@@ -806,8 +824,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertTrue(response.getErrors().isEmpty());
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
-        assertEquals("In chambers", payload.getHeldAt());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals(LocalDate.now().toString(), body.getHeldOn().toString());
+        assertEquals("In chambers", body.getHeldAt());
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
@@ -840,7 +861,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals("2019-01-02", payload.getHeldOn().toString());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals("2019-01-02", body.getHeldOn().toString());
 
     }
 
@@ -922,8 +946,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
 
-        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", payload.getHeldBefore());
+
+        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", body.getHeldBefore());
 
     }
 
@@ -951,7 +978,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals("Judge Full Name and Mr Panel Member 1", payload.getHeldBefore());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+
+        assertEquals("Judge Full Name and Mr Panel Member 1", body.getHeldBefore());
 
     }
 
@@ -976,8 +1007,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
 
-        assertEquals("Judge Full Name", payload.getHeldBefore());
+        assertEquals("Judge Full Name", body.getHeldBefore());
 
     }
 
@@ -1029,9 +1062,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(image, payload.getImage());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
-        assertEquals(dateOfDecision, payload.getDateOfDecision());
-        assertEquals(allowed, payload.isAllowed());
-        assertEquals(allowed, payload.isSetAside());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+        assertEquals(dateOfDecision, body.getDateOfDecision());
+        assertEquals(allowed, body.isAllowed());
+        assertEquals(allowed, body.isSetAside());
 
         return payload;
     }
