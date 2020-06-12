@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.model.docassembly;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class DescriptorTest {
             "1",
             "questionValue",
             "answerLetter",
-           "answerValue",
+            "answerValue",
             10);
 
         assertEquals("questionValue", descriptor.getActivityQuestionValue());
