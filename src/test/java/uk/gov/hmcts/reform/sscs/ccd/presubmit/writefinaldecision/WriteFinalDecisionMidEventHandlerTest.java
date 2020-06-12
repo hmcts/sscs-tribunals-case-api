@@ -236,6 +236,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -278,6 +279,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("My reasons for decision", body.getReasonsForDecision());
     }
 
     @Test
@@ -292,6 +294,8 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
+
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -330,6 +334,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("My reasons for decision", body.getReasonsForDecision());
     }
 
     @Test
@@ -344,6 +349,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -381,6 +387,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertNull(body.getMobilityAwardRate());
         assertNull(body.getMobilityDescriptors());
+        assertEquals("My reasons for decision", body.getReasonsForDecision());
     }
 
 
@@ -397,6 +404,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -441,6 +449,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("My reasons for decision", body.getReasonsForDecision());
     }
 
     @Test
@@ -454,6 +463,8 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
+
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -491,6 +502,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("My reasons for decision", body.getReasonsForDecision());
     }
 
     @Test
@@ -500,6 +512,7 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("lower");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("lower");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));

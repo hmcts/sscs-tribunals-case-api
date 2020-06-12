@@ -117,6 +117,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(false, payload.isMobilityIsSeverelyLimited());
         Assert.assertNull(payload.getMobilityAwardRate());
         Assert.assertNull(payload.getMobilityDescriptors());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision());
 
     }
 

@@ -162,6 +162,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
         setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
 
+        writeFinalDecisionBuilder.reasonsForDecision(caseData.getWriteFinalDecisionReasonsForDecision());
 
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 

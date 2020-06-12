@@ -36,6 +36,7 @@
       "writeFinalDecisionStartDate": "2018-10-10",
       "writeFinalDecisionEndDate": "2018-11-10",
       "writeFinalDecisionGenerateNotice": "Yes",
+      "writeFinalDecisionReasonsForDecision" : "My reasons for decision",
       "writeFinalDecisionPreviewDocument": {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
@@ -764,6 +765,7 @@
       "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
       "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1f",
       "pipWriteFinalDecisionTakingNutritionQuestion" : "takingNutrition2f",
+      "writeFinalDecisionReasonsForDecision" : "My reasons for decision",
       "writeFinalDecisionPreviewDocument": {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
