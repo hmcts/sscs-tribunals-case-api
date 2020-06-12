@@ -8,10 +8,10 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 
 @Builder(toBuilder = true)
-@Value
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class WriteFinalDecisionTemplateBody {
 
