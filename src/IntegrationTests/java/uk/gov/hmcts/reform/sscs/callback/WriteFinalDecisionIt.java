@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @SpringBootTest
@@ -77,10 +78,12 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
-        assertEquals("An Test", payload.getAppellantFullName());
-        assertEquals("12345656789", payload.getCaseId());
-        assertEquals("JT 12 34 56 D", payload.getNino());
+        DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
+
+        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("12345656789", parentPayload.getCaseId());
+        assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());

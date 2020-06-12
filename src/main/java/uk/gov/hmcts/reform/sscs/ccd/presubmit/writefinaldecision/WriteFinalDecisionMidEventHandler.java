@@ -31,6 +31,8 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody.DirectionOrDecisionIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.util.StringUtils;
@@ -115,57 +117,65 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish,
         String userAuthorisation) {
         DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
+        WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
+
 
         DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
-        builder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
+        writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
             Hearing finalHearing = caseData.getHearings().get(0);
             if (finalHearing != null && finalHearing.getValue() != null) {
                 if (finalHearing.getValue().getHearingDate() != null) {
-                    builder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
+                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
                 }
                 if (finalHearing.getValue().getVenue() != null) {
-                    builder.heldAt(finalHearing.getValue().getVenue().getName());
+                    writeFinalDecisionBuilder.heldAt(finalHearing.getValue().getVenue().getName());
                 }
             }
         } else {
-            builder.heldOn(LocalDate.now());
-            builder.heldAt("In chambers");
+            writeFinalDecisionBuilder.heldOn(LocalDate.now());
+            writeFinalDecisionBuilder.heldAt("In chambers");
         }
 
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
-            builder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
-            builder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+            writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+            writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
         }
 
         if (caseData.getWriteFinalDecisionDateOfDecision() != null) {
-            builder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
+            writeFinalDecisionBuilder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
         }
 
-        builder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
-        builder.endDate(caseData.getWriteFinalDecisionEndDate());
-        builder.startDate(caseData.getWriteFinalDecisionStartDate());
-        builder.appellantName(buildName(caseData));
+        writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
+        writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
+        writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
+        writeFinalDecisionBuilder.appellantName(buildName(caseData));
 
-        setEntitlements(builder, caseData);
+        setEntitlements(writeFinalDecisionBuilder, caseData);
 
-        setDescriptorsAndPoints(builder, caseData);
+        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
 
-        DirectionOrDecisionIssuedTemplateBody payload = builder.build();
+
+        WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
+
         validateRequiredProperties(payload);
 
-        return payload;
+        builder.writeFinalDecisionTemplateBody(payload);
+
+        return builder.build();
+
     }
 
-    private void setEntitlements(DirectionOrDecisionIssuedTemplateBodyBuilder builder, SscsCaseData caseData) {
+    private void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
         String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
         String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
+
 
         if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
             builder.dailyLivingIsEntited(true);
@@ -194,7 +204,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
         }
     }
 
-    protected void setDescriptorsAndPoints(DirectionOrDecisionIssuedTemplateBodyBuilder builder, SscsCaseData caseData) {
+    protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
         List<String> dailyLivingAnswers = ActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
         if (dailyLivingAnswers != null) {
 
@@ -240,7 +250,7 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
     }
 
 
-    private void validateRequiredProperties(DirectionOrDecisionIssuedTemplateBody payload) {
+    private void validateRequiredProperties(WriteFinalDecisionTemplateBody payload) {
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
             throw new IllegalStateException("Unable to determine hearing date or venue");
         } else if (payload.getHeldOn() == null) {
