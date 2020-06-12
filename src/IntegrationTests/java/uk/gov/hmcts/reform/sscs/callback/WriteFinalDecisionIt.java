@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWi
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @SpringBootTest
@@ -76,16 +78,46 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
-        assertEquals("An Test", payload.getAppellantFullName());
-        assertEquals("12345656789", payload.getCaseId());
-        assertEquals("JT 12 34 56 D", payload.getNino());
+        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
+
+        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("12345656789", parentPayload.getCaseId());
+        assertEquals("JT 12 34 56 D", parentPayload.getNino());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
         assertEquals(true, payload.isAllowed());
         assertEquals(true, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
+        assertEquals("An Test",payload.getAppellantName());
+        assertEquals("2018-10-10",payload.getStartDate());
+        assertEquals("2018-11-10",payload.getEndDate());
+        assertEquals(false, payload.isIndefinite());
+        assertEquals(true, payload.isDailyLivingIsEntited());
+        assertEquals(true, payload.isDailyLivingIsSeverelyLimited());
+        assertEquals("enhanced rate", payload.getDailyLivingAwardRate());
+        Assert.assertNotNull(payload.getDailyLivingDescriptors());
+        assertEquals(2, payload.getDailyLivingDescriptors().size());
+        Assert.assertNotNull(payload.getDailyLivingDescriptors().get(0));
+        assertEquals(8, payload.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("f", payload.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot prepare and cook food.", payload.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Preparing food", payload.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
+        Assert.assertNotNull(payload.getDailyLivingDescriptors().get(1));
+        assertEquals(10, payload.getDailyLivingDescriptors().get(1).getActivityAnswerPoints());
+        assertEquals("f", payload.getDailyLivingDescriptors().get(1).getActivityAnswerLetter());
+        assertEquals("Cannot convey food and drink to their mouth and needs another person to do so.", payload.getDailyLivingDescriptors().get(1).getActivityAnswerValue());
+        assertEquals("Taking nutrition", payload.getDailyLivingDescriptors().get(1).getActivityQuestionValue());
+        assertEquals("2", payload.getDailyLivingDescriptors().get(1).getActivityQuestionNumber());
+        Assert.assertNotNull(payload.getDailyLivingNumberOfPoints());
+        assertEquals(18, payload.getDailyLivingNumberOfPoints().intValue());
+        assertEquals(false, payload.isMobilityIsEntited());
+        assertEquals(false, payload.isMobilityIsSeverelyLimited());
+        Assert.assertNull(payload.getMobilityAwardRate());
+        Assert.assertNull(payload.getMobilityDescriptors());
+
     }
 
     @Test

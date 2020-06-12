@@ -43,7 +43,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionMidEventHandlerTest {
@@ -73,12 +75,16 @@ public class WriteFinalDecisionMidEventHandlerTest {
     private SscsCaseData sscsCaseData;
 
     private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    private DecisionNoticeQuestionService decisionNoticeQuestionService;
+
 
     @Before
     public void setUp() throws IOException {
         initMocks(this);
         this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
-        handler = new WriteFinalDecisionMidEventHandler(generateFile, idamClient, decisionNoticeOutcomeService, TEMPLATE_ID);
+        this.decisionNoticeQuestionService = new DecisionNoticeQuestionService();
+        handler = new WriteFinalDecisionMidEventHandler(generateFile, idamClient, decisionNoticeOutcomeService,
+            decisionNoticeQuestionService, TEMPLATE_ID);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -217,8 +223,15 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void willSetPreviewFile_whenAppealAllowed() {
+    public void willSetPreviewFile_whenAppealAllowedAtFiniteTimeEnhancedRate() {
 
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround",
+            "planningAndFollowing"));
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
+        sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion("planningAndFollowing11f");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
@@ -237,7 +250,247 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+        assertEquals("2018-10-10",body.getStartDate());
+        assertEquals("2018-11-10",body.getEndDate());
+        assertEquals(false, body.isIndefinite());
+        assertEquals(true, body.isMobilityIsEntited());
+        assertEquals(true, body.isMobilityIsSeverelyLimited());
+        assertEquals("enhanced rate", body.getMobilityAwardRate());
+        assertNotNull(body.getMobilityDescriptors());
+        assertNotNull(body.getMobilityDescriptors().get(0));
+        assertEquals(12, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("f", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getMobilityDescriptors().get(1));
+        assertEquals(12, body.getMobilityDescriptors().get(1).getActivityAnswerPoints());
+        assertEquals("f", body.getMobilityDescriptors().get(1).getActivityAnswerLetter());
+        assertEquals("Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid.", body.getMobilityDescriptors().get(1).getActivityAnswerValue());
+        assertEquals("Planning and following journeys", body.getMobilityDescriptors().get(1).getActivityQuestionValue());
+        assertEquals("11", body.getMobilityDescriptors().get(1).getActivityQuestionNumber());
+        assertNotNull(body.getMobilityNumberOfPoints());
+        assertEquals(24, body.getMobilityNumberOfPoints().intValue());
+        assertEquals(false, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertNull(body.getDailyLivingAwardRate());
+        assertNull(body.getDailyLivingDescriptors());
+    }
+
+    @Test
+    public void willSetPreviewFile_whenAppealAllowedAtFiniteTimeStandardRate() {
+
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals("2018-10-10",body.getStartDate());
+        assertEquals("2018-11-10",body.getEndDate());
+        assertEquals(false, body.isIndefinite());
+        assertEquals(true, body.isMobilityIsEntited());
+        assertEquals(false, body.isMobilityIsSeverelyLimited());
+        assertEquals("standard rate", body.getMobilityAwardRate());
+        assertNotNull(body.getMobilityDescriptors());
+        assertEquals(1, body.getMobilityDescriptors().size());
+        assertNotNull(body.getMobilityDescriptors().get(0));
+        assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getMobilityNumberOfPoints());
+        assertEquals(10, body.getMobilityNumberOfPoints().intValue());
+        assertEquals(false, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertNull(body.getDailyLivingAwardRate());
+        assertNull(body.getDailyLivingDescriptors());
+    }
+
+    @Test
+    public void willSetPreviewFile_whenAppealAllowedAtDailyLivingFiniteTimeStandardRate() {
+
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
+        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+        assertEquals("2018-10-10",body.getStartDate());
+        assertEquals("2018-11-10",body.getEndDate());
+        assertEquals(false, body.isIndefinite());
+        assertEquals(true, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertEquals("standard rate", body.getDailyLivingAwardRate());
+        assertNotNull(body.getDailyLivingDescriptors());
+        assertEquals(1, body.getDailyLivingDescriptors().size());
+        assertNotNull(body.getDailyLivingDescriptors().get(0));
+        assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getDailyLivingNumberOfPoints());
+        assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
+        assertEquals(false, body.isMobilityIsEntited());
+        assertEquals(false, body.isMobilityIsSeverelyLimited());
+        assertNull(body.getMobilityAwardRate());
+        assertNull(body.getMobilityDescriptors());
+    }
+
+
+    @Test
+    public void willSetPreviewFile_whenAppealAllowedAtIndefiniteEnhancedRate() {
+
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround",
+            "planningAndFollowing"));
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
+        sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion("planningAndFollowing11f");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals("2018-10-10",body.getStartDate());
+        assertNull(body.getEndDate());
+        assertEquals(true, body.isIndefinite());
+        assertEquals(true, body.isMobilityIsEntited());
+        assertEquals(true, body.isMobilityIsSeverelyLimited());
+        assertEquals("enhanced rate", body.getMobilityAwardRate());
+        assertNotNull(body.getMobilityDescriptors());
+        assertEquals(2, body.getMobilityDescriptors().size());
+        assertNotNull(body.getMobilityDescriptors().get(0));
+        assertEquals(12, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("f", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getMobilityDescriptors().get(1));
+        assertEquals(12, body.getMobilityDescriptors().get(1).getActivityAnswerPoints());
+        assertEquals("f", body.getMobilityDescriptors().get(1).getActivityAnswerLetter());
+        assertEquals("Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid.", body.getMobilityDescriptors().get(1).getActivityAnswerValue());
+        assertEquals("Planning and following journeys", body.getMobilityDescriptors().get(1).getActivityQuestionValue());
+        assertEquals("11", body.getMobilityDescriptors().get(1).getActivityQuestionNumber());
+        assertNotNull(body.getMobilityNumberOfPoints());
+        assertEquals(24, body.getMobilityNumberOfPoints().intValue());
+        assertEquals(false, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertNull(body.getDailyLivingAwardRate());
+        assertNull(body.getDailyLivingDescriptors());
+    }
+
+    @Test
+    public void willSetPreviewFile_whenAppealAllowedAtIndefiniteStandardRate() {
+
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+        assertEquals("2018-10-10",body.getStartDate());
+        assertNull(body.getEndDate());
+        assertEquals(true, body.isIndefinite());
+        assertEquals(true, body.isMobilityIsEntited());
+        assertEquals(false, body.isMobilityIsSeverelyLimited());
+        assertEquals("standard rate", body.getMobilityAwardRate());
+        assertNotNull(body.getMobilityDescriptors());
+        assertEquals(1, body.getMobilityDescriptors().size());
+        assertNotNull(body.getMobilityDescriptors().get(0));
+        assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getMobilityNumberOfPoints());
+        assertEquals(10, body.getMobilityNumberOfPoints().intValue());
+        assertEquals(false, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertNull(body.getDailyLivingAwardRate());
+        assertNull(body.getDailyLivingDescriptors());
     }
 
     @Test
@@ -277,9 +530,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine date of decision", error);
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -376,9 +630,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
 
     @Test
@@ -426,8 +681,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
 
-        assertEquals("venue 2 name", payload.getHeldAt());
+        assertEquals("venue 2 name", body.getHeldAt());
 
     }
 
@@ -544,8 +801,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertTrue(response.getErrors().isEmpty());
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
-        assertEquals("In chambers", payload.getHeldAt());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals(LocalDate.now().toString(), body.getHeldOn().toString());
+        assertEquals("In chambers", body.getHeldAt());
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
@@ -560,11 +820,15 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
+
         assertTrue(response.getErrors().isEmpty());
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals(LocalDate.now().toString(), payload.getHeldOn().toString());
-        assertEquals("In chambers", payload.getHeldAt());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals(LocalDate.now().toString(), body.getHeldOn().toString());
+        assertEquals("In chambers", body.getHeldAt());
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
@@ -597,7 +861,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals("2019-01-02", payload.getHeldOn().toString());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals("2019-01-02", body.getHeldOn().toString());
 
     }
 
@@ -645,9 +912,13 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
     }
 
     @Test
@@ -675,8 +946,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
 
-        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", payload.getHeldBefore());
+
+        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", body.getHeldBefore());
 
     }
 
@@ -704,7 +978,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
-        assertEquals("Judge Full Name and Mr Panel Member 1", payload.getHeldBefore());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+
+        assertEquals("Judge Full Name and Mr Panel Member 1", body.getHeldBefore());
 
     }
 
@@ -729,8 +1007,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
 
-        assertEquals("Judge Full Name", payload.getHeldBefore());
+        assertEquals("Judge Full Name", body.getHeldBefore());
 
     }
 
@@ -782,9 +1062,11 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(image, payload.getImage());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
-        assertEquals(dateOfDecision, payload.getDateOfDecision());
-        assertEquals(allowed, payload.isAllowed());
-        assertEquals(allowed, payload.isSetAside());
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+        assertEquals(dateOfDecision, body.getDateOfDecision());
+        assertEquals(allowed, body.isAllowed());
+        assertEquals(allowed, body.isSetAside());
 
         return payload;
     }

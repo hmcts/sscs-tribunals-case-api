@@ -42,19 +42,6 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     private LocalDate generatedDate;
     @JsonProperty("hmcts2")
     @Builder.Default private String image = ENGLISH_IMAGE;
-    @JsonProperty("held_at")
-    private String heldAt;
-    @JsonProperty("held_before")
-    private String heldBefore;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @JsonSerialize(using = LocalDateSerializer.class)
-    @JsonProperty("held_on")
-    private LocalDate heldOn;
-    @JsonProperty("is_allowed")
-    private boolean isAllowed;
-    @JsonProperty("is_set_aside")
-    private boolean isSetAside;
-    @JsonProperty("date_of_decision")
-    private String dateOfDecision;
-
+    @JsonProperty("write_final_decision")
+    private WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody;
 }

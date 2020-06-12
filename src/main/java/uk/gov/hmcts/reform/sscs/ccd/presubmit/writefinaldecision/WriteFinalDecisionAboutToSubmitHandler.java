@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,21 +82,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     /**
-     * Obtain the points award for an activity question, given an SscsCaseData instance.
-     *
-     * @param sscsCaseData The SscsCaseData
-     * @param activityQuestionKey The key of an activity question.
-     * @return The points awarded for that question, given the SscsCaseData instance provided.
-     */
-    private int getPointsForActivityQuestionKey(SscsCaseData sscsCaseData, String activityQuestionKey) {
-
-        Function<SscsCaseData, String> answerExtractor =
-            ActivityQuestion.getByKey(activityQuestionKey).getAnswerExtractor();
-        return decisionNoticeQuestionService
-            .extractPointsFromSelectedValue(answerExtractor.apply(sscsCaseData));
-    }
-
-    /**
      * Given a points condition, and an SscsCaseData instance, obtain an error message for that condition if the condition has failed to be satified, or an empty optional if the condition is met.
      *
      * @param pointsCondition The condition to evaluate against the SscsCaseData
@@ -107,8 +91,8 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private Optional<String> getOptionalErrorMessage(PointsCondition pointsCondition, SscsCaseData sscsCaseData) {
 
         int totalPoints = pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData)
-            .stream().mapToInt(answerText -> getPointsForActivityQuestionKey(sscsCaseData,
-                answerText)).sum();
+            .stream().map(answerText -> decisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
+                answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
 
         return pointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
             Optional.of(pointsCondition.getErrorMessage());
