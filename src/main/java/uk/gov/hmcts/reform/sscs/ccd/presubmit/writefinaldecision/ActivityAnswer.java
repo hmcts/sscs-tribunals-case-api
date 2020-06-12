@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Getter;
 
 @Builder(toBuilder = true)
-@Value
+@Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActivityAnswer {
 
