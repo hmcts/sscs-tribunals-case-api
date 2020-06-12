@@ -78,8 +78,8 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
-        WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
+        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
