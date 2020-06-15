@@ -45,7 +45,7 @@
       "writeFinalDecisionGenerateNotice": "Yes",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Ted",
       "writeFinalDecisionPageSectionReference": "B2",
-      "writeFinalDecisionPresentingAppellantAttendedQuestion": "Yes",
+      "writeFinalDecisionAppellantAttendedQuestion": "Yes",
       "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
       "writeFinalDecisionReasonsForDecision": "Because appellant has trouble walking",
       "writeFinalDecisionStartDate": "2019-10-10",
