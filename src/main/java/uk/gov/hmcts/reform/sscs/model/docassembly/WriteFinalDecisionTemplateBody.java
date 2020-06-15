@@ -59,4 +59,12 @@ public class WriteFinalDecisionTemplateBody {
     private List<Descriptor> mobilityDescriptors;
     @JsonProperty("reasons_for_decision")
     private String reasonsForDecision;
+    @JsonProperty("hearing_type")
+    private String hearingType;
+    @JsonProperty("page_number")
+    private String pageNumber;
+    @JsonProperty("attended_hearing")
+    private boolean attendedHearing;
+    @JsonProperty("presenting_officer_attended")
+    private boolean presentingOfficerAttended;
 }
