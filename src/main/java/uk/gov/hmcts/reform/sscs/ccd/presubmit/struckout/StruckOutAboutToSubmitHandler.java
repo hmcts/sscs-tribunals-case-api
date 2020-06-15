@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.struckOut;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.struckout;
 
 import static java.util.Objects.requireNonNull;
 
