@@ -236,6 +236,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
+        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
+        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -278,6 +282,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("telephone", body.getHearingType());
+        assertEquals("A1", body.getPageNumber());
+        assertTrue(body.isAttendedHearing());
+        assertFalse(body.isPresentingOfficerAttended());
     }
 
     @Test
@@ -292,6 +300,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
+        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
+        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -330,6 +342,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("telephone", body.getHearingType());
+        assertEquals("A1", body.getPageNumber());
+        assertTrue(body.isAttendedHearing());
+        assertFalse(body.isPresentingOfficerAttended());
     }
 
     @Test
@@ -344,6 +360,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
+        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
+        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -381,6 +401,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertNull(body.getMobilityAwardRate());
         assertNull(body.getMobilityDescriptors());
+        assertEquals("telephone", body.getHearingType());
+        assertEquals("A1", body.getPageNumber());
+        assertTrue(body.isAttendedHearing());
+        assertFalse(body.isPresentingOfficerAttended());
     }
 
 
@@ -397,6 +421,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
+        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
+        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -441,6 +469,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("telephone", body.getHearingType());
+        assertEquals("A1", body.getPageNumber());
+        assertTrue(body.isAttendedHearing());
+        assertFalse(body.isPresentingOfficerAttended());
     }
 
     @Test
@@ -454,6 +486,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
+        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
+        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
+        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -491,6 +527,10 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertEquals("telephone", body.getHearingType());
+        assertEquals("A1", body.getPageNumber());
+        assertTrue(body.isAttendedHearing());
+        assertFalse(body.isPresentingOfficerAttended());
     }
 
     @Test

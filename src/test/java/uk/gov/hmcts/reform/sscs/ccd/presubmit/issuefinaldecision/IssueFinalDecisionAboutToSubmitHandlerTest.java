@@ -49,7 +49,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .sscsDocument(documentList)
             .writeFinalDecisionTypeOfHearing("")
             .writeFinalDecisionPresentingOfficerAttendedQuestion("")
-            .writeFinalDecisionPresentingAppellantAttendedQuestion("")
+            .writeFinalDecisionAppellantAttendedQuestion("")
             .writeFinalDecisionDisabilityQualifiedPanelMemberName("")
             .writeFinalDecisionMedicallyQualifiedPanelMemberName("")
             .pipWriteFinalDecisionDailyLivingQuestion("")
@@ -100,7 +100,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
         assertNull(sscsCaseData.getWriteFinalDecisionTypeOfHearing());
         assertNull(sscsCaseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion());
-        assertNull(sscsCaseData.getWriteFinalDecisionPresentingAppellantAttendedQuestion());
+        assertNull(sscsCaseData.getWriteFinalDecisionAppellantAttendedQuestion());
         assertNull(sscsCaseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         assertNull(sscsCaseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         assertNull(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion());

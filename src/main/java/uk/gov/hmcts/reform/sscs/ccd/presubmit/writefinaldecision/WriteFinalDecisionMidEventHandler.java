@@ -162,6 +162,10 @@ public class WriteFinalDecisionMidEventHandler extends IssueDocumentHandler impl
 
         setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
 
+        writeFinalDecisionBuilder.hearingType(caseData.getWriteFinalDecisionTypeOfHearing());
+        writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
+        writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionAppellantAttendedQuestion()));
+        writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
 
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 

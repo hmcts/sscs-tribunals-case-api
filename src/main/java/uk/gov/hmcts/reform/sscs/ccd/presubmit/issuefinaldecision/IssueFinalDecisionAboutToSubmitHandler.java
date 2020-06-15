@@ -64,7 +64,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private void clearTransientFields(SscsCaseData sscsCaseData) {
         sscsCaseData.setWriteFinalDecisionTypeOfHearing(null);
         sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
-        sscsCaseData.setWriteFinalDecisionPresentingAppellantAttendedQuestion(null);
+        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion(null);
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName(null);
         sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName(null);
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(null);
