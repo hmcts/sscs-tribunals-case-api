@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
+import junitparams.NamedParameters;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Before;
@@ -222,67 +223,62 @@ public class WriteFinalDecisionMidEventHandlerTest {
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
     }
 
-    @Test
-    public void willSetPreviewFile_whenAppealAllowedAtFiniteTimeEnhancedRate() {
+    @NamedParameters("previewEndDateAndRateCombinations")
+    @SuppressWarnings("unused")
+    private Object[] previewEndDateAndRateCombinations() {
+        return new Object[]{
+            new String[]{"2018-11-10", "standardRate", "lower", "lower"},
+            new String[]{"2018-11-10", "standardRate", "same", "lower"},
+            new String[]{"2018-11-10", "standardRate", "higher", "lower"},
+            new String[]{"2018-11-10", "standardRate", "lower", "same"},
+            new String[]{"2018-11-10", "standardRate", "same", "same"},
+            new String[]{"2018-11-10", "standardRate", "higher", "same"},
+            new String[]{"2018-11-10", "enhancedRate", "same", "lower"},
+            new String[]{"2018-11-10", "enhancedRate", "higher", "lower"},
+            new String[]{"2018-11-10", "enhancedRate", "same", "same"},
+            new String[]{"2018-11-10", "enhancedRate", "higher", "same"},
+            new String[]{"2018-11-10", "noAward", "lower", "lower"},
+            new String[]{"2018-11-10", "noAward", "same", "lower"},
+            new String[]{"2018-11-10", "noAward", "lower", "same"},
+            new String[]{"2018-11-10", "noAward", "same", "same"},
+            new String[]{null, "standardRate", "lower", "lower"},
+            new String[]{null, "standardRate", "same", "lower"},
+            new String[]{null, "standardRate", "higher", "lower"},
+            new String[]{null, "standardRate", "lower", "same"},
+            new String[]{null, "standardRate", "same", "same"},
+            new String[]{null, "standardRate", "higher", "same"},
+            new String[]{null, "enhancedRate", "same", "lower"},
+            new String[]{null, "enhancedRate", "higher", "lower"},
+            new String[]{null, "enhancedRate", "same", "same"},
+            new String[]{null, "enhancedRate", "higher", "same"},
+            new String[]{null, "noAward", "lower", "lower"},
+            new String[]{null, "noAward", "same", "lower"},
+            new String[]{null, "noAward", "lower", "same"},
+            new String[]{null, "noAward", "same", "same"},
 
-        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround",
-            "planningAndFollowing"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
-        sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion("planningAndFollowing11f");
+        };
+    }
+
+    private void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
+        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
+        sscsCaseData.setWriteFinalDecisionEndDate(endDate);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
         sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
         sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
         sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
         sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
-
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
+    }
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-        assertNotNull(body);
-        assertEquals("2018-10-10",body.getStartDate());
-        assertEquals("2018-11-10",body.getEndDate());
-        assertEquals(false, body.isIndefinite());
-        assertEquals(true, body.isMobilityIsEntited());
-        assertEquals(true, body.isMobilityIsSeverelyLimited());
-        assertEquals("enhanced rate", body.getMobilityAwardRate());
-        assertNotNull(body.getMobilityDescriptors());
-        assertNotNull(body.getMobilityDescriptors().get(0));
-        assertEquals(12, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("f", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        assertNotNull(body.getMobilityDescriptors().get(1));
-        assertEquals(12, body.getMobilityDescriptors().get(1).getActivityAnswerPoints());
-        assertEquals("f", body.getMobilityDescriptors().get(1).getActivityAnswerLetter());
-        assertEquals("Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid.", body.getMobilityDescriptors().get(1).getActivityAnswerValue());
-        assertEquals("Planning and following journeys", body.getMobilityDescriptors().get(1).getActivityQuestionValue());
-        assertEquals("11", body.getMobilityDescriptors().get(1).getActivityQuestionNumber());
-        assertNotNull(body.getMobilityNumberOfPoints());
-        assertEquals(24, body.getMobilityNumberOfPoints().intValue());
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertNull(body.getDailyLivingDescriptors());
+    private void assertCommonPreviewParams(WriteFinalDecisionTemplateBody body, String endDate) {
+        assertEquals("2018-10-11",body.getStartDate());
+        assertEquals(endDate,body.getEndDate());
+        assertEquals("2018-10-10", body.getDateOfDecision());
+        assertEquals(endDate == null, body.isIndefinite());
         assertEquals("My reasons for decision", body.getReasonsForDecision());
         assertEquals("telephone", body.getHearingType());
         assertEquals("A1", body.getPageNumber());
@@ -291,26 +287,19 @@ public class WriteFinalDecisionMidEventHandlerTest {
     }
 
     @Test
-    public void willSetPreviewFile_whenAppealAllowedAtFiniteTimeStandardRate() {
+    @Parameters(named = "previewEndDateAndRateCombinations")
+    public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
+        String nonDescriptorsComparedWithDwp) {
 
-        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
+
+        // Mobility specific parameters
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
-        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
-        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
-        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
-        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -321,16 +310,31 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
+            appealAllowedExpectation);
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
         assertNotNull(body);
 
-        assertEquals("2018-10-10",body.getStartDate());
-        assertEquals("2018-11-10",body.getEndDate());
-        assertEquals(false, body.isIndefinite());
-        assertEquals(true, body.isMobilityIsEntited());
-        assertEquals(false, body.isMobilityIsSeverelyLimited());
-        assertEquals("standard rate", body.getMobilityAwardRate());
+        // Common assertions
+        assertCommonPreviewParams(body, endDate);
+
+        // Mobility specific assertions
+        if ("standardRate".equals(rate)) {
+            assertEquals("standard rate", body.getMobilityAwardRate());
+            assertEquals(false, body.isMobilityIsSeverelyLimited());
+            assertEquals(true, body.isMobilityIsEntited());
+        } else if ("enhancedRate".equals(rate)) {
+            assertEquals("enhanced rate", body.getMobilityAwardRate());
+            assertEquals(true, body.isMobilityIsSeverelyLimited());
+            assertEquals(true, body.isMobilityIsEntited());
+
+        } else {
+            assertEquals(false, body.isMobilityIsEntited());
+        }
+
         assertNotNull(body.getMobilityDescriptors());
         assertEquals(1, body.getMobilityDescriptors().size());
         assertNotNull(body.getMobilityDescriptors().get(0));
@@ -341,38 +345,28 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
         assertNotNull(body.getMobilityNumberOfPoints());
         assertEquals(10, body.getMobilityNumberOfPoints().intValue());
+
+        // Daily living specific assertions
         assertEquals(false, body.isDailyLivingIsEntited());
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
-        assertEquals("My reasons for decision", body.getReasonsForDecision());
-        assertEquals("telephone", body.getHearingType());
-        assertEquals("A1", body.getPageNumber());
-        assertTrue(body.isAttendedHearing());
-        assertFalse(body.isPresentingOfficerAttended());
     }
 
     @Test
-    public void willSetPreviewFile_whenAppealAllowedAtDailyLivingFiniteTimeStandardRate() {
+    @Parameters(named = "previewEndDateAndRateCombinations")
+    public void willSetPreviewFile_whenDailyLivingDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
+        String nonDescriptorsComparedWithDwp) {
 
-        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionEndDate("2018-11-10");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
+
+        // Daily living specific params
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(rate);
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
         sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
-        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
-        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
-        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
-        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -383,15 +377,32 @@ public class WriteFinalDecisionMidEventHandlerTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
+            appealAllowedExpectation);
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
         assertNotNull(body);
-        assertEquals("2018-10-10",body.getStartDate());
-        assertEquals("2018-11-10",body.getEndDate());
-        assertEquals(false, body.isIndefinite());
-        assertEquals(true, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertEquals("standard rate", body.getDailyLivingAwardRate());
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate);
+
+        // Daily living specific assertions
+        if ("standardRate".equals(rate)) {
+            assertEquals("standard rate", body.getDailyLivingAwardRate());
+            assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+            assertEquals(true, body.isDailyLivingIsEntited());
+
+        } else if ("enhancedRate".equals(rate)) {
+            assertEquals("enhanced rate", body.getDailyLivingAwardRate());
+            assertEquals(true, body.isDailyLivingIsSeverelyLimited());
+            assertEquals(true, body.isDailyLivingIsEntited());
+
+        } else {
+            assertEquals(false, body.isDailyLivingIsEntited());
+        }
+
         assertNotNull(body.getDailyLivingDescriptors());
         assertEquals(1, body.getDailyLivingDescriptors().size());
         assertNotNull(body.getDailyLivingDescriptors().get(0));
@@ -402,170 +413,12 @@ public class WriteFinalDecisionMidEventHandlerTest {
         assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
         assertNotNull(body.getDailyLivingNumberOfPoints());
         assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
+
+        // Mobility specific assertions
         assertEquals(false, body.isMobilityIsEntited());
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertNull(body.getMobilityAwardRate());
         assertNull(body.getMobilityDescriptors());
-        assertEquals("My reasons for decision", body.getReasonsForDecision());
-        assertEquals("telephone", body.getHearingType());
-        assertEquals("A1", body.getPageNumber());
-        assertTrue(body.isAttendedHearing());
-        assertFalse(body.isPresentingOfficerAttended());
-    }
-
-
-    @Test
-    public void willSetPreviewFile_whenAppealAllowedAtIndefiniteEnhancedRate() {
-
-        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround",
-            "planningAndFollowing"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12f");
-        sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion("planningAndFollowing11f");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
-        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
-        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
-        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
-        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-        assertNotNull(body);
-
-        assertEquals("2018-10-10",body.getStartDate());
-        assertNull(body.getEndDate());
-        assertEquals(true, body.isIndefinite());
-        assertEquals(true, body.isMobilityIsEntited());
-        assertEquals(true, body.isMobilityIsSeverelyLimited());
-        assertEquals("enhanced rate", body.getMobilityAwardRate());
-        assertNotNull(body.getMobilityDescriptors());
-        assertEquals(2, body.getMobilityDescriptors().size());
-        assertNotNull(body.getMobilityDescriptors().get(0));
-        assertEquals(12, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("f", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot, either aided or unaided,  stand; or (ii) move more than 1 metre.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        assertNotNull(body.getMobilityDescriptors().get(1));
-        assertEquals(12, body.getMobilityDescriptors().get(1).getActivityAnswerPoints());
-        assertEquals("f", body.getMobilityDescriptors().get(1).getActivityAnswerLetter());
-        assertEquals("Cannot follow the route of a familiar journey without another person, an assistance dog or an orientation aid.", body.getMobilityDescriptors().get(1).getActivityAnswerValue());
-        assertEquals("Planning and following journeys", body.getMobilityDescriptors().get(1).getActivityQuestionValue());
-        assertEquals("11", body.getMobilityDescriptors().get(1).getActivityQuestionNumber());
-        assertNotNull(body.getMobilityNumberOfPoints());
-        assertEquals(24, body.getMobilityNumberOfPoints().intValue());
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertNull(body.getDailyLivingDescriptors());
-        assertEquals("My reasons for decision", body.getReasonsForDecision());
-        assertEquals("telephone", body.getHearingType());
-        assertEquals("A1", body.getPageNumber());
-        assertTrue(body.isAttendedHearing());
-        assertFalse(body.isPresentingOfficerAttended());
-    }
-
-    @Test
-    public void willSetPreviewFile_whenAppealAllowedAtIndefiniteStandardRate() {
-
-        sscsCaseData.setWriteFinalDecisionStartDate("2018-10-10");
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
-        sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
-        sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
-        sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
-        sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion("No");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-        assertNotNull(body);
-        assertEquals("2018-10-10",body.getStartDate());
-        assertNull(body.getEndDate());
-        assertEquals(true, body.isIndefinite());
-        assertEquals(true, body.isMobilityIsEntited());
-        assertEquals(false, body.isMobilityIsSeverelyLimited());
-        assertEquals("standard rate", body.getMobilityAwardRate());
-        assertNotNull(body.getMobilityDescriptors());
-        assertEquals(1, body.getMobilityDescriptors().size());
-        assertNotNull(body.getMobilityDescriptors().get(0));
-        assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        assertNotNull(body.getMobilityNumberOfPoints());
-        assertEquals(10, body.getMobilityNumberOfPoints().intValue());
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertNull(body.getDailyLivingDescriptors());
-        assertEquals("My reasons for decision", body.getReasonsForDecision());
-        assertEquals("telephone", body.getHearingType());
-        assertEquals("A1", body.getPageNumber());
-        assertTrue(body.isAttendedHearing());
-        assertFalse(body.isPresentingOfficerAttended());
-    }
-
-    @Test
-    public void willSetPreviewFile_whenAppealRefused() {
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("lower");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("lower");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", false);
     }
 
     @Test
@@ -634,7 +487,6 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
@@ -674,10 +526,8 @@ public class WriteFinalDecisionMidEventHandlerTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
