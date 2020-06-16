@@ -14,16 +14,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -39,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
+import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -156,7 +156,7 @@ public class SubmitAppealServiceTest {
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build());
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(Arrays.asList("citizen")).build());
         given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
     }
@@ -250,6 +250,14 @@ public class SubmitAppealServiceTest {
         Assert.assertFalse(result.isPresent());
     }
 
+    @Test(expected = ApplicationErrorException.class)
+    public void shouldRaisedExceptionOnCreateDraftWhenCitizenRoleIsNotPresent() {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+
+        Assert.assertFalse(result.isPresent());
+    }
+
     @Test
     public void shouldSuppressExceptionIfIts409OnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
@@ -276,6 +284,12 @@ public class SubmitAppealServiceTest {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertFalse(optionalSessionDraft.isPresent());
+    }
+
+    @Test(expected = ApplicationErrorException.class)
+    public void shouldThrowExceptionOnGetDraftWhenCitizenRoleNotPresent() {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
     }
 
     @Test
