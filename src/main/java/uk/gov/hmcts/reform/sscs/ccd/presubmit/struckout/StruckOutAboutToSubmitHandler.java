@@ -8,6 +8,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -38,7 +39,7 @@ public class StruckOutAboutToSubmitHandler implements PreSubmitCallbackHandler<S
 
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setDirectionDueDate(null);
-        sscsCaseData.setHmctsDwpState("strikeOutActioned");
+        sscsCaseData.setHmctsDwpState(DwpState.STRIKE_OUT_ACTIONED.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 

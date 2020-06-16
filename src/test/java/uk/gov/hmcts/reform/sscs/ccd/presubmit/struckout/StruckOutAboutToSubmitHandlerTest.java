@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -85,6 +86,6 @@ public class StruckOutAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
-        assertThat(response.getData().getHmctsDwpState(), is("strikeOutActioned"));
+        assertThat(response.getData().getHmctsDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
     }
 }
