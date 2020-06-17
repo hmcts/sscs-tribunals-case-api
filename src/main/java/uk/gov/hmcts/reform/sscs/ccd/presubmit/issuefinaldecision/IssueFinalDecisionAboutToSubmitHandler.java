@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -66,8 +67,15 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         if (iterator.hasNext()) {
             while (iterator.hasNext()) {
                 SscsDocument sscsDocument = iterator.next();
-                footerService.createFooterAndAddDocToCase(sscsDocument.getValue().getDocumentLink(), preSubmitCallbackResponse.getData(), DocumentType.DECISION_NOTICE,
-                        LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+                String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
+
+                DocumentLink documentLink = DocumentLink.builder()
+                    .documentUrl(sscsDocument.getValue().getDocumentLink().getDocumentUrl())
+                    .documentFilename(DocumentType.DECISION_NOTICE.getValue() + " issued on " + now + ".pdf")
+                    .documentBinaryUrl(sscsDocument.getValue().getDocumentLink().getDocumentBinaryUrl())
+                    .build();
+
+                footerService.createFooterAndAddDocToCase(documentLink, preSubmitCallbackResponse.getData(), DocumentType.DECISION_NOTICE, now);
             }
 
         } else {

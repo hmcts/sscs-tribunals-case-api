@@ -12,6 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -102,7 +104,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenAnIssueFinalDecisionEvent_thenCreateDecisionWithFooterAndClearTransientFields() {
         SscsDocument doc = SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder().documentUrl("test.com").build())
+                        .documentLink(DocumentLink.builder().documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build())
                         .documentFileName("myTest.doc")
                         .documentType(DRAFT_DECISION_NOTICE.getValue()).build())
                 .build();

@@ -101,7 +101,12 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private void writePreviewDocumentToSscsDocument(SscsCaseData sscsCaseData) {
-        final String filename = String.format("%s issued on %s.pdf", DRAFT_DECISION_NOTICE.getValue(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        if (sscsCaseData.getSscsDocument() != null) {
+            sscsCaseData.getSscsDocument()
+                    .removeIf(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType()));
+        }
+
+        final String filename = String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         SscsDocument draftDecisionNotice = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(filename)
