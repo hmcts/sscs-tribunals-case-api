@@ -4,8 +4,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +52,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             }
         }
 
-        createFooter(url, caseData);
+        footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
+                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
 
         State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
 
@@ -77,29 +76,5 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;
-    }
-
-    private void createFooter(DocumentLink url, SscsCaseData caseData) {
-        if (url != null) {
-            log.info("Decision issued adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
-
-            String bundleAddition = footerService.getNextBundleAddition(caseData.getSscsDocument());
-
-            String bundleFileName = footerService.buildBundleAdditionFileName(bundleAddition, "Decision notice issued on "
-                    + Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
-
-            SscsDocument sscsDocument = footerService.createFooterDocument(url, "Decision notice", bundleAddition, bundleFileName,
-                    caseData.getDateAdded(), DocumentType.DECISION_NOTICE);
-
-            List<SscsDocument> documents = new ArrayList<>();
-            documents.add(sscsDocument);
-
-            if (caseData.getSscsDocument() != null) {
-                documents.addAll(caseData.getSscsDocument());
-            }
-            caseData.setSscsDocument(documents);
-        } else {
-            log.info("Could not find decision issued document for caseId {} so skipping generating footer", caseData.getCcdCaseId());
-        }
     }
 }

@@ -65,7 +65,7 @@ public class IssueDocumentHandler {
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        String documentUrl = Optional.ofNullable(caseData.getPreviewDocument()).map(DocumentLink::getDocumentUrl).orElse(null);
+        String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
 
         LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
 
@@ -99,9 +99,20 @@ public class IssueDocumentHandler {
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-
+    /**
+     * Override this method if previewDocument is not the correct field to set.
+     */
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
         caseData.setPreviewDocument(file);
+    }
+
+    /**
+     * Override this method if previewDocument is not the correct field to use.
+     *
+     * @return DocumentLink
+     */
+    protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
+        return caseData.getPreviewDocument();
     }
 
     protected String buildFullName(SscsCaseData caseData) {

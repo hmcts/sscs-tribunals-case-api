@@ -61,8 +61,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         handler = new DirectionIssuedAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
-        when(footerService.createFooterDocument(any(), any(), any(), any(), any(), any())).thenReturn(SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.DIRECTION_NOTICE.getValue()).bundleAddition("A").documentLink(DocumentLink.builder().documentUrl("footerUrl").build()).build()).build());
-        when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
         List<SscsDocument> docs = new ArrayList<>();
@@ -129,32 +127,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getGenerateNotice());
         assertNull(response.getData().getDateAdded());
 
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("myTest.doc", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals(expectedDocument.getValue().getDocumentType(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()), eq("Directions notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any());
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
-        verify(footerService).createFooterDocument(any(), eq("Directions notice"), any(), any(), any(), any());
-    }
-
-    @Test
-    public void givenManuallyUploadedDirectionDocument_thenOverwriteOriginalWithFooterDocument() {
-        sscsCaseData.setPreviewDocument(null);
-        sscsCaseData.setSscsDocument(null);
-
-        SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
-                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build())
-                .documentDateAdded(LocalDate.now()).build();
-
-        sscsCaseData.setSscsInterlocDirectionDocument(theDocument);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
     }
 
     @Test
@@ -177,12 +152,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         sscsDocuments.add(document1);
         sscsCaseData.setSscsDocument(sscsDocuments);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterDocument(eq(theDocument.getDocumentLink()), eq("Directions notice"), eq("A"), any(), any(), eq(DocumentType.DIRECTION_NOTICE));
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any());
     }
 
     public void willSetTheWithDwpStateToDirectionActionRequired() {
