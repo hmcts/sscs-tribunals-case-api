@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.removeacase;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.removelinkforcase;
 
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class RemoveACaseLinkAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class RemoveLinkForCaseAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -21,7 +21,7 @@ public class RemoveACaseLinkAboutToSubmitHandler implements PreSubmitCallbackHan
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.REMOVE_A_CASE;
+                && callback.getEvent() == EventType.REMOVE_LINK_FOR_CASE;
     }
 
     @Override

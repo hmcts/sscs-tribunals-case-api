@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.removeacase;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.removelinkforcase;
 
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.joining;
@@ -30,10 +30,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @RunWith(JUnitParamsRunner.class)
-public class RemoveACaseLinkAboutToSubmitHandlerTest {
+public class RemoveLinkForCaseAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
-    private RemoveACaseLinkAboutToSubmitHandler handler;
+    private RemoveLinkForCaseAboutToSubmitHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -50,9 +50,9 @@ public class RemoveACaseLinkAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new RemoveACaseLinkAboutToSubmitHandler();
+        handler = new RemoveLinkForCaseAboutToSubmitHandler();
 
-        when(callback.getEvent()).thenReturn(EventType.REMOVE_A_CASE);
+        when(callback.getEvent()).thenReturn(EventType.REMOVE_LINK_FOR_CASE);
 
         sscsCaseDataBefore = SscsCaseData.builder()
                 .ccdCaseId("1234")
