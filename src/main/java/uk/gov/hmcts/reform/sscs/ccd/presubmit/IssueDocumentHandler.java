@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -65,7 +66,7 @@ public class IssueDocumentHandler {
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        String documentUrl = Optional.ofNullable(caseData.getPreviewDocument()).map(DocumentLink::getDocumentUrl).orElse(null);
+        String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
 
         LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
 
@@ -86,7 +87,9 @@ public class IssueDocumentHandler {
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        final String filename = String.format("%s issued on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        documentTypeLabel = documentTypeLabel + (DRAFT_DECISION_NOTICE.equals(documentType) ? " generated" : " issued");
+
+        final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
         DocumentLink previewFile = DocumentLink.builder()
                 .documentFilename(filename)
@@ -99,9 +102,20 @@ public class IssueDocumentHandler {
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
-
+    /**
+     * Override this method if previewDocument is not the correct field to set.
+     */
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
         caseData.setPreviewDocument(file);
+    }
+
+    /**
+     * Override this method if previewDocument is not the correct field to use.
+     *
+     * @return DocumentLink
+     */
+    protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
+        return caseData.getPreviewDocument();
     }
 
     protected String buildFullName(SscsCaseData caseData) {

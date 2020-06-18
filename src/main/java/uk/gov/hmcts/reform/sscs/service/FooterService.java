@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
@@ -38,7 +39,31 @@ public class FooterService {
         this.alter = alter;
     }
 
-    public SscsDocument createFooterDocument(DocumentLink url, String leftText, String bundleAddition, String documentFileName,
+    public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued) {
+        String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
+        if (url != null) {
+            log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
+
+            String bundleAddition = getNextBundleAddition(caseData.getSscsDocument());
+
+            String bundleFileName = buildBundleAdditionFileName(bundleAddition, label + " issued on " + dateIssued);
+
+            SscsDocument sscsDocument = createFooterDocument(url, label, bundleAddition, bundleFileName,
+                    caseData.getDateAdded(), documentType);
+
+            List<SscsDocument> documents = new ArrayList<>();
+            documents.add(sscsDocument);
+
+            if (caseData.getSscsDocument() != null) {
+                documents.addAll(caseData.getSscsDocument());
+            }
+            caseData.setSscsDocument(documents);
+        } else {
+            log.info("Could not find {} document for caseId {} so skipping generating footer", label, caseData.getCcdCaseId());
+        }
+    }
+
+    private SscsDocument createFooterDocument(DocumentLink url, String leftText, String bundleAddition, String documentFileName,
                                                 LocalDate dateAdded, DocumentType documentType) {
         url = addFooter(url, leftText, bundleAddition);
 
@@ -108,7 +133,7 @@ public class FooterService {
         return "A";
     }
 
-    public String buildBundleAdditionFileName(String bundleAddition, String rightText) {
+    protected String buildBundleAdditionFileName(String bundleAddition, String rightText) {
         return "Addition " + bundleAddition + " - " + rightText + ".pdf";
     }
 
