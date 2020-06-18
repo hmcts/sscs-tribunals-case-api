@@ -17,11 +17,11 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackDispatcher;
-import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @TestPropertySource(locations = "classpath:config/application_it.properties")
@@ -44,13 +44,25 @@ public abstract class AbstractEventIt {
     @Autowired
     protected ObjectMapper mapper;
 
+    @Autowired
+    protected WebApplicationContext context;
+
     String json;
 
+    void setup() throws IOException {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+        mapper.registerModule(new JavaTimeModule());
+    }
+
     void setup(String jsonFile) throws IOException {
-        CcdCallbackController controller = new CcdCallbackController(authorisationService, deserializer, dispatcher);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         mapper.registerModule(new JavaTimeModule());
         json = getJson(jsonFile);
+    }
+
+    protected void setJsonAndReplace(String fileLocation, String replaceKey, String replaceValue) throws IOException {
+        String result = getJson(fileLocation);
+        json = result.replace(replaceKey, replaceValue);
     }
 
     protected String getJson(String fileLocation) throws IOException {

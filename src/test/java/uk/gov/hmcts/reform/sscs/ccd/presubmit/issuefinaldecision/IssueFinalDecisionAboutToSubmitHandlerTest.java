@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -9,6 +12,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
@@ -21,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFinalDecisionAboutToSubmitHandlerTest {
@@ -34,15 +40,21 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
+    @Mock
+    private FooterService footerService;
+
     private SscsCaseData sscsCaseData;
+
+    private SscsDocument document;
 
     @Before
     public void setUp() throws IOException {
         initMocks(this);
-        handler = new IssueFinalDecisionAboutToSubmitHandler();
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+
         List<SscsDocument> documentList = new ArrayList<>();
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
@@ -76,9 +88,9 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .pipWriteFinalDecisionMovingAroundQuestion("")
             .writeFinalDecisionReasonsForDecision("")
             .writeFinalDecisionPageSectionReference("")
-            .writeFinalDecisionGenerateNotice("")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
             .build();
+
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -89,14 +101,20 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueFinalDecisionEvent_thenMoveDraftDocToSscsDocumentsAndClearTransientFields() {
-        callback.getCaseDetails().getCaseData().getSscsDocument().add(SscsDocument.builder().value(
-                SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build());
+    public void givenAnIssueFinalDecisionEvent_thenCreateDecisionWithFooterAndClearTransientFields() {
+        SscsDocument doc = SscsDocument.builder().value(
+                SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder().documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build())
+                        .documentFileName("myTest.doc")
+                        .documentType(DRAFT_DECISION_NOTICE.getValue()).build())
+                .build();
+        callback.getCaseDetails().getCaseData().getSscsDocument().add(doc);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        verify(footerService).createFooterAndAddDocToCase(eq(doc.getValue().getDocumentLink()), any(), eq(DECISION_NOTICE), any());
         assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
-        assertEquals(DECISION_NOTICE.getValue(), response.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(0, (int) response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue())).count());
 
         assertNull(sscsCaseData.getWriteFinalDecisionTypeOfHearing());
         assertNull(sscsCaseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion());
