@@ -44,7 +44,7 @@ public class IssueDocumentHandler {
         }
     }
 
-    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish, String userAuthorisation) {
+    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
         DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
             .appellantFullName(buildFullName(caseData))
             .caseId(caseData.getCcdCaseId())
@@ -54,7 +54,7 @@ public class IssueDocumentHandler {
             .noticeType(documentTypeLabel.toUpperCase())
             .userRole(caseData.getSignedRole())
             .dateAdded(dateAdded)
-            .generatedDate(LocalDate.now())
+            .generatedDate(generatedDate)
             .build();
 
         if (isScottish) {
@@ -74,7 +74,7 @@ public class IssueDocumentHandler {
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
-        FormPayload formPayload = createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
+        FormPayload formPayload = createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(documentUrl)
