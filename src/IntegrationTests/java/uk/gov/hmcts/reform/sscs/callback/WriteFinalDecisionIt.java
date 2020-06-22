@@ -8,11 +8,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -54,13 +52,11 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     @MockBean
     private UserDetails userDetails;
 
-    @Before
-    public void setup() throws IOException {
-        setup("callback/writeFinalDecision.json");
-    }
-
     @Test
-    public void callToMidEventHandler_willPreviewTheDocument() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocument() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecision.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
@@ -68,7 +64,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
@@ -122,7 +118,24 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     }
 
     @Test
+    public void callToMidEventCallback_willValidateTheData() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecision.json", "START_DATE_PLACEHOLDER", "2019-10-10");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(1, result.getErrors().size());
+        assertEquals("Decision notice end date must be after decision notice start date", result.getErrors().toArray()[0]);
+
+    }
+
+    @Test
     public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCase() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecision.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
