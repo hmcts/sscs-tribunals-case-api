@@ -80,6 +80,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
             "lower, same, decisionUpheld",
             "lower, lower, decisionUpheld"})
     public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigherAndNeitherIsLower_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility, String expectedOutcome) {
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving);
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -89,6 +90,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenFinalDecisionComparedToDwpQuestionComparedRatesAreNull_thenDisplayAnError() {
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -102,6 +104,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -128,6 +131,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -156,6 +160,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -182,6 +187,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -209,6 +215,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -237,6 +244,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -264,6 +272,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -291,6 +300,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -317,6 +327,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -343,6 +354,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -369,6 +381,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
 
@@ -396,6 +409,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
 
@@ -422,6 +436,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
 
@@ -448,6 +463,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
 
@@ -475,6 +491,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -502,6 +519,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(doc);
         callback.getCaseDetails().getCaseData().setSscsDocument(docs);
+
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
 
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
@@ -44,12 +45,11 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     private final IdamClient idamClient;
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
-
     private boolean showIssueDate;
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
-                                                    DecisionNoticeQuestionService decisionNoticeQuestionService, @Value("${doc_assembly.issue_final_decision}") String templateId) {
+        DecisionNoticeQuestionService decisionNoticeQuestionService, @Value("${doc_assembly.issue_final_decision}") String templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
         this.idamClient = idamClient;
@@ -60,6 +60,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, String userAuthorisation, boolean showIssueDate) {
 
         this.showIssueDate = showIssueDate;
+
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -81,13 +82,73 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     @Override
     protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
-        DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
+        DirectionOrDecisionIssuedTemplateBody formPayload = super
+            .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
+        writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
+
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
+        setHearings(writeFinalDecisionBuilder, caseData);
+
+        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
+        if (outcome == null) {
+            throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
+        } else {
+            writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+            writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+        }
+
+        if (caseData.getWriteFinalDecisionDateOfDecision() != null) {
+            writeFinalDecisionBuilder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
+        } else {
+            writeFinalDecisionBuilder.dateOfDecision(null);
+        }
+
+        writeFinalDecisionBuilder.appellantName(buildName(caseData));
+
+        writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
+        writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
+        writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
+
+        setEntitlements(writeFinalDecisionBuilder, caseData);
+        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
+        writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
+
+        if (caseData.getWriteFinalDecisionReasons() != null && !caseData.getWriteFinalDecisionReasons().isEmpty()) {
+            writeFinalDecisionBuilder.reasonsForDecision(
+                caseData.getWriteFinalDecisionReasons().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+        } else {
+            writeFinalDecisionBuilder.reasonsForDecision(null);
+        }
+
+        writeFinalDecisionBuilder.anythingElse(caseData.getWriteFinalDecisionAnythingElse());
+
+        writeFinalDecisionBuilder.hearingType(caseData.getWriteFinalDecisionTypeOfHearing());
+        writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionAppellantAttendedQuestion()));
+        writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
+
+        WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
+
+        validateRequiredProperties(payload);
+
+        if (showIssueDate) {
+            builder.dateIssued(LocalDate.now());
+        } else {
+            builder.dateIssued(null);
+        }
+
+        builder.writeFinalDecisionTemplateBody(payload);
+
+        return builder.build();
+
+    }
+
+    private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
             Hearing finalHearing = caseData.getHearings().get(0);
             if (finalHearing != null && finalHearing.getValue() != null) {
@@ -102,46 +163,6 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             writeFinalDecisionBuilder.heldOn(LocalDate.now());
             writeFinalDecisionBuilder.heldAt("In chambers");
         }
-
-        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
-        if (outcome == null) {
-            throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
-        } else {
-            writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
-            writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
-        }
-
-        if (caseData.getWriteFinalDecisionDateOfDecision() != null) {
-            writeFinalDecisionBuilder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
-        }
-
-        writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
-        writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
-        writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
-        writeFinalDecisionBuilder.appellantName(buildName(caseData));
-
-        setEntitlements(writeFinalDecisionBuilder, caseData);
-
-        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
-
-        writeFinalDecisionBuilder.reasonsForDecision(caseData.getWriteFinalDecisionReasonsForDecision());
-        writeFinalDecisionBuilder.hearingType(caseData.getWriteFinalDecisionTypeOfHearing());
-        writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
-        writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionAppellantAttendedQuestion()));
-        writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
-
-        WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
-
-        validateRequiredProperties(payload);
-
-        if (showIssueDate) {
-            builder.dateIssued(LocalDate.now());
-        }
-
-        builder.writeFinalDecisionTemplateBody(payload);
-
-        return builder.build();
-
     }
 
     private void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
@@ -152,6 +173,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         if (dailyLivingAwardType != null) {
             builder.dailyLivingAwardRate(join(
                 splitByCharacterTypeCamelCase(dailyLivingAwardType), ' ').toLowerCase());
+        } else {
+            builder.dailyLivingAwardRate(null);
         }
 
         if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
@@ -168,6 +191,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         if (mobilityAwardType != null) {
             builder.mobilityAwardRate(join(
                 splitByCharacterTypeCamelCase(mobilityAwardType), ' ').toLowerCase());
+        } else {
+            builder.mobilityAwardRate(null);
         }
 
         if (AwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
@@ -191,6 +216,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             builder.dailyLivingNumberOfPoints(dailyLivingDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
 
             builder.dailyLivingDescriptors(dailyLivingDescriptors);
+        } else {
+            builder.dailyLivingDescriptors(null);
+            builder.dailyLivingNumberOfPoints(null);
         }
 
         List<String> mobilityAnswers = ActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
@@ -200,6 +228,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             builder.mobilityDescriptors(mobilityDescriptors);
 
             builder.mobilityNumberOfPoints(mobilityDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
+        } else {
+            builder.mobilityDescriptors(null);
+            builder.mobilityNumberOfPoints(null);
         }
     }
 

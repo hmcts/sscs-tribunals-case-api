@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -113,7 +114,9 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(false, payload.isMobilityIsSeverelyLimited());
         Assert.assertNull(payload.getMobilityAwardRate());
         Assert.assertNull(payload.getMobilityDescriptors());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision());
+        assertNotNull(payload.getReasonsForDecision());
+        assertEquals(1, payload.getReasonsForDecision().size());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
 
     }
 

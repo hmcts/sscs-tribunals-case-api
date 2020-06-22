@@ -16,6 +16,23 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 public class DecisionNoticeOutcomeService {
 
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
+
+        if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() == null) {
+            return null;
+        } else {
+            if (sscsCaseData.isDailyLivingAndOrMobilityDecision()) {
+                return determineDescriptorFlowOutcome(sscsCaseData);
+
+            } else {
+                return determineNonDescriptorFlowOutcome(sscsCaseData);
+            }
+        }
+    }
+
+    private Outcome determineDescriptorFlowOutcome(SscsCaseData sscsCaseData) {
+
+        // Daily living and or/mobility
+
         if (sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null
             || sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null) {
             return null;
@@ -44,6 +61,18 @@ public class DecisionNoticeOutcomeService {
                 return null;
             }
 
+        }
+    }
+
+    private Outcome determineNonDescriptorFlowOutcome(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
+            return null;
+        } else {
+            if ("allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                return DECISION_IN_FAVOUR_OF_APPELLANT;
+            } else {
+                return DECISION_UPHELD;
+            }
         }
     }
 }

@@ -24,6 +24,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
@@ -35,7 +36,7 @@
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
-      "writeFinalDecisionReasonsForDecision" : "My reasons for decision",
+      "writeFinalDecisionReasons" : [{"id" : null, "value" : "My reasons for decision"}],
       "writeFinalDecisionPreviewDocument": {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
@@ -752,6 +753,7 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
@@ -763,7 +765,7 @@
       "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
       "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1f",
       "pipWriteFinalDecisionTakingNutritionQuestion" : "takingNutrition2f",
-      "writeFinalDecisionReasonsForDecision" : "My reasons for decision",
+      "writeFinalDecisionReasons" : [{"id" : null, "value" : "My reasons for decision"}],
       "writeFinalDecisionPreviewDocument": {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
