@@ -29,14 +29,14 @@
       "signedBy": "Maple Magoo",
       "signedRole": "Proxy Judge",
       "decisionType": "strikeOut",
-      "previewDocument" : {
+      "dwpTimeExtension": [
+      ],
+      "generatedNino": "JT 12 34 56 D",
+      "writeFinalDecisionPreviewDocument" : {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
         "document_filename": "decisionIssued.pdf"
       },
-      "dwpTimeExtension": [
-      ],
-      "generatedNino": "JT 12 34 56 D",
       "hearings": [
         {
           "value": {
@@ -90,33 +90,33 @@
           }
         }
       },
-        {
-          "value" : {
-            "documentType" : "representativeEvidence",
-            "documentFileName" : "22222.pdf",
-            "documentDateAdded" : "2018-10-11",
-            "evidenceIssued": "Yes",
-            "documentLink" : {
-              "document_url" : "http://www.itv.com",
-              "document_binary_url" : "http://www.itv.com/binary",
-              "document_filename" : "myfile2.jpg"
-            }
+      {
+        "value" : {
+          "documentType" : "representativeEvidence",
+          "documentFileName" : "22222.pdf",
+          "documentDateAdded" : "2018-10-11",
+          "evidenceIssued": "Yes",
+          "documentLink" : {
+            "document_url" : "http://www.itv.com",
+            "document_binary_url" : "http://www.itv.com/binary",
+            "document_filename" : "myfile2.jpg"
           }
-        },
-        {
-          "value" : {
-            "documentType" : "decisionIssued",
-            "documentFileName" : "oldDecisionIssued.pdf",
-            "documentDateAdded" : "2018-10-12",
-            "evidenceIssued": "Yes",
-            "bundleAddition": "A",
-            "documentLink" : {
-              "document_url" : "http://www.itv3.com",
-              "document_binary_url" : "http://www.itv3.com/binary",
-              "document_filename" : "myfile3.jpg"
-            }
+        }
+      },
+      {
+        "value" : {
+          "documentType" : "decisionIssued",
+          "documentFileName" : "oldDecisionIssued.pdf",
+          "documentDateAdded" : "2018-10-12",
+          "evidenceIssued": "Yes",
+          "bundleAddition": "A",
+          "documentLink" : {
+            "document_url" : "http://www.itv3.com",
+            "document_binary_url" : "http://www.itv3.com/binary",
+            "document_filename" : "myfile3.jpg"
           }
-        }],
+        }
+      }],
       "reissueFurtherEvidenceDocument": {},
       "resendToAppellant": "NO",
       "resendToRepresentative": "NO",

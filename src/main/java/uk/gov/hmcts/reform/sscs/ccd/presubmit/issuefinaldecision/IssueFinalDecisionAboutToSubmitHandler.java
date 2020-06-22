@@ -1,24 +1,34 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
 
-import java.util.Iterator;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Component
 @Slf4j
 public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final FooterService footerService;
+
+    @Autowired
+    public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService) {
+        this.footerService = footerService;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -40,28 +50,34 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
 
-        moveDraftFinalDecision(preSubmitCallbackResponse);
+        if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
+            createFinalDecisionNoticeFromPreviewDraft(sscsCaseData);
+        } else {
+            preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
+        }
 
-        clearTransientFields(sscsCaseData);
+        clearTransientFields(preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }
 
-    private void moveDraftFinalDecision(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void createFinalDecisionNoticeFromPreviewDraft(SscsCaseData sscsCaseData) {
 
-        Iterator<SscsDocument> iterator = preSubmitCallbackResponse.getData().getSscsDocument().stream()
-                .filter(e -> e.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue())).iterator();
+        DocumentLink previewDoc = sscsCaseData.getWriteFinalDecisionPreviewDocument();
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
 
-        if (iterator.hasNext()) {
-            while (iterator.hasNext()) {
-                iterator.next().getValue().setDocumentType(DECISION_NOTICE.getValue());
-            }
-        } else {
-            preSubmitCallbackResponse.addError("There is no Draft Decision Notice on the case so decision cannot be issued");
-        }
+        DocumentLink documentLink = DocumentLink.builder()
+            .documentUrl(previewDoc.getDocumentUrl())
+            .documentFilename(DocumentType.DECISION_NOTICE.getValue() + " issued on " + now + ".pdf")
+            .documentBinaryUrl(previewDoc.getDocumentBinaryUrl())
+            .build();
+
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.DECISION_NOTICE, now);
     }
 
-    private void clearTransientFields(SscsCaseData sscsCaseData) {
+    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
+
         sscsCaseData.setWriteFinalDecisionTypeOfHearing(null);
         sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
         sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion(null);
@@ -91,8 +107,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion(null);
         sscsCaseData.setWriteFinalDecisionReasonsForDecision(null);
         sscsCaseData.setWriteFinalDecisionPageSectionReference(null);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice(null);
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
+        sscsCaseData.setWriteFinalDecisionGeneratedDate(null);
+
+        preSubmitCallbackResponse.getData().getSscsDocument()
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
     }
 
 }

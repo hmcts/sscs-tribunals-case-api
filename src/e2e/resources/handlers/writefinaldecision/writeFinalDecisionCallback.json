@@ -42,7 +42,6 @@
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Fred",
       "writeFinalDecisionEndDate": "2020-10-10",
       "writeFinalDecisionEndDateType": "setEndDate",
-      "writeFinalDecisionGenerateNotice": "Yes",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Ted",
       "writeFinalDecisionPageSectionReference": "B2",
       "writeFinalDecisionAppellantAttendedQuestion": "Yes",
@@ -776,7 +775,6 @@
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "writeFinalDecisionStartDate": "2018-10-10",
       "writeFinalDecisionEndDate": "2018-10-10",
-      "writeFinalDecisionGenerateNotice": "Yes",
       "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
       "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "higher",
       "writeFinalDecisionPreviewDocument": {
