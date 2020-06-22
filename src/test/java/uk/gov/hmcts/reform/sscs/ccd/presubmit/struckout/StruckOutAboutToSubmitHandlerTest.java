@@ -52,7 +52,7 @@ public class StruckOutAboutToSubmitHandlerTest {
                 .ccdCaseId("1234")
                 .interlocReviewState(AWAITING_INFORMATION.getId())
                 .directionDueDate(LocalDate.now().toString())
-                .hmctsDwpState("sentToDwp")
+                .dwpState(DwpState.IN_PROGRESS.getId())
                 .state(State.INTERLOCUTORY_REVIEW_STATE)
                 .appeal(Appeal.builder().build())
                 .build();
@@ -86,6 +86,6 @@ public class StruckOutAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
-        assertThat(response.getData().getHmctsDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
     }
 }

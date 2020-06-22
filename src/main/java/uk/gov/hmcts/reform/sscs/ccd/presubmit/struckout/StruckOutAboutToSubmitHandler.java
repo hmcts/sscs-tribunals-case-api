@@ -39,10 +39,8 @@ public class StruckOutAboutToSubmitHandler implements PreSubmitCallbackHandler<S
 
         sscsCaseData.setInterlocReviewState(null);
         sscsCaseData.setDirectionDueDate(null);
-        sscsCaseData.setHmctsDwpState(DwpState.STRIKE_OUT_ACTIONED.getId());
+        sscsCaseData.setDwpState(DwpState.STRIKE_OUT_ACTIONED.getId());
 
-        PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return callbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 }
