@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -86,7 +87,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .pipWriteFinalDecisionBudgetingDecisionsQuestion("")
             .pipWriteFinalDecisionPlanningAndFollowingQuestion("")
             .pipWriteFinalDecisionMovingAroundQuestion("")
-            .writeFinalDecisionReasonsForDecision("")
+            .writeFinalDecisionReasons(Arrays.asList(new CollectionItem(null, "")))
             .writeFinalDecisionPageSectionReference("")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
             .build();
@@ -143,7 +144,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
         assertNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
         assertNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
-        assertNull(sscsCaseData.getWriteFinalDecisionReasonsForDecision());
+        assertNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
     }
 

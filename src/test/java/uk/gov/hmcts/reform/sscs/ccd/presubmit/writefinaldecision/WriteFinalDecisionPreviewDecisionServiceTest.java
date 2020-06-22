@@ -138,7 +138,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
         sscsCaseData.setWriteFinalDecisionEndDate(endDate);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
+        sscsCaseData.setWriteFinalDecisionReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
         sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
         sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
         sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
@@ -153,7 +153,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertEquals(endDate,body.getEndDate());
         assertEquals("2018-10-10", body.getDateOfDecision());
         assertEquals(endDate == null, body.isIndefinite());
-        assertEquals("My reasons for decision", body.getReasonsForDecision());
+        assertNotNull(body.getReasonsForDecision());
+        assertFalse(body.getReasonsForDecision().isEmpty());
+        assertEquals("My reasons for decision", body.getReasonsForDecision().get(0));
         assertEquals("telephone", body.getHearingType());
         assertEquals("A1", body.getPageNumber());
         assertTrue(body.isAttendedHearing());
@@ -166,6 +168,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         String nonDescriptorsComparedWithDwp) {
 
         setCommonPreviewParams(sscsCaseData, endDate);
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
 
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
@@ -239,6 +243,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+
         // Daily living specific params
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(rate);
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
@@ -300,6 +306,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
@@ -318,6 +325,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -337,6 +345,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -356,6 +365,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -373,6 +383,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -392,6 +403,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -418,6 +430,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -451,6 +464,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -475,6 +489,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -499,6 +514,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -521,6 +537,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -544,6 +561,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithEmptyHearingsList_thenDefaultHearingData() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -568,6 +586,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithNullHearingsList_thenDefaultHearingData() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -590,6 +609,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -624,6 +644,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -648,6 +669,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -675,6 +697,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -707,6 +730,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -738,6 +762,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithNoPanelMembers_thenCorrectlySetTheHeldBefore() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -765,6 +790,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void scottishRpcWillShowAScottishImage() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -782,6 +808,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -804,6 +831,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
     @Test
     public void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument() {
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -817,6 +845,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
     @Test
     public void givenGeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -840,6 +869,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertEquals(dateOfDecision, body.getDateOfDecision());
         assertEquals(allowed, body.isAllowed());
         assertEquals(allowed, body.isSetAside());
+        assertNull(body.getDetailsOfDecision());
+        assertTrue(body.isDescriptorFlow());
 
         return payload;
     }

@@ -105,7 +105,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setPipWriteFinalDecisionBudgetingDecisionsQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion(null);
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision(null);
+        sscsCaseData.setWriteFinalDecisionReasons(null);
         sscsCaseData.setWriteFinalDecisionPageSectionReference(null);
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
         sscsCaseData.setWriteFinalDecisionGeneratedDate(null);

@@ -16,34 +16,56 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 public class DecisionNoticeOutcomeService {
 
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null
-            || sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null) {
+
+        if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() == null) {
             return null;
         } else {
 
-            try {
+            if (sscsCaseData.isDailyLivingAndOrMobilityDecision()) {
 
-                ComparedRate dailyLivingComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-                ComparedRate mobilityComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+                // Daily living and or/mobility
 
-                Set<ComparedRate> comparedRates = new HashSet<>();
-                comparedRates.add(dailyLivingComparedRate);
-                comparedRates.add(mobilityComparedRate);
-
-                // At least one higher,  and non lower, means the decision is in favour of appellant
-                if (comparedRates.contains(ComparedRate.Higher)
-                    && !comparedRates.contains(ComparedRate.Lower)) {
-                    return DECISION_IN_FAVOUR_OF_APPELLANT;
+                if (sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null
+                    || sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null) {
+                    return null;
                 } else {
-                    // Otherwise, decision upheld
-                    return DECISION_UPHELD;
+
+                    try {
+
+                        ComparedRate dailyLivingComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+                        ComparedRate mobilityComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+
+                        Set<ComparedRate> comparedRates = new HashSet<>();
+                        comparedRates.add(dailyLivingComparedRate);
+                        comparedRates.add(mobilityComparedRate);
+
+                        // At least one higher,  and non lower, means the decision is in favour of appellant
+                        if (comparedRates.contains(ComparedRate.Higher)
+                            && !comparedRates.contains(ComparedRate.Lower)) {
+                            return DECISION_IN_FAVOUR_OF_APPELLANT;
+                        } else {
+                            // Otherwise, decision upheld
+                            return DECISION_UPHELD;
+                        }
+
+                    } catch (IllegalArgumentException e) {
+                        log.error(e.getMessage());
+                        return null;
+                    }
+
                 }
-
-            } catch (IllegalArgumentException e) {
-                log.error(e.getMessage());
-                return null;
+            } else {
+                // Non-daily-living and/or mobility
+                if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
+                    return null;
+                } else {
+                    if ("allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                        return DECISION_IN_FAVOUR_OF_APPELLANT;
+                    } else {
+                        return DECISION_UPHELD;
+                    }
+                }
             }
-
         }
     }
 }

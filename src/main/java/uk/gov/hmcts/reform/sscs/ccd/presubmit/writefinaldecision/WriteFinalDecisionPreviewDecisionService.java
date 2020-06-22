@@ -44,7 +44,6 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     private final IdamClient idamClient;
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
-
     private boolean showIssueDate;
 
     @Autowired
@@ -60,6 +59,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, String userAuthorisation, boolean showIssueDate) {
 
         this.showIssueDate = showIssueDate;
+
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -85,6 +85,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
+
+        writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
@@ -115,18 +117,33 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             writeFinalDecisionBuilder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
         }
 
-        writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
-        writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
-        writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.appellantName(buildName(caseData));
 
-        setEntitlements(writeFinalDecisionBuilder, caseData);
 
-        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        if (caseData.isDailyLivingAndOrMobilityDecision()) {
 
-        writeFinalDecisionBuilder.reasonsForDecision(caseData.getWriteFinalDecisionReasonsForDecision());
+            writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
+            writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
+            writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
+
+            setEntitlements(writeFinalDecisionBuilder, caseData);
+
+            setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+
+            writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
+        } else {
+            writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
+
+        }
+
+        if (caseData.getWriteFinalDecisionReasons() != null) {
+            writeFinalDecisionBuilder.reasonsForDecision(
+                caseData.getWriteFinalDecisionReasons().stream().map(i -> i.getValue()).collect(Collectors.toList()));
+        }
+
+        writeFinalDecisionBuilder.anythingElse(caseData.getWriteFinalDecisionAnythingElse());
+
         writeFinalDecisionBuilder.hearingType(caseData.getWriteFinalDecisionTypeOfHearing());
-        writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
         writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionAppellantAttendedQuestion()));
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
 
