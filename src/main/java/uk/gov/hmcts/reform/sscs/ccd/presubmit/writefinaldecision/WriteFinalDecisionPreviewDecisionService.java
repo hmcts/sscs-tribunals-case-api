@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
