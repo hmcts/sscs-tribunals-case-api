@@ -20,51 +20,58 @@ public class DecisionNoticeOutcomeService {
         if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() == null) {
             return null;
         } else {
-
             if (sscsCaseData.isDailyLivingAndOrMobilityDecision()) {
+                return determineDescriptorFlowOutcome(sscsCaseData);
 
-                // Daily living and or/mobility
-
-                if (sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null
-                    || sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null) {
-                    return null;
-                } else {
-
-                    try {
-
-                        ComparedRate dailyLivingComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-                        ComparedRate mobilityComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
-
-                        Set<ComparedRate> comparedRates = new HashSet<>();
-                        comparedRates.add(dailyLivingComparedRate);
-                        comparedRates.add(mobilityComparedRate);
-
-                        // At least one higher,  and non lower, means the decision is in favour of appellant
-                        if (comparedRates.contains(ComparedRate.Higher)
-                            && !comparedRates.contains(ComparedRate.Lower)) {
-                            return DECISION_IN_FAVOUR_OF_APPELLANT;
-                        } else {
-                            // Otherwise, decision upheld
-                            return DECISION_UPHELD;
-                        }
-
-                    } catch (IllegalArgumentException e) {
-                        log.error(e.getMessage());
-                        return null;
-                    }
-
-                }
             } else {
-                // Non-daily-living and/or mobility
-                if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
-                    return null;
+                return determineNonDescriptorFlowOutcome(sscsCaseData);
+            }
+        }
+    }
+
+    private Outcome determineDescriptorFlowOutcome(SscsCaseData sscsCaseData) {
+
+        // Daily living and or/mobility
+
+        if (sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null
+            || sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null) {
+            return null;
+        } else {
+
+            try {
+
+                ComparedRate dailyLivingComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+                ComparedRate mobilityComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+
+                Set<ComparedRate> comparedRates = new HashSet<>();
+                comparedRates.add(dailyLivingComparedRate);
+                comparedRates.add(mobilityComparedRate);
+
+                // At least one higher,  and non lower, means the decision is in favour of appellant
+                if (comparedRates.contains(ComparedRate.Higher)
+                    && !comparedRates.contains(ComparedRate.Lower)) {
+                    return DECISION_IN_FAVOUR_OF_APPELLANT;
                 } else {
-                    if ("allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
-                        return DECISION_IN_FAVOUR_OF_APPELLANT;
-                    } else {
-                        return DECISION_UPHELD;
-                    }
+                    // Otherwise, decision upheld
+                    return DECISION_UPHELD;
                 }
+
+            } catch (IllegalArgumentException e) {
+                log.error(e.getMessage());
+                return null;
+            }
+
+        }
+    }
+
+    private Outcome determineNonDescriptorFlowOutcome(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
+            return null;
+        } else {
+            if ("allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                return DECISION_IN_FAVOUR_OF_APPELLANT;
+            } else {
+                return DECISION_UPHELD;
             }
         }
     }

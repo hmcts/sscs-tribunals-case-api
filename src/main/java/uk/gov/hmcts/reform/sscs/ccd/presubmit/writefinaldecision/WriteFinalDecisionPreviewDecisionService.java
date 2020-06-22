@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
@@ -48,7 +50,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
-                                                    DecisionNoticeQuestionService decisionNoticeQuestionService, @Value("${doc_assembly.issue_final_decision}") String templateId) {
+        DecisionNoticeQuestionService decisionNoticeQuestionService, @Value("${doc_assembly.issue_final_decision}") String templateId) {
         this.generateFile = generateFile;
         this.templateId = templateId;
         this.idamClient = idamClient;
@@ -81,7 +83,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     @Override
     protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
-        DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
+        DirectionOrDecisionIssuedTemplateBody formPayload = super
+            .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -90,20 +93,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
-            Hearing finalHearing = caseData.getHearings().get(0);
-            if (finalHearing != null && finalHearing.getValue() != null) {
-                if (finalHearing.getValue().getHearingDate() != null) {
-                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
-                }
-                if (finalHearing.getValue().getVenue() != null) {
-                    writeFinalDecisionBuilder.heldAt(finalHearing.getValue().getVenue().getName());
-                }
-            }
-        } else {
-            writeFinalDecisionBuilder.heldOn(LocalDate.now());
-            writeFinalDecisionBuilder.heldAt("In chambers");
-        }
+        setHearings(writeFinalDecisionBuilder, caseData);
 
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
         if (outcome == null) {
@@ -115,30 +105,26 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         if (caseData.getWriteFinalDecisionDateOfDecision() != null) {
             writeFinalDecisionBuilder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
+        } else {
+            writeFinalDecisionBuilder.dateOfDecision(null);
         }
 
         writeFinalDecisionBuilder.appellantName(buildName(caseData));
 
+        writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
+        writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
+        writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
 
-        if (caseData.isDailyLivingAndOrMobilityDecision()) {
+        setEntitlements(writeFinalDecisionBuilder, caseData);
+        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
+        writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
 
-            writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
-            writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
-            writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
-
-            setEntitlements(writeFinalDecisionBuilder, caseData);
-
-            setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
-
-            writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
-        } else {
-            writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
-
-        }
-
-        if (caseData.getWriteFinalDecisionReasons() != null) {
+        if (caseData.getWriteFinalDecisionReasons() != null && !caseData.getWriteFinalDecisionReasons().isEmpty()) {
             writeFinalDecisionBuilder.reasonsForDecision(
-                caseData.getWriteFinalDecisionReasons().stream().map(i -> i.getValue()).collect(Collectors.toList()));
+                caseData.getWriteFinalDecisionReasons().stream().map(CollectionItem::getValue).collect(Collectors.toList()));
+        } else {
+            writeFinalDecisionBuilder.reasonsForDecision(null);
         }
 
         writeFinalDecisionBuilder.anythingElse(caseData.getWriteFinalDecisionAnythingElse());
@@ -153,12 +139,31 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         if (showIssueDate) {
             builder.dateIssued(LocalDate.now());
+        } else {
+            builder.dateIssued(null);
         }
 
         builder.writeFinalDecisionTemplateBody(payload);
 
         return builder.build();
 
+    }
+
+    private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
+        if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
+            Hearing finalHearing = caseData.getHearings().get(0);
+            if (finalHearing != null && finalHearing.getValue() != null) {
+                if (finalHearing.getValue().getHearingDate() != null) {
+                    writeFinalDecisionBuilder.heldOn(LocalDate.parse(finalHearing.getValue().getHearingDate()));
+                }
+                if (finalHearing.getValue().getVenue() != null) {
+                    writeFinalDecisionBuilder.heldAt(finalHearing.getValue().getVenue().getName());
+                }
+            }
+        } else {
+            writeFinalDecisionBuilder.heldOn(LocalDate.now());
+            writeFinalDecisionBuilder.heldAt("In chambers");
+        }
     }
 
     private void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
@@ -169,6 +174,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         if (dailyLivingAwardType != null) {
             builder.dailyLivingAwardRate(join(
                 splitByCharacterTypeCamelCase(dailyLivingAwardType), ' ').toLowerCase());
+        } else {
+            builder.dailyLivingAwardRate(null);
         }
 
         if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
@@ -185,6 +192,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         if (mobilityAwardType != null) {
             builder.mobilityAwardRate(join(
                 splitByCharacterTypeCamelCase(mobilityAwardType), ' ').toLowerCase());
+        } else {
+            builder.mobilityAwardRate(null);
         }
 
         if (AwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
@@ -208,6 +217,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             builder.dailyLivingNumberOfPoints(dailyLivingDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
 
             builder.dailyLivingDescriptors(dailyLivingDescriptors);
+        } else {
+            builder.dailyLivingDescriptors(null);
+            builder.dailyLivingNumberOfPoints(null);
         }
 
         List<String> mobilityAnswers = ActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
@@ -217,6 +229,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             builder.mobilityDescriptors(mobilityDescriptors);
 
             builder.mobilityNumberOfPoints(mobilityDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
+        } else {
+            builder.mobilityDescriptors(null);
+            builder.mobilityNumberOfPoints(null);
         }
     }
 
