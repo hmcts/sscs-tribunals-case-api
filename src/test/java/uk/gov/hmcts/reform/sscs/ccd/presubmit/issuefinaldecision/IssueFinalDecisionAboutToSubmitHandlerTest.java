@@ -149,13 +149,12 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventAndNoDraftDecisionOnCase_thenDisplayAnError() {
-        callback.getCaseDetails().getCaseData().getSscsDocument().add(SscsDocument.builder().value(
-                SscsDocumentDetails.builder().documentType(DECISION_NOTICE.getValue()).build()).build());
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("There is no Draft Decision Notice on the case so decision cannot be issued", error);
+        assertEquals("There is no Preview Draft Decision Notice on the case so decision cannot be issued", error);
     }
 
     @Test
