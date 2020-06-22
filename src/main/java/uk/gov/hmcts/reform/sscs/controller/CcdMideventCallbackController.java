@@ -45,6 +45,6 @@ public class CcdMideventCallbackController {
 
         authorisationService.authorise(serviceAuthHeader);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, userAuthorisation));
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, userAuthorisation, false));
     }
 }

@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,6 +45,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
 
+    private boolean showIssueDate;
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
@@ -55,11 +57,16 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, String userAuthorisation, boolean showIssueDate) {
 
+        this.showIssueDate = showIssueDate;
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
+            sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
+        }
 
         try {
             return issueDocument(callback, DocumentType.DRAFT_DECISION_NOTICE, templateId, generateFile, userAuthorisation);
@@ -72,9 +79,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     }
 
     @Override
-    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish,
+    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
-        DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
+        DirectionOrDecisionIssuedTemplateBody formPayload = super.createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -126,6 +133,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
         validateRequiredProperties(payload);
+
+        if (showIssueDate) {
+            builder.dateIssued(LocalDate.now());
+        }
 
         builder.writeFinalDecisionTemplateBody(payload);
 
