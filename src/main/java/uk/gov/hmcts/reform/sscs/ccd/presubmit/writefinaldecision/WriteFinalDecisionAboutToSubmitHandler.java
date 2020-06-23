@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
 import java.time.LocalDate;
@@ -91,8 +92,12 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
      */
     private Optional<String> getOptionalErrorMessage(PointsCondition pointsCondition, SscsCaseData sscsCaseData) {
 
-        int totalPoints = pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData)
-            .stream().map(answerText -> decisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
+        Collection<String> collection = emptyIfNull(pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData));
+
+        if (collection.isEmpty()) {
+            return Optional.empty();
+        }
+        int totalPoints = collection.stream().map(answerText -> decisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
                 answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
 
         return pointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :

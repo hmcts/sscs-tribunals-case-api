@@ -5,11 +5,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
@@ -146,6 +148,10 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test
@@ -159,6 +165,10 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("2019-10-10", result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("test.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test
@@ -172,5 +182,9 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("2019-10-10", result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("test.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 }

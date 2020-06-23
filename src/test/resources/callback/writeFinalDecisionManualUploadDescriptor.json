@@ -104,11 +104,10 @@
       "generatedMobile": "01234567890",
       "generatedNino": "AB 22 55 66 B",
       "generatedSurname": "Test",
-      "outcome": "decisionInFavourOfAppellant",
-      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "same",
-      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "lower",
-      "pipWriteFinalDecisionDailyLivingQuestion": "standardRate",
-      "pipWriteFinalDecisionMobilityQuestion": "standardRate",
+      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
+      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "higher",
+      "pipWriteFinalDecisionDailyLivingQuestion": "enhancedRate",
+      "pipWriteFinalDecisionMobilityQuestion": "enhancedRate",
       "sscsDocument": [
         {
           "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
@@ -829,7 +828,6 @@
       "generatedMobile": "01234567890",
       "generatedNino": "AB 22 55 66 B",
       "generatedSurname": "Test",
-      "outcome": "decisionInFavourOfAppellant",
       "sscsDocument": [
         {
           "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
