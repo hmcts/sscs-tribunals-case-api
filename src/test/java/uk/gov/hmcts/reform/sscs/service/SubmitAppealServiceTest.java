@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -20,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -233,7 +233,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
-        Assert.assertTrue(result.isPresent());
+        assertTrue(result.isPresent());
 
     }
 
@@ -247,7 +247,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
-        Assert.assertFalse(result.isPresent());
+        assertFalse(result.isPresent());
     }
 
     @Test
@@ -260,7 +260,7 @@ public class SubmitAppealServiceTest {
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
-        Assert.assertFalse(result.isPresent());
+        assertFalse(result.isPresent());
     }
 
     @Test
