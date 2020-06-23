@@ -57,8 +57,6 @@ public class WriteFinalDecisionTemplateBody {
     private List<Descriptor> dailyLivingDescriptors;
     @JsonProperty("mobility_descriptors")
     private List<Descriptor> mobilityDescriptors;
-    @JsonProperty("reasons_for_decision")
-    private String reasonsForDecision;
     @JsonProperty("hearing_type")
     private String hearingType;
     @JsonProperty("page_number")
@@ -67,4 +65,13 @@ public class WriteFinalDecisionTemplateBody {
     private boolean attendedHearing;
     @JsonProperty("presenting_officer_attended")
     private boolean presentingOfficerAttended;
+    @JsonProperty("is_descriptor_flow")
+    private boolean isDescriptorFlow;
+    @JsonProperty("details_of_decision")
+    private String detailsOfDecision;
+    @JsonProperty("reasons_for_decision")
+    private List<String> reasonsForDecision;
+    @JsonProperty("anything_else")
+    private String anythingElse;
+
 }

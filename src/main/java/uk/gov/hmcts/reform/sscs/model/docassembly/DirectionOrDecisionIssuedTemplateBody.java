@@ -40,6 +40,8 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonProperty("generated_date")
     private LocalDate generatedDate;
+    @JsonProperty("date_issued")
+    private LocalDate dateIssued;
     @JsonProperty("hmcts2")
     @Builder.Default private String image = ENGLISH_IMAGE;
     @JsonProperty("write_final_decision")

@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.util;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.LocalDateTime;
 import org.hamcrest.Matchers;

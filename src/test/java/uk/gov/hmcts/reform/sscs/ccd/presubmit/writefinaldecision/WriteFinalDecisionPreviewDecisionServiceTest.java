@@ -138,7 +138,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
         sscsCaseData.setWriteFinalDecisionEndDate(endDate);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision("My reasons for decision");
+        sscsCaseData.setWriteFinalDecisionReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
+        sscsCaseData.setWriteFinalDecisionAnythingElse("Something else.");
         sscsCaseData.setWriteFinalDecisionTypeOfHearing("telephone");
         sscsCaseData.setWriteFinalDecisionPageSectionReference("A1");
         sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion("Yes");
@@ -148,12 +149,19 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
     }
 
-    private void assertCommonPreviewParams(WriteFinalDecisionTemplateBody body, String endDate) {
+    private void assertCommonPreviewParams(WriteFinalDecisionTemplateBody body, String endDate, boolean nullReasonsExpected) {
         assertEquals("2018-10-11",body.getStartDate());
         assertEquals(endDate,body.getEndDate());
         assertEquals("2018-10-10", body.getDateOfDecision());
         assertEquals(endDate == null, body.isIndefinite());
-        assertEquals("My reasons for decision", body.getReasonsForDecision());
+        if (nullReasonsExpected) {
+            assertNull(body.getReasonsForDecision());
+        } else {
+            assertNotNull(body.getReasonsForDecision());
+            assertFalse(body.getReasonsForDecision().isEmpty());
+            assertEquals("My reasons for decision", body.getReasonsForDecision().get(0));
+        }
+        assertEquals("Something else.", body.getAnythingElse());
         assertEquals("telephone", body.getHearingType());
         assertEquals("A1", body.getPageNumber());
         assertTrue(body.isAttendedHearing());
@@ -161,11 +169,17 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     }
 
     @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
-    public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
+    public void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty() {
+
+        final String endDate = "10-10-2020";
+        final String rate = "standardRate";
+        final String descriptorsComparedToDwp = "higher";
+        final String nonDescriptorsComparedWithDwp = "higher";
 
         setCommonPreviewParams(sscsCaseData, endDate);
+        sscsCaseData.setWriteFinalDecisionReasons(new ArrayList<>());
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
 
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
@@ -175,7 +189,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -193,7 +207,68 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertNotNull(body);
 
         // Common assertions
-        assertCommonPreviewParams(body, endDate);
+        assertCommonPreviewParams(body, endDate, true);
+
+        assertEquals("standard rate", body.getMobilityAwardRate());
+        assertEquals(false, body.isMobilityIsSeverelyLimited());
+        assertEquals(true, body.isMobilityIsEntited());
+
+        assertNotNull(body.getMobilityDescriptors());
+        assertEquals(1, body.getMobilityDescriptors().size());
+        assertNotNull(body.getMobilityDescriptors().get(0));
+        assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
+        assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
+        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getMobilityNumberOfPoints());
+        assertEquals(10, body.getMobilityNumberOfPoints().intValue());
+
+        // Daily living specific assertions
+        assertEquals(false, body.isDailyLivingIsEntited());
+        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
+        assertNull(body.getDailyLivingAwardRate());
+        assertNull(body.getDailyLivingDescriptors());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+    }
+
+    @Test
+    @Parameters(named = "previewEndDateAndRateCombinations")
+    public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
+        String nonDescriptorsComparedWithDwp) {
+
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
+
+        // Mobility specific parameters
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
+            appealAllowedExpectation);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
 
         // Mobility specific assertions
         if ("standardRate".equals(rate)) {
@@ -225,6 +300,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertEquals(false, body.isDailyLivingIsSeverelyLimited());
         assertNull(body.getDailyLivingAwardRate());
         assertNull(body.getDailyLivingDescriptors());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
     @Test
@@ -237,12 +314,14 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+
         // Daily living specific params
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(rate);
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
         sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -260,7 +339,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertNotNull(body);
 
         // Common assertions
-        assertCommonPreviewParams(body, endDate);
+        assertCommonPreviewParams(body, endDate, false);
 
         // Daily living specific assertions
         if ("standardRate".equals(rate)) {
@@ -298,6 +377,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
 
@@ -305,7 +385,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
@@ -316,6 +396,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -325,7 +406,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user name", error);
@@ -335,6 +416,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -344,7 +426,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user details", error);
@@ -354,6 +436,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
@@ -361,7 +444,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
@@ -371,6 +454,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -380,7 +464,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
@@ -390,6 +474,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -397,7 +482,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
@@ -408,7 +493,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenGenerateNoticeNotSet_willNotSetPreviewFile() {
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
@@ -416,6 +501,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -429,7 +515,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -449,6 +535,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -462,7 +549,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
@@ -473,6 +560,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -486,7 +574,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
@@ -497,6 +585,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -508,7 +597,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
@@ -519,6 +608,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -531,7 +621,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
@@ -542,6 +632,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithEmptyHearingsList_thenDefaultHearingData() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -549,7 +640,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = new ArrayList<>();
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertTrue(response.getErrors().isEmpty());
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
@@ -566,11 +657,12 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithNullHearingsList_thenDefaultHearingData() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
 
         assertTrue(response.getErrors().isEmpty());
@@ -588,6 +680,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -601,7 +694,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -622,6 +715,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -636,7 +730,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date", error);
@@ -646,6 +740,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -659,7 +754,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
@@ -673,6 +768,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -684,7 +780,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -705,6 +801,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -714,7 +811,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -736,6 +833,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithNoPanelMembers_thenCorrectlySetTheHeldBefore() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -743,7 +841,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -763,6 +861,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void scottishRpcWillShowAScottishImage() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -772,7 +871,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        service.preview(callback, USER_AUTHORISATION);
+        service.preview(callback, USER_AUTHORISATION, false);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
     }
@@ -780,6 +879,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -795,9 +895,38 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        service.preview(callback, USER_AUTHORISATION);
+        service.preview(callback, USER_AUTHORISATION, false);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "2018-10-10", true);
+    }
+
+    @Test
+    public void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument() {
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        service.preview(callback, USER_AUTHORISATION, true);
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+
+        assertEquals(LocalDate.now(), payload.getDateIssued());
+    }
+
+    @Test
+    public void givenGeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+
+        service.preview(callback, USER_AUTHORISATION, true);
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+
+        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
     }
 
     private DirectionOrDecisionIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String dateOfDecision, boolean allowed) {
@@ -811,6 +940,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertEquals(dateOfDecision, body.getDateOfDecision());
         assertEquals(allowed, body.isAllowed());
         assertEquals(allowed, body.isSetAside());
+        assertNull(body.getDetailsOfDecision());
+        assertTrue(body.isDescriptorFlow());
 
         return payload;
     }

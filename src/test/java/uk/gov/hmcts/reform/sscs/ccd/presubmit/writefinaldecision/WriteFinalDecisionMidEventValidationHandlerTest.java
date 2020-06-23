@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String URL = "http://dm-store/documents/123";
     private WriteFinalDecisionMidEventValidationHandler handler;
 
     @Mock
