@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.pdf.util;
 
 import static java.time.LocalDate.parse;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static uk.gov.hmcts.reform.sscs.service.pdf.util.PdfDateUtil.reformatDate;
 import static uk.gov.hmcts.reform.sscs.service.pdf.util.PdfDateUtil.reformatDateTimeToDate;
 
