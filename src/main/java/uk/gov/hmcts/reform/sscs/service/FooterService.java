@@ -39,17 +39,17 @@ public class FooterService {
         this.alter = alter;
     }
 
-    public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued) {
+    public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName) {
         String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
         if (url != null) {
             log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
 
             String bundleAddition = getNextBundleAddition(caseData.getSscsDocument());
 
-            String bundleFileName = buildBundleAdditionFileName(bundleAddition, label + " issued on " + dateIssued);
+            String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, label + " issued on " + dateIssued);
 
             SscsDocument sscsDocument = createFooterDocument(url, label, bundleAddition, bundleFileName,
-                    caseData.getDateAdded(), documentType);
+                    dateAdded, documentType);
 
             List<SscsDocument> documents = new ArrayList<>();
             documents.add(sscsDocument);

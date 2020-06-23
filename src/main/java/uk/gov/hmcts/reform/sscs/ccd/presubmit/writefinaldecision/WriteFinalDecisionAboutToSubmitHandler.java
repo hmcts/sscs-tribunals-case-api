@@ -106,12 +106,10 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                     .removeIf(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType()));
         }
 
-        final String filename = String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-
         SscsDocument draftDecisionNotice = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(filename)
+                .documentFileName(createFileName(sscsCaseData))
                 .documentLink(sscsCaseData.getWriteFinalDecisionPreviewDocument())
-                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                .documentDateAdded(setDocumentDateAdded(sscsCaseData))
                 .documentType(DRAFT_DECISION_NOTICE.getValue())
                 .build()).build();
 
@@ -123,5 +121,21 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             documents.addAll(sscsCaseData.getSscsDocument());
         }
         sscsCaseData.setSscsDocument(documents);
+    }
+
+    private String createFileName(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getWriteFinalDecisionDocumentFileName() != null) {
+            return sscsCaseData.getWriteFinalDecisionDocumentFileName();
+        } else {
+            return String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        }
+    }
+
+    private String setDocumentDateAdded(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getWriteFinalDecisionDocumentDateAdded() != null) {
+            return sscsCaseData.getWriteFinalDecisionDocumentDateAdded();
+        } else {
+            return LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        }
     }
 }
