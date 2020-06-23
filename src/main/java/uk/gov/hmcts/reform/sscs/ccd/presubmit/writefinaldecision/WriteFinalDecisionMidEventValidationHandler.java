@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -44,7 +45,32 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             preSubmitCallbackResponse.addError("Decision notice date of decision must not be in the future");
         }
 
+        validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+
         return preSubmitCallbackResponse;
+    }
+
+    private void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (AwardType.NO_AWARD.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            if ("higher".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
+                preSubmitCallbackResponse.addError("Daily living decision of No-Award cannot be higher than DWP decision");
+            }
+        }
+        if (AwardType.NO_AWARD.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            if ("higher".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
+                preSubmitCallbackResponse.addError("Mobility decision of No-Award cannot be higher than DWP decision");
+            }
+        }
+        if (AwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            if ("lower".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
+                preSubmitCallbackResponse.addError("Daily living decision of Enhanced Award cannot be lower than DWP decision");
+            }
+        }
+        if (AwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            if ("lower".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
+                preSubmitCallbackResponse.addError("Mobility decision of Enhanced Award cannot be lower than DWP decision");
+            }
+        }
     }
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
