@@ -173,6 +173,19 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     }
 
     @Test
+    public void givenANonPdfDecisionNotice_thenDisplayAnError() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
+        sscsCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You need to upload PDF documents only", error);
+    }
+
+    @Test
     public void givenDailyLivingNoAwardAndDailyLivingHigherThanDwp_thenDisplayAnError() {
 
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");

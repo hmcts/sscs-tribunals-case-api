@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -41,6 +42,11 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         }
         if (isDecisionNoticeDateOfDecisionInvalid(sscsCaseData)) {
             preSubmitCallbackResponse.addError("Decision notice date of decision must not be in the future");
+        }
+
+        if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null && !isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {
+            preSubmitCallbackResponse.addError("You need to upload PDF documents only");
+            return preSubmitCallbackResponse;
         }
 
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
