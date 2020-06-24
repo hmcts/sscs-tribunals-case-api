@@ -146,7 +146,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
-             any(), eq(DocumentType.DECISION_NOTICE), any());
+             any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null));
     }
 
     @Test
@@ -171,7 +171,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DECISION_NOTICE), any());
+        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DECISION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null));
     }
 
     @Test
