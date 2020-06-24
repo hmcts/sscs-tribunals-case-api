@@ -10,20 +10,26 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
@@ -35,7 +41,6 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 public class WriteFinalDecisionPreviewDecisionServiceTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
     private WriteFinalDecisionPreviewDecisionService service;
 
@@ -54,6 +59,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Mock
     private UserDetails userDetails;
 
+    @Spy
+    private DocumentConfiguration documentConfiguration;
+
     private ArgumentCaptor<GenerateFileParams> capture;
 
     private SscsCaseData sscsCaseData;
@@ -65,10 +73,27 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Before
     public void setUp() throws IOException {
         initMocks(this);
+        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED , "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION , "TB-SCS-GNO-ENG-00453.docx");
+
+
+        Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.DECISION_ISSUED , "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION , "TB-SCS-GNO-WEL-00485.docx");
+
+        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+
+        documentConfiguration.setDocuments(documents);
+
         this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
         this.decisionNoticeQuestionService = new DecisionNoticeQuestionService();
         service = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, decisionNoticeOutcomeService,
-            decisionNoticeQuestionService, TEMPLATE_ID);
+            decisionNoticeQuestionService, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -201,7 +226,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation);
+            appealAllowedExpectation, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
 
         assertNotNull(body);
@@ -262,7 +287,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation);
+            appealAllowedExpectation, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
 
         assertNotNull(body);
@@ -333,7 +358,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation);
+            appealAllowedExpectation, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
 
         assertNotNull(body);
@@ -524,7 +549,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
@@ -643,7 +669,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
 
         assertTrue(response.getErrors().isEmpty());
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -666,7 +693,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
 
         assertTrue(response.getErrors().isEmpty());
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -703,7 +731,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -789,7 +818,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
@@ -820,7 +850,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -850,7 +881,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
@@ -873,7 +905,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         service.preview(callback, USER_AUTHORISATION, false);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     @Test
@@ -897,7 +930,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         service.preview(callback, USER_AUTHORISATION, false);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "2018-10-10", true);
+        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     @Test
@@ -909,7 +943,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         service.preview(callback, USER_AUTHORISATION, true);
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getDateIssued());
     }
@@ -924,14 +959,33 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         service.preview(callback, USER_AUTHORISATION, true);
 
-        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("2018-10-10", payload.getGeneratedDate().toString());
     }
 
-    private DirectionOrDecisionIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String dateOfDecision, boolean allowed) {
+    @Test
+    public void givenWelsh_GeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
+        sscsCaseData.setLanguagePreferenceWelsh("yes");
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+
+        service.preview(callback, USER_AUTHORISATION, true);
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,
+                documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+    }
+
+    private DirectionOrDecisionIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String dateOfDecision, boolean allowed, String templateId) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
-        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        GenerateFileParams generateFileParams = capture.getValue();
+        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) generateFileParams.getFormPayload();
         assertEquals(image, payload.getImage());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
@@ -942,7 +996,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertEquals(allowed, body.isSetAside());
         assertNull(body.getDetailsOfDecision());
         assertTrue(body.isDescriptorFlow());
-
+        assertEquals(templateId, generateFileParams.getTemplateId());
         return payload;
     }
 }

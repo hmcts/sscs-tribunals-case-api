@@ -22,10 +22,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
@@ -41,20 +43,20 @@ import uk.gov.hmcts.reform.sscs.util.StringUtils;
 public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandler {
 
     private final GenerateFile generateFile;
-    private final String templateId;
     private final IdamClient idamClient;
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private final DocumentConfiguration documentConfiguration;
     private boolean showIssueDate;
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
-        DecisionNoticeQuestionService decisionNoticeQuestionService, @Value("${doc_assembly.issue_final_decision}") String templateId) {
+                                                    DecisionNoticeQuestionService decisionNoticeQuestionService, DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;
-        this.templateId = templateId;
         this.idamClient = idamClient;
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.documentConfiguration = documentConfiguration;
     }
 
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, String userAuthorisation, boolean showIssueDate) {
@@ -68,6 +70,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
             sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
         }
+
+        String templateId = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.ISSUE_FINAL_DECISION);
 
         try {
             return issueDocument(callback, DocumentType.DRAFT_DECISION_NOTICE, templateId, generateFile, userAuthorisation);
