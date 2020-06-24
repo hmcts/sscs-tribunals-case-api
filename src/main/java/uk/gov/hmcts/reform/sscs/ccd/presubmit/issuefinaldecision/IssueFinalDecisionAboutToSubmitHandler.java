@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,6 +52,12 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
 
         if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
+
+            if (!isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {
+                preSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                return preSubmitCallbackResponse;
+            }
+
             createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         } else {
             preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");

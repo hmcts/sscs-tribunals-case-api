@@ -103,7 +103,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEvent_thenCreateDecisionWithFooterAndClearTransientFields() {
-        DocumentLink docLink = DocumentLink.builder().documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -151,7 +151,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventWithDocumentNameSet_thenCreateDecisionWithFooterAndOverrideDocName() {
-        DocumentLink docLink = DocumentLink.builder().build();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionDocumentFileName("test.pdf");
 
@@ -162,7 +162,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEventWithDocumentDateAddedSet_thenCreateDecisionWithFooterAndOverrideDocDate() {
-        DocumentLink docLink = DocumentLink.builder().build();
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("test.pdf").build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionDocumentDateAdded(LocalDate.now().toString());
 
@@ -179,6 +179,19 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("There is no Preview Draft Decision Notice on the case so decision cannot be issued", error);
+    }
+
+    @Test
+    public void givenANonPdfDecisionNotice_thenDisplayAnError() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
+        sscsCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You need to upload PDF documents only", error);
     }
 
     @Test
