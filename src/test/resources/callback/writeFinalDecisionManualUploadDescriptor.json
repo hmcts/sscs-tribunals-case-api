@@ -104,10 +104,6 @@
       "generatedMobile": "01234567890",
       "generatedNino": "AB 22 55 66 B",
       "generatedSurname": "Test",
-      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
-      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "higher",
-      "pipWriteFinalDecisionDailyLivingQuestion": "enhancedRate",
-      "pipWriteFinalDecisionMobilityQuestion": "enhancedRate",
       "sscsDocument": [
         {
           "id": "b59c9cce-d62b-458a-b92d-f05a358b3dba",
@@ -349,10 +345,6 @@
       "generatedNino": "PUBLIC",
       "generatedSurname": "PUBLIC",
       "outcome": "PUBLIC",
-      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "PUBLIC",
-      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "PUBLIC",
-      "pipWriteFinalDecisionDailyLivingQuestion": "PUBLIC",
-      "pipWriteFinalDecisionMobilityQuestion": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": [
