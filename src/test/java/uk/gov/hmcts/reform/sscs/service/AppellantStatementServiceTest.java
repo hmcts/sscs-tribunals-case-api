@@ -48,7 +48,6 @@ public class AppellantStatementServiceTest {
     public void reRunTest() throws IOException {
         System.out.println("here we go");
         assert(true);
-//        throw new IOException("Error in Test");
     }
 
     @Test
