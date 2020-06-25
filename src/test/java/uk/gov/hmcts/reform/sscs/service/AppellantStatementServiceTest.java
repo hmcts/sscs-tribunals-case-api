@@ -50,7 +50,7 @@ public class AppellantStatementServiceTest {
      * By default Exception.class will be handled in test
      */
     @ParameterizedRepeatedIfExceptionsTest
-    @ValueSource(ints = {14, 15, 100, -10})
+    @ValueSource(ints = {14, 15, 55, -10})
     public void reRunTest(int argument) throws IOException {
         System.out.println("here we go");
         if (argument != 100) {
