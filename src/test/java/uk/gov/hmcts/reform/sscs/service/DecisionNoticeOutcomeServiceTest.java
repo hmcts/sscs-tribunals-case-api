@@ -89,7 +89,7 @@ public class DecisionNoticeOutcomeServiceTest {
     }
 
     @Test
-    public void givenExplicitAltenratePathRefusalFinalDecisionComparedToDwpQuestionWithIncorrectValue_ThenReturnNull() {
+    public void givenExplicitAlternatePathRefusalFinalDecisionComparedToDwpQuestionWithIncorrectValue_ThenReturnNull() {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher")
             .writeFinalDecisionAllowedOrRefused("refused")
