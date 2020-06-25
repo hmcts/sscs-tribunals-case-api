@@ -47,7 +47,7 @@ public class AppellantStatementServiceTest {
     @RepeatedIfExceptionsTest(repeats = 3)
     public void reRunTest() throws IOException {
         System.out.println("here we go");
-        assert(true);
+        assert (true);
     }
 
     @Test
