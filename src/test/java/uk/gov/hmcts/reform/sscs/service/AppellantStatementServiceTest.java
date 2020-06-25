@@ -7,9 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someStatement;
-
-import io.github.artsok.RepeatedIfExceptionsTest;
-import java.io.IOException;
+    
 import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
