@@ -19,6 +19,8 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     public static final String SCOTTISH_IMAGE = "[userImage:schmcts2.png]";
     @JsonIgnore
     public static final String ENGLISH_IMAGE = "[userImage:enhmcts.png]";
+    @JsonIgnore
+    public static final String WELSH_IMAGE = "[userImage:welshhmcts.png]";
     @JsonProperty("appellant_full_name")
     private String appellantFullName;
     private String nino;
@@ -44,6 +46,8 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     private LocalDate dateIssued;
     @JsonProperty("hmcts2")
     @Builder.Default private String image = ENGLISH_IMAGE;
+    @JsonProperty("welshhmcts2")
+    @Builder.Default private String welshImage = WELSH_IMAGE;
     @JsonProperty("write_final_decision")
     private WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody;
 }

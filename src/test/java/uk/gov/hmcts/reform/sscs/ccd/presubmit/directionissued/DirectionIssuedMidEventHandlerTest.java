@@ -60,14 +60,14 @@ public class DirectionIssuedMidEventHandlerTest {
         initMocks(this);
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypeDocs.put(EventType.DECISION_ISSUED , "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION , "TB-SCS-GNO-ENG-00453.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
 
 
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
-        welshEventTypeDocs.put(EventType.DECISION_ISSUED , "TB-SCS-GNO-WEL-00485.docx");
-        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION , "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
 
         Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);

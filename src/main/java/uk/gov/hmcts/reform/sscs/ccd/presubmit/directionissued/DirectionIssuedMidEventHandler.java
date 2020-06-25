@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -50,7 +49,7 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
         }
         String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
 
-        log.info("Direction Type is {} and templateId is {}" + caseData.getDirectionTypeDl().getValue(), templateId);
+        log.info("Direction Type is {} and templateId is {}", caseData.getDirectionTypeDl().getValue(), templateId);
         return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
     }
 

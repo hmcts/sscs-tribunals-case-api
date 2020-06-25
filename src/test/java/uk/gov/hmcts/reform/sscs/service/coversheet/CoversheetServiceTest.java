@@ -11,9 +11,16 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
 import org.junit.Before;
 import org.junit.Test;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -35,6 +42,7 @@ public class CoversheetServiceTest {
     private  Map<String, String> welshTempateDetails;
     private static final String template = "template";
     private static final String hmctsImgVal = "hmctsImgVal";
+
     @Before
     public void setUp() {
         onlineHearingId = "onlineHearingId";
@@ -49,17 +57,17 @@ public class CoversheetServiceTest {
 
         englishTempateDetails = new HashMap<>();
         englishTempateDetails.put(template,"TB-SCS-GNO-ENG-00012.docx");
-        englishTempateDetails.put( hmctsImgVal,"\"[userImage:hmcts.png]\"");
+        englishTempateDetails.put(hmctsImgVal,"\"[userImage:hmcts.png]\"");
 
         welshTempateDetails = new HashMap<>();
         welshTempateDetails.put(template,"TB-SCS-GNO-WEL-00479.docx");
-        welshTempateDetails.put( hmctsImgVal,"\"[userImage:welshhmcts.png]\"");
+        welshTempateDetails.put(hmctsImgVal,"\"[userImage:welshhmcts.png]\"");
 
         Map<LanguagePreference, Map<String, String>>  evidence =  new HashMap<>();
         evidence.put(LanguagePreference.ENGLISH, englishTempateDetails);
         evidence.put(LanguagePreference.WELSH, welshTempateDetails);
         documentConfiguration.setEvidence(evidence);
-  }
+    }
 
     @Test
     public void canLoadCcdCaseAndProducePdf() {

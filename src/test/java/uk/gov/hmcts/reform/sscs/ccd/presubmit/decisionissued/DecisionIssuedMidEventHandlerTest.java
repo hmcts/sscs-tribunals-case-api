@@ -58,14 +58,14 @@ public class DecisionIssuedMidEventHandlerTest {
         initMocks(this);
         Map<EventType, String> englishEventTypeDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypeDocs.put(EventType.DECISION_ISSUED , "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION , "TB-SCS-GNO-ENG-00453.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
 
 
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
-        welshEventTypeDocs.put(EventType.DECISION_ISSUED , "TB-SCS-GNO-WEL-00485.docx");
-        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION , "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
 
         Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
@@ -160,7 +160,8 @@ public class DecisionIssuedMidEventHandlerTest {
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
     }
- @Test
+
+    @Test
     public void givenWelsh_CaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
         sscsCaseData.setLanguagePreferenceWelsh("yes");
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
