@@ -37,6 +37,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .generateNotice("yes")
             .writeFinalDecisionIsDescriptorFlow("yes").build();
 
         Outcome outcome = service.determineOutcome(caseData);
@@ -62,6 +63,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .generateNotice("yes")
             .writeFinalDecisionAllowedOrRefused("refused")
             .writeFinalDecisionIsDescriptorFlow("yes").build();
 
@@ -78,6 +80,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher")
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion("something")
+            .generateNotice("yes")
             .writeFinalDecisionIsDescriptorFlow("yes").build();
 
         Outcome outcome = service.determineOutcome(caseData);
@@ -91,6 +94,7 @@ public class DecisionNoticeOutcomeServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher")
             .writeFinalDecisionAllowedOrRefused("refused")
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion("something")
+            .generateNotice("yes")
             .writeFinalDecisionIsDescriptorFlow("yes").build();
 
         Outcome outcome = service.determineOutcome(caseData);
@@ -102,6 +106,7 @@ public class DecisionNoticeOutcomeServiceTest {
     public void givenFinalDecisionComparedToDwpQuestionWithNullValue_ThenReturnNull() {
 
         SscsCaseData caseData = SscsCaseData.builder().writeFinalDecisionIsDescriptorFlow("yes")
+            .generateNotice("yes")
             .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher")
             .build();
 
@@ -127,6 +132,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .generateNotice("yes")
             .writeFinalDecisionAllowedOrRefused("refused")
             .build();
 
@@ -140,6 +146,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
         SscsCaseData caseData = SscsCaseData.builder().writeFinalDecisionIsDescriptorFlow("yes")
             .writeFinalDecisionAllowedOrRefused("refused")
+            .generateNotice("yes")
             .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher")
             .build();
 
@@ -166,6 +173,7 @@ public class DecisionNoticeOutcomeServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
             .writeFinalDecisionIsDescriptorFlow("no")
+            .generateNotice("yes")
             .writeFinalDecisionAllowedOrRefused("refused").build();
 
         Outcome outcome = service.determineOutcome(caseData);
@@ -192,6 +200,7 @@ public class DecisionNoticeOutcomeServiceTest {
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
             .writeFinalDecisionIsDescriptorFlow("no")
+            .generateNotice("yes")
             .writeFinalDecisionAllowedOrRefused("allowed").build();
 
         Outcome outcome = service.determineOutcome(caseData);
@@ -216,7 +225,165 @@ public class DecisionNoticeOutcomeServiceTest {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
             .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .generateNotice("yes")
             .writeFinalDecisionIsDescriptorFlow("no")
+            .build();
+
+        Outcome outcome = service.determineOutcome(caseData);
+
+        Assert.assertNull(outcome);
+    }
+
+    @Test
+    @Parameters({
+        "higher, higher, decisionUpheld",
+        "higher, same, decisionUpheld",
+        "higher, lower, decisionUpheld",
+        "same, higher, decisionUpheld",
+        "same, same, decisionUpheld",
+        "same, lower, decisionUpheld",
+        "lower, higher, decisionUpheld",
+        "lower, same, decisionUpheld",
+        "lower, lower, decisionUpheld"})
+    public void givenManualUploadNonDailyLivingAndOrMobilityScenarioAndIsRefusedAndIrrelevantParametersSet_thenSetDecisionUpheld(String comparedRateDailyLiving, String comparedRateMobility,
+        String expectedOutcome) {
+
+        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .writeFinalDecisionIsDescriptorFlow("no")
+            .generateNotice("no")
+            .writeFinalDecisionAllowedOrRefused("refused").build();
+
+        Outcome outcome = service.determineOutcome(caseData);
+
+        Assert.assertNotNull(outcome);
+
+        assertEquals(expectedOutcome, outcome.getId());
+    }
+
+    @Test
+    @Parameters({
+        "higher, higher, decisionInFavourOfAppellant",
+        "higher, same, decisionInFavourOfAppellant",
+        "higher, lower, decisionInFavourOfAppellant",
+        "same, higher, decisionInFavourOfAppellant",
+        "same, same, decisionInFavourOfAppellant",
+        "same, lower, decisionInFavourOfAppellant",
+        "lower, higher, decisionInFavourOfAppellant",
+        "lower, same, decisionInFavourOfAppellant",
+        "lower, lower, decisionInFavourOfAppellant"})
+    public void givenManualUploadNonDailyLivingAndOrMobilityScenarioAndIsAllowedAndIrrelevantParametersSet_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility,
+        String expectedOutcome) {
+
+        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .writeFinalDecisionIsDescriptorFlow("no")
+            .generateNotice("no")
+            .writeFinalDecisionAllowedOrRefused("allowed").build();
+
+        Outcome outcome = service.determineOutcome(caseData);
+
+        Assert.assertNotNull(outcome);
+
+        assertEquals(expectedOutcome, outcome.getId());
+    }
+
+    @Test
+    @Parameters({
+        "higher, higher",
+        "higher, same",
+        "higher, lower",
+        "same, higher",
+        "same, same",
+        "same, lower",
+        "lower, higher",
+        "lower, same",
+        "lower, lower"})
+    public void givenManualUploadNonDailyLivingAndOrMobilityScenarioAndExplictOutcomeNotSetAndIrrelevantParametersSet_thenReturnNull(String comparedRateDailyLiving, String comparedRateMobility) {
+
+        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .generateNotice("no")
+            .writeFinalDecisionIsDescriptorFlow("no")
+            .build();
+
+        Outcome outcome = service.determineOutcome(caseData);
+
+        Assert.assertNull(outcome);
+    }
+
+
+    @Test
+    @Parameters({
+        "higher, higher, decisionUpheld",
+        "higher, same, decisionUpheld",
+        "higher, lower, decisionUpheld",
+        "same, higher, decisionUpheld",
+        "same, same, decisionUpheld",
+        "same, lower, decisionUpheld",
+        "lower, higher, decisionUpheld",
+        "lower, same, decisionUpheld",
+        "lower, lower, decisionUpheld"})
+    public void givenManualUploadDailyLivingAndOrMobilityScenarioAndIsRefusedAndIrrelevantParametersSet_thenSetDecisionUpheld(String comparedRateDailyLiving, String comparedRateMobility,
+        String expectedOutcome) {
+
+        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .writeFinalDecisionIsDescriptorFlow("yes")
+            .generateNotice("no")
+            .writeFinalDecisionAllowedOrRefused("refused").build();
+
+        Outcome outcome = service.determineOutcome(caseData);
+
+        Assert.assertNotNull(outcome);
+
+        assertEquals(expectedOutcome, outcome.getId());
+    }
+
+    @Test
+    @Parameters({
+        "higher, higher, decisionInFavourOfAppellant",
+        "higher, same, decisionInFavourOfAppellant",
+        "higher, lower, decisionInFavourOfAppellant",
+        "same, higher, decisionInFavourOfAppellant",
+        "same, same, decisionInFavourOfAppellant",
+        "same, lower, decisionInFavourOfAppellant",
+        "lower, higher, decisionInFavourOfAppellant",
+        "lower, same, decisionInFavourOfAppellant",
+        "lower, lower, decisionInFavourOfAppellant"})
+    public void givenManualUploadDailyLivingAndOrMobilityScenarioAndIsAllowedAndIrrelevantParametersSet_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility,
+        String expectedOutcome) {
+
+        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .writeFinalDecisionIsDescriptorFlow("yes")
+            .generateNotice("no")
+            .writeFinalDecisionAllowedOrRefused("allowed").build();
+
+        Outcome outcome = service.determineOutcome(caseData);
+
+        Assert.assertNotNull(outcome);
+
+        assertEquals(expectedOutcome, outcome.getId());
+    }
+
+    @Test
+    @Parameters({
+        "higher, higher",
+        "higher, same",
+        "higher, lower",
+        "same, higher",
+        "same, same",
+        "same, lower",
+        "lower, higher",
+        "lower, same",
+        "lower, lower"})
+    public void givenManualUploadDailyLivingAndOrMobilityScenarioAndExplictOutcomeNotSetAndIrrelevantParametersSet_thenReturnNull(String comparedRateDailyLiving, String comparedRateMobility) {
+
+        SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility)
+            .generateNotice("no")
+            .writeFinalDecisionIsDescriptorFlow("yes")
             .build();
 
         Outcome outcome = service.determineOutcome(caseData);
