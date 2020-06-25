@@ -6,6 +6,7 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.artsok.RepeatedIfExceptionsTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.io.File;
@@ -53,7 +54,7 @@ public class EvidenceDocumentUploadTest {
     }
 
 
-    @Test
+    @RepeatedIfExceptionsTest(repeats = 3)
     public void shouldCreateAppealCaseWithEvidenceDocumentLinkIntoCcd() throws IOException {
         Response response = uploadAndVerifyEvidenceDocumentUpload();
 

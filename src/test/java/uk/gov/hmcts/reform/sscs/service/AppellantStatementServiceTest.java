@@ -44,12 +44,6 @@ public class AppellantStatementServiceTest {
         assertThat(handled, is(Optional.empty()));
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3)
-    public void reRunTest() throws IOException {
-        System.out.println("here we go");
-        assert (true);
-    }
-
     @Test
     public void findsOnlineHearing() {
         long id = 1234L;
