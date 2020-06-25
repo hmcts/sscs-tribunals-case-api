@@ -274,6 +274,8 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.3'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.18.1'
+    testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.5'
+
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
@@ -337,6 +339,10 @@ jacocoTestReport {
         xml.enabled = true
         csv.enabled = false
     }
+}
+
+test {
+    useJUnitPlatform()
 }
 
 pitest {
