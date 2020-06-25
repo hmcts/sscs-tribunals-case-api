@@ -53,7 +53,7 @@ public class GetAppealStatus extends BaseHandler {
         assertThat(response).contains("status\":\"WITH_DWP");
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void testResponseReceived() throws IOException {
         sscsCaseDetails = createCaseInResponseReceivedState();
 

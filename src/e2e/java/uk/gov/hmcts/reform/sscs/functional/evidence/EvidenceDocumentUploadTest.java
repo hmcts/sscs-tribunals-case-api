@@ -53,8 +53,7 @@ public class EvidenceDocumentUploadTest {
         uploadAndVerifyEvidenceDocumentUpload();
     }
 
-
-    @RepeatedIfExceptionsTest(repeats = 3)
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void shouldCreateAppealCaseWithEvidenceDocumentLinkIntoCcd() throws IOException {
         Response response = uploadAndVerifyEvidenceDocumentUpload();
 
