@@ -73,6 +73,12 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             && "lower".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
             preSubmitCallbackResponse.addError("Mobility award at Enhanced Rate cannot be lower than DWP decision");
         }
+
+        if (AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+            && AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            preSubmitCallbackResponse.addError("At least one of Mobility or Daily Living must be considered");
+        }
+
     }
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {

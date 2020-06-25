@@ -209,7 +209,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
         List<String> dailyLivingAnswers = ActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
-        if (dailyLivingAnswers != null) {
+        if (dailyLivingAnswers != null && !"notConsidered".equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
 
             List<Descriptor> dailyLivingDescriptors = getDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
 
@@ -222,7 +222,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         }
 
         List<String> mobilityAnswers = ActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
-        if (mobilityAnswers != null) {
+        if (mobilityAnswers != null && !"notConsidered".equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
             List<Descriptor> mobilityDescriptors = getDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
 
             builder.mobilityDescriptors(mobilityDescriptors);

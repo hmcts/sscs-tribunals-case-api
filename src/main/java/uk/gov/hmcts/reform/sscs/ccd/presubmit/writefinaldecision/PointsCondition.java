@@ -63,8 +63,11 @@ public enum PointsCondition {
             awardDescription = "No Award";
         } else if (awardType == AwardType.STANDARD_RATE) {
             awardDescription = "a standard rate award";
-        } else {
+        } else if (awardType == AwardType.ENHANCED_RATE) {
             awardDescription = "an enhanced rate award";
+        } else {
+            throw new IllegalArgumentException("Unable to construct a "
+                + "standard PointsCondition error message for award type:" + awardType);
         }
         return "You have previously selected " + awardDescription + " for " + activityType.getName()
             + ". The points awarded don't match. Please review your previous selection.";
