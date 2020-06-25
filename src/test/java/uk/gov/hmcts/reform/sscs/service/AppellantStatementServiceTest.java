@@ -8,11 +8,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.util.DataFixtures.someStatement;
 
+import io.github.artsok.ParameterizedRepeatedIfExceptionsTest;
 import java.io.IOException;
 import java.util.Optional;
-
-import io.github.artsok.ParameterizedRepeatedIfExceptionsTest;
-import io.github.artsok.RepeatedIfExceptionsTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -47,12 +45,6 @@ public class AppellantStatementServiceTest {
         assertThat(handled, is(Optional.empty()));
     }
 
-//    @RepeatedIfExceptionsTest(repeats = 3)
-//    public void repeater() {
-//        System.out.println("This one");
-//        assert(true);
-//    }
-
     /**
      * Repeated three times if test failed.
      * By default Exception.class will be handled in test
@@ -61,7 +53,7 @@ public class AppellantStatementServiceTest {
     @ValueSource(ints = {14, 15, 100, -10})
     public void reRunTest(int argument) throws IOException {
         System.out.println("here we go");
-        if(argument != 100) {
+        if (argument != 100) {
             System.out.println("fail with" + argument);
             throw new IOException("Error in Test");
         } else {
