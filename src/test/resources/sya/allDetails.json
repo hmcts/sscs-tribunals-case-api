@@ -86,5 +86,6 @@
   },
   "signAndSubmit": {
     "signer": "Joe Bloggs"
-  }
+  },
+  "languagePreferenceWelsh" : true
 }

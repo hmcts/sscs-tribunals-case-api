@@ -66,6 +66,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .caseCode(caseCode)
                 .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getBenefitType().getCode(),
                         appeal.getMrnDetails().getDwpIssuingOffice()))
+                .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
                 .build();
     }
 
@@ -82,6 +83,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             return false;
         }
         return syaCaseWrapper.getCaseType().equals("draft");
+    }
+
+    private static String booleanToYesNo(Boolean flag) {
+        if (flag == null) {
+            return null;
+        }
+        return flag ? "Yes" : "No";
     }
 
     private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {

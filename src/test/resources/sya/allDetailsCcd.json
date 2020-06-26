@@ -165,5 +165,6 @@
   },
   "evidencePresent" : "No",
   "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle"
+  "dwpRegionalCentre": "Newcastle",
+  "languagePreferenceWelsh" : "Yes"
 }

@@ -119,4 +119,7 @@ public class SessionDraft {
 
     @JsonProperty("HearingArrangements")
     SessionHearingArrangements hearingArrangements;
+
+    @JsonProperty("LanguagePreferenceWelsh")
+    SessionLanguagePreferenceWelsh languagePreferenceWelsh;
 }
