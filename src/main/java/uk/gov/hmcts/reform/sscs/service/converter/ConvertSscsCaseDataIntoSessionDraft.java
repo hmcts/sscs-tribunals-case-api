@@ -122,7 +122,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
     }
 
     private SessionLanguagePreferenceWelsh buildLanuagePreferenceWelsh(SscsCaseData caseData) {
-        if(caseData.getLanguagePreferenceWelsh() != null) {
+        if (caseData.getLanguagePreferenceWelsh() != null) {
             return new SessionLanguagePreferenceWelsh(caseData.isLanguagePreferenceWelsh());
         }
         return null;
