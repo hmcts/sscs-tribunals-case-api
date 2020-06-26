@@ -281,6 +281,24 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     }
 
     @Test
+    public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCaseForNonDescriptorRoute() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecisionNonDescriptor.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+    }
+
+    @Test
     public void callToAboutToSubmitHandler_willWriteManuallyUploadedFinalDecisionToCase() throws Exception {
         setup("callback/writeFinalDecisionManualUploadDescriptor.json");
 
