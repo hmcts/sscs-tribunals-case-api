@@ -57,7 +57,7 @@ public enum PointsCondition {
         return pointsRequirementCondition;
     }
 
-    private static String getStandardErrorMessage(AwardType awardType, ActivityType activityType) {
+    protected static String getStandardErrorMessage(AwardType awardType, ActivityType activityType) {
         final String awardDescription;
         if (awardType == AwardType.NO_AWARD) {
             awardDescription = "No Award";
