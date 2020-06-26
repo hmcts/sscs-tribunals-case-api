@@ -18,18 +18,26 @@ public class DecisionNoticeOutcomeService {
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
 
         if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() == null) {
+            // We need at least this flag to be set in order to determine outcome
             return null;
         } else {
             if (sscsCaseData.isDailyLivingAndOrMobilityDecision()) {
-                return determineDescriptorFlowOutcome(sscsCaseData);
-
+                if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+                    // If we are generating the notice we use the daily living/mobility descriptors
+                    // to determine outcome
+                    return determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(sscsCaseData);
+                } else {
+                    // If we are not generating the notice we use an explicitly set outcome
+                    return useExplicitySetOutcome(sscsCaseData);
+                }
             } else {
-                return determineNonDescriptorFlowOutcome(sscsCaseData);
+                // If we are in the non-descriptor flow we use an explicitly set outcome.
+                return useExplicitySetOutcome(sscsCaseData);
             }
         }
     }
 
-    private Outcome determineDescriptorFlowOutcome(SscsCaseData sscsCaseData) {
+    private Outcome determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(SscsCaseData sscsCaseData) {
 
         // Daily living and or/mobility
 
@@ -64,7 +72,7 @@ public class DecisionNoticeOutcomeService {
         }
     }
 
-    private Outcome determineNonDescriptorFlowOutcome(SscsCaseData sscsCaseData) {
+    private Outcome useExplicitySetOutcome(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
             return null;
         } else {

@@ -2,14 +2,17 @@ package uk.gov.hmcts.reform.sscs.callback;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import org.junit.Assert;
 import org.junit.Test;
@@ -54,9 +57,9 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     private UserDetails userDetails;
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocument() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForDescriptorRoute() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecision.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+        setJsonAndReplace("callback/writeFinalDecisionDescriptor.json", "START_DATE_PLACEHOLDER", "2018-10-10");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -117,13 +120,69 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        assertEquals("Something else.", payload.getAnythingElse());
 
+    }
+
+    @Test
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForNonDescriptorRoute() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecisionNonDescriptor.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+
+        String documentUrl = "document.url";
+        when(generateFile.assemble(any())).thenReturn(documentUrl);
+
+        when(userDetails.getFullName()).thenReturn("Judge Full Name");
+
+        when(idamClient.getUserDetails("Bearer userToken")).thenReturn(userDetails);
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventPreviewFinalDecision"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+
+        ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
+        verify(generateFile).assemble(capture.capture());
+        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
+
+        assertEquals("An Test", parentPayload.getAppellantFullName());
+        assertEquals("12345656789", parentPayload.getCaseId());
+        assertEquals("JT 12 34 56 D", parentPayload.getNino());
+        assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
+        assertEquals("Chester Magistrate's Court", payload.getHeldAt());
+        assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
+        assertEquals(true, payload.isAllowed());
+        assertEquals(true, payload.isSetAside());
+        assertEquals("2018-09-01", payload.getDateOfDecision());
+        assertEquals("An Test",payload.getAppellantName());
+        assertNull(payload.getStartDate());
+        assertNull(payload.getEndDate());
+        assertEquals(true, payload.isIndefinite());
+        assertEquals(false, payload.isDailyLivingIsEntited());
+        assertEquals(false, payload.isDailyLivingIsSeverelyLimited());
+        assertNull(payload.getDailyLivingAwardRate());
+        assertNull(payload.getDailyLivingDescriptors());
+        Assert.assertNull(payload.getDailyLivingNumberOfPoints());
+        assertEquals(false, payload.isMobilityIsEntited());
+        assertEquals(false, payload.isMobilityIsSeverelyLimited());
+        assertNull(payload.getMobilityAwardRate());
+        assertNull(payload.getMobilityDescriptors());
+        assertNotNull(payload.getReasonsForDecision());
+        assertEquals(1, payload.getReasonsForDecision().size());
+        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
+        assertNotNull(payload.getDetailsOfDecision());
+        Assert.assertEquals("The details of the decision", payload.getDetailsOfDecision());
+        assertEquals("Something else.", payload.getAnythingElse());
     }
 
     @Test
     public void callToMidEventCallback_willValidateTheData() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecision.json", "START_DATE_PLACEHOLDER", "2019-10-10");
+        setJsonAndReplace("callback/writeFinalDecisionDescriptor.json", "START_DATE_PLACEHOLDER", "2019-10-10");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -137,7 +196,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     @Test
     public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCase() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecision.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+        setJsonAndReplace("callback/writeFinalDecisionDescriptor.json", "START_DATE_PLACEHOLDER", "2018-10-10");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -146,5 +205,43 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
         assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+    }
+
+    @Test
+    public void callToAboutToSubmitHandler_willWriteManuallyUploadedFinalDecisionToCase() throws Exception {
+        setup("callback/writeFinalDecisionManualUploadDescriptor.json");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("2019-10-10", result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("test.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+    }
+
+    @Test
+    public void callToAboutToSubmitHandler_willWriteManuallyUploadedFinalDecisionToCaseForNonDescriptorRoute() throws Exception {
+        setup("callback/writeFinalDecisionManualUploadNonDescriptor.json");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("2019-10-10", result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("test.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 }

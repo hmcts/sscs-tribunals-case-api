@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 
 @RunWith(JUnitParamsRunner.class)
@@ -105,15 +104,5 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     public void throwsExceptionIfItCannotHandleTheAppeal() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-    }
-
-    private void verifyTemplateBody(String image, String expectedName) {
-        verify(generateFile, atLeastOnce()).assemble(capture.capture());
-        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
-        assertEquals(image, payload.getImage());
-        assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
-        assertEquals("DIRECTIONS NOTICE", payload.getGeneratedDate());
-        assertEquals("DIRECTIONS NOTICE", payload.getDateIssued());
-        assertEquals(expectedName, payload.getAppellantFullName());
     }
 }
