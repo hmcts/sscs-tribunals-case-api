@@ -116,6 +116,12 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             new String[]{"2018-11-10", "noAward", "same", "lower"},
             new String[]{"2018-11-10", "noAward", "lower", "same"},
             new String[]{"2018-11-10", "noAward", "same", "same"},
+            new String[]{"2018-11-10", "notConsidered", "lower", "lower"},
+            new String[]{"2018-11-10", "notConsidered", "same", "lower"},
+            new String[]{"2018-11-10", "notConsidered", "higher", "lower"},
+            new String[]{"2018-11-10", "notConsidered", "lower", "same"},
+            new String[]{"2018-11-10", "notConsidered", "same", "same"},
+            new String[]{"2018-11-10", "notConsidered", "higher", "same"},
             new String[]{null, "standardRate", "lower", "lower"},
             new String[]{null, "standardRate", "same", "lower"},
             new String[]{null, "standardRate", "higher", "lower"},
@@ -130,6 +136,12 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             new String[]{null, "noAward", "same", "lower"},
             new String[]{null, "noAward", "lower", "same"},
             new String[]{null, "noAward", "same", "same"},
+            new String[]{null, "notConsidered", "lower", "lower"},
+            new String[]{null, "notConsidered", "same", "lower"},
+            new String[]{null, "notConsidered", "higher", "lower"},
+            new String[]{null, "notConsidered", "lower", "same"},
+            new String[]{null, "notConsidered", "same", "same"},
+            new String[]{null, "notConsidered", "higher", "same"},
 
         };
     }
@@ -261,7 +273,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
+        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
             appealAllowedExpectation);
@@ -286,16 +298,25 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             assertEquals(false, body.isMobilityIsEntited());
         }
 
-        assertNotNull(body.getMobilityDescriptors());
-        assertEquals(1, body.getMobilityDescriptors().size());
-        assertNotNull(body.getMobilityDescriptors().get(0));
-        assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        assertNotNull(body.getMobilityNumberOfPoints());
-        assertEquals(10, body.getMobilityNumberOfPoints().intValue());
+        if ("notConsidered".equals(rate)) {
+
+            assertNull(body.getMobilityDescriptors());
+            assertNull(body.getMobilityNumberOfPoints());
+
+        } else {
+
+            assertNotNull(body.getMobilityDescriptors());
+            assertEquals(1, body.getMobilityDescriptors().size());
+            assertNotNull(body.getMobilityDescriptors().get(0));
+            assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
+            assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
+            assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
+            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
+            assertNotNull(body.getMobilityNumberOfPoints());
+            assertEquals(10, body.getMobilityNumberOfPoints().intValue());
+
+        }
 
         // Daily living specific assertions
         assertEquals(false, body.isDailyLivingIsEntited());
@@ -333,7 +354,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
+        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
             appealAllowedExpectation);
@@ -359,16 +380,23 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             assertEquals(false, body.isDailyLivingIsEntited());
         }
 
-        assertNotNull(body.getDailyLivingDescriptors());
-        assertEquals(1, body.getDailyLivingDescriptors().size());
-        assertNotNull(body.getDailyLivingDescriptors().get(0));
-        assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
-        assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
-        assertNotNull(body.getDailyLivingNumberOfPoints());
-        assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
+        if ("notConsidered".equals(rate)) {
+            assertNull(body.getDailyLivingDescriptors());
+            assertNull(body.getDailyLivingNumberOfPoints());
+        } else {
+            assertNotNull(body.getDailyLivingDescriptors());
+            assertEquals(1, body.getDailyLivingDescriptors().size());
+            assertNotNull(body.getDailyLivingDescriptors().get(0));
+            assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
+            assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
+            assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
+            assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
+            assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
+            assertNotNull(body.getDailyLivingNumberOfPoints());
+            assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
+
+        }
+
 
         // Mobility specific assertions
         assertEquals(false, body.isMobilityIsEntited());
