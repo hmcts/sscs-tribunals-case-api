@@ -56,6 +56,9 @@ public class GetAppealStatus extends BaseHandler {
     public void testResponseReceived() throws IOException {
         sscsCaseDetails = createCaseInResponseReceivedState();
 
+
+
+
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
 
