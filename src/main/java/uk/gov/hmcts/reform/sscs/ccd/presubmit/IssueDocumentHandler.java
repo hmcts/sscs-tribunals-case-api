@@ -33,6 +33,7 @@ public class IssueDocumentHandler {
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
         caseData.setGenerateNotice(null);
+        caseData.setWriteFinalDecisionGenerateNotice(null);
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
