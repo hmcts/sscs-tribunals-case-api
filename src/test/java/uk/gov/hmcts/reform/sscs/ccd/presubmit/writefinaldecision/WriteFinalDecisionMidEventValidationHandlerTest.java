@@ -249,7 +249,11 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         "standardRate, lower",
         "standardRate, higher",
         "noAward, lower",
-        "noAward, same"})
+        "noAward, same",
+        "notConsidered, lower",
+        "notConsidered, higher",
+        "notConsidered, same",
+    })
 
     public void givenDailyLivingValidAwardAndDwpComparison_thenDoNotDisplayAnError(String award, String comparison) {
 
@@ -271,7 +275,58 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         "standardRate, lower",
         "standardRate, higher",
         "noAward, lower",
-        "noAward, same"})
+        "noAward, same",
+    })
+
+    public void givenDailyLivingValidAwardAndDwpComparisonWhenMobilityNotConsidered_thenDoNotDisplayAnError(String award, String comparison) {
+
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("notConsidered");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(award);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    @Parameters({
+        "notConsidered, lower",
+        "notConsidered, higher",
+        "notConsidered, same",
+    })
+
+    public void givenDailyLivingNotConsideredWhenMobilityNotConsidered_thenDisplayAnError(String award, String comparison) {
+
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("notConsidered");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(award);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("At least one of Mobility or Daily Living must be considered", error);
+    }
+
+
+    @Test
+    @Parameters({
+        "enhancedRate, same",
+        "enhancedRate, higher",
+        "standardRate, same",
+        "standardRate, lower",
+        "standardRate, higher",
+        "noAward, lower",
+        "noAward, same",
+        "notConsidered, lower",
+        "notConsidered, higher",
+        "notConsidered, same",
+    })
 
     public void givenMobilityValidAwardAndDwpComparison_thenDoNotDisplayAnError(String award, String comparison) {
 
@@ -283,6 +338,53 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    @Parameters({
+        "enhancedRate, same",
+        "enhancedRate, higher",
+        "standardRate, same",
+        "standardRate, lower",
+        "standardRate, higher",
+        "noAward, lower",
+        "noAward, same",
+    })
+
+    public void givenMobilityValidAwardAndDwpComparisonWhenDailyLivingNotConsidered_thenDoNotDisplayAnError(String award, String comparison) {
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(award);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+
+    @Test
+    @Parameters({
+        "notConsidered, lower",
+        "notConsidered, higher",
+        "notConsidered, same",
+    })
+
+    public void givenMobilityNotConsideredWhenDailyLivingNotConsidered_thenDisplayAnError(String award, String comparison) {
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(award);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("At least one of Mobility or Daily Living must be considered", error);
     }
 
     @Test(expected = IllegalStateException.class)

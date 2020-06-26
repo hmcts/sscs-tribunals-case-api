@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 
 @Slf4j
@@ -41,19 +42,29 @@ public class DecisionNoticeOutcomeService {
 
         // Daily living and or/mobility
 
-        if (sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null
-            || sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null) {
+        if ((!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+            && sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null)
+            || (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
+            && sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null)) {
             return null;
         } else {
 
             try {
 
-                ComparedRate dailyLivingComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-                ComparedRate mobilityComparedRate = ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+                ComparedRate dailyLivingComparedRate = AwardType.NOT_CONSIDERED.getKey()
+                    .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()) ? null :
+                    ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+
+                ComparedRate mobilityComparedRate = AwardType.NOT_CONSIDERED.getKey()
+                    .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()) ? null : ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
 
                 Set<ComparedRate> comparedRates = new HashSet<>();
-                comparedRates.add(dailyLivingComparedRate);
-                comparedRates.add(mobilityComparedRate);
+                if (dailyLivingComparedRate != null) {
+                    comparedRates.add(dailyLivingComparedRate);
+                }
+                if (mobilityComparedRate != null) {
+                    comparedRates.add(mobilityComparedRate);
+                }
 
                 // At least one higher,  and non lower, means the decision is in favour of appellant
                 if (comparedRates.contains(ComparedRate.Higher)
