@@ -19,4 +19,5 @@ public class DocumentConfiguration {
 
     private Map<LanguagePreference, Map<EventType,String>> documents;
     private Map<LanguagePreference, Map<String, String>> evidence;
+    private Map<LanguagePreference, String> cover;
 }

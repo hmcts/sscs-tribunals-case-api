@@ -49,6 +49,13 @@ public class DocumentConfigurationTest {
         };
     }
 
+    public static Object[][] coverPageParameters() {
+        return new Object[][] {
+                {LanguagePreference.ENGLISH, "SSCS-cover-page.docx"},
+                {LanguagePreference.WELSH, "TB-SCS-LET-WEL-00486.docx"},
+        };
+    }
+
     @Test
     @Parameters(method = "documentParameters")
     public void testDocumnetConfig(LanguagePreference languagePreference, EventType eventType, String documentName) {
@@ -60,4 +67,12 @@ public class DocumentConfigurationTest {
     public void testEvidenceConfig(LanguagePreference languagePreference, String type, String documentName) {
         assertThat(config.getEvidence().get(languagePreference).get(type)).isEqualTo(documentName);
     }
+
+    @Test
+    @Parameters(method = "coverPageParameters")
+    public void testCoverPage(LanguagePreference languagePreference, String documentName) {
+        assertThat(config.getCover().get(languagePreference)).isEqualTo(documentName);
+    }
+
+
 }

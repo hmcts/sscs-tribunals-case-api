@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
 
 @Service
@@ -20,14 +21,17 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
 
     private BundleRequestExecutor bundleRequestExecutor;
     private String bundleUrl;
+    private final DocumentConfiguration documentConfiguration;
 
     private static String EDIT_BUNDLE_ENDPOINT = "/api/stitch-ccd-bundles";
 
     @Autowired
     public EditBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor,
-                                         @Value("${bundle.url}") String bundleUrl) {
+                                         @Value("${bundle.url}") String bundleUrl,
+                                         DocumentConfiguration documentConfiguration) {
         this.bundleRequestExecutor = bundleRequestExecutor;
         this.bundleUrl = bundleUrl;
+        this.documentConfiguration = documentConfiguration;
     }
 
     @Override
@@ -47,14 +51,14 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
 
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
-
+        final String template = documentConfiguration.getCover().get(sscsCaseData.getLanguagePreference());
         if (sscsCaseData.getCaseBundles() != null) {
             boolean eligibleForStitching = false;
             for (Bundle bundle : sscsCaseData.getCaseBundles()) {
                 if ("Yes".equals(bundle.getValue().getEligibleForStitching())) {
                     eligibleForStitching = true;
                     bundle.getValue().setFileName("SscsBundle.pdf");
-                    bundle.getValue().setCoverpageTemplate("SSCS-cover-page.docx");
+                    bundle.getValue().setCoverpageTemplate(template);
                     bundle.getValue().setHasTableOfContents("Yes");
                     bundle.getValue().setHasCoversheets("Yes");
                     bundle.getValue().setPaginationStyle("topCenter");
