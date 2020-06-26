@@ -183,7 +183,8 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(18, payload.getDailyLivingNumberOfPoints().intValue());
         assertEquals(false, payload.isMobilityIsEntited());
         assertEquals(false, payload.isMobilityIsSeverelyLimited());
-        Assert.assertNull(payload.getMobilityAwardRate());
+        Assert.assertNotNull(payload.getMobilityAwardRate());
+        assertEquals("not considered", payload.getMobilityAwardRate());
         Assert.assertNull(payload.getMobilityDescriptors());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());

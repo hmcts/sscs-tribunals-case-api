@@ -29,7 +29,7 @@
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
-      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "notConsidered",
+      "pipWriteFinalDecisionMobilityQuestion" : "notConsidered",
       "pipWriteFinalDecisionDailyLivingQuestion" : "enhancedRate",
       "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
       "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1f",

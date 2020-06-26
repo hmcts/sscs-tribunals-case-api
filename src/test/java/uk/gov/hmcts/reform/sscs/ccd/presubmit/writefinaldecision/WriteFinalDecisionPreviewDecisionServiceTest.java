@@ -273,7 +273,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
+        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
             appealAllowedExpectation);
@@ -354,7 +354,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .documentUrl(URL)
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
-        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
+        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
             appealAllowedExpectation);
