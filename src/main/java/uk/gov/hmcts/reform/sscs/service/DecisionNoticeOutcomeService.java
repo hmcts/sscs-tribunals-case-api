@@ -44,8 +44,8 @@ public class DecisionNoticeOutcomeService {
 
         if ((!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
             && sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null)
-            || (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()) &&
-            sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null)) {
+            || (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
+            && sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null)) {
             return null;
         } else {
 
