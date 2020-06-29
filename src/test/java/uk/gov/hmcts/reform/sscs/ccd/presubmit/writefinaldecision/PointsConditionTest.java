@@ -46,6 +46,16 @@ public class PointsConditionTest {
     }
 
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStandardErrorMessage_WhenNotConsideredDailyLiving() {
+        PointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, ActivityType.DAILY_LIVING);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetStandardErrorMessage_WhenNotConsideredMobility() {
+        PointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, ActivityType.MOBILITY);
+    }
+
     /**
      * Test the continuity of boundaries between point ranges for mobility conditions. * (ie. this test will fail if there are any gaps, or overlap between the boundaries)
      */
