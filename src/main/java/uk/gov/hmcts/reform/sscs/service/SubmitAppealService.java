@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -188,12 +189,6 @@ public class SubmitAppealService {
                     caseData.getAppeal().getBenefitType().getCode(),
                     eventType);
                 return caseDetails;
-            } else {
-                log.info("Duplicate case {} found for Nino {} and benefit type {}. "
-                        + "No need to continue with post create case processing.",
-                    caseDetails.getId(), caseData.getGeneratedNino(),
-                    caseData.getAppeal().getBenefitType().getCode());
-                return null;
             }
         } catch (Exception e) {
             throw new CcdException(
@@ -202,6 +197,19 @@ public class SubmitAppealService {
                     caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
+
+        if (caseDetails != null) {
+            log.info("Duplicate case {} found for Nino {} and benefit type {}. "
+                            + "No need to continue with post create case processing.",
+                    caseDetails.getId(), caseData.getGeneratedNino(),
+                    caseData.getAppeal().getBenefitType().getCode());
+            throw new DuplicateCaseException(
+                    String.format("An appeal has already been submitted, for that decision date %s \n "
+                                    + "Please check the date of your MRN, and try again \n "
+                                    + "If you were not expecting to see this messge, please use the details below to contact us.",
+                            caseData.getAppeal().getMrnDetails().getMrnDate()));
+        }
+        return null;
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
