@@ -129,10 +129,10 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private String createFileName() {
-            return String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        return String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
     }
 
     private String setDocumentDateAdded() {
-            return LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+        return LocalDate.now().format(DateTimeFormatter.ISO_DATE);
     }
 }
