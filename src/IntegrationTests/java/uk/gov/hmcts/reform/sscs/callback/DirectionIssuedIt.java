@@ -29,7 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
@@ -40,9 +39,6 @@ public class DirectionIssuedIt extends AbstractEventIt {
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
-
-    @MockBean
-    private IdamApiClient idamApiClient;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -103,7 +99,40 @@ public class DirectionIssuedIt extends AbstractEventIt {
         assertEquals(4, result.getData().getSscsDocument().size());
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
-        assertEquals("Addition B - Directions notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("Addition B - Directions Notice issued on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
+        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals(DwpState.DIRECTION_ACTION_REQUIRED.getId(), result.getData().getDwpState());
+        assertEquals("awaitingInformation", result.getData().getInterlocReviewState());
+    }
+
+    @Test
+    public void callToAboutToSubmitEventHandler_willSaveTheManuallyUploadedInterlocDirectionDocument() throws Exception {
+        setup("callback/directionIssuedManualInterloc.json");
+
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        UploadResponse uploadResponse = createUploadResponse();
+        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertNull(result.getData().getPreviewDocument());
+        assertNull(result.getData().getSignedRole());
+        assertNull(result.getData().getSignedBy());
+        assertNull(result.getData().getGenerateNotice());
+        assertNull(result.getData().getDateAdded());
+        assertNull(result.getData().getExtensionNextEventDl());
+        assertNull(result.getData().getDirectionTypeDl());
+        assertEquals(4, result.getData().getSscsDocument().size());
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        assertEquals("Addition B - Directions Notice issued on 09-02-2018.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
         assertEquals("B", result.getData().getSscsDocument().get(0).getValue().getBundleAddition());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
         assertEquals(DwpState.DIRECTION_ACTION_REQUIRED.getId(), result.getData().getDwpState());

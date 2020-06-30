@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.controller.CcdCallbackController;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,9 +31,6 @@ public class ReissueFurtherEvidenceIt extends AbstractEventIt {
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
-
-    @MockBean
-    private IdamApiClient idamApiClient;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;

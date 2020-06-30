@@ -13,7 +13,6 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.Response;
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.http.HttpStatus;
@@ -27,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
@@ -49,7 +49,7 @@ public class SubmitDraftTest {
     private String testUrl;
 
     @Autowired
-    private IdamApiClient idamApiClient;
+    private IdamClient idamApiClient;
 
     @Autowired
     private CitizenCcdService citizenCcdService;
@@ -111,7 +111,7 @@ public class SubmitDraftTest {
     }
 
     private UserDetails getUserDetails(String userToken) {
-        return idamApiClient.getUserDetails(userToken);
+        return new UserDetailsTransformer(idamApiClient.getUserDetails(userToken)).asLocalUserDetails();
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {
@@ -269,27 +269,6 @@ public class SubmitDraftTest {
     }
 
     public String getIdamOauth2Token(String username, String password) {
-        String authorisation = username + ":" + password;
-        String base64Authorisation = Base64.getEncoder().encodeToString(authorisation.getBytes());
-
-        Authorize authorize = idamApiClient.authorizeCodeType(
-            BASIC_AUTHORIZATION + base64Authorisation,
-            RESPONSE_TYPE,
-            CLIENT_ID,
-            idamOauth2RedirectUrl,
-            " "
-        );
-
-        Authorize authorizeToken = idamApiClient.authorizeToken(
-            authorize.getCode(),
-            AUTHORIZATION_CODE,
-            idamOauth2RedirectUrl,
-            CLIENT_ID,
-            idamOauth2ClientSecret,
-            " "
-        );
-
-        return "Bearer " + authorizeToken.getAccessToken();
+        return idamApiClient.getAccessToken(username, password);
     }
-
 }

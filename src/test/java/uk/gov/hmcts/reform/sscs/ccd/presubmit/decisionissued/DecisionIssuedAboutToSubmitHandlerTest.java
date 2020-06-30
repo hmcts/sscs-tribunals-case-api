@@ -62,16 +62,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         initMocks(this);
 
         handler = new DecisionIssuedAboutToSubmitHandler(footerService);
-
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
-        when(footerService.createFooterDocument(any(), any(), any(), any(), any(), any()))
-            .thenReturn(SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                    .documentType(DocumentType.DECISION_NOTICE.getValue())
-                    .bundleAddition("A").documentLink(DocumentLink.builder()
-                        .documentUrl("footerUrl").build()).build())
-                .build());
-        when(footerService.getNextBundleAddition(any())).thenReturn("A");
 
         SscsDocument document = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("myTest.doc").build()).build();
         List<SscsDocument> docs = new ArrayList<>();
@@ -154,32 +145,8 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getGenerateNotice());
         assertNull(response.getData().getDateAdded());
 
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("myTest.doc",
-            response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
-        assertEquals(expectedDocument.getValue().getDocumentType(),
-            response.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        verify(footerService).createFooterDocument(eq(expectedDocument.getValue().getDocumentLink()),
-            eq("Decision notice"), eq("A"), any(), any(), eq(DocumentType.DECISION_NOTICE));
-    }
-
-    @Test
-    public void givenManuallyUploadedDecisionDocument_thenOverwriteOriginalWithFooterDocument() {
-        sscsCaseData.setPreviewDocument(null);
-        sscsCaseData.setSscsDocument(null);
-
-        SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
-            .documentType(DocumentType.DECISION_NOTICE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build())
-            .documentDateAdded(LocalDate.now()).build();
-
-        sscsCaseData.setSscsInterlocDecisionDocument(theDocument);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getData().getSscsDocument().size());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
+             any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null));
     }
 
     @Test
@@ -204,10 +171,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterDocument(eq(theDocument.getDocumentLink()), eq("Decision notice"), eq("A"), any(), any(), eq(DocumentType.DECISION_NOTICE));
-        assertEquals(2, response.getData().getSscsDocument().size());
-        assertEquals("A", response.getData().getSscsDocument().get(0).getValue().getBundleAddition());
-        assertEquals("footerUrl", response.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
+        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DECISION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null));
     }
 
     @Test

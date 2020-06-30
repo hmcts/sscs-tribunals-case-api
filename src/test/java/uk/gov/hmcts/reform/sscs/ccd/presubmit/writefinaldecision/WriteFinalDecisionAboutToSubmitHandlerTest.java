@@ -5,12 +5,16 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate.Higher;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -20,10 +24,8 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -39,20 +41,23 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() throws IOException {
         initMocks(this);
         decisionNoticeQuestionService = new DecisionNoticeQuestionService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService);
+        decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService,
+            decisionNoticeOutcomeService);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().build())
-            .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(Higher.name())
-            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(Higher.name())
+            .pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(Higher.getKey())
+            .pipWriteFinalDecisionComparedToDwpMobilityQuestion(Higher.getKey())
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -65,26 +70,29 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({
-            "Higher, Higher, decisionInFavourOfAppellant",
-            "Higher, Same, decisionInFavourOfAppellant",
-            "Higher, Lower, decisionInFavourOfAppellant",
-            "Same, Higher, decisionInFavourOfAppellant",
-            "Same, Same, decisionUpheld",
-            "Same, Lower, decisionUpheld",
-            "Lower, Higher, decisionInFavourOfAppellant",
-            "Lower, Same, decisionUpheld",
-            "Lower, Lower, decisionUpheld"})
-    public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigher_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility, String expectedOutcome) {
+            "higher, higher, decisionInFavourOfAppellant",
+            "higher, same, decisionInFavourOfAppellant",
+            "higher, lower, decisionUpheld",
+            "same, higher, decisionInFavourOfAppellant",
+            "same, same, decisionUpheld",
+            "same, lower, decisionUpheld",
+            "lower, higher, decisionUpheld",
+            "lower, same, decisionUpheld",
+            "lower, lower, decisionUpheld"})
+    public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigherAndNeitherIsLower_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility, String expectedOutcome) {
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving);
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparedRateMobility);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(expectedOutcome, response.getData().getOutcome());
-        assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
     }
 
     @Test
     public void givenFinalDecisionComparedToDwpQuestionComparedRatesAreNull_thenDisplayAnError() {
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
         callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -98,6 +106,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -124,6 +134,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -152,6 +164,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -178,6 +192,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -205,6 +221,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("enhancedRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -233,6 +251,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -260,6 +280,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -287,6 +309,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -313,6 +337,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -339,6 +365,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -365,6 +393,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
 
@@ -392,6 +422,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("enhancedRate");
 
@@ -418,6 +450,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
 
@@ -444,6 +478,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
 
@@ -471,6 +507,8 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
 
@@ -490,6 +528,24 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
         assertEquals("You have previously selected a standard rate award for Daily Living. The points awarded don't match. Please review your previous selection.", error1);
         assertEquals("You have previously selected a standard rate award for Mobility. The points awarded don't match. Please review your previous selection.", error2);
 
+    }
+
+    @Test
+    public void givenDraftFinalDecisionAlreadyExistsOnCase_thenOverwriteExistingDraft() {
+        SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
+        List<SscsDocument> docs = new ArrayList<>();
+        docs.add(doc);
+        callback.getCaseDetails().getCaseData().setSscsDocument(docs);
+
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getSscsDocument().size());
+        assertEquals((String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test

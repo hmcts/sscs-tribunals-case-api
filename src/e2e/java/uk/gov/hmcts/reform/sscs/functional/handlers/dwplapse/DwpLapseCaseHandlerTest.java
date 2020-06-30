@@ -4,11 +4,7 @@ import static io.restassured.RestAssured.*;
 import static org.junit.Assert.assertEquals;
 
 import io.restassured.http.ContentType;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
@@ -42,7 +39,7 @@ public class DwpLapseCaseHandlerTest {
     @Test
     public void hitCallback() throws IOException {
 
-        String body = getJsonCallbackForTest();
+        String body = BaseHandler.getJsonCallbackForTest("handlers/dwplapse/dwpLapseCallback.json");
 
         String response = given()
                 .contentType(ContentType.JSON)
@@ -59,11 +56,5 @@ public class DwpLapseCaseHandlerTest {
                 .extract().body().jsonPath().get("data.interlocReviewState");
 
         assertEquals("awaitingAdminAction", response);
-    }
-
-    private String getJsonCallbackForTest() throws IOException {
-        String path = Objects.requireNonNull(getClass().getClassLoader()
-                .getResource("handlers/dwplapse/dwpLapseCallback.json")).getFile();
-        return FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
     }
 }

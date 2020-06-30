@@ -5,12 +5,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_DOCUMENT_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.FILE_UPLOAD_IS_EMPTY;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.FILE_UPLOAD_IS_NULL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.uploaddocuments.FileUploadScenario.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -19,8 +19,7 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
@@ -114,6 +113,32 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandlerTest {
         long numberOfExpectedError = actualResponse.getErrors().stream()
             .filter(error -> error.equalsIgnoreCase("You need to provide a file and a document type"))
             .count();
+        assertEquals(1, numberOfExpectedError);
+    }
+
+    @Test
+    public void handleDocumentUploadWhereUploadedFileIsNotAPdf() throws IOException {
+        Callback<SscsCaseData> callback = buildTestCallbackGivenData(UPLOAD_DOCUMENT_FURTHER_EVIDENCE,
+                "withDwp",
+                "representativeEvidence", "appellantEvidence",
+                UPLOAD_DOCUMENT_FE_CALLBACK_JSON);
+        List<SscsFurtherEvidenceDoc> draftDocuments = Collections.singletonList(SscsFurtherEvidenceDoc.builder()
+                .value(SscsFurtherEvidenceDocDetails.builder()
+                        .documentFileName("word.docx")
+                        .documentType("representativeEvidence")
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("http://dm-store:5005/documents/abe3b75a-7a72-4e68-b136-4349b7d4f655")
+                                .documentFilename("word.docx").build())
+                        .build())
+                .build());
+        callback.getCaseDetails().getCaseData().setDraftSscsFurtherEvidenceDocument(draftDocuments);
+        PreSubmitCallbackResponse<SscsCaseData> actualResponse = handler.handle(CallbackType.ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertThatJson(actualResponse.getData()).isEqualTo(callback.getCaseDetails().getCaseData());
+        assertNull(actualResponse.getData().getDwpState());
+        assertNull(actualResponse.getData().getDraftSscsFurtherEvidenceDocument());
+        long numberOfExpectedError = actualResponse.getErrors().stream()
+                .filter(error -> error.equalsIgnoreCase("You need to upload PDF documents only"))
+                .count();
         assertEquals(1, numberOfExpectedError);
     }
 

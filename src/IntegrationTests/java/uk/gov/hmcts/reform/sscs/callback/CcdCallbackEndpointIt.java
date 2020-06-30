@@ -18,10 +18,7 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.createUpload
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.servlet.http.HttpServletResponse;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -49,12 +46,10 @@ import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.idam.Authorize;
-import uk.gov.hmcts.reform.sscs.idam.IdamApiClient;
-import uk.gov.hmcts.reform.sscs.idam.UserDetails;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -70,7 +65,7 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     private CoreCaseDataApi coreCaseDataApi;
 
     @MockBean
-    private IdamApiClient idamApiClient;
+    private IdamClient idamClient;
 
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
@@ -227,16 +222,11 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
     }
 
     private void mockIdam() {
-        given(idamApiClient.authorizeCodeType(anyString(), eq("code"), eq("sscs"),
-            eq("https://localhost:3000/authenticated"), eq(" ")))
-            .willReturn(Authorize.builder().code("code").build());
+        given(idamClient.getAccessToken(anyString(), anyString()))
+                .willReturn("Bearer authToken");
 
-        given(idamApiClient.authorizeToken(anyString(), eq("authorization_code"),
-            eq("https://localhost:3000/authenticated"), eq("sscs"), anyString(), eq(" ")))
-            .willReturn(Authorize.builder().accessToken("authToken").build());
-
-        given(idamApiClient.getUserDetails("Bearer authToken"))
-            .willReturn(UserDetails.builder().id("userId").build());
+        given(idamClient.getUserDetails(anyString()))
+                    .willReturn(new uk.gov.hmcts.reform.idam.client.models.UserDetails("userId", "", "", "", Arrays.asList("caseworker", "citizen")));
 
         given(authTokenGenerator.generate()).willReturn("s2s token");
     }
