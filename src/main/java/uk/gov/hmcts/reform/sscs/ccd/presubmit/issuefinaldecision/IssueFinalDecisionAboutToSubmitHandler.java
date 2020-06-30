@@ -83,7 +83,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
 
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.DECISION_NOTICE, now,
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.FINAL_DECISION_NOTICE, now,
                 null, null);
     }
 
