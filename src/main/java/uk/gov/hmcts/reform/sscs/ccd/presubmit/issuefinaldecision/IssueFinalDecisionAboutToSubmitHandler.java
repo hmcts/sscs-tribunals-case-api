@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,7 +52,13 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
 
         if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
-            createFinalDecisionNoticeFromPreviewDraft(sscsCaseData);
+
+            if (!isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {
+                preSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                return preSubmitCallbackResponse;
+            }
+
+            createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
         } else {
             preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
         }
@@ -61,18 +68,27 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         return preSubmitCallbackResponse;
     }
 
-    private void createFinalDecisionNoticeFromPreviewDraft(SscsCaseData sscsCaseData) {
+    private void createFinalDecisionNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
-        DocumentLink previewDoc = sscsCaseData.getWriteFinalDecisionPreviewDocument();
-        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
+        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
+
+        DocumentLink docLink = sscsCaseData.getWriteFinalDecisionPreviewDocument();
 
         DocumentLink documentLink = DocumentLink.builder()
-            .documentUrl(previewDoc.getDocumentUrl())
-            .documentFilename(DocumentType.DECISION_NOTICE.getValue() + " issued on " + now + ".pdf")
-            .documentBinaryUrl(previewDoc.getDocumentBinaryUrl())
+            .documentUrl(docLink.getDocumentUrl())
+            .documentFilename(docLink.getDocumentFilename())
+            .documentBinaryUrl(docLink.getDocumentBinaryUrl())
             .build();
 
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.DECISION_NOTICE, now);
+        LocalDate dateAdded = null;
+        if (sscsCaseData.getWriteFinalDecisionDocumentDateAdded() != null) {
+            dateAdded = LocalDate.parse(sscsCaseData.getWriteFinalDecisionDocumentDateAdded(), DateTimeFormatter.ISO_DATE);
+        }
+
+        String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
+
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.DECISION_NOTICE, now,
+                dateAdded, sscsCaseData.getWriteFinalDecisionDocumentFileName());
     }
 
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -105,10 +121,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setPipWriteFinalDecisionBudgetingDecisionsQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionPlanningAndFollowingQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion(null);
-        sscsCaseData.setWriteFinalDecisionReasonsForDecision(null);
+        sscsCaseData.setWriteFinalDecisionReasons(null);
         sscsCaseData.setWriteFinalDecisionPageSectionReference(null);
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
         sscsCaseData.setWriteFinalDecisionGeneratedDate(null);
+        sscsCaseData.setWriteFinalDecisionDocumentDateAdded(null);
+        sscsCaseData.setWriteFinalDecisionDocumentFileName(null);
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));

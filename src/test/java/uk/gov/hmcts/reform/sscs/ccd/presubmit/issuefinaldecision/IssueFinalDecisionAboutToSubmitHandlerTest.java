@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -86,7 +87,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .pipWriteFinalDecisionBudgetingDecisionsQuestion("")
             .pipWriteFinalDecisionPlanningAndFollowingQuestion("")
             .pipWriteFinalDecisionMovingAroundQuestion("")
-            .writeFinalDecisionReasonsForDecision("")
+            .writeFinalDecisionReasons(Arrays.asList(new CollectionItem(null, "")))
             .writeFinalDecisionPageSectionReference("")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
             .build();
@@ -102,17 +103,12 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueFinalDecisionEvent_thenCreateDecisionWithFooterAndClearTransientFields() {
-        SscsDocument doc = SscsDocument.builder().value(
-                SscsDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder().documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build())
-                        .documentFileName("myTest.doc")
-                        .documentType(DRAFT_DECISION_NOTICE.getValue()).build())
-                .build();
-        callback.getCaseDetails().getCaseData().getSscsDocument().add(doc);
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(doc.getValue().getDocumentLink()), any(), eq(DECISION_NOTICE), any());
+        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(DECISION_NOTICE), any(), eq(null), eq(null));
         assertEquals(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
         assertEquals(0, (int) response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue())).count());
 
@@ -143,8 +139,36 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getPipWriteFinalDecisionBudgetingDecisionsQuestion());
         assertNull(sscsCaseData.getPipWriteFinalDecisionPlanningAndFollowingQuestion());
         assertNull(sscsCaseData.getPipWriteFinalDecisionMovingAroundQuestion());
-        assertNull(sscsCaseData.getWriteFinalDecisionReasonsForDecision());
+        assertNull(sscsCaseData.getWriteFinalDecisionReasons());
         assertNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
+        assertNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
+        assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
+        assertNull(sscsCaseData.getWriteFinalDecisionDocumentDateAdded());
+        assertNull(sscsCaseData.getWriteFinalDecisionDocumentFileName());
+        assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
+        assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventWithDocumentNameSet_thenCreateDecisionWithFooterAndOverrideDocName() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionDocumentFileName("test.pdf");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(DECISION_NOTICE), any(), eq(null), eq("test.pdf"));
+    }
+
+    @Test
+    public void givenAnIssueFinalDecisionEventWithDocumentDateAddedSet_thenCreateDecisionWithFooterAndOverrideDocDate() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("test.pdf").build();
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
+        callback.getCaseDetails().getCaseData().setWriteFinalDecisionDocumentDateAdded(LocalDate.now().toString());
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(DECISION_NOTICE), any(), eq(LocalDate.now()), eq(null));
     }
 
     @Test
@@ -155,6 +179,19 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("There is no Preview Draft Decision Notice on the case so decision cannot be issued", error);
+    }
+
+    @Test
+    public void givenANonPdfDecisionNotice_thenDisplayAnError() {
+        DocumentLink docLink = DocumentLink.builder().documentUrl("test.doc").build();
+        sscsCaseData.setWriteFinalDecisionPreviewDocument(docLink);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You need to upload PDF documents only", error);
     }
 
     @Test

@@ -53,7 +53,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         }
 
         footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
+                caseData.getDateAdded(), null);
 
         State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
 
