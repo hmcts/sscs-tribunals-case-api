@@ -80,15 +80,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .documentBinaryUrl(docLink.getDocumentBinaryUrl())
             .build();
 
-        LocalDate dateAdded = null;
-        if (sscsCaseData.getWriteFinalDecisionDocumentDateAdded() != null) {
-            dateAdded = LocalDate.parse(sscsCaseData.getWriteFinalDecisionDocumentDateAdded(), DateTimeFormatter.ISO_DATE);
-        }
 
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
 
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.DECISION_NOTICE, now,
-                dateAdded, sscsCaseData.getWriteFinalDecisionDocumentFileName());
+                null, null);
     }
 
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -125,8 +121,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setWriteFinalDecisionPageSectionReference(null);
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
         sscsCaseData.setWriteFinalDecisionGeneratedDate(null);
-        sscsCaseData.setWriteFinalDecisionDocumentDateAdded(null);
-        sscsCaseData.setWriteFinalDecisionDocumentFileName(null);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(null);
 

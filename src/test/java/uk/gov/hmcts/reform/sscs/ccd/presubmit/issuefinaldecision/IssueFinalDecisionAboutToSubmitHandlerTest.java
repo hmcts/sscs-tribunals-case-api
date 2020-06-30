@@ -143,32 +143,28 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionPageSectionReference());
         assertNull(sscsCaseData.getWriteFinalDecisionPreviewDocument());
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionDocumentDateAdded());
-        assertNull(sscsCaseData.getWriteFinalDecisionDocumentFileName());
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
     }
 
     @Test
-    public void givenAnIssueFinalDecisionEventWithDocumentNameSet_thenCreateDecisionWithFooterAndOverrideDocName() {
+    public void givenAnIssueFinalDecisionEventWithDocumentNameNotSet_thenCreateDecisionWithFooter() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionDocumentFileName("test.pdf");
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(DECISION_NOTICE), any(), eq(null), eq("test.pdf"));
+        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(DECISION_NOTICE), any(), eq(null), eq(null));
     }
 
     @Test
-    public void givenAnIssueFinalDecisionEventWithDocumentDateAddedSet_thenCreateDecisionWithFooterAndOverrideDocDate() {
+    public void givenAnIssueFinalDecisionEventWithDocumentDateAddedNotSet_thenCreateDecisionWithFooter() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("test.pdf").build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionDocumentDateAdded(LocalDate.now().toString());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(DECISION_NOTICE), any(), eq(LocalDate.now()), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(DECISION_NOTICE), any(), eq(null), eq(null));
     }
 
     @Test

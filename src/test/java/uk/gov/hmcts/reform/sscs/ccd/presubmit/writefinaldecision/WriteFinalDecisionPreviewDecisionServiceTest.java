@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -202,7 +203,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -264,7 +265,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -345,7 +346,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
         sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -417,7 +418,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
@@ -439,7 +440,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user name", error);
@@ -460,7 +461,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to obtain signed in user details", error);
@@ -479,7 +480,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
@@ -500,7 +501,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
@@ -519,7 +520,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
@@ -530,7 +531,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenGenerateNoticeNotSet_willNotSetPreviewFile() {
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
     }
@@ -553,7 +554,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -588,7 +589,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
@@ -614,7 +615,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing venue", error);
@@ -638,7 +639,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         sscsCaseData.setHearings(Arrays.asList(hearing2, hearing1));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
@@ -663,7 +664,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date or venue", error);
@@ -683,7 +684,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = new ArrayList<>();
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertTrue(response.getErrors().isEmpty());
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
@@ -706,7 +707,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
 
         assertTrue(response.getErrors().isEmpty());
@@ -739,7 +740,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -776,7 +777,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Unable to determine hearing date", error);
@@ -801,7 +802,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         List<Hearing> hearings = Arrays.asList(hearing2, hearing1);
         sscsCaseData.setHearings(hearings);
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
 
@@ -828,7 +829,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -860,7 +861,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -891,7 +892,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, USER_AUTHORISATION, false);
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
         assertEquals(DocumentLink.builder()
@@ -922,7 +923,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
-        service.preview(callback, USER_AUTHORISATION, false);
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
     }
@@ -947,7 +948,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
 
-        service.preview(callback, USER_AUTHORISATION, false);
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "2018-10-10", true);
     }
@@ -960,7 +961,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        service.preview(callback, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 
@@ -976,7 +977,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
 
-        service.preview(callback, USER_AUTHORISATION, true);
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true);
 

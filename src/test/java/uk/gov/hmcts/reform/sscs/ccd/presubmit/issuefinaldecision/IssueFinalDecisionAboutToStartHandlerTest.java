@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -85,10 +86,10 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
 
-        when(previewDecisionService.preview(callback, USER_AUTHORISATION, true)).thenReturn(response);
+        when(previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true)).thenReturn(response);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
-        verify(previewDecisionService).preview(callback, USER_AUTHORISATION, true);
+        verify(previewDecisionService).preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
     }
 
     @Test

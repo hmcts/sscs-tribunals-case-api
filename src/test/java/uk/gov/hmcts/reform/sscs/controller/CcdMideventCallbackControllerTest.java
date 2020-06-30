@@ -27,6 +27,7 @@ import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -81,7 +82,7 @@ public class CcdMideventCallbackControllerTest {
                 Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(SscsCaseData.builder().interlocReviewState("new_state").build());
-        when(writeFinalDecisionPreviewDecisionService.preview(any(), anyString(), eq(false)))
+        when(writeFinalDecisionPreviewDecisionService.preview(any(),eq(DocumentType.DRAFT_DECISION_NOTICE), anyString(), eq(false)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/ccdMidEventPreviewFinalDecision")

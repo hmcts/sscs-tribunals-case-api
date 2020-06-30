@@ -112,9 +112,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         SscsDocument draftDecisionNotice = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(createFileName(sscsCaseData))
+                .documentFileName(createFileName())
                 .documentLink(sscsCaseData.getWriteFinalDecisionPreviewDocument())
-                .documentDateAdded(setDocumentDateAdded(sscsCaseData))
+                .documentDateAdded(setDocumentDateAdded())
                 .documentType(DRAFT_DECISION_NOTICE.getValue())
                 .build()).build();
 
@@ -128,19 +128,11 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setSscsDocument(documents);
     }
 
-    private String createFileName(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWriteFinalDecisionDocumentFileName() != null) {
-            return sscsCaseData.getWriteFinalDecisionDocumentFileName();
-        } else {
+    private String createFileName() {
             return String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-        }
     }
 
-    private String setDocumentDateAdded(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWriteFinalDecisionDocumentDateAdded() != null) {
-            return sscsCaseData.getWriteFinalDecisionDocumentDateAdded();
-        } else {
+    private String setDocumentDateAdded() {
             return LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        }
     }
 }
