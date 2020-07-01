@@ -37,8 +37,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
-        boolean hasContactDetails = syaCaseWrapper.getContactDetails() != null;
-
         boolean isDraft = isDraft(syaCaseWrapper);
 
         String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode());
@@ -57,6 +55,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .caseCode(caseCode)
                 .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getBenefitType().getCode(),
                         appeal.getMrnDetails().getDwpIssuingOffice()))
+                .pcqId(syaCaseWrapper.getPcqId())
                 .build();
     }
 

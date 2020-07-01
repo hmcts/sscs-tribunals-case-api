@@ -160,5 +160,6 @@
   },
   "evidencePresent" : "No",
   "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle"
+  "dwpRegionalCentre": "Newcastle",
+  "pcqId": "12345678"
 }
