@@ -299,10 +299,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
         names.add(signedInJudgeName);
-        if (caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName() != null) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
             names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         }
-        if (caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName() != null) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
             names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);

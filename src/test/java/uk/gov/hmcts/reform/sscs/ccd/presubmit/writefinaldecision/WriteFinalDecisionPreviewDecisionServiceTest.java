@@ -978,13 +978,45 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     }
 
     @Test
-    public void givenCaseWithNoPanelMembers_thenCorrectlySetTheHeldBefore() {
+    public void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore() {
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        DirectionOrDecisionIssuedTemplateBody payload = verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10", true,true);
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+        assertNotNull(body);
+
+        assertEquals("Judge Full Name", body.getHeldBefore());
+
+    }
+
+    @Test
+    public void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore() {
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName("");
+        sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName("");
+
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
