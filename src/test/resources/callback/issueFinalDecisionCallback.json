@@ -80,7 +80,7 @@
       },
       "sscsDocument" : [ {
         "value" : {
-          "documentType" : "draftDecisionNotice",
+          "documentType" : "finalDecisionNotice",
           "documentFileName" : "11111.pdf",
           "documentDateAdded" : "2020-10-10",
           "documentLink" : {

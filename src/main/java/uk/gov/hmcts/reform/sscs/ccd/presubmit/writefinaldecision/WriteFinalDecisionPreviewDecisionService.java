@@ -57,7 +57,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, String userAuthorisation, boolean showIssueDate) {
+    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
 
         this.showIssueDate = showIssueDate;
 
@@ -70,7 +70,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         }
 
         try {
-            return issueDocument(callback, DocumentType.DRAFT_DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+            return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());
@@ -87,6 +87,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
+
+        builder.userName(buildSignedInJudgeName(userAuthorisation));
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
 
