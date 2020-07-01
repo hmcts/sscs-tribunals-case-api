@@ -84,6 +84,8 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
+        assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
+        assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
@@ -152,6 +154,8 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
+        assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
+        assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
@@ -221,6 +225,8 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
+        assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
+        assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
