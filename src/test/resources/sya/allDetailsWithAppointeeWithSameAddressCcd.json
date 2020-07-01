@@ -1,10 +1,5 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "generatedDOB" : "1990-02-26",
-  "generatedEmail" : "sscsappointee@greencroftconsulting.com",
-  "generatedMobile" : "07411222221",
-  "generatedNino" : "AB877533C",
-  "generatedSurname" : "Bloggs",
   "benefitCode" : "002",
   "issueCode" : "DD",
   "caseCode" : "002DD",

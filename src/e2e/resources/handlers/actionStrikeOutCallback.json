@@ -26,7 +26,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JT 12 34 56 D",
       "interlocReferralReason": "other",
       "subscriptions": {
         "appellantSubscription": {
@@ -73,7 +72,6 @@
       "appealNotePad": {
         "notesCollection": []
       },
-      "generatedSurname": "Test",
       "appeal": {
         "rep": {
           "name": {
@@ -263,7 +261,6 @@
       },
       "interlocReviewState": "reviewByJudge",
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "events": [
         {
           "id": "7d2f5ff0-6a2c-4e0d-929e-5a2fa14445bc",
