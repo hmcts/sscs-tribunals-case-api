@@ -24,7 +24,9 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "generateNotice" : "Yes",
+      "writeFinalDecisionIsDescriptorFlow" : "No",
+      "writeFinalDecisionGenerateNotice": "No",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
       "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
       "signedBy": "Maple Magoo",
       "signedRole": "Proxy Judge",
@@ -676,7 +678,9 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "generateNotice" : "Yes",
+      "writeFinalDecisionIsDescriptorFlow" : "No",
+      "writeFinalDecisionGenerateNotice": "No",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
       "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
       "signedBy": "Maple Magoo",
       "signedRole": "Proxy Judge",

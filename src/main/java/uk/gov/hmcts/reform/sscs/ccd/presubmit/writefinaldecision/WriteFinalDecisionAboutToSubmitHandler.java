@@ -15,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @Component
@@ -23,13 +22,10 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
-    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
     @Autowired
-    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService,
-        DecisionNoticeOutcomeService decisionNoticeOutcomeService) {
+    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService) {
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
-        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
 
     @Override
@@ -52,24 +48,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
-        calculateOutcomeCode(sscsCaseData, preSubmitCallbackResponse);
-
         writePreviewDocumentToSscsDocument(sscsCaseData);
 
         return preSubmitCallbackResponse;
-    }
-
-    private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
-        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(sscsCaseData);
-
-        if (outcome != null) {
-            sscsCaseData.setOutcome(outcome.getId());
-        } else {
-            log.error("Outcome cannot be empty when generating final decision. Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError("Outcome cannot be empty. Please check case data. If problem continues please contact support");
-        }
-
     }
 
     private List<String> getDecisionNoticePointsValidationErrorMessages(SscsCaseData sscsCaseData) {
