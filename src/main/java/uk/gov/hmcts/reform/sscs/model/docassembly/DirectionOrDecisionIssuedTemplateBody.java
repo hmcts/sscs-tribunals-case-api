@@ -50,4 +50,8 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     @Builder.Default private String welshImage = WELSH_IMAGE;
     @JsonProperty("write_final_decision")
     private WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody;
+    @JsonProperty("welsh_date_added")
+    private String welshDateAdded;
+    @JsonProperty("welsh_generated_date")
+    private String welshGeneratedDate;
 }

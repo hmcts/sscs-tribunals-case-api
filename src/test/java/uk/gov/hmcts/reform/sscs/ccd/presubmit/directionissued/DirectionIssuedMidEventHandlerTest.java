@@ -135,7 +135,8 @@ public class DirectionIssuedMidEventHandlerTest {
                 .build(), response.getData().getPreviewDocument());
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -145,7 +146,8 @@ public class DirectionIssuedMidEventHandlerTest {
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -161,7 +163,8 @@ public class DirectionIssuedMidEventHandlerTest {
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -178,7 +181,8 @@ public class DirectionIssuedMidEventHandlerTest {
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
-                documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DIRECTION_ISSUED));
+                documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -191,7 +195,7 @@ public class DirectionIssuedMidEventHandlerTest {
         assertEquals("Direction Type cannot be empty", response.getErrors().toArray()[0]);
     }
 
-    private void verifyTemplateBody(String image, String expectedName, String templateId) {
+    private void verifyTemplateBody(String image, String expectedName, String templateId, boolean isLanguageWelsh) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         GenerateFileParams generateFileParams = capture.getValue();
         DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) generateFileParams.getFormPayload();
@@ -199,6 +203,10 @@ public class DirectionIssuedMidEventHandlerTest {
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
         assertEquals(templateId, generateFileParams.getTemplateId());
+        if (isLanguageWelsh) {
+            assertNotNull(payload.getWelshDateAdded());
+            assertNotNull(payload.getWelshGeneratedDate());
+        }
     }
 }
 
