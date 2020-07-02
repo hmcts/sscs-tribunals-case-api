@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -45,6 +46,6 @@ public class CcdMideventCallbackController {
 
         authorisationService.authorise(serviceAuthHeader);
 
-        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, userAuthorisation, false));
+        return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
     }
 }

@@ -24,18 +24,21 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "generateNotice" : "Yes",
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
+      "writeFinalDecisionGenerateNotice": "No",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
       "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
       "signedBy": "Maple Magoo",
       "signedRole": "Proxy Judge",
       "decisionType": "strikeOut",
-      "previewDocument" : {
+      "dwpTimeExtension": [
+      ],
+      "generatedNino": "JT 12 34 56 D",
+      "writeFinalDecisionPreviewDocument" : {
         "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
         "document_filename": "decisionIssued.pdf"
       },
-      "dwpTimeExtension": [
-      ],
       "hearings": [
         {
           "value": {
@@ -79,10 +82,9 @@
       },
       "sscsDocument" : [ {
         "value" : {
-          "documentType" : "appellantEvidence",
+          "documentType" : "finalDecisionNotice",
           "documentFileName" : "11111.pdf",
-          "documentDateAdded" : "2018-10-10",
-          "evidenceIssued": "Yes",
+          "documentDateAdded" : "2020-10-10",
           "documentLink" : {
             "document_url" : "http://www.bbc.com",
             "document_binary_url" : "http://www.bbc.com/binary",
@@ -90,33 +92,33 @@
           }
         }
       },
-        {
-          "value" : {
-            "documentType" : "representativeEvidence",
-            "documentFileName" : "22222.pdf",
-            "documentDateAdded" : "2018-10-11",
-            "evidenceIssued": "Yes",
-            "documentLink" : {
-              "document_url" : "http://www.itv.com",
-              "document_binary_url" : "http://www.itv.com/binary",
-              "document_filename" : "myfile2.jpg"
-            }
+      {
+        "value" : {
+          "documentType" : "representativeEvidence",
+          "documentFileName" : "22222.pdf",
+          "documentDateAdded" : "2018-10-11",
+          "evidenceIssued": "Yes",
+          "documentLink" : {
+            "document_url" : "http://www.itv.com",
+            "document_binary_url" : "http://www.itv.com/binary",
+            "document_filename" : "myfile2.jpg"
           }
-        },
-        {
-          "value" : {
-            "documentType" : "decisionIssued",
-            "documentFileName" : "oldDecisionIssued.pdf",
-            "documentDateAdded" : "2018-10-12",
-            "evidenceIssued": "Yes",
-            "bundleAddition": "A",
-            "documentLink" : {
-              "document_url" : "http://www.itv3.com",
-              "document_binary_url" : "http://www.itv3.com/binary",
-              "document_filename" : "myfile3.jpg"
-            }
+        }
+      },
+      {
+        "value" : {
+          "documentType" : "decisionIssued",
+          "documentFileName" : "oldDecisionIssued.pdf",
+          "documentDateAdded" : "2018-10-12",
+          "evidenceIssued": "Yes",
+          "bundleAddition": "A",
+          "documentLink" : {
+            "document_url" : "http://www.itv3.com",
+            "document_binary_url" : "http://www.itv3.com/binary",
+            "document_filename" : "myfile3.jpg"
           }
-        }],
+        }
+      }],
       "reissueFurtherEvidenceDocument": {},
       "resendToAppellant": "NO",
       "resendToRepresentative": "NO",
@@ -126,6 +128,7 @@
         ]
       },
       "caseReference": "SC022/14/12423",
+      "generatedSurname": "Test",
       "regionalProcessingCenter": {
         "faxNumber": "0126 434 7983",
         "address4": "PO Box 14620",
@@ -199,6 +202,7 @@
         "hearingType": "paper"
       },
       "region": "BIRMINGHAM",
+      "generatedDOB": "1900-01-01",
       "evidencePresent": "No",
       "events": [
         {
@@ -674,7 +678,9 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "generateNotice" : "Yes",
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
+      "writeFinalDecisionGenerateNotice": "No",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
       "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
       "signedBy": "Maple Magoo",
       "signedRole": "Proxy Judge",
@@ -686,6 +692,7 @@
       },
       "dwpTimeExtension": [
       ],
+      "generatedNino": "JT 12 34 56 D",
       "hearings": [
         {
           "value": {
@@ -776,6 +783,7 @@
         ]
       },
       "caseReference": "SC022/14/12423",
+      "generatedSurname": "Test",
       "regionalProcessingCenter": {
         "faxNumber": "0126 434 7983",
         "address4": "PO Box 14620",
@@ -849,6 +857,7 @@
         "hearingType": "paper"
       },
       "region": "BIRMINGHAM",
+      "generatedDOB": "1900-01-01",
       "evidencePresent": "No",
       "events": [
         {
@@ -1299,5 +1308,5 @@
       }
     }
   },
-  "event_id": "decisionIssued"
+  "event_id": "issueFinalDecision"
 }
