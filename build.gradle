@@ -162,7 +162,7 @@ sonarqube {
                 "src/main/java/uk/gov/hmcts/reform/sscs/TribunalsCaseApiApplication.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/email/Email.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/config/*," +
-                "src/main/java/uk/gov/hmcts/reform/sscs/model/**/*.java" +
+                "src/main/java/uk/gov/hmcts/reform/sscs/model/**/*.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/EvidenceUploadService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/OnlineHearingService.java," +
                 "src/main/java/uk/gov/hmcts/reform/sscs/service/pdf/data/EvidenceDescriptionPdfData.java," +
