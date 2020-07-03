@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
-
 import java.time.LocalDate;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
