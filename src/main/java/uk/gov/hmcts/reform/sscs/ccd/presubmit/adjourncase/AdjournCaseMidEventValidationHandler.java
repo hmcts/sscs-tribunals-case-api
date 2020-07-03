@@ -49,7 +49,7 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
 
     private boolean isDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null) {
-            if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null) {
+            if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null && !"0".equals(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())) {
                 throw new IllegalStateException(("Cannot specify both directions due date and directions due days offset"));
             }
             LocalDate directionsDueDate = LocalDate.parse(sscsCaseData.getAdjournCaseDirectionsDueDate());
