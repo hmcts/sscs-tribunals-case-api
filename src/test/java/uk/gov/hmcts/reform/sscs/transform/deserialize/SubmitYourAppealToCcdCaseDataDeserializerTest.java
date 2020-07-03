@@ -61,9 +61,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
+
+import java.util.Collections;
 
 @RunWith(JUnitParamsRunner.class)
 public class SubmitYourAppealToCcdCaseDataDeserializerTest {
@@ -324,6 +327,21 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         final SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
         final SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
         assertEquals("Tya number should have a size of 10", 10, caseData.getSubscriptions().getAppointeeSubscription().getTya().length());
+    }
+
+    @Test
+    public void willConvertReasonsForAppealingInTheCorrectOrder() {
+        final SyaCaseWrapper syaCaseWrapper = ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS.getDeserializeMessage();
+
+        final Reason reason = new Reason();
+        reason.setReasonForAppealing("reasonForAppealing");
+        reason.setWhatYouDisagreeWith("whatYouDisagreeWith");
+        syaCaseWrapper.getReasonsForAppealing().setReasons(Collections.singletonList(reason));
+
+        final SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        assertEquals(1, caseData.getAppeal().getAppealReasons().getReasons().size());
+        assertEquals(reason.getReasonForAppealing(), caseData.getAppeal().getAppealReasons().getReasons().get(0).getValue().getDescription());
+        assertEquals(reason.getWhatYouDisagreeWith(), caseData.getAppeal().getAppealReasons().getReasons().get(0).getValue().getReason());
     }
 
     @Test
