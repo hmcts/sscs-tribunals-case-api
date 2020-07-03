@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
