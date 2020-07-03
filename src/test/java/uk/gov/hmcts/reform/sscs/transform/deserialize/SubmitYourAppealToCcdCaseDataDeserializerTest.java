@@ -50,6 +50,7 @@ import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WAN
 import static uk.gov.hmcts.reform.sscs.util.SyaJsonMessageSerializer.WITHOUT_WANTS_SUPPORT_CCD;
 import static uk.gov.hmcts.reform.sscs.util.SyaServiceHelper.getRegionalProcessingCenter;
 
+import java.util.Collections;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -65,8 +66,6 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.Reason;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
-
-import java.util.Collections;
 
 @RunWith(JUnitParamsRunner.class)
 public class SubmitYourAppealToCcdCaseDataDeserializerTest {
