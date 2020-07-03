@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -101,6 +102,16 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
             writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+        }
+
+        if ("yes".equalsIgnoreCase((caseData.getWriteFinalDecisionIsDescriptorFlow()))
+            && "yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+
+            boolean isSetAside = getConsideredComparisonsWithDwp(caseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
+
+            writeFinalDecisionBuilder.isSetAside(isSetAside);
+
+        } else {
             writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
         }
 
@@ -148,6 +159,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         return builder.build();
 
+    }
+
+    private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
+        List<String> consideredComparissons = new ArrayList<>();
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        }
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        }
+        return consideredComparissons;
     }
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
