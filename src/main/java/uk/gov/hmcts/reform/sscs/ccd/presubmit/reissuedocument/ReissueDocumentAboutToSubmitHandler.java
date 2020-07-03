@@ -37,10 +37,12 @@ public class ReissueDocumentAboutToSubmitHandler implements PreSubmitCallbackHan
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         ArrayList<String> errors = new ArrayList<>();
 
-        boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("YES", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
+        boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("Yes", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
 
-        if (!caseHasARepresentative && sscsCaseData.isResendToRepresentative()) {
-            errors.add("Cannot re-issue to the representative as there is no representative on the appeal.");
+        if (!sscsCaseData.isResendToRepresentative() && !sscsCaseData.isResendToAppellant()) {
+            errors.add("No party selected to reissue document");
+        } else if (!caseHasARepresentative && sscsCaseData.isResendToRepresentative()) {
+            errors.add("Cannot re-issue to the representative as there is no representative on the appeal");
         }
 
         PreSubmitCallbackResponse<SscsCaseData> callbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
