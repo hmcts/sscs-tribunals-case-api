@@ -67,8 +67,7 @@ public class DecisionNoticeOutcomeService {
                 }
 
                 // At least one higher,  and non lower, means the decision is in favour of appellant
-                if (comparedRates.contains(ComparedRate.Higher)
-                    && !comparedRates.contains(ComparedRate.Lower)) {
+                if (comparedRates.contains(ComparedRate.Higher)) {
                     return DECISION_IN_FAVOUR_OF_APPELLANT;
                 } else {
                     // Otherwise, decision upheld
