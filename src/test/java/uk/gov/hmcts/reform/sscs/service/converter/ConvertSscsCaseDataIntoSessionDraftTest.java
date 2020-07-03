@@ -1668,4 +1668,12 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         assertEquals("5", actual.getDatesCantAttend().getDatesCantAttend().get(1).getMonth());
         assertEquals("2099", actual.getDatesCantAttend().getDatesCantAttend().get(1).getYear());
     }
+
+    @Test
+    public void givenCaseWithPcqId_shouldReturnResponseWithPcqId() {
+        caseData = SscsCaseData.builder().appeal(Appeal.builder().build()).pcqId("12345").build();
+
+        SessionDraft actualSessionDraft = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("12345", actualSessionDraft.getPcqId().getPcqId());
+    }
 }
