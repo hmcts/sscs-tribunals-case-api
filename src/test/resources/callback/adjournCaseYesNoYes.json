@@ -28,7 +28,6 @@
       "adjournCaseTypeOfHearing" : "video",
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "Yes",
-      "adjournCaseDirectionsDueDateDaysOffset" : "0",
       "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",
       "adjournCaseTypeOfNextHearing" : "video",
       "dwpTimeExtension": [
@@ -746,7 +745,6 @@
       "adjournCaseTypeOfHearing" : "video",
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "Yes",
-      "adjournCaseDirectionsDueDateDaysOffset" : "0",
       "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",
       "adjournCaseTypeOfNextHearing" : "video",
       "dwpTimeExtension": [
