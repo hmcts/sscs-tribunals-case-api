@@ -132,6 +132,17 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
+    public void givenDirectionsDueDateIsNotSpecifiedAndDaysOffsetSpecified_ThenDoNotDisplayAnError() {
+
+        sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset("7");
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
     public void givenNeitherDirectionsDueDateOrOffsetSpecified_ThenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
