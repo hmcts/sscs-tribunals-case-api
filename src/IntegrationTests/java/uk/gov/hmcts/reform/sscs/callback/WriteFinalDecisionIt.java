@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -279,7 +278,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
@@ -297,7 +296,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
@@ -314,7 +313,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
@@ -331,7 +330,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
