@@ -7,7 +7,6 @@ import io.restassured.RestAssured;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
