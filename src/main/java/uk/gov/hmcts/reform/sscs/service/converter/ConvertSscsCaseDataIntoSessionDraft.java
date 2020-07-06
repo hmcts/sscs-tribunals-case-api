@@ -50,6 +50,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionName;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionNoMrn;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionOtherReasonForAppealing;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionPcqId;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionPostcodeChecker;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealing;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionReasonForAppealingItem;
@@ -116,6 +117,7 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             .hearingArrangements(buildHearingArrangements(appeal))
             .hearingAvailability(buildHearingAvailability(appeal))
             .datesCantAttend(buildDatesCantAttend(appeal))
+            .pcqId(new SessionPcqId(caseData.getPcqId()))
             .build();
     }
 
