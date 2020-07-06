@@ -194,7 +194,7 @@ public class SubmitAppealService {
             throw new CcdException(
                 String.format("Error found in the creating case process for case with Id - %s"
                         + " and Nino - %s and Benefit type - %s and exception: %s",
-                    caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
+                    caseDetails != null ? caseDetails.getId() : "", caseData.getAppeal().getAppellant().getIdentity().getNino(),
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
 

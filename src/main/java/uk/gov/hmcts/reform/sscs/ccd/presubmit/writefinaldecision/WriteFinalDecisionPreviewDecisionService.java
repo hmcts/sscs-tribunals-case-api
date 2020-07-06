@@ -57,7 +57,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, String userAuthorisation, boolean showIssueDate) {
+    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
 
         this.showIssueDate = showIssueDate;
 
@@ -70,7 +70,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         }
 
         try {
-            return issueDocument(callback, DocumentType.DRAFT_DECISION_NOTICE, templateId, generateFile, userAuthorisation);
+            return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());
@@ -88,6 +88,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
 
+        builder.userName(buildSignedInJudgeName(userAuthorisation));
+
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
@@ -99,6 +101,16 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
             writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+        }
+
+        if ("yes".equalsIgnoreCase((caseData.getWriteFinalDecisionIsDescriptorFlow()))
+            && "yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+
+            boolean isSetAside = getConsideredComparisonsWithDwp(caseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
+
+            writeFinalDecisionBuilder.isSetAside(isSetAside);
+
+        } else {
             writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
         }
 
@@ -146,6 +158,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         return builder.build();
 
+    }
+
+    private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
+        List<String> consideredComparissons = new ArrayList<>();
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        }
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        }
+        return consideredComparissons;
     }
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
@@ -297,10 +320,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
         names.add(signedInJudgeName);
-        if (caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName() != null) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
             names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
         }
-        if (caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName() != null) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
             names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
