@@ -3,7 +3,7 @@ java:
   ingressHost: ${SERVICE_FQDN}
   readinessDelay: 45
   environment:
-    PDF_API_URL: "http://cmc-pdf-service-aat.service.core-compute-aat.internal"
+    PDF_API_URL: "http://rpe-pdf-service-aat.service.core-compute-aat.internal"
     CORE_CASE_DATA_API_URL: "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     DOCUMENT_MANAGEMENT_URL: "http://dm-store-aat.service.core-compute-aat.internal"
     IDAM_S2S_AUTH: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
