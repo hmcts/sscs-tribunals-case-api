@@ -204,9 +204,7 @@ public class SubmitAppealService {
                     caseDetails.getId(), caseData.getGeneratedNino(),
                     caseData.getAppeal().getBenefitType().getCode());
             throw new DuplicateCaseException(
-                    String.format("An appeal has already been submitted, for that decision date %s \n "
-                                    + "Please check the date of your MRN, and try again \n "
-                                    + "If you were not expecting to see this messge, please use the details below to contact us.",
+                    String.format("An appeal has already been submitted, for that decision date %s ",
                             caseData.getAppeal().getMrnDetails().getMrnDate()));
         }
         return null;
