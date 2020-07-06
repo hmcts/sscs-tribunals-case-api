@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.tya;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.artsok.RepeatedIfExceptionsTest;
 import io.restassured.RestAssured;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class GetAppealStatus extends BaseHandler {
         super.setUp();
     }
 
-    @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void testDwpRespond() throws IOException {
         sscsCaseDetails = createCaseInWithDwpState();
 
@@ -52,7 +53,7 @@ public class GetAppealStatus extends BaseHandler {
         assertThat(response).contains("status\":\"WITH_DWP");
     }
 
-    @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void testResponseReceived() throws IOException {
         sscsCaseDetails = createCaseInResponseReceivedState();
 
