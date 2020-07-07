@@ -108,12 +108,35 @@ public class FooterServiceTest {
         String now = LocalDate.now().toString();
 
         footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
-                sscsCaseData, DocumentType.DIRECTION_NOTICE, now);
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null);
 
         assertEquals(2, sscsCaseData.getSscsDocument().size());
         SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
         assertEquals("Addition A - Directions Notice issued on " + now + ".pdf", footerDoc.getDocumentFileName());
+        assertEquals(now, footerDoc.getDocumentDateAdded());
+        assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
+        verify(evidenceManagementService).upload(any(), eq(DM_STORE_USER_ID));
+        assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
+        assertEquals("Addition A", stringCaptor.getAllValues().get(1));
+    }
+
+    @Test
+    public void givenADocumentWithOverridenDateAndFileName_thenAddAFooterWithOverriddenValues() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        when(evidenceManagementService.upload(any(), eq(DM_STORE_USER_ID))).thenReturn(uploadResponse);
+
+        when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
+
+        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, LocalDate.now().toString(), LocalDate.now().minusDays(1), "overriden.pdf");
+
+        assertEquals(2, sscsCaseData.getSscsDocument().size());
+        SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
+        assertEquals("overriden.pdf", footerDoc.getDocumentFileName());
         assertEquals(LocalDate.now().minusDays(1).toString(), footerDoc.getDocumentDateAdded());
         assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
         verify(evidenceManagementService).upload(any(), eq(DM_STORE_USER_ID));

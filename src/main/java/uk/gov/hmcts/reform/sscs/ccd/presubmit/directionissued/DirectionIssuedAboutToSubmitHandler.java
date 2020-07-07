@@ -76,7 +76,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         }
 
         footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
+                caseData.getDateAdded(), null);
 
         State beforeState = callback.getCaseDetailsBefore().map(e -> e.getState()).orElse(null);
 

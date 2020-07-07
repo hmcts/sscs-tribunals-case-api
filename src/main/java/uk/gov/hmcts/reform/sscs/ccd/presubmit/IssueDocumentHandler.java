@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +34,7 @@ public class IssueDocumentHandler {
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
         caseData.setGenerateNotice(null);
+        caseData.setWriteFinalDecisionGenerateNotice(null);
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
@@ -44,7 +46,7 @@ public class IssueDocumentHandler {
         }
     }
 
-    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, boolean isScottish, String userAuthorisation) {
+    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
         DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
             .appellantFullName(buildFullName(caseData))
             .caseId(caseData.getCcdCaseId())
@@ -54,7 +56,7 @@ public class IssueDocumentHandler {
             .noticeType(documentTypeLabel.toUpperCase())
             .userRole(caseData.getSignedRole())
             .dateAdded(dateAdded)
-            .generatedDate(LocalDate.now())
+            .generatedDate(generatedDate)
             .build();
 
         if (isScottish) {
@@ -72,9 +74,12 @@ public class IssueDocumentHandler {
 
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
 
+
+        String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
+
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
-        FormPayload formPayload = createPayload(caseData, documentTypeLabel, dateAdded, isScottish, userAuthorisation);
+        FormPayload formPayload = createPayload(caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(documentUrl)

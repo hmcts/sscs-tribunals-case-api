@@ -49,7 +49,9 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest extends BaseHandler {
             .assertThat().body("writeFinalDecisionPageSectionReference", equalTo("B2"))
             .assertThat().body("writeFinalDecisionAppellantAttendedQuestion", equalTo("Yes"))
             .assertThat().body("writeFinalDecisionPresentingOfficerAttendedQuestion", equalTo("Yes"))
-            .assertThat().body("writeFinalDecisionReasonsForDecision", equalTo("Because appellant has trouble walking"))
+            .assertThat().body("writeFinalDecisionReasons[0].value", equalTo("Because appellant has trouble walking"))
+            .assertThat().body("writeFinalDecisionDetailsOfDecision", equalTo("The details of the decision."))
+            .assertThat().body("writeFinalDecisionAnythingElse", equalTo("Something else."))
             .assertThat().body("writeFinalDecisionStartDate", equalTo("2019-10-10"))
             .assertThat().body("writeFinalDecisionTypeOfHearing", equalTo("telephone"))
             .assertThat().body("writeFinalDecisionPreviewDocument.document_url", notNullValue());

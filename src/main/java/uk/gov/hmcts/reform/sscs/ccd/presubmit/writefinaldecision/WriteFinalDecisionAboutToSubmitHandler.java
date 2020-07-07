@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
 import java.time.LocalDate;
@@ -14,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @Component
@@ -22,13 +22,10 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
-    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
     @Autowired
-    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService,
-        DecisionNoticeOutcomeService decisionNoticeOutcomeService) {
+    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService) {
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
-        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
 
     @Override
@@ -51,24 +48,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
-        calculateOutcomeCode(sscsCaseData, preSubmitCallbackResponse);
-
         writePreviewDocumentToSscsDocument(sscsCaseData);
 
         return preSubmitCallbackResponse;
-    }
-
-    private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-
-        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(sscsCaseData);
-
-        if (outcome != null) {
-            sscsCaseData.setOutcome(outcome.getId());
-        } else {
-            log.error("Outcome cannot be empty when generating final decision. Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError("Outcome cannot be empty. Please check case data. If problem continues please contact support");
-        }
-
     }
 
     private List<String> getDecisionNoticePointsValidationErrorMessages(SscsCaseData sscsCaseData) {
@@ -91,8 +73,12 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
      */
     private Optional<String> getOptionalErrorMessage(PointsCondition pointsCondition, SscsCaseData sscsCaseData) {
 
-        int totalPoints = pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData)
-            .stream().map(answerText -> decisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
+        Collection<String> collection = emptyIfNull(pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData));
+
+        if (collection.isEmpty()) {
+            return Optional.empty();
+        }
+        int totalPoints = collection.stream().map(answerText -> decisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
                 answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
 
         return pointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
@@ -106,12 +92,10 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                     .removeIf(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType()));
         }
 
-        final String filename = String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-
         SscsDocument draftDecisionNotice = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(filename)
+                .documentFileName(createFileName())
                 .documentLink(sscsCaseData.getWriteFinalDecisionPreviewDocument())
-                .documentDateAdded(LocalDate.now().format(DateTimeFormatter.ISO_DATE))
+                .documentDateAdded(setDocumentDateAdded())
                 .documentType(DRAFT_DECISION_NOTICE.getValue())
                 .build()).build();
 
@@ -123,5 +107,13 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             documents.addAll(sscsCaseData.getSscsDocument());
         }
         sscsCaseData.setSscsDocument(documents);
+    }
+
+    private String createFileName() {
+        return String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+    }
+
+    private String setDocumentDateAdded() {
+        return LocalDate.now().format(DateTimeFormatter.ISO_DATE);
     }
 }
