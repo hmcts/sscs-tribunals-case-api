@@ -120,6 +120,9 @@ public class SessionDraft {
     @JsonProperty("HearingArrangements")
     SessionHearingArrangements hearingArrangements;
 
+    @JsonProperty("PcqId")
+    SessionPcqId pcqId;
+
     @JsonProperty("LanguagePreferenceWelsh")
     SessionLanguagePreferenceWelsh languagePreferenceWelsh;
 }

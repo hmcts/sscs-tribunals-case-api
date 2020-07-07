@@ -10,7 +10,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JT 12 34 56 D",
       "hmctsDwpState": "sentToDwp",
       "subscriptions": {
         "appellantSubscription": {
@@ -49,7 +48,6 @@
           "id": "baa2d443-2722-4cbb-89fc-9a94fa71d870"
         }]
       },
-      "generatedSurname": "Test",
       "appeal": {
         "rep": {
           "name": {
@@ -117,7 +115,6 @@
           "wantsToAttend": "No"
         }
       },
-      "generatedEmail": "mail@example.com",
       "dateSentToDwp": "2019-09-01",
       "sscsDocument": [{
         "value": {
@@ -172,7 +169,6 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "events": [{
         "id": "930063e1-2023-49c6-ac04-224db44755b6",
         "value": {
@@ -201,8 +197,7 @@
           "type": "appealReceived",
           "description": "Appeal received"
         }
-      }],
-      "generatedMobile": "01234567890"
+      }]
     },
     "data_classification": {
       "evidencePresent": "PUBLIC",
@@ -791,7 +786,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JT 12 34 56 D",
       "hmctsDwpState": "sentToDwp",
       "subscriptions": {
         "appellantSubscription": {
@@ -821,7 +815,6 @@
         "documents": []
       },
       "caseReference": "SC022/14/12423",
-      "generatedSurname": "Test",
       "appeal": {
         "rep": {
           "name": {
@@ -889,7 +882,6 @@
           "wantsToAttend": "No"
         }
       },
-      "generatedEmail": "mail@example.com",
       "dateSentToDwp": "2019-09-01",
       "dwpTimeExtension": [],
       "hearings": [{
@@ -926,7 +918,6 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "events": [{
         "id": "930063e1-2023-49c6-ac04-224db44755b6",
         "value": {
@@ -955,8 +946,7 @@
           "type": "appealReceived",
           "description": "Appeal received"
         }
-      }],
-      "generatedMobile": "01234567890"
+      }]
     },
     "data_classification": {
       "evidencePresent": "PUBLIC",

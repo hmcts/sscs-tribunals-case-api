@@ -1670,6 +1670,14 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
     }
 
     @Test
+    public void givenCaseWithPcqId_shouldReturnResponseWithPcqId() {
+        caseData = SscsCaseData.builder().appeal(Appeal.builder().build()).pcqId("12345").build();
+
+        SessionDraft actualSessionDraft = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("12345", actualSessionDraft.getPcqId().getPcqId());
+    }
+
+    @Test
     public void convertPopulatedCaseDataWhenLanguagePreferenceWelshIsGiven() {
         caseData = SscsCaseData.builder()
                 .appeal(Appeal.builder()

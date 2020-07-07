@@ -48,6 +48,9 @@ public class SyaCaseWrapper {
     @JsonProperty("signAndSubmit")
     private SyaSignAndSubmit signAndSubmit;
 
+    @JsonProperty("pcqId")
+    private String pcqId;
+
     private String evidenceProvide;
 
     @JsonProperty("languagePreferenceWelsh")

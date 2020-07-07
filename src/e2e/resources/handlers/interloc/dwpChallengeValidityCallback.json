@@ -27,7 +27,6 @@
     "case_data": {
       "caseCode": "002DD",
       "evidencePresent": "No",
-      "generatedNino": "PCCKAETIO",
       "subscriptions": {
         "appellantSubscription": {
           "tya": "05WQSM7r9d",
@@ -67,7 +66,6 @@
         }
       },
       "dwpRegionalCentre": "Newcastle",
-      "generatedSurname": "Bloggs",
       "appeal": {
         "rep": {
           "name": {
@@ -209,7 +207,6 @@
         }
       },
       "benefitCode": "002",
-      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "sscsDocument": [],
       "dwpFurtherEvidenceStates": "inProgress",
       "dwpState": "Exception",
@@ -236,15 +233,12 @@
       },
       "interlocReviewState": "someValue",
       "region": "BIRMINGHAM",
-      "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
-      "issueCode": "DD",
-      "generatedMobile": "07411222222"
+      "issueCode": "DD"
     },
     "data_classification": {
       "caseCode": "PUBLIC",
       "evidencePresent": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -299,7 +293,6 @@
         }
       },
       "dwpRegionalCentre": "PUBLIC",
-      "generatedSurname": "PUBLIC",
       "appeal": {
         "classification": "PUBLIC",
         "value": {
@@ -501,7 +494,6 @@
         }
       },
       "benefitCode": "PUBLIC",
-      "generatedEmail": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": []
@@ -533,10 +525,8 @@
       },
       "interlocReviewState": "PUBLIC",
       "region": "PUBLIC",
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
-      "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC"
+      "issueCode": "PUBLIC"
     },
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
@@ -546,7 +536,6 @@
     "security_classifications": {
       "caseCode": "PUBLIC",
       "evidencePresent": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -601,7 +590,6 @@
         }
       },
       "dwpRegionalCentre": "PUBLIC",
-      "generatedSurname": "PUBLIC",
       "appeal": {
         "classification": "PUBLIC",
         "value": {
@@ -803,7 +791,6 @@
         }
       },
       "benefitCode": "PUBLIC",
-      "generatedEmail": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": []
@@ -835,10 +822,8 @@
       },
       "interlocReviewState": "PUBLIC",
       "region": "PUBLIC",
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
-      "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC"
+      "issueCode": "PUBLIC"
     }
   },
   "case_details_before": {
@@ -869,7 +854,6 @@
     "case_data": {
       "caseCode": "002DD",
       "evidencePresent": "No",
-      "generatedNino": "PCCKAETIO",
       "subscriptions": {
         "appellantSubscription": {
           "tya": "05WQSM7r9d",
@@ -909,7 +893,6 @@
         }
       },
       "dwpRegionalCentre": "Newcastle",
-      "generatedSurname": "Bloggs",
       "appeal": {
         "rep": {
           "name": {
@@ -1051,7 +1034,6 @@
         }
       },
       "benefitCode": "002",
-      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "sscsDocument": [],
       "dwpFurtherEvidenceStates": "inProgress",
       "dwpState": "Registered",
@@ -1072,15 +1054,12 @@
       },
       "interlocReviewState": "reviewByJudge",
       "region": "BIRMINGHAM",
-      "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
-      "issueCode": "DD",
-      "generatedMobile": "07411222222"
+      "issueCode": "DD"
     },
     "data_classification": {
       "caseCode": "PUBLIC",
       "evidencePresent": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "value": {
           "appellantSubscription": {
@@ -1135,7 +1114,6 @@
         "classification": "PUBLIC"
       },
       "dwpRegionalCentre": "PUBLIC",
-      "generatedSurname": "PUBLIC",
       "appeal": {
         "value": {
           "rep": {
@@ -1337,7 +1315,6 @@
         "classification": "PUBLIC"
       },
       "benefitCode": "PUBLIC",
-      "generatedEmail": "PUBLIC",
       "sscsDocument": {
         "value": [],
         "classification": "PUBLIC"
@@ -1367,10 +1344,8 @@
       },
       "interlocReviewState": "PUBLIC",
       "region": "PUBLIC",
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
-      "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC"
+      "issueCode": "PUBLIC"
     },
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
@@ -1380,7 +1355,6 @@
     "security_classifications": {
       "caseCode": "PUBLIC",
       "evidencePresent": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "value": {
           "appellantSubscription": {
@@ -1435,7 +1409,6 @@
         "classification": "PUBLIC"
       },
       "dwpRegionalCentre": "PUBLIC",
-      "generatedSurname": "PUBLIC",
       "appeal": {
         "value": {
           "rep": {
@@ -1637,7 +1610,6 @@
         "classification": "PUBLIC"
       },
       "benefitCode": "PUBLIC",
-      "generatedEmail": "PUBLIC",
       "sscsDocument": {
         "value": [],
         "classification": "PUBLIC"
@@ -1667,10 +1639,8 @@
       },
       "interlocReviewState": "PUBLIC",
       "region": "PUBLIC",
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
-      "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC"
+      "issueCode": "PUBLIC"
     }
   },
   "event_id": "dwpChallengeValidity",

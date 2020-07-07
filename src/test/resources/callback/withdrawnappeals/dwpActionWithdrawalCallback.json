@@ -10,7 +10,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JT 12 34 56 D",
       "hmctsDwpState": "sentToDwp",
       "subscriptions": {
         "appellantSubscription": {
@@ -67,7 +66,6 @@
           }
         }]
       },
-      "generatedSurname": "Test",
       "appeal": {
         "rep": {
           "name": {
@@ -140,7 +138,6 @@
           "wantsToAttend": "No"
         }
       },
-      "generatedEmail": "mail@example.com",
       "sscsDocument": [{
         "id": "39d0cfcd-2bfe-4b33-b595-b4ed32cde3bf",
         "value": {
@@ -188,7 +185,6 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "events": [{
         "id": "a6499b6e-054d-4c4a-acaf-5c33f20c842a",
         "value": {
@@ -217,8 +213,7 @@
           "type": "appealReceived",
           "description": "Appeal received"
         }
-      }],
-      "generatedMobile": "01234567890"
+      }]
     },
     "data_classification": {
       "evidencePresent": "PUBLIC",
@@ -855,7 +850,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JT 12 34 56 D",
       "hmctsDwpState": "sentToDwp",
       "subscriptions": {
         "appellantSubscription": {
@@ -908,7 +902,6 @@
           }
         }]
       },
-      "generatedSurname": "Test",
       "appeal": {
         "rep": {
           "name": {
@@ -981,7 +974,6 @@
           "wantsToAttend": "No"
         }
       },
-      "generatedEmail": "mail@example.com",
       "sscsDocument": [{
         "id": "39d0cfcd-2bfe-4b33-b595-b4ed32cde3bf",
         "value": {
@@ -1029,7 +1021,6 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "events": [{
         "id": "a6499b6e-054d-4c4a-acaf-5c33f20c842a",
         "value": {
@@ -1058,8 +1049,7 @@
           "type": "appealReceived",
           "description": "Appeal received"
         }
-      }],
-      "generatedMobile": "01234567890"
+      }]
     },
     "data_classification": {
       "evidencePresent": "PUBLIC",

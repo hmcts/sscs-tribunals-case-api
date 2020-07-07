@@ -25,14 +25,14 @@ public class DecisionNoticeOutcomeServiceTest {
     @Parameters({
         "higher, higher, decisionInFavourOfAppellant",
         "higher, same, decisionInFavourOfAppellant",
-        "higher, lower, decisionUpheld",
+        "higher, lower, decisionInFavourOfAppellant",
         "same, higher, decisionInFavourOfAppellant",
         "same, same, decisionUpheld",
         "same, lower, decisionUpheld",
-        "lower, higher, decisionUpheld",
+        "lower, higher, decisionInFavourOfAppellant",
         "lower, same, decisionUpheld",
         "lower, lower, decisionUpheld"})
-    public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigherAndNeitherIsLower_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility,
+    public void givenFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigher_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility,
         String expectedOutcome) {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
@@ -51,14 +51,14 @@ public class DecisionNoticeOutcomeServiceTest {
     @Parameters({
         "higher, higher, decisionInFavourOfAppellant",
         "higher, same, decisionInFavourOfAppellant",
-        "higher, lower, decisionUpheld",
+        "higher, lower, decisionInFavourOfAppellant",
         "same, higher, decisionInFavourOfAppellant",
         "same, same, decisionUpheld",
         "same, lower, decisionUpheld",
-        "lower, higher, decisionUpheld",
+        "lower, higher, decisionInFavourOfAppellant",
         "lower, same, decisionUpheld",
         "lower, lower, decisionUpheld"})
-    public void givenExplicitAlternatePathRefusalAndFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigherAndNeitherIsLower_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility,
+    public void givenExplicitAlternatePathRefusalAndFinalDecisionComparedToDwpQuestionAndAtLeastOneDecisionIsHigher_thenSetDecisionInFavourOfAppellant(String comparedRateDailyLiving, String comparedRateMobility,
         String expectedOutcome) {
 
         SscsCaseData caseData = SscsCaseData.builder().pipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparedRateDailyLiving)
