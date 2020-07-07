@@ -255,7 +255,7 @@ public class SubmitAppealServiceTest {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
         Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
 
-        Assert.assertFalse(result.isPresent());
+        assertFalse(result.isPresent());
     }
 
     @Test
