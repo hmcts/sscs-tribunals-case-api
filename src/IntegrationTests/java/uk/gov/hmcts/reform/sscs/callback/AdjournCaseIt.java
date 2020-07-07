@@ -42,4 +42,17 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         assertEquals(0, result.getErrors().size());
     }
+
+    @Test
+    public void callToMidEventCallback_whenPathIsYesNoNo_willValidateTheData() throws Exception {
+        setup();
+        this.json = getJson("callback/adjournCaseYesNoNo.json");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(0, result.getErrors().size());
+    }
+
 }

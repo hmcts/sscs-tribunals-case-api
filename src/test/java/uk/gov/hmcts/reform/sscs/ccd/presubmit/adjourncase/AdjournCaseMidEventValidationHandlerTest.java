@@ -95,6 +95,8 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -107,6 +109,8 @@ public class AdjournCaseMidEventValidationHandlerTest {
 
     @Test
     public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
+
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
 
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
 
@@ -121,6 +125,8 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecified_ThenDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
         sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset("7");
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -134,6 +140,8 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsAfterTodayAndDaysOffsetSpecifiedButZero_ThenDoNotDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+
         sscsCaseData.setAdjournCaseDirectionsDueDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
         sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset("0");
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -146,6 +154,8 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsNotSpecifiedAndDaysOffsetSpecified_ThenDoNotDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+
         sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset("7");
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -157,12 +167,26 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Test
     public void givenNeitherDirectionsDueDateOrOffsetSpecified_ThenDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("yes");
+
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("At least one of directions due date or directions due date offset must be specified", error);
+    }
+
+    @Test
+    public void givenNeitherDirectionsDueDateOrOffsetSpecifiedButNoDirectionsToParties_ThenDoNotDisplayAnError() {
+
+        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties("no");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test

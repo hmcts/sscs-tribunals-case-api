@@ -35,7 +35,7 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
 
         try {
 
-            if (isDirectionsDueDateInvalid(sscsCaseData)) {
+            if (sscsCaseData.isAdjournCaseDirectionsMadeToParties() && isDirectionsDueDateInvalid(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("Directions due date must be in the future");
             }
 
