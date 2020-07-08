@@ -20,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.service.exceptions.DocumentServiceResponseExcept
 
 @Slf4j
 @Service
-public class BundleRequestExecutor {
+public class ServiceRequestExecutor {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
 
@@ -28,7 +28,7 @@ public class BundleRequestExecutor {
     private final AuthTokenGenerator serviceAuthTokenGenerator;
     private final IdamService idamService;
 
-    public BundleRequestExecutor(RestTemplate restTemplate, AuthTokenGenerator serviceAuthTokenGenerator, IdamService idamService) {
+    public ServiceRequestExecutor(RestTemplate restTemplate, AuthTokenGenerator serviceAuthTokenGenerator, IdamService idamService) {
         this.restTemplate = restTemplate;
         this.serviceAuthTokenGenerator = serviceAuthTokenGenerator;
         this.idamService = idamService;
@@ -48,13 +48,14 @@ public class BundleRequestExecutor {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
         headers.set(HttpHeaders.AUTHORIZATION, idamService.getIdamOauth2Token());
+        headers.set("user-id", idamService.getIdamTokens().getUserId());
         headers.set(SERVICE_AUTHORIZATION, serviceAuthorizationToken);
 
         HttpEntity<Callback<SscsCaseData>> requestEntity = new HttpEntity<>(payload, headers);
 
         PreSubmitCallbackResponse<SscsCaseData> response;
 
-        log.info("About to hit bundling service with url: " + endpoint + " for case id: " + payload.getCaseDetails().getId());
+        log.info("About to hit the service with url: " + endpoint + " for case id: " + payload.getCaseDetails().getId());
 
         try {
             response =
@@ -68,7 +69,7 @@ public class BundleRequestExecutor {
                     ).getBody();
 
         } catch (RestClientResponseException e) {
-            throw new DocumentServiceResponseException("Couldn't create bundle using API: ", e);
+            throw new DocumentServiceResponseException("Couldn't call service using API: ", e);
         }
 
         return response;
