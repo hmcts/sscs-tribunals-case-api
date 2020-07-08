@@ -60,14 +60,10 @@ public enum SyaJsonMessageSerializer {
     private final String serializedMessage;
 
     SyaJsonMessageSerializer(String fileName) {
-        this.serializedMessage = getSerializedMessage(fileName);
+        this.serializedMessage = getSerialisedMessage(fileName);
     }
 
-    public String getSerializedMessage() {
-        return serializedMessage;
-    }
-
-    private String getSerializedMessage(String fileName) {
+    private String getSerialisedMessage(String fileName) {
         try {
             return new String(Files.readAllBytes(Paths.get("src/test/resources/sya/" + fileName)));
         } catch (IOException e) {
