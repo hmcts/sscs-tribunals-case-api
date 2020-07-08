@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
 public class CreateBundleAboutToStartHandlerTest {
@@ -34,14 +34,14 @@ public class CreateBundleAboutToStartHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private BundleRequestExecutor bundleRequestExecutor;
+    private ServiceRequestExecutor serviceRequestExecutor;
 
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new CreateBundleAboutToStartHandler(bundleRequestExecutor, "bundleUrl.com");
+        handler = new CreateBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
@@ -49,7 +49,7 @@ public class CreateBundleAboutToStartHandlerTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(bundleRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
+        when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
     }
 
     @Test
@@ -106,7 +106,7 @@ public class CreateBundleAboutToStartHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
     }
 
     @Test
