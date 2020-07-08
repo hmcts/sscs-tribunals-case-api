@@ -38,6 +38,12 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
             if (sscsCaseData.isAdjournCaseDirectionsMadeToParties() && isDirectionsDueDateInvalid(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("Directions due date must be in the future");
             }
+            if ("provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod())
+                || "provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrTime())) {
+                if (isNextHearingSpecifiedDateInvalid(sscsCaseData)) {
+                    preSubmitCallbackResponse.addError("Specified date cannot be in the past");
+                }
+            }
 
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
@@ -45,6 +51,15 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private boolean isNextHearingSpecifiedDateInvalid(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getAdjournCaseNextHearingSpecificDate() != null) {
+            LocalDate now = LocalDate.now();
+            return LocalDate.parse(sscsCaseData.getAdjournCaseNextHearingSpecificDate()).isBefore(now);
+        } else {
+            throw new IllegalStateException("Specified date must be provided");
+        }
     }
 
     private boolean isDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
