@@ -13,20 +13,20 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private BundleRequestExecutor bundleRequestExecutor;
+    private ServiceRequestExecutor serviceRequestExecutor;
     private String bundleUrl;
 
     private static String EDIT_BUNDLE_ENDPOINT = "/api/stitch-ccd-bundles";
 
     @Autowired
-    public EditBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor,
+    public EditBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
                                          @Value("${bundle.url}") String bundleUrl) {
-        this.bundleRequestExecutor = bundleRequestExecutor;
+        this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
     }
 
@@ -67,7 +67,7 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
                 preSubmitCallbackResponse.addWarning("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?");
                 return preSubmitCallbackResponse;
             } else {
-                return bundleRequestExecutor.post(callback, bundleUrl + EDIT_BUNDLE_ENDPOINT);
+                return serviceRequestExecutor.post(callback, bundleUrl + EDIT_BUNDLE_ENDPOINT);
             }
         } else {
             return null;
