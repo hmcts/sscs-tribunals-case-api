@@ -38,11 +38,10 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
             if (sscsCaseData.isAdjournCaseDirectionsMadeToParties() && isDirectionsDueDateInvalid(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("Directions due date must be in the future");
             }
-            if ("provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod())
-                || "provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrTime())) {
-                if (isNextHearingSpecifiedDateInvalid(sscsCaseData)) {
-                    preSubmitCallbackResponse.addError("Specified date cannot be in the past");
-                }
+            if (("provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod())
+                || "provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrTime()))
+                && isNextHearingSpecifiedDateInvalid(sscsCaseData)) {
+                preSubmitCallbackResponse.addError("Specified date cannot be in the past");
             }
 
         } catch (IllegalStateException e) {
