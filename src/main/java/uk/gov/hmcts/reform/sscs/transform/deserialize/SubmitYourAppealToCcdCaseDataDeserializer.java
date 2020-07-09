@@ -31,7 +31,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         return caseData.toBuilder()
                 .region(region)
-                .regionalProcessingCenter(rpc).build();
+                .regionalProcessingCenter(rpc)
+                .isScottishCase(isScottishCase(rpc))
+                .build();
     }
 
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
@@ -57,7 +59,12 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         appeal.getMrnDetails().getDwpIssuingOffice()))
                 .pcqId(syaCaseWrapper.getPcqId())
                 .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
+                .isScottishCase("No")
                 .build();
+    }
+
+    public static String isScottishCase(RegionalProcessingCenter rpc) {
+        return rpc.getName().equalsIgnoreCase("GLASGOW") ?  "Yes" : "No";
     }
 
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
