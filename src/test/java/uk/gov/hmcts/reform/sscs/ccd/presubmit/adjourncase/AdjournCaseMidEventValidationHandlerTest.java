@@ -204,10 +204,11 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingSpecificDateIsAfterToday_ThenDoNotDisplayAnError() {
+    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateIsAfterToday_ThenDoNotDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
+        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -217,10 +218,11 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingSpecificDateIsToday_ThenDoNotDisplayAnError() {
+    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateIsToday_ThenDoNotDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().toString());
+        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate(LocalDate.now().toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -230,24 +232,26 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingSpecificDateBeforeToday_ThenDisplayAnError() {
+    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingAndDateBeforeToday_ThenDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
+        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Specified date cannot be in the past", error);
+        assertEquals("'First available date after' date cannot be in the past", error);
     }
 
     @Test
-    public void givenNextHearingDateNotRequiredForDateOrPeriodAndNextHearingSpecificDateBeforeToday_ThenDoNotDisplayAnError() {
+    public void givenNextHearingDateNotRequiredForDateOrPeriodAndNextHearingAndDateBeforeToday_ThenDoNotDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("providePeriod");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
+        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -258,8 +262,9 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingSpecificDateNotSet_ThenDisplayAnError() {
+    public void givenNextHearingDateRequiredForDateOrPeriodAndNextHearingDateNotSet_ThenDisplayAnError() {
 
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDateAfter");
         sscsCaseData.setAdjournCaseNextHearingDateOrPeriod("provideDate");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -267,14 +272,14 @@ public class AdjournCaseMidEventValidationHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Specified date must be provided", error);
+        assertEquals("'First available date after' date must be provided", error);
 
     }
 
     @Test
-    public void givenNextHearingDateRequiredForDateOrTimeAndNextHearingSpecificDateIsAfterToday_ThenDoNotDisplayAnError() {
+    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateIsAfterToday_ThenDoNotDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseNextHearingDateOrTime("provideDate");
+        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
         sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -285,9 +290,9 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateRequiredForDateOrtTimeAndNextHearingSpecificDateIsToday_ThenDoNotDisplayAnError() {
+    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateIsToday_ThenDoNotDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseNextHearingDateOrTime("provideDate");
+        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
         sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -298,9 +303,9 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateRequiredForDateOrTimeAndNextHearingSpecificDateBeforeToday_ThenDisplayAnError() {
+    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateBeforeToday_ThenDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseNextHearingDateOrTime("provideDate");
+        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
         sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -312,23 +317,9 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateNotRequiredForDateOrTimeAndNextHearingSpecificDateBeforeToday_ThenDoNotDisplayAnError() {
+    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateNotSet_ThenDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseNextHearingDateOrTime("providePeriod");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-
-    }
-
-    @Test
-    public void givenNextHearingDateRequiredForDateOrTimeAndNextHearingSpecificDateNotSet_ThenDisplayAnError() {
-
-        sscsCaseData.setAdjournCaseNextHearingDateOrTime("provideDate");
+        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -339,18 +330,6 @@ public class AdjournCaseMidEventValidationHandlerTest {
 
     }
 
-    @Test
-    public void givenNextHearingDateNotRequiredAndNextHearingSpecificDateBeforeToday_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-
-    }
 
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheEvent() {
