@@ -165,6 +165,24 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
     }
 
+    @Parameters({"DWP PIP (1),PIP,Cardiff,No", "DWP PIP (2),Pip,Glasgow,Yes"})
+    @Test
+    public void dwpIssuingOfficeShouldMapToIsScottishCaseCorrectly(@Nullable String dwpIssuingOffice,
+                                                                       @Nullable String benefitCode,
+                                                                       @Nullable String dwpIssuingOfficeName,
+                                                                       @Nullable String expectedIsScottishCase) {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getMrn().setDwpIssuingOffice(dwpIssuingOffice);
+        syaCaseWrapper.getBenefitType().setCode(benefitCode);
+
+        RegionalProcessingCenter rpc = regionalProcessingCenter.toBuilder().name(dwpIssuingOfficeName).build();
+
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(),
+                rpc);
+
+        assertEquals(expectedIsScottishCase, caseData.getIsScottishCase());
+    }
+
     @Test
     public void syaMissingMrnTest() {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();

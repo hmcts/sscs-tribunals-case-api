@@ -145,6 +145,7 @@ public class SubmitAppealService {
     }
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
+
         String firstHalfOfPostcode = regionalProcessingCenterService
             .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);

@@ -49,17 +49,22 @@ public class SyaController {
     @PostMapping(value = "/appeals", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createAppeals(@RequestHeader(value = AUTHORIZATION, required = false)
                                                     String authorisation, @RequestBody SyaCaseWrapper syaCaseWrapper) {
+
         log.info("Appeal with Nino - {} and benefit type {} received", syaCaseWrapper.getAppellant().getNino(),
             syaCaseWrapper.getBenefitType().getCode());
         Long caseId = submitAppealService.submitAppeal(syaCaseWrapper, authorisation);
+
         log.info("Case {} with benefit type - {} processed successfully",
             caseId,
             syaCaseWrapper.getBenefitType().getCode());
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(caseId).toUri();
+
         log.info(location.toString());
         return created(location).build();
     }
+
 
     @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)
     @ApiResponses(value =
