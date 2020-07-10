@@ -258,13 +258,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     }
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return questionKeys
+        List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,
                 decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
                     questionKey))).filter(pair -> pair.getRight().isPresent()).map(pair ->
                 new ImmutablePair<>(pair.getLeft(), pair.getRight().get())).map(pair ->
                 buildDescriptorFromActivityAnswer(ActivityQuestion.getByKey(pair.getLeft()),
                     pair.getRight())).collect(Collectors.toList());
+
+        descriptors.sort(new DescriptorLexicographicalComparator());
+
+        return descriptors;
     }
 
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {
