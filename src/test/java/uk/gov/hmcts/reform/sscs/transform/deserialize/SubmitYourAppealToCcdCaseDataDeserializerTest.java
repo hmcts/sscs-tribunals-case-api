@@ -74,7 +74,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
     private RegionalProcessingCenter regionalProcessingCenter;
 
-
     @Before
     public void setUp() {
         initMocks(this);
