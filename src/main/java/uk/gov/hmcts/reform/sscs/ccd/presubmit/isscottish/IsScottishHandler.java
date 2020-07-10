@@ -1,4 +1,6 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.isScottish;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
+
+import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,8 +10,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-
-import static java.util.Objects.requireNonNull;
 
 @Service
 @Slf4j

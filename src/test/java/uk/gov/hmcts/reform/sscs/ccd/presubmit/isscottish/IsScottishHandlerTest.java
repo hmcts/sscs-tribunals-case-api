@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.isScottish;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
