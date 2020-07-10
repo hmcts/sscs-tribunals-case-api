@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.isScottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
@@ -32,7 +33,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         return caseData.toBuilder()
                 .region(region)
                 .regionalProcessingCenter(rpc)
-                .isScottishCase(isScottishCase(rpc))
+                .isScottishCase(IsScottishHandler.isScottishCase(rpc))
                 .build();
     }
 
@@ -61,10 +62,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
                 .isScottishCase("No")
                 .build();
-    }
-
-    public static String isScottishCase(RegionalProcessingCenter rpc) {
-        return rpc.getName().equalsIgnoreCase("GLASGOW") ?  "Yes" : "No";
     }
 
     private static String getDwpRegionalCenterGivenDwpIssuingOffice(String benefitTypeCode, String dwpIssuingOffice) {
