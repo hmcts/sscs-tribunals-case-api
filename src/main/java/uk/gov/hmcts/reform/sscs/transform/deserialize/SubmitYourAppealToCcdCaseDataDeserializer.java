@@ -342,8 +342,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         List<AppealReason> appealReasons = new ArrayList<>();
         for (Reason reason : syaReasonsForAppealing.getReasons()) {
             AppealReasonDetails appealReasonDetails = AppealReasonDetails.builder()
-                    .reason(reason.getReasonForAppealing())
-                    .description(reason.getWhatYouDisagreeWith())
+                    .reason(reason.getWhatYouDisagreeWith())
+                    .description(reason.getReasonForAppealing())
                     .build();
             AppealReason appealReason = AppealReason.builder()
                     .value(appealReasonDetails)
