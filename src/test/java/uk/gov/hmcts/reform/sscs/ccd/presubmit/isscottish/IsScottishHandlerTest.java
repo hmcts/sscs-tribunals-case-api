@@ -66,4 +66,24 @@ public class IsScottishHandlerTest {
 
         assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
     }
+
+    @Test
+    public void setIsScottishCorrectlyWhenNullRpc() {
+
+        sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .regionalProcessingCenter(null)
+                .appeal(Appeal.builder().build())
+                .build();
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("No", response.getData().getIsScottishCase());
+    }
 }

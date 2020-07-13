@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,10 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
     }
 
     public static String isScottishCase(RegionalProcessingCenter rpc) {
-        return rpc.getName().equalsIgnoreCase("GLASGOW") ?  "Yes" : "No";
+        if (isNull(rpc)) {
+            return "No";
+        } else {
+            return rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
+        }
     }
 }
