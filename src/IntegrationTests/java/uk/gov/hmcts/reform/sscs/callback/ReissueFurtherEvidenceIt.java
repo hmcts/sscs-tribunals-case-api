@@ -65,22 +65,4 @@ public class ReissueFurtherEvidenceIt extends AbstractEventIt {
         assertEquals(expected, result.getData().getReissueFurtherEvidenceDocument());
     }
 
-    @Test
-    public void callToMidEventHandler_willPopulateOriginalSender() throws Exception {
-        json = json.replaceFirst("\"reissueFurtherEvidenceDocument\": \\{\\}", "\"reissueFurtherEvidenceDocument\": " + midEventPartialJson);
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        assertEquals(Collections.EMPTY_SET, result.getErrors());
-
-        DynamicListItem appellantListItem = new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel());
-        DynamicListItem repListItem = new DynamicListItem(REPRESENTATIVE.getCode(), REPRESENTATIVE.getLabel());
-        DynamicListItem dwpListItem = new DynamicListItem(DWP.getCode(), DWP.getLabel());
-
-        DynamicList expected = new DynamicList(repListItem, Arrays.asList(appellantListItem, repListItem, dwpListItem));
-        assertEquals(expected, result.getData().getOriginalSender());
-    }
-
 }

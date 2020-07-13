@@ -42,4 +42,30 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         assertEquals(0, result.getErrors().size());
     }
+
+    @Test
+    public void callToMidEventCallback_whenPathIsYesNoNo_willValidateTheNextHearingDate_WhenDateInFuture() throws Exception {
+        setup();
+        setJsonAndReplace("callback/adjournCaseYesNoNo.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(0, result.getErrors().size());
+    }
+
+    @Test
+    public void callToMidEventCallback_whenPathIsYesNoNo_willValidateTheNextHearingDate_WhenDateInPast() throws Exception {
+        setup();
+        setJsonAndReplace("callback/adjournCaseYesNoNo.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(1, result.getErrors().size());
+        assertEquals("Specified date cannot be in the past", result.getErrors().toArray()[0]);
+    }
+
 }
