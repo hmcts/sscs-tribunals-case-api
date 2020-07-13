@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -388,7 +389,12 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     public void callToAboutToSubmitHandler_willWriteManuallyUploadedFinalDecisionToCaseForNonDescriptorRoute() throws Exception {
         setup("callback/writeFinalDecisionManualUploadNonDescriptor.json");
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+
+        MockHttpServletRequestBuilder req = getRequestWithAuthHeader(json, "/ccdAboutToSubmit");
+
+        System.out.println("req = " + req);
+
+        MockHttpServletResponse response = getResponse(req);
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
