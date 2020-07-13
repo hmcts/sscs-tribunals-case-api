@@ -2,69 +2,32 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
-public class AdjournCasePreviewService extends IssueDocumentHandler {
-
-    private final GenerateFile generateFile;
-    private final String templateId;
-    private final IdamClient idamClient;
-    private boolean showIssueDate;
+public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient,
         @Value("${doc_assembly.issue_final_decision}") String templateId) {
-        this.generateFile = generateFile;
-        this.templateId = templateId;
-        this.idamClient = idamClient;
-    }
-
-    public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
-
-        this.showIssueDate = showIssueDate;
-
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
-            sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
-        }
-
-        try {
-            return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation);
-        } catch (IllegalStateException e) {
-            log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
-            preSubmitCallbackResponse.addError(e.getMessage());
-        }
-
-        return preSubmitCallbackResponse;
+        super(generateFile, idamClient, templateId);
     }
 
     @Override
@@ -116,7 +79,17 @@ public class AdjournCasePreviewService extends IssueDocumentHandler {
 
     }
 
-    private void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
+    protected void validateRequiredProperties(AdjournCaseTemplateBody payload) {
+        if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
+            throw new IllegalStateException("Unable to determine hearing date or venue");
+        } else if (payload.getHeldOn() == null) {
+            throw new IllegalStateException("Unable to determine hearing date");
+        } else if (payload.getHeldAt() == null) {
+            throw new IllegalStateException("Unable to determine hearing venue");
+        }
+    }
+
+    protected void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
             Hearing finalHearing = caseData.getHearings().get(0);
             if (finalHearing != null && finalHearing.getValue() != null) {
@@ -133,23 +106,6 @@ public class AdjournCasePreviewService extends IssueDocumentHandler {
         }
     }
 
-
-    protected String buildName(SscsCaseData caseData) {
-        return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName()
-            .getFullNameNoTitle(), ' ', '.');
-    }
-
-
-    private void validateRequiredProperties(AdjournCaseTemplateBody payload) {
-        if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
-            throw new IllegalStateException("Unable to determine hearing date or venue");
-        } else if (payload.getHeldOn() == null) {
-            throw new IllegalStateException("Unable to determine hearing date");
-        } else if (payload.getHeldAt() == null) {
-            throw new IllegalStateException("Unable to determine hearing venue");
-        }
-    }
-
     @Override
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
         caseData.setAdjournCasePreviewDocument(file);
@@ -160,27 +116,4 @@ public class AdjournCasePreviewService extends IssueDocumentHandler {
         return caseData.getWriteFinalDecisionPreviewDocument();
     }
 
-    private String buildSignedInJudgeName(String userAuthorisation) {
-        UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
-        if (userDetails == null) {
-            throw new IllegalStateException("Unable to obtain signed in user details");
-        }
-        return userDetails.getFullName();
-    }
-
-    private String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        List<String> names = new ArrayList<>();
-        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
-        if (signedInJudgeName == null) {
-            throw new IllegalStateException("Unable to obtain signed in user name");
-        }
-        names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        }
-        return StringUtils.getGramaticallyJoinedStrings(names);
-    }
 }
