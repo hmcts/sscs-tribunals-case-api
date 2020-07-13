@@ -98,6 +98,9 @@ public class SyaEndpointsIt {
     @Value("${appellant.appeal.html.template.path}")
     private String templateName;
 
+    @Value("${appellant.appeal.html.welsh.template.path}")
+    private String welshTemplateName;
+
     private SyaCaseWrapper caseWrapper;
 
     @Before
@@ -108,6 +111,9 @@ public class SyaEndpointsIt {
 
         given(pdfServiceClient.generateFromHtml(eq(getTemplate()), captor.capture()))
             .willReturn(PDF.getBytes());
+
+        given(pdfServiceClient.generateFromHtml(eq(getWelshTemplate()), captor.capture()))
+                .willReturn(PDF.getBytes());
 
         given(ccdClient.readForCaseworker(any(), any())).willReturn(null);
         given(ccdClient.startEvent(any(), any(), anyString())).willReturn(StartEventResponse.builder().eventId("12345").build());
@@ -199,8 +205,30 @@ public class SyaEndpointsIt {
         verify(ccdClient, never()).submitForCaseworker(any(), any());
     }
 
+    @Test
+    public void shouldNotAddDuplicateCaseToCcdAndShouldNotGeneratePdfWelshCase() throws Exception {
+        Map<String, Object> languagePreferenceMap = new HashMap<>();
+        languagePreferenceMap.put("languagePreferenceWelsh","Yes");
+        CaseDetails caseDetails = CaseDetails.builder().id(1L).data(languagePreferenceMap).build();
+
+        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
+
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(getCase("json/sya.json")))
+                .andExpect(status().isCreated());
+
+        verify(pdfServiceClient, never()).generateFromHtml(eq(getWelshTemplate()), anyMap());
+        verify(ccdClient, never()).submitForCaseworker(any(), any());
+    }
+
     private byte[] getTemplate() throws IOException {
         URL resource = getClass().getResource(templateName);
+        return IOUtils.toByteArray(resource);
+    }
+
+    private byte[] getWelshTemplate() throws IOException {
+        URL resource = getClass().getResource(welshTemplateName);
         return IOUtils.toByteArray(resource);
     }
 

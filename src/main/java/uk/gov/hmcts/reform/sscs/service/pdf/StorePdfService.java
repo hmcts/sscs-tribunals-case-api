@@ -28,17 +28,20 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
 public abstract class StorePdfService<E, D extends PdfData> {
     private final PdfService pdfService;
     private final String pdfTemplatePath;
+    private final String welshPdfTemplatePath;
     private final CcdPdfService ccdPdfService;
     private final IdamService idamService;
     private final EvidenceManagementService evidenceManagementService;
 
     StorePdfService(PdfService pdfService,
                     String pdfTemplatePath,
+                    String welshPdfTemplatePath,
                     CcdPdfService ccdPdfService,
                     IdamService idamService,
                     EvidenceManagementService evidenceManagementService) {
         this.pdfService = pdfService;
         this.pdfTemplatePath = pdfTemplatePath;
+        this.welshPdfTemplatePath = welshPdfTemplatePath;
         this.ccdPdfService = ccdPdfService;
         this.idamService = idamService;
         this.evidenceManagementService = evidenceManagementService;
@@ -60,8 +63,11 @@ public abstract class StorePdfService<E, D extends PdfData> {
                                            String documentNamePrefix) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
+        boolean isWelsh = caseDetails.getData().isLanguagePreferenceWelsh();
+
         log.info("Storing pdf for [" + caseId + "]");
-        byte[] pdfBytes = pdfService.createPdf(getPdfContent(data, onlineHearingId, pdfAppealDetails), pdfTemplatePath);
+        byte[] pdfBytes = pdfService.createPdf(getPdfContent(data, onlineHearingId, pdfAppealDetails),
+                isWelsh ? welshPdfTemplatePath : pdfTemplatePath);
 
         SscsCaseData caseData = caseDetails.getData();
         String pdfName = getPdfName(documentNamePrefix, caseData.getCcdCaseId());

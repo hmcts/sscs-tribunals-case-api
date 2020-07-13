@@ -20,10 +20,11 @@ public class StoreEvidenceDescriptionService extends StorePdfService<PdfEvidence
     StoreEvidenceDescriptionService(
             @Qualifier("oldPdfService") PdfService pdfService,
             @Value("${evidenceDescription.html.template.path}")String pdfTemplatePath,
+            @Value("${evidenceDescription.html.welsh.template.path}")String welshPdfTemplatePath,
             CcdPdfService ccdPdfService,
             IdamService idamService,
             EvidenceManagementService evidenceManagementService) {
-        super(pdfService, pdfTemplatePath, ccdPdfService, idamService, evidenceManagementService);
+        super(pdfService, pdfTemplatePath, welshPdfTemplatePath, ccdPdfService, idamService, evidenceManagementService);
     }
 
     @Override

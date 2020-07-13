@@ -21,15 +21,18 @@ import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 public class SscsPdfService {
 
     private String appellantTemplatePath;
+    private String appellantWelshTemplatePath;
     private PDFServiceClient pdfServiceClient;
     private CcdPdfService ccdPdfService;
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
+                          @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
                           PDFServiceClient pdfServiceClient,
                           CcdPdfService ccdPdfService) {
         this.pdfServiceClient = pdfServiceClient;
         this.appellantTemplatePath = appellantTemplatePath;
+        this.appellantWelshTemplatePath = appellantWelshTemplatePath;
         this.ccdPdfService = ccdPdfService;
     }
 
@@ -46,7 +49,7 @@ public class SscsPdfService {
     private byte[] generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId) {
         byte[] template;
         try {
-            template = getTemplate();
+            template = getTemplate(sscsCaseData.isLanguagePreferenceWelsh());
         } catch (IOException e) {
             throw new PdfGenerationException("Error getting template", e);
         }
@@ -70,8 +73,8 @@ public class SscsPdfService {
         }
     }
 
-    private byte[] getTemplate() throws IOException {
-        InputStream in = getClass().getResourceAsStream(appellantTemplatePath);
+    private byte[] getTemplate(boolean isWelsh) throws IOException {
+        InputStream in = getClass().getResourceAsStream(isWelsh ? appellantWelshTemplatePath : appellantTemplatePath);
         return IOUtils.toByteArray(in);
     }
 }

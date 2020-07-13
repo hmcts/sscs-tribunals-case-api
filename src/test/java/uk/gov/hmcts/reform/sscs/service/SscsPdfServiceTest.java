@@ -21,6 +21,8 @@ public class SscsPdfServiceTest {
 
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
 
+    private static final String WELSH_TEMPLATE_PATH = "/templates/appellant_appeal_welsh_template.html";
+
     @Mock
     private PDFServiceClient pdfServiceClient;
 
@@ -32,8 +34,20 @@ public class SscsPdfServiceTest {
     @Before
     public void setup() {
         initMocks(this);
-        service = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
+        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
     }
+
+    @Test
+    public void createValidWelshPdfAndSendEmailAndStoreInDocumentStore() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+        caseData.setLanguagePreferenceWelsh("Yes");
+        service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
+
+        verify(pdfServiceClient).generateFromHtml(any(), any());
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"));
+    }
+
 
     @Test
     public void createValidPdfAndSendEmailAndStoreInDocumentStore() {

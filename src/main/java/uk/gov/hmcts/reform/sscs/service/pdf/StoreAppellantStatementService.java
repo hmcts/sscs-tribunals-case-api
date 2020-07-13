@@ -31,10 +31,11 @@ public class StoreAppellantStatementService extends StorePdfService<PdfAppellant
     public StoreAppellantStatementService(
         @Qualifier("oldPdfService") PdfService pdfService,
         @Value("${personalStatement.html.template.path}") String pdfTemplatePath,
+        @Value("${personalStatement.html.welsh.template.path}") String welshPdfTemplatePath,
         CcdPdfService ccdPdfService,
         IdamService idamService,
         EvidenceManagementService evidenceManagementService) {
-        super(pdfService, pdfTemplatePath, ccdPdfService, idamService, evidenceManagementService);
+        super(pdfService, pdfTemplatePath, welshPdfTemplatePath, ccdPdfService, idamService, evidenceManagementService);
     }
 
     @Override
