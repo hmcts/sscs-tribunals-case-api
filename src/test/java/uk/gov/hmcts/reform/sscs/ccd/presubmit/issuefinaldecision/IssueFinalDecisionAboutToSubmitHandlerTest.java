@@ -136,7 +136,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
 
         verifyNoInteractions(footerService);
-        assertNull(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertNull(response.getData().getDwpState());
         assertEquals(1, (int) response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue())).count());
 
         assertNotNull(sscsCaseData.getWriteFinalDecisionTypeOfHearing());
@@ -191,7 +191,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
 
         verifyNoInteractions(footerService);
-        assertNull(FINAL_DECISION_ISSUED.getId(), response.getData().getDwpState());
+        assertNull(response.getData().getDwpState());
         assertEquals(1, (int) response.getData().getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue())).count());
 
         assertNotNull(sscsCaseData.getWriteFinalDecisionTypeOfHearing());
@@ -454,34 +454,6 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
-    }
-
-    @Test
-    public void givenAnIssueFinalDecisionEventWithDocumentNameNotSet_thenCreateDecisionWithFooter() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null));
-    }
-
-    @Test
-    public void givenAnIssueFinalDecisionEventWithDocumentDateAddedNotSet_thenCreateDecisionWithFooter() {
-        DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("test.pdf").build();
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
-        callback.getCaseDetails().getCaseData().setWriteFinalDecisionIsDescriptorFlow("yes");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        callback.getCaseDetails().getCaseData().setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
-
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(FINAL_DECISION_NOTICE), any(), eq(null), eq(null));
     }
 
     @Test
