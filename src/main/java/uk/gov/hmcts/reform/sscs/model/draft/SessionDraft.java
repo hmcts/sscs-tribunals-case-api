@@ -123,6 +123,6 @@ public class SessionDraft {
     @JsonProperty("PcqId")
     SessionPcqId pcqId;
 
-    @JsonProperty("LanguagePreferenceWelsh")
+    @JsonProperty("LanguagePreference")
     SessionLanguagePreferenceWelsh languagePreferenceWelsh;
 }
