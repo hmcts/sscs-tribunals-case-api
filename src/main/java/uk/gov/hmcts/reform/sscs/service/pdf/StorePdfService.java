@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.CcdPdfService;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.PdfData;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
@@ -157,6 +158,11 @@ public abstract class StorePdfService<E, D extends PdfData> {
         String nino = caseDetails.getData().getAppeal().getAppellant().getIdentity().getNino();
         String caseReference = caseDetails.getId().toString();
         String dateCreated = reformatDate(now());
+
+        if (caseDetails.getData().isLanguagePreferenceWelsh()) {
+            return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference,
+                    dateCreated, LocalDateToWelshStringConverter.convert(now()));
+        }
 
         return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference,
             dateCreated);

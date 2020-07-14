@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -7,8 +8,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
+import java.util.List;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
@@ -42,10 +46,20 @@ public class SscsPdfServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
         caseData.setLanguagePreferenceWelsh("Yes");
+        caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
-        verify(pdfServiceClient).generateFromHtml(any(), any());
+        ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(pdfServiceClient).generateFromHtml(any(), argumentCaptor.capture());
         verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"));
+
+        List<String> list =  (List) argumentCaptor.getValue().get("welsh_exclude_dates");
+        assertEquals("30 Mehefin 2018",((List) argumentCaptor.getValue().get("welsh_exclude_dates")).get(0));
+        assertEquals("30 Gorffennaf 2018",((List) argumentCaptor.getValue().get("welsh_exclude_dates")).get(1));
+        assertEquals("30 Awst 2018",((List) argumentCaptor.getValue().get("welsh_exclude_dates")).get(2));
+        assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_appointee_identity_dob"));
+        assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_identity_dob"));
+        assertEquals("29 Mehefin 2018",argumentCaptor.getValue().get("date_of_decision"));
     }
 
 
