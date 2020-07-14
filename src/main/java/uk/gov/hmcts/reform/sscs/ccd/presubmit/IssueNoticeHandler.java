@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +11,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
@@ -63,16 +59,6 @@ public class IssueNoticeHandler extends IssueDocumentHandler {
             .getFullNameNoTitle(), ' ', '.');
     }
 
-    @Override
-    protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
-        caseData.setAdjournCasePreviewDocument(file);
-    }
-
-    @Override
-    protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
-        return caseData.getWriteFinalDecisionPreviewDocument();
-    }
-
     protected String buildSignedInJudgeName(String userAuthorisation) {
         UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
         if (userDetails == null) {
@@ -81,19 +67,4 @@ public class IssueNoticeHandler extends IssueDocumentHandler {
         return userDetails.getFullName();
     }
 
-    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        List<String> names = new ArrayList<>();
-        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
-        if (signedInJudgeName == null) {
-            throw new IllegalStateException("Unable to obtain signed in user name");
-        }
-        names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
-            names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
-        }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
-            names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        }
-        return StringUtils.getGramaticallyJoinedStrings(names);
-    }
 }

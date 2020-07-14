@@ -29,6 +29,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
@@ -257,6 +258,22 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         if (payload.getDateOfDecision() == null) {
             throw new IllegalStateException("Unable to determine date of decision");
         }
+    }
+
+    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
+        List<String> names = new ArrayList<>();
+        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
+        if (signedInJudgeName == null) {
+            throw new IllegalStateException("Unable to obtain signed in user name");
+        }
+        names.add(signedInJudgeName);
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
+            names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
+            names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
+        }
+        return StringUtils.getGramaticallyJoinedStrings(names);
     }
 
     @Override

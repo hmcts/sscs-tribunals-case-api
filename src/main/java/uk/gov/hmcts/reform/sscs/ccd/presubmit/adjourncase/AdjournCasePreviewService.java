@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -15,19 +17,25 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.service.ReferenceDataService;
+import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
 public class AdjournCasePreviewService extends IssueNoticeHandler {
 
+    private final ReferenceDataService referenceDataService;
+
     @Autowired
-    public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient,
+    public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient, ReferenceDataService referenceDataService,
         @Value("${doc_assembly.issue_final_decision}") String templateId) {
         super(generateFile, idamClient, templateId);
+        this.referenceDataService = referenceDataService;
     }
 
     @Override
@@ -57,7 +65,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         adjournCaseBuilder.hearingType(caseData.getAdjournCaseTypeOfHearing());
 
-        adjournCaseBuilder.nextHearingVenue(caseData.getAdjournCaseNextHearingVenue());
+        if (caseData.getAdjournCaseNextHearingVenueSelected() != null) {
+
+            VenueDetails venueDetails =
+                referenceDataService.getVenueDetails(caseData.getAdjournCaseNextHearingVenueSelected());
+            adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
+
+        }
         adjournCaseBuilder.nextHearingType(caseData.getAdjournCaseTypeOfHearing());
         adjournCaseBuilder.nextHearingTimeslot(caseData.getAdjournCaseNextHearingListingDuration()
             + " " + caseData.getAdjournCaseNextHearingListingDurationUnits());
@@ -72,11 +86,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             builder.dateIssued(null);
         }
 
-
         builder.adjournCaseTemplateBody(payload);
 
         return builder.build();
-
     }
 
     protected void validateRequiredProperties(AdjournCaseTemplateBody payload) {
@@ -114,6 +126,25 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     @Override
     protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
         return caseData.getWriteFinalDecisionPreviewDocument();
+    }
+
+    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
+        List<String> names = new ArrayList<>();
+        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
+        if (signedInJudgeName == null) {
+            throw new IllegalStateException("Unable to obtain signed in user name");
+        }
+        names.add(signedInJudgeName);
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
+            names.add(caseData.getAdjournCaseDisabilityQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
+            names.add(caseData.getAdjournCaseMedicallyQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournCaseOtherPanelMemberName())) {
+            names.add(caseData.getAdjournCaseOtherPanelMemberName());
+        }
+        return StringUtils.getGramaticallyJoinedStrings(names);
     }
 
 }
