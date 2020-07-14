@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,27 +21,27 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.ReferenceDataService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
 public class AdjournCasePreviewService extends IssueNoticeHandler {
 
-    private final ReferenceDataService referenceDataService;
+    private final VenueDataLoader venueDataLoader;
 
     @Autowired
-    public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient, ReferenceDataService referenceDataService,
+    public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient, VenueDataLoader venueDataLoader,
         @Value("${doc_assembly.issue_final_decision}") String templateId) {
         super(generateFile, idamClient, templateId);
-        this.referenceDataService = referenceDataService;
+        this.venueDataLoader = venueDataLoader;
     }
 
     @Override
     protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = super
-            .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
+            .createPayload(caseData, documentTypeLabel, dateAdded, generatedDate, isScottish, userAuthorisation);
         AdjournCaseTemplateBodyBuilder adjournCaseBuilder = AdjournCaseTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -68,7 +67,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         if (caseData.getAdjournCaseNextHearingVenueSelected() != null) {
 
             VenueDetails venueDetails =
-                referenceDataService.getVenueDetails(caseData.getAdjournCaseNextHearingVenueSelected());
+                venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected());
             adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
 
         }
