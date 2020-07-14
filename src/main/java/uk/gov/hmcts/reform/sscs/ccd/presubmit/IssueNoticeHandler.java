@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @Component
 @Slf4j
-public class IssueNoticeHandler extends IssueDocumentHandler {
+public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
     protected final GenerateFile generateFile;
     protected final String templateId;
@@ -31,6 +30,8 @@ public class IssueNoticeHandler extends IssueDocumentHandler {
         this.idamClient = idamClient;
     }
 
+    protected abstract void setGeneratedDateIfNotAlreadySet(SscsCaseData caseData);
+
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
 
         this.showIssueDate = showIssueDate;
@@ -39,9 +40,7 @@ public class IssueNoticeHandler extends IssueDocumentHandler {
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
-            sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
-        }
+        setGeneratedDateIfNotAlreadySet(sscsCaseData);
 
         try {
             return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation);

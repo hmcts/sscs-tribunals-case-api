@@ -125,7 +125,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     @Override
     protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
-        return caseData.getWriteFinalDecisionPreviewDocument();
+        return caseData.getAdjournCasePreviewDocument();
     }
 
     protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
@@ -147,4 +147,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
 
+    @Override
+    protected void setGeneratedDateIfNotAlreadySet(SscsCaseData sscsCaseData) {
+       // No-op for now
+    }
 }

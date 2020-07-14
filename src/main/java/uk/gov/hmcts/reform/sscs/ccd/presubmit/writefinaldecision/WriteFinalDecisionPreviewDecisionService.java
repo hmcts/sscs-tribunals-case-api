@@ -285,4 +285,11 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     protected DocumentLink getDocumentFromCaseData(SscsCaseData caseData) {
         return caseData.getWriteFinalDecisionPreviewDocument();
     }
+
+    @Override
+    protected void setGeneratedDateIfNotAlreadySet(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
+            sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
+        }
+    }
 }
