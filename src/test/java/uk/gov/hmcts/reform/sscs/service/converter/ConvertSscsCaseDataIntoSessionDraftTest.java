@@ -1698,7 +1698,7 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
                 .languagePreferenceWelsh("yes")
                 .build();
         SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
-        assertEquals(Boolean.TRUE, actual.getLanguagePreferenceWelsh().isLanguagePreferenceWelsh());
+        assertEquals("yes", actual.getLanguagePreferenceWelsh().getLanguagePreferenceWelsh());
     }
 
     @Test
