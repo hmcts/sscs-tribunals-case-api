@@ -64,6 +64,6 @@ public class CcdMideventCallbackController {
 
         authorisationService.authorise(serviceAuthHeader);
 
-        return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
+        return ok(adjournCasePreviewService.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, userAuthorisation, false));
     }
 }

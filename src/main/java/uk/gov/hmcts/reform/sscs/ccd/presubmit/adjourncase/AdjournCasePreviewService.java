@@ -32,9 +32,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient, VenueDataLoader venueDataLoader,
-        @Value("${doc_assembly.issue_final_decision}") String templateId) {
+        @Value("${doc_assembly.adjourn_case}") String templateId) {
         super(generateFile, idamClient, templateId);
         this.venueDataLoader = venueDataLoader;
+    }
+
+    private LocalDate getDateForPeriodAfterIssueDate(LocalDate issueDate, String period) {
+        return issueDate.plusDays(Integer.parseInt(period));
     }
 
     @Override
@@ -50,7 +54,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         adjournCaseBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
-        setHearings(adjournCaseBuilder, caseData);
+        String venueName = setHearings(adjournCaseBuilder, caseData);
         adjournCaseBuilder.appellantName(buildName(caseData));
 
         if (caseData.getAdjournCaseReasons() != null && !caseData.getAdjournCaseReasons().isEmpty()) {
@@ -70,22 +74,60 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected());
             adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
 
+        } else {
+            adjournCaseBuilder.nextHearingVenue(venueName);
+
         }
-        adjournCaseBuilder.nextHearingType(caseData.getAdjournCaseTypeOfHearing());
-        adjournCaseBuilder.nextHearingTimeslot(caseData.getAdjournCaseNextHearingListingDuration()
-            + " " + caseData.getAdjournCaseNextHearingListingDurationUnits());
+        adjournCaseBuilder.nextHearingType(HearingType.getByKey(caseData.getAdjournCaseTypeOfHearing()).getValue());
+        if (caseData.getAdjournCaseNextHearingListingDuration() != null) {
+            adjournCaseBuilder.nextHearingTimeslot(caseData.getAdjournCaseNextHearingListingDuration()
+                + " " + caseData.getAdjournCaseNextHearingListingDurationUnits());
+        } else {
+            adjournCaseBuilder.nextHearingTimeslot("a standard time slot");
+        }
+
+
+        adjournCaseBuilder.panelMembersExcluded(caseData.getAdjournCasePanelMembersExcluded());
+
+        LocalDate issueDate = LocalDate.now();
+
+
+        String dateString = null;
+        String timeString = null;
+        if ("firstAvailableDate".equals(caseData.getAdjournCaseNextHearingDateType())) {
+            dateString = "the first available date";
+        } else if ("firstAvailableDateAfter".equals(caseData.getAdjournCaseNextHearingDateType())) {
+            if ("provideDate".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
+                dateString = "the first available date after " + caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate();
+            } else if ("providePeriod".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
+                dateString = "the first available date after " + getDateForPeriodAfterIssueDate(issueDate,
+                    caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod());
+            }
+        } else if ("specificDateAndTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
+            dateString = caseData.getAdjournCaseNextHearingSpecificDate();
+            timeString = (caseData.getAdjournCaseNextHearingSpecificTime().equals("am") ? "am" : "pm");
+        } else if ("specificTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
+            dateString = "a date to be decided";
+            timeString = (caseData.getAdjournCaseNextHearingSpecificTime().equals("am") ? "am" : "pm");
+        } else if ("dateToBeFixed".equals(caseData.getAdjournCaseNextHearingDateType())) {
+            dateString = "a date to be fixed";
+        }
+
+        adjournCaseBuilder.nextHearingDate(dateString);
+        adjournCaseBuilder.nextHearingTime(timeString);
 
         AdjournCaseTemplateBody payload = adjournCaseBuilder.build();
 
         validateRequiredProperties(payload);
 
         if (showIssueDate) {
-            builder.dateIssued(LocalDate.now());
+            builder.dateIssued(issueDate);
         } else {
             builder.dateIssued(null);
         }
 
         builder.adjournCaseTemplateBody(payload);
+
 
         return builder.build();
     }
@@ -100,7 +142,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
     }
 
-    protected void setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
+    protected String setHearings(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
+        String venue = "In chambers";
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
             Hearing finalHearing = caseData.getHearings().get(0);
             if (finalHearing != null && finalHearing.getValue() != null) {
@@ -109,12 +152,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 }
                 if (finalHearing.getValue().getVenue() != null) {
                     adjournCaseBuilder.heldAt(finalHearing.getValue().getVenue().getName());
+                    venue = finalHearing.getValue().getVenue().getName();
                 }
             }
         } else {
             adjournCaseBuilder.heldOn(LocalDate.now());
             adjournCaseBuilder.heldAt("In chambers");
         }
+        return venue;
     }
 
     @Override

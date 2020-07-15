@@ -45,6 +45,9 @@ public class AdjournCaseTemplateBody {
     @JsonProperty("next_hearing_timeslot")
     private String nextHearingTimeslot;
 
+    @JsonProperty("panel_members_excluded")
+    private String panelMembersExcluded;
+
     @JsonProperty("reasons_for_decision")
     private List<String> reasonsForDecision;
     @JsonProperty("anything_else")
