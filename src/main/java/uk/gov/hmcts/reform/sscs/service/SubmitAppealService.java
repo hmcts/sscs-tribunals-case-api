@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
+import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -71,7 +72,7 @@ public class SubmitAppealService {
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
         postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken);
         // in case of duplicate case the caseDetails will be null
-        return (caseDetails != null) ? caseDetails.getId() : null;
+        return caseDetails.getId();
     }
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
@@ -204,12 +205,6 @@ public class SubmitAppealService {
                     caseData.getAppeal().getBenefitType().getCode(),
                     eventType);
                 return caseDetails;
-            } else {
-                log.info("Duplicate case {} found for Nino {} and benefit type {}. "
-                        + "No need to continue with post create case processing.",
-                    caseDetails.getId(), caseData.getAppeal().getAppellant().getIdentity().getNino(),
-                    caseData.getAppeal().getBenefitType().getCode());
-                return null;
             }
         } catch (Exception e) {
             throw new CcdException(
@@ -218,6 +213,14 @@ public class SubmitAppealService {
                     caseDetails != null ? caseDetails.getId() : "", caseData.getAppeal().getAppellant().getIdentity().getNino(),
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
+
+        log.info("Duplicate case {} found for Nino {} and benefit type {}. "
+                        + "No need to continue with post create case processing.",
+                caseDetails.getId(), caseData.getGeneratedNino(),
+                caseData.getAppeal().getBenefitType().getCode());
+        throw new DuplicateCaseException(
+                String.format("An appeal has already been submitted, for that decision date %s ",
+                        caseData.getAppeal().getMrnDetails().getMrnDate()));
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
