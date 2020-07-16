@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -23,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.sscs.idam.client"})
 public class AdminSendToInterlocIt extends AbstractEventIt {
 
     @Before
