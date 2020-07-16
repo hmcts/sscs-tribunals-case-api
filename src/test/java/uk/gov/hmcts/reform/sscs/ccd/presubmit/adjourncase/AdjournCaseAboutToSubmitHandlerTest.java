@@ -59,7 +59,7 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDraftFinalDecisionAlreadyExistsOnCase_thenOverwriteExistingDraft() {
+    public void givenDraftAdjournmentNoticeAlreadyExistsOnCase_thenOverwriteExistingDraft() {
         SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_ADJOURNMENT_NOTICE.getValue()).build()).build();
         List<SscsDocument> docs = new ArrayList<>();
         docs.add(doc);
@@ -69,6 +69,30 @@ public class AdjournCaseAboutToSubmitHandlerTest {
 
         assertEquals(1, response.getData().getSscsDocument().size());
         assertEquals((String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+    }
+
+    @Test
+    public void givenAnAdjournmentEventWithLanguageInterpreterRequiredAndCaseHasExistingInterpreter_thenOverwriteExistingInterpreterInHearingOptions() {
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired("Yes");
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage("Spanish");
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(HearingOptions.builder().languageInterpreter("No").languages("French").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertEquals("Spanish", response.getData().getAppeal().getHearingOptions().getLanguages());
+    }
+
+    @Test
+    public void givenAnAdjournmentEventWithLanguageInterpreterRequiredAndCaseDoesNotHaveExistingInterpreter_thenSetInterpreterInHearingOptions() {
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterRequired("Yes");
+        callback.getCaseDetails().getCaseData().setAdjournCaseInterpreterLanguage("Spanish");
+        callback.getCaseDetails().getCaseData().getAppeal().setHearingOptions(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Yes", response.getData().getAppeal().getHearingOptions().getLanguageInterpreter());
+        assertEquals("Spanish", response.getData().getAppeal().getHearingOptions().getLanguages());
     }
 
     @Test

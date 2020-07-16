@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
@@ -44,6 +45,14 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE);
+
+        if (sscsCaseData.getAdjournCaseInterpreterRequired() != null) {
+            HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions() != null ? sscsCaseData.getAppeal().getHearingOptions() : HearingOptions.builder().build();
+            hearingOptions.setLanguages(sscsCaseData.getAdjournCaseInterpreterLanguage());
+            hearingOptions.setLanguageInterpreter(sscsCaseData.getAdjournCaseInterpreterRequired());
+
+            sscsCaseData.getAppeal().setHearingOptions(hearingOptions);
+        }
 
         return preSubmitCallbackResponse;
     }
