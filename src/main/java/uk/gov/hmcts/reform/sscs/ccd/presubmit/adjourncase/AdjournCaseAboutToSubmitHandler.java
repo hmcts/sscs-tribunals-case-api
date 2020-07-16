@@ -44,7 +44,7 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE);
+        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
         if (sscsCaseData.getAdjournCaseInterpreterRequired() != null) {
             HearingOptions hearingOptions = sscsCaseData.getAppeal().getHearingOptions() != null ? sscsCaseData.getAppeal().getHearingOptions() : HearingOptions.builder().build();

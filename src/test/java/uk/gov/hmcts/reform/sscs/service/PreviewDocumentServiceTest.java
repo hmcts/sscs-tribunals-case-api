@@ -34,7 +34,7 @@ public class PreviewDocumentServiceTest {
         docs.add(doc);
         sscsCaseData.setSscsDocument(docs);
 
-        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE);
+        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_ADJOURNMENT_NOTICE, sscsCaseData.getAdjournCasePreviewDocument());
 
         assertEquals(1, sscsCaseData.getSscsDocument().size());
         assertEquals((String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), sscsCaseData.getSscsDocument().get(0).getValue().getDocumentFileName());
