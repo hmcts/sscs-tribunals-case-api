@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -13,7 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 @Service
 public class PreviewDocumentService {
 
-    public void writePreviewDocumentToSscsDocument(SscsCaseData sscsCaseData, DocumentType documentType) {
+    public void writePreviewDocumentToSscsDocument(SscsCaseData sscsCaseData, DocumentType documentType, DocumentLink documentLink) {
         if (sscsCaseData.getSscsDocument() != null) {
             sscsCaseData.getSscsDocument()
                     .removeIf(doc -> documentType.getValue().equals(doc.getValue().getDocumentType()));
@@ -21,7 +22,7 @@ public class PreviewDocumentService {
 
         SscsDocument draftDecisionNotice = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName(createFileName(documentType))
-                .documentLink(sscsCaseData.getWriteFinalDecisionPreviewDocument())
+                .documentLink(documentLink)
                 .documentDateAdded(setDocumentDateAdded())
                 .documentType(documentType.getValue())
                 .build()).build();
