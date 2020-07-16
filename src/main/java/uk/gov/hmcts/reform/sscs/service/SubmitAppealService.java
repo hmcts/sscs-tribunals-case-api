@@ -196,6 +196,12 @@ public class SubmitAppealService {
                     }
                 }
 
+                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {}",
+                        caseData.getAppeal().getBenefitType().getCode(),
+                        eventType,
+                        caseData.getIsScottishCase()
+                        );
+
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
                     "SSCS - new case created",
@@ -261,6 +267,7 @@ public class SubmitAppealService {
     }
 
     private EventType findEventType(SscsCaseData caseData) {
+
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());
