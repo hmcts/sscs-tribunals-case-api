@@ -39,7 +39,7 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
     }
 
     public static String isScottishCase(RegionalProcessingCenter rpc) {
-        if (isNull(rpc)) {
+        if (isNull(rpc) || isNull(rpc.getName())) {
             return "No";
         } else {
             return rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
