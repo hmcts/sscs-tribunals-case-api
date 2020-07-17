@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.sscs.idam.client"})
 public class AdminSendToInterlocIt extends AbstractEventIt {
 
     @Before

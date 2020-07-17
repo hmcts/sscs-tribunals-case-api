@@ -21,10 +21,10 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
         {
                 "uk.gov.hmcts.reform.authorisation",
                 "uk.gov.hmcts.reform.sscs.idam",
-                "uk.gov.hmcts.reform.sscs.idam.client",
                 "uk.gov.hmcts.reform.sscs.document",
                 "uk.gov.hmcts.reform.docassembly",
-                "uk.gov.hmcts.reform.sscs.thirdparty"
+                "uk.gov.hmcts.reform.sscs.thirdparty",
+                "uk.gov.hmcts.reform.idam.client"
         })
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableScheduling

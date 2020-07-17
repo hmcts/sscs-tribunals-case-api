@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@EnableFeignClients(basePackages = {"uk.gov.hmcts.reform.sscs.idam.client"})
 @TestPropertySource(locations = "classpath:config/application_it.properties")
 @AutoConfigureMockMvc
 public class PostCodeEndpointsIt {
