@@ -69,6 +69,11 @@ public class IssueDocumentHandler {
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        if (caseData.getAdjournCaseGenerateNotice() == null) {
+            throw new IllegalStateException("Generate notice has not been set");
+        }
+
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
 
         LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());

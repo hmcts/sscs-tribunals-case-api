@@ -45,7 +45,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = super
-            .createPayload(caseData, documentTypeLabel, dateAdded, generatedDate, isScottish, userAuthorisation);
+            .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getAdjournCaseGeneratedDate()), isScottish, userAuthorisation);
         AdjournCaseTemplateBodyBuilder adjournCaseBuilder = AdjournCaseTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -78,7 +78,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             adjournCaseBuilder.nextHearingVenue(venueName);
 
         }
-        adjournCaseBuilder.nextHearingType(HearingType.getByKey(caseData.getAdjournCaseTypeOfHearing()).getValue());
+        adjournCaseBuilder.nextHearingType(HearingType.getByKey(caseData.getAdjournCaseTypeOfNextHearing()).getValue());
         if (caseData.getAdjournCaseNextHearingListingDuration() != null) {
             adjournCaseBuilder.nextHearingTimeslot(caseData.getAdjournCaseNextHearingListingDuration()
                 + " " + caseData.getAdjournCaseNextHearingListingDurationUnits());
@@ -179,10 +179,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             throw new IllegalStateException("Unable to obtain signed in user name");
         }
         names.add(signedInJudgeName);
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournCaseDisabilityQualifiedPanelMemberName())) {
             names.add(caseData.getAdjournCaseDisabilityQualifiedPanelMemberName());
         }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournCaseMedicallyQualifiedPanelMemberName())) {
             names.add(caseData.getAdjournCaseMedicallyQualifiedPanelMemberName());
         }
         if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getAdjournCaseOtherPanelMemberName())) {
@@ -193,6 +193,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     @Override
     protected void setGeneratedDateIfNotAlreadySet(SscsCaseData sscsCaseData) {
-       // No-op for now
+        if (sscsCaseData.getAdjournCaseGeneratedDate() == null) {
+            sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
+        }
     }
 }
