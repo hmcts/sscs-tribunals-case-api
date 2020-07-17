@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
@@ -147,12 +148,12 @@ public class AdjournCaseIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(documentUrl, result.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        assertEquals(documentUrl, result.getData().getAdjournCasePreviewDocument().getDocumentUrl());
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
         final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
-        final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
+        final AdjournCaseTemplateBody payload = parentPayload.getAdjournCaseTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
@@ -161,41 +162,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
-        assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertEquals(true, payload.isAllowed());
-        assertEquals(true, payload.isSetAside());
-        assertEquals("2018-09-01", payload.getDateOfDecision());
-        assertEquals("An Test",payload.getAppellantName());
-        assertEquals("2018-10-10",payload.getStartDate());
-        assertEquals("2018-11-10",payload.getEndDate());
-        assertEquals(false, payload.isIndefinite());
-        assertEquals(true, payload.isDailyLivingIsEntited());
-        assertEquals(true, payload.isDailyLivingIsSeverelyLimited());
-        assertEquals("enhanced rate", payload.getDailyLivingAwardRate());
-        Assert.assertNotNull(payload.getDailyLivingDescriptors());
-        assertEquals(2, payload.getDailyLivingDescriptors().size());
-        Assert.assertNotNull(payload.getDailyLivingDescriptors().get(0));
-        assertEquals(8, payload.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("f", payload.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot prepare and cook food.", payload.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Preparing food", payload.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
-        assertEquals("1", payload.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getDailyLivingDescriptors().get(1));
-        assertEquals(10, payload.getDailyLivingDescriptors().get(1).getActivityAnswerPoints());
-        assertEquals("f", payload.getDailyLivingDescriptors().get(1).getActivityAnswerLetter());
-        assertEquals("Cannot convey food and drink to their mouth and needs another person to do so.", payload.getDailyLivingDescriptors().get(1).getActivityAnswerValue());
-        assertEquals("Taking nutrition", payload.getDailyLivingDescriptors().get(1).getActivityQuestionValue());
-        assertEquals("2", payload.getDailyLivingDescriptors().get(1).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getDailyLivingNumberOfPoints());
-        assertEquals(18, payload.getDailyLivingNumberOfPoints().intValue());
-        assertEquals(false, payload.isMobilityIsEntited());
-        assertEquals(false, payload.isMobilityIsSeverelyLimited());
-        Assert.assertNull(payload.getMobilityAwardRate());
-        Assert.assertNull(payload.getMobilityDescriptors());
-        assertNotNull(payload.getReasonsForDecision());
-        assertEquals(1, payload.getReasonsForDecision().size());
-        Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
-        assertEquals("Something else.", payload.getAnythingElse());
+        assertEquals("Judge Full Name", payload.getHeldBefore());
     }
 
 }

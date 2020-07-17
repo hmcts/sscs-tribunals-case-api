@@ -33,6 +33,7 @@
       "adjournCaseNextHearingDateType" : "specificDateAndTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
+      "adjournCaseNextHearingSpecificTime" : "am",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -753,6 +754,7 @@
       "adjournCaseNextHearingDateType" : "specificDateAndTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
+      "adjournCaseNextHearingSpecificTime" : "am",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
