@@ -70,7 +70,7 @@ public class IssueDocumentHandler {
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        
+
         if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) && caseData.getAdjournCaseGenerateNotice() == null) {
             throw new IllegalStateException("Generate notice has not been set");
         }
