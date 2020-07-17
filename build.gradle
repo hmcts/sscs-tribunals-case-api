@@ -277,7 +277,6 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.3.24'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.7'
 
-
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
     compile 'org.projectlombok:lombok:1.18.12'
