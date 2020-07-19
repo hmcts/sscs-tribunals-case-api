@@ -101,6 +101,16 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
             writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+        }
+
+        if ("yes".equalsIgnoreCase((caseData.getWriteFinalDecisionIsDescriptorFlow()))
+            && "yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+
+            boolean isSetAside = getConsideredComparisonsWithDwp(caseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
+
+            writeFinalDecisionBuilder.isSetAside(isSetAside);
+
+        } else {
             writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
         }
 
@@ -148,6 +158,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         return builder.build();
 
+    }
+
+    private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
+        List<String> consideredComparissons = new ArrayList<>();
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        }
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        }
+        return consideredComparissons;
     }
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
@@ -237,13 +258,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     }
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return questionKeys
+        List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,
                 decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
                     questionKey))).filter(pair -> pair.getRight().isPresent()).map(pair ->
                 new ImmutablePair<>(pair.getLeft(), pair.getRight().get())).map(pair ->
                 buildDescriptorFromActivityAnswer(ActivityQuestion.getByKey(pair.getLeft()),
                     pair.getRight())).collect(Collectors.toList());
+
+        descriptors.sort(new DescriptorLexicographicalComparator());
+
+        return descriptors;
     }
 
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {

@@ -43,8 +43,10 @@ public class CoversheetService {
 
         return sscsCaseDetails
                 .map(sscsCase -> {
+
                     SscsCaseData sscsCaseData = sscsCase.getData();
                     Address address = sscsCaseData.getAppeal().getAppellant().getAddress();
+
                     PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
                             "" + sscsCase.getId(),
                             sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle(),

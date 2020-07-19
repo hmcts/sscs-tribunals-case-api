@@ -192,9 +192,8 @@ public class SyaEndpointsIt {
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
 
         mockMvc.perform(post("/appeals")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(getCase("json/sya.json")))
-            .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is4xxClientError());
 
         verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
