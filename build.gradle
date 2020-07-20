@@ -290,7 +290,11 @@ dependencies {
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.18.1'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
-
+    
+    // Added to fix CVE-2020-13934, CVE-2020-13935
+    testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.37'
+    testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.37'
+    testCompile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.37'
 
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 

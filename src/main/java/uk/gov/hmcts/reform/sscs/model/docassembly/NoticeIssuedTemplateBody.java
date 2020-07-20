@@ -21,6 +21,8 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     public static final String ENGLISH_IMAGE = "[userImage:enhmcts.png]";
     @JsonProperty("appellant_full_name")
     private String appellantFullName;
+    @JsonProperty("appointee_full_name")
+    private String appointeeFullName;
     private String nino;
     @JsonProperty("case_id")
     private String caseId;
