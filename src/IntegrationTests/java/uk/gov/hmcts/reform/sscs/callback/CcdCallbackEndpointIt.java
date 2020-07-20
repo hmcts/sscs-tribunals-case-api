@@ -47,6 +47,7 @@ import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.domain.Document;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
@@ -225,8 +226,8 @@ public class CcdCallbackEndpointIt extends AbstractEventIt {
         given(idamClient.getAccessToken(anyString(), anyString()))
                 .willReturn("Bearer authToken");
 
-        given(idamClient.getUserDetails(anyString()))
-                    .willReturn(new uk.gov.hmcts.reform.idam.client.models.UserDetails("userId", "", "", "", Arrays.asList("caseworker", "citizen")));
+        given(idamClient.getUserInfo(anyString()))
+                    .willReturn(new UserInfo("16", "userId", "", "", "", Arrays.asList("caseworker", "citizen")));
 
         given(authTokenGenerator.generate()).willReturn("s2s token");
     }
