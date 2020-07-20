@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,6 +73,9 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
             VenueDetails venueDetails =
                 venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected());
+            if (venueDetails == null) {
+                throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected());
+            }
             adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
 
         } else {
@@ -90,25 +94,42 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         adjournCaseBuilder.panelMembersExcluded(caseData.getAdjournCasePanelMembersExcluded());
 
         LocalDate issueDate = LocalDate.now();
-
-
         String dateString = null;
         String timeString = null;
         if ("firstAvailableDate".equals(caseData.getAdjournCaseNextHearingDateType())) {
             dateString = "the first available date";
         } else if ("firstAvailableDateAfter".equals(caseData.getAdjournCaseNextHearingDateType())) {
             if ("provideDate".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
-                dateString = "the first available date after " + caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate();
+                if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate() == null) {
+                    throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterDate in case data");
+                }
+                dateString = "the first available date after " + LocalDate.parse(caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate())
+                    .format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
             } else if ("providePeriod".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
+                if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod() == null) {
+                    throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
+                }
                 dateString = "the first available date after " + getDateForPeriodAfterIssueDate(issueDate,
-                    caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod());
+                    caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
+            } else {
+                throw new IllegalStateException("Date or period indicator not available in case data");
             }
         } else if ("specificDateAndTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            dateString = caseData.getAdjournCaseNextHearingSpecificDate();
-            timeString = (caseData.getAdjournCaseNextHearingSpecificTime().equals("am") ? "am" : "pm");
+            if (caseData.getAdjournCaseNextHearingSpecificDate() == null) {
+                throw new IllegalStateException("adjournCaseNextHearingSpecificDate not available in case data");
+            }
+            if (caseData.getAdjournCaseNextHearingSpecificTime() == null) {
+                throw new IllegalStateException("adjournCaseNextHearingSpecificTime not available in case data");
+            }
+            dateString = LocalDate.parse(caseData.getAdjournCaseNextHearingSpecificDate())
+                .format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
+            timeString = caseData.getAdjournCaseNextHearingSpecificTime();
         } else if ("specificTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
+            if (caseData.getAdjournCaseNextHearingSpecificTime() == null) {
+                throw new IllegalStateException("adjournCaseNextHearingSpecificTime not available in case data");
+            }
             dateString = "a date to be decided";
-            timeString = (caseData.getAdjournCaseNextHearingSpecificTime().equals("am") ? "am" : "pm");
+            timeString = caseData.getAdjournCaseNextHearingSpecificTime();
         } else if ("dateToBeFixed".equals(caseData.getAdjournCaseNextHearingDateType())) {
             dateString = "a date to be fixed";
         } else {
