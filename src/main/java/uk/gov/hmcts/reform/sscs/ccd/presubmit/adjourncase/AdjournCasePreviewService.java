@@ -111,6 +111,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             timeString = (caseData.getAdjournCaseNextHearingSpecificTime().equals("am") ? "am" : "pm");
         } else if ("dateToBeFixed".equals(caseData.getAdjournCaseNextHearingDateType())) {
             dateString = "a date to be fixed";
+        } else {
+            throw new IllegalStateException("Unknown next hearing date type for:" + caseData.getAdjournCaseNextHearingDateType());
         }
 
         adjournCaseBuilder.nextHearingDate(dateString);
