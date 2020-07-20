@@ -49,6 +49,7 @@ public class IssueDocumentHandler {
     protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
         DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
             .appellantFullName(buildFullName(caseData))
+            .appointeeFullName(buildAppointeeName(caseData).orElse(null))
             .caseId(caseData.getCcdCaseId())
             .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
             .noticeBody(caseData.getBodyContent())
@@ -133,5 +134,13 @@ public class IssueDocumentHandler {
         fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'));
 
         return fullNameText.toString();
+    }
+
+    protected Optional<String> buildAppointeeName(SscsCaseData caseData) {
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
+            return Optional.of(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+        } else {
+            return Optional.empty();
+        }
     }
 }
