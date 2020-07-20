@@ -176,17 +176,13 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
         sscsCaseData.setAdjournCaseAnythingElse("Something else.");
         sscsCaseData.setAdjournCaseTypeOfHearing("faceToFace");
-        //sscsCaseData.setAdjournCaseTypeOfNextHearing("telephone");
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
     }
 
     private void assertCommonPreviewParams(AdjournCaseTemplateBody body, String endDate, boolean nullReasonsExpected) {
-        //  assertEquals("2018-10-11",body.getStartDate());
-        //  assertEquals(endDate,body.getEndDate());
-        //  assertEquals("2018-10-10", body.getDateOfDecision());
-        // assertEquals(endDate == null, body.isIndefinite());
+
         if (nullReasonsExpected) {
             assertNull(body.getReasonsForDecision());
         } else {
@@ -196,9 +192,6 @@ public class AdjournCasePreviewServiceTest {
         }
         assertEquals("Something else.", body.getAnythingElse());
         assertEquals("faceToFace", body.getHearingType());
-        //assertEquals("A1", body.getPageNumber());
-        // assertTrue(body.isAttendedHearing());
-        // assertFalse(body.isPresentingOfficerAttended());
     }
 
     @Test
@@ -238,58 +231,29 @@ public class AdjournCasePreviewServiceTest {
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
-    private List<String> getConsideredComparissons(String rate, String nonDescriptorsRate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
-        List<String> consideredComparissions = new ArrayList<>();
-        if (!"notConsidered".equalsIgnoreCase(rate)) {
-            consideredComparissions.add(descriptorsComparedToDwp);
-        }
-        if (!"notConsidered".equalsIgnoreCase(nonDescriptorsRate)) {
-            consideredComparissions.add(nonDescriptorsComparedWithDwp);
-        }
-        return consideredComparissions;
-    }
-
-    /*
-
     @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
-    public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
+    public void willSetPreviewFileWithNullReasons_WhenReasonsListIsNotEmpty() {
+
+        final String endDate = "10-10-2020";
 
         setCommonPreviewParams(sscsCaseData, endDate);
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
-
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
-
-        // Mobility specific parameters
-        sscsCaseData.setPipAdjournCaseMobilityQuestion(rate);
-        sscsCaseData.setPipAdjournCaseDailyLivingQuestion("notConsidered");
-        sscsCaseData.setPipAdjournCaseMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipAdjournCaseMovingAroundQuestion("movingAround12d");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getAdjournCasePreviewDocument());
         assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
             .documentBinaryUrl(URL + "/binary")
             .documentUrl(URL)
             .build(), response.getData().getAdjournCasePreviewDocument());
 
-        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
-
-        boolean setAsideExpectation = getConsideredComparissons(rate, "notConsidered", descriptorsComparedToDwp, nonDescriptorsComparedWithDwp).stream().anyMatch(comparission ->
-            !"same".equalsIgnoreCase(comparission));
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true);
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face", true);
 
         assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+        assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
 
         AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
 
@@ -298,446 +262,10 @@ public class AdjournCasePreviewServiceTest {
         // Common assertions
         assertCommonPreviewParams(body, endDate, false);
 
-        // Mobility specific assertions
-        if ("standardRate".equals(rate)) {
-            assertEquals("standard rate", body.getMobilityAwardRate());
-            assertEquals(false, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-        } else if ("enhancedRate".equals(rate)) {
-            assertEquals("enhanced rate", body.getMobilityAwardRate());
-            assertEquals(true, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-
-        } else {
-            assertEquals(false, body.isMobilityIsEntited());
-        }
-
-        if ("notConsidered".equals(rate)) {
-
-            assertNull(body.getMobilityDescriptors());
-            assertNull(body.getMobilityNumberOfPoints());
-
-        } else {
-
-            assertNotNull(body.getMobilityDescriptors());
-            assertEquals(1, body.getMobilityDescriptors().size());
-            assertNotNull(body.getMobilityDescriptors().get(0));
-            assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-            assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-            assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-            assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-            assertNotNull(body.getMobilityNumberOfPoints());
-            assertEquals(10, body.getMobilityNumberOfPoints().intValue());
-
-        }
-
-        // Daily living specific assertions
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingDescriptors());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
-
-    @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
-    public void willSetPreviewFile_whenDailyLivingDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
-
-        setCommonPreviewParams(sscsCaseData, endDate);
-
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-
-        // Daily living specific params
-        sscsCaseData.setPipAdjournCaseDailyLivingQuestion(rate);
-        sscsCaseData.setPipAdjournCaseMobilityQuestion("notConsidered");
-        sscsCaseData.setPipAdjournCaseDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
-        sscsCaseData.setPipAdjournCasePreparingFoodQuestion("preparingFood1f");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getAdjournCasePreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournCasePreviewDocument());
-
-        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
-
-        boolean setAsideExpectation = getConsideredComparissons(rate, "notConsidered", descriptorsComparedToDwp, nonDescriptorsComparedWithDwp).stream().anyMatch(comparission ->
-            !"same".equalsIgnoreCase(comparission));
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true);
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
-
-        // Daily living specific assertions
-        if ("standardRate".equals(rate)) {
-            assertEquals("standard rate", body.getDailyLivingAwardRate());
-            assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-            assertEquals(true, body.isDailyLivingIsEntited());
-
-        } else if ("enhancedRate".equals(rate)) {
-            assertEquals("enhanced rate", body.getDailyLivingAwardRate());
-            assertEquals(true, body.isDailyLivingIsSeverelyLimited());
-            assertEquals(true, body.isDailyLivingIsEntited());
-
-        } else {
-            assertEquals(false, body.isDailyLivingIsEntited());
-        }
-
-        if ("notConsidered".equals(rate)) {
-            assertNull(body.getDailyLivingDescriptors());
-            assertNull(body.getDailyLivingNumberOfPoints());
-        } else {
-            assertNotNull(body.getDailyLivingDescriptors());
-            assertEquals(1, body.getDailyLivingDescriptors().size());
-            assertNotNull(body.getDailyLivingDescriptors().get(0));
-            assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
-            assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
-            assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
-            assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
-            assertNotNull(body.getDailyLivingNumberOfPoints());
-            assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
-
-        }
-
-
-        // Mobility specific assertions
-        assertEquals(false, body.isMobilityIsEntited());
-        assertEquals(false, body.isMobilityIsSeverelyLimited());
-        assertNull(body.getMobilityDescriptors());
-    }
-
-
-
-    @Test
-    public void willSetPreviewFileForDailyLivingMobility_whenNotGeneratingNotice() {
-
-        setCommonPreviewParams(sscsCaseData, null);
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("no");
-        sscsCaseData.setAdjournCaseAllowedOrRefused("allowed");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getAdjournCasePreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournCasePreviewDocument());
-
-        boolean appealAllowedExpectation = true;
-        boolean setAsideExpectation = appealAllowedExpectation;
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, false);
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, null, false);
-
-        assertNull(body.getMobilityAwardRate());
-        assertFalse(body.isMobilityIsSeverelyLimited());
-        assertFalse(body.isMobilityIsEntited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertFalse(body.isDailyLivingIsSeverelyLimited());
-        assertFalse(body.isDailyLivingIsEntited());
-        assertNull(body.getMobilityDescriptors());
-        assertNull(body.getMobilityNumberOfPoints());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(body.getDailyLivingNumberOfPoints());
-
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-    }
-
-    @Test
-    public void willSetPreviewFileForNotDailyLivingMobility_whenNotGeneratingNotice() {
-
-        setCommonPreviewParams(sscsCaseData, null);
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("no");
-        sscsCaseData.setAdjournCaseGenerateNotice("no");
-        sscsCaseData.setAdjournCaseAllowedOrRefused("allowed");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getAdjournCasePreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournCasePreviewDocument());
-
-        boolean appealAllowedExpectation = true;
-        boolean setAsideExpectation = appealAllowedExpectation;
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, false, false);
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, null, false);
-
-        assertNull(body.getMobilityAwardRate());
-        assertFalse(body.isMobilityIsSeverelyLimited());
-        assertFalse(body.isMobilityIsEntited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertFalse(body.isDailyLivingIsSeverelyLimited());
-        assertFalse(body.isDailyLivingIsEntited());
-        assertNull(body.getMobilityDescriptors());
-        assertNull(body.getMobilityNumberOfPoints());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(body.getDailyLivingNumberOfPoints());
-
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-    }
-
-    @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
-    public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRateForIssueDecision(String endDate, String rate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
-
-        setCommonPreviewParams(sscsCaseData, endDate);
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
-
-        // Mobility specific parameters
-        sscsCaseData.setPipAdjournCaseMobilityQuestion(rate);
-        sscsCaseData.setPipAdjournCaseDailyLivingQuestion("notConsidered");
-        sscsCaseData.setPipAdjournCaseMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipAdjournCaseMovingAroundQuestion("movingAround12d");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.FINAL_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getAdjournCasePreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getAdjournCasePreviewDocument());
-
-        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
-
-        boolean setAsideExpectation = getConsideredComparissons(rate, "notConsidered", descriptorsComparedToDwp, nonDescriptorsComparedWithDwp).stream().anyMatch(comparission ->
-            !"same".equalsIgnoreCase(comparission));
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, false,
-            true, true);
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DECISION NOTICE", payload.getNoticeType());
-
-        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
-
-        // Mobility specific assertions
-        if ("standardRate".equals(rate)) {
-            assertEquals("standard rate", body.getMobilityAwardRate());
-            assertEquals(false, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-        } else if ("enhancedRate".equals(rate)) {
-            assertEquals("enhanced rate", body.getMobilityAwardRate());
-            assertEquals(true, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-
-        } else {
-            assertEquals(false, body.isMobilityIsEntited());
-        }
-
-        if ("notConsidered".equals(rate)) {
-
-            assertNull(body.getMobilityDescriptors());
-            assertNull(body.getMobilityNumberOfPoints());
-
-        } else {
-
-            assertNotNull(body.getMobilityDescriptors());
-            assertEquals(1, body.getMobilityDescriptors().size());
-            assertNotNull(body.getMobilityDescriptors().get(0));
-            assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-            assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-            assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-            assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-            assertNotNull(body.getMobilityNumberOfPoints());
-            assertEquals(10, body.getMobilityNumberOfPoints().intValue());
-
-        }
-
-        // Daily living specific assertions
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-    }
-
-    @Test
-    public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion("higher");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        assertNull(response.getData().getAdjournCasePreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to determine date of decision", error);
-    }
-
-    @Test
-    public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setAdjournCaseDateOfDecision("2018-10-10");
-        when(userDetails.getFullName()).thenReturn(null);
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to obtain signed in user name", error);
-        assertNull(response.getData().getAdjournCasePreviewDocument());
-    }
-
-    @Test
-    public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setAdjournCaseDateOfDecision("2018-10-10");
-        when(idamClient.getUserDetails("Bearer token")).thenReturn(null);
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Unable to obtain signed in user details", error);
-        assertNull(response.getData().getAdjournCasePreviewDocument());
-    }
-
-    @Test
-    public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setAdjournCaseDateOfDecision("2018-10-10");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-        assertNull(response.getData().getAdjournCasePreviewDocument());
-    }
-
-    @Test
-    public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion("someValue");
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion("higher");
-        sscsCaseData.setAdjournCaseDateOfDecision("2018-10-10");
-
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-        assertNull(response.getData().getAdjournCasePreviewDocument());
-    }
-
-    @Test
-    public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
-
-        sscsCaseData.setAdjournCaseIsDescriptorFlow("yes");
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setPipAdjournCaseComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipAdjournCaseComparedToDwpMobilityQuestion("someValue");
-        sscsCaseData.setAdjournCaseDateOfDecision("2018-10-10");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        assertNull(response.getData().getAdjournCasePreviewDocument());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Outcome cannot be empty. Please check case data. If problem continues please contact support", error);
-    }
-    */
-
-
+    
     @Test
     public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
@@ -1457,6 +985,23 @@ public class AdjournCasePreviewServiceTest {
     }
 
     @Test
+    public void givenCaseWithFirstWithInvaidDateTime_thenDisplayAnErrorAndDoNotDisplayTheDocument() {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("unknownDateType");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Unknown next hearing date type for:unknownDateType", error);
+        assertNull(response.getData().getAdjournCasePreviewDocument());
+    }
+
+    @Test
     public void givenCaseWithSelectedVenueSet_thenCorrectlySetTheVenueToBeTheNewVenue() {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
@@ -1590,13 +1135,6 @@ public class AdjournCasePreviewServiceTest {
         assertNotNull(body.getHeldAt());
         assertNotNull(body.getHeldBefore());
         assertNotNull(body.getHeldOn());
-        //assertNotNull(body.getPanelMembersExcluded());
-        //assertNotNull(body.getHearingType());
-
-        //assertNotNull(body.getNextHearingTime());
-        //assertNotNull(body.getReasonsForDecision());
-        //assertNotNull(body.getHearingType());
-
         return payload;
     }
 }

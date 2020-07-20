@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.util.StringUtils;
 public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     private final VenueDataLoader venueDataLoader;
+    private static final String DOCUMENT_DATE_PATTERN = "dd/MM/YYYY";
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient, VenueDataLoader venueDataLoader,
@@ -94,6 +95,26 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         adjournCaseBuilder.panelMembersExcluded(caseData.getAdjournCasePanelMembersExcluded());
 
         LocalDate issueDate = LocalDate.now();
+
+        setNextHearingDateAndTime(adjournCaseBuilder, caseData, issueDate);
+
+        AdjournCaseTemplateBody payload = adjournCaseBuilder.build();
+
+        validateRequiredProperties(payload);
+
+        if (showIssueDate) {
+            builder.dateIssued(issueDate);
+        } else {
+            builder.dateIssued(null);
+        }
+
+        builder.adjournCaseTemplateBody(payload);
+
+
+        return builder.build();
+    }
+
+    private void setNextHearingDateAndTime(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData, LocalDate issueDate) {
         String dateString = null;
         String timeString = null;
         if ("firstAvailableDate".equals(caseData.getAdjournCaseNextHearingDateType())) {
@@ -104,13 +125,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterDate in case data");
                 }
                 dateString = "the first available date after " + LocalDate.parse(caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate())
-                    .format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
+                    .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             } else if ("providePeriod".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
                 if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
                 }
                 dateString = "the first available date after " + getDateForPeriodAfterIssueDate(issueDate,
-                    caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
+                    caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             } else {
                 throw new IllegalStateException("Date or period indicator not available in case data");
             }
@@ -122,7 +143,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                 throw new IllegalStateException("adjournCaseNextHearingSpecificTime not available in case data");
             }
             dateString = LocalDate.parse(caseData.getAdjournCaseNextHearingSpecificDate())
-                .format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
+                .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             timeString = caseData.getAdjournCaseNextHearingSpecificTime();
         } else if ("specificTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
             if (caseData.getAdjournCaseNextHearingSpecificTime() == null) {
@@ -139,20 +160,6 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         adjournCaseBuilder.nextHearingDate(dateString);
         adjournCaseBuilder.nextHearingTime(timeString);
 
-        AdjournCaseTemplateBody payload = adjournCaseBuilder.build();
-
-        validateRequiredProperties(payload);
-
-        if (showIssueDate) {
-            builder.dateIssued(issueDate);
-        } else {
-            builder.dateIssued(null);
-        }
-
-        builder.adjournCaseTemplateBody(payload);
-
-
-        return builder.build();
     }
 
     protected void validateRequiredProperties(AdjournCaseTemplateBody payload) {

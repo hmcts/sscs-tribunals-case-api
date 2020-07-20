@@ -20,11 +20,7 @@ public enum HearingType {
         }
         throw new IllegalArgumentException("Unknown HearingType for key:" + key);
     }
-
-    public String getKey() {
-        return key;
-    }
-
+    
     public String getValue() {
         return value;
     }
