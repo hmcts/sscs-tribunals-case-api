@@ -28,8 +28,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
@@ -77,7 +77,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
@@ -147,7 +147,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
@@ -218,7 +218,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
