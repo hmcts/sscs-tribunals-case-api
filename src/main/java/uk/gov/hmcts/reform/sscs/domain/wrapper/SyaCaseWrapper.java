@@ -56,7 +56,6 @@ public class SyaCaseWrapper {
     @JsonProperty("languagePreferenceWelsh")
     private Boolean languagePreferenceWelsh;
 
-
     public SyaContactDetails getContactDetails() {
         if (null == appellant && null == appointee) {
             return null;
