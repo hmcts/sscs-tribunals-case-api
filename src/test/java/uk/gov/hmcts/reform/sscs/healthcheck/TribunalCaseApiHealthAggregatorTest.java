@@ -22,35 +22,63 @@ public class TribunalCaseApiHealthAggregatorTest {
 
 
     @Test
-    public void shouldReturnOverallHealthUpWithDetailMessageUp() {
-        //Given
+    public void shouldReturnOverallHealthUpWhenHardCheckIsUpAndSoftCheckIsDown() {
+        //Given hard dependency
         Health mockCcdDataHealth = Health.up().build();
-        Health mockPdfServiceHealth = Health.up().build();
+        Health mockServiceAuth = Health.up().build();
+
+        // soft dependency
+        Health mockPdfServiceHealth = Health.down().build();
+
         Map<String, Health> healths = new HashMap<>();
-        healths.put("mockCcdDataHealth", mockCcdDataHealth);
+        healths.put("coreCaseData", mockCcdDataHealth);
+        healths.put("serviceAuth", mockServiceAuth);
         healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
         // when
         Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
 
         // then
         Assert.assertEquals(Health.up().build().getStatus(), actual.getStatus());
-        Assert.assertEquals("UP {}", actual.getDetails().values().iterator().next().toString());
+        Assert.assertEquals("{coreCaseData=UP {}, serviceAuth=UP {}, mockPdfServiceHealth=DOWN {}}", actual.getDetails().values().iterator().next().toString());
     }
 
     @Test
-    public void shouldReturnOverallHealthUpWithDetailMessageWithException() {
-        //Given
-        Health mockCcdDataHealth = Health.down(new SocketTimeoutException()).build();
+    public void shouldReturnOverallHealthUpWhenHardCheckIsUpAndSoftCheckIsUp() {
+        //Given hard dependency
+        Health mockCcdDataHealth = Health.up().build();
+        Health mockServiceAuth = Health.up().build();
+
+        // soft dependency
         Health mockPdfServiceHealth = Health.up().build();
         Map<String, Health> healths = new HashMap<>();
-        healths.put("mockCcdDataHealth", mockCcdDataHealth);
+        healths.put("coreCaseData", mockCcdDataHealth);
+        healths.put("serviceAuth", mockServiceAuth);
         healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
         // when
         Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
 
         // then
         Assert.assertEquals(Health.up().build().getStatus(), actual.getStatus());
-        Assert.assertEquals("{mockCcdDataHealth=DOWN {error=java.net.SocketTimeoutException: null}, mockPdfServiceHealth=UP {}}",
+        Assert.assertEquals("{coreCaseData=UP {}, serviceAuth=UP {}, mockPdfServiceHealth=UP {}}", actual.getDetails().values().iterator().next().toString());
+    }
+
+    @Test
+    public void shouldReturnOverallHealthDownWhenHardCheckIsDown() {
+        //Given
+        Health mockCcdDataHealth = Health.down(new SocketTimeoutException()).build();
+        Health mockServiceAuth = Health.up().build();
+
+        Health mockPdfServiceHealth = Health.up().build();
+        Map<String, Health> healths = new HashMap<>();
+        healths.put("coreCaseData", mockCcdDataHealth);
+        healths.put("serviceAuth", mockServiceAuth);
+        healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
+        // when
+        Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
+
+        // then
+        Assert.assertEquals(Health.down().build().getStatus(), actual.getStatus());
+        Assert.assertEquals("{coreCaseData=DOWN {error=java.net.SocketTimeoutException: null}, serviceAuth=UP {}, mockPdfServiceHealth=UP {}}",
                 actual.getDetails().values().iterator().next().toString());
     }
 
