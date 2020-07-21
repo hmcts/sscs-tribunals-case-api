@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatenotlistable;
 
+import java.time.LocalDate;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,6 +37,12 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
         if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableDirectionsFulfilled())) {
             sscsCaseData.setState(State.READY_TO_LIST);
             sscsCaseData.setNotListableProvideReasons(null);
+        }
+
+        if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableInterlocReview())) {
+            sscsCaseData.setInterlocReviewState(sscsCaseData.getUpdateNotListableWhoReviewsCase());
+            sscsCaseData.setInterlocReferralDate(LocalDate.now().toString());
+            sscsCaseData.setDirectionDueDate(null);
         }
 
         return preSubmitCallbackResponse;

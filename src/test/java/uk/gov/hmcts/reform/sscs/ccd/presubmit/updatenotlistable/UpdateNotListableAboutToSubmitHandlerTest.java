@@ -4,12 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
+import java.time.LocalDate;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -78,7 +78,33 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("reason1", response.getData().getNotListableProvideReasons());
-        assertEquals(NOT_LISTABLE, sscsCaseData.getState());
+        assertEquals(NOT_LISTABLE, response.getData().getState());
+    }
+
+    @Test
+    public void givenUpdateNotListableWithInterlocReviewTcw_thenSetInterlocFields() {
+        sscsCaseData.setUpdateNotListableInterlocReview("yes");
+        sscsCaseData.setUpdateNotListableWhoReviewsCase("reviewByTcw");
+        sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("reviewByTcw", response.getData().getInterlocReviewState());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertNull(response.getData().getDirectionDueDate());
+    }
+
+    @Test
+    public void givenUpdateNotListableWithInterlocReviewJudge_thenSetInterlocFields() {
+        sscsCaseData.setUpdateNotListableInterlocReview("yes");
+        sscsCaseData.setUpdateNotListableWhoReviewsCase("reviewByJudge");
+        sscsCaseData.setDirectionDueDate(LocalDate.now().toString());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("reviewByJudge", response.getData().getInterlocReviewState());
+        assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertNull(response.getData().getDirectionDueDate());
     }
 
     @Test
