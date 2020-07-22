@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.notlistable;
 
 import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,7 +12,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.CallbackValidationService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -17,11 +19,11 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class NotListableMidEventValidationHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private CallbackValidationService callbackValidationService;
+    private Validator validator;
 
     @Autowired
-    public NotListableMidEventValidationHandler(CallbackValidationService callbackValidationService) {
-        this.callbackValidationService = callbackValidationService;
+    public NotListableMidEventValidationHandler(Validator validator) {
+        this.validator = validator;
     }
 
     @Override
@@ -42,8 +44,9 @@ public class NotListableMidEventValidationHandler extends IssueDocumentHandler i
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (callbackValidationService.isDueDateInvalid(sscsCaseData.getNotListableDueDate())) {
-            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
         }
 
         return preSubmitCallbackResponse;

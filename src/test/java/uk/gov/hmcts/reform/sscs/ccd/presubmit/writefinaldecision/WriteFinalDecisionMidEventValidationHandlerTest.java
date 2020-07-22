@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -43,8 +45,8 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     @Before
     public void setUp() throws IOException {
-        initMocks(this);
-        handler = new WriteFinalDecisionMidEventValidationHandler();
+        openMocks(this);
+        handler = new WriteFinalDecisionMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

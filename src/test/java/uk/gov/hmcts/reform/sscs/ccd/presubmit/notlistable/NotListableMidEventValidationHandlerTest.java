@@ -3,13 +3,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.notlistable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.CallbackValidationService;
 
 @RunWith(JUnitParamsRunner.class)
 public class NotListableMidEventValidationHandlerTest {
@@ -47,13 +46,10 @@ public class NotListableMidEventValidationHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
-    private CallbackValidationService callbackValidationService;
-
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        callbackValidationService = new CallbackValidationService();
-        handler = new NotListableMidEventValidationHandler(callbackValidationService);
+        handler = new NotListableMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.NOT_LISTABLE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

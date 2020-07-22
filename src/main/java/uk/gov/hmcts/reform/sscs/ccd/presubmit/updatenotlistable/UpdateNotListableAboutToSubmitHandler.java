@@ -32,8 +32,6 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableDirectionsFulfilled())) {
             sscsCaseData.setState(State.READY_TO_LIST);
             sscsCaseData.setNotListableProvideReasons(null);
@@ -45,9 +43,11 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
             sscsCaseData.setDirectionDueDate(null);
         }
 
-        if("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
+        if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
             sscsCaseData.setDirectionDueDate(sscsCaseData.getUpdateNotListableDueDate());
         }
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return preSubmitCallbackResponse;
     }
