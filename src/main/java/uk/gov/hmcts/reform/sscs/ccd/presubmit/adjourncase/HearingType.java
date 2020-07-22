@@ -2,7 +2,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 public enum HearingType {
 
-    FACE_TO_FACE("faceToFace", "face to face");
+    FACE_TO_FACE("faceToFace", "face to face"),
+    TELEPHONE("telephone", "telephone");
 
     final String key;
     final String value;
