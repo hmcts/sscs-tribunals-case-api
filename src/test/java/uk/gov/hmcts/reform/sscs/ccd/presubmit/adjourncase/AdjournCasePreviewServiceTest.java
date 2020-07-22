@@ -132,6 +132,7 @@ public class AdjournCasePreviewServiceTest {
         return new Object[] {
             new String[] {"faceToFace", "face to face"},
             new String[] {"telephone", "telephone"},
+            new String[] {"video", "video"},
         };
     }
 
@@ -140,6 +141,7 @@ public class AdjournCasePreviewServiceTest {
     private Object[] nonFaceToFaceNextHearingTypeParameters() {
         return new Object[] {
             new String[] {"telephone", "telephone"},
+            new String[] {"video", "video"},
         };
     }
 
