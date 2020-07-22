@@ -28,9 +28,8 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        String isScotCase = isScottishCase(caseData.getRegionalProcessingCenter());
+        String isScotCase = isScottishCase(caseData);
 
-        log.info("Setting isScottishCase field to " + isScotCase);
         caseData.setIsScottishCase(isScotCase);
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
@@ -38,10 +37,14 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
-    public static String isScottishCase(RegionalProcessingCenter rpc) {
+    public static String isScottishCase(SscsCaseData caseData) {
+
+        RegionalProcessingCenter rpc = caseData.getRegionalProcessingCenter();
         if (isNull(rpc) || isNull(rpc.getName())) {
+            log.info("Setting isScottishCase field to No for empty RPC for case " + caseData.getCcdCaseId());
             return "No";
         } else {
+            log.info("Setting isScottishCase field to Yes for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
             return rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
         }
     }
