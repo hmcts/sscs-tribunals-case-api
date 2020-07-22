@@ -47,8 +47,24 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
             sscsCaseData.setDirectionDueDate(sscsCaseData.getUpdateNotListableDueDate());
         }
 
+        if (null != sscsCaseData.getUpdateNotListableWhereShouldCaseMoveTo()) {
+            sscsCaseData.setState(State.getById(sscsCaseData.getUpdateNotListableWhereShouldCaseMoveTo()));
+            sscsCaseData.setNotListableProvideReasons(null);
+        }
+
+        clearTransientFields(sscsCaseData);
+
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         return preSubmitCallbackResponse;
+    }
+
+    private void clearTransientFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled(null);
+        sscsCaseData.setUpdateNotListableInterlocReview(null);
+        sscsCaseData.setUpdateNotListableWhoReviewsCase(null);
+        sscsCaseData.setUpdateNotListableSetNewDueDate(null);
+        sscsCaseData.setUpdateNotListableDueDate(null);
+        sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo(null);
     }
 }

@@ -20,10 +20,7 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
 public class UpdateNotListableAboutToSubmitHandlerTest {
@@ -128,6 +125,37 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getDirectionDueDate());
+    }
+
+    @Test
+    @Parameters({"readyToList, READY_TO_LIST", "withDwp, WITH_DWP"})
+    public void givenUpdateNotListableWhatShouldCaseMoveToNextReadyToList_thenSetStateToReadyToList(String nextState, State expectedState) {
+        sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo(nextState);
+        sscsCaseData.setNotListableProvideReasons("reason1");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedState, response.getData().getState());
+        assertNull(response.getData().getNotListableProvideReasons());
+    }
+
+    @Test
+    public void givenUpdateNotListableEvent_thenClearTransientFields() {
+        sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
+        sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo("withDwp");
+        sscsCaseData.setNotListableProvideReasons("reason1");
+        sscsCaseData.setUpdateNotListableSetNewDueDate("No");
+        sscsCaseData.setUpdateNotListableWhoReviewsCase("reviewByJudge");
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getUpdateNotListableDueDate());
+        assertNull(response.getData().getUpdateNotListableWhereShouldCaseMoveTo());
+        assertNull(response.getData().getNotListableProvideReasons());
+        assertNull(response.getData().getUpdateNotListableSetNewDueDate());
+        assertNull(response.getData().getUpdateNotListableWhoReviewsCase());
+        assertNull(response.getData().getUpdateNotListableDirectionsFulfilled());
     }
 
     @Test
