@@ -10,6 +10,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -104,6 +105,28 @@ public class UpdateNotListableAboutToSubmitHandlerTest {
 
         assertEquals("reviewByJudge", response.getData().getInterlocReviewState());
         assertEquals(LocalDate.now().toString(), response.getData().getInterlocReferralDate());
+        assertNull(response.getData().getDirectionDueDate());
+    }
+
+    @Test
+    public void givenUpdateNotListableSetNewDueDateYes_thenWriteToDirectionDueDateField() {
+        String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
+        sscsCaseData.setUpdateNotListableSetNewDueDate("Yes");
+        sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(tomorrowDate, response.getData().getDirectionDueDate());
+    }
+
+    @Test
+    public void givenUpdateNotListableSetNewDueDateNo_thenDirectionDueDateFieldIsNull() {
+        String tomorrowDate = LocalDate.now().plus(1, ChronoUnit.DAYS).toString();
+        sscsCaseData.setUpdateNotListableSetNewDueDate("No");
+        sscsCaseData.setUpdateNotListableDueDate(tomorrowDate);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
         assertNull(response.getData().getDirectionDueDate());
     }
 

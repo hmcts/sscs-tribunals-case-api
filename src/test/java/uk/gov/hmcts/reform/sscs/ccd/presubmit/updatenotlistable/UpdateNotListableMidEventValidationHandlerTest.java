@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.notlistable;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatenotlistable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,12 +26,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.CallbackValidationService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.notlistable.NotListableMidEventValidationHandler;
 
 @RunWith(JUnitParamsRunner.class)
-public class NotListableMidEventValidationHandlerTest {
+public class UpdateNotListableMidEventValidationHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private NotListableMidEventValidationHandler handler;
+    private UpdateNotListableMidEventValidationHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -53,9 +54,9 @@ public class NotListableMidEventValidationHandlerTest {
     public void setUp() throws IOException {
         openMocks(this);
         callbackValidationService = new CallbackValidationService();
-        handler = new NotListableMidEventValidationHandler(callbackValidationService);
+        handler = new UpdateNotListableMidEventValidationHandler(callbackValidationService);
 
-        when(callback.getEvent()).thenReturn(EventType.NOT_LISTABLE);
+        when(callback.getEvent()).thenReturn(EventType.UPDATE_NOT_LISTABLE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         when(idamClient.getUserDetails("Bearer token")).thenReturn(userDetails);
@@ -68,7 +69,7 @@ public class NotListableMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenANonNotListableCaseEvent_thenReturnFalse() {
+    public void givenANonUpdateNotListableCaseEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
@@ -82,7 +83,7 @@ public class NotListableMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsToday_ThenDisplayAnError() {
 
-        sscsCaseData.setNotListableDueDate(LocalDate.now().toString());
+        sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -95,7 +96,7 @@ public class NotListableMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsBeforeToday_ThenDisplayAnError() {
 
-        sscsCaseData.setNotListableDueDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
+        sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -108,7 +109,7 @@ public class NotListableMidEventValidationHandlerTest {
     @Test
     public void givenDirectionsDueDateIsAfterToday_ThenDoNotDisplayAnError() {
 
-        sscsCaseData.setNotListableDueDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
+        sscsCaseData.setUpdateNotListableDueDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

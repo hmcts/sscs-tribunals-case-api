@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.notlistable;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatenotlistable;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -15,19 +15,19 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
-public class NotListableMidEventValidationHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class UpdateNotListableMidEventValidationHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private CallbackValidationService callbackValidationService;
 
     @Autowired
-    public NotListableMidEventValidationHandler(CallbackValidationService callbackValidationService) {
+    public UpdateNotListableMidEventValidationHandler(CallbackValidationService callbackValidationService) {
         this.callbackValidationService = callbackValidationService;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
-                && callback.getEvent() == EventType.NOT_LISTABLE
+                && callback.getEvent() == EventType.UPDATE_NOT_LISTABLE
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
@@ -42,7 +42,7 @@ public class NotListableMidEventValidationHandler extends IssueDocumentHandler i
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (callbackValidationService.isDueDateInvalid(sscsCaseData.getNotListableDueDate())) {
+        if (callbackValidationService.isDueDateInvalid(sscsCaseData.getUpdateNotListableDueDate())) {
             preSubmitCallbackResponse.addError("Directions due date must be in the future");
         }
 

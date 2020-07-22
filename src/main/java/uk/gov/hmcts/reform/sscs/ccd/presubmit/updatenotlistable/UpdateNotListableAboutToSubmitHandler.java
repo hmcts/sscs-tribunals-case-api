@@ -45,6 +45,10 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
             sscsCaseData.setDirectionDueDate(null);
         }
 
+        if("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
+            sscsCaseData.setDirectionDueDate(sscsCaseData.getUpdateNotListableDueDate());
+        }
+
         return preSubmitCallbackResponse;
     }
 }
