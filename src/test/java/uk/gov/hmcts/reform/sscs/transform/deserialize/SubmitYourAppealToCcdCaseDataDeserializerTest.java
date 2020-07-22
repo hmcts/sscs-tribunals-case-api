@@ -336,6 +336,15 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
         assertJsonEquals(WITHOUT_REGIONAL_PROCESSING_CENTER.getSerializedMessage(), removeTyaNumber(caseData));
+        assertEquals("No", caseData.getIsScottishCase());
+    }
+
+    @Test
+    public void draftSyaWithNoRpc() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.setCaseType("draft");
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        assertNull(caseData.getIsScottishCase());
     }
 
     @Test
