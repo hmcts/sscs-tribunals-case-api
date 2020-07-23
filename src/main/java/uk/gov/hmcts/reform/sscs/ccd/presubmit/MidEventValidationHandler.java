@@ -1,27 +1,33 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.notlistable;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
-public class NotListableMidEventValidationHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class MidEventValidationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private Validator validator;
+
+    @Autowired
+    public MidEventValidationHandler(Validator validator) {
+        this.validator = validator;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
-            && callback.getEvent() == EventType.NOT_LISTABLE
+            && (callback.getEvent() == EventType.NOT_LISTABLE || callback.getEvent() == EventType.UPDATE_NOT_LISTABLE)
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
@@ -36,21 +42,12 @@ public class NotListableMidEventValidationHandler extends IssueDocumentHandler i
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (isNotListableDueDateInvalid(sscsCaseData)) {
-            preSubmitCallbackResponse.addError("Directions due date must be in the future");
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
         }
 
         return preSubmitCallbackResponse;
-    }
-
-
-    private boolean isNotListableDueDateInvalid(SscsCaseData sscsCaseData) {
-        if (!isBlank(sscsCaseData.getNotListableDueDate())) {
-            LocalDate dueDate = LocalDate.parse(sscsCaseData.getNotListableDueDate());
-            LocalDate now = LocalDate.now();
-            return !dueDate.isAfter(now);
-        }
-        return false;
     }
 
 }
