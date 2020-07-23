@@ -43,8 +43,9 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
             log.info("Setting isScottishCase field to No for empty RPC for case " + caseData.getCcdCaseId());
             return "No";
         } else {
-            log.info("Setting isScottishCase field to Yes for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
-            return rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
+            String isScotCase = rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
+            log.info("Setting isScottishCase field to " + isScotCase + " for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
+            return isScotCase;
         }
     }
 }
