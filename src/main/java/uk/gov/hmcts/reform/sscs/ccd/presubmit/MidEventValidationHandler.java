@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatenotlistable;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import java.util.Objects;
 import java.util.Set;
@@ -12,24 +12,22 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
-public class UpdateNotListableMidEventValidationHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class MidEventValidationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private Validator validator;
 
     @Autowired
-    public UpdateNotListableMidEventValidationHandler(Validator validator) {
+    public MidEventValidationHandler(Validator validator) {
         this.validator = validator;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
-                && callback.getEvent() == EventType.UPDATE_NOT_LISTABLE
+            && (callback.getEvent() == EventType.NOT_LISTABLE || callback.getEvent() == EventType.UPDATE_NOT_LISTABLE)
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
