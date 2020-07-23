@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 import org.apache.commons.io.FileUtils;
 import org.junit.Rule;
@@ -63,6 +64,14 @@ public abstract class AbstractEventIt {
     protected void setJsonAndReplace(String fileLocation, String replaceKey, String replaceValue) throws IOException {
         String result = getJson(fileLocation);
         json = result.replace(replaceKey, replaceValue);
+    }
+
+    protected void setJsonAndReplace(String fileLocation, List<String> replaceKeys, List<String> replaceValues) throws IOException {
+        String result = getJson(fileLocation);
+        for (int i = 0; i < replaceKeys.size(); i++) {
+            result = result.replace(replaceKeys.get(i), replaceValues.get(i));
+        }
+        json = result;
     }
 
     protected String getJson(String fileLocation) throws IOException {
