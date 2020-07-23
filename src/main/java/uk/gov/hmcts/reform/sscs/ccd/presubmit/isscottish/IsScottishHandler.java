@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.isScottish;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
