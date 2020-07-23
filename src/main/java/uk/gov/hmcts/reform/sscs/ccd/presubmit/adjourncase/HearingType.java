@@ -4,7 +4,9 @@ public enum HearingType {
 
     FACE_TO_FACE("faceToFace", "face to face"),
     TELEPHONE("telephone", "telephone"),
-    VIDEO("video", "video");
+    VIDEO("video", "video"),
+    PAPER("paper", "paper");
+
 
     final String key;
     final String value;

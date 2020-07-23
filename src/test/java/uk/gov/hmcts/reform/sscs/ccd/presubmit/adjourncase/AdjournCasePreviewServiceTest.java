@@ -133,6 +133,7 @@ public class AdjournCasePreviewServiceTest {
             new String[] {"faceToFace", "face to face"},
             new String[] {"telephone", "telephone"},
             new String[] {"video", "video"},
+            new String[] {"oral", "oral"},
         };
     }
 
@@ -142,6 +143,7 @@ public class AdjournCasePreviewServiceTest {
         return new Object[] {
             new String[] {"telephone", "telephone"},
             new String[] {"video", "video"},
+            new String[] {"oral", "oral"},
         };
     }
 
