@@ -50,7 +50,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
 
             sscsCaseData.setDwpState(ADJOURNMENT_NOTICE.getId());
-            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournCaseDirectionsDueDate());
+
+            calculateDueDate(sscsCaseData);
 
             if (sscsCaseData.getAdjournCasePreviewDocument() != null) {
 
@@ -60,14 +61,28 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
                 }
 
                 createAdjournmentNoticeFromPreviewDraft(preSubmitCallbackResponse);
-                clearTransientFields(preSubmitCallbackResponse);
             } else {
                 preSubmitCallbackResponse.addError("There is no Draft Adjournment Notice on the case so adjournment cannot be issued");
             }
 
+            if ("yes".equalsIgnoreCase(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties())) {
+                sscsCaseData.setState(State.NOT_LISTABLE);
+            } else {
+                sscsCaseData.setState(State.READY_TO_LIST);
+            }
+
+            clearTransientFields(preSubmitCallbackResponse);
         }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void calculateDueDate(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDate())) {
+            sscsCaseData.setDirectionDueDate(sscsCaseData.getAdjournCaseDirectionsDueDate());
+        } else if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null && !"".equalsIgnoreCase(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())) {
+            sscsCaseData.setDirectionDueDate(LocalDate.now().plusDays(Integer.valueOf(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())).toString());
+        }
     }
 
     private void createAdjournmentNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

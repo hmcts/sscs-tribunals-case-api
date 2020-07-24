@@ -9,6 +9,8 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.NOT_LISTABLE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -99,7 +101,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueAdjournmentEvent_thenCreateDecisionWithFooterAndSetStatesAndClearTransientFields() {
+    public void givenAnIssueAdjournmentEvent_thenCreatAdjournmentWithFooterAndSetStatesAndClearTransientFields() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
@@ -139,6 +141,42 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificTime());
         assertNull(sscsCaseData.getAdjournCaseReasons());
         assertNull(sscsCaseData.getAdjournCaseAnythingElse());
+    }
+
+    @Test
+    public void givenAnIssueAdjournmentEventWithDueDate_thenCreateAdjournmentWithGivenDueDate() {
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
+    }
+
+    @Test
+    public void givenAnIssueAdjournmentEventWithDueDateDaysOffset_thenCreateAdjournmentWithGivenDueDateOffset() {
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDateDaysOffset("7");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(LocalDate.now().plusDays(7).toString(), sscsCaseData.getDirectionDueDate());
+    }
+
+    @Test
+    public void givenAnIssueAdjournmentEventWithDirectionsToAllParties_thenSetStateToNotListable() {
+        callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties("Yes");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(NOT_LISTABLE, sscsCaseData.getState());
+    }
+
+    @Test
+    public void givenAnIssueAdjournmentEventWithNoDirections_thenSetStateToReadyToList() {
+        callback.getCaseDetails().getCaseData().setAdjournCaseAreDirectionsBeingMadeToParties("No");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(READY_TO_LIST, sscsCaseData.getState());
     }
 
     @Test
