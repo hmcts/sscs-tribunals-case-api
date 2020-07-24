@@ -185,6 +185,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
+        assertEquals(true, payload.isNextHearingIsAtVenue());
     }
 
     @Test
@@ -237,6 +238,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
+        assertEquals(false, payload.isNextHearingIsAtVenue());
     }
 
     @Test
@@ -289,10 +291,11 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
+        assertEquals(false, payload.isNextHearingIsAtVenue());
     }
 
     @Test
-    public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForOral() throws Exception {
+    public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForPaper() throws Exception {
         setup();
         String nextHearingDateSpecificDate = "2020-07-01";
         final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
@@ -332,7 +335,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("am", payload.getNextHearingTime());
         assertEquals("paper", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
-        assertEquals("a standard time slot", payload.getNextHearingTimeslot());
+        assertNull(payload.getNextHearingTimeslot());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
@@ -341,6 +344,8 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
+        assertEquals(false, payload.isNextHearingIsAtVenue());
+
     }
 
 }
