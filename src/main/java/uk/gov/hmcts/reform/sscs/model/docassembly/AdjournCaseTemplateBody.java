@@ -33,6 +33,9 @@ public class AdjournCaseTemplateBody {
     @JsonProperty("next_hearing_venue")
     private String nextHearingVenue;
 
+    @JsonProperty("next_hearing_at_venue")
+    private boolean nextHearingAtVenue;
+
     @JsonProperty("next_hearing_type")
     private String nextHearingType;
 
