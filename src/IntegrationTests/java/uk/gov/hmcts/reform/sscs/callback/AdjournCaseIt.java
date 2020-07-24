@@ -185,7 +185,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
-        assertEquals(true, payload.isNextHearingIsAtVenue());
+        assertEquals(true, payload.isNextHearingAtVenue());
     }
 
     @Test
@@ -238,7 +238,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
-        assertEquals(false, payload.isNextHearingIsAtVenue());
+        assertEquals(false, payload.isNextHearingAtVenue());
     }
 
     @Test
@@ -291,7 +291,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
-        assertEquals(false, payload.isNextHearingIsAtVenue());
+        assertEquals(false, payload.isNextHearingAtVenue());
     }
 
     @Test
@@ -344,7 +344,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
-        assertEquals(false, payload.isNextHearingIsAtVenue());
+        assertEquals(false, payload.isNextHearingAtVenue());
 
     }
 

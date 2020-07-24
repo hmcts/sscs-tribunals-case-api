@@ -1211,9 +1211,9 @@ public class AdjournCasePreviewServiceTest {
             assertNull(body.getNextHearingVenue());
         }
         if (AdjournCasePreviewService.IN_CHAMBERS.equals(body.getNextHearingVenue())) {
-            assertFalse(body.isNextHearingIsAtVenue());
+            assertFalse(body.isNextHearingAtVenue());
         } else {
-            assertEquals(hasVenue, body.isNextHearingIsAtVenue());
+            assertEquals(hasVenue, body.isNextHearingAtVenue());
         }
         assertNotNull(body.getNextHearingDate());
         assertNotNull(body.getNextHearingType());

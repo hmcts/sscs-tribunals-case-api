@@ -81,13 +81,13 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected());
                 }
                 adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
-                adjournCaseBuilder.nextHearingIsAtVenue(true);
+                adjournCaseBuilder.nextHearingAtVenue(true);
             } else {
-                adjournCaseBuilder.nextHearingIsAtVenue(!IN_CHAMBERS.equals(venueName));
+                adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
                 adjournCaseBuilder.nextHearingVenue(venueName);
             }
         } else {
-            adjournCaseBuilder.nextHearingIsAtVenue(false);
+            adjournCaseBuilder.nextHearingAtVenue(false);
             if (caseData.getAdjournCaseNextHearingVenueSelected() != null) {
                 throw new IllegalStateException("adjournCaseNextHearingVenueSelected field should not be set");
             }
