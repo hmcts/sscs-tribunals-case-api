@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.notlistable;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -33,7 +32,7 @@ public class NotListableAboutToSubmitHandlerTest extends BaseHandler {
             .statusCode(HttpStatus.SC_OK)
             .rootPath("data")
             .assertThat().body("directionDueDate", equalTo("2020-11-10"))
-            .assertThat().body("notListableDueDate", equalTo("2020-11-10"))
+            .assertThat().body("notListableDueDate", nullValue())
             .assertThat().body("notListableProvideReasons", equalTo("My reasons"));
     }
 }

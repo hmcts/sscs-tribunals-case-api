@@ -33,9 +33,9 @@ public class UpdateNotListableAboutToSubmitHandlerTest extends BaseHandler {
                 .statusCode(HttpStatus.SC_OK)
                 .rootPath("data")
                 .assertThat().body("directionDueDate", nullValue())
-                .assertThat().body("updateNotListableDirectionsFulfilled", equalTo("No"))
-                .assertThat().body("updateNotListableInterlocReview", equalTo("Yes"))
-                .assertThat().body("updateNotListableWhoReviewsCase", equalTo("reviewByJudge"))
+                .assertThat().body("updateNotListableDirectionsFulfilled", nullValue())
+                .assertThat().body("updateNotListableInterlocReview", nullValue())
+                .assertThat().body("updateNotListableWhoReviewsCase", nullValue())
                 .assertThat().body("interlocReferralDate", equalTo(LocalDate.now().toString()))
                 .assertThat().body("interlocReviewState", equalTo("reviewByJudge"));
     }
