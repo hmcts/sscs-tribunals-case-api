@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs;
 
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import javax.validation.ValidatorFactory;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.reform.sscs.ccd.config.CcdRequestDetails;
 import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
@@ -23,7 +25,8 @@ import uk.gov.hmcts.reform.sscs.docmosis.service.DocmosisPdfGenerationService;
                 "uk.gov.hmcts.reform.sscs.idam",
                 "uk.gov.hmcts.reform.sscs.document",
                 "uk.gov.hmcts.reform.docassembly",
-                "uk.gov.hmcts.reform.sscs.thirdparty"
+                "uk.gov.hmcts.reform.sscs.thirdparty",
+                "uk.gov.hmcts.reform.idam.client"
         })
 @ComponentScan(basePackages = {"uk.gov.hmcts.reform"})
 @EnableScheduling
@@ -58,6 +61,11 @@ public class TribunalsCaseApiApplication {
         properties.put("mail.smtp.ssl.trust","*");
         javaMailSender.setJavaMailProperties(properties);
         return javaMailSender;
+    }
+
+    @Bean
+    ValidatorFactory validator() {
+        return new LocalValidatorFactoryBean();
     }
 
     @Bean

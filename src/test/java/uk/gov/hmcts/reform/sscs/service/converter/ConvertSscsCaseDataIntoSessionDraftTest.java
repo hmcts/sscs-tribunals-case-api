@@ -1676,4 +1676,53 @@ public class ConvertSscsCaseDataIntoSessionDraftTest {
         SessionDraft actualSessionDraft = convertSscsCaseDataIntoSessionDraft.convert(caseData);
         assertEquals("12345", actualSessionDraft.getPcqId().getPcqId());
     }
+
+    @Test
+    public void convertPopulatedCaseDataWhenLanguagePreferenceWelshIsGiven() {
+        caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .hearingOptions(
+                                HearingOptions.builder()
+                                        .wantsToAttend("Yes")
+                                        .scheduleHearing("Yes")
+                                        .wantsSupport("Yes")
+                                        .languageInterpreter(null)
+                                        .signLanguageType(null)
+                                        .other("Help with stairs")
+                                        .arrangements(Collections.singletonList(""))
+                                        .build()
+                        )
+                        .build()
+                )
+                .evidencePresent("no")
+                .languagePreferenceWelsh("yes")
+                .build();
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertEquals("yes", actual.getLanguagePreferenceWelsh().getLanguagePreferenceWelsh());
+    }
+
+    @Test
+    public void convertPopulatedCaseDataWhenLanguagePreferenceWelshIsNotGiven() {
+        caseData = SscsCaseData.builder()
+                .appeal(Appeal.builder()
+                        .hearingOptions(
+                                HearingOptions.builder()
+                                        .wantsToAttend("Yes")
+                                        .scheduleHearing("Yes")
+                                        .wantsSupport("Yes")
+                                        .languageInterpreter(null)
+                                        .signLanguageType(null)
+                                        .other("Help with stairs")
+                                        .arrangements(Collections.singletonList(""))
+                                        .build()
+                        )
+                        .build()
+                )
+                .evidencePresent("no")
+                .languagePreferenceWelsh(null)
+                .build();
+        SessionDraft actual = convertSscsCaseDataIntoSessionDraft.convert(caseData);
+        assertNull(actual.getLanguagePreferenceWelsh());
+    }
+
 }

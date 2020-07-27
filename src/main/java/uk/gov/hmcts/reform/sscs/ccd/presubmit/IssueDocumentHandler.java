@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 
@@ -18,8 +20,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
 @Slf4j
 public class IssueDocumentHandler {
@@ -46,9 +48,10 @@ public class IssueDocumentHandler {
         }
     }
 
-    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
-        DirectionOrDecisionIssuedTemplateBody formPayload = DirectionOrDecisionIssuedTemplateBody.builder()
+    protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
+        NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
             .appellantFullName(buildFullName(caseData))
+            .appointeeFullName(buildAppointeeName(caseData).orElse(null))
             .caseId(caseData.getCcdCaseId())
             .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
             .noticeBody(caseData.getBodyContent())
@@ -60,7 +63,7 @@ public class IssueDocumentHandler {
             .build();
 
         if (isScottish) {
-            formPayload = formPayload.toBuilder().image(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE).build();
+            formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
         }
         return formPayload;
     }
@@ -68,12 +71,16 @@ public class IssueDocumentHandler {
     protected PreSubmitCallbackResponse<SscsCaseData> issueDocument(Callback<SscsCaseData> callback, DocumentType documentType, String templateId, GenerateFile generateFile, String userAuthorisation) {
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        if ((ADJOURNMENT_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) && caseData.getAdjournCaseGenerateNotice() == null) {
+            throw new IllegalStateException("Generate notice has not been set");
+        }
+
         String documentUrl = Optional.ofNullable(getDocumentFromCaseData(caseData)).map(DocumentLink::getDocumentUrl).orElse(null);
 
         LocalDate dateAdded = Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now());
 
         String documentTypeLabel = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-
 
         String embeddedDocumentTypeLabel = (FINAL_DECISION_NOTICE.equals(documentType) ? "Decision Notice" : documentTypeLabel);
 
@@ -92,7 +99,7 @@ public class IssueDocumentHandler {
 
         final String generatedFileUrl = generateFile.assemble(params);
 
-        documentTypeLabel = documentTypeLabel + (DRAFT_DECISION_NOTICE.equals(documentType) ? " generated" : " issued");
+        documentTypeLabel = documentTypeLabel + ((DRAFT_DECISION_NOTICE.equals(documentType) || DRAFT_ADJOURNMENT_NOTICE.equals(documentType)) ? " generated" : " issued");
 
         final String filename = String.format("%s on %s.pdf", documentTypeLabel, dateAdded.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 
@@ -133,5 +140,13 @@ public class IssueDocumentHandler {
         fullNameText.append(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName().getFullNameNoTitle(), ' ', '.'));
 
         return fullNameText.toString();
+    }
+
+    protected Optional<String> buildAppointeeName(SscsCaseData caseData) {
+        if (caseData.getAppeal().getAppellant().getIsAppointee() != null && caseData.getAppeal().getAppellant().getIsAppointee().equalsIgnoreCase("Yes") && caseData.getAppeal().getAppellant().getAppointee().getName() != null) {
+            return Optional.of(WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getAppointee().getName().getFullNameNoTitle(), ' ', '.'));
+        } else {
+            return Optional.empty();
+        }
     }
 }

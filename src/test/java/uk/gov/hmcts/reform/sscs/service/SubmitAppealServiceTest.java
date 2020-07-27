@@ -38,6 +38,7 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
 import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
+import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -420,7 +421,7 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
     }
 
-    @Test
+    @Test(expected = DuplicateCaseException.class)
     public void givenCaseIsADuplicate_shouldNotResendEmails() {
         SscsCaseDetails duplicateCase = SscsCaseDetails.builder().build();
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
@@ -431,7 +432,7 @@ public class SubmitAppealServiceTest {
         then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
     }
 
-    @Test
+    @Test(expected = DuplicateCaseException.class)
     public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
             .willReturn(SscsCaseDetails.builder().build());

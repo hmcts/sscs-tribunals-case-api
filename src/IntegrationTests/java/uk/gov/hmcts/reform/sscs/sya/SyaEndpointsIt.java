@@ -42,6 +42,7 @@ import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -127,8 +128,8 @@ public class SyaEndpointsIt {
 
         given(authTokenGenerator.generate()).willReturn("authToken");
 
-        given(idamClient.getUserDetails(anyString()))
-                .willReturn(new uk.gov.hmcts.reform.idam.client.models.UserDetails("userId", "dummy@email.com", "test", "test",
+        given(idamClient.getUserInfo(anyString()))
+                .willReturn(new UserInfo("16","userId", "dummy@email.com", "test", "test",
                 Arrays.asList("caseworker", "citizen")));
 
         UploadResponse uploadResponse = createUploadResponse();
@@ -191,9 +192,8 @@ public class SyaEndpointsIt {
         given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
 
         mockMvc.perform(post("/appeals")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(getCase("json/sya.json")))
-            .andExpect(status().isCreated());
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().is4xxClientError());
 
         verify(pdfServiceClient, never()).generateFromHtml(eq(getTemplate()), anyMap());
         verify(ccdClient, never()).submitForCaseworker(any(), any());
