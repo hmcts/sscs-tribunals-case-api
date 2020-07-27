@@ -215,11 +215,6 @@
         }
       }
     ],
-    "generatedNino": "JT 12 34 56 D",
-    "generatedSurname": "Test",
-    "generatedEmail": "mail@example.com",
-    "generatedMobile": "01234567890",
-    "generatedDOB": "1900-01-01",
     "evidencePresent": "No",
     "dateSentToDwp": "2019-09-06",
     "hmctsDwpState": "sentToDwp",

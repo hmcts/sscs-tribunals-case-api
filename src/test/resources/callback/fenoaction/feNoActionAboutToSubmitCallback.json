@@ -10,7 +10,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JT 12 34 56 D",
       "hmctsDwpState": "sentToDwp",
       "subscriptions": {
         "appellantSubscription": {
@@ -54,7 +53,6 @@
         "documents": []
       },
       "caseReference": "SC022/14/12423",
-      "generatedSurname": "Test",
       "appeal": {
         "rep": {
           "name": {
@@ -138,7 +136,6 @@
           "wantsToAttend": "No"
         }
       },
-      "generatedEmail": "mail@example.com",
       "sscsDocument": [{
         "id": "6ff3e570-ae53-4993-8cf5-a58f6297ec73",
         "value": {
@@ -222,7 +219,6 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "events": [{
         "id": "14fdd2fc-47bb-4d66-a526-1132e8ca4850",
         "value": {
@@ -251,8 +247,7 @@
           "type": "appealReceived",
           "description": "Appeal received"
         }
-      }],
-      "generatedMobile": "01234567890"
+      }]
     },
     "data_classification": {
       "evidencePresent": "PUBLIC",
@@ -903,7 +898,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "evidencePresent": "No",
-      "generatedNino": "JT 12 34 56 D",
       "hmctsDwpState": "sentToDwp",
       "subscriptions": {
         "appellantSubscription": {
@@ -947,7 +941,6 @@
         "documents": []
       },
       "caseReference": "SC022/14/12423",
-      "generatedSurname": "Test",
       "appeal": {
         "rep": {
           "name": {
@@ -1031,7 +1024,6 @@
           "wantsToAttend": "No"
         }
       },
-      "generatedEmail": "mail@example.com",
       "sscsDocument": [{
         "id": "6ff3e570-ae53-4993-8cf5-a58f6297ec73",
         "value": {
@@ -1102,7 +1094,6 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "events": [{
         "id": "14fdd2fc-47bb-4d66-a526-1132e8ca4850",
         "value": {
@@ -1131,8 +1122,7 @@
           "type": "appealReceived",
           "description": "Appeal received"
         }
-      }],
-      "generatedMobile": "01234567890"
+      }]
     },
     "data_classification": {
       "evidencePresent": "PUBLIC",

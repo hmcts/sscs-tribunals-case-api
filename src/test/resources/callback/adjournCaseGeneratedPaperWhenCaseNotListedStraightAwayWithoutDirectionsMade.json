@@ -24,40 +24,54 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "generateNotice" : "Yes",
-      "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
-      "signedBy": "Maple Magoo",
-      "signedRole": "Proxy Judge",
-      "decisionType": "strikeOut",
+      "adjournCaseGenerateNotice" : "Yes",
+      "adjournCaseTypeOfHearing" : "paper",
+      "adjournCaseCanCaseBeListedRightAway" : "No",
+      "adjournCaseAreDirectionsBeingMadeToParties" : "No",
+      "adjournCaseTypeOfNextHearing" : "paper",
+      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateOrPeriod" : "provideDate",
+      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
+      "adjournCaseNextHearingSpecificTime" : "am",
+      "adjournCaseAnythingElse" : "something else",
+      "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
-      "writeFinalDecisionPreviewDocument" : {
-        "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
-        "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
-        "document_filename": "decisionIssued.pdf"
-      },
       "hearings": [
+        {
+          "value": {
+            "venue": {
+              "name": "Chester Magistrate's Court",
+              "address": {
+                "line1": "Chester Magistrate's Court",
+                "line2": "Grosvenor Street",
+                "town": "Chester",
+                "postcode": "CH1 2XA"
+              },
+              "googleMapLink": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632"
+            },
+            "hearingDate": "2017-07-17",
+            "time": "23:00"
+          }
+        },
         {
           "value": {
             "venue": {
               "name": "Prudential House",
               "address": {
-                "line1": "2-10 Topping Street",
+                "line1": "36 Dale Street",
                 "line2": "",
-                "town": "Blackpool",
-                "county": "",
-                "postcode": "FY1 3AB"
+                "town": "Liverpool",
+                "postcode": "L2 5UZ"
               },
-              "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
+              "googleMapLink": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509"
             },
-            "hearingDate": "2018-06-01",
-            "time": "11:40:00",
-            "adjourned": "No",
-            "eventDate": null,
-            "hearingId": "3698764"
-          },
-          "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            "hearingDate": "2017-07-12",
+            "time": "23:00",
+            "eventDate": "2017-06-24T18:11:34.013"
+          }
         }
       ],
       "subscriptions": {
@@ -78,45 +92,34 @@
           "tya": ""
         }
       },
-      "sscsDocument" : [ {
-        "value" : {
-          "documentType" : "draftDecisionNotice",
-          "documentFileName" : "11111.pdf",
-          "documentDateAdded" : "2020-10-10",
-          "documentLink" : {
-            "document_url" : "http://www.bbc.com",
-            "document_binary_url" : "http://www.bbc.com/binary",
-            "document_filename" : "myfile1.jpg"
+      "sscsDocument": [
+        {
+          "value": {
+            "documentType": "appellantEvidence",
+            "documentFileName": "11111.pdf",
+            "documentDateAdded": "2018-10-10",
+            "evidenceIssued": "Yes",
+            "documentLink": {
+              "document_url": "http://www.bbc.com",
+              "document_binary_url": "http://www.bbc.com/binary",
+              "document_filename": "myfile1.jpg"
+            }
+          }
+        },
+        {
+          "value": {
+            "documentType": "representativeEvidence",
+            "documentFileName": "22222.pdf",
+            "documentDateAdded": "2018-10-11",
+            "evidenceIssued": "Yes",
+            "documentLink": {
+              "document_url": "http://www.itv.com",
+              "document_binary_url": "http://www.itv.com/binary",
+              "document_filename": "myfile2.jpg"
+            }
           }
         }
-      },
-      {
-        "value" : {
-          "documentType" : "representativeEvidence",
-          "documentFileName" : "22222.pdf",
-          "documentDateAdded" : "2018-10-11",
-          "evidenceIssued": "Yes",
-          "documentLink" : {
-            "document_url" : "http://www.itv.com",
-            "document_binary_url" : "http://www.itv.com/binary",
-            "document_filename" : "myfile2.jpg"
-          }
-        }
-      },
-      {
-        "value" : {
-          "documentType" : "decisionIssued",
-          "documentFileName" : "oldDecisionIssued.pdf",
-          "documentDateAdded" : "2018-10-12",
-          "evidenceIssued": "Yes",
-          "bundleAddition": "A",
-          "documentLink" : {
-            "document_url" : "http://www.itv3.com",
-            "document_binary_url" : "http://www.itv3.com/binary",
-            "document_filename" : "myfile3.jpg"
-          }
-        }
-      }],
+      ],
       "reissueFurtherEvidenceDocument": {},
       "resendToAppellant": "NO",
       "resendToRepresentative": "NO",
@@ -246,38 +249,72 @@
         ]
       },
       "generatedNino": "PUBLIC",
-      "hearings": {
-        "classification": "PUBLIC",
-        "value": [
-          {
-            "value": {
-              "venue": {
-                "classification": "PUBLIC",
-                "value": {
-                  "name": "PUBLIC",
-                  "address": {
-                    "classification": "PUBLIC",
-                    "value": {
-                      "line1": "PUBLIC",
-                      "line2": "PUBLIC",
-                      "town": "PUBLIC",
-                      "county": "PUBLIC",
-                      "postcode": "PUBLIC"
-                    }
-                  },
-                  "googleMapLink": "PUBLIC"
-                }
+      "hearings": [
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
               },
-              "hearingDate": "PUBLIC",
-              "time": "PUBLIC",
-              "adjourned": "PUBLIC",
-              "eventDate": "PUBLIC",
-              "hearingId": "PUBLIC"
-            },
-            "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
-          }
-        ]
-      },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        },
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
+              },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        }
+      ],
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -454,38 +491,72 @@
         ]
       },
       "generatedNino": "PUBLIC",
-      "hearings": {
-        "classification": "PUBLIC",
-        "value": [
-          {
-            "value": {
-              "venue": {
-                "classification": "PUBLIC",
-                "value": {
-                  "name": "PUBLIC",
-                  "address": {
-                    "classification": "PUBLIC",
-                    "value": {
-                      "line1": "PUBLIC",
-                      "line2": "PUBLIC",
-                      "town": "PUBLIC",
-                      "county": "PUBLIC",
-                      "postcode": "PUBLIC"
-                    }
-                  },
-                  "googleMapLink": "PUBLIC"
-                }
+      "hearings": [
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
               },
-              "hearingDate": "PUBLIC",
-              "time": "PUBLIC",
-              "adjourned": "PUBLIC",
-              "eventDate": "PUBLIC",
-              "hearingId": "PUBLIC"
-            },
-            "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
-          }
-        ]
-      },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        },
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
+              },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        }
+      ],
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -676,16 +747,16 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "generateNotice" : "Yes",
-      "bodyContent": "Hello, you have been instructed to provide further information. Please do so at your earliest convenience.",
-      "signedBy": "Maple Magoo",
-      "signedRole": "Proxy Judge",
-      "decisionType": "strikeOut",
-      "previewDocument" : {
-        "document_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c",
-        "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
-        "document_filename": "decisionIssued.pdf"
-      },
+      "adjournCaseGenerateNotice" : "Yes",
+      "adjournCaseTypeOfHearing" : "paper",
+      "adjournCaseCanCaseBeListedRightAway" : "No",
+      "adjournCaseAreDirectionsBeingMadeToParties" : "No",
+      "adjournCaseTypeOfNextHearing" : "paper",
+      "adjournCasePanelMembersExcluded" : "yes",
+      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateOrPeriod" : "provideDate",
+      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
+      "adjournCaseNextHearingSpecificTime" : "am",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -693,23 +764,35 @@
         {
           "value": {
             "venue": {
+              "name": "Chester Magistrate's Court",
+              "address": {
+                "line1": "Chester Magistrate's Court",
+                "line2": "Grosvenor Street",
+                "town": "Chester",
+                "postcode": "CH1 2XA"
+              },
+              "googleMapLink": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632"
+            },
+            "hearingDate": "2017-07-17",
+            "time": "23:00"
+          }
+        },
+        {
+          "value": {
+            "venue": {
               "name": "Prudential House",
               "address": {
-                "line1": "2-10 Topping Street",
+                "line1": "36 Dale Street",
                 "line2": "",
-                "town": "Blackpool",
-                "county": "",
-                "postcode": "FY1 3AB"
+                "town": "Liverpool",
+                "postcode": "L2 5UZ"
               },
-              "googleMapLink": "https://www.google.com/maps/place/2-10+Topping+Street+Blackpool+FY1+3AB/@53.820175,-3.050717"
+              "googleMapLink": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509"
             },
-            "hearingDate": "2018-06-01",
-            "time": "11:40:00",
-            "adjourned": "No",
-            "eventDate": null,
-            "hearingId": "3698764"
-          },
-          "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            "hearingDate": "2017-07-12",
+            "time": "23:00",
+            "eventDate": "2017-06-24T18:11:34.013"
+          }
         }
       ],
       "subscriptions": {
@@ -730,46 +813,34 @@
           "tya": ""
         }
       },
-      "sscsDocument" : [ {
-        "value" : {
-          "documentType" : "appellantEvidence",
-          "documentFileName" : "11111.pdf",
-          "documentDateAdded" : "2018-10-10",
-          "evidenceIssued": "Yes",
-          "documentLink" : {
-            "document_url" : "http://www.bbc.com",
-            "document_binary_url" : "http://www.bbc.com/binary",
-            "document_filename" : "myfile1.jpg"
-          }
-        }
-      },
+      "sscsDocument": [
         {
-          "value" : {
-            "documentType" : "representativeEvidence",
-            "documentFileName" : "22222.pdf",
-            "documentDateAdded" : "2018-10-11",
+          "value": {
+            "documentType": "appellantEvidence",
+            "documentFileName": "11111.pdf",
+            "documentDateAdded": "2018-10-10",
             "evidenceIssued": "Yes",
-            "documentLink" : {
-              "document_url" : "http://www.itv.com",
-              "document_binary_url" : "http://www.itv.com/binary",
-              "document_filename" : "myfile2.jpg"
+            "documentLink": {
+              "document_url": "http://www.bbc.com",
+              "document_binary_url": "http://www.bbc.com/binary",
+              "document_filename": "myfile1.jpg"
             }
           }
         },
         {
-          "value" : {
-            "documentType" : "decisionIssued",
-            "documentFileName" : "oldDecisionIssued.pdf",
-            "documentDateAdded" : "2018-10-12",
+          "value": {
+            "documentType": "representativeEvidence",
+            "documentFileName": "22222.pdf",
+            "documentDateAdded": "2018-10-11",
             "evidenceIssued": "Yes",
-            "bundleAddition": "A",
-            "documentLink" : {
-              "document_url" : "http://www.itv3.com",
-              "document_binary_url" : "http://www.itv3.com/binary",
-              "document_filename" : "myfile3.jpg"
+            "documentLink": {
+              "document_url": "http://www.itv.com",
+              "document_binary_url": "http://www.itv.com/binary",
+              "document_filename": "myfile2.jpg"
             }
           }
-        }],
+        }
+      ],
       "reissueFurtherEvidenceDocument": {},
       "resendToAppellant": "NO",
       "resendToRepresentative": "NO",
@@ -899,38 +970,72 @@
         ]
       },
       "generatedNino": "PUBLIC",
-      "hearings": {
-        "classification": "PUBLIC",
-        "value": [
-          {
-            "value": {
-              "venue": {
-                "classification": "PUBLIC",
-                "value": {
-                  "name": "PUBLIC",
-                  "address": {
-                    "classification": "PUBLIC",
-                    "value": {
-                      "line1": "PUBLIC",
-                      "line2": "PUBLIC",
-                      "town": "PUBLIC",
-                      "county": "PUBLIC",
-                      "postcode": "PUBLIC"
-                    }
-                  },
-                  "googleMapLink": "PUBLIC"
-                }
+      "hearings": [
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
               },
-              "hearingDate": "PUBLIC",
-              "time": "PUBLIC",
-              "adjourned": "PUBLIC",
-              "eventDate": "PUBLIC",
-              "hearingId": "PUBLIC"
-            },
-            "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
-          }
-        ]
-      },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        },
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
+              },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        }
+      ],
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -1107,38 +1212,72 @@
         ]
       },
       "generatedNino": "PUBLIC",
-      "hearings": {
-        "classification": "PUBLIC",
-        "value": [
-          {
-            "value": {
-              "venue": {
-                "classification": "PUBLIC",
-                "value": {
-                  "name": "PUBLIC",
-                  "address": {
-                    "classification": "PUBLIC",
-                    "value": {
-                      "line1": "PUBLIC",
-                      "line2": "PUBLIC",
-                      "town": "PUBLIC",
-                      "county": "PUBLIC",
-                      "postcode": "PUBLIC"
-                    }
-                  },
-                  "googleMapLink": "PUBLIC"
-                }
+      "hearings": [
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
               },
-              "hearingDate": "PUBLIC",
-              "time": "PUBLIC",
-              "adjourned": "PUBLIC",
-              "eventDate": "PUBLIC",
-              "hearingId": "PUBLIC"
-            },
-            "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
-          }
-        ]
-      },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        },
+        {
+          "classification": "PUBLIC",
+          "value": [
+            {
+              "value": {
+                "venue": {
+                  "classification": "PUBLIC",
+                  "value": {
+                    "name": "PUBLIC",
+                    "address": {
+                      "classification": "PUBLIC",
+                      "value": {
+                        "line1": "PUBLIC",
+                        "line2": "PUBLIC",
+                        "town": "PUBLIC",
+                        "county": "PUBLIC",
+                        "postcode": "PUBLIC"
+                      }
+                    },
+                    "googleMapLink": "PUBLIC"
+                  }
+                },
+                "hearingDate": "PUBLIC",
+                "time": "PUBLIC",
+                "adjourned": "PUBLIC",
+                "eventDate": "PUBLIC",
+                "hearingId": "PUBLIC"
+              },
+              "id": "491adfdc-a8d3-430d-bd47-5ae3eac2149f"
+            }
+          ]
+        }
+      ],
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -1304,5 +1443,5 @@
       }
     }
   },
-  "event_id": "issueFinalDecision"
+  "event_id": "adjournCase"
 }

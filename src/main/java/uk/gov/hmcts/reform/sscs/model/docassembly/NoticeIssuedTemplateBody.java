@@ -14,7 +14,7 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 @Builder(toBuilder = true)
 @Value
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
+public class NoticeIssuedTemplateBody implements FormPayload {
     @JsonIgnore
     public static final String SCOTTISH_IMAGE = "[userImage:schmcts2.png]";
     @JsonIgnore
@@ -23,6 +23,8 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     public static final String WELSH_IMAGE = "[userImage:welshhmcts.png]";
     @JsonProperty("appellant_full_name")
     private String appellantFullName;
+    @JsonProperty("appointee_full_name")
+    private String appointeeFullName;
     private String nino;
     @JsonProperty("case_id")
     private String caseId;
@@ -54,4 +56,6 @@ public class DirectionOrDecisionIssuedTemplateBody implements FormPayload {
     private String welshDateAdded;
     @JsonProperty("welsh_generated_date")
     private String welshGeneratedDate;
+    @JsonProperty("adjourn_case")
+    private AdjournCaseTemplateBody adjournCaseTemplateBody;
 }

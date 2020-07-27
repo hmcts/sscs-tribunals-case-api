@@ -48,7 +48,13 @@ public class SyaCaseWrapper {
     @JsonProperty("signAndSubmit")
     private SyaSignAndSubmit signAndSubmit;
 
+    @JsonProperty("pcqId")
+    private String pcqId;
+
     private String evidenceProvide;
+
+    @JsonProperty("languagePreferenceWelsh")
+    private Boolean languagePreferenceWelsh;
 
     public SyaContactDetails getContactDetails() {
         if (null == appellant && null == appointee) {

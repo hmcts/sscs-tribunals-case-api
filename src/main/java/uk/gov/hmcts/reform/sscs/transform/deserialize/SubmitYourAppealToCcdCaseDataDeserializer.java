@@ -37,8 +37,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper) {
         Appeal appeal = getAppeal(syaCaseWrapper);
 
-        boolean hasContactDetails = syaCaseWrapper.getContactDetails() != null;
-
         boolean isDraft = isDraft(syaCaseWrapper);
 
         String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode());
@@ -48,15 +46,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
-                .generatedSurname(isDraft ? null : syaCaseWrapper.getAppellant().getLastName())
-                .generatedEmail(isDraft || !hasContactDetails ? null : syaCaseWrapper.getContactDetails().getEmailAddress())
-                .generatedMobile(isDraft || !hasContactDetails
-                        ? null
-                        : getPhoneNumberWithOutSpaces(syaCaseWrapper.getContactDetails().getPhoneNumber())
-                )
-                .generatedNino(isDraft ? null : syaCaseWrapper.getAppellant().getNino())
-                .generatedDob(isDraft ? null : syaCaseWrapper
-                        .getAppellant().getDob().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .appeal(appeal)
                 .subscriptions(getSubscriptions(syaCaseWrapper))
                 .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
@@ -66,6 +55,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .caseCode(caseCode)
                 .dwpRegionalCentre(getDwpRegionalCenterGivenDwpIssuingOffice(appeal.getBenefitType().getCode(),
                         appeal.getMrnDetails().getDwpIssuingOffice()))
+                .pcqId(syaCaseWrapper.getPcqId())
+                .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
                 .build();
     }
 
@@ -82,6 +73,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             return false;
         }
         return syaCaseWrapper.getCaseType().equals("draft");
+    }
+
+    private static String booleanToYesNo(Boolean flag) {
+        if (flag == null) {
+            return null;
+        }
+        return flag ? "Yes" : "No";
     }
 
     private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
@@ -344,8 +342,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         List<AppealReason> appealReasons = new ArrayList<>();
         for (Reason reason : syaReasonsForAppealing.getReasons()) {
             AppealReasonDetails appealReasonDetails = AppealReasonDetails.builder()
-                    .reason(reason.getReasonForAppealing())
-                    .description(reason.getWhatYouDisagreeWith())
+                    .reason(reason.getWhatYouDisagreeWith())
+                    .description(reason.getReasonForAppealing())
                     .build();
             AppealReason appealReason = AppealReason.builder()
                     .value(appealReasonDetails)

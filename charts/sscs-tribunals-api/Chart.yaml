@@ -1,11 +1,11 @@
 apiVersion: v2
 name: sscs-tribunals-api
 home: https://github.com/hmcts/sscs-tribunals-case-api
-version: 0.0.16
+version: 0.0.18
 description: SSCS Tribunals Case API
 maintainers:
   - name: HMCTS SSCS Team
 dependencies:
   - name: java
-    version: 3.0.2
+    version: 3.1.0
     repository: https://hmctspublic.azurecr.io/helm/v1/repo/

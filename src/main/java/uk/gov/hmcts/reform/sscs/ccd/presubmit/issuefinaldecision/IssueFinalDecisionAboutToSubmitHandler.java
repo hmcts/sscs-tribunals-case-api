@@ -16,8 +16,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Component
@@ -25,10 +27,13 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
+    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
     @Autowired
-    public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService) {
+    public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
+        DecisionNoticeOutcomeService decisionNoticeOutcomeService) {
         this.footerService = footerService;
+        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
 
     @Override
@@ -49,23 +54,42 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+        calculateOutcomeCode(sscsCaseData, preSubmitCallbackResponse);
 
-        if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
+        if (preSubmitCallbackResponse.getErrors().isEmpty()) {
 
-            if (!isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {
-                preSubmitCallbackResponse.addError("You need to upload PDF documents only");
-                return preSubmitCallbackResponse;
+            sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
+
+            if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
+
+                if (!isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {
+                    preSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                    return preSubmitCallbackResponse;
+                }
+
+                createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
+            } else {
+                preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
             }
 
-            createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
-        } else {
-            preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
+            clearTransientFields(preSubmitCallbackResponse);
+
         }
 
-        clearTransientFields(preSubmitCallbackResponse);
-
         return preSubmitCallbackResponse;
+    }
+
+    private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(sscsCaseData);
+
+        if (outcome != null) {
+            sscsCaseData.setOutcome(outcome.getId());
+        } else {
+            log.error("Outcome cannot be empty when generating final decision. Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
+            preSubmitCallbackResponse.addError("Outcome cannot be empty. Please check case data. If problem continues please contact support");
+        }
+
     }
 
     private void createFinalDecisionNoticeFromPreviewDraft(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -80,15 +104,11 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             .documentBinaryUrl(docLink.getDocumentBinaryUrl())
             .build();
 
-        LocalDate dateAdded = null;
-        if (sscsCaseData.getWriteFinalDecisionDocumentDateAdded() != null) {
-            dateAdded = LocalDate.parse(sscsCaseData.getWriteFinalDecisionDocumentDateAdded(), DateTimeFormatter.ISO_DATE);
-        }
 
         String now = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"));
 
-        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.DECISION_NOTICE, now,
-                dateAdded, sscsCaseData.getWriteFinalDecisionDocumentFileName());
+        footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.FINAL_DECISION_NOTICE, now,
+                null, null);
     }
 
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -125,8 +145,6 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setWriteFinalDecisionPageSectionReference(null);
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
         sscsCaseData.setWriteFinalDecisionGeneratedDate(null);
-        sscsCaseData.setWriteFinalDecisionDocumentDateAdded(null);
-        sscsCaseData.setWriteFinalDecisionDocumentFileName(null);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(null);
 

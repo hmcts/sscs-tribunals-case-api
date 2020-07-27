@@ -36,7 +36,6 @@
       },
       "dwpTimeExtension": [
       ],
-      "generatedNino": "JT 12 34 56 D",
       "hearings": [
         {
           "value": {
@@ -127,7 +126,6 @@
         ]
       },
       "caseReference": "SC022/14/12423",
-      "generatedSurname": "Test",
       "regionalProcessingCenter": {
         "faxNumber": "0126 434 7983",
         "address4": "PO Box 14620",
@@ -201,7 +199,6 @@
         "hearingType": "paper"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "evidencePresent": "No",
       "events": [
         {
@@ -689,7 +686,6 @@
       },
       "dwpTimeExtension": [
       ],
-      "generatedNino": "JT 12 34 56 D",
       "hearings": [
         {
           "value": {
@@ -780,7 +776,6 @@
         ]
       },
       "caseReference": "SC022/14/12423",
-      "generatedSurname": "Test",
       "regionalProcessingCenter": {
         "faxNumber": "0126 434 7983",
         "address4": "PO Box 14620",
@@ -854,7 +849,6 @@
         "hearingType": "paper"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "evidencePresent": "No",
       "events": [
         {

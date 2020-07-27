@@ -163,8 +163,6 @@
         }
       },
       "writeFinalDecisionAllowedOrRefused": "allowed",
-      "writeFinalDecisionDocumentDateAdded": "2019-10-10",
-      "writeFinalDecisionDocumentFileName": "test.pdf",
       "writeFinalDecisionGenerateNotice": "No",
       "writeFinalDecisionIsDescriptorFlow": "Yes",
       "writeFinalDecisionPreviewDocument": {

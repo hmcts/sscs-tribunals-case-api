@@ -24,16 +24,18 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.exceptions.DocumentServiceResponseException;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("unchecked")
-public class BundleRequestExecutorTest {
+public class ServiceRequestExecutorTest {
 
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String ENDPOINT = "http://endpoint";
     private static final String SERVICE_TOKEN = randomAlphabetic(32);
     private static final String ACCESS_TOKEN = randomAlphabetic(32);
+    private static final String USER_ID = "123";
 
     @Mock private AuthTokenGenerator serviceAuthTokenGenerator;
     @Mock private RestTemplate restTemplate;
@@ -45,11 +47,11 @@ public class BundleRequestExecutorTest {
     @Mock private ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> responseEntity;
 
 
-    private BundleRequestExecutor bundleRequestExecutor;
+    private ServiceRequestExecutor serviceRequestExecutor;
 
     @Before
     public void setUp() {
-        bundleRequestExecutor = new BundleRequestExecutor(
+        serviceRequestExecutor = new ServiceRequestExecutor(
                 restTemplate,
                 serviceAuthTokenGenerator,
                 idamService
@@ -57,6 +59,7 @@ public class BundleRequestExecutorTest {
 
         when(serviceAuthTokenGenerator.generate()).thenReturn(SERVICE_TOKEN);
         when(idamService.getIdamOauth2Token()).thenReturn(ACCESS_TOKEN);
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().userId(USER_ID).build());
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getId()).thenReturn(1234L);
     }
@@ -75,7 +78,7 @@ public class BundleRequestExecutorTest {
         when(responseEntity.getBody()).thenReturn(callbackResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> response =
-                bundleRequestExecutor.post(
+                serviceRequestExecutor.post(
                         callback,
                         ENDPOINT
 
@@ -97,6 +100,7 @@ public class BundleRequestExecutorTest {
 
         final String actualContentTypeHeader = actualRequestEntity.getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
         final String actualAcceptHeader = actualRequestEntity.getHeaders().getFirst(HttpHeaders.ACCEPT);
+        final String actualUserIdHeader = actualRequestEntity.getHeaders().getFirst("user-id");
         final String actualServiceAuthorizationHeader = actualRequestEntity.getHeaders().getFirst(SERVICE_AUTHORIZATION);
         final String actualAuthorizationHeader = actualRequestEntity.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         final Callback<SscsCaseData> actualPostBody = (Callback<SscsCaseData>) actualRequestEntity.getBody();
@@ -105,6 +109,7 @@ public class BundleRequestExecutorTest {
         assertThat(actualAcceptHeader).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
         assertThat(actualServiceAuthorizationHeader).isEqualTo(SERVICE_TOKEN);
         assertThat(actualAuthorizationHeader).isEqualTo(ACCESS_TOKEN);
+        assertThat(actualUserIdHeader).isEqualTo(USER_ID);
         assertThat(actualPostBody).isEqualTo(callback);
 
     }
@@ -112,11 +117,11 @@ public class BundleRequestExecutorTest {
     @Test
     public void should_not_allow_null_arguments() {
 
-        assertThatThrownBy(() -> bundleRequestExecutor.post(null, ENDPOINT))
+        assertThatThrownBy(() -> serviceRequestExecutor.post(null, ENDPOINT))
                 .hasMessage("payload must not be null")
                 .isExactlyInstanceOf(NullPointerException.class);
 
-        assertThatThrownBy(() -> bundleRequestExecutor.post(callback, null))
+        assertThatThrownBy(() -> serviceRequestExecutor.post(callback, null))
                 .hasMessage("endpoint must not be null")
                 .isExactlyInstanceOf(NullPointerException.class);
     }
@@ -134,9 +139,9 @@ public class BundleRequestExecutorTest {
                         any(ParameterizedTypeReference.class)
                 )).thenThrow(underlyingException);
 
-        assertThatThrownBy(() -> bundleRequestExecutor.post(callback, ENDPOINT))
+        assertThatThrownBy(() -> serviceRequestExecutor.post(callback, ENDPOINT))
                 .isExactlyInstanceOf(DocumentServiceResponseException.class)
-                .hasMessageContaining("Couldn't create bundle using API")
+                .hasMessageContaining("Couldn't call service using API")
                 .hasCause(underlyingException);
 
     }
@@ -153,9 +158,9 @@ public class BundleRequestExecutorTest {
                         any(ParameterizedTypeReference.class)
                 )).thenThrow(underlyingException);
 
-        assertThatThrownBy(() -> bundleRequestExecutor.post(callback, ENDPOINT))
+        assertThatThrownBy(() -> serviceRequestExecutor.post(callback, ENDPOINT))
                 .isExactlyInstanceOf(DocumentServiceResponseException.class)
-                .hasMessageContaining("Couldn't create bundle using API")
+                .hasMessageContaining("Couldn't call service using API")
                 .hasCause(underlyingException);
     }
 

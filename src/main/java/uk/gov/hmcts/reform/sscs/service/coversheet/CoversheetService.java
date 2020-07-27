@@ -42,12 +42,14 @@ public class CoversheetService {
                 Optional.ofNullable(ccdService.getByCaseId(Long.parseLong(identifier), idamService.getIdamTokens()));
         return sscsCaseDetails
                 .map(sscsCase -> {
+
                     SscsCaseData sscsCaseData = sscsCase.getData();
                     String derivedTemplate = documentConfiguration.getEvidence()
                             .get(sscsCaseData.getLanguagePreference()).get(template);
                     String derivedImage = documentConfiguration.getEvidence()
                             .get(sscsCaseData.getLanguagePreference()).get(hmctsImgValue);
                     Address address = sscsCaseData.getAppeal().getAppellant().getAddress();
+
                     PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
                             "" + sscsCase.getId(),
                             sscsCaseData.getAppeal().getAppellant().getName().getFullNameNoTitle(),

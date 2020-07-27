@@ -6,6 +6,7 @@ import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.artsok.RepeatedIfExceptionsTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.io.File;
@@ -20,12 +21,14 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaEvidence;
+import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 
 
 @RunWith(SpringRunner.class)
@@ -41,6 +44,9 @@ public class EvidenceDocumentUploadTest {
     @Value("${test-url}")
     private String testUrl;
 
+    @Autowired
+    private SubmitHelper submitHelper;
+
     @Before
     public void setUp() {
         baseURI = testUrl;
@@ -52,8 +58,7 @@ public class EvidenceDocumentUploadTest {
         uploadAndVerifyEvidenceDocumentUpload();
     }
 
-
-    @Test
+    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
     public void shouldCreateAppealCaseWithEvidenceDocumentLinkIntoCcd() throws IOException {
         Response response = uploadAndVerifyEvidenceDocumentUpload();
 
@@ -107,6 +112,13 @@ public class EvidenceDocumentUploadTest {
         String syaJson;
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("evidence/appealCaseSyaDocument.json");
         syaJson = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+        // set random nino and mrnDate
+        String nino = submitHelper.getRandomNino();
+        syaJson = submitHelper.setNino(syaJson, nino);
+
+        LocalDate mrnDate = LocalDate.now().minusMonths(12);
+        syaJson = submitHelper.setLatestMrnDate(syaJson, mrnDate);
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 

@@ -27,7 +27,6 @@
     "case_data": {
       "caseCode": "002DD",
       "evidencePresent": "No",
-      "generatedNino": "RERO1R4L5",
       "subscriptions": {
         "appellantSubscription": {
           "tya": "tsyDZv089f",
@@ -51,7 +50,6 @@
         }
       },
       "dwpRegionalCentre": "Newcastle",
-      "generatedSurname": "Bloggs",
       "appeal": {
         "rep": {
           "name": {
@@ -177,7 +175,6 @@
         }
       },
       "benefitCode": "002",
-      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "sscsDocument": [
         {
           "id": "b7bd8dcc-35c2-422e-bc0d-321a3f05208d",
@@ -217,10 +214,8 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
-      "issueCode": "DD",
-      "generatedMobile": "07411222222"
+      "issueCode": "DD"
     },
     "data_classification": {
       "caseCode": "PUBLIC",
@@ -780,7 +775,6 @@
     "case_data": {
       "caseCode": "002DD",
       "evidencePresent": "No",
-      "generatedNino": "RERO1R4L5",
       "subscriptions": {
         "appellantSubscription": {
           "tya": "tsyDZv089f",
@@ -804,7 +798,6 @@
         }
       },
       "dwpRegionalCentre": "Newcastle",
-      "generatedSurname": "Bloggs",
       "appeal": {
         "rep": {
           "name": {
@@ -930,7 +923,6 @@
         }
       },
       "benefitCode": "002",
-      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "sscsDocument": [
         {
           "id": "b7bd8dcc-35c2-422e-bc0d-321a3f05208d",
@@ -970,10 +962,8 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
-      "issueCode": "DD",
-      "generatedMobile": "07411222222"
+      "issueCode": "DD"
     },
     "data_classification": {
       "caseCode": "PUBLIC",

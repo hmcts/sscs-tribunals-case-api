@@ -30,7 +30,6 @@
       "issueCode": "DD",
       "benefitCode": "002",
       "isInterlocRequired": "IS_INTERLOC_REQUIRED_VALUE",
-      "generatedNino": "JT 12 34 56 D",
       "dwpResponseDocument": {
         "documentLink": {
           "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/c68120b8-12db-4b4c-8551-72ebdfe84c5b",
@@ -133,7 +132,6 @@
         ]
       },
       "caseReference": "SC022/14/12423",
-      "generatedSurname": "Test",
       "regionalProcessingCenter": {
         "faxNumber": "0126 434 7983",
         "address4": "PO Box 14620",
@@ -212,7 +210,6 @@
         "hearingType": "paper"
       },
       "region": "BIRMINGHAM",
-      "generatedDOB": "1900-01-01",
       "evidencePresent": "No",
       "events": [
         {

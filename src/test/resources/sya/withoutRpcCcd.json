@@ -1,10 +1,5 @@
 {
   "caseCreated" : "${json-unit.ignore}",
-  "generatedDOB" : "1990-02-26",
-  "generatedEmail" : "sscstest+notify@greencroftconsulting.com",
-  "generatedMobile" : "07411222222",
-  "generatedNino" : "AB877533C",
-  "generatedSurname" : "Bloggs",
   "benefitCode" : "002",
   "issueCode" : "DD",
   "caseCode" : "002DD",
@@ -152,5 +147,7 @@
   },
   "evidencePresent" : "No",
   "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle"
+  "dwpRegionalCentre": "Newcastle",
+  "pcqId": "12345678",
+  "languagePreferenceWelsh" : "Yes"
 }

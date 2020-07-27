@@ -26,7 +26,6 @@
     "security_classification": "PUBLIC",
     "case_data": {
       "caseCode": "002DD",
-      "generatedNino": "RERO1R4L5",
       "subscriptions": {
         "appellantSubscription": {
           "tya": "tsyDZv089f",
@@ -66,7 +65,6 @@
         }
       },
       "dwpRegionalCentre": "Newcastle",
-      "generatedSurname": "Bloggs",
       "benefitCode": "002",
       "dwpFurtherEvidenceStates": "furtherEvidenceReceived",
       "regionalProcessingCenter": {
@@ -81,10 +79,8 @@
         "faxNumber": "0126 434 7983",
         "phoneNumber": "0300 123 1142"
       },
-      "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
       "issueCode": "DD",
-      "generatedMobile": "07411222222",
       "evidencePresent": "No",
       "interlocReferralReason": "timeExtension",
       "originalSender": {
@@ -247,7 +243,6 @@
           "languageInterpreter": "Yes"
         }
       },
-      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "evidenceHandled": "Yes",
       "sscsDocument": [
         {
@@ -285,7 +280,6 @@
     },
     "data_classification": {
       "caseCode": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "value": {
           "appellantSubscription": {
@@ -340,7 +334,6 @@
         "classification": "PUBLIC"
       },
       "dwpRegionalCentre": "PUBLIC",
-      "generatedSurname": "PUBLIC",
       "benefitCode": "PUBLIC",
       "dwpFurtherEvidenceStates": "PUBLIC",
       "furtherEvidenceAction": "PUBLIC",
@@ -359,10 +352,8 @@
         },
         "classification": "PUBLIC"
       },
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
       "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC",
       "evidencePresent": "PUBLIC",
       "interlocReferralReason": "PUBLIC",
       "originalSender": "PUBLIC",
@@ -566,7 +557,6 @@
         },
         "classification": "PUBLIC"
       },
-      "generatedEmail": "PUBLIC",
       "evidenceHandled": "PUBLIC",
       "sscsDocument": {
         "value": [
@@ -604,7 +594,6 @@
     "delete_draft_response_status": null,
     "security_classifications": {
       "caseCode": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "value": {
           "appellantSubscription": {
@@ -659,7 +648,6 @@
         "classification": "PUBLIC"
       },
       "dwpRegionalCentre": "PUBLIC",
-      "generatedSurname": "PUBLIC",
       "benefitCode": "PUBLIC",
       "dwpFurtherEvidenceStates": "PUBLIC",
       "furtherEvidenceAction": "PUBLIC",
@@ -678,10 +666,8 @@
         },
         "classification": "PUBLIC"
       },
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
       "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC",
       "evidencePresent": "PUBLIC",
       "interlocReferralReason": "PUBLIC",
       "originalSender": "PUBLIC",
@@ -885,7 +871,6 @@
         },
         "classification": "PUBLIC"
       },
-      "generatedEmail": "PUBLIC",
       "evidenceHandled": "PUBLIC",
       "sscsDocument": {
         "value": [

@@ -23,6 +23,8 @@ import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
+import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
+import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.idam.UserDetails;
@@ -34,6 +36,7 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 @Slf4j
 public class SubmitAppealService {
     public static final String DM_STORE_USER_ID = "sscs";
+    private static final String CITIZEN_ROLE = "citizen";
 
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
@@ -69,13 +72,16 @@ public class SubmitAppealService {
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
         postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken);
         // in case of duplicate case the caseDetails will be null
-        return (caseDetails != null) ? caseDetails.getId() : null;
+        return caseDetails.getId();
     }
 
     public Optional<SaveCaseResult> submitDraftAppeal(String oauth2Token, SyaCaseWrapper appeal) {
         appeal.setCaseType("draft");
 
         IdamTokens idamTokens = getUserTokens(oauth2Token);
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
         try {
             return Optional.of(saveDraftCaseInCcd(convertSyaToCcdCaseData(appeal), idamTokens));
         } catch (FeignException e) {
@@ -95,6 +101,9 @@ public class SubmitAppealService {
         SscsCaseData caseDetails = null;
         SessionDraft sessionDraft = null;
         IdamTokens idamTokens = getUserTokens(oauth2Token);
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
 
         if (CollectionUtils.isNotEmpty(caseDetailsList)) {
@@ -116,6 +125,14 @@ public class SubmitAppealService {
             .roles(userDetails.getRoles())
             .email(userDetails.getEmail())
             .build();
+    }
+
+    private boolean hasValidCitizenRole(IdamTokens idamTokens) {
+        boolean hasRole = false;
+        if (idamTokens != null && !CollectionUtils.isEmpty(idamTokens.getRoles())) {
+            hasRole = idamTokens.getRoles().stream().anyMatch(role -> CITIZEN_ROLE.equalsIgnoreCase(role));
+        }
+        return hasRole;
     }
 
     private void postCreateCaseInCcdProcess(SscsCaseData caseData,
@@ -188,20 +205,22 @@ public class SubmitAppealService {
                     caseData.getAppeal().getBenefitType().getCode(),
                     eventType);
                 return caseDetails;
-            } else {
-                log.info("Duplicate case {} found for Nino {} and benefit type {}. "
-                        + "No need to continue with post create case processing.",
-                    caseDetails.getId(), caseData.getGeneratedNino(),
-                    caseData.getAppeal().getBenefitType().getCode());
-                return null;
             }
         } catch (Exception e) {
             throw new CcdException(
                 String.format("Error found in the creating case process for case with Id - %s"
                         + " and Nino - %s and Benefit type - %s and exception: %s",
-                    caseDetails != null ? caseDetails.getId() : "", caseData.getGeneratedNino(),
+                    caseDetails != null ? caseDetails.getId() : "", caseData.getAppeal().getAppellant().getIdentity().getNino(),
                     caseData.getAppeal().getBenefitType().getCode(), e.getMessage()), e);
         }
+
+        log.info("Duplicate case {} found for Nino {} and benefit type {}. "
+                        + "No need to continue with post create case processing.",
+                caseDetails.getId(), caseData.getGeneratedNino(),
+                caseData.getAppeal().getBenefitType().getCode());
+        throw new DuplicateCaseException(
+                String.format("An appeal has already been submitted, for that decision date %s ",
+                        caseData.getAppeal().getMrnDetails().getMrnDate()));
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {

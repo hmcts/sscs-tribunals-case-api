@@ -20,8 +20,8 @@ import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
-import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
 public class EditBundleAboutToStartTest {
@@ -36,7 +36,7 @@ public class EditBundleAboutToStartTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private BundleRequestExecutor bundleRequestExecutor;
+    private ServiceRequestExecutor serviceRequestExecutor;
 
     @Spy
     private DocumentConfiguration documentConfiguration;
@@ -48,7 +48,7 @@ public class EditBundleAboutToStartTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new EditBundleAboutToStartHandler(bundleRequestExecutor, "bundleUrl.com", documentConfiguration);
+        handler = new EditBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com");
 
         when(callback.getEvent()).thenReturn(EventType.EDIT_BUNDLE);
 
@@ -56,7 +56,7 @@ public class EditBundleAboutToStartTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(bundleRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
+        when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
 
         coverPage = new HashMap<>();
         coverPage.put(LanguagePreference.ENGLISH,"SSCS-cover-page.docx");
@@ -185,7 +185,7 @@ public class EditBundleAboutToStartTest {
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
     }
 
     @Test
@@ -203,7 +203,7 @@ public class EditBundleAboutToStartTest {
                 .orElse("");
         assertEquals("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?", warning);
 
-        verifyNoInteractions(bundleRequestExecutor);
+        verifyNoInteractions(serviceRequestExecutor);
     }
 
     @Test
@@ -216,7 +216,7 @@ public class EditBundleAboutToStartTest {
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
     }
 
     @Test

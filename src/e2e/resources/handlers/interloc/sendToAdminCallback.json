@@ -27,7 +27,6 @@
     "case_data": {
       "caseCode": "002DD",
       "evidencePresent": "No",
-      "generatedNino": "JWYBTSNOW",
       "subscriptions": {
         "appellantSubscription": {
           "tya": "vPgM0J1vNe",
@@ -78,7 +77,6 @@
           }
         ]
       },
-      "generatedSurname": "Bloggs",
       "appeal": {
         "rep": {
           "name": {
@@ -220,7 +218,6 @@
         }
       },
       "benefitCode": "002",
-      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "sscsDocument": [
         {
           "id": "cd75ad65-b54c-48ca-b87a-8f04188fb63a",
@@ -253,15 +250,12 @@
       },
       "interlocReviewState": "reviewByTcw",
       "region": "BIRMINGHAM",
-      "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
-      "issueCode": "DD",
-      "generatedMobile": "07411222222"
+      "issueCode": "DD"
     },
     "data_classification": {
       "caseCode": "PUBLIC",
       "evidencePresent": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -333,7 +327,6 @@
           }
         }
       },
-      "generatedSurname": "PUBLIC",
       "appeal": {
         "classification": "PUBLIC",
         "value": {
@@ -535,7 +528,6 @@
         }
       },
       "benefitCode": "PUBLIC",
-      "generatedEmail": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": [
@@ -570,10 +562,8 @@
       },
       "interlocReviewState": "PUBLIC",
       "region": "PUBLIC",
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
-      "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC"
+      "issueCode": "PUBLIC"
     },
     "after_submit_callback_response": null,
     "callback_response_status_code": null,
@@ -583,7 +573,6 @@
     "security_classifications": {
       "caseCode": "PUBLIC",
       "evidencePresent": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "classification": "PUBLIC",
         "value": {
@@ -655,7 +644,6 @@
           }
         }
       },
-      "generatedSurname": "PUBLIC",
       "appeal": {
         "classification": "PUBLIC",
         "value": {
@@ -857,7 +845,6 @@
         }
       },
       "benefitCode": "PUBLIC",
-      "generatedEmail": "PUBLIC",
       "sscsDocument": {
         "classification": "PUBLIC",
         "value": [
@@ -892,10 +879,8 @@
       },
       "interlocReviewState": "PUBLIC",
       "region": "PUBLIC",
-      "generatedDOB": "PUBLIC",
       "createdInGapsFrom": "PUBLIC",
-      "issueCode": "PUBLIC",
-      "generatedMobile": "PUBLIC"
+      "issueCode": "PUBLIC"
     }
   },
   "case_details_before": {
@@ -926,7 +911,6 @@
     "case_data": {
       "caseCode": "002DD",
       "evidencePresent": "No",
-      "generatedNino": "JWYBTSNOW",
       "subscriptions": {
         "appellantSubscription": {
           "tya": "vPgM0J1vNe",
@@ -977,7 +961,6 @@
           }
         ]
       },
-      "generatedSurname": "Bloggs",
       "appeal": {
         "rep": {
           "name": {
@@ -1119,7 +1102,6 @@
         }
       },
       "benefitCode": "002",
-      "generatedEmail": "sscstest+notify@greencroftconsulting.com",
       "sscsDocument": [
         {
           "id": "cd75ad65-b54c-48ca-b87a-8f04188fb63a",
@@ -1152,15 +1134,12 @@
       },
       "interlocReviewState": "awaitingAdminAction",
       "region": "BIRMINGHAM",
-      "generatedDOB": "1990-02-26",
       "createdInGapsFrom": "validAppeal",
-      "issueCode": "DD",
-      "generatedMobile": "07411222222"
+      "issueCode": "DD"
     },
     "data_classification": {
       "caseCode": "PUBLIC",
       "evidencePresent": "PUBLIC",
-      "generatedNino": "PUBLIC",
       "subscriptions": {
         "value": {
           "appellantSubscription": {

@@ -30,6 +30,8 @@ Run the application by executing:
 ./gradlew bootRun
 ```
 
+
+
 ### Running Smoke Test locally
 Once the application running locally, please make sure
 1. Your local CCD is up and running with subscription id "7S9MxdSBpt"
@@ -105,6 +107,7 @@ and then using it to publish your tests:
 ```
 ./gradlew pactPublish
 ```
+
 
 ## Gotchas
 

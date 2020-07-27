@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpStatus;
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
@@ -29,8 +28,8 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
@@ -78,12 +77,14 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
+        assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
+        assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
@@ -146,12 +147,14 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
+        assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
+        assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
@@ -215,12 +218,14 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         ArgumentCaptor<GenerateFileParams> capture = ArgumentCaptor.forClass(GenerateFileParams.class);
         verify(generateFile).assemble(capture.capture());
-        final DirectionOrDecisionIssuedTemplateBody parentPayload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        final NoticeIssuedTemplateBody parentPayload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         final WriteFinalDecisionTemplateBody payload = parentPayload.getWriteFinalDecisionTemplateBody();
 
         assertEquals("An Test", parentPayload.getAppellantFullName());
         assertEquals("12345656789", parentPayload.getCaseId());
         assertEquals("JT 12 34 56 D", parentPayload.getNino());
+        assertEquals("DRAFT DECISION NOTICE", parentPayload.getNoticeType());
+        assertEquals("Judge Full Name", parentPayload.getUserName());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
@@ -273,7 +278,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
@@ -291,7 +296,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
@@ -308,11 +313,11 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("2019-10-10", result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("test.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test
@@ -325,10 +330,10 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
 
         assertEquals(Collections.EMPTY_SET, result.getErrors());
 
-        assertEquals(DECISION_IN_FAVOUR_OF_APPELLANT.getId(), result.getData().getOutcome());
+        assertNull(result.getData().getOutcome());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("2019-10-10", result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
-        assertEquals("test.pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 }

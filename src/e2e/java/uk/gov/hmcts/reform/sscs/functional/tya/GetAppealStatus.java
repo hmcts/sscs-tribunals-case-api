@@ -25,8 +25,6 @@ public class GetAppealStatus extends BaseHandler {
     @Value("${test-url}")
     private String testUrl;
 
-    SscsCaseDetails sscsCaseDetails;
-
     @Before
     public void setUp() {
         super.setUp();
@@ -34,7 +32,8 @@ public class GetAppealStatus extends BaseHandler {
 
     @Test
     public void testDwpRespond() throws IOException {
-        sscsCaseDetails = createCaseInWithDwpState();
+
+        SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState();
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();
@@ -54,7 +53,7 @@ public class GetAppealStatus extends BaseHandler {
 
     @Test
     public void testResponseReceived() throws IOException {
-        sscsCaseDetails = createCaseInResponseReceivedState();
+        SscsCaseDetails sscsCaseDetails = createCaseInResponseReceivedState();
 
         RestAssured.baseURI = testUrl;
         RestAssured.useRelaxedHTTPSValidation();

@@ -11,14 +11,9 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.text.WordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.idam.client.models.UserDetails;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -27,10 +22,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody.DirectionOrDecisionIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
@@ -39,20 +35,16 @@ import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
 @Component
 @Slf4j
-public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandler {
+public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler {
 
-    private final GenerateFile generateFile;
-    private final IdamClient idamClient;
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
     private final DocumentConfiguration documentConfiguration;
-    private boolean showIssueDate;
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
-                                                    DecisionNoticeQuestionService decisionNoticeQuestionService, DocumentConfiguration documentConfiguration) {
-        this.generateFile = generateFile;
-        this.idamClient = idamClient;
+        DecisionNoticeQuestionService decisionNoticeQuestionService,  DocumentConfiguration documentConfiguration) {
+        super(generateFile, idamClient, templateId);
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
         this.documentConfiguration = documentConfiguration;
@@ -70,8 +62,6 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
         }
 
-        String templateId = documentConfiguration.getDocuments().get(sscsCaseData.getLanguagePreference()).get(EventType.ISSUE_FINAL_DECISION);
-
         try {
             return issueDocument(callback, DocumentType.DRAFT_DECISION_NOTICE, templateId, generateFile, userAuthorisation);
         } catch (IllegalStateException e) {
@@ -83,13 +73,15 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     }
 
     @Override
-    protected DirectionOrDecisionIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
+    protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
-        DirectionOrDecisionIssuedTemplateBody formPayload = super
+        NoticeIssuedTemplateBody formPayload = super
             .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
-        final DirectionOrDecisionIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
+        final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
+
+        builder.userName(buildSignedInJudgeName(userAuthorisation));
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
 
@@ -102,6 +94,16 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
             writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
+        }
+
+        if ("yes".equalsIgnoreCase((caseData.getWriteFinalDecisionIsDescriptorFlow()))
+            && "yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+
+            boolean isSetAside = getConsideredComparisonsWithDwp(caseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
+
+            writeFinalDecisionBuilder.isSetAside(isSetAside);
+
+        } else {
             writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
         }
 
@@ -149,6 +151,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
 
         return builder.build();
 
+    }
+
+    private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
+        List<String> consideredComparissons = new ArrayList<>();
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        }
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        }
+        return consideredComparissons;
     }
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
@@ -238,13 +251,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
     }
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return questionKeys
+        List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,
                 decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
                     questionKey))).filter(pair -> pair.getRight().isPresent()).map(pair ->
                 new ImmutablePair<>(pair.getLeft(), pair.getRight().get())).map(pair ->
                 buildDescriptorFromActivityAnswer(ActivityQuestion.getByKey(pair.getLeft()),
                     pair.getRight())).collect(Collectors.toList());
+
+        descriptors.sort(new DescriptorLexicographicalComparator());
+
+        return descriptors;
     }
 
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {
@@ -255,12 +272,6 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
             .activityQuestionValue(activityQuestion.getValue())
             .build();
     }
-
-    protected String buildName(SscsCaseData caseData) {
-        return WordUtils.capitalizeFully(caseData.getAppeal().getAppellant().getName()
-            .getFullNameNoTitle(), ' ', '.');
-    }
-
 
     private void validateRequiredProperties(WriteFinalDecisionTemplateBody payload) {
         if (payload.getHeldAt() == null && payload.getHeldOn() == null) {
@@ -275,6 +286,22 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         }
     }
 
+    protected String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
+        List<String> names = new ArrayList<>();
+        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
+        if (signedInJudgeName == null) {
+            throw new IllegalStateException("Unable to obtain signed in user name");
+        }
+        names.add(signedInJudgeName);
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName())) {
+            names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
+            names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
+        }
+        return StringUtils.getGramaticallyJoinedStrings(names);
+    }
+
     @Override
     protected void setDocumentOnCaseData(SscsCaseData caseData, DocumentLink file) {
         caseData.setWriteFinalDecisionPreviewDocument(file);
@@ -285,27 +312,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueDocumentHandl
         return caseData.getWriteFinalDecisionPreviewDocument();
     }
 
-    private String buildSignedInJudgeName(String userAuthorisation) {
-        UserDetails userDetails = idamClient.getUserDetails(userAuthorisation);
-        if (userDetails == null) {
-            throw new IllegalStateException("Unable to obtain signed in user details");
+    @Override
+    protected void setGeneratedDateIfNotAlreadySet(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
+            sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
         }
-        return userDetails.getFullName();
-    }
-
-    private String buildHeldBefore(SscsCaseData caseData, String userAuthorisation) {
-        List<String> names = new ArrayList<>();
-        String signedInJudgeName = buildSignedInJudgeName(userAuthorisation);
-        if (signedInJudgeName == null) {
-            throw new IllegalStateException("Unable to obtain signed in user name");
-        }
-        names.add(signedInJudgeName);
-        if (caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName() != null) {
-            names.add(caseData.getWriteFinalDecisionDisabilityQualifiedPanelMemberName());
-        }
-        if (caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName() != null) {
-            names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
-        }
-        return StringUtils.getGramaticallyJoinedStrings(names);
     }
 }
