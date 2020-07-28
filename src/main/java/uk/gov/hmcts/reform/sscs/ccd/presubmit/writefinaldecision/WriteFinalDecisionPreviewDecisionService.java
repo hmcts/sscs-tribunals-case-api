@@ -289,7 +289,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
     @Override
     protected void setGeneratedDateIfRequired(SscsCaseData sscsCaseData, EventType eventType) {
-        // Update the generated date iff the event type is Adjourn Case
+        // Update the generated date if (and only if) the event type is Adjourn Case
         // ( not for EventType.ISSUE_FINAL_DECISION)
         if (eventType == EventType.WRITE_FINAL_DECISION) {
             sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
