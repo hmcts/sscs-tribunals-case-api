@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
 public class CoversheetService {
     private final OnlineHearingService onlineHearingService;
     private final PdfService pdfService;
-    private static final String template = "template";
-    private static final String hmctsImgValue = "hmctsImgVal";
+    private static final String TEMPLATE = "template";
+    private static final String HMCTS_IMG_VALUE = "hmctsImgVal";
     private final CcdService ccdService;
     private final IdamService idamService;
     private final DocumentConfiguration documentConfiguration;
@@ -45,9 +45,9 @@ public class CoversheetService {
 
                     SscsCaseData sscsCaseData = sscsCase.getData();
                     String derivedTemplate = documentConfiguration.getEvidence()
-                            .get(sscsCaseData.getLanguagePreference()).get(template);
+                            .get(sscsCaseData.getLanguagePreference()).get(TEMPLATE);
                     String derivedImage = documentConfiguration.getEvidence()
-                            .get(sscsCaseData.getLanguagePreference()).get(hmctsImgValue);
+                            .get(sscsCaseData.getLanguagePreference()).get(HMCTS_IMG_VALUE);
                     Address address = sscsCaseData.getAppeal().getAppellant().getAddress();
 
                     PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
