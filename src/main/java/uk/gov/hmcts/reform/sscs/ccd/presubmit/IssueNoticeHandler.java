@@ -4,11 +4,15 @@ import java.util.function.Function;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -28,7 +32,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         this.idamClient = idamClient;
     }
 
-    protected abstract void setGeneratedDateIfNotAlreadySet(SscsCaseData caseData);
+    protected abstract void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType);
 
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
 
@@ -38,7 +42,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        setGeneratedDateIfNotAlreadySet(sscsCaseData);
+        setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
 
         try {
             return issueDocument(callback, documentType, templateId.apply(sscsCaseData.getLanguagePreference()), generateFile, userAuthorisation);

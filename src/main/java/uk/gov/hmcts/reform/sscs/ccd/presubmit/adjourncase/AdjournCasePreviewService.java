@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
@@ -232,8 +233,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     @Override
-    protected void setGeneratedDateIfNotAlreadySet(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournCaseGeneratedDate() == null) {
+    protected void setGeneratedDateIfRequired(SscsCaseData sscsCaseData, EventType eventType) {
+        // Update the generated date if (and only if) the event type is Adjourn Case
+        // ( not for EventType.ISSUE_ADJOURNMENT)
+        if (eventType == EventType.ADJOURN_CASE) {
             sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
         }
     }
