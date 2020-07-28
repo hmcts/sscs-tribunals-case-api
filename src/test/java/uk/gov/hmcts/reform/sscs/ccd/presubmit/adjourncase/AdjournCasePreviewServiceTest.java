@@ -92,7 +92,7 @@ public class AdjournCasePreviewServiceTest {
         service = new AdjournCasePreviewService(generateFile, idamClient,
             venueDataLoader, TEMPLATE_ID);
 
-        when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
+        when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         when(userDetails.getFullName()).thenReturn("Judge Full Name");
@@ -746,6 +746,7 @@ public class AdjournCasePreviewServiceTest {
 
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -1159,7 +1160,7 @@ public class AdjournCasePreviewServiceTest {
 
     @Test
     @Parameters(named = "allNextHearingTypeParameters")
-    public void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoNotSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
+    public void givenGeneratedDateIsAlreadySetForGeneratedFlow_thenDoSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseGeneratedDate("2018-10-10");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
@@ -1169,12 +1170,12 @@ public class AdjournCasePreviewServiceTest {
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
-        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @Test
     @Parameters(named = "allNextHearingTypeParameters")
-    public void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoNotSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
+    public void givenGeneratedDateIsAlreadySetNonGeneratedFlow_thenDoSetNewGeneratedDate(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.setAdjournCaseGenerateNotice("no");
         sscsCaseData.setAdjournCaseGeneratedDate("2018-10-10");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
@@ -1184,7 +1185,7 @@ public class AdjournCasePreviewServiceTest {
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
 
-        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     private NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String nextHearingType, boolean isDraft) {

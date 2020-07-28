@@ -1254,7 +1254,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     }
 
     @Test
-    public void givenGeneratedDateIsAlreadySetGeneratedDescriptorFlow_thenDoNotSetNewGeneratedDate() {
+    public void givenGeneratedDateIsAlreadySetGeneratedDescriptorFlow_thenSetNewGeneratedDate() {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
@@ -1267,11 +1267,11 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
             true, true);
 
-        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @Test
-    public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenDoNotSetNewGeneratedDate() {
+    public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1282,11 +1282,11 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true);
 
-        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @Test
-    public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoNotSetNewGeneratedDate() {
+    public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1298,11 +1298,11 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
             true, false);
 
-        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @Test
-    public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoNotSetNewGeneratedDate() {
+    public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1314,7 +1314,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
             false, true);
 
-        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
 

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -287,8 +288,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     @Override
-    protected void setGeneratedDateIfNotAlreadySet(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
+    protected void setGeneratedDateIfRequired(SscsCaseData sscsCaseData, EventType eventType) {
+        // Update the generated date if (and only if) the event type is Adjourn Case
+        // ( not for EventType.ISSUE_FINAL_DECISION)
+        if (eventType == EventType.WRITE_FINAL_DECISION) {
             sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
         }
     }
