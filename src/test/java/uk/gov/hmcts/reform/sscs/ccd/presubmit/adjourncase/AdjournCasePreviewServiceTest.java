@@ -133,6 +133,7 @@ public class AdjournCasePreviewServiceTest {
             new String[] {"faceToFace", "face to face"},
             new String[] {"telephone", "telephone"},
             new String[] {"video", "video"},
+            new String[] {"paper", "paper"},
         };
     }
 
@@ -142,6 +143,7 @@ public class AdjournCasePreviewServiceTest {
         return new Object[] {
             new String[] {"telephone", "telephone"},
             new String[] {"video", "video"},
+            new String[] {"paper", "paper"},
         };
     }
 
@@ -1189,6 +1191,9 @@ public class AdjournCasePreviewServiceTest {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
 
         final boolean hasVenue = HearingType.FACE_TO_FACE.getValue().equals(nextHearingType);
+        final boolean isOralHearing = HearingType.FACE_TO_FACE.getValue().equals(nextHearingType)
+            || HearingType.TELEPHONE.getValue().equals(nextHearingType)
+            || HearingType.VIDEO.getValue().equals(nextHearingType);
 
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
@@ -1205,10 +1210,19 @@ public class AdjournCasePreviewServiceTest {
         } else {
             assertNull(body.getNextHearingVenue());
         }
+        if (AdjournCasePreviewService.IN_CHAMBERS.equals(body.getNextHearingVenue())) {
+            assertFalse(body.isNextHearingAtVenue());
+        } else {
+            assertEquals(hasVenue, body.isNextHearingAtVenue());
+        }
         assertNotNull(body.getNextHearingDate());
         assertNotNull(body.getNextHearingType());
         assertEquals(nextHearingType, body.getNextHearingType());
-        assertNotNull(body.getNextHearingTimeslot());
+        if (isOralHearing) {
+            assertNotNull(body.getNextHearingTimeslot());
+        } else {
+            assertNull(body.getNextHearingTimeslot());
+        }
         assertNotNull(body.getHeldAt());
         assertNotNull(body.getHeldBefore());
         assertNotNull(body.getHeldOn());

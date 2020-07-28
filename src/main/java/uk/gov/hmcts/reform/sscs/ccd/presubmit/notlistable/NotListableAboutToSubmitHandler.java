@@ -34,6 +34,12 @@ public class NotListableAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         sscsCaseData.setDirectionDueDate(sscsCaseData.getNotListableDueDate());
 
+        clearTransientFields(sscsCaseData);
+
         return preSubmitCallbackResponse;
+    }
+
+    private void clearTransientFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.setNotListableDueDate(null);
     }
 }

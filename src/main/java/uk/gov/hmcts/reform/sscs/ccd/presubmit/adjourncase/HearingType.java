@@ -2,16 +2,19 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 public enum HearingType {
 
-    FACE_TO_FACE("faceToFace", "face to face"),
-    TELEPHONE("telephone", "telephone"),
-    VIDEO("video", "video");
+    FACE_TO_FACE("faceToFace", "face to face", true),
+    TELEPHONE("telephone", "telephone", true),
+    VIDEO("video", "video", true),
+    PAPER("paper", "paper", false);
 
     final String key;
     final String value;
+    final boolean isOralHearingType;
 
-    HearingType(String key, String value) {
+    HearingType(String key, String value, boolean isOralHearingType) {
         this.key = key;
         this.value = value;
+        this.isOralHearingType = isOralHearingType;
     }
 
     public static HearingType getByKey(String key) {
@@ -25,6 +28,10 @@ public enum HearingType {
     
     public String getValue() {
         return value;
+    }
+
+    public boolean isOralHearingType() {
+        return isOralHearingType;
     }
 
 }

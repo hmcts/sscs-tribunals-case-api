@@ -5,7 +5,11 @@ import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -19,6 +23,13 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    private Validator validator;
+
+    @Autowired
+    WriteFinalDecisionMidEventValidationHandler(Validator validator) {
+        this.validator = validator;
+    }
+    
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
@@ -37,11 +48,13 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
         if (isDecisionNoticeDatesInvalid(sscsCaseData)) {
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
-        }
-        if (isDecisionNoticeDateOfDecisionInvalid(sscsCaseData)) {
-            preSubmitCallbackResponse.addError("Decision notice date of decision must not be in the future");
         }
 
         if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null && !isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {

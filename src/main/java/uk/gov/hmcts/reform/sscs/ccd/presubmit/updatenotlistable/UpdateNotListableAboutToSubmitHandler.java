@@ -32,8 +32,6 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableDirectionsFulfilled())) {
             sscsCaseData.setState(State.READY_TO_LIST);
             sscsCaseData.setNotListableProvideReasons(null);
@@ -45,6 +43,28 @@ public class UpdateNotListableAboutToSubmitHandler implements PreSubmitCallbackH
             sscsCaseData.setDirectionDueDate(null);
         }
 
+        if ("yes".equalsIgnoreCase(sscsCaseData.getUpdateNotListableSetNewDueDate())) {
+            sscsCaseData.setDirectionDueDate(sscsCaseData.getUpdateNotListableDueDate());
+        }
+
+        if (null != sscsCaseData.getUpdateNotListableWhereShouldCaseMoveTo()) {
+            sscsCaseData.setState(State.getById(sscsCaseData.getUpdateNotListableWhereShouldCaseMoveTo()));
+            sscsCaseData.setNotListableProvideReasons(null);
+        }
+
+        clearTransientFields(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
         return preSubmitCallbackResponse;
+    }
+
+    private void clearTransientFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.setUpdateNotListableDirectionsFulfilled(null);
+        sscsCaseData.setUpdateNotListableInterlocReview(null);
+        sscsCaseData.setUpdateNotListableWhoReviewsCase(null);
+        sscsCaseData.setUpdateNotListableSetNewDueDate(null);
+        sscsCaseData.setUpdateNotListableDueDate(null);
+        sscsCaseData.setUpdateNotListableWhereShouldCaseMoveTo(null);
     }
 }
