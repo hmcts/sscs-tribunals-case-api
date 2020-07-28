@@ -10,6 +10,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
@@ -30,7 +31,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
         this.idamClient = idamClient;
     }
 
-    protected abstract void setGeneratedDateIfNotAlreadySet(SscsCaseData caseData);
+    protected abstract void setGeneratedDateIfRequired(SscsCaseData caseData, EventType eventType);
 
     public PreSubmitCallbackResponse<SscsCaseData> preview(Callback<SscsCaseData> callback, DocumentType documentType, String userAuthorisation, boolean showIssueDate) {
 
@@ -40,7 +41,7 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        setGeneratedDateIfNotAlreadySet(sscsCaseData);
+        setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
 
         try {
             return issueDocument(callback, documentType, templateId, generateFile, userAuthorisation);
