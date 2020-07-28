@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
@@ -38,18 +39,19 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
-    private final DocumentConfiguration documentConfiguration;
 
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
         DecisionNoticeQuestionService decisionNoticeQuestionService,  DocumentConfiguration documentConfiguration) {
-        super(generateFile, idamClient, languagePreference -> documentConfiguration.getDocuments().get(languagePreference).get(EventType.ISSUE_FINAL_DECISION));
+        super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
-        this.documentConfiguration = documentConfiguration;
     }
 
+    private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
+        return documentConfiguration.getDocuments().get(languagePreference).get(EventType.ISSUE_FINAL_DECISION);
+    }
 
     @Override
     protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,

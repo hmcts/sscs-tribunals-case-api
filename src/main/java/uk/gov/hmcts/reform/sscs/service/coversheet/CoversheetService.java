@@ -18,8 +18,8 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.PdfService;
 public class CoversheetService {
     private final OnlineHearingService onlineHearingService;
     private final PdfService pdfService;
-    private final String template = "template";
-    private final String hmctsImgValue = "hmctsImgVal";
+    private static final String template = "template";
+    private static final String hmctsImgValue = "hmctsImgVal";
     private final CcdService ccdService;
     private final IdamService idamService;
     private final DocumentConfiguration documentConfiguration;
