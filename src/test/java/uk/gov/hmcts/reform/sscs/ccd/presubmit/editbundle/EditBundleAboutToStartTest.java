@@ -20,8 +20,9 @@ import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+
 
 @RunWith(JUnitParamsRunner.class)
 public class EditBundleAboutToStartTest {
@@ -48,7 +49,7 @@ public class EditBundleAboutToStartTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new EditBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com");
+        handler = new EditBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com", documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.EDIT_BUNDLE);
 

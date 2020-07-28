@@ -13,8 +13,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+
 
 @Service
 public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -27,7 +28,7 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
 
     @Autowired
     public EditBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                         @Value("${bundle.url}") String bundleUrl) {
+                                         @Value("${bundle.url}") String bundleUrl,
                                          DocumentConfiguration documentConfiguration) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
