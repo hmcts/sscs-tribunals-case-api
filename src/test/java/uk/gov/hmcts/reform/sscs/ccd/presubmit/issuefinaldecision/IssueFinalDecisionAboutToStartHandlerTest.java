@@ -136,7 +136,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
         DecisionNoticeQuestionService decisionNoticeQuestionService = new DecisionNoticeQuestionService();
-        WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
+        final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
             decisionNoticeQuestionService, TEMPLATE_ID);
 
         when(generateFile.assemble(any())).thenReturn(URL);
@@ -169,7 +169,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     public void givenAboutToStartRequestNonDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
         DecisionNoticeQuestionService decisionNoticeQuestionService = new DecisionNoticeQuestionService();
-        WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
+        final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
             decisionNoticeQuestionService, TEMPLATE_ID);
 
         when(generateFile.assemble(any())).thenReturn(URL);
