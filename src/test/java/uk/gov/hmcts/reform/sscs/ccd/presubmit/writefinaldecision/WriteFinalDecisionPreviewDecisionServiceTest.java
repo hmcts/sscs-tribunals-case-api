@@ -1254,7 +1254,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     }
 
     @Test
-    public void givenGeneratedDateIsAlreadySetGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
+    public void givenGeneratedDateIsAlreadySetGeneratedDescriptorFlow_thenSetNewGeneratedDate() {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
