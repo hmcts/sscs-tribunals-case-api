@@ -47,13 +47,11 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        // Due to a bug with CCD related to hidden fields, this field is being nulled out
+        // Due to a bug with CCD related to hidden fields, this field is not being set
         // on the final submission from CCD, so we need to reset it here
         // See https://tools.hmcts.net/jira/browse/RDM-8200
         // This is a temporary workaround for this issue.
-        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
-            sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
-        }
+        sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 

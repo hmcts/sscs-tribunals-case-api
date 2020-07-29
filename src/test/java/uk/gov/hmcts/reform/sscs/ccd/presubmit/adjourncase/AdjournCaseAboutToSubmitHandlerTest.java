@@ -103,20 +103,20 @@ public class AdjournCaseAboutToSubmitHandlerTest {
     }
 
     /**
-     * This test asserts that if the (correclty set) generated date referenced by the preview document
-     * is submitted as part of the payload to the AdjournCaseAboutToSubmit handler,
-     * then that same date is set on the case data after the AdjournCaseAboutToSubmitHandler
-     * is called.
+     * This test asserts that whatever the value of the existing generated date from CCD
+     * submitted as part of the payload to the AdjournCaseAboutToSubmitHandler,
+     * then that date is updated to now() after the AdjournCaseAboutToSubmitHandler is called.
+     * This is due to a workaround we have implemented in the AdjournCaseAboutToSubmitHandler
      *
      */
     @Test
-    public void givenValidSubmissionWithGeneratedDateSet_thenSetCorrectGeneratedDateAndDoNotDisplayAnError() {
+    public void givenValidSubmissionWithGeneratedDateSet_thenSetGeneratedDateToNowAndDoNotDisplayAnError() {
 
         callback.getCaseDetails().getCaseData().setAdjournCaseGeneratedDate("2018-01-01");
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals("2018-01-01", callback.getCaseDetails().getCaseData().getAdjournCaseGeneratedDate());
+        assertEquals(LocalDate.now().toString(), callback.getCaseDetails().getCaseData().getAdjournCaseGeneratedDate());
     }
 
     @Test

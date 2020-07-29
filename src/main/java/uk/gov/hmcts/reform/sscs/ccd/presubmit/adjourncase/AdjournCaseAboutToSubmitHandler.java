@@ -43,13 +43,11 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        // Due to a bug with CCD related to hidden fields, this field is being nulled out
+        // Due to a bug with CCD related to hidden fields, this field not being set
         // on the final submission from CCD, so we need to reset it here
         // See https://tools.hmcts.net/jira/browse/RDM-8200
         // This is a temporary workaround for this issue.
-        if (sscsCaseData.getAdjournCaseGeneratedDate() == null) {
-            sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
-        }
+        sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 

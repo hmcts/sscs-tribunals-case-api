@@ -320,13 +320,14 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     }
 
     /**
-     * This test asserts that if the (correclty set) generated date referenced by the preview document
-     * is submitted as part of the payload to the WriteFinalDecisionAboutToSubmitHandler,
-     * then that same date is set on the case data after the WriteFinalDecisionboutToSubmitHandler
-     * is called.
+     * This test asserts that whatever the value of the existing generated date from CCD
+     * submitted as part of the payload to the WriterFinalSubmissionAboutToSubmitHandler,
+     * then that date is updated to now() after the WriterFinalSubmissionAboutToSubmitHandler is called.
+     * This is due to a workaround we have implemented in the WriterFinalSubmissionAboutToSubmitHandler
+     *
      */
     @Test
-    public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCaseWithGeneratedDateAsProvidedDateWhenSubmittedGeneratedDateIsSet() throws Exception {
+    public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCaseWithGeneratedDateAsNowWhenSubmittedGeneratedDateIsSet() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorSetGeneratedDate.json", "START_DATE_PLACEHOLDER", "2018-10-10");
 

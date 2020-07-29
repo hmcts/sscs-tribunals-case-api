@@ -192,14 +192,14 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     }
 
     /**
-     * This test asserts that if the (correclty set) generated date referenced by the preview document
-     * is submitted as part of the payload to the WriterFinalSubmissionAboutToSubmitHandler,
-     * then that same date is set on the case data after the WriterFinalSubmissionAboutToSubmitHandler
-     * is called.
+     * This test asserts that whatever the value of the existing generated date from CCD
+     * submitted as part of the payload to the WriterFinalSubmissionAboutToSubmitHandler,
+     * then that date is updated to now() after the WriterFinalSubmissionAboutToSubmitHandler is called.
+     * This is due to a workaround we have implemented in the WriterFinalSubmissionAboutToSubmitHandler
      *
      */
     @Test
-    public void givenValidSubmissionWithGeneratedDateSet_thenSetGeneratedDateCorrectlyAndDoNotDisplayAnError() {
+    public void givenValidSubmissionWithGeneratedDateSet_thenSetUpdateGeneratedDateAndDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -225,7 +225,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
 
-        assertEquals("2018-01-01", sscsCaseData.getWriteFinalDecisionGeneratedDate());
+        assertEquals(LocalDate.now().toString(), sscsCaseData.getWriteFinalDecisionGeneratedDate());
     }
 
     @Test
