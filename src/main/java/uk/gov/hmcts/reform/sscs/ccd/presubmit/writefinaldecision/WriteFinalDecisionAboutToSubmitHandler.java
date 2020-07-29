@@ -51,7 +51,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         // on the final submission from CCD, so we need to reset it here
         // See https://tools.hmcts.net/jira/browse/RDM-8200
         // This is a temporary workaround for this issue.
-        sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
+        if (sscsCaseData.getWriteFinalDecisionGeneratedDate() == null) {
+            sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 

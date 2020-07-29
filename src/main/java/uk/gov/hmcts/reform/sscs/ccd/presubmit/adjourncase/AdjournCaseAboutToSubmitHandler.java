@@ -47,7 +47,9 @@ public class AdjournCaseAboutToSubmitHandler implements PreSubmitCallbackHandler
         // on the final submission from CCD, so we need to reset it here
         // See https://tools.hmcts.net/jira/browse/RDM-8200
         // This is a temporary workaround for this issue.
-        sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
+        if (sscsCaseData.getAdjournCaseGeneratedDate() == null) {
+            sscsCaseData.setAdjournCaseGeneratedDate(LocalDate.now().toString());
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
