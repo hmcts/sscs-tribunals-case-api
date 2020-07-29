@@ -180,14 +180,13 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueAdjournmentEventAndNoDraftDecisionOnCase_thenDisplayAnError() {
+    public void givenAnIssueAdjournmentEventAndNoDraftAdjournmentOnCase_thenDisplayAnError() {
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(null);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("There is no Draft Adjournment Notice on the case so adjournment cannot be issued", error);
-        assertEquals(1, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
     }
 
     @Test
