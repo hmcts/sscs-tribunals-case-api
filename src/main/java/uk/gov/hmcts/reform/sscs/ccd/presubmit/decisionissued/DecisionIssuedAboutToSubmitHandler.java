@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +35,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && callback.getEvent() == EventType.DECISION_ISSUED
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && nonNull(callback.getCaseDetails())
+                && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -42,14 +44,21 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
+        final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
-        if (Objects.nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
+        if (nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
             url = caseData.getPreviewDocument();
-        } else {
-            if (caseData.getSscsInterlocDecisionDocument() != null) {
-                url = caseData.getSscsInterlocDecisionDocument().getDocumentLink();
-                caseData.setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
+        } else if (caseData.getSscsInterlocDecisionDocument() != null) {
+            url = caseData.getSscsInterlocDecisionDocument().getDocumentLink();
+            caseData.setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
+            if (!isFileAPdf(caseData.getSscsInterlocDecisionDocument().getDocumentLink())) {
+                sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                return sscsCaseDataPreSubmitCallbackResponse;
             }
+        }
+        if (isNull(url)) {
+            sscsCaseDataPreSubmitCallbackResponse.addError("There needs to be a PDF document");
+            return sscsCaseDataPreSubmitCallbackResponse;
         }
 
         footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
@@ -73,7 +82,6 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             caseData.setInterlocReviewState(null);
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
 
         return sscsCaseDataPreSubmitCallbackResponse;

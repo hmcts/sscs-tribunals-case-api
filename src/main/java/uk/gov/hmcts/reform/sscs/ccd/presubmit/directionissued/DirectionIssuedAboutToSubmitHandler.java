@@ -1,13 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +32,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private final FooterService footerService;
     private final ServiceRequestExecutor serviceRequestExecutor;
-    private String bulkScanEndpoint;
+    private final String bulkScanEndpoint;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
@@ -45,8 +47,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && callback.getEvent() == EventType.DIRECTION_ISSUED
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && nonNull(callback.getCaseDetails())
+                && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -61,14 +63,21 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return errorResponse;
         }
 
+        final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
-        if (Objects.nonNull(caseData.getPreviewDocument())) {
+        if (nonNull(caseData.getPreviewDocument())) {
             url = caseData.getPreviewDocument();
-        } else {
-            if (caseData.getSscsInterlocDirectionDocument() != null) {
-                url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
-                caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
+        } else if (caseData.getSscsInterlocDirectionDocument() != null) {
+            url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
+            caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
+            if (!isFileAPdf(caseData.getSscsInterlocDirectionDocument().getDocumentLink())) {
+                sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                return sscsCaseDataPreSubmitCallbackResponse;
             }
+        }
+        if (isNull(url)) {
+            sscsCaseDataPreSubmitCallbackResponse.addError("There needs to be a PDF document");
+            return sscsCaseDataPreSubmitCallbackResponse;
         }
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
@@ -98,7 +107,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         caseData.setTimeExtensionRequested("No");
 
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         if (caseDetails.getState().equals(State.INTERLOCUTORY_REVIEW_STATE) && caseData.getDirectionTypeDl() != null && StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(), caseData.getDirectionTypeDl().getValue().getCode())) {
             PreSubmitCallbackResponse<SscsCaseData> response = serviceRequestExecutor.post(callback, bulkScanEndpoint);
