@@ -68,12 +68,10 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 }
 
                 createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
+                clearTransientFields(preSubmitCallbackResponse);
             } else {
                 preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
             }
-
-            clearTransientFields(preSubmitCallbackResponse);
-
         }
 
         return preSubmitCallbackResponse;
