@@ -7,6 +7,13 @@ public class PdfAppealDetails {
     private final String nino;
     private final String caseReference;
     private final String dateCreated;
+    private String welshDateCreated;
+
+    public PdfAppealDetails(String title, String firstName, String surname, String nino, String caseReference,
+                            String dateCreated, String welshDateCreated) {
+        this(title, firstName, surname, nino, caseReference, dateCreated);
+        this.welshDateCreated = welshDateCreated;
+    }
 
     public PdfAppealDetails(String title, String firstName, String surname, String nino, String caseReference, String dateCreated) {
         this.title = title;
@@ -39,6 +46,10 @@ public class PdfAppealDetails {
 
     public String getDateCreated() {
         return dateCreated;
+    }
+
+    public String getWelshDateCreated() {
+        return welshDateCreated;
     }
 
     @Override

@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 @RunWith(JUnitParamsRunner.class)
 public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
+    private static final String WELSH_TEMPLATE_PATH = "/templates/appellant_appeal_welsh_template.html";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
@@ -145,7 +146,7 @@ public class SubmitAppealServiceTest {
         offices.add("Watford DRT");
         offices.add("Sheffield DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
+        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
