@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,12 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        // Due to a bug with CCD related to hidden fields, this field is being nulled out
+        // on the final submission from CCD, so we need to reset it here
+        // See https://tools.hmcts.net/jira/browse/RDM-8200
+        // This is a temporary workaround for this issue.
+        sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
