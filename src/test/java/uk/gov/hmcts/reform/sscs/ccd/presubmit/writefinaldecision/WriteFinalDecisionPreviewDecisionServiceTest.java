@@ -1357,7 +1357,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
                 false, true, documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
 
-        assertEquals("2018-10-10", payload.getGeneratedDate().toString());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
     private NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
