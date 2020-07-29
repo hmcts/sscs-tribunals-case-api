@@ -197,6 +197,20 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
+        sscsCaseData.setPreviewDocument(null);
+
+        sscsCaseData.setSscsInterlocDecisionDocument(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You need to upload a PDF document", error);
+        }
+    }
+
+    @Test
     @Parameters({"file.png", "file.jpg", "file.doc"})
     public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
         sscsCaseData.setPreviewDocument(null);

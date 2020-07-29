@@ -76,7 +76,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
         }
         if (isNull(url)) {
-            sscsCaseDataPreSubmitCallbackResponse.addError("There needs to be a PDF document");
+            sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload a PDF document");
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 

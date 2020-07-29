@@ -295,4 +295,18 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         }
     }
 
+    @Test
+    public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
+        sscsCaseData.setPreviewDocument(null);
+
+        sscsCaseData.setSscsInterlocDirectionDocument(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You need to upload a PDF document", error);
+        }
+    }
+
 }
