@@ -345,7 +345,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals(LocalDate.now().toString(), result.getData().getWriteFinalDecisionGeneratedDate());
 
         assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
-        assertEquals("2018-01-01", result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
         assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
