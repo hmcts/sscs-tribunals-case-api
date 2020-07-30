@@ -36,7 +36,8 @@ public class DocmosisPdfServiceTest {
         expectedPlaceholders.put("hmcts2", "hmcts.img");
 
         pdfCoverSheet = new PdfCoverSheet(
-                "caseId", "name", "addressLine1", "addressLine2", "addressTown", "addressCounty", "addressPostcode", "hmcts.img"
+                "caseId", "name", "addressLine1", "addressLine2", "addressTown", "addressCounty", "addressPostcode",
+                "hmcts.img", "welshhmcts.img"
         );
         docmosisPdfGenerationService = mock(DocmosisPdfGenerationService.class);
     }
