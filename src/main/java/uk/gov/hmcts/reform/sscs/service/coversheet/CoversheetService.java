@@ -6,6 +6,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -46,8 +47,6 @@ public class CoversheetService {
                     SscsCaseData sscsCaseData = sscsCase.getData();
                     String derivedTemplate = documentConfiguration.getEvidence()
                             .get(sscsCaseData.getLanguagePreference()).get(TEMPLATE);
-                    String derivedImage = documentConfiguration.getEvidence()
-                            .get(sscsCaseData.getLanguagePreference()).get(HMCTS_IMG_VALUE);
                     Address address = sscsCaseData.getAppeal().getAppellant().getAddress();
 
                     PdfCoverSheet pdfCoverSheet = new PdfCoverSheet(
@@ -58,7 +57,10 @@ public class CoversheetService {
                             address.getTown(),
                             address.getCounty(),
                             address.getPostcode(),
-                            derivedImage
+                            documentConfiguration.getEvidence()
+                                    .get(LanguagePreference.ENGLISH).get(HMCTS_IMG_VALUE),
+                            documentConfiguration.getEvidence()
+                                    .get(LanguagePreference.WELSH).get(HMCTS_IMG_VALUE)
                     );
 
                     return pdfService.createPdf(pdfCoverSheet, derivedTemplate);
