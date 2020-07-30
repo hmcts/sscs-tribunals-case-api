@@ -34,6 +34,7 @@ public class DocmosisPdfServiceTest {
         expectedPlaceholders.put("address_county", "addressCounty");
         expectedPlaceholders.put("address_postcode", "addressPostcode");
         expectedPlaceholders.put("hmcts2", "hmcts.img");
+        expectedPlaceholders.put("welshhmcts2", "welshhmcts.img");
 
         pdfCoverSheet = new PdfCoverSheet(
                 "caseId", "name", "addressLine1", "addressLine2", "addressTown", "addressCounty", "addressPostcode",

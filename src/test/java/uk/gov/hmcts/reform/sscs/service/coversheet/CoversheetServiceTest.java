@@ -95,7 +95,7 @@ public class CoversheetServiceTest {
 
         byte[] pdf = {2, 4, 6, 0, 1};
         PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "firstname lastname", "line1", "line2",
-                "town", "county", "postcode", welshTempateDetails.get(hmctsImgVal),
+                "town", "county", "postcode", englishTempateDetails.get(hmctsImgVal),
                 welshTempateDetails.get(hmctsImgVal));
         when(pdfService.createPdf(pdfSummary, welshTempateDetails.get(template))).thenReturn(pdf);
 
@@ -140,7 +140,7 @@ public class CoversheetServiceTest {
 
         byte[] pdf = {2, 4, 6, 0, 1};
         PdfCoverSheet pdfSummary = new PdfCoverSheet("12345", "firstname lastname", "line1", "line2",
-                "town", "county", "postcode", welshTempateDetails.get(hmctsImgVal), welshTempateDetails.get(hmctsImgVal));
+                "town", "county", "postcode", englishTempateDetails.get(hmctsImgVal), welshTempateDetails.get(hmctsImgVal));
         when(pdfService.createPdf(pdfSummary, welshTempateDetails.get(template))).thenReturn(pdf);
 
         Optional<byte[]> pdfOptional =
