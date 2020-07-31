@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.welsh;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -11,21 +10,22 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
 @Component
-@Slf4j
 public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private List<DynamicListItem> listOptions;
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -51,27 +51,26 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
     }
 
     private void setOriginalDocumentDropdown(SscsCaseData sscsCaseData) {
-        log.debug("invoking custom class");
-        SscsDocumentDetails sscsDocumentDetails;
-        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions = new ArrayList<>();
+
         List<SscsDocument> sscsDocuments =  Optional.ofNullable(sscsCaseData).map(SscsCaseData::getSscsDocument)
                 .orElse(Collections.emptyList())
                 .stream()
-                .filter(a -> a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
+                .filter(Objects::nonNull)
+                .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
+                        && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
                 .collect(Collectors.toList());
 
-        for (SscsDocument sscsDocument: sscsDocuments){
-            sscsDocumentDetails = sscsDocument.getValue();
-            listOptions.add(new DynamicListItem(sscsDocumentDetails.getDocumentLink().getDocumentFilename(),
-                    sscsDocumentDetails.getDocumentLink().getDocumentFilename()));
-        }
+        sscsDocuments.forEach(sscsDocument -> {
+            listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(),
+                    sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
+        });
 
         if(listOptions.size() > 0) {
             sscsCaseData.setOriginalDocuments(new DynamicList(listOptions.get(0), listOptions));
         } else {
-            listOptions.add(new DynamicListItem("-", "Not file available in desired status"));
+            listOptions.add(new DynamicListItem("-", "No original file"));
             sscsCaseData.setOriginalDocuments(new DynamicList(listOptions.get(0), listOptions));
         }
-
     }
 }
