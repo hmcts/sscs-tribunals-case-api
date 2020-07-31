@@ -1,3 +1,0 @@
-java:
-  environment:
-    BUNDLE_URL: http://em-ccdorc-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal

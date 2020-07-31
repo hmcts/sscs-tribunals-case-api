@@ -359,10 +359,6 @@ jacocoTestReport {
     }
 }
 
-test {
-    useJUnitPlatform()
-}
-
 pitest {
     targetClasses = ['uk.gov.hmcts.sscs.*']
     excludedClasses = ['uk.gov.hmcts.reform.sscs.config.*','uk.gov.hmcts.reform.sscs.models.*','uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication.java']
