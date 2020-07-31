@@ -93,7 +93,7 @@ public class RequestInfoIncompleteApplicationAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"APPEAL_CREATED", "CLOSED", "DORMANT_APPEAL_STATE", "HEARING", "OUTCOME", "PENDING_APPEAL", "READY_TO_LIST", "RESPONSE_RECEIVED", "VALID_APPEAL", "WITH_DWP"})
+    @Parameters({"APPEAL_CREATED", "CLOSED", "DORMANT_APPEAL_STATE", "HEARING", "PENDING_APPEAL", "READY_TO_LIST", "RESPONSE_RECEIVED", "VALID_APPEAL", "WITH_DWP"})
     public void doNotUpdateStateIfCaseStateIsNotApplicable(State state) {
         when(caseDetails.getState()).thenReturn(state);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
