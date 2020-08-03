@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -50,7 +51,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -104,14 +105,14 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     public void givenAnIssueAdjournmentEvent_thenCreatAdjournmentWithFooterAndSetStatesAndClearTransientFields() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null));
 
         assertEquals(DwpState.ADJOURNMENT_NOTICE.getId(), sscsCaseData.getDwpState());
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
+        assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
         assertEquals(0, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
 
         assertNull(sscsCaseData.getAdjournCaseGenerateNotice());
