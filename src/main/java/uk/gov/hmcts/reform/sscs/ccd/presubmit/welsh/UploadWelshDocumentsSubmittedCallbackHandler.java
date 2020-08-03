@@ -97,6 +97,8 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
                         .documentFileName(sscsWelshDocument.getValue().getDocumentLink().getDocumentFilename())
                         .documentLink(sscsWelshDocument.getValue().getDocumentLink())
                         .originalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode())
+                        .documentComment(sscsWelshDocument.getValue().getDocumentComment())
+                        .documentLanguage(sscsWelshDocument.getValue().getDocumentLanguage())
                         .build()).build();
 
                 sscsWelshDocumentsList.add(_sscsWelshDocument);
