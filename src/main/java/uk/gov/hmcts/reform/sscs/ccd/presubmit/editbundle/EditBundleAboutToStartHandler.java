@@ -55,6 +55,8 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String template = documentConfiguration.getCover().get(sscsCaseData.getLanguagePreference());
+        log.info("EditBundleAboutToStartHandler getLanguagePreference  {}",sscsCaseData.getLanguagePreference());
+        log.debug("EditBundleAboutToStartHandler getLanguagePreference  {}",sscsCaseData.getLanguagePreference());
         log.info("EditBundleAboutToStartHandler Coversheet Template {}",template);
         log.debug("EditBundleAboutToStartHandler Coversheet Template {}",template);
         if (sscsCaseData.getCaseBundles() != null) {
