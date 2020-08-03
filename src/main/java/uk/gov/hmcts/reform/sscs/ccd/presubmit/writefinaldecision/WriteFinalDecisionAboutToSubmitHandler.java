@@ -4,7 +4,6 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -16,16 +15,20 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @Component
 @Slf4j
 public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private final PreviewDocumentService previewDocumentService;
 
     @Autowired
-    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService) {
+    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService,
+                                                  PreviewDocumentService previewDocumentService) {
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.previewDocumentService = previewDocumentService;
     }
 
     @Override
@@ -44,11 +47,17 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
+        // Due to a bug with CCD related to hidden fields, this field is not being set
+        // on the final submission from CCD, so we need to reset it here
+        // See https://tools.hmcts.net/jira/browse/RDM-8200
+        // This is a temporary workaround for this issue.
+        sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
+
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
-        writePreviewDocumentToSscsDocument(sscsCaseData);
+        previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getWriteFinalDecisionPreviewDocument());
 
         return preSubmitCallbackResponse;
     }
@@ -84,36 +93,5 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         return pointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
             Optional.of(pointsCondition.getErrorMessage());
 
-    }
-
-    private void writePreviewDocumentToSscsDocument(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSscsDocument() != null) {
-            sscsCaseData.getSscsDocument()
-                    .removeIf(doc -> DRAFT_DECISION_NOTICE.getValue().equals(doc.getValue().getDocumentType()));
-        }
-
-        SscsDocument draftDecisionNotice = SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentFileName(createFileName())
-                .documentLink(sscsCaseData.getWriteFinalDecisionPreviewDocument())
-                .documentDateAdded(setDocumentDateAdded())
-                .documentType(DRAFT_DECISION_NOTICE.getValue())
-                .build()).build();
-
-        List<SscsDocument> documents = new ArrayList<>();
-
-        documents.add(draftDecisionNotice);
-
-        if (sscsCaseData.getSscsDocument() != null) {
-            documents.addAll(sscsCaseData.getSscsDocument());
-        }
-        sscsCaseData.setSscsDocument(documents);
-    }
-
-    private String createFileName() {
-        return String.format("%s generated on %s.pdf", DRAFT_DECISION_NOTICE.getLabel(), LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
-    }
-
-    private String setDocumentDateAdded() {
-        return LocalDate.now().format(DateTimeFormatter.ISO_DATE);
     }
 }

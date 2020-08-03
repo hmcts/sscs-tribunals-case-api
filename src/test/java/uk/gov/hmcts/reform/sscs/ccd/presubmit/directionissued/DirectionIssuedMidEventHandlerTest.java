@@ -1,6 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
@@ -10,6 +13,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -17,22 +23,39 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedMidEventHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String TEMPLATE_ID = "nuts.docx";
+    //private static final String TEMPLATE_ID = "nuts.docx";
     private static final String URL = "http://dm-store/documents/123";
 
     private DirectionIssuedMidEventHandler handler;
+
+    @Spy
+    private DocumentConfiguration documentConfiguration;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -50,7 +73,23 @@ public class DirectionIssuedMidEventHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new DirectionIssuedMidEventHandler(generateFile, TEMPLATE_ID);
+        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
+
+
+        Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
+
+        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+
+        documentConfiguration.setDocuments(documents);
+        handler = new DirectionIssuedMidEventHandler(generateFile, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -110,7 +149,9 @@ public class DirectionIssuedMidEventHandlerTest {
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -119,7 +160,9 @@ public class DirectionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname");
+        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -134,7 +177,27 @@ public class DirectionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname");
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
+    }
+
+    @Test
+    public void givenWelsh_CaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
+        sscsCaseData.setLanguagePreferenceWelsh("yes");
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
+                .name(Name.builder().firstName("APPOINTEE")
+                        .lastName("SurNamE")
+                        .build())
+                .identity(Identity.builder().build())
+                .build());
+
+        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DIRECTION_ISSUED),
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -147,12 +210,18 @@ public class DirectionIssuedMidEventHandlerTest {
         assertEquals("Direction Type cannot be empty", response.getErrors().toArray()[0]);
     }
 
-    private void verifyTemplateBody(String image, String expectedName) {
+    private void verifyTemplateBody(String image, String expectedName, String templateId, boolean isLanguageWelsh) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
-        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(image, payload.getImage());
         assertEquals("DIRECTIONS NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
+        assertEquals(templateId, value.getTemplateId());
+        if (isLanguageWelsh) {
+            assertNotNull(payload.getWelshDateAdded());
+            assertNotNull(payload.getWelshGeneratedDate());
+        }
     }
 }
 

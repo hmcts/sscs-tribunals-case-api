@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
@@ -63,11 +64,15 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private WriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService;
 
+    @MockBean
+    private AdjournCasePreviewService adjournCasePreviewService;
+
     private CcdMideventCallbackController controller;
 
     @Before
     public void setUp() {
-        controller = new CcdMideventCallbackController(authorisationService, deserializer, writeFinalDecisionPreviewDecisionService);
+        controller = new CcdMideventCallbackController(authorisationService, deserializer, writeFinalDecisionPreviewDecisionService,
+            adjournCasePreviewService);
         mockMvc = standaloneSetup(controller).build();
     }
 

@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @Component
@@ -20,12 +20,12 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final GenerateFile generateFile;
-    private final String templateId;
+    private final DocumentConfiguration documentConfiguration;
 
     @Autowired
-    public DecisionIssuedMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.decision_issued}") String templateId) {
+    public DecisionIssuedMidEventHandler(GenerateFile generateFile, DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;
-        this.templateId = templateId;
+        this.documentConfiguration = documentConfiguration;
     }
 
     @Override
@@ -39,7 +39,8 @@ public class DecisionIssuedMidEventHandler extends IssueDocumentHandler implemen
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
-
+        String templateId = documentConfiguration.getDocuments()
+                .get(callback.getCaseDetails().getCaseData().getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
         return issueDocument(callback, DocumentType.DECISION_NOTICE, templateId, generateFile, userAuthorisation);
     }
 }

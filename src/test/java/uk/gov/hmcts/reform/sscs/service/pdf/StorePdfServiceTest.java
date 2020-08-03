@@ -49,7 +49,7 @@ public class StorePdfServiceTest {
         fileNamePrefix = "test name";
         evidenceManagementService = mock(EvidenceManagementService.class);
         storePdfService = new StorePdfService<Object, PdfData>(
-            pdfService, "sometemplate", sscsPdfService, idamService, evidenceManagementService) {
+            pdfService, "sometemplate","sometemplate", sscsPdfService, idamService, evidenceManagementService) {
 
             @Override
             protected String documentNamePrefix(SscsCaseDetails caseDetails, String onlineHearingId, PdfData data) {
@@ -70,6 +70,25 @@ public class StorePdfServiceTest {
         byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
         when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
         String expectedCaseId = "expectedCcdCaseId";
+        when(sscsPdfService.mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence"))
+                .thenReturn(SscsCaseData.builder().ccdCaseId(expectedCaseId).build());
+
+        MyaEventActionContext myaEventActionContext = storePdfService.storePdf(caseId, someOnlineHearingId, new PdfData(caseDetails));
+
+        verify(sscsPdfService).mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence");
+        assertThat(myaEventActionContext.getPdf().getContent(), is(new ByteArrayResource(expectedPdfBytes)));
+        assertThat(myaEventActionContext.getPdf().getName(), is(fileNamePrefix + CASE_ID + ".pdf"));
+        assertThat(myaEventActionContext.getDocument().getData().getCcdCaseId(), is(expectedCaseId));
+    }
+
+    @Test
+    public void storeWelshPdf() {
+        SscsCaseDetails caseDetails = createCaseDetails();
+        caseDetails.getData().setLanguagePreferenceWelsh("Yes");
+        byte[] expectedPdfBytes = {2, 4, 6, 0, 1};
+        when(pdfService.createPdf(pdfContent, "sometemplate")).thenReturn(expectedPdfBytes);
+        String expectedCaseId = "expectedCcdCaseId";
+
         when(sscsPdfService.mergeDocIntoCcd(fileNamePrefix + CASE_ID + ".pdf", expectedPdfBytes, caseId, caseDetails.getData(), idamTokens, "Other evidence"))
                 .thenReturn(SscsCaseData.builder().ccdCaseId(expectedCaseId).build());
 

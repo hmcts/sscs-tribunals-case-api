@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static java.util.Collections.emptySet;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
@@ -13,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
+import com.google.common.collect.ImmutableSet;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
-
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
 public class DirectionIssuedAboutToSubmitHandlerTest {
@@ -51,15 +53,21 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
+    @Mock
+    private ServiceRequestExecutor serviceRequestExecutor;
+
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
+
+    @Mock
+    private PreSubmitCallbackResponse<SscsCaseData> response;
 
     @Before
     public void setUp() {
         initMocks(this);
 
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService);
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate");
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -98,7 +106,10 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
         when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        when(serviceRequestExecutor.post(eq(callback), eq("https://sscs-bulk-scan.net/validate"))).thenReturn(response);
+        when(response.getErrors()).thenReturn(emptySet());
     }
 
     @Test
@@ -121,6 +132,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Test
     public void willCopyThePreviewFileToTheInterlocDirectionDocumentAndAddFooter() {
+        when(caseDetails.getState()).thenReturn(State.READY_TO_LIST);
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getPreviewDocument());
         assertNull(response.getData().getSignedBy());
@@ -193,9 +205,22 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenDirectionTypeOfAppealToProceedAndCaseIsPreValidInterloc_willReturnValidationErrorsFromExternalService() {
+        String errorMessage = "There was an error in the external service";
+        when(response.getErrors()).thenReturn(ImmutableSet.of(errorMessage));
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals(errorMessage, response.getErrors().iterator().next());
+    }
+
+    @Test
     public void givenDirectionTypeOfAppealToProceedAndCaseIsPostValidInterloc_setInterlocStateToAwaitingAdminActionAndDirectionTypeIsSet() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -244,4 +269,5 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
     }
+
 }

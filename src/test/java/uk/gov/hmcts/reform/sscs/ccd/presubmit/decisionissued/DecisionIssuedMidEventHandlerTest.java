@@ -1,13 +1,21 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.decisionissued;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -15,13 +23,25 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DirectionOrDecisionIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
+import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 
 
 @RunWith(JUnitParamsRunner.class)
@@ -41,6 +61,9 @@ public class DecisionIssuedMidEventHandlerTest {
     @Mock
     private GenerateFile generateFile;
 
+    @Spy
+    private DocumentConfiguration documentConfiguration;
+
     private SscsCaseData sscsCaseData;
 
     private ArgumentCaptor<GenerateFileParams> capture;
@@ -48,7 +71,23 @@ public class DecisionIssuedMidEventHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new DecisionIssuedMidEventHandler(generateFile, TEMPLATE_ID);
+        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
+
+
+        Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
+
+        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+
+        documentConfiguration.setDocuments(documents);
+        handler = new DecisionIssuedMidEventHandler(generateFile, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
@@ -107,7 +146,8 @@ public class DecisionIssuedMidEventHandlerTest {
                 .documentUrl(URL)
                 .build(), response.getData().getPreviewDocument());
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname");
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
     }
 
     @Test
@@ -116,7 +156,8 @@ public class DecisionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname");
+        verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
     }
 
     @Test
@@ -131,15 +172,36 @@ public class DecisionIssuedMidEventHandlerTest {
 
         handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        verifyTemplateBody(DirectionOrDecisionIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname");
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DECISION_ISSUED));
     }
 
-    private void verifyTemplateBody(String image, String expectedName) {
+    @Test
+    public void givenWelsh_CaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppended() {
+        sscsCaseData.setLanguagePreferenceWelsh("yes");
+        sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
+        sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
+                .name(Name.builder().firstName("APPOINTEE")
+                        .lastName("SurNamE")
+                        .build())
+                .identity(Identity.builder().build())
+                .build());
+
+        handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
+                documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DECISION_ISSUED));
+    }
+
+    private void verifyTemplateBody(String image, String expectedName, String templateId) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
-        DirectionOrDecisionIssuedTemplateBody payload = (DirectionOrDecisionIssuedTemplateBody) capture.getValue().getFormPayload();
+        var value = capture.getValue();
+        NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) value.getFormPayload();
         assertEquals(image, payload.getImage());
         assertEquals("DECISION NOTICE", payload.getNoticeType());
         assertEquals(expectedName, payload.getAppellantFullName());
+        assertEquals(templateId, value.getTemplateId());
+
     }
 }
 

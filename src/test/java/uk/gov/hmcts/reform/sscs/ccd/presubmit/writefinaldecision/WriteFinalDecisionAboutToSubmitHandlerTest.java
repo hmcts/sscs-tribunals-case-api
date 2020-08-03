@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionAboutToSubmitHandlerTest {
@@ -39,13 +40,15 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private PreviewDocumentService previewDocumentService;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() throws IOException {
         initMocks(this);
         decisionNoticeQuestionService = new DecisionNoticeQuestionService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService);
+        previewDocumentService = new PreviewDocumentService();
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService, previewDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -145,6 +148,84 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
 
+    }
+
+    /**
+     * Due to a CCD bug ( https://tools.hmcts.net/jira/browse/RDM-8200 ) we have had
+     * to implement a workaround in WriteFinalDecisionAboutToSubmitHandler to set
+     * the generated date to now, even though it is already being determined by the
+     * preview document handler.  This is because on submission, the correct generated date
+     * (the one referenced in the preview document) is being overwritten to a null value.
+     * Once RDM-8200 is fixed and we remove the workaround, this test should be changed
+     * to assert that a "something has gone wrong" error is displayed, as a null generated
+     * date would indicate that the date in the preview document hasn't been set.
+     *
+     */
+    @Test
+    public void givenValidSubmissionWithGeneratedDateNotSet_thenSetGeneratedDateAsNowAndDoNotDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+            Arrays.asList("movingAround"));
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+            Arrays.asList("preparingFood", "takingNutrition"));
+
+        // 8 points - correct for mobility standard award
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+
+        // 8 points total - correct for daily living standard award
+        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(LocalDate.now().toString(), sscsCaseData.getWriteFinalDecisionGeneratedDate());
+
+    }
+
+    /**
+     * This test asserts that whatever the value of the existing generated date from CCD
+     * submitted as part of the payload to the WriterFinalSubmissionAboutToSubmitHandler,
+     * then that date is updated to now() after the WriterFinalSubmissionAboutToSubmitHandler is called.
+     * This is due to a workaround we have implemented in the WriterFinalSubmissionAboutToSubmitHandler
+     *
+     */
+    @Test
+    public void givenValidSubmissionWithGeneratedDateSet_thenSetUpdateGeneratedDateAndDoNotDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("standardRate");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-01-01");
+
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+            Arrays.asList("movingAround"));
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+            Arrays.asList("preparingFood", "takingNutrition"));
+
+        // 8 points - correct for mobility standard award
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
+
+        // 8 points total - correct for daily living standard award
+        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals(LocalDate.now().toString(), sscsCaseData.getWriteFinalDecisionGeneratedDate());
     }
 
     @Test

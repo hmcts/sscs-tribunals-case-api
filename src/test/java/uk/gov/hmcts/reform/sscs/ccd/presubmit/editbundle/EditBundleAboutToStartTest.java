@@ -7,16 +7,22 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
+
 
 @RunWith(JUnitParamsRunner.class)
 public class EditBundleAboutToStartTest {
@@ -31,14 +37,19 @@ public class EditBundleAboutToStartTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private BundleRequestExecutor bundleRequestExecutor;
+    private ServiceRequestExecutor serviceRequestExecutor;
+
+    @Spy
+    private DocumentConfiguration documentConfiguration;
 
     private SscsCaseData sscsCaseData;
+
+    private Map<LanguagePreference, String> coverPage;
 
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new EditBundleAboutToStartHandler(bundleRequestExecutor, "bundleUrl.com");
+        handler = new EditBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com", documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.EDIT_BUNDLE);
 
@@ -46,7 +57,12 @@ public class EditBundleAboutToStartTest {
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(bundleRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
+        when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
+
+        coverPage = new HashMap<>();
+        coverPage.put(LanguagePreference.ENGLISH,"SSCS-cover-page.docx");
+        coverPage.put(LanguagePreference.WELSH,"TB-SCS-LET-WEL-00486.docx");
+        documentConfiguration.setCover(coverPage);
     }
 
     @Test
@@ -72,6 +88,26 @@ public class EditBundleAboutToStartTest {
 
         assertEquals("SscsBundle.pdf", bundleResult.getFileName());
         assertEquals("SSCS-cover-page.docx", bundleResult.getCoverpageTemplate());
+        assertEquals("Yes", bundleResult.getHasTableOfContents());
+        assertEquals("Yes", bundleResult.getHasCoversheets());
+        assertEquals("topCenter", bundleResult.getPaginationStyle());
+        assertEquals("numberOfPages", bundleResult.getPageNumberFormat());
+        assertNull(bundleResult.getStitchStatus());
+    }
+
+    @Test
+    public void givenWelsh_ABundleSelectedToBeStitched_thenSetDefaultConfigDetails() {
+        Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
+        List<Bundle> bundles = new ArrayList<>();
+        bundles.add(bundle);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setCaseBundles(bundles);
+        caseData.setLanguagePreferenceWelsh("Yes");
+        BundleDetails bundleResult = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getData().getCaseBundles().get(0).getValue();
+
+        assertEquals("SscsBundle.pdf", bundleResult.getFileName());
+        assertEquals(coverPage.get(LanguagePreference.WELSH), bundleResult.getCoverpageTemplate());
         assertEquals("Yes", bundleResult.getHasTableOfContents());
         assertEquals("Yes", bundleResult.getHasCoversheets());
         assertEquals("topCenter", bundleResult.getPaginationStyle());
@@ -110,6 +146,38 @@ public class EditBundleAboutToStartTest {
     }
 
     @Test
+    public void givenWelsh_ACaseWithMultipleBundles_thenSetDefaultConfigDetailsForSelectedBundle() {
+        Bundle bundle1 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
+        Bundle bundle2 = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("No").build()).build();
+        List<Bundle> bundles = new ArrayList<>();
+        bundles.add(bundle1);
+        bundles.add(bundle2);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setCaseBundles(bundles);
+        caseData.setLanguagePreferenceWelsh("Yes");
+        PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        BundleDetails bundleResult1 = result.getData().getCaseBundles().get(0).getValue();
+
+        assertEquals("SscsBundle.pdf", bundleResult1.getFileName());
+        assertEquals(coverPage.get(LanguagePreference.WELSH), bundleResult1.getCoverpageTemplate());
+        assertEquals("Yes", bundleResult1.getHasTableOfContents());
+        assertEquals("Yes", bundleResult1.getHasCoversheets());
+        assertEquals("topCenter", bundleResult1.getPaginationStyle());
+        assertEquals("numberOfPages", bundleResult1.getPageNumberFormat());
+        assertNull(bundleResult1.getStitchStatus());
+
+        BundleDetails bundleResult2 = result.getData().getCaseBundles().get(1).getValue();
+
+        assertNull(bundleResult2.getFileName());
+        assertNull(bundleResult2.getCoverpageTemplate());
+        assertNull(bundleResult2.getHasTableOfContents());
+        assertNull(bundleResult2.getHasCoversheets());
+        assertNull(bundleResult2.getPaginationStyle());
+        assertNull(bundleResult2.getPageNumberFormat());
+    }
+
+    @Test
     public void givenEditBundleEvent_thenTriggerTheExternalEditBundleEvent() {
         Bundle bundle = Bundle.builder().value(BundleDetails.builder().eligibleForStitching("Yes").build()).build();
         List<Bundle> bundles = new ArrayList<>();
@@ -118,7 +186,7 @@ public class EditBundleAboutToStartTest {
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
     }
 
     @Test
@@ -136,7 +204,7 @@ public class EditBundleAboutToStartTest {
                 .orElse("");
         assertEquals("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?", warning);
 
-        verifyNoInteractions(bundleRequestExecutor);
+        verifyNoInteractions(serviceRequestExecutor);
     }
 
     @Test
@@ -149,7 +217,7 @@ public class EditBundleAboutToStartTest {
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(bundleRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
+        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/stitch-ccd-bundles");
     }
 
     @Test

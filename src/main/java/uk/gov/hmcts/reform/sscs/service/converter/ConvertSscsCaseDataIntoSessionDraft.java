@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangements;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingArrangementsSelection;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingAvailability;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionHearingSupport;
+import uk.gov.hmcts.reform.sscs.model.draft.SessionLanguagePreferenceWelsh;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnDate;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverOneMonthLate;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionMrnOverThirteenMonthsLate;
@@ -118,7 +119,15 @@ public class ConvertSscsCaseDataIntoSessionDraft implements ConvertAIntoBService
             .hearingAvailability(buildHearingAvailability(appeal))
             .datesCantAttend(buildDatesCantAttend(appeal))
             .pcqId(new SessionPcqId(caseData.getPcqId()))
+            .languagePreferenceWelsh(buildLanuagePreferenceWelsh(caseData))
             .build();
+    }
+
+    private SessionLanguagePreferenceWelsh buildLanuagePreferenceWelsh(SscsCaseData caseData) {
+        if (caseData.getLanguagePreferenceWelsh() != null) {
+            return new SessionLanguagePreferenceWelsh(StringUtils.lowerCase(caseData.getLanguagePreferenceWelsh()));
+        }
+        return null;
     }
 
     private SessionEnterMobile buildEnterMobile(SscsCaseData caseData) {

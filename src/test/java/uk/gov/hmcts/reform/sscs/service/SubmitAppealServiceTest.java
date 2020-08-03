@@ -15,10 +15,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -39,6 +37,8 @@ import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaMrn;
+import uk.gov.hmcts.reform.sscs.exception.ApplicationErrorException;
+import uk.gov.hmcts.reform.sscs.exception.DuplicateCaseException;
 import uk.gov.hmcts.reform.sscs.helper.EmailHelper;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -51,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
 @RunWith(JUnitParamsRunner.class)
 public class SubmitAppealServiceTest {
     private static final String TEMPLATE_PATH = "/templates/appellant_appeal_template.html";
+    private static final String WELSH_TEMPLATE_PATH = "/templates/appellant_appeal_welsh_template.html";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
@@ -145,7 +146,7 @@ public class SubmitAppealServiceTest {
         offices.add("Watford DRT");
         offices.add("Sheffield DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
+        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
@@ -156,7 +157,7 @@ public class SubmitAppealServiceTest {
 
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
-        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build());
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().roles(Arrays.asList("citizen")).build());
         given(emailHelper.generateUniqueEmailId(any(Appellant.class))).willReturn("Bloggs_33C");
 
     }
@@ -250,6 +251,14 @@ public class SubmitAppealServiceTest {
         assertFalse(result.isPresent());
     }
 
+    @Test(expected = ApplicationErrorException.class)
+    public void shouldRaisedExceptionOnCreateDraftWhenCitizenRoleIsNotPresent() {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+
+        assertFalse(result.isPresent());
+    }
+
     @Test
     public void shouldSuppressExceptionIfIts409OnCreateDraftCaseWithAppealDetailsWithDraftEvent() {
         FeignException feignException = mock(FeignException.class);
@@ -276,6 +285,12 @@ public class SubmitAppealServiceTest {
         when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
         assertFalse(optionalSessionDraft.isPresent());
+    }
+
+    @Test(expected = ApplicationErrorException.class)
+    public void shouldThrowExceptionOnGetDraftWhenCitizenRoleNotPresent() {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
     }
 
     @Test
@@ -406,7 +421,7 @@ public class SubmitAppealServiceTest {
         submitAppealService.submitAppeal(appealData, userToken);
     }
 
-    @Test
+    @Test(expected = DuplicateCaseException.class)
     public void givenCaseIsADuplicate_shouldNotResendEmails() {
         SscsCaseDetails duplicateCase = SscsCaseDetails.builder().build();
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
@@ -417,7 +432,7 @@ public class SubmitAppealServiceTest {
         then(pdfServiceClient).should(never()).generateFromHtml(any(byte[].class), anyMap());
     }
 
-    @Test
+    @Test(expected = DuplicateCaseException.class)
     public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
         given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
             .willReturn(SscsCaseDetails.builder().build());

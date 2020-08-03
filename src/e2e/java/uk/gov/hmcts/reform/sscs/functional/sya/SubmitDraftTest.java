@@ -111,7 +111,7 @@ public class SubmitDraftTest {
     }
 
     private UserDetails getUserDetails(String userToken) {
-        return new UserDetailsTransformer(idamApiClient.getUserDetails(userToken)).asLocalUserDetails();
+        return new UserDetailsTransformer(idamApiClient.getUserInfo(userToken)).asLocalUserDetails();
     }
 
     private SyaCaseWrapper buildTestDraftAppeal() {

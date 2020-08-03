@@ -15,21 +15,21 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.BundleRequestExecutor;
+import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private BundleRequestExecutor bundleRequestExecutor;
+    private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
-    public CreateBundleAboutToStartHandler(BundleRequestExecutor bundleRequestExecutor,
+    public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
                                            @Value("${bundle.url}") String bundleUrl) {
-        this.bundleRequestExecutor = bundleRequestExecutor;
+        this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
     }
 
@@ -73,7 +73,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                     }
                 }
             }
-            return bundleRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
+            return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
         }
     }
 
