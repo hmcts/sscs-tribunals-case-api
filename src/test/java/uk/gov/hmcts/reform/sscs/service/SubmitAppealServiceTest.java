@@ -32,6 +32,7 @@ import org.mockito.quality.Strictness;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaBenefitType;
@@ -88,7 +89,7 @@ public class SubmitAppealServiceTest {
 
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
-    private SscsPdfService sscsPdfService;
+    private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     static {
         AirLookupService airLookupService = new AirLookupService();
@@ -146,10 +147,10 @@ public class SubmitAppealServiceTest {
         offices.add("Watford DRT");
         offices.add("Sheffield DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
+        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
 
         submitAppealService = new SubmitAppealService(
-            ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
+            ccdService, citizenCcdService, associatedCaseLinkHelper, regionalProcessingCenterService,
             idamService, convertAIntoBService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
@@ -165,7 +166,7 @@ public class SubmitAppealServiceTest {
     @Test
     public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
         submitAppealService = new SubmitAppealService(
-                ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
+                ccdService, citizenCcdService, associatedCaseLinkHelper, regionalProcessingCenterService,
                 idamService, convertAIntoBService, offices);
 
         byte[] expected = {};
@@ -459,57 +460,16 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void givenAssociatedCase_thenAddAssociatedCaseLinkToCase() {
-        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
+        Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
+        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
         matchedByNinoCases.add(matchingCase);
+        when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
 
-        SscsCaseData caseData = submitAppealService.addAssociatedCases(
-            SscsCaseData.builder().ccdCaseId("00000000").build(),
-            matchedByNinoCases);
+        submitAppealService.submitAppeal(appealData, userToken);
 
-        assertEquals(1, caseData.getAssociatedCase().size());
-        assertEquals("Yes", caseData.getLinkedCasesBoolean());
-        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
-    }
-
-    @Test
-    public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
-        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().build()).build();
-        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().build()).build();
-        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
-        matchedByNinoCases.add(matchingCase1);
-        matchedByNinoCases.add(matchingCase2);
-
-        SscsCaseData caseData = submitAppealService.addAssociatedCases(
-                SscsCaseData.builder().ccdCaseId("00000000").build(),
-                matchedByNinoCases);
-
-        assertEquals(2, caseData.getAssociatedCase().size());
-        assertEquals("Yes", caseData.getLinkedCasesBoolean());
-        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("56765676", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
-    }
-
-    @Test
-    public void addNoAssociatedCases() {
-        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
-
-        SscsCaseData caseData = submitAppealService.addAssociatedCases(
-            SscsCaseData.builder().ccdCaseId("00000000").build(),
-            matchedByNinoCases);
-
-        assertNull(caseData.getAssociatedCase());
-        assertEquals("No", caseData.getLinkedCasesBoolean());
-        verify(ccdService, times(0)).updateCase(any(), any(), eq(ASSOCIATE_CASE.getCcdType()), eq("Associate case"), eq("Associated case added"), any());
-    }
-
-    @Test
-    public void getMatchedCases() {
-        given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
-            SscsCaseDetails.builder().id(12345678L).build()
-        ));
-        List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
-
-        assertEquals(1, matchedCases.size());
+        verify(ccdService).findCaseBy(anyMap(),any());
+        verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
+        verify(citizenCcdService).draftArchived(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
     }
 }
