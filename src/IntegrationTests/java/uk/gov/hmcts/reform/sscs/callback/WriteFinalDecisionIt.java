@@ -285,6 +285,70 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
+    /**
+     * Due to a CCD bug ( https://tools.hmcts.net/jira/browse/RDM-8200 ) we have had
+     * to implement a workaround in WriteFinalDecisionAboutToSubmitHandler to set
+     * the generated date to now, even though it is already being determined by the
+     * preview document handler.  This is because on submission, the correct generated date
+     * (the one referenced in the preview document) is being overwritten to a null value.
+     * Once RDM-8200 is fixed and we remove the workaround, this test should be changed
+     * to assert that a "something has gone wrong" error is displayed instead of
+     * previewing the document, as a null generated date would indicate that the
+     * date in the preview document hasn't been set.
+     *
+     */
+    @Test
+    public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCaseWithGeneratedDateAsNowWhenSubmittedGeneratedDateIsNull() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorNullGeneratedDate.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertNull(result.getData().getOutcome());
+
+
+        assertNotNull(result.getData().getWriteFinalDecisionGeneratedDate());
+        assertEquals(LocalDate.now().toString(), result.getData().getWriteFinalDecisionGeneratedDate());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+    }
+
+    /**
+     * This test asserts that whatever the value of the existing generated date from CCD
+     * submitted as part of the payload to the WriterFinalSubmissionAboutToSubmitHandler,
+     * then that date is updated to now() after the WriterFinalSubmissionAboutToSubmitHandler is called.
+     * This is due to a workaround we have implemented in the WriterFinalSubmissionAboutToSubmitHandler
+     *
+     */
+    @Test
+    public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCaseWithGeneratedDateAsNowWhenSubmittedGeneratedDateIsSet() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorSetGeneratedDate.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(Collections.EMPTY_SET, result.getErrors());
+
+        assertNull(result.getData().getOutcome());
+
+
+        assertNotNull(result.getData().getWriteFinalDecisionGeneratedDate());
+
+        assertEquals(LocalDate.now().toString(), result.getData().getWriteFinalDecisionGeneratedDate());
+
+        assertEquals(DRAFT_DECISION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
+        assertEquals(LocalDate.now().toString(), result.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals("Draft Decision Notice generated on " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")) + ".pdf", result.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+    }
+
     @Test
     public void callToAboutToSubmitHandler_willWriteDraftFinalDecisionToCaseForNonDescriptorRoute() throws Exception {
         setup();

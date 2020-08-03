@@ -12,6 +12,9 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;
@@ -20,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -32,10 +36,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -68,6 +74,9 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
 
     @Mock
     private WriteFinalDecisionPreviewDecisionService previewDecisionService;
+
+    @Spy
+    private DocumentConfiguration documentConfiguration;
 
     @Mock
     private GenerateFile generateFile;
@@ -107,6 +116,20 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         when(generateFile.assemble(any())).thenReturn(URL);
+
+        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, TEMPLATE_ID);
+
+
+        Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
+
+        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+
+        documentConfiguration.setDocuments(documents);
+
     }
 
     @Test
@@ -137,7 +160,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
 
         DecisionNoticeQuestionService decisionNoticeQuestionService = new DecisionNoticeQuestionService();
         final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
-            decisionNoticeQuestionService, TEMPLATE_ID);
+            decisionNoticeQuestionService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -170,7 +193,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
 
         DecisionNoticeQuestionService decisionNoticeQuestionService = new DecisionNoticeQuestionService();
         final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
-            decisionNoticeQuestionService, TEMPLATE_ID);
+            decisionNoticeQuestionService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 

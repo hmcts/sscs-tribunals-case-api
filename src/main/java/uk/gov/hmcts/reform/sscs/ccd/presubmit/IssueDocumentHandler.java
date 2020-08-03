@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 
 @Slf4j
 public class IssueDocumentHandler {
@@ -64,6 +65,13 @@ public class IssueDocumentHandler {
 
         if (isScottish) {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
+        }
+
+        if (caseData.isLanguagePreferenceWelsh()) {
+            formPayload = formPayload.toBuilder()
+                    .welshDateAdded(LocalDateToWelshStringConverter.convert(dateAdded))
+                    .welshGeneratedDate(LocalDateToWelshStringConverter.convert(generatedDate))
+                    .build();
         }
         return formPayload;
     }
