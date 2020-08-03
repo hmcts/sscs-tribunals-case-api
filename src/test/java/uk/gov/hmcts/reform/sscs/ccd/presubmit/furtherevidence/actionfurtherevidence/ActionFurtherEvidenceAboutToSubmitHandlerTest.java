@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
@@ -17,12 +18,9 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -33,9 +31,6 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
@@ -54,6 +49,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
+        initMocks(this);
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
@@ -402,7 +398,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         List<ScannedDocument> docs = new ArrayList<>();
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName(filename).url(DocumentLink.builder().documentUrl("test.pdf").documentFilename("test.pdf").build()).build()).build();
+                ScannedDocumentDetails.builder().fileName(filename).url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
 
         docs.add(scannedDocument);
 
@@ -414,27 +410,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         for (String error : response.getErrors()) {
             assertEquals("No document file name so could not process", error);
-        }
-    }
-
-    @Test
-    @Parameters({"file.png", "file.jpg", "file.doc"})
-    public void givenADocumentThatIsNotAPdf_thenAddAnErrorToResponse(String filename) {
-        List<ScannedDocument> docs = new ArrayList<>();
-
-        ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName(filename).url(DocumentLink.builder().documentUrl(filename).documentFilename(filename).build()).build()).build();
-
-        docs.add(scannedDocument);
-
-        sscsCaseData.setScannedDocuments(docs);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertEquals(1, response.getErrors().size());
-
-        for (String error : response.getErrors()) {
-            assertEquals("You need to upload PDF documents only", error);
         }
     }
 }
