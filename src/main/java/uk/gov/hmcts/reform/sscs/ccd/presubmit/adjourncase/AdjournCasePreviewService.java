@@ -37,7 +37,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient, VenueDataLoader venueDataLoader,
         @Value("${doc_assembly.adjourn_case}") String templateId) {
-        super(generateFile, idamClient, templateId);
+        super(generateFile, idamClient, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
     }
 

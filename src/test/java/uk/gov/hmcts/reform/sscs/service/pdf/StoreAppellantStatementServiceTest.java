@@ -66,7 +66,7 @@ public class StoreAppellantStatementServiceTest {
     @Before
     public void setUp() {
         storeAppellantStatementService = spy(new StoreAppellantStatementService(pdfService,
-            "templatePath", ccdPdfService, idamService, evidenceManagementService));
+            "templatePath","templatePath", ccdPdfService, idamService, evidenceManagementService));
     }
 
     @Test

@@ -27,6 +27,7 @@ public class StoreEvidenceDescriptionServiceTest {
         storeEvidenceDescriptionService = new StoreEvidenceDescriptionService(
                 mock(OldPdfService.class),
                 "template_path",
+                "template_path",
                 mock(CcdPdfService.class),
                 mock(IdamService.class),
                 mock(EvidenceManagementService.class)
