@@ -104,7 +104,7 @@ public class TrackYourAppealJsonBuilder {
 
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
 
-            List<String> closedStates = Arrays.asList("closed", "incompleteApplicationVoidState",
+            List<String> closedStates = Arrays.asList("closed",
                     "voidState", "dormantAppealState");
 
             if (appealReceivedStates.contains(state)) {
