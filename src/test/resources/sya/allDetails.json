@@ -88,5 +88,5 @@
     "signer": "Joe Bloggs"
   },
   "pcqId": "12345678",
-  "languagePreferenceWelsh" : "No"
+  "languagePreferenceWelsh" : false
 }
