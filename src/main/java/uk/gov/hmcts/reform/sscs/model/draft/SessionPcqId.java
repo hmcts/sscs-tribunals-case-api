@@ -5,6 +5,6 @@ import lombok.Value;
 
 @Value
 public class SessionPcqId {
-    @JsonProperty("PcqId")
+    @JsonProperty("pcqId")
     private String pcqId;
 }
