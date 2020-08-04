@@ -110,7 +110,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null));
 
-        assertEquals(DwpState.ADJOURNMENT_NOTICE.getId(), sscsCaseData.getDwpState());
+        assertEquals(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId(), sscsCaseData.getDwpState());
         assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
         assertEquals(0, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
 

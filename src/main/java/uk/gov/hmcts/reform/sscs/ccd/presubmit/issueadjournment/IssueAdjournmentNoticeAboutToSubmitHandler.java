@@ -49,7 +49,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
 
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
 
-            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE.getId());
+            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
 
             calculateDueDate(sscsCaseData);
 
