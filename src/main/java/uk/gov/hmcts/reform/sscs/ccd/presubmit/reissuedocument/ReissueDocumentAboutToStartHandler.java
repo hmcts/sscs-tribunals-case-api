@@ -67,7 +67,7 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
             }
             if (sscsCaseData.getSscsDocument().stream()
                 .anyMatch(doc -> doc.getValue().getDocumentType().equals(ADJOURNMENT_NOTICE.getValue()))) {
-                listCostOptions.add(new DynamicListItem(EventType.ADJOURN_CASE.getCcdType(), ADJOURNMENT_NOTICE.getLabel()));
+                listCostOptions.add(new DynamicListItem(EventType.ISSUE_ADJOURNMENT.getCcdType(), ADJOURNMENT_NOTICE.getLabel()));
             }
         }
 
