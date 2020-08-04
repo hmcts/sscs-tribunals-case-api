@@ -51,6 +51,11 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
 
             sscsCaseData.setDwpState(ADJOURNMENT_NOTICE.getId());
@@ -59,10 +64,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
 
             if (sscsCaseData.getAdjournCasePreviewDocument() != null) {
 
-                Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
-                for (ConstraintViolation<SscsCaseData> violation : violations) {
-                    preSubmitCallbackResponse.addError(violation.getMessage());
-                }
                 if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
                     return preSubmitCallbackResponse;
                 }

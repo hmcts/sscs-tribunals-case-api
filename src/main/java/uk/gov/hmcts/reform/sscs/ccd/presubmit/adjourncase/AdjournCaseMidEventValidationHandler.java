@@ -44,20 +44,15 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
         try {
 
-
             if (sscsCaseData.isAdjournCaseDirectionsMadeToParties()) {
-
                 checkDirectionsDueDateInvalid(sscsCaseData);
-
-
-                if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null) {
-                    Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
-                    for (ConstraintViolation<SscsCaseData> violation : violations) {
-                        preSubmitCallbackResponse.addError(violation.getMessage());
-                    }
-                }
             }
             if (("specificDateAndTime".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateType()))
                 && isNextHearingSpecifiedDateInvalid(sscsCaseData)) {

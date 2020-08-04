@@ -146,11 +146,11 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueAdjournmentEventWithDueDate_thenCreateAdjournmentWithGivenDueDate() {
-        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
+        assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
     }
 
     @Test
