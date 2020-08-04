@@ -57,12 +57,12 @@ public class AssociatedCaseLinkHelperTest {
         when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("00000000").build();
-        associatedCaseLinkHelper.linkCaseByNino(caseData);
+        SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData);
 
-        assertEquals(2, caseData.getAssociatedCase().size());
-        assertEquals("Yes", caseData.getLinkedCasesBoolean());
-        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("56765676", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
+        assertEquals(2, result.getAssociatedCase().size());
+        assertEquals("Yes", result.getLinkedCasesBoolean());
+        assertEquals("12345678", result.getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("56765676", result.getAssociatedCase().get(1).getValue().getCaseReference());
     }
 
     @Test

@@ -184,7 +184,7 @@ public class SubmitAppealService {
                 if (caseData.getAppeal().getAppellant().getIdentity() != null
                     && !StringUtils.isEmpty(caseData.getAppeal().getAppellant().getIdentity().getNino())) {
 
-                    associatedCaseLinkHelper.linkCaseByNino(caseData);
+                    caseData = associatedCaseLinkHelper.linkCaseByNino(caseData);
                 }
 
                 caseDetails = ccdService.createCase(caseData,

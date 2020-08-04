@@ -25,16 +25,18 @@ public class AssociatedCaseLinkHelper {
         this.idamService = idamService;
     }
 
-    public void linkCaseByNino(SscsCaseData sscsCaseData) {
+    public SscsCaseData linkCaseByNino(SscsCaseData sscsCaseData) {
+        SscsCaseData updatedSscsCaseData = sscsCaseData;
         Identity identity = sscsCaseData.getAppeal().getAppellant().getIdentity();
         final String nino = (identity != null) ? identity.getNino() : null;
         if (!StringUtils.isEmpty(nino)) {
             List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamService.getIdamTokens());
             if (!matchedByNinoCases.isEmpty()) {
                 log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
-                sscsCaseData = addAssociatedCases(sscsCaseData, matchedByNinoCases);
+                updatedSscsCaseData = addAssociatedCases(sscsCaseData, matchedByNinoCases);
             }
         }
+        return updatedSscsCaseData;
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
