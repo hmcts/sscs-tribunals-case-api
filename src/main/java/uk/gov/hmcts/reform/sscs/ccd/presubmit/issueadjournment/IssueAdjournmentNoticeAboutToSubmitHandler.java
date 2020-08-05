@@ -39,7 +39,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-            && callback.getEvent() == EventType.ISSUE_ADJOURNMENT
+            && callback.getEvent() == EventType.ISSUE_ADJOURNMENT_NOTICE
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }

@@ -51,7 +51,7 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
         initMocks(this);
         handler = new IssueAdjournmentNoticeAboutToStartHandler(previewService);
 
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT);
+        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         sscsCaseData = SscsCaseData.builder()

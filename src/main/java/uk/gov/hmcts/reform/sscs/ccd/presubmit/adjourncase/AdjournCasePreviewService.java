@@ -68,7 +68,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             adjournCaseBuilder.reasonsForDecision(null);
         }
 
-        adjournCaseBuilder.anythingElse(caseData.getAdjournCaseAnythingElse());
+        adjournCaseBuilder.additionalDirections(caseData.getAdjournCaseAdditionalDirections());
 
         adjournCaseBuilder.hearingType(caseData.getAdjournCaseTypeOfHearing());
 
