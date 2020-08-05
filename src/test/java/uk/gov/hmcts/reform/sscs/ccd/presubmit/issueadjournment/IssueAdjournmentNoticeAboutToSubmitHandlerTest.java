@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -25,7 +28,15 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -50,7 +61,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -104,14 +115,15 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     public void givenAnIssueAdjournmentEvent_thenCreatAdjournmentWithFooterAndSetStatesAndClearTransientFields() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null));
 
+
         assertEquals(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId(), sscsCaseData.getDwpState());
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
+        assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
         assertEquals(0, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
 
         assertNull(sscsCaseData.getAdjournCaseGenerateNotice());
@@ -145,11 +157,11 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Test
     public void givenAnIssueAdjournmentEventWithDueDate_thenCreateAdjournmentWithGivenDueDate() {
-        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
+        assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
     }
 
     @Test
