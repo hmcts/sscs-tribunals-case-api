@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +16,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -36,7 +39,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-            && callback.getEvent() == EventType.ISSUE_ADJOURNMENT
+            && callback.getEvent() == EventType.ISSUE_ADJOURNMENT_NOTICE
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
@@ -58,7 +61,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
 
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
 
-            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE.getId());
+            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
 
             calculateDueDate(sscsCaseData);
 
@@ -140,7 +143,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
         sscsCaseData.setAdjournCaseNextHearingSpecificDate(null);
         sscsCaseData.setAdjournCaseNextHearingSpecificTime(null);
         sscsCaseData.setAdjournCaseReasons(null);
-        sscsCaseData.setAdjournCaseAnythingElse(null);
+        sscsCaseData.setAdjournCaseAdditionalDirections(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));

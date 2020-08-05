@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -26,7 +28,15 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -53,7 +63,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         initMocks(this);
         handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, Validation.buildDefaultValidatorFactory().getValidator());
 
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT);
+        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         List<SscsDocument> documentList = new ArrayList<>();
@@ -111,7 +121,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null));
 
-        assertEquals(DwpState.ADJOURNMENT_NOTICE.getId(), sscsCaseData.getDwpState());
+
+        assertEquals(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId(), sscsCaseData.getDwpState());
         assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
         assertEquals(0, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
 
@@ -141,7 +152,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificDate());
         assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificTime());
         assertNull(sscsCaseData.getAdjournCaseReasons());
-        assertNull(sscsCaseData.getAdjournCaseAnythingElse());
+        assertNull(sscsCaseData.getAdjournCaseAdditionalDirections());
     }
 
     @Test
