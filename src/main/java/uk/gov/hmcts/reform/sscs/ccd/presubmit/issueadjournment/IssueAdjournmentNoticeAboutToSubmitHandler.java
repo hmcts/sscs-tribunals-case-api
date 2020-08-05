@@ -82,7 +82,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
                 sscsCaseData.setState(State.READY_TO_LIST);
             }
 
-            clearTransientFields(preSubmitCallbackResponse);
+            preSubmitCallbackResponse.getData().getSscsDocument()
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
         }
 
         return preSubmitCallbackResponse;
@@ -112,41 +113,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
 
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.ADJOURNMENT_NOTICE, now,
                 null, null);
-    }
-
-    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
-
-        sscsCaseData.setAdjournCaseGenerateNotice(null);
-        sscsCaseData.setAdjournCaseTypeOfHearing(null);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(null);
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(null);
-        sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset(null);
-        sscsCaseData.setAdjournCaseDirectionsDueDate(null);
-        sscsCaseData.setAdjournCaseTypeOfNextHearing(null);
-        sscsCaseData.setAdjournCaseNextHearingVenue(null);
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected(null);
-        sscsCaseData.setAdjournCasePanelMembersExcluded(null);
-        sscsCaseData.setAdjournCaseDisabilityQualifiedPanelMemberName(null);
-        sscsCaseData.setAdjournCaseMedicallyQualifiedPanelMemberName(null);
-        sscsCaseData.setAdjournCaseOtherPanelMemberName(null);
-        sscsCaseData.setAdjournCaseNextHearingListingDurationType(null);
-        sscsCaseData.setAdjournCaseNextHearingListingDuration(null);
-        sscsCaseData.setAdjournCaseNextHearingListingDurationUnits(null);
-        sscsCaseData.setAdjournCaseInterpreterRequired(null);
-        sscsCaseData.setAdjournCaseInterpreterLanguage(null);
-        sscsCaseData.setAdjournCaseNextHearingDateType(null);
-        sscsCaseData.setAdjournCaseNextHearingDateOrPeriod(null);
-        sscsCaseData.setAdjournCaseNextHearingDateOrTime(null);
-        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate(null);
-        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterPeriod(null);
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(null);
-        sscsCaseData.setAdjournCaseNextHearingSpecificTime(null);
-        sscsCaseData.setAdjournCaseReasons(null);
-        sscsCaseData.setAdjournCaseAdditionalDirections(null);
-
-        preSubmitCallbackResponse.getData().getSscsDocument()
-                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
     }
 
 }

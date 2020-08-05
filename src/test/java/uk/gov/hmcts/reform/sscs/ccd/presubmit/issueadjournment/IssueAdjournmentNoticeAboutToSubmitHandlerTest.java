@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -112,7 +111,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueAdjournmentEvent_thenCreatAdjournmentWithFooterAndSetStatesAndClearTransientFields() {
+    public void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
         callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
@@ -125,34 +124,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         assertEquals(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId(), sscsCaseData.getDwpState());
         assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
         assertEquals(0, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
-
-        assertNull(sscsCaseData.getAdjournCaseGenerateNotice());
-        assertNull(sscsCaseData.getAdjournCaseTypeOfHearing());
-        assertNull(sscsCaseData.getAdjournCaseCanCaseBeListedRightAway());
-        assertNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties());
-        assertNull(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset());
-        assertNull(sscsCaseData.getAdjournCaseDirectionsDueDate());
-        assertNull(sscsCaseData.getAdjournCaseTypeOfNextHearing());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingVenue());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingVenueSelected());
-        assertNull(sscsCaseData.getAdjournCasePanelMembersExcluded());
-        assertNull(sscsCaseData.getAdjournCaseDisabilityQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getAdjournCaseMedicallyQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getAdjournCaseOtherPanelMemberName());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingListingDurationType());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingListingDuration());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingListingDurationUnits());
-        assertNull(sscsCaseData.getAdjournCaseInterpreterRequired());
-        assertNull(sscsCaseData.getAdjournCaseInterpreterLanguage());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingDateType());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingDateOrTime());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificDate());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificTime());
-        assertNull(sscsCaseData.getAdjournCaseReasons());
-        assertNull(sscsCaseData.getAdjournCaseAdditionalDirections());
     }
 
     @Test
