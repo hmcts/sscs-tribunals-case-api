@@ -103,7 +103,7 @@ public class ReissueDocumentAboutToStartHandlerTest {
         assertEquals(new DynamicListItem("decisionIssued", "Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
         assertEquals(new DynamicListItem("directionIssued", "Directions Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
         assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
-        assertEquals(new DynamicListItem("issueAdjournment", "Adjournment Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(3));
         assertNull(response.getData().getResendToAppellant());
         assertNull(response.getData().getResendToRepresentative());
     }
