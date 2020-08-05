@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -13,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 
 @Component
@@ -20,12 +20,13 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 public class DirectionIssuedMidEventHandler extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final GenerateFile generateFile;
-    private final String templateId;
+    private final DocumentConfiguration documentConfiguration;
 
     @Autowired
-    public DirectionIssuedMidEventHandler(GenerateFile generateFile, @Value("${doc_assembly.direction_issued}") String templateId) {
+    public DirectionIssuedMidEventHandler(GenerateFile generateFile,
+                                          DocumentConfiguration documentConfiguration) {
         this.generateFile = generateFile;
-        this.templateId = templateId;
+        this.documentConfiguration = documentConfiguration;
     }
 
     @Override
@@ -39,13 +40,16 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if (callback.getCaseDetails().getCaseData().getDirectionTypeDl() == null) {
-            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+        if (caseData.getDirectionTypeDl() == null) {
+            PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;
         }
-        log.info("Direction Type is " + callback.getCaseDetails().getCaseData().getDirectionTypeDl().getValue());
+        String templateId = documentConfiguration.getDocuments().get(caseData.getLanguagePreference()).get(EventType.DIRECTION_ISSUED);
+
+        log.info("Direction Type is {} and templateId is {}", caseData.getDirectionTypeDl().getValue(), templateId);
         return issueDocument(callback, DocumentType.DIRECTION_NOTICE, templateId, generateFile, userAuthorisation);
     }
 

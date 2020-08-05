@@ -1,12 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.ADJOURNMENT_NOTICE_ISSUED;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +16,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -23,10 +28,12 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
+    private final Validator validator;
 
     @Autowired
-    public IssueAdjournmentNoticeAboutToSubmitHandler(FooterService footerService) {
+    public IssueAdjournmentNoticeAboutToSubmitHandler(FooterService footerService, Validator validator) {
         this.footerService = footerService;
+        this.validator = validator;
     }
 
     @Override
@@ -47,16 +54,20 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
 
-            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE.getId());
+            sscsCaseData.setDwpState(ADJOURNMENT_NOTICE_ISSUED.getId());
 
             calculateDueDate(sscsCaseData);
 
             if (sscsCaseData.getAdjournCasePreviewDocument() != null) {
 
-                if (!isFileAPdf(sscsCaseData.getAdjournCasePreviewDocument())) {
-                    preSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
                     return preSubmitCallbackResponse;
                 }
 
@@ -71,7 +82,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
                 sscsCaseData.setState(State.READY_TO_LIST);
             }
 
-            clearTransientFields(preSubmitCallbackResponse);
+            preSubmitCallbackResponse.getData().getSscsDocument()
+                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
         }
 
         return preSubmitCallbackResponse;
@@ -101,41 +113,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandler implements PreSubmitCall
 
         footerService.createFooterAndAddDocToCase(documentLink, sscsCaseData, DocumentType.ADJOURNMENT_NOTICE, now,
                 null, null);
-    }
-
-    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
-
-        sscsCaseData.setAdjournCaseGenerateNotice(null);
-        sscsCaseData.setAdjournCaseTypeOfHearing(null);
-        sscsCaseData.setAdjournCaseCanCaseBeListedRightAway(null);
-        sscsCaseData.setAdjournCaseAreDirectionsBeingMadeToParties(null);
-        sscsCaseData.setAdjournCaseDirectionsDueDateDaysOffset(null);
-        sscsCaseData.setAdjournCaseDirectionsDueDate(null);
-        sscsCaseData.setAdjournCaseTypeOfNextHearing(null);
-        sscsCaseData.setAdjournCaseNextHearingVenue(null);
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected(null);
-        sscsCaseData.setAdjournCasePanelMembersExcluded(null);
-        sscsCaseData.setAdjournCaseDisabilityQualifiedPanelMemberName(null);
-        sscsCaseData.setAdjournCaseMedicallyQualifiedPanelMemberName(null);
-        sscsCaseData.setAdjournCaseOtherPanelMemberName(null);
-        sscsCaseData.setAdjournCaseNextHearingListingDurationType(null);
-        sscsCaseData.setAdjournCaseNextHearingListingDuration(null);
-        sscsCaseData.setAdjournCaseNextHearingListingDurationUnits(null);
-        sscsCaseData.setAdjournCaseInterpreterRequired(null);
-        sscsCaseData.setAdjournCaseInterpreterLanguage(null);
-        sscsCaseData.setAdjournCaseNextHearingDateType(null);
-        sscsCaseData.setAdjournCaseNextHearingDateOrPeriod(null);
-        sscsCaseData.setAdjournCaseNextHearingDateOrTime(null);
-        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate(null);
-        sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterPeriod(null);
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(null);
-        sscsCaseData.setAdjournCaseNextHearingSpecificTime(null);
-        sscsCaseData.setAdjournCaseReasons(null);
-        sscsCaseData.setAdjournCaseAnythingElse(null);
-
-        preSubmitCallbackResponse.getData().getSscsDocument()
-                .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue()));
     }
 
 }

@@ -98,7 +98,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters({"INCOMPLETE_APPLICATION", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED", "INTERLOCUTORY_REVIEW_STATE", "INCOMPLETE_APPLICATION_VOID_STATE"})
+    @Parameters({"INCOMPLETE_APPLICATION", "INCOMPLETE_APPLICATION_INFORMATION_REQUESTED", "INTERLOCUTORY_REVIEW_STATE"})
     public void givenNonValidAppeal_populateExtensionNextEventDropdown(State state) {
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(state);

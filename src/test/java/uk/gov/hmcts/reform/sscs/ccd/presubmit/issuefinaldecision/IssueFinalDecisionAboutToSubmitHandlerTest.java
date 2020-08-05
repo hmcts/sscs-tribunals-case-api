@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -66,7 +67,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     public void setUp() throws IOException {
         initMocks(this);
         decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeOutcomeService);
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeOutcomeService, Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

@@ -20,6 +20,8 @@ public class PdfCoverSheet {
     private final String addressPostcode;
     @JsonProperty("hmcts2")
     private final String hmcts;
+    @JsonProperty("welshhmcts2")
+    private final String welshhmcts;
 
     public PdfCoverSheet(String caseId,
                          String name,
@@ -28,7 +30,8 @@ public class PdfCoverSheet {
                          String addressTown,
                          String addressCounty,
                          String addressPostcode,
-                         String hmcts) {
+                         String hmcts,
+                         String welshhmcts) {
         this.caseId = caseId;
         this.name = name;
         this.addressLine1 = addressLine1;
@@ -37,6 +40,7 @@ public class PdfCoverSheet {
         this.addressCounty = addressCounty;
         this.addressPostcode = addressPostcode;
         this.hmcts = hmcts;
+        this.welshhmcts =  welshhmcts;
     }
 
     @Override
