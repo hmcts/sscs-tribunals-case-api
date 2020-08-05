@@ -62,6 +62,71 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
 
+        caseData =  updateOriginalDocument(caseData);
+        if(caseData.getSscsDocument() !=null && caseData.getSscsDocument().size() > 0) {
+            caseData = updateTranslatedDocument(caseData);
+        } else {
+            caseData.setTranslationWorkOutstanding("No");
+        }
+        return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.UPLOAD_WELSH_DOCUMENT.getCcdType(), "Update document translation status",
+                "Update document translation status", idamService.getIdamTokens());
+    }
+
+    private SscsCaseData updateOriginalDocument(SscsCaseData caseData) {
+
+        List<SscsDocument> documents = new ArrayList<>();
+        List<SscsDocument> sscsDocuments =  Optional.ofNullable(caseData).map(SscsCaseData::getSscsDocument)
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(a -> a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
+                .collect(Collectors.toList());
+
+        if(sscsDocuments.size() > 0) {
+            for (SscsDocument sscsDocument : sscsDocuments) {
+                SscsDocument _sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                        .documentType(sscsDocument.getValue().getDocumentType())
+                        .documentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename())
+                        .documentLink(sscsDocument.getValue().getDocumentLink())
+                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE)
+                        .build()).build();
+
+                documents.add(_sscsDocument);
+            }
+        }
+        caseData.setSscsDocument(documents);
+        return caseData;
+    }
+
+    private SscsCaseData updateTranslatedDocument(SscsCaseData caseData) {
+
+        List<SscsWelshDocuments> sscsWelshDocumentsList = new ArrayList<>();
+        List<SscsWelshDocuments> sscsWelshDocuments =
+                new ArrayList<>(Optional.ofNullable(caseData).map(SscsCaseData::getSscsWelshDocuments)
+                        .orElse(Collections.emptyList()));
+
+        if(sscsWelshDocuments.size() > 0) {
+            for (SscsWelshDocuments sscsWelshDocument : sscsWelshDocuments) {
+                SscsWelshDocuments _sscsWelshDocument =
+                        sscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                                .documentType(sscsWelshDocument.getValue().getDocumentType())
+                                .documentFileName(sscsWelshDocument.getValue().getDocumentLink().getDocumentFilename())
+                                .documentLink(sscsWelshDocument.getValue().getDocumentLink())
+                                .originalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode())
+                                .documentComment(sscsWelshDocument.getValue().getDocumentComment())
+                                .documentLanguage(sscsWelshDocument.getValue().getDocumentLanguage())
+                                .build()).build();
+
+                sscsWelshDocumentsList.add(_sscsWelshDocument);
+            }
+        }
+        caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
+        return caseData;
+    }
+
+
+    private SscsCaseDetails updateCase2(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+
         List<SscsDocument> documents = new ArrayList<>();
         List<SscsWelshDocuments> sscsWelshDocumentsList = new ArrayList<>();
         List<SscsDocument> sscsDocuments =  Optional.ofNullable(caseData).map(SscsCaseData::getSscsDocument)
