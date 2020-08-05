@@ -62,7 +62,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
         initMocks(this);
         handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, Validation.buildDefaultValidatorFactory().getValidator());
 
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT);
+        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         List<SscsDocument> documentList = new ArrayList<>();
@@ -98,7 +98,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseNextHearingSpecificDate("")
             .adjournCaseNextHearingSpecificTime("")
             .adjournCaseReasons(Arrays.asList(new CollectionItem(null, "")))
-            .adjournCaseAnythingElse("")
+            .adjournCaseAdditionalDirections("")
         .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

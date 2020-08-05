@@ -4,7 +4,7 @@
     "callback_response_status": null,
     "callback_response_status_code": null,
     "case_data": {
-      "adjournCaseAnythingElse": "Nothing else",
+      "adjournCaseAdditionalDirections": "Nothing else",
       "adjournCaseCanCaseBeListedRightAway": "Yes",
       "adjournCaseDisabilityQualifiedPanelMemberName": "Bob Smith",
       "adjournCaseGenerateNotice": "Yes",
@@ -349,7 +349,7 @@
       768000000
     ],
     "data_classification": {
-      "adjournCaseAnythingElse": "PUBLIC",
+      "adjournCaseAdditionalDirections": "PUBLIC",
       "adjournCaseCanCaseBeListedRightAway": "PUBLIC",
       "adjournCaseDisabilityQualifiedPanelMemberName": "PUBLIC",
       "adjournCaseGenerateNotice": "PUBLIC",
@@ -774,7 +774,7 @@
     ],
     "security_classification": "PUBLIC",
     "security_classifications": {
-      "adjournCaseAnythingElse": "PUBLIC",
+      "adjournCaseAdditionalDirections": "PUBLIC",
       "adjournCaseCanCaseBeListedRightAway": "PUBLIC",
       "adjournCaseDisabilityQualifiedPanelMemberName": "PUBLIC",
       "adjournCaseGenerateNotice": "PUBLIC",

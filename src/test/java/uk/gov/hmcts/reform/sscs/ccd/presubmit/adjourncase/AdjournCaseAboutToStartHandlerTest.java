@@ -73,7 +73,7 @@ public class AdjournCaseAboutToStartHandlerTest {
                 .adjournCaseNextHearingSpecificDate("")
                 .adjournCaseNextHearingSpecificTime("")
                 .adjournCaseReasons(Arrays.asList(new CollectionItem(null, "")))
-                .adjournCaseAnythingElse("")
+                .adjournCaseAdditionalDirections("")
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -122,7 +122,7 @@ public class AdjournCaseAboutToStartHandlerTest {
         assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificDate());
         assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificTime());
         assertNull(sscsCaseData.getAdjournCaseReasons());
-        assertNull(sscsCaseData.getAdjournCaseAnythingElse());
+        assertNull(sscsCaseData.getAdjournCaseAdditionalDirections());
     }
 
     @Test
@@ -163,7 +163,7 @@ public class AdjournCaseAboutToStartHandlerTest {
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingSpecificDate());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingSpecificTime());
         assertEquals(Arrays.asList(new CollectionItem(null, "")), sscsCaseData.getAdjournCaseReasons());
-        assertEquals("", sscsCaseData.getAdjournCaseAnythingElse());
+        assertEquals("", sscsCaseData.getAdjournCaseAdditionalDirections());
     }
 
     @Test
