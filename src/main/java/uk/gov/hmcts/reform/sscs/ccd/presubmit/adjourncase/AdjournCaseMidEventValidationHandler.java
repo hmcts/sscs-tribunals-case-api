@@ -2,7 +2,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -14,6 +18,13 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Component
 @Slf4j
 public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private Validator validator;
+
+    @Autowired
+    public AdjournCaseMidEventValidationHandler(Validator validator) {
+        this.validator = validator;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -33,10 +44,15 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
         try {
 
-            if (sscsCaseData.isAdjournCaseDirectionsMadeToParties() && isDirectionsDueDateInvalid(sscsCaseData)) {
-                preSubmitCallbackResponse.addError("Directions due date must be in the future");
+            if (sscsCaseData.isAdjournCaseDirectionsMadeToParties()) {
+                checkDirectionsDueDateInvalid(sscsCaseData);
             }
             if (("specificDateAndTime".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateType()))
                 && isNextHearingSpecifiedDateInvalid(sscsCaseData)) {
@@ -73,19 +89,15 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
         }
     }
 
-    private boolean isDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
+    private void checkDirectionsDueDateInvalid(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getAdjournCaseDirectionsDueDate() != null) {
             if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() != null && !"0".equals(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset())) {
                 throw new IllegalStateException(("Cannot specify both directions due date and directions due days offset"));
             }
-            LocalDate directionsDueDate = LocalDate.parse(sscsCaseData.getAdjournCaseDirectionsDueDate());
-            LocalDate now = LocalDate.now();
-            return !directionsDueDate.isAfter(now);
         } else {
             if (sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset() == null) {
                 throw new IllegalStateException(("At least one of directions due date or directions due date offset must be specified"));
             }
         }
-        return false;
     }
 }

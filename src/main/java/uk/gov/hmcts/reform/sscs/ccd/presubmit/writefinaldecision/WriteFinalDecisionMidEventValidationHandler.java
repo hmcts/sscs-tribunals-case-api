@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
-
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
@@ -57,11 +54,6 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
         }
 
-        if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null && !isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {
-            preSubmitCallbackResponse.addError("You need to upload PDF documents only");
-            return preSubmitCallbackResponse;
-        }
-
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
@@ -99,15 +91,6 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionStartDate());
             LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionEndDate());
             return !decisionNoticeStartDate.isBefore(decisionNoticeEndDate);
-        }
-        return false;
-    }
-
-    private boolean isDecisionNoticeDateOfDecisionInvalid(SscsCaseData sscsCaseData) {
-        if (!isBlank(sscsCaseData.getWriteFinalDecisionDateOfDecision())) {
-            LocalDate decisionNoticeDecisionDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionDateOfDecision());
-            LocalDate today = LocalDate.now();
-            return decisionNoticeDecisionDate.isAfter(today);
         }
         return false;
     }

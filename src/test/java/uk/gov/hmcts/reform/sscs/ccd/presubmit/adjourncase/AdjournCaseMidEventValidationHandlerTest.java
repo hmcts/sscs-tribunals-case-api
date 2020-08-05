@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -54,7 +55,7 @@ public class AdjournCaseMidEventValidationHandlerTest {
     @Before
     public void setUp() throws IOException {
         initMocks(this);
-        handler = new AdjournCaseMidEventValidationHandler();
+        handler = new AdjournCaseMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
