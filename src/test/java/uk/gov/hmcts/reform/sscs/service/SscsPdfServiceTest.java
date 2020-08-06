@@ -72,8 +72,8 @@ public class SscsPdfServiceTest {
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence")
-                , eq(null));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
+                eq(null));
     }
 
     @Test
@@ -86,8 +86,8 @@ public class SscsPdfServiceTest {
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence")
-                , eq(null));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
+                eq(null));
     }
 
     @Test
@@ -100,8 +100,8 @@ public class SscsPdfServiceTest {
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence")
-                , eq(null));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
+                eq(null));
     }
 
     @Test
@@ -115,6 +115,7 @@ public class SscsPdfServiceTest {
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
+                eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
     }
 }
