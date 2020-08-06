@@ -1,21 +1,25 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 
-import static org.junit.Assert.*;
+import static java.util.Arrays.asList;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -24,6 +28,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 @RunWith(JUnitParamsRunner.class)
 public class ReissueDocumentAboutToStartHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
+
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
 
     private ReissueDocumentAboutToStartHandler handler;
 
@@ -37,35 +44,41 @@ public class ReissueDocumentAboutToStartHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
         handler = new ReissueDocumentAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.REISSUE_DOCUMENT);
 
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+                .documentFileName("file5.pdf")
+                .documentType(null)
+                .documentLink(DocumentLink.builder().documentUrl("url5").build())
+                .build()).build();
+
+        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file1.pdf")
                 .documentType(DECISION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
                 .build()).build();
 
-        SscsDocument document2 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file1.pdf")
                 .documentType(DIRECTION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
                 .build()).build();
 
-        SscsDocument document3 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+        SscsDocument document4 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentFileName("file1.pdf")
                 .documentType(FINAL_DECISION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
                 .build()).build();
-        SscsDocument document4 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+
+        SscsDocument document5 = SscsDocument.builder().value(SscsDocumentDetails.builder()
             .documentFileName("file1.pdf")
             .documentType(ADJOURNMENT_NOTICE.getValue())
             .documentLink(DocumentLink.builder().documentUrl("url1").build())
             .build()).build();
-        
-        List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3, document4);
+
+        List<SscsDocument> sscsDocuments = asList(document1, document2, document3, document4, document5);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
                 .build();
