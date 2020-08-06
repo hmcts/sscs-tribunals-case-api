@@ -240,7 +240,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
         assertEquals("am", payload.getNextHearingTime());
-        assertEquals("face to face", payload.getNextHearingType());
+        assertEquals("face to face hearing", payload.getNextHearingType());
         assertEquals("Chester Magistrate's Court", payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
@@ -293,7 +293,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
         assertEquals("am", payload.getNextHearingTime());
-        assertEquals("telephone", payload.getNextHearingType());
+        assertEquals("telephone hearing", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
@@ -346,7 +346,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
         assertEquals("am", payload.getNextHearingTime());
-        assertEquals("video", payload.getNextHearingType());
+        assertEquals("video hearing", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
@@ -399,7 +399,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
         assertEquals("am", payload.getNextHearingTime());
-        assertEquals("paper", payload.getNextHearingType());
+        assertEquals("decision on the papers", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertNull(payload.getNextHearingTimeslot());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
