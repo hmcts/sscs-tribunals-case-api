@@ -30,6 +30,10 @@ public enum HearingType {
         return value;
     }
 
+    public String getKey() {
+        return key;
+    }
+
     public boolean isOralHearingType() {
         return isOralHearingType;
     }

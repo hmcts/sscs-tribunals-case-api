@@ -95,8 +95,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
         if (nextHearingType.isOralHearingType()) {
             if (caseData.getAdjournCaseNextHearingListingDuration() != null) {
-                adjournCaseBuilder.nextHearingTimeslot(getTimeslotString(caseData.getAdjournCaseNextHearingListingDurationUnits(),
-                    caseData.getAdjournCaseNextHearingListingDuration()));
+                if (caseData.getAdjournCaseNextHearingListingDurationUnits() == null) {
+                    throw new IllegalStateException("Timeslot duration units not supplied on case data");
+                }
+                adjournCaseBuilder.nextHearingTimeslot(getTimeslotString(caseData.getAdjournCaseNextHearingListingDuration(),
+                    caseData.getAdjournCaseNextHearingListingDurationUnits()));
             } else {
                 adjournCaseBuilder.nextHearingTimeslot("a standard time slot");
             }
