@@ -269,6 +269,37 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenAWelshCaseWithScannedDocuments_thenSetTranslationStatusToRequired() {
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        SscsDocument doc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentType("appellantEvidence")
+                        .documentFileName("exist.pdf")
+                        .build())
+                .build();
+        sscsDocuments.add(doc);
+
+        sscsCaseData.setScannedDocuments(scannedDocumentList);
+        sscsCaseData.setSscsDocument(sscsDocuments);
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("Other document received on 12-06-2019", response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
+        assertEquals("2019-06-12", response.getData().getSscsDocument().get(0).getValue().getDocumentDateAdded());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
+
+        assertEquals("Other document received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
+        assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, response.getData().getSscsDocument().get(1).getValue().getDocumentTranslationStatus());
+
+        assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
+        assertNull(response.getData().getSscsDocument().get(2).getValue().getDocumentTranslationStatus());
+        assertNull(response.getData().getScannedDocuments());
+        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+    }
+
+    @Test
     public void givenACaseWithScannedDocumentWithEmptyValues_thenHandleTheDocument() {
         List<ScannedDocument> docs = new ArrayList<>();
 
