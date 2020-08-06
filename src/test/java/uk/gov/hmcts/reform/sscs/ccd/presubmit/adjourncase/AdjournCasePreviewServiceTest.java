@@ -130,10 +130,10 @@ public class AdjournCasePreviewServiceTest {
     @SuppressWarnings("unused")
     private Object[] allNextHearingTypeParameters() {
         return new Object[] {
-            new String[] {"faceToFace", "face to face"},
-            new String[] {"telephone", "telephone"},
-            new String[] {"video", "video"},
-            new String[] {"paper", "paper"},
+            new String[] {"faceToFace", "face to face hearing"},
+            new String[] {"telephone", "telephone hearing"},
+            new String[] {"video", "video hearing"},
+            new String[] {"paper", "decision on the papers"},
         };
     }
 
@@ -141,9 +141,9 @@ public class AdjournCasePreviewServiceTest {
     @SuppressWarnings("unused")
     private Object[] nonFaceToFaceNextHearingTypeParameters() {
         return new Object[] {
-            new String[] {"telephone", "telephone"},
-            new String[] {"video", "video"},
-            new String[] {"paper", "paper"},
+            new String[] {"telephone", "telephone hearing"},
+            new String[] {"video", "video hearing"},
+            new String[] {"paper", "decision on the papers"},
         };
     }
 
@@ -151,7 +151,7 @@ public class AdjournCasePreviewServiceTest {
     @SuppressWarnings("unused")
     private Object[] faceToFaceNextHearingTypeParameter() {
         return new Object[] {
-            new String[] {"faceToFace", "face to face"},
+            new String[] {"faceToFace", "face to face hearing"},
         };
     }
 
