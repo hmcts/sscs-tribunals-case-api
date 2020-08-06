@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 
 public class SscsPdfServiceTest {
 
@@ -71,7 +72,8 @@ public class SscsPdfServiceTest {
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence")
+                , eq(null));
     }
 
     @Test
@@ -84,7 +86,8 @@ public class SscsPdfServiceTest {
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence")
+                , eq(null));
     }
 
     @Test
@@ -97,6 +100,21 @@ public class SscsPdfServiceTest {
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
 
         verify(pdfServiceClient).generateFromHtml(any(), any());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence")
+                , eq(null));
+    }
+
+    @Test
+    public void givenLanguagePreferenceWelsh_createValidPdfAndSendEmailAndStoreInDocumentStoreWithTranslationStatusReqd() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+
+        caseData.getAppeal().setRep(Representative.builder().hasRepresentative("No").build());
+        caseData.setLanguagePreferenceWelsh("Yes");
+
+        service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
+
+        verify(pdfServiceClient).generateFromHtml(any(), any());
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
     }
 }

@@ -16,6 +16,7 @@ import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.ExcludeDate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
@@ -46,8 +47,8 @@ public class SscsPdfService {
         log.info("Case {} PDF successfully created for benefit type {}",
                 caseDetailsId,
                 sscsCaseData.getAppeal().getBenefitType().getCode());
-
-        return ccdPdfService.updateDoc(fileName, pdf, caseDetailsId, sscsCaseData, documentType);
+        SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        return ccdPdfService.updateDoc(fileName, pdf, caseDetailsId, sscsCaseData, documentType, documentTranslationStatus);
     }
 
     private byte[] generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId) {
