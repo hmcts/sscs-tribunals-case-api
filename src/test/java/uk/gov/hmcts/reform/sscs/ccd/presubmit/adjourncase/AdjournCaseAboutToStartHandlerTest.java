@@ -55,7 +55,7 @@ public class AdjournCaseAboutToStartHandlerTest {
                 .adjournCaseDirectionsDueDate("")
                 .adjournCaseTypeOfNextHearing("")
                 .adjournCaseNextHearingVenue("")
-                .adjournCaseNextHearingVenueSelected("")
+                .adjournCaseNextHearingVenueSelected(new DynamicList(new DynamicListItem("", ""), new ArrayList<>()))
                 .adjournCasePanelMembersExcluded("")
                 .adjournCaseDisabilityQualifiedPanelMemberName("")
                 .adjournCaseMedicallyQualifiedPanelMemberName("")
@@ -145,7 +145,7 @@ public class AdjournCaseAboutToStartHandlerTest {
         assertEquals("", sscsCaseData.getAdjournCaseDirectionsDueDate());
         assertEquals("", sscsCaseData.getAdjournCaseTypeOfNextHearing());
         assertEquals("", sscsCaseData.getAdjournCaseNextHearingVenue());
-        assertEquals("", sscsCaseData.getAdjournCaseNextHearingVenueSelected());
+        assertEquals("", sscsCaseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
         assertEquals("", sscsCaseData.getAdjournCasePanelMembersExcluded());
         assertEquals("", sscsCaseData.getAdjournCaseDisabilityQualifiedPanelMemberName());
         assertEquals("", sscsCaseData.getAdjournCaseMedicallyQualifiedPanelMemberName());

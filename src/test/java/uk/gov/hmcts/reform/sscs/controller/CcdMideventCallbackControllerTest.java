@@ -13,6 +13,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
@@ -21,6 +23,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -35,7 +38,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @SuppressWarnings("unchecked")
 @RunWith(JUnitParamsRunner.class)
@@ -67,12 +72,22 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private AdjournCasePreviewService adjournCasePreviewService;
 
+    @Mock
+    private VenueDataLoader venueDataLoader;
+
     private CcdMideventCallbackController controller;
 
     @Before
     public void setUp() {
+
+        Map<String, VenueDetails> venueDetailsMap = new HashMap<>();
+        VenueDetails venueDetails = VenueDetails.builder().venName("New Venue Name").build();
+        venueDetailsMap.put("someVenueId", venueDetails);
+
+        when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
+
         controller = new CcdMideventCallbackController(authorisationService, deserializer, writeFinalDecisionPreviewDecisionService,
-            adjournCasePreviewService);
+            adjournCasePreviewService, venueDataLoader);
         mockMvc = standaloneSetup(controller).build();
     }
 

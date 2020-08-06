@@ -75,11 +75,12 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         HearingType nextHearingType = HearingType.getByKey(caseData.getAdjournCaseTypeOfNextHearing());
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
-            if (caseData.getAdjournCaseNextHearingVenueSelected() != null) {
+            if (caseData.getAdjournCaseNextHearingVenueSelected() != null && caseData.getAdjournCaseNextHearingVenueSelected().getValue() != null
+                && caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode() != null) {
                 VenueDetails venueDetails =
-                    venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected());
+                    venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
                 if (venueDetails == null) {
-                    throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected());
+                    throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
                 }
                 adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
                 adjournCaseBuilder.nextHearingAtVenue(true);
