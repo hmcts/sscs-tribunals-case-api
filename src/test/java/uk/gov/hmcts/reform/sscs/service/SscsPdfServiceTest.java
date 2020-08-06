@@ -52,7 +52,8 @@ public class SscsPdfServiceTest {
 
         ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
         verify(pdfServiceClient).generateFromHtml(any(), argumentCaptor.capture());
-        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"));
+        verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
+                eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
 
         List<String> list =  (List) argumentCaptor.getValue().get("welsh_exclude_dates");
         assertEquals("30 Mehefin 2018",((List) argumentCaptor.getValue().get("welsh_exclude_dates")).get(0));
@@ -88,6 +89,7 @@ public class SscsPdfServiceTest {
         verify(pdfServiceClient).generateFromHtml(any(), any());
         verify(ccdPdfService).updateDoc(eq("fileName"), any(), eq(1L), any(), eq("appellantEvidence"),
                 eq(null));
+
     }
 
     @Test
