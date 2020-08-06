@@ -677,7 +677,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
     @Nullable
     private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SyaCaseWrapper syaCaseWrapper) {
-        return syaCaseWrapper.getLanguagePreferenceWelsh() !=null && syaCaseWrapper.getLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        return syaCaseWrapper.getLanguagePreferenceWelsh() != null && syaCaseWrapper.getLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
     }
 
     private static String getPhoneNumberWithOutSpaces(String phoneNumber) {
