@@ -147,6 +147,24 @@ public class AdjournCasePreviewServiceTest {
         };
     }
 
+    @NamedParameters("paperNextHearingTypeParameters")
+    @SuppressWarnings("unused")
+    private Object[] paperNextHearingTypeParameters() {
+        return new Object[] {
+            new String[] {"paper", "decision on the papers"},
+        };
+    }
+
+    @NamedParameters("oralNextHearingTypeParameters")
+    @SuppressWarnings("unused")
+    private Object[] oralNextHearingTypeParameters() {
+        return new Object[] {
+            new String[] {"faceToFace", "face to face hearing"},
+            new String[] {"telephone", "telephone hearing"},
+            new String[] {"video", "video hearing"},
+        };
+    }
+
     @NamedParameters("faceToFaceNextHearingTypeParameter")
     @SuppressWarnings("unused")
     private Object[] faceToFaceNextHearingTypeParameter() {
@@ -600,6 +618,54 @@ public class AdjournCasePreviewServiceTest {
         if (isOralHearing) {
             assertEquals("a standard time slot", body.getNextHearingTimeslot());
         }
+    }
+
+    @Test
+    @Parameters(named = "oralNextHearingTypeParameters")
+    public void givenCaseWithDurationParameterButMissingUnitsWhenOralHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+        sscsCaseData.setAdjournCaseNextHearingListingDuration("2");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Timeslot duration units not supplied on case data", error);
+        assertNull(response.getData().getAdjournCasePreviewDocument());
+    }
+
+    @Test
+    @Parameters(named = "paperNextHearingTypeParameters")
+    public void givenCaseWithDurationParameterButMissingUnitsWhenPaperHearing_thenDisplayErrorAndDoNotGenerateDocument(String nextHearingType, String nextHearingTypeText) {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+        sscsCaseData.setAdjournCaseNextHearingListingDuration("2");
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getAdjournCasePreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getAdjournCasePreviewDocument());
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
+
+        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
+        assertNotNull(body);
+
+        assertNull(body.getNextHearingTimeslot());
     }
 
     @Test
