@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
-/**
- * Enum to encapsulate binding between an activity question key, and the corresponding getter method on SscsCaseData that yields that answer to that question.
- */
 public enum ElementsDisputed {
 
     GENERAL("general", "General"),
