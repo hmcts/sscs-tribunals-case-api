@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
+import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +49,7 @@ public class AssociatedCaseLinkHelper {
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
         log.info("Adding " + matchedByNinoCases.size() + " associated cases for case id {}", caseData.getCcdCaseId());
 
-        List<CaseLink> associatedCases = new ArrayList<>();
+        Set<CaseLink> associatedCases = new HashSet<>();
 
         for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
             log.info("Linking case " + sscsCaseDetails.getId().toString());
@@ -62,7 +58,7 @@ public class AssociatedCaseLinkHelper {
         }
 
         if (!matchedByNinoCases.isEmpty()) {
-            caseData.setAssociatedCase(associatedCases);
+            caseData.setAssociatedCase(new ArrayList<>(associatedCases));
             caseData.setLinkedCasesBoolean("Yes");
             addLinkToOtherAssociatedCases(matchedByNinoCases, caseData.getCcdCaseId());
         } else {
@@ -78,7 +74,8 @@ public class AssociatedCaseLinkHelper {
                 List<CaseLink> linkList = Optional.ofNullable(sscsCaseData.getAssociatedCase()).orElse(Lists.newArrayList());
                 linkList.add(CaseLink.builder().value(
                         CaseLinkDetails.builder().caseReference(caseId).build()).build());
-                sscsCaseData.setAssociatedCase(linkList);
+                Set<CaseLink> uniqueLinkSet = new HashSet<>(linkList);
+                sscsCaseData.setAssociatedCase(new ArrayList<>(uniqueLinkSet));
                 sscsCaseData.setLinkedCasesBoolean("Yes");
                 ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.UPDATE_CASE_ONLY.getCcdType(), "updated case only", "Auto linked case added", idamService.getIdamTokens());
             }

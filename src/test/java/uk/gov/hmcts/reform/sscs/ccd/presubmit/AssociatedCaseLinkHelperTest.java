@@ -61,8 +61,8 @@ public class AssociatedCaseLinkHelperTest {
 
         assertEquals(2, result.getAssociatedCase().size());
         assertEquals("Yes", result.getLinkedCasesBoolean());
-        assertEquals("12345678", result.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("56765676", result.getAssociatedCase().get(1).getValue().getCaseReference());
+        assertEquals("56765676", result.getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("12345678", result.getAssociatedCase().get(1).getValue().getCaseReference());
 
         assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
@@ -86,8 +86,8 @@ public class AssociatedCaseLinkHelperTest {
 
         assertEquals(2, result.getAssociatedCase().size());
         assertEquals("Yes", result.getLinkedCasesBoolean());
-        assertEquals("12345678", result.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("56765676", result.getAssociatedCase().get(1).getValue().getCaseReference());
+        assertEquals("56765676", result.getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("12345678", result.getAssociatedCase().get(1).getValue().getCaseReference());
 
         assertNull(matchingCase1.getData().getLinkedCasesBoolean());
         assertNull(matchingCase1.getData().getAssociatedCase());
@@ -110,8 +110,8 @@ public class AssociatedCaseLinkHelperTest {
 
         assertEquals(2, caseData.getAssociatedCase().size());
         assertEquals("Yes", caseData.getLinkedCasesBoolean());
-        assertEquals("12345678", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("56765676", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
+        assertEquals("56765676", caseData.getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("12345678", caseData.getAssociatedCase().get(1).getValue().getCaseReference());
 
         assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("33333333", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());

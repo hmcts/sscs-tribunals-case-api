@@ -137,8 +137,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertEquals(2, response.getData().getAssociatedCase().size());
         assertEquals("Yes", response.getData().getLinkedCasesBoolean());
-        assertEquals("12345678", response.getData().getAssociatedCase().get(0).getValue().getCaseReference());
-        assertEquals("56765676", response.getData().getAssociatedCase().get(1).getValue().getCaseReference());
+        assertEquals("56765676", response.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("12345678", response.getData().getAssociatedCase().get(1).getValue().getCaseReference());
 
         assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
         assertEquals("ccdId", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
