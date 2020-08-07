@@ -3,7 +3,11 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -61,9 +65,24 @@ public class AssociatedCaseLinkHelper {
         if (!matchedByNinoCases.isEmpty()) {
             caseData.setAssociatedCase(associatedCases);
             caseData.setLinkedCasesBoolean("Yes");
+            addLinkToOtherAssociatedCases(matchedByNinoCases, caseData.getCcdCaseId());
         } else {
             caseData.setLinkedCasesBoolean("No");
         }
         return caseData;
+    }
+
+    private void addLinkToOtherAssociatedCases(List<SscsCaseDetails> matchedByNinoCases, String caseId) {
+        if (!matchedByNinoCases.isEmpty() && !StringUtils.isEmpty(caseId)) {
+            for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
+                SscsCaseData sscsCaseData = sscsCaseDetails.getData();
+                List<CaseLink> linkList = Optional.ofNullable(sscsCaseData.getAssociatedCase()).orElse(Lists.newArrayList());
+                linkList.add(CaseLink.builder().value(
+                        CaseLinkDetails.builder().caseReference(caseId).build()).build());
+                sscsCaseData.setAssociatedCase(linkList);
+                sscsCaseData.setLinkedCasesBoolean("Yes");
+                ccdService.updateCase(sscsCaseData, Long.valueOf(sscsCaseData.getCcdCaseId()), EventType.UPDATE_CASE_ONLY.getCcdType(), "updated case only", "Auto linked case added", idamService.getIdamTokens());
+            }
+        }
     }
 }

@@ -461,7 +461,7 @@ public class SubmitAppealServiceTest {
     @Test
     public void givenAssociatedCase_thenAddAssociatedCaseLinkToCase() {
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
-        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        SscsCaseDetails matchingCase = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
         matchedByNinoCases.add(matchingCase);
         when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
