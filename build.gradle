@@ -265,7 +265,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '10.0.1'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.8.0'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.8.1'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
