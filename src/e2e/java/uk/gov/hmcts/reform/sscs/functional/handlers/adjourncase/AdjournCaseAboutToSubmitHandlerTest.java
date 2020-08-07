@@ -32,7 +32,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
             .then()
             .statusCode(HttpStatus.SC_OK)
             .rootPath("data")
-            .assertThat().body("adjournCaseAnythingElse", equalTo("Nothing else"))
+            .assertThat().body("adjournCaseAdditionalDirections", equalTo("Nothing else"))
             .assertThat().body("adjournCaseCanCaseBeListedRightAway", equalTo("Yes"))
             .assertThat().body("adjournCaseDisabilityQualifiedPanelMemberName", equalTo("Bob Smith"))
             .assertThat().body("adjournCaseGenerateNotice", equalTo("Yes"))

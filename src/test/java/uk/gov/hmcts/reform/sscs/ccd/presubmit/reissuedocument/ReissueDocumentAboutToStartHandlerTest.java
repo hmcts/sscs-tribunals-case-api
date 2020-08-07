@@ -59,7 +59,13 @@ public class ReissueDocumentAboutToStartHandlerTest {
                 .documentType(FINAL_DECISION_NOTICE.getValue())
                 .documentLink(DocumentLink.builder().documentUrl("url1").build())
                 .build()).build();
-        List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3);
+        SscsDocument document4 = SscsDocument.builder().value(SscsDocumentDetails.builder()
+            .documentFileName("file1.pdf")
+            .documentType(ADJOURNMENT_NOTICE.getValue())
+            .documentLink(DocumentLink.builder().documentUrl("url1").build())
+            .build()).build();
+        
+        List<SscsDocument> sscsDocuments = Arrays.asList(document1, document2, document3, document4);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
                 .build();
@@ -93,10 +99,11 @@ public class ReissueDocumentAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
         assertEquals(Collections.EMPTY_SET, response.getErrors());
-        assertEquals(3, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(4, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
         assertEquals(new DynamicListItem("decisionIssued", "Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
         assertEquals(new DynamicListItem("directionIssued", "Directions Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
         assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(3));
         assertNull(response.getData().getResendToAppellant());
         assertNull(response.getData().getResendToRepresentative());
     }

@@ -68,7 +68,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             adjournCaseBuilder.reasonsForDecision(null);
         }
 
-        adjournCaseBuilder.anythingElse(caseData.getAdjournCaseAnythingElse());
+        adjournCaseBuilder.additionalDirections(caseData.getAdjournCaseAdditionalDirections());
 
         adjournCaseBuilder.hearingType(caseData.getAdjournCaseTypeOfHearing());
 
@@ -95,8 +95,11 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         }
         if (nextHearingType.isOralHearingType()) {
             if (caseData.getAdjournCaseNextHearingListingDuration() != null) {
-                adjournCaseBuilder.nextHearingTimeslot(caseData.getAdjournCaseNextHearingListingDuration()
-                    + " " + caseData.getAdjournCaseNextHearingListingDurationUnits());
+                if (caseData.getAdjournCaseNextHearingListingDurationUnits() == null) {
+                    throw new IllegalStateException("Timeslot duration units not supplied on case data");
+                }
+                adjournCaseBuilder.nextHearingTimeslot(getTimeslotString(caseData.getAdjournCaseNextHearingListingDuration(),
+                    caseData.getAdjournCaseNextHearingListingDurationUnits()));
             } else {
                 adjournCaseBuilder.nextHearingTimeslot("a standard time slot");
             }
@@ -124,6 +127,14 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         return builder.build();
     }
     
+    private String getTimeslotString(String nextHearingListingDuration, String nextHearingListingDurationUnits) {
+        if (nextHearingListingDuration.equals("1")) {
+            return "1 " + nextHearingListingDurationUnits.substring(0, nextHearingListingDurationUnits.length() - 1);
+        } else {
+            return nextHearingListingDuration + " " +  nextHearingListingDurationUnits;
+        }
+    }
+
 
     private void setNextHearingDateAndTime(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData, LocalDate issueDate) {
         String dateString = null;

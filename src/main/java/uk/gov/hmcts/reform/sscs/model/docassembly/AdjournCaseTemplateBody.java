@@ -53,7 +53,8 @@ public class AdjournCaseTemplateBody {
 
     @JsonProperty("reasons_for_decision")
     private List<String> reasonsForDecision;
-    @JsonProperty("anything_else")
-    private String anythingElse;
+
+    @JsonProperty("additional_directions")
+    private String additionalDirections;
 
 }

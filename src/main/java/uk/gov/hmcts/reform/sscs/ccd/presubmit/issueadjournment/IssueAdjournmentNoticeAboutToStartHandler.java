@@ -30,7 +30,7 @@ public class IssueAdjournmentNoticeAboutToStartHandler implements PreSubmitCallb
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.ISSUE_ADJOURNMENT;
+                && callback.getEvent() == EventType.ISSUE_ADJOURNMENT_NOTICE;
     }
 
     @Override
