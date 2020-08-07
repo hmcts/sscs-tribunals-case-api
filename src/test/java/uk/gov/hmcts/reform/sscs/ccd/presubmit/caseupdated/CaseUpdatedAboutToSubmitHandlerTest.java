@@ -122,8 +122,8 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Test
     public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
-        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).build()).build();
-        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
         matchedByNinoCases.add(matchingCase1);
         matchedByNinoCases.add(matchingCase2);
@@ -139,5 +139,11 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         assertEquals("Yes", response.getData().getLinkedCasesBoolean());
         assertEquals("12345678", response.getData().getAssociatedCase().get(0).getValue().getCaseReference());
         assertEquals("56765676", response.getData().getAssociatedCase().get(1).getValue().getCaseReference());
+
+        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
+        assertEquals("ccdId", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+
+        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
+        assertEquals("ccdId", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
     }
 }
