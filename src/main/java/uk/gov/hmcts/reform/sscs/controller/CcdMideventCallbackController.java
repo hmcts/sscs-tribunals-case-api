@@ -4,6 +4,9 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -67,17 +70,32 @@ public class CcdMideventCallbackController {
             .filter(e -> isRegionalProcessingCentreMatch(e.getValue().getRegionalProcessingCentre(),
                 sscsCaseData.getRegionalProcessingCenter().getName()))
             .map(e -> new DynamicListItem(e.getKey(),
-                getVenueDisplayString(e.getValue()))).collect(Collectors.toList());
+                getVenueDisplayString(e.getValue(), false))).collect(Collectors.toList());
 
-        DynamicList list = new DynamicList(new DynamicListItem("", ""), itemList);
+        List<DynamicListItem> otherRPCitemList = venueDataLoader.getVenueDetailsMap()
+            .entrySet().stream()
+            .filter(e -> !isRegionalProcessingCentreMatch(e.getValue().getRegionalProcessingCentre(),
+                sscsCaseData.getRegionalProcessingCenter().getName()))
+            .map(e -> new DynamicListItem(e.getKey(),
+                getVenueDisplayString(e.getValue(), true))).collect(Collectors.toList());
+
+        Collections.sort(itemList, (d1, d2) -> d1.getLabel().compareTo(d2.getLabel()));
+
+        Collections.sort(otherRPCitemList, (d1, d2) -> d1.getLabel().compareTo(d2.getLabel()));
+
+        List<DynamicListItem> fullList = new ArrayList<>();
+        fullList.addAll(itemList);
+        fullList.addAll(otherRPCitemList);
+
+        DynamicList list = new DynamicList(new DynamicListItem("", ""), fullList);
 
         sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         return ok(preSubmitCallbackResponse);
     }
 
-    private String getVenueDisplayString(VenueDetails venueDetails) {
-        return venueDetails.getVenName() + ", "
+    private String getVenueDisplayString(VenueDetails venueDetails, boolean prefix) {
+        return (prefix ? (getRPC(venueDetails) + " - " ) : "") + venueDetails.getVenName() + ", "
             + venueDetails.getVenAddressLine1() + ", "
             + venueDetails.getVenAddressLine2() + ", "
             + venueDetails.getVenAddressTown() + ", "
@@ -87,6 +105,10 @@ public class CcdMideventCallbackController {
 
     private boolean isRegionalProcessingCentreMatch(String value, String rpc) {
         return value.substring(5).equalsIgnoreCase(rpc);
+    }
+
+    private String getRPC(VenueDetails vd) {
+        return vd.getRegionalProcessingCentre().substring(5);
     }
 
 
