@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.welsh;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,14 +23,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static java.util.Objects.requireNonNull;
-
 @Service
 @Slf4j
 public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -33,8 +32,6 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
     private static Map<String, String> nextEventMap = new HashMap<>();
 
     static {
-        nextEventMap.put("sscs1","sendToDwp");
-        nextEventMap.put("sscs1","sendToDwp");
         nextEventMap.put("sscs1","sendToDwp");
     }
 
@@ -69,8 +66,8 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
         int outStandingDocumentFlag = 0;
         String nextEvent;
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
-            if (sscsDocument.getValue().getDocumentTranslationStatus() !=null &&
-                    sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
+            if (sscsDocument.getValue().getDocumentTranslationStatus() != null
+                    && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
                 outStandingDocumentFlag++;
                 if (sscsDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
                     sscsDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
@@ -80,9 +77,10 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
         log.info("outStandingDocumentFlag  {}",outStandingDocumentFlag);
         for (SscsWelshDocuments sscsWelshPreviewDocuments : caseData.getSscsWelshPreviewDocuments()) {
             sscsWelshPreviewDocuments.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
+
             nextEvent = sscsWelshPreviewDocuments.getValue().getDocumentType();
             log.info("nextEvent  {}",nextEvent);
-            if(caseData.getSscsWelshDocuments() != null) {
+            if (caseData.getSscsWelshDocuments() != null) {
                 caseData.getSscsWelshDocuments().add(sscsWelshPreviewDocuments);
             } else {
                 List<SscsWelshDocuments> sscsWelshDocumentsList =  new ArrayList<>();
@@ -93,13 +91,13 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
 
         //clear the Preview collection
         caseData.setSscsWelshPreviewDocuments(new ArrayList<>());
-        if(outStandingDocumentFlag <= 1) {
+        if (outStandingDocumentFlag <= 1) {
             log.info("outStandingDocumentFlag if {}",outStandingDocumentFlag);
             caseData.setTranslationWorkOutstanding("No");
         } else {
             log.info("outStandingDocumentFlag else {}",outStandingDocumentFlag);
-            caseData.setTranslationWorkOutstanding(caseData.getTranslationWorkOutstanding() != null ?
-                    caseData.getTranslationWorkOutstanding() : "Yes");
+            caseData.setTranslationWorkOutstanding(caseData.getTranslationWorkOutstanding() != null
+                    ? caseData.getTranslationWorkOutstanding() : "Yes");
         }
 
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
@@ -107,8 +105,8 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
                 "Update document translation status", idamService.getIdamTokens());
     }
 
-    private String getNextEvent(String documentType){
-        return nextEventMap.get(documentType) != null ? nextEventMap.get(documentType):
+    private String getNextEvent(String documentType) {
+        return nextEventMap.get(documentType) != null ? nextEventMap.get(documentType) :
                 EventType.UPLOAD_WELSH_DOCUMENT.getCcdType();
     }
 }

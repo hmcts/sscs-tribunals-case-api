@@ -1,7 +1,23 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.welsh;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
+
 import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,23 +47,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
@@ -93,14 +92,15 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption =
                 buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, false);
-        return new Object[]{
-                new Object[]{SUBMITTED, callbackWithValidEventOption, true}
+        return new Object[] {
+            new Object[]{SUBMITTED, callbackWithValidEventOption, true}
         };
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
                                                  boolean moreThanOneDoc) {
-        DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
+
+        final DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
                 Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
 
         SscsDocument sscs1Doc = SscsDocument.builder()
@@ -138,7 +138,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
 
         List<SscsDocument> oneDoc = new ArrayList<>();
         oneDoc.add(sscs1Doc);
-        if(moreThanOneDoc) {
+        if (moreThanOneDoc) {
             oneDoc.add(sscs2Doc);
         }
 
@@ -156,7 +156,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void updateCaseWhenOnlyOneDocumentAndOnlyOneSetToRequestTranslationStatusTORequestTranslation() {
+    public void updateCaseWhenOnlyOneDocumentAndOnlyOneSetToRequestTranslationStatusToRequestTranslation() {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, false);
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
@@ -178,7 +178,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void updateCaseWhenOnlyOneDocumentAndMorethanOneSetToRequestTranslationStatusTORequestTranslation() {
+    public void updateCaseWhenOnlyOneDocumentAndMorethanOneSetToRequestTranslationStatusToRequestTranslation() {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, true);
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 

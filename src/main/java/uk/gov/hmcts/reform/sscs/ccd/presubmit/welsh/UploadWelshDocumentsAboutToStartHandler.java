@@ -1,5 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.welsh;
 
+import static java.util.Objects.requireNonNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -12,15 +21,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static java.util.Objects.requireNonNull;
 
 @Component
 public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -66,7 +66,7 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
                     sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
         });
 
-        if(listOptions.size() > 0) {
+        if (listOptions.size() > 0) {
             sscsCaseData.setOriginalDocuments(new DynamicList(listOptions.get(0), listOptions));
         } else {
             listOptions.add(new DynamicListItem("-", "No original file"));

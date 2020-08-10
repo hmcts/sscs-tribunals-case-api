@@ -1,5 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.welsh;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -20,15 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 @RunWith(JUnitParamsRunner.class)
 public class UploadWelshDocumentsAboutToStartHandlerTest {
@@ -81,7 +81,7 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
 
     @Test
     @Parameters(method = "generateSscsCaseData")
-    public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(@Nullable List<SscsDocument> sscsDocuments){
+    public void originalDocumentDropDownWhenSscsDocumentTranslationStatusIsSet(@Nullable List<SscsDocument> sscsDocuments) {
         sscsCaseData = SscsCaseData.builder()
                 .sscsDocument(sscsDocuments)
                 .appeal(Appeal.builder().build())
@@ -107,8 +107,8 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
         List<SscsDocument> oneDoc = new ArrayList<>();
         oneDoc.add(sscs1Doc);
 
-        return new Object[]{
-                new Object[]{oneDoc}
+        return new Object[] {
+            new Object[]{oneDoc}
         };
     }
 }
