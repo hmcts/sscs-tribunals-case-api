@@ -24,6 +24,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.w3c.dom.traversal.DocumentTraversal;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -144,6 +145,33 @@ public class FooterServiceTest {
         assertEquals("Addition A", stringCaptor.getAllValues().get(1));
     }
 
+
+    @Test
+    public void givenADocumentWithTranslationStatus_thenAddTranslationStatusToDocumentDetails() throws Exception {
+        byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
+        when(evidenceManagementService.download(any(), anyString())).thenReturn(pdfBytes);
+
+        when(evidenceManagementService.upload(any(), eq(DM_STORE_USER_ID))).thenReturn(uploadResponse);
+
+        when(pdfWatermarker.shrinkAndWatermarkPdf(any(), stringCaptor.capture(), stringCaptor.capture())).thenReturn(new byte[]{});
+
+        String now = LocalDate.now().toString();
+
+        footerService.createFooterAndAddDocToCase(DocumentLink.builder().documentUrl("MyUrl").build(),
+                sscsCaseData, DocumentType.DIRECTION_NOTICE, now, null, null, SscsDocumentTranslationStatus.TRANSLATION_REQUIRED);
+
+        assertEquals(2, sscsCaseData.getSscsDocument().size());
+        SscsDocumentDetails footerDoc = sscsCaseData.getSscsDocument().get(0).getValue();
+        assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), footerDoc.getDocumentType());
+        assertEquals("Addition A - Directions Notice issued on " + now + ".pdf", footerDoc.getDocumentFileName());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED, footerDoc.getDocumentTranslationStatus());
+        assertEquals(now, footerDoc.getDocumentDateAdded());
+        assertEquals(expectedDocumentUrl, footerDoc.getDocumentLink().getDocumentUrl());
+        verify(evidenceManagementService).upload(any(), eq(DM_STORE_USER_ID));
+        assertEquals("Directions Notice", stringCaptor.getAllValues().get(0));
+        assertEquals("Addition A", stringCaptor.getAllValues().get(1));
+    }
+
     @Test
     public void buildFooterLinkFromLeftAndRightText() throws IOException {
         byte[] pdfBytes = IOUtils.toByteArray(getClass().getClassLoader().getResourceAsStream("pdf/sample.pdf"));
@@ -183,6 +211,7 @@ public class FooterServiceTest {
         String expected = currentAppendix.equals("") ? "A" : String.valueOf((char)(currentAppendix.charAt(0) +  1));
         assertEquals(expected, actual);
     }
+
 
     @Test
     @Parameters({"Z", "Z1", "Z9", "Z85", "Z100"})

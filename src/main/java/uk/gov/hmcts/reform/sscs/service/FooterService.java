@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 
@@ -40,6 +41,10 @@ public class FooterService {
     }
 
     public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName) {
+        this.createFooterAndAddDocToCase(url,caseData, documentType, dateIssued, dateAdded, overrideFileName, null); ;
+    }
+
+    public void createFooterAndAddDocToCase(DocumentLink url, SscsCaseData caseData, DocumentType documentType, String dateIssued, LocalDate dateAdded, String overrideFileName, SscsDocumentTranslationStatus documentTranslationStatus) {
         String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
         if (url != null) {
             log.info(label + " adding footer appendix document link: {} and caseId {}", url, caseData.getCcdCaseId());
@@ -49,7 +54,7 @@ public class FooterService {
             String bundleFileName = overrideFileName != null ? overrideFileName : buildBundleAdditionFileName(bundleAddition, label + " issued on " + dateIssued);
 
             SscsDocument sscsDocument = createFooterDocument(url, label, bundleAddition, bundleFileName,
-                    dateAdded, documentType);
+                    dateAdded, documentType, documentTranslationStatus);
 
             List<SscsDocument> documents = new ArrayList<>();
             documents.add(sscsDocument);
@@ -64,7 +69,7 @@ public class FooterService {
     }
 
     private SscsDocument createFooterDocument(DocumentLink url, String leftText, String bundleAddition, String documentFileName,
-                                                LocalDate dateAdded, DocumentType documentType) {
+                                                LocalDate dateAdded, DocumentType documentType, SscsDocumentTranslationStatus documentTranslationStatus) {
         url = addFooter(url, leftText, bundleAddition);
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
@@ -73,6 +78,7 @@ public class FooterService {
                 .bundleAddition(bundleAddition)
                 .documentDateAdded(Optional.ofNullable(dateAdded).orElse(LocalDate.now()).format(DateTimeFormatter.ISO_DATE))
                 .documentType(documentType.getValue())
+                .documentTranslationStatus(documentTranslationStatus)
                 .build())
                 .build();
     }

@@ -27,6 +27,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -56,6 +57,8 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
+
+    private SscsWelshDocument expectedWelshDocument;
 
     @Before
     public void setUp() {
@@ -95,7 +98,6 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
                 .documentDateAdded(LocalDate.now().minusDays(1).toString())
                 .documentType(DocumentType.DECISION_NOTICE.getValue())
                 .build()).build();
-
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
@@ -146,7 +148,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
-             any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null));
+             any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
     }
 
     @Test
@@ -171,7 +173,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DECISION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DECISION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null), eq(null));
     }
 
     @Test
@@ -191,5 +193,49 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
+    }
+
+    @Test
+    public void givenDecisionIssuedAndCaseIsWelsh_DoNotSetDwpStateAndOutcomeToStruckOut() {
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("welshTranslation",response.getData().getInterlocReviewState());
+        assertEquals("Yes",response.getData().getTranslationWorkOutstanding());
+        assertNull(response.getData().getDwpState());
+        assertNull( response.getData().getOutcome());
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
+                any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+    }
+
+    @Test
+    public void givenDecisionIssuedWelshAndCaseIsWelsh_SetDwpStateAndOutcomeToStruckOut() {
+
+        expectedWelshDocument = SscsWelshDocument.builder()
+                .value(SscsWelshDocumentDetails.builder()
+                        .documentFileName("welshDecisionDocFilename")
+                        .documentLink(DocumentLink.builder().documentUrl("welshUrl").documentBinaryUrl("welshBinaryUrl").build())
+                        .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                        .documentType(DocumentType.DECISION_NOTICE.getValue())
+                        .build()).build();
+        sscsCaseData.setSscsWelshDocuments(new ArrayList<>());
+        sscsCaseData.getSscsWelshDocuments().add(expectedWelshDocument);
+
+
+        when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED_WELSH);
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getInterlocReviewState());
+        assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
+        assertEquals("struckOut", response.getData().getOutcome());
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedWelshDocument.getValue().getDocumentLink()),
+                any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
     }
 }
