@@ -98,6 +98,8 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
             caseData.setTranslationWorkOutstanding("No");
         } else {
             log.info("outStandingDocumentFlag else {}",outStandingDocumentFlag);
+            caseData.setTranslationWorkOutstanding(caseData.getTranslationWorkOutstanding() != null ?
+                    caseData.getTranslationWorkOutstanding() : "Yes");
         }
 
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),

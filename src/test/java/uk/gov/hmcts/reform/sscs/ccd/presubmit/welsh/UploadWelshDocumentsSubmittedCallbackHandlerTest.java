@@ -92,13 +92,14 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
 
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption =
-                buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT);
+                buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, false);
         return new Object[]{
                 new Object[]{SUBMITTED, callbackWithValidEventOption, true}
         };
     }
 
-    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType) {
+    private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
+                                                 boolean moreThanOneDoc) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
                 Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
 
@@ -107,6 +108,17 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("/anotherUrl")
                                 .documentFilename("english.pdf")
+                                .build())
+                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
+                        .documentType("sscs1")
+                        .build())
+                .build();
+
+        SscsDocument sscs2Doc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("/anotherUrl")
+                                .documentFilename("anything.pdf")
                                 .build())
                         .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
                         .documentType("sscs1")
@@ -126,6 +138,9 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
 
         List<SscsDocument> oneDoc = new ArrayList<>();
         oneDoc.add(sscs1Doc);
+        if(moreThanOneDoc) {
+            oneDoc.add(sscs2Doc);
+        }
 
         List<SscsWelshDocuments> welshDoc = new ArrayList<>();
         welshDoc.add(sscs1WelshDoc);
@@ -141,8 +156,8 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void update() {
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT);
+    public void updateCaseWhenOnlyOneDocumentAndOnlyOneSetToRequestTranslationStatusTORequestTranslation() {
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, false);
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
@@ -160,7 +175,28 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
                 captor.getValue().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
                 captor.getValue().getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
-
     }
 
+    @Test
+    public void updateCaseWhenOnlyOneDocumentAndMorethanOneSetToRequestTranslationStatusTORequestTranslation() {
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, true);
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq("uploadWelshDocument"),
+                anyString(), anyString(), any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        assertNotNull(captor.getValue().getOriginalDocuments());
+        assertEquals("english.pdf",captor.getValue().getOriginalDocuments().getListItems().get(0).getCode());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
+                captor.getValue().getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
+        assertEquals("Yes",captor.getValue().getTranslationWorkOutstanding());
+        assertEquals("english.pdf",
+                captor.getValue().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+        assertEquals("welsh",
+                captor.getValue().getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
+
+    }
 }
