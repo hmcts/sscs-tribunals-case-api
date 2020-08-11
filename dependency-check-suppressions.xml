@@ -15,6 +15,7 @@
         <packageUrl regex="true">^pkg:maven/edu\.usc\.ir/sentiment-analysis-parser@0.*$</packageUrl>
         <cve>CVE-2018-18749</cve>
     </suppress>
+
     <suppress>
         <notes><![CDATA[No fix available]]></notes>
         <gav regex="true">^org\.apache\.sling:org\.apache\.sling\.javax\.activation:0\.1\.0$</gav>
@@ -28,13 +29,13 @@
         <gav regex="true">^org\.jetbrains\.kotlin:*:.*$</gav>
         <cve>CVE-2020-15824</cve>
     </suppress>
-    <suppress until="2020-09-30">
+    <suppress until="2020-11-30">
         <notes><![CDATA[No fix available]]></notes>
         <gav regex="true">^org\.apache\.sling:org\.apache\.sling\.javax\.activation:0\.1\.0$</gav>
         <cve>CVE-2016-5394</cve>
         <cve>CVE-2016-6798</cve>
     </suppress>
-    <suppress until="2020-11-30">
+    <suppress until="2021-01-01">
         <notes><![CDATA[
          file name: sscs-pdf-email-common-1.4.14.jar
          Jquery included from SpringCloud. We are on latest release awaiting patch (Hoxton SR8)
