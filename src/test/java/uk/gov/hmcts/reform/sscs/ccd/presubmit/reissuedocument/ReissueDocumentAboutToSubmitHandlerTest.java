@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
@@ -39,7 +39,7 @@ public class ReissueDocumentAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new ReissueDocumentAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.REISSUE_DOCUMENT);

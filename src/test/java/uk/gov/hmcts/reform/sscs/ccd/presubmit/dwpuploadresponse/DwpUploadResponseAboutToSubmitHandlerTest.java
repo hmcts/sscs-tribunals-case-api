@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDate;
@@ -33,7 +33,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
