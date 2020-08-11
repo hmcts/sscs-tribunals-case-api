@@ -210,7 +210,6 @@ dependencyManagement {
         dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.13.3'
         // resolves: CVE-2020-9489
         dependency group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
-
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
         dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.0') {
             entry 'kotlin-stdlib'
