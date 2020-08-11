@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
@@ -45,7 +45,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() throws IOException {
-        initMocks(this);
+        openMocks(this);
         decisionNoticeQuestionService = new DecisionNoticeQuestionService();
         previewDocumentService = new PreviewDocumentService();
         handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService, previewDocumentService);
