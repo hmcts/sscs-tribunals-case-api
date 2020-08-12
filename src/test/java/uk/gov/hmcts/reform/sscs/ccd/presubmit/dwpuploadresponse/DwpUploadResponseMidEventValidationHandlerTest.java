@@ -266,6 +266,54 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
         assertEquals("You’ve entered an invalid date of birth", error);
     }
 
+    @Test
+    public void givenNoJointPartyNino_thenDoNotDisplayError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenValidJointPartyNinoNoSpaces_thenDoNotDisplayError() {
+
+        sscsCaseData.setJointPartyNino("BB000000B");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenValidJointPartyNinoWithSpaces_thenDoNotDisplayError() {
+
+        sscsCaseData.setJointPartyNino("BB 00 00 00 B");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenInvalidJointPartyNino_thenDoDisplayError() {
+
+        sscsCaseData.setJointPartyNino("blah");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Invalid National Insurance number", error);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheEvent() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
