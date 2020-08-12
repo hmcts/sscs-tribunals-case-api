@@ -198,7 +198,7 @@ def versions = [
 ]
 
 ///
-ext["rest-assured.version"] = '4.3.0'
+ext["rest-assured.version"] = '4.2.0'
 
 ext {
     springCloudVersion = 'Hoxton.SR7'
