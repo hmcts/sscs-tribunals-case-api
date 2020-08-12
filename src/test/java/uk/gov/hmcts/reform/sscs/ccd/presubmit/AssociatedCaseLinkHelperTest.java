@@ -7,9 +7,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.ASSOCIATE_CASE;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,17 +50,20 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
-    public void shouldLinkCaseByNino() {
+    public void shouldLinkCaseByNinoIfPreviousNinoNotPresent() {
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
+
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
         matchedByNinoCases.add(matchingCase1);
         matchedByNinoCases.add(matchingCase2);
+        SscsCaseData previousCaseData  = SscsCaseData.builder().appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).ccdCaseId("33333333").build();
+        Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails = Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now()));
         when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
-        SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData);
+        SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
 
         assertEquals(2, result.getAssociatedCase().size());
         assertEquals("Yes", result.getLinkedCasesBoolean());
@@ -72,6 +78,32 @@ public class AssociatedCaseLinkHelperTest {
     }
 
     @Test
+    public void shouldNotLinkCaseByNinoIfPreviousNinoIsPresent() {
+        Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
+
+        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+        matchedByNinoCases.add(matchingCase1);
+        matchedByNinoCases.add(matchingCase2);
+        SscsCaseData previousCaseData  = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
+        Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails = Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now()));
+        when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
+
+        SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
+        SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
+
+        assertNull(result.getAssociatedCase());
+        assertNull(result.getLinkedCasesBoolean());
+
+        assertNull( matchingCase1.getData().getLinkedCasesBoolean());
+        assertNull( matchingCase1.getData().getAssociatedCase());
+
+        assertNull(matchingCase2.getData().getLinkedCasesBoolean());
+        assertNull(matchingCase2.getData().getAssociatedCase());
+    }
+
+    @Test
     public void shouldLinkCaseByNinoButNotToOthersIfCaseIdIsNull() {
         Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
         SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
@@ -82,7 +114,7 @@ public class AssociatedCaseLinkHelperTest {
         when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).build();
-        SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData);
+        SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, Optional.empty());
 
         assertEquals(2, result.getAssociatedCase().size());
         assertEquals("Yes", result.getLinkedCasesBoolean());
