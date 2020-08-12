@@ -275,15 +275,12 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.6'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
-<<<<<<< HEAD
 
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.57'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.9'
 
-=======
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.3.39-SSCS-7722-RC3'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.3.39-SSCS-7722-RC4'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.9_SSCS-7727_RC1'
->>>>>>> SSCS-7722 Fix CVEs
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
