@@ -67,7 +67,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     sscsCaseData.getDwpResponseDocument().getDocumentLink()));
         }
 
-        if (sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("uc")) {
+        if (sscsCaseData.getAppeal().getBenefitType() != null && sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("uc")) {
             setUcCaseCode(sscsCaseData);
         }
 
