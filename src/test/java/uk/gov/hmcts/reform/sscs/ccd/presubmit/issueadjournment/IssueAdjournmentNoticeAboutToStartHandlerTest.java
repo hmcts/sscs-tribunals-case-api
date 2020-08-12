@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import junitparams.JUnitParamsRunner;
@@ -48,10 +48,10 @@ public class IssueAdjournmentNoticeAboutToStartHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new IssueAdjournmentNoticeAboutToStartHandler(previewService);
 
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT);
+        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         sscsCaseData = SscsCaseData.builder()

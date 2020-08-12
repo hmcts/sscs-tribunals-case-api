@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.issueadjournment;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -49,10 +51,10 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService);
+        openMocks(this);
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, Validation.buildDefaultValidatorFactory().getValidator());
 
-        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT);
+        when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         List<SscsDocument> documentList = new ArrayList<>();
@@ -88,7 +90,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseNextHearingSpecificDate("")
             .adjournCaseNextHearingSpecificTime("")
             .adjournCaseReasons(Arrays.asList(new CollectionItem(null, "")))
-            .adjournCaseAnythingElse("")
+            .adjournCaseAdditionalDirections("")
         .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -101,55 +103,28 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenAnIssueAdjournmentEvent_thenCreatAdjournmentWithFooterAndSetStatesAndClearTransientFields() {
+    public void givenAnIssueAdjournmentEvent_thenCreateAdjournmentWithFooterAndSetStatesAndClearDraftDoc() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename("bla.pdf").build();
         callback.getCaseDetails().getCaseData().setAdjournCasePreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         verify(footerService).createFooterAndAddDocToCase(eq(docLink), any(), eq(ADJOURNMENT_NOTICE), any(), eq(null), eq(null));
 
-        assertEquals(DwpState.ADJOURNMENT_NOTICE.getId(), sscsCaseData.getDwpState());
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
-        assertEquals(0, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
 
-        assertNull(sscsCaseData.getAdjournCaseGenerateNotice());
-        assertNull(sscsCaseData.getAdjournCaseTypeOfHearing());
-        assertNull(sscsCaseData.getAdjournCaseCanCaseBeListedRightAway());
-        assertNull(sscsCaseData.getAdjournCaseAreDirectionsBeingMadeToParties());
-        assertNull(sscsCaseData.getAdjournCaseDirectionsDueDateDaysOffset());
-        assertNull(sscsCaseData.getAdjournCaseDirectionsDueDate());
-        assertNull(sscsCaseData.getAdjournCaseTypeOfNextHearing());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingVenue());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingVenueSelected());
-        assertNull(sscsCaseData.getAdjournCasePanelMembersExcluded());
-        assertNull(sscsCaseData.getAdjournCaseDisabilityQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getAdjournCaseMedicallyQualifiedPanelMemberName());
-        assertNull(sscsCaseData.getAdjournCaseOtherPanelMemberName());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingListingDurationType());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingListingDuration());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingListingDurationUnits());
-        assertNull(sscsCaseData.getAdjournCaseInterpreterRequired());
-        assertNull(sscsCaseData.getAdjournCaseInterpreterLanguage());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingDateType());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingDateOrTime());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificDate());
-        assertNull(sscsCaseData.getAdjournCaseNextHearingSpecificTime());
-        assertNull(sscsCaseData.getAdjournCaseReasons());
-        assertNull(sscsCaseData.getAdjournCaseAnythingElse());
+        assertEquals(DwpState.ADJOURNMENT_NOTICE_ISSUED.getId(), sscsCaseData.getDwpState());
+        assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
+        assertEquals(0, (int) sscsCaseData.getSscsDocument().stream().filter(f -> f.getValue().getDocumentType().equals(DRAFT_ADJOURNMENT_NOTICE.getValue())).count());
     }
 
     @Test
     public void givenAnIssueAdjournmentEventWithDueDate_thenCreateAdjournmentWithGivenDueDate() {
-        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().toString());
+        callback.getCaseDetails().getCaseData().setAdjournCaseDirectionsDueDate(LocalDate.now().plusDays(1).toString());
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertEquals(LocalDate.now().toString(), sscsCaseData.getDirectionDueDate());
+        assertEquals(LocalDate.now().plusDays(1).toString(), sscsCaseData.getDirectionDueDate());
     }
 
     @Test

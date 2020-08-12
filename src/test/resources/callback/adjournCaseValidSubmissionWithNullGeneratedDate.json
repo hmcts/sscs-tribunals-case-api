@@ -34,7 +34,7 @@
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
       "adjournCaseNextHearingSpecificTime" : "am",
-      "adjournCaseAnythingElse" : "something else",
+      "adjournCaseAdditionalDirections" : "something else",
       "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
       "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",
       "dwpTimeExtension": [
@@ -758,7 +758,7 @@
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
       "adjournCaseNextHearingSpecificTime" : "am",
-      "adjournCaseAnythingElse" : "something else",
+      "adjournCaseAdditionalDirections" : "something else",
       "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
       "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",
       "dwpTimeExtension": [
