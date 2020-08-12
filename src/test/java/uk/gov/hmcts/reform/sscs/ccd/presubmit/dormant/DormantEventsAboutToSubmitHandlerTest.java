@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dormant;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 
 import java.util.Collections;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -35,11 +39,14 @@ public class DormantEventsAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new DormantEventsAboutToSubmitHandler();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getState()).thenReturn(INTERLOCUTORY_REVIEW_STATE);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build())
+                .state(INTERLOCUTORY_REVIEW_STATE)
                 .interlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -63,6 +70,7 @@ public class DormantEventsAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionDueDate());
+        assertThat(response.getData().getPreviousState(), is(INTERLOCUTORY_REVIEW_STATE));
     }
 
     @Test(expected = IllegalStateException.class)
