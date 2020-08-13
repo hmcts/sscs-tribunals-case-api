@@ -38,8 +38,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
-
         if (sscsCaseData.getDwpFurtherInfo() == null) {
             preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
         }
@@ -70,6 +68,8 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         if (sscsCaseData.getAppeal().getBenefitType() != null && sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("uc")) {
             setUcCaseCode(sscsCaseData);
         }
+
+        checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
         return preSubmitCallbackResponse;
     }
