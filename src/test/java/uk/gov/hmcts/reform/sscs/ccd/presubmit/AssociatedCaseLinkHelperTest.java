@@ -96,8 +96,8 @@ public class AssociatedCaseLinkHelperTest {
         assertNull(result.getAssociatedCase());
         assertNull(result.getLinkedCasesBoolean());
 
-        assertNull( matchingCase1.getData().getLinkedCasesBoolean());
-        assertNull( matchingCase1.getData().getAssociatedCase());
+        assertNull(matchingCase1.getData().getLinkedCasesBoolean());
+        assertNull(matchingCase1.getData().getAssociatedCase());
 
         assertNull(matchingCase2.getData().getLinkedCasesBoolean());
         assertNull(matchingCase2.getData().getAssociatedCase());
