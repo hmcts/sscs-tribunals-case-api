@@ -16,11 +16,29 @@ def type = "java"
 def product = "sscs"
 def component = "tribunals-api"
 
+def secrets = [
+        'sscs-${env}'      : [
+                secret('idam-api', 'IDAM_API_URL'),
+                secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
+                secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
+                secret('idam-redirect', 'IDAM_OAUTH2_REDIRECT_URL'),
+                secret('idam-sscs-systemupdate-user', 'IDAM_SSCS_SYSTEMUPDATE_USER'),
+                secret('idam-sscs-systemupdate-password', 'IDAM_SSCS_SYSTEMUPDATE_PASSWORD'),
+                secret('idam-sscs-oauth2-client-secret', 'IDAM_OAUTH2_CLIENT_SECRET'),
+                secret('idam-s2s-api', 'IDAM_S2S_AUTH'),
+                secret('sscs-s2s-secret', 'IDAM_S2S_AUTH_TOTP_SECRET'),
+                secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
+                secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
+                secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
+                secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+        ]
+]
 
 withNightlyPipeline(type, product, component) {
     env.TEST_URL = params.URL_TO_TEST
-
     env.Rules = params.SecurityRules
+
+    loadVaultSecrets(secrets)
     enableSlackNotifications('#sscs-tech')
     enableSecurityScan()
     enableFullFunctionalTest()
