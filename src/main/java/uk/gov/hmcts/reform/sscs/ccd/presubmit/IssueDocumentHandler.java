@@ -32,6 +32,16 @@ public class IssueDocumentHandler {
     // Fields used for a short period in case progression are transient,
     // relevant for a short period of the case lifecycle.
     protected void clearTransientFields(SscsCaseData caseData, State beforeState) {
+        clearBasicTransientFields(caseData);
+        caseData.setExtensionNextEventDl(null);
+
+        if (caseData.getDirectionTypeDl() != null && !DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                || !State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
+            caseData.setDirectionTypeDl(null);
+        }
+    }
+
+    protected  void clearBasicTransientFields(SscsCaseData caseData) {
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
         caseData.setSignedBy(null);
@@ -41,12 +51,6 @@ public class IssueDocumentHandler {
         caseData.setDateAdded(null);
         caseData.setSscsInterlocDirectionDocument(null);
         caseData.setSscsInterlocDecisionDocument(null);
-        caseData.setExtensionNextEventDl(null);
-
-        if (caseData.getDirectionTypeDl() != null && !DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                || !State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
-            caseData.setDirectionTypeDl(null);
-        }
     }
 
     protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {

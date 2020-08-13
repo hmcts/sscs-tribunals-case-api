@@ -1,16 +1,20 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Collections.emptySet;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.STRUCK_OUT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
@@ -29,7 +33,26 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ExtensionNextEvent;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsInterlocDirectionDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
@@ -59,6 +82,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private SscsCaseData sscsCaseData;
 
     private SscsDocument expectedDocument;
+
+    private SscsWelshDocument expectedWelshDocument;
 
     @Mock
     private PreSubmitCallbackResponse<SscsCaseData> response;
@@ -96,11 +121,11 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         expectedDocument = SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
-                .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
-                .documentLink(sscsCaseData.getPreviewDocument())
-                .documentDateAdded(LocalDate.now().minusDays(1).toString())
-                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .build()).build();
+                        .documentFileName(sscsCaseData.getPreviewDocument().getDocumentFilename())
+                        .documentLink(sscsCaseData.getPreviewDocument())
+                        .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                        .build()).build();
 
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -117,6 +142,13 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     public void givenANonHandleEvidenceEvent_thenReturnFalse(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
         assertFalse(handler.canHandle(MID_EVENT, callback));
+    }
+
+    @Test
+    @Parameters({"DIRECTION_ISSUED", "DIRECTION_ISSUED_WELSH"})
+    public void givenAValidHandleAndEventType_thenReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test
@@ -140,7 +172,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getGenerateNotice());
         assertNull(response.getData().getDateAdded());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(DirectionType.APPEAL_TO_PROCEED.toString(), response.getData().getDirectionTypeDl().getValue().getCode());
     }
@@ -167,12 +199,12 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null));
+        verify(footerService).createFooterAndAddDocToCase(eq(theDocument.getDocumentLink()), any(), eq(DocumentType.DIRECTION_NOTICE), any(), eq(theDocument.getDocumentDateAdded()), eq(null), eq(null));
     }
 
     public void willSetTheWithDwpStateToDirectionActionRequired() {
         final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
@@ -227,7 +259,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDateSentToDwp());
         assertNull(response.getData().getDirectionTypeDl());
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
@@ -237,7 +269,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionTypeDl());
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
@@ -250,7 +282,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionTypeDl());
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getState(), is(State.RESPONSE_RECEIVED));
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
@@ -264,10 +296,61 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDirectionTypeDl());
-        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
         assertThat(response.getData().getState(), is(State.WITH_DWP));
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
+    }
+
+    @Test
+    public void givenDecisionIssuedEventAndCaseIsWelsh_SetFieldsAndCallServicesCorrectly() {
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.REFUSE_EXTENSION.toString()));
+        callback.getCaseDetails().getCaseData().setExtensionNextEventDl(new DynamicList(ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("welshTranslation", response.getData().getInterlocReviewState());
+        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+        assertNull(response.getData().getDwpState());
+        assertNull(response.getData().getTimeExtensionRequested());
+        assertNotNull(response.getData().getDirectionTypeDl());
+        assertNotNull(response.getData().getExtensionNextEventDl());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
+                any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
+
+        verifyNoInteractions(serviceRequestExecutor);
+    }
+
+    @Test
+    public void givenDecisionIssuedWelshEvent_SetFieldsAndCallServicesCorrectly() {
+
+        expectedWelshDocument = SscsWelshDocument.builder()
+                .value(SscsWelshDocumentDetails.builder()
+                        .documentFileName("welshDirectionDocFilename")
+                        .documentLink(DocumentLink.builder().documentUrl("welshUrl").documentBinaryUrl("welshBinaryUrl").build())
+                        .documentDateAdded(LocalDate.now().minusDays(1).toString())
+                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                        .build()).build();
+        sscsCaseData.setSscsWelshDocuments(new ArrayList<>());
+        sscsCaseData.getSscsWelshDocuments().add(expectedWelshDocument);
+
+
+        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED_WELSH);
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getInterlocReviewState());
+        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
+        assertEquals("No", response.getData().getTimeExtensionRequested());
+
+        verify(footerService).createFooterAndAddDocToCase(eq(expectedWelshDocument.getValue().getDocumentLink()),
+                any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
     }
 
 }

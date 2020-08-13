@@ -41,7 +41,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && callback.getEvent() == EventType.DECISION_ISSUED
+                && (callback.getEvent() == EventType.DECISION_ISSUED
+                || callback.getEvent() == EventType.DECISION_ISSUED_WELSH)
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
@@ -70,13 +71,11 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
                 caseData.getDateAdded(), null, documentTranslationStatus);
 
+        State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
+        clearBasicTransientFields(caseData);
+
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
-            State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
-
-            clearTransientFields(caseData, beforeState);
-
             caseData.setDwpState(DwpState.STRUCK_OUT.getId());
-
             caseData.setDirectionDueDate(null);
 
             if (STRIKE_OUT.getValue().equals(caseData.getDecisionType())) {
@@ -90,8 +89,6 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         } else {
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
             caseData.setTranslationWorkOutstanding("Yes");
-            caseData.setPreviewDocument(null);
-            caseData.setSscsInterlocDirectionDocument(null);
         }
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());

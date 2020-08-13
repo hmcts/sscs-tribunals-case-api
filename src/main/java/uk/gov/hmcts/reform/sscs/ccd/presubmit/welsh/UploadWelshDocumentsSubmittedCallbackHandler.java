@@ -12,13 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocuments;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -32,7 +33,11 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
     private static Map<String, String> nextEventMap = new HashMap<>();
 
     static {
-        nextEventMap.put("sscs1","sendToDwp");
+
+        nextEventMap.put(DocumentType.SSCS1.getValue(),EventType.SEND_TO_DWP.getCcdType());
+        nextEventMap.put(DocumentType.APPELLANT_EVIDENCE.getValue(),EventType.UPLOAD_WELSH_DOCUMENT.getCcdType());
+        nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(),EventType.DECISION_ISSUED_WELSH.getCcdType());
+        nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(),EventType.DIRECTION_ISSUED_WELSH.getCcdType());
     }
 
     @Autowired
@@ -64,7 +69,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         int outStandingDocumentFlag = 0;
-        String nextEvent;
+        String previewDocumentType =null;
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
             if (sscsDocument.getValue().getDocumentTranslationStatus() != null
                     && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
@@ -75,16 +80,15 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
             }
         }
         log.info("outStandingDocumentFlag  {}",outStandingDocumentFlag);
-        for (SscsWelshDocuments sscsWelshPreviewDocuments : caseData.getSscsWelshPreviewDocuments()) {
-            sscsWelshPreviewDocuments.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
-
-            nextEvent = sscsWelshPreviewDocuments.getValue().getDocumentType();
-            log.info("nextEvent  {}",nextEvent);
+        for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
+            sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
+            previewDocumentType = sscsWelshPreviewDocument.getValue().getDocumentType();
+            log.info("previewDocumentType  {}",previewDocumentType);
             if (caseData.getSscsWelshDocuments() != null) {
-                caseData.getSscsWelshDocuments().add(sscsWelshPreviewDocuments);
+                caseData.getSscsWelshDocuments().add(sscsWelshPreviewDocument);
             } else {
-                List<SscsWelshDocuments> sscsWelshDocumentsList =  new ArrayList<>();
-                sscsWelshDocumentsList.add(sscsWelshPreviewDocuments);
+                List<SscsWelshDocument> sscsWelshDocumentsList =  new ArrayList<>();
+                sscsWelshDocumentsList.add(sscsWelshPreviewDocument);
                 caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
             }
         }
@@ -101,7 +105,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
         }
 
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.UPLOAD_WELSH_DOCUMENT.getCcdType(), "Update document translation status",
+                getNextEvent(previewDocumentType), "Update document translation status",
                 "Update document translation status", idamService.getIdamTokens());
     }
 

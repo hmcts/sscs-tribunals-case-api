@@ -113,6 +113,13 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"DECISION_ISSUED", "DECISION_ISSUED_WELSH"})
+    public void givenAValidHandleAndEventType_thenReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+        assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
     @Parameters({"ABOUT_TO_START", "MID_EVENT", "SUBMITTED"})
     public void givenANonCallbackType_thenReturnFalse(CallbackType callbackType) {
         assertFalse(handler.canHandle(callbackType, callback));
