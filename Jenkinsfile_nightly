@@ -23,4 +23,5 @@ withNightlyPipeline(type, product, component) {
     env.Rules = params.SecurityRules
     enableSlackNotifications('#sscs-tech')
     enableSecurityScan()
+    enableFullFunctionalTest()
 } 
