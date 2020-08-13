@@ -4,7 +4,11 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.ElementsD
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -21,6 +25,13 @@ public class DwpUploadResponseMidEventValidationHandler implements PreSubmitCall
     PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
 
     private static String DUPLICATE_MESSAGE = " element contains duplicate issue codes";
+
+    private Validator validator;
+
+    @Autowired
+    public DwpUploadResponseMidEventValidationHandler(Validator validator) {
+        this.validator = validator;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -39,6 +50,11 @@ public class DwpUploadResponseMidEventValidationHandler implements PreSubmitCall
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
 
         checkForDuplicateIssueCodes(sscsCaseData);
 
