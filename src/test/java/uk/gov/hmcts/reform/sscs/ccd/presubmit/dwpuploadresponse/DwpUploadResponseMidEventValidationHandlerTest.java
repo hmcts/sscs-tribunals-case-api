@@ -6,7 +6,9 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
+import javax.validation.Validation;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -39,7 +41,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        handler = new DwpUploadResponseMidEventValidationHandler();
+        handler = new DwpUploadResponseMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -208,6 +210,108 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("General element contains duplicate issue codes", error);
+    }
+
+    @Test
+    public void givenNoJointPartyDob_thenDoNotDisplayError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenDobWithYearInPast_thenDoNotDisplayError() {
+
+        String dateToTest = LocalDate.now().minusYears(1).toString();
+
+        sscsCaseData.setJointPartyDob(dateToTest);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenDobWithYearOfThisYear_thenDoShowError() {
+
+        String dateToTest = LocalDate.now().toString();
+
+        sscsCaseData.setJointPartyDob(dateToTest);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You’ve entered an invalid date of birth", error);
+    }
+
+    @Test
+    public void givenDobWithYearOfFutureYear_thenDoShowError() {
+
+        String dateToTest = LocalDate.now().plusYears(1).toString();
+
+        sscsCaseData.setJointPartyDob(dateToTest);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You’ve entered an invalid date of birth", error);
+    }
+
+    @Test
+    public void givenNoJointPartyNino_thenDoNotDisplayError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenValidJointPartyNinoNoSpaces_thenDoNotDisplayError() {
+
+        sscsCaseData.setJointPartyNino("BB000000B");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenValidJointPartyNinoWithSpaces_thenDoNotDisplayError() {
+
+        sscsCaseData.setJointPartyNino("BB 00 00 00 B");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenInvalidJointPartyNino_thenDoDisplayError() {
+
+        sscsCaseData.setJointPartyNino("blah");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Invalid National Insurance number", error);
     }
 
     @Test(expected = IllegalStateException.class)
