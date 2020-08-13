@@ -1,11 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 
+import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DIRECTION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,7 +44,7 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
 
         List<DynamicListItem> dropdownList = getDocumentDropdown(sscsCaseData);
 
-        if (CollectionUtils.isEmpty(dropdownList)) {
+        if (isEmpty(dropdownList)) {
             response.addError("There are no documents in this appeal available to reissue.");
         } else {
             sscsCaseData.setReissueFurtherEvidenceDocument(new DynamicList(dropdownList.get(0), dropdownList));
@@ -52,20 +58,21 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
     private List<DynamicListItem> getDocumentDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
-        if (null != sscsCaseData.getSscsDocument()) {
-            if (sscsCaseData.getSscsDocument().stream()
+        if (nonNull(sscsCaseData.getSscsDocument())) {
+            List<SscsDocument> filteredSscsDocuments = sscsCaseData.getSscsDocument().stream().filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
+            if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(DECISION_NOTICE.getValue()))) {
                 listCostOptions.add(new DynamicListItem(EventType.DECISION_ISSUED.getCcdType(), DECISION_NOTICE.getValue()));
             }
-            if (sscsCaseData.getSscsDocument().stream()
+            if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(DIRECTION_NOTICE.getValue()))) {
                 listCostOptions.add(new DynamicListItem(EventType.DIRECTION_ISSUED.getCcdType(), DIRECTION_NOTICE.getLabel()));
             }
-            if (sscsCaseData.getSscsDocument().stream()
+            if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(FINAL_DECISION_NOTICE.getValue()))) {
                 listCostOptions.add(new DynamicListItem(EventType.ISSUE_FINAL_DECISION.getCcdType(), FINAL_DECISION_NOTICE.getLabel()));
             }
-            if (sscsCaseData.getSscsDocument().stream()
+            if (filteredSscsDocuments.stream()
                 .anyMatch(doc -> doc.getValue().getDocumentType().equals(ADJOURNMENT_NOTICE.getValue()))) {
                 listCostOptions.add(new DynamicListItem(EventType.ISSUE_ADJOURNMENT_NOTICE.getCcdType(), ADJOURNMENT_NOTICE.getLabel()));
             }
