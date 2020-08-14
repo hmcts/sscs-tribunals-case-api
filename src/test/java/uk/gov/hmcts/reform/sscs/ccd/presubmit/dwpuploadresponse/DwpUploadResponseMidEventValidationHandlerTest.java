@@ -314,6 +314,101 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
         assertEquals("Invalid National Insurance number", error);
     }
 
+    @Test
+    public void givenInvalidJointPartyValidAddress_thenDoNoDisplayError() {
+
+        Address jointPartyAddress = Address.builder()
+            .line1("some text")
+            .line2("some text")
+            .town("some text")
+            .county("some text")
+            .postcode("w1p 4df").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInLine1_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().line1("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Line 1 must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInLine2_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().line2("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Line 2 must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInTown_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().town("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Town must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInCounty_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().county("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("County must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidPostcode_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().postcode("invalid postcode").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Please enter a valid postcode", error);
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheEvent() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
