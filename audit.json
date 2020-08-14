@@ -63,5 +63,12 @@
   "100000_A Client Error response code was returned by the server_https://sscs-tribunals-api-aat.service.core-compute-aat.internal/v2JHVRU_TRACK": "ignore",
   "100000_A Client Error response code was returned by the server_https://sscs-tribunals-api-aat.service.core-compute-aat.internal/9PSKA_TRACK": "ignore",
   "100000_A Client Error response code was returned by the server_https://sscs-tribunals-api-aat.service.core-compute-aat.internal/v2/7013730199798081003_GET": "ignore",
-  "10036_Server Leaks Version Information via \"Server\" HTTP Response Header Field_https://sscs-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore"
+  "10036_Server Leaks Version Information via \"Server\" HTTP Response Header Field_https://sscs-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore",
+  "10010_Cookie No HttpOnly Flag_http://****-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore",
+	"10054_Cookie Without SameSite Attribute_http://****-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore",
+	"100000_A Server Error response code was returned by the server_http://****-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore",
+	"90022_Application Error Disclosure_http://****-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore",
+	"10023_Information Disclosure - Debug Error Messages_http://****-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore",
+	"90033_Loosely Scoped Cookie_http://****-tribunals-api-aat.service.core-compute-aat.internal//v2/api-docs_GET": "ignore"
+
 }
