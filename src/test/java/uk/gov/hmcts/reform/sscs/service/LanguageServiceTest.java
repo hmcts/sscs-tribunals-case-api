@@ -88,7 +88,7 @@ public class LanguageServiceTest {
     public void givenASignLanguageDeafBlindKey_ThenExtractTheInterpreterDescription() {
         String intepreterDescription = service.getInterpreterDescriptionForLanguageKey("signDeafBlind");
         Assert.assertNotNull(intepreterDescription);
-        Assert.assertEquals("a sign language interpreter (Deaf Blind - Hands on)", intepreterDescription);
+        Assert.assertEquals("a sign language interpreter (Deaf Blind ‑ Hands on)", intepreterDescription);
     }
 
     @Test
@@ -192,7 +192,7 @@ public class LanguageServiceTest {
     public void givenASignLanguageDeafBlindKey_ThenExtractTheLanguageName() {
         String languageName = service.getLanguageNameFromLanguageKey("signDeafBlind");
         Assert.assertNotNull(languageName);
-        Assert.assertEquals("Sign (Deaf Blind - Hands on)", languageName);
+        Assert.assertEquals("Sign (Deaf Blind ‑ Hands on)", languageName);
     }
 
     @Test
