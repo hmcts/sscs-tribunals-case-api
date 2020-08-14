@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @RunWith(JUnitParamsRunner.class)
@@ -53,7 +54,6 @@ public class AdjournCasePreviewServiceTest {
     @Mock
     private UserDetails userDetails;
 
-
     private ArgumentCaptor<GenerateFileParams> capture;
 
     private SscsCaseData sscsCaseData;
@@ -65,7 +65,7 @@ public class AdjournCasePreviewServiceTest {
     public void setUp() throws IOException {
         openMocks(this);
         service = new AdjournCasePreviewService(generateFile, idamClient,
-            venueDataLoader, TEMPLATE_ID);
+            venueDataLoader, new LanguageService(), TEMPLATE_ID);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -243,6 +243,144 @@ public class AdjournCasePreviewServiceTest {
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
+
+    @Test
+    @Parameters(named = "allNextHearingTypeParameters")
+    public void willSetPreviewFileWithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
+
+        final String endDate = "10-10-2020";
+
+        setCommonPreviewParams(sscsCaseData, endDate);
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+        sscsCaseData.setAdjournCaseInterpreterRequired("Yes");
+        sscsCaseData.setAdjournCaseInterpreterLanguage("french");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getAdjournCasePreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getAdjournCasePreviewDocument());
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
+
+        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+
+        assertEquals("an interpreter in French", body.getInterpreterDescription());
+    }
+
+    @Test
+    @Parameters(named = "allNextHearingTypeParameters")
+    public void willNotSetPreviewFileButWillDisplayError_WithInterpreterDescription_WhenInterpreterRequiredAndLanguageIsNotSet(String nextHearingType, String nextHearingTypeText) {
+
+        final String endDate = "10-10-2020";
+
+        setCommonPreviewParams(sscsCaseData, endDate);
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+        sscsCaseData.setAdjournCaseInterpreterRequired("Yes");
+
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getAdjournCasePreviewDocument());
+    }
+
+    @Test
+    @Parameters(named = "allNextHearingTypeParameters")
+    public void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterNotRequiredAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
+
+        final String endDate = "10-10-2020";
+
+        setCommonPreviewParams(sscsCaseData, endDate);
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+        sscsCaseData.setAdjournCaseInterpreterRequired("No");
+        sscsCaseData.setAdjournCaseInterpreterLanguage("french");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getAdjournCasePreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getAdjournCasePreviewDocument());
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
+
+        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+
+        assertNull(body.getInterpreterDescription());
+    }
+
+    @Test
+    @Parameters(named = "allNextHearingTypeParameters")
+    public void willSetPreviewFileWithoutInterpreterDescription_WhenInterpreterRequiredNotSetAndLanguageIsSet(String nextHearingType, String nextHearingTypeText) {
+
+        final String endDate = "10-10-2020";
+
+        setCommonPreviewParams(sscsCaseData, endDate);
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+        sscsCaseData.setAdjournCaseInterpreterLanguage("french");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getAdjournCasePreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Adjournment Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getAdjournCasePreviewDocument());
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT ADJOURNMENT NOTICE", payload.getNoticeType());
+
+        AdjournCaseTemplateBody body = payload.getAdjournCaseTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+
+        assertNull(body.getInterpreterDescription());
+    }
+
 
     @Test
     @Parameters(named = "allNextHearingTypeParameters")
