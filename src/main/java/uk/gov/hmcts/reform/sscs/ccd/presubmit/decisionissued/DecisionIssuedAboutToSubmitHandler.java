@@ -15,7 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -37,8 +37,8 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && (callback.getEvent() == EventType.DECISION_ISSUED
                 || callback.getEvent() == EventType.DECISION_ISSUED_WELSH)
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && nonNull(callback.getCaseDetails())
+                && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -48,9 +48,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
-        if (nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument())) {
+        if (nonNull(callback.getCaseDetails().getCaseData().getPreviewDocument()) && callback.getEvent() == EventType.DECISION_ISSUED) {
             url = caseData.getPreviewDocument();
-        } else if (caseData.getSscsInterlocDecisionDocument() != null) {
+        } else if (caseData.getSscsInterlocDecisionDocument() != null && callback.getEvent() == EventType.DECISION_ISSUED) {
             url = caseData.getSscsInterlocDecisionDocument().getDocumentLink();
             caseData.setDateAdded(caseData.getSscsInterlocDecisionDocument().getDocumentDateAdded());
             if (!isFileAPdf(caseData.getSscsInterlocDecisionDocument().getDocumentLink())) {

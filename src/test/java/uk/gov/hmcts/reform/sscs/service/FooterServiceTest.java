@@ -1,9 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
 import java.io.IOException;
@@ -24,10 +26,19 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.w3c.dom.traversal.DocumentTraversal;
 import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.pdf.PdfWatermarker;
 
 @RunWith(JUnitParamsRunner.class)
@@ -47,9 +58,12 @@ public class FooterServiceTest {
     @Captor
     private ArgumentCaptor<String> stringCaptor;
 
-    @Mock private UploadResponse uploadResponse;
-    @Mock private UploadResponse.Embedded uploadResponseEmbedded;
-    @Mock private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
+    @Mock
+    private UploadResponse uploadResponse;
+    @Mock
+    private UploadResponse.Embedded uploadResponseEmbedded;
+    @Mock
+    private List<uk.gov.hmcts.reform.document.domain.Document> uploadedDocuments;
     private uk.gov.hmcts.reform.document.domain.Document uploadedDocument = new uk.gov.hmcts.reform.document.domain.Document();
 
     private SscsCaseData sscsCaseData;
@@ -208,7 +222,7 @@ public class FooterServiceTest {
 
         String actual = footerService.getNextBundleAddition(sscsDocuments);
 
-        String expected = currentAppendix.equals("") ? "A" : String.valueOf((char)(currentAppendix.charAt(0) +  1));
+        String expected = currentAppendix.equals("") ? "A" : String.valueOf((char) (currentAppendix.charAt(0) + 1));
         assertEquals(expected, actual);
     }
 

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,7 +68,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
 
     private SscsCaseDetails updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         int outStandingDocumentFlag = 0;
-        String previewDocumentType =null;
+        String previewDocumentType = null;
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
             if (sscsDocument.getValue().getDocumentTranslationStatus() != null
                     && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {

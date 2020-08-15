@@ -67,9 +67,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
-        if (nonNull(caseData.getPreviewDocument())) {
+        if (nonNull(caseData.getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getPreviewDocument();
-        } else if (caseData.getSscsInterlocDirectionDocument() != null) {
+        } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
             caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
             if (!isFileAPdf(caseData.getSscsInterlocDirectionDocument().getDocumentLink())) {

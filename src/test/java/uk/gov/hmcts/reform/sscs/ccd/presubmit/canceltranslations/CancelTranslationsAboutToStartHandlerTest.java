@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
@@ -57,7 +56,7 @@ public class CancelTranslationsAboutToStartHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
-        if(response.getErrors().stream().findAny().isPresent()) {
+        if (response.getErrors().stream().findAny().isPresent()) {
             assertEquals("Error: This action is only available for Welsh cases.",
                     response.getErrors().stream().findAny().get());
         }
