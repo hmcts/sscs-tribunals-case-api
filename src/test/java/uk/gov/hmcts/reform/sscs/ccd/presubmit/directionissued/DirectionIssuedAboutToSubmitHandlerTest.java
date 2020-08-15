@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static java.util.Collections.emptySet;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
@@ -10,7 +9,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
@@ -26,9 +24,12 @@ import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -62,6 +63,9 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
 
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
+
     @Mock
     private FooterService footerService;
 
@@ -90,8 +94,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
-
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate");
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
@@ -184,12 +186,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
+                .documentFileName("file.pdf")
+                .documentLink(DocumentLink.builder().documentFilename("file.pdf").documentUrl(DOCUMENT_URL).build()).build())
                 .build();
 
         SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
                 .documentType(DocumentType.DIRECTION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build())
+                .documentFileName("file.pdf")
+                .documentLink(DocumentLink.builder().documentFilename("file.pdf").documentUrl(DOCUMENT_URL2).build())
                 .documentDateAdded(LocalDate.now()).build();
 
         sscsCaseData.setSscsInterlocDirectionDocument(theDocument);
@@ -300,6 +304,40 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertThat(response.getData().getState(), is(State.WITH_DWP));
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
         assertThat(response.getData().getDateSentToDwp(), is(LocalDate.now().toString()));
+    }
+
+    @Test
+    @Parameters({"file.png", "file.jpg", "file.doc"})
+    public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
+        sscsCaseData.setPreviewDocument(null);
+
+        SscsInterlocDirectionDocument theDocument = SscsInterlocDirectionDocument.builder()
+                .documentType(DocumentType.DECISION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentFilename(filename).documentUrl(DOCUMENT_URL).build())
+                .documentDateAdded(LocalDate.now()).build();
+
+        sscsCaseData.setSscsInterlocDirectionDocument(theDocument);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You need to upload PDF documents only", error);
+        }
+    }
+
+    @Test
+    public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
+        sscsCaseData.setPreviewDocument(null);
+
+        sscsCaseData.setSscsInterlocDirectionDocument(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You need to upload a PDF document", error);
+        }
     }
 
     @Test

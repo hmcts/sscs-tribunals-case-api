@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
 public enum HearingType {
 
-    FACE_TO_FACE("faceToFace", "face to face", true),
-    TELEPHONE("telephone", "telephone", true),
-    VIDEO("video", "video", true),
-    PAPER("paper", "paper", false);
+    FACE_TO_FACE("faceToFace", "face to face hearing", true),
+    TELEPHONE("telephone", "telephone hearing", true),
+    VIDEO("video", "video hearing", true),
+    PAPER("paper", "decision on the papers", false);
 
     final String key;
     final String value;
@@ -28,6 +28,10 @@ public enum HearingType {
     
     public String getValue() {
         return value;
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public boolean isOralHearingType() {

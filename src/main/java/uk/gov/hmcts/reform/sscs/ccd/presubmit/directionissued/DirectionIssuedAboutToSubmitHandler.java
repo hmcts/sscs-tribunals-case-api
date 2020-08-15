@@ -1,13 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
+import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,16 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ExtensionNextEvent;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -40,7 +33,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private final FooterService footerService;
     private final ServiceRequestExecutor serviceRequestExecutor;
-    private String bulkScanEndpoint;
+    private final String bulkScanEndpoint;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
@@ -56,8 +49,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return callbackType == CallbackType.ABOUT_TO_SUBMIT
                 && (callback.getEvent() == EventType.DIRECTION_ISSUED
                 || callback.getEvent() == EventType.DIRECTION_ISSUED_WELSH)
-                && Objects.nonNull(callback.getCaseDetails())
-                && Objects.nonNull(callback.getCaseDetails().getCaseData());
+                && nonNull(callback.getCaseDetails())
+                && nonNull(callback.getCaseDetails().getCaseData());
     }
 
     @Override
@@ -72,15 +65,24 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return errorResponse;
         }
 
+        final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         DocumentLink url = null;
-        if (Objects.nonNull(caseData.getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+        if (nonNull(caseData.getPreviewDocument())) {
             url = caseData.getPreviewDocument();
-        } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+        } else if (caseData.getSscsInterlocDirectionDocument() != null) {
             url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
             caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
+            if (!isFileAPdf(caseData.getSscsInterlocDirectionDocument().getDocumentLink())) {
+                sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
+                return sscsCaseDataPreSubmitCallbackResponse;
+            }
         } else if (callback.getEvent() == EventType.DIRECTION_ISSUED_WELSH) {
             Optional<SscsWelshDocument> document = caseData.getLatestWelshDocumentForDocumentType(DocumentType.DIRECTION_NOTICE);
             url = document.isPresent() ? document.get().getValue().getDocumentLink() : null;
+        }
+        if (isNull(url)) {
+            sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload a PDF document");
+            return sscsCaseDataPreSubmitCallbackResponse;
         }
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
@@ -101,7 +103,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 caseData.setInterlocReviewState(null);
             }
         }
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
                     Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
