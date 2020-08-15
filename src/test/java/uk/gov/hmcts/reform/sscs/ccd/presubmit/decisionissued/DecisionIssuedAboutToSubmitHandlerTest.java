@@ -72,6 +72,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         docs.add(document);
 
         sscsCaseData = SscsCaseData.builder()
+                .state(State.INTERLOCUTORY_REVIEW_STATE)
                 .generateNotice("Yes")
                 .signedBy("User")
                 .signedRole("Judge")
@@ -190,6 +191,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
         assertEquals("nonCompliantAppealStruckout", response.getData().getOutcome());
         assertNull(response.getData().getInterlocReviewState());
+        assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
     }
 
     @Test
@@ -200,6 +202,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
+        assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
     }
 
     @Test
@@ -213,6 +216,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertEquals("Yes",response.getData().getTranslationWorkOutstanding());
         assertNull(response.getData().getDwpState());
         assertNull( response.getData().getOutcome());
+        assertEquals(response.getData().getState(), (State.INTERLOCUTORY_REVIEW_STATE));
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED));
@@ -241,6 +245,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
+        assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
 
         verify(footerService).createFooterAndAddDocToCase(eq(expectedWelshDocument.getValue().getDocumentLink()),
                 any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));

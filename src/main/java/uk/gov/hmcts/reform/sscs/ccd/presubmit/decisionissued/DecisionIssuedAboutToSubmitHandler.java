@@ -71,10 +71,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
                 caseData.getDateAdded(), null, documentTranslationStatus);
 
-        State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
-        clearBasicTransientFields(caseData);
-
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
+            State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
+            clearTransientFields(caseData,beforeState);
             caseData.setDwpState(DwpState.STRUCK_OUT.getId());
             caseData.setDirectionDueDate(null);
 
@@ -86,7 +85,9 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
                 }
                 caseData.setInterlocReviewState(null);
             }
+            caseData.setState(State.DORMANT_APPEAL_STATE);
         } else {
+            clearBasicTransientFields(caseData);
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
             caseData.setTranslationWorkOutstanding("Yes");
         }

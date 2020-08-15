@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.welsh;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
