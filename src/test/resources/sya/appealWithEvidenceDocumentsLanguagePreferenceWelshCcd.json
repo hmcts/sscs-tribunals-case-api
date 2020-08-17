@@ -185,6 +185,6 @@
   "evidencePresent" : "Yes",
   "dwpRegionalCentre": "Newcastle",
   "languagePreferenceWelsh": "Yes",
-  "translationWorkOutstanding": "Yes"
-
+  "translationWorkOutstanding": "Yes",
+  "isScottishCase": "No"
 }

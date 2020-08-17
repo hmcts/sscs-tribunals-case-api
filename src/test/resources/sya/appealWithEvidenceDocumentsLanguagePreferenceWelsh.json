@@ -100,5 +100,6 @@
   "signAndSubmit": {
     "signer": "Joe Bloggs"
   },
-  "languagePreferenceWelsh" : true
+  "languagePreferenceWelsh" : true,
+  "isScottishCase": "No"
 }
