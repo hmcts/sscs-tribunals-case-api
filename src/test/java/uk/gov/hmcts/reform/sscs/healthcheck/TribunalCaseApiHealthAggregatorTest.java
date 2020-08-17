@@ -1,85 +1,72 @@
 package uk.gov.hmcts.reform.sscs.healthcheck;
 
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.openMocks;
 
-import java.net.SocketTimeoutException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.actuate.health.Health;
+import org.mockito.Mock;
+import org.springframework.boot.actuate.health.*;
 
 public class TribunalCaseApiHealthAggregatorTest {
 
     private TribunalCaseApiHealthAggregator tribunalCaseApiHealthAggregator;
 
+    @Mock
+    private HealthContributorRegistry healthContributorRegistry;
+
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         tribunalCaseApiHealthAggregator = new TribunalCaseApiHealthAggregator();
-    }
-
-
-    @Test
-    public void shouldReturnOverallHealthUpWhenHardCheckIsUpAndSoftCheckIsDown() {
-        //Given hard dependency
-        Health mockCcdDataHealth = Health.up().build();
-        Health mockServiceAuth = Health.up().build();
-
-        // soft dependency
-        Health mockPdfServiceHealth = Health.down().build();
-
-        Map<String, Health> healths = new HashMap<>();
-        healths.put("coreCaseData", mockCcdDataHealth);
-        healths.put("serviceAuth", mockServiceAuth);
-        healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
-        // when
-        Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
-
-        // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual.getStatus());
-        Assert.assertEquals("{coreCaseData=UP {}, serviceAuth=UP {}, mockPdfServiceHealth=DOWN {}}", actual.getDetails().values().iterator().next().toString());
+        tribunalCaseApiHealthAggregator.healthContributorRegistry = healthContributorRegistry;
     }
 
     @Test
-    public void shouldReturnOverallHealthUpWhenHardCheckIsUpAndSoftCheckIsUp() {
-        //Given hard dependency
-        Health mockCcdDataHealth = Health.up().build();
-        Health mockServiceAuth = Health.up().build();
-
-        // soft dependency
-        Health mockPdfServiceHealth = Health.up().build();
-        Map<String, Health> healths = new HashMap<>();
-        healths.put("coreCaseData", mockCcdDataHealth);
-        healths.put("serviceAuth", mockServiceAuth);
-        healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
-        // when
-        Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
-
-        // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual.getStatus());
-        Assert.assertEquals("{coreCaseData=UP {}, serviceAuth=UP {}, mockPdfServiceHealth=UP {}}", actual.getDetails().values().iterator().next().toString());
-    }
-
-    @Test
-    public void shouldReturnOverallHealthDownWhenHardCheckIsDown() {
+    public void shouldReturnOverallHealthUpWithWhenSoftCheckHealthIsDown() {
         //Given
-        Health mockCcdDataHealth = Health.down(new SocketTimeoutException()).build();
-        Health mockServiceAuth = Health.up().build();
+        HealthIndicator mockCoreCaseData = mock(HealthIndicator.class);
+        HealthIndicator mockDocumentManagement = mock(HealthIndicator.class);
+        when(mockCoreCaseData.health()).thenReturn(Health.up().build());
+        when(mockDocumentManagement.health()).thenReturn(Health.down().build());
 
-        Health mockPdfServiceHealth = Health.up().build();
-        Map<String, Health> healths = new HashMap<>();
-        healths.put("coreCaseData", mockCcdDataHealth);
-        healths.put("serviceAuth", mockServiceAuth);
-        healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
+        List<NamedContributor<HealthContributor>> namedContributors = new ArrayList<>();
+        namedContributors.add(NamedContributor.of("coreCaseData", mockCoreCaseData));
+        namedContributors.add(NamedContributor.of("documentManagement", mockDocumentManagement));
+
+        when(healthContributorRegistry.getContributor("coreCaseData")).thenReturn(mockCoreCaseData);
+        when(healthContributorRegistry.getContributor("documentManagement")).thenReturn(mockDocumentManagement);
+        when(healthContributorRegistry.stream()).thenReturn(namedContributors.stream());
         // when
-        Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
+        Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
 
         // then
-        Assert.assertEquals(Health.down().build().getStatus(), actual.getStatus());
-        Assert.assertEquals("{coreCaseData=DOWN {error=java.net.SocketTimeoutException: null}, serviceAuth=UP {}, mockPdfServiceHealth=UP {}}",
-                actual.getDetails().values().iterator().next().toString());
+        Assert.assertEquals(Health.up().build().getStatus(), actual);
+    }
+
+    @Test
+    public void shouldReturnOverallHealthDownWhenHardCheckHealthIsDown() {
+        //Given
+        HealthIndicator mockCoreCaseData = mock(HealthIndicator.class);
+        HealthIndicator mockDocumentManagement = mock(HealthIndicator.class);
+
+        when(mockCoreCaseData.health()).thenReturn(Health.down().build());
+        when(mockDocumentManagement.health()).thenReturn(Health.up().build());
+
+        List<NamedContributor<HealthContributor>> namedContributors = new ArrayList<>();
+        namedContributors.add(NamedContributor.of("coreCaseData", mockCoreCaseData));
+        namedContributors.add(NamedContributor.of("documentManagement", mockDocumentManagement));
+
+        when(healthContributorRegistry.getContributor("coreCaseData")).thenReturn(mockCoreCaseData);
+        when(healthContributorRegistry.getContributor("documentManagement")).thenReturn(mockDocumentManagement);
+        when(healthContributorRegistry.stream()).thenReturn(namedContributors.stream());
+        // when
+        Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
+
+        // then
+        Assert.assertEquals(Health.down().build().getStatus(), actual);
     }
 
 }
