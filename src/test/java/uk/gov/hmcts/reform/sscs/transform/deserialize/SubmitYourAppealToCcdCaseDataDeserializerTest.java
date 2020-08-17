@@ -76,7 +76,6 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
 
     private RegionalProcessingCenter regionalProcessingCenter;
 
-
     @Before
     public void setUp() {
         initMocks(this);
@@ -165,6 +164,24 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
             regionalProcessingCenter);
 
         assertEquals(expectedDwpRegionalCenter, caseData.getDwpRegionalCentre());
+    }
+
+    @Parameters({"DWP PIP (1),PIP,Cardiff,No", "DWP PIP (2),Pip,Glasgow,Yes"})
+    @Test
+    public void dwpIssuingOfficeShouldMapToIsScottishCaseCorrectly(@Nullable String dwpIssuingOffice,
+                                                                       @Nullable String benefitCode,
+                                                                       @Nullable String dwpIssuingOfficeName,
+                                                                       @Nullable String expectedIsScottishCase) {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.getMrn().setDwpIssuingOffice(dwpIssuingOffice);
+        syaCaseWrapper.getBenefitType().setCode(benefitCode);
+
+        RegionalProcessingCenter rpc = regionalProcessingCenter.toBuilder().name(dwpIssuingOfficeName).build();
+
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper, rpc.getName(),
+                rpc);
+
+        assertEquals(expectedIsScottishCase, caseData.getIsScottishCase());
     }
 
     @Test
@@ -329,6 +346,15 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
         assertJsonEquals(WITHOUT_REGIONAL_PROCESSING_CENTER.getSerializedMessage(), removeTyaNumber(caseData));
+        assertEquals("No", caseData.getIsScottishCase());
+    }
+
+    @Test
+    public void draftSyaWithNoRpc() {
+        SyaCaseWrapper syaCaseWrapper = ALL_DETAILS.getDeserializeMessage();
+        syaCaseWrapper.setCaseType("draft");
+        SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
+        assertNull(caseData.getIsScottishCase());
     }
 
     @Test
