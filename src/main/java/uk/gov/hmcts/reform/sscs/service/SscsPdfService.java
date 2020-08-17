@@ -31,10 +31,10 @@ public class SscsPdfService {
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
-                          @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
-                          PDFServiceClient pdfServiceClient,
-                          CcdPdfService ccdPdfService,
-                          ResourceManager resourceManager) {
+        @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
+        PDFServiceClient pdfServiceClient,
+        CcdPdfService ccdPdfService,
+        ResourceManager resourceManager) {
         this.pdfServiceClient = pdfServiceClient;
         this.appellantTemplatePath = appellantTemplatePath;
         this.appellantWelshTemplatePath = appellantWelshTemplatePath;
@@ -46,8 +46,8 @@ public class SscsPdfService {
         byte[] pdf = generatePdf(sscsCaseData, caseDetailsId);
 
         log.info("Case {} PDF successfully created for benefit type {}",
-                caseDetailsId,
-                sscsCaseData.getAppeal().getBenefitType().getCode());
+            caseDetailsId,
+            sscsCaseData.getAppeal().getBenefitType().getCode());
 
         return ccdPdfService.updateDoc(fileName, pdf, caseDetailsId, sscsCaseData, documentType);
     }
@@ -60,11 +60,11 @@ public class SscsPdfService {
             throw new PdfGenerationException("Error getting template", e);
         }
         PdfWrapper pdfWrapper = PdfWrapper.builder().sscsCaseData(sscsCaseData).ccdCaseId(caseDetailsId)
-                .isSignLanguageInterpreterRequired(sscsCaseData.getAppeal().getHearingOptions().wantsSignLanguageInterpreter())
-                .isHearingLoopRequired(sscsCaseData.getAppeal().getHearingOptions().wantsHearingLoop())
-                .isAccessibleHearingRoomRequired(sscsCaseData.getAppeal().getHearingOptions().wantsAccessibleHearingRoom())
-                .currentDate(LocalDate.now())
-                .repFullName(getRepFullName(sscsCaseData.getAppeal().getRep())).build();
+            .isSignLanguageInterpreterRequired(sscsCaseData.getAppeal().getHearingOptions().wantsSignLanguageInterpreter())
+            .isHearingLoopRequired(sscsCaseData.getAppeal().getHearingOptions().wantsHearingLoop())
+            .isAccessibleHearingRoomRequired(sscsCaseData.getAppeal().getHearingOptions().wantsAccessibleHearingRoom())
+            .currentDate(LocalDate.now())
+            .repFullName(getRepFullName(sscsCaseData.getAppeal().getRep())).build();
 
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("PdfWrapper", pdfWrapper);
@@ -74,7 +74,7 @@ public class SscsPdfService {
             placeholders.put("appellant_appointee_identity_dob",
                 LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
             placeholders.put("date_of_decision",
-                    LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
+                LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
 
             List<String> welshExcludesDates = new ArrayList<>();
             List<ExcludeDate> excludesDates = sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();
