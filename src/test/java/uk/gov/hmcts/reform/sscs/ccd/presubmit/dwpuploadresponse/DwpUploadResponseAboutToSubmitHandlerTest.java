@@ -3,11 +3,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +35,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         dwpUploadResponseAboutToSubmitHandler = new DwpUploadResponseAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
@@ -43,6 +45,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             .benefitCode("002")
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
+            .appeal(Appeal.builder().build())
             .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -168,5 +171,34 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()));
+    }
+
+    @Test
+    public void givenAUcCaseWithSingleElementSelected_thenSetCaseCodeToUs() {
+        List<String> elementList = new ArrayList<>();
+        elementList.add("testElement");
+        sscsCaseData.setElementsDisputedList(elementList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("US", response.getData().getIssueCode());
+        assertEquals("001", response.getData().getBenefitCode());
+        assertEquals("001US", response.getData().getCaseCode());
+    }
+
+    @Test
+    public void givenAUcCaseWithMultipleElementSelected_thenSetCaseCodeToUm() {
+        List<String> elementList = new ArrayList<>();
+        elementList.add("testElement");
+        elementList.add("testElement2");
+        sscsCaseData.setElementsDisputedList(elementList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("UM", response.getData().getIssueCode());
+        assertEquals("001", response.getData().getBenefitCode());
+        assertEquals("001UM", response.getData().getCaseCode());
     }
 }

@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DecisionType.STRIKE_OUT;
@@ -19,9 +18,12 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -35,6 +37,9 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
+
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private FooterService footerService;
@@ -59,8 +64,6 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
-
         handler = new DecisionIssuedAboutToSubmitHandler(footerService);
         when(callback.getEvent()).thenReturn(EventType.DECISION_ISSUED);
 
@@ -156,12 +159,12 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         SscsDocument document1 = SscsDocument.builder().value(SscsDocumentDetails.builder()
             .documentType(DocumentType.DECISION_NOTICE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL).build()).build())
+            .documentLink(DocumentLink.builder().documentFilename("file.pdf").documentUrl(DOCUMENT_URL).build()).build())
             .build();
 
         SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
             .documentType(DocumentType.DECISION_NOTICE.getValue())
-            .documentLink(DocumentLink.builder().documentUrl(DOCUMENT_URL2).build())
+            .documentLink(DocumentLink.builder().documentFilename("file.pdf").documentUrl(DOCUMENT_URL2).build())
             .documentDateAdded(LocalDate.now()).build();
 
         sscsCaseData.setSscsInterlocDecisionDocument(theDocument);
@@ -191,5 +194,39 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
 
         assertEquals(STRUCK_OUT.getId(), response.getData().getDwpState());
         assertEquals("struckOut", response.getData().getOutcome());
+    }
+
+    @Test
+    public void givenNoPdfIsUploaded_thenAddAnErrorToResponse() {
+        sscsCaseData.setPreviewDocument(null);
+
+        sscsCaseData.setSscsInterlocDecisionDocument(null);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You need to upload a PDF document", error);
+        }
+    }
+
+    @Test
+    @Parameters({"file.png", "file.jpg", "file.doc"})
+    public void givenManuallyUploadedFileIsNotAPdf_thenAddAnErrorToResponse(String filename) {
+        sscsCaseData.setPreviewDocument(null);
+
+        SscsInterlocDecisionDocument theDocument = SscsInterlocDecisionDocument.builder()
+                .documentType(DocumentType.DECISION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentFilename(filename).documentUrl(DOCUMENT_URL).build())
+                .documentDateAdded(LocalDate.now()).build();
+
+        sscsCaseData.setSscsInterlocDecisionDocument(theDocument);
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You need to upload PDF documents only", error);
+        }
     }
 }
