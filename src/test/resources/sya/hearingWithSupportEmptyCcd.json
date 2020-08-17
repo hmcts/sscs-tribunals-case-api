@@ -129,5 +129,6 @@
   },
   "evidencePresent" : "No",
   "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle"
+  "dwpRegionalCentre": "Newcastle",
+  "isScottishCase": "No"
 }

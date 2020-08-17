@@ -145,6 +145,7 @@ public class SubmitAppealService {
     }
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
+
         String firstHalfOfPostcode = regionalProcessingCenterService
             .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
@@ -194,6 +195,11 @@ public class SubmitAppealService {
                         caseData = addAssociatedCases(caseData, matchedByNinoCases);
                     }
                 }
+
+                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {}",
+                        caseData.getAppeal().getBenefitType().getCode(),
+                        eventType,
+                        caseData.getIsScottishCase());
 
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
@@ -260,6 +266,7 @@ public class SubmitAppealService {
     }
 
     private EventType findEventType(SscsCaseData caseData) {
+
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());
