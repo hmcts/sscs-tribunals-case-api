@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Component
@@ -45,19 +46,32 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         setCaseCode(sscsCaseData);
 
-        if (sscsCaseData.getAppeal().getAppellant() != null && sscsCaseData.getAppeal().getAppellant().getAddress() != null && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
-            RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
-            sscsCaseData.setRegionalProcessingCenter(rpc);
+        if (sscsCaseData.getAppeal().getAppellant() != null
+                && sscsCaseData.getAppeal().getAppellant().getAddress() != null
+                && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
 
-            if (rpc != null) {
-                sscsCaseData.setRegion(rpc.getName());
+            RegionalProcessingCenter newRpc =
+                    regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
+
+            maybeChangeIsScottish(sscsCaseData.getRegionalProcessingCenter(), newRpc, sscsCaseData);
+
+            sscsCaseData.setRegionalProcessingCenter(newRpc);
+
+            if (newRpc != null) {
+                sscsCaseData.setRegion(newRpc.getName());
             }
+
         }
 
-        return preSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
+    }
+
+    public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
+        if (oldRpc != newRpc) {
+            String isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
+            caseData.setIsScottishCase(isScottishCase);
+        }
     }
 }
