@@ -11,7 +11,7 @@ import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.PDFAIdentificationSchema;
 import org.apache.xmpbox.type.BadFieldValueException;
 import org.apache.xmpbox.xml.XmpSerializer;
-import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.InputStreamWrapper;
+import uk.gov.hmcts.reform.sscs.model.InputStreamWrapper;
 
 /**
  * Copied from https://github.com/keefmarshall/pdfpoc

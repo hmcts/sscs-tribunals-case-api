@@ -4,6 +4,7 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.util.IOUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.model.InputStreamWrapper;
 
 @Service
 @Slf4j
