@@ -241,8 +241,8 @@ public class EvidenceUploadService {
             PDDocument statementDoc = getLoadSafe(statement, "statementDoc", caseId);
             final PDFMergerUtility merger = new PDFMergerUtility();
 
-            for(int i = 0; i < uploads.size(); i++) {
-                PDDocument uploadDoc = getLoadSafe(uploads.get(i), "uploadDoc"+i, caseId);
+            for (int i = 0; i < uploads.size(); i++) {
+                PDDocument uploadDoc = getLoadSafe(uploads.get(i), "uploadDoc" + i, caseId);
                 appendDocumentSafe(statementDoc, merger, uploadDoc);
                 closeSafe(uploadDoc);
             }
@@ -285,8 +285,8 @@ public class EvidenceUploadService {
         try {
             return PDDocument.load(statement);
         } catch (IOException e) {
-            throw new RuntimeException("Error when getting PDDocument " + docType + " for caseId " + caseId +
-                    " with bytes length " + statement.length, e);
+            throw new RuntimeException("Error when getting PDDocument " + docType + " for caseId " + caseId
+                    + " with bytes length " + statement.length, e);
         }
     }
 
