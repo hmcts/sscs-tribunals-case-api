@@ -1,14 +1,12 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.domain.pdf.PdfWrapper;
 import uk.gov.hmcts.reform.sscs.exception.PdfGenerationException;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 @Service
 @Slf4j
@@ -28,16 +27,19 @@ public class SscsPdfService {
     private String appellantWelshTemplatePath;
     private PDFServiceClient pdfServiceClient;
     private CcdPdfService ccdPdfService;
+    private ResourceManager resourceManager;
 
     @Autowired
     public SscsPdfService(@Value("${appellant.appeal.html.template.path}") String appellantTemplatePath,
                           @Value("${appellant.appeal.html.welsh.template.path}") String appellantWelshTemplatePath,
                           PDFServiceClient pdfServiceClient,
-                          CcdPdfService ccdPdfService) {
+                          CcdPdfService ccdPdfService,
+                          ResourceManager resourceManager) {
         this.pdfServiceClient = pdfServiceClient;
         this.appellantTemplatePath = appellantTemplatePath;
         this.appellantWelshTemplatePath = appellantWelshTemplatePath;
         this.ccdPdfService = ccdPdfService;
+        this.resourceManager = resourceManager;
     }
 
     public SscsCaseData generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId, String documentType, String fileName) {
@@ -96,7 +98,6 @@ public class SscsPdfService {
     }
 
     private byte[] getTemplate(boolean isWelsh) throws IOException {
-        InputStream in = getClass().getResourceAsStream(isWelsh ? appellantWelshTemplatePath : appellantTemplatePath);
-        return IOUtils.toByteArray(in);
+        return resourceManager.getResource(isWelsh ? appellantWelshTemplatePath : appellantTemplatePath);
     }
 }
