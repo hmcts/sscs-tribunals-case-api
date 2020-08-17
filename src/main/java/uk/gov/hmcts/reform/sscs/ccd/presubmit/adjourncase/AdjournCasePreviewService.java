@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody.AdjournCaseTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 import uk.gov.hmcts.reform.sscs.util.StringUtils;
 
@@ -31,14 +32,16 @@ import uk.gov.hmcts.reform.sscs.util.StringUtils;
 public class AdjournCasePreviewService extends IssueNoticeHandler {
 
     private final VenueDataLoader venueDataLoader;
+    private final LanguageService languageService;
     private static final String DOCUMENT_DATE_PATTERN = "dd/MM/YYYY";
     public static final String IN_CHAMBERS = "In chambers";
 
     @Autowired
     public AdjournCasePreviewService(GenerateFile generateFile, IdamClient idamClient, VenueDataLoader venueDataLoader,
-        @Value("${doc_assembly.adjourn_case}") String templateId) {
+        LanguageService languageService, @Value("${doc_assembly.adjourn_case}") String templateId) {
         super(generateFile, idamClient, languagePreference -> templateId);
         this.venueDataLoader = venueDataLoader;
+        this.languageService = languageService;
     }
 
     private LocalDate getDateForPeriodAfterIssueDate(LocalDate issueDate, String period) {
@@ -108,6 +111,8 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         adjournCaseBuilder.panelMembersExcluded(caseData.getAdjournCasePanelMembersExcluded());
 
+        setIntepreterDescriptionIfRequired(adjournCaseBuilder, caseData);
+
         LocalDate issueDate = LocalDate.now();
 
         setNextHearingDateAndTime(adjournCaseBuilder, caseData, issueDate);
@@ -126,7 +131,19 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
         return builder.build();
     }
-    
+
+    private void setIntepreterDescriptionIfRequired(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData) {
+        if ("yes".equalsIgnoreCase(caseData.getAdjournCaseInterpreterRequired())) {
+            if (caseData.getAdjournCaseInterpreterLanguage() != null) {
+                adjournCaseBuilder.interpreterDescription(
+                    languageService.getInterpreterDescriptionForLanguageKey(
+                        caseData.getAdjournCaseInterpreterLanguage()));
+            } else {
+                throw new IllegalStateException("An interpreter is required but no language is set");
+            }
+        }
+    }
+
     private String getTimeslotString(String nextHearingListingDuration, String nextHearingListingDurationUnits) {
         if (nextHearingListingDuration.equals("1")) {
             return "1 " + nextHearingListingDurationUnits.substring(0, nextHearingListingDurationUnits.length() - 1);
