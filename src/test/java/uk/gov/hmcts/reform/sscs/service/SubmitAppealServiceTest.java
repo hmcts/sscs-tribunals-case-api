@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.*;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -47,6 +46,7 @@ import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseResult;
 import uk.gov.hmcts.reform.sscs.model.draft.SessionDraft;
 import uk.gov.hmcts.reform.sscs.service.converter.ConvertAIntoBService;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 @RunWith(JUnitParamsRunner.class)
 public class SubmitAppealServiceTest {
@@ -73,6 +73,9 @@ public class SubmitAppealServiceTest {
 
     @Mock
     private IdamService idamService;
+
+    @Mock
+    private ResourceManager resourceManager;
 
     private SubmitAppealService submitAppealService;
 
@@ -146,7 +149,7 @@ public class SubmitAppealServiceTest {
         offices.add("Watford DRT");
         offices.add("Sheffield DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
+        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,

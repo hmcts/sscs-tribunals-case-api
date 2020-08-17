@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.xml.transform.TransformerException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.common.PDMetadata;
 import org.apache.pdfbox.pdmodel.graphics.color.PDOutputIntent;
@@ -11,6 +12,7 @@ import org.apache.xmpbox.XMPMetadata;
 import org.apache.xmpbox.schema.PDFAIdentificationSchema;
 import org.apache.xmpbox.type.BadFieldValueException;
 import org.apache.xmpbox.xml.XmpSerializer;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 /**
  * Copied from https://github.com/keefmarshall/pdfpoc
@@ -21,6 +23,7 @@ import org.apache.xmpbox.xml.XmpSerializer;
  * on every element in the document, and we'd really need to purchase the ISO spec to fully
  * understand this.
  */
+@Slf4j
 public class PdfACompliance {
 
     public enum PdfAPart {
@@ -74,14 +77,22 @@ public class PdfACompliance {
         // sRGB output intent - NOTE you need the actual ICC file in your resources
         // directory, it doesn't come with pdfbox's jar. You can download it from
         // the pdfbox examples repository.
-        InputStream colorProfile =
+        InputStream colorProfile = null;
+        try {
+            colorProfile =
                 this.getClass().getResourceAsStream(
                         "/pdfa/sRGB.icc");
-        PDOutputIntent intent = new PDOutputIntent(document, colorProfile);
-        intent.setInfo("sRGB IEC61966-2.1");
-        intent.setOutputCondition("sRGB IEC61966-2.1");
-        intent.setOutputConditionIdentifier("sRGB IEC61966-2.1");
-        intent.setRegistryName("http://www.color.org");
-        document.getDocumentCatalog().addOutputIntent(intent);
+
+            PDOutputIntent intent = new PDOutputIntent(document, colorProfile);
+            intent.setInfo("sRGB IEC61966-2.1");
+            intent.setOutputCondition("sRGB IEC61966-2.1");
+            intent.setOutputConditionIdentifier("sRGB IEC61966-2.1");
+            intent.setRegistryName("http://www.color.org");
+            document.getDocumentCatalog().addOutputIntent(intent);
+        } finally {
+            if (colorProfile != null) {
+                ResourceManager.safeClose(colorProfile);
+            }
+        }
     }
 }

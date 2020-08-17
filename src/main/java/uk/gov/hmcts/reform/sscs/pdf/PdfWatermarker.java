@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.util.Matrix;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 /**
  * Copied from https://github.com/keefmarshall/pdfpoc
@@ -49,9 +50,19 @@ public class PdfWatermarker {
         // - the running code can load form the deployed system but if this is likely to be a Docker image there's
         // no guarantee it will have any TTF fonts present. If we want something else we'll likely have to embed
         // it into the code base, and be really careful about licensing.
-        InputStream fontStream = this.getClass().getResourceAsStream(
-                "/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf");
-        PDFont font = PDType0Font.load(document, fontStream, true);
+        InputStream fontStream = null;
+        PDFont font;
+        try {
+            fontStream = this.getClass().getResourceAsStream(
+                    "/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf");
+
+            font = PDType0Font.load(document, fontStream, true);
+
+        } finally {
+            if (fontStream != null) {
+                ResourceManager.safeClose(fontStream);
+            }
+        }
 
         int fontSize = 12;
 
