@@ -48,9 +48,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         setCaseCode(sscsCaseData);
 
-        if (sscsCaseData.getAppeal().getAppellant() != null &&
-                sscsCaseData.getAppeal().getAppellant().getAddress() != null &&
-                sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
+        if (sscsCaseData.getAppeal().getAppellant() != null
+                && sscsCaseData.getAppeal().getAppellant().getAddress() != null
+                && sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode() != null) {
 
             RegionalProcessingCenter newRpc =
                     regionalProcessingCenterService.getByPostcode(sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode());
@@ -69,7 +69,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     }
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
-        if(oldRpc != newRpc) {
+        if (oldRpc != newRpc) {
             String isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
             caseData.setIsScottishCase(isScottishCase);
         }
