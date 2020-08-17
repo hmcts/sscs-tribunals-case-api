@@ -62,7 +62,7 @@ public class PdfWatermarker {
          * be safely closed (eg.  try (InputStream inputStream = this.getClass().getResourceAsStream(... )) {
          */
         try (InputStreamWrapper fontStreamWrapper = new InputStreamWrapper(log, this.getClass().getResourceAsStream(
-            "/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"))){
+            "/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"))) {
 
             font = PDType0Font.load(document, fontStreamWrapper.get(), true);
 

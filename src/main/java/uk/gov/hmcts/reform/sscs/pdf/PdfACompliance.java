@@ -86,7 +86,7 @@ public class PdfACompliance {
          * be safely closed eg. try (InputStream inputStream = this.getClass().getResourceAsStream(... )) {
          */
         try (InputStreamWrapper colorProfile = new InputStreamWrapper(log, this.getClass().getResourceAsStream(
-            "/pdfa/sRGB.icc"))){
+            "/pdfa/sRGB.icc"))) {
 
             PDOutputIntent intent = new PDOutputIntent(document, colorProfile.get());
             intent.setInfo("sRGB IEC61966-2.1");
