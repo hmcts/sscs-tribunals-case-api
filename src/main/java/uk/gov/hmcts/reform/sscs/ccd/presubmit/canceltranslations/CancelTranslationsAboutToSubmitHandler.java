@@ -3,38 +3,26 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 import static java.util.Objects.requireNonNull;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
-import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 @Slf4j
-public class CancelTranslationsSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-    private final CcdService ccdService;
-    private final IdamService idamService;
-
-    @Autowired
-    public CancelTranslationsSubmittedCallbackHandler(CcdService ccdService, IdamService idamService) {
-        this.ccdService = ccdService;
-        this.idamService = idamService;
-    }
+public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return callbackType.equals(CallbackType.SUBMITTED)
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent().equals(EventType.CANCEL_TRANSLATIONS);
     }
 
@@ -44,13 +32,7 @@ public class CancelTranslationsSubmittedCallbackHandler implements PreSubmitCall
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        SscsCaseDetails sscsCaseDetails = updateCase(callback);
 
-        return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
-    }
-
-    private SscsCaseDetails updateCase(Callback<SscsCaseData> callback) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
             if (sscsDocument.getValue().getDocumentTranslationStatus() != null
@@ -65,8 +47,8 @@ public class CancelTranslationsSubmittedCallbackHandler implements PreSubmitCall
             }
         }
         caseData.setTranslationWorkOutstanding("No");
-        return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
-                EventType.CANCEL_TRANSLATIONS.getCcdType(), "Cancel translations",
-                "Updated case with cancel translations and update secondary state to No", idamService.getIdamTokens());
+        return new PreSubmitCallbackResponse<>(caseData);
     }
+
+
 }

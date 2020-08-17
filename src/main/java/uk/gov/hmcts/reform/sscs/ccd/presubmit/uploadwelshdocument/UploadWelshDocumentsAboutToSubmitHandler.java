@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
 @Service
 @Slf4j
-public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private final CcdService ccdService;
     private final IdamService idamService;
 
@@ -40,7 +40,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
     }
 
     @Autowired
-    public UploadWelshDocumentsSubmittedCallbackHandler(CcdService ccdService, IdamService idamService) {
+    public UploadWelshDocumentsAboutToSubmitHandler(CcdService ccdService, IdamService idamService) {
         this.ccdService = ccdService;
         this.idamService = idamService;
     }
@@ -50,16 +50,13 @@ public class UploadWelshDocumentsSubmittedCallbackHandler implements PreSubmitCa
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
 
-        return callbackType.equals(CallbackType.SUBMITTED)
+        return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
                 && callback.getEvent().equals(EventType.UPLOAD_WELSH_DOCUMENT);
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-        if (!canHandle(callbackType, callback)) {
-            throw new IllegalStateException("Cannot handle callback");
-        }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         SscsCaseDetails sscsCaseDetails = updateCase(callback, caseData);
 

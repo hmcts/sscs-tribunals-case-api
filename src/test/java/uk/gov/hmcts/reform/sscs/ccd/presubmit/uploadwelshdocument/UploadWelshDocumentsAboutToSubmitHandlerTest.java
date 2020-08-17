@@ -8,7 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
 
 import java.time.LocalDateTime;
@@ -50,10 +50,10 @@ import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 
 @RunWith(JUnitParamsRunner.class)
-public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
+public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private UploadWelshDocumentsSubmittedCallbackHandler handler;
+    private UploadWelshDocumentsAboutToSubmitHandler handler;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -73,7 +73,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new UploadWelshDocumentsSubmittedCallbackHandler(ccdService, idamService);
+        handler = new UploadWelshDocumentsAboutToSubmitHandler(ccdService, idamService);
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_WELSH_DOCUMENT);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -100,7 +100,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
                 anyString(), anyString(), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNotNull(captor.getValue().getOriginalDocuments());
         assertEquals("english.pdf", captor.getValue().getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
@@ -121,7 +121,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
                 anyString(), anyString(), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNotNull(captor.getValue().getOriginalDocuments());
         assertEquals("english.pdf", captor.getValue().getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
@@ -147,7 +147,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
                 anyString(), anyString(), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         verify(ccdService).updateCase(captor.capture(), anyLong(), eq(EventType.DIRECTION_ISSUED_WELSH.getCcdType()),
                 anyString(), anyString(), any(IdamTokens.class));
     }
@@ -162,7 +162,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
                 anyString(), anyString(), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         verify(ccdService).updateCase(captor.capture(), anyLong(), eq(EventType.DIRECTION_ISSUED_WELSH.getCcdType()),
                 anyString(), anyString(), any(IdamTokens.class));
     }
@@ -177,7 +177,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
                 anyString(), anyString(), any(IdamTokens.class)))
                 .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
-        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         verify(ccdService).updateCase(captor.capture(), anyLong(), eq(UPLOAD_WELSH_DOCUMENT.getCcdType()),
                 anyString(), anyString(), any(IdamTokens.class));
     }
@@ -185,7 +185,7 @@ public class UploadWelshDocumentsSubmittedCallbackHandlerTest {
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption =
                 buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()));
-        return new Object[]{ new Object[]{ SUBMITTED, callbackWithValidEventOption, true}};
+        return new Object[]{ new Object[]{ ABOUT_TO_SUBMIT, callbackWithValidEventOption, true}};
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
