@@ -1,10 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
@@ -18,17 +23,38 @@ import junitparams.Parameters;
 import junitparams.converters.Nullable;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
+
+    @Rule
+    public MockitoRule rule = MockitoJUnit.rule();
 
     private static final String USER_AUTHORISATION = "Bearer token";
 
@@ -49,7 +75,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
         actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
@@ -159,6 +184,44 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         } else {
             String warning = response.getWarnings().stream().findFirst().orElse("");
             assertEquals("Coversheet will be ignored, are you happy to proceed?", warning);
+        }
+    }
+
+    @Test
+    @Parameters({"true", "false"})
+    public void givenACaseWithAnEmptyScannedDocumentType_shouldMoveToSscsDocumentsAndWarningShouldBeReturned(boolean ignoreWarnings) {
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .type(null)
+                        .fileName("bla.pdf")
+                        .subtype("sscs1")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .scannedDate("2019-06-12T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+        scannedDocumentList = new ArrayList<>();
+        scannedDocumentList.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(scannedDocumentList);
+        sscsCaseData.setFurtherEvidenceAction(
+                buildFurtherEvidenceActionItemListForGivenOption(APPELLANT_EVIDENCE.getValue(),
+                "\"Appellant (or Appointee)"));
+        sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
+                "Appellant (or Appointee)"));
+        sscsCaseData.setEvidenceHandled("No");
+
+        when(callback.isIgnoreWarnings()).thenReturn(ignoreWarnings);
+
+        PreSubmitCallbackResponse<SscsCaseData> response =
+                actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(response.getData().getSscsDocument().size(), 1);
+        assertEquals("Yes", response.getData().getEvidenceHandled());
+
+        if (ignoreWarnings) {
+            assertEquals(0, response.getWarnings().size());
+        } else {
+            String warning = response.getWarnings().stream().findFirst().orElse("");
+            assertEquals("Document type is empty, are you happy to proceed?", warning);
         }
     }
 

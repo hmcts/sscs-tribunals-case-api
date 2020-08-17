@@ -2,11 +2,13 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
 
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
-import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,12 +30,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private final FooterService footerService;
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    private final Validator validator;
 
     @Autowired
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
-        DecisionNoticeOutcomeService decisionNoticeOutcomeService) {
+        DecisionNoticeOutcomeService decisionNoticeOutcomeService, Validator validator) {
         this.footerService = footerService;
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
+        this.validator = validator;
     }
 
     @Override
@@ -54,26 +58,27 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
         calculateOutcomeCode(sscsCaseData, preSubmitCallbackResponse);
 
         if (preSubmitCallbackResponse.getErrors().isEmpty()) {
 
             sscsCaseData.setDwpState(FINAL_DECISION_ISSUED.getId());
 
+            if (!preSubmitCallbackResponse.getErrors().isEmpty()) {
+                return preSubmitCallbackResponse;
+            }
+
             if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
-
-                if (!isFileAPdf(sscsCaseData.getWriteFinalDecisionPreviewDocument())) {
-                    preSubmitCallbackResponse.addError("You need to upload PDF documents only");
-                    return preSubmitCallbackResponse;
-                }
-
                 createFinalDecisionNoticeFromPreviewDraft(preSubmitCallbackResponse);
+                clearTransientFields(preSubmitCallbackResponse);
             } else {
                 preSubmitCallbackResponse.addError("There is no Preview Draft Decision Notice on the case so decision cannot be issued");
             }
-
-            clearTransientFields(preSubmitCallbackResponse);
-
         }
 
         return preSubmitCallbackResponse;

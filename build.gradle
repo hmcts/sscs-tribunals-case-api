@@ -12,12 +12,12 @@ plugins {
     id 'pmd'
     id 'org.sonarqube' version '2.8'
     id 'jacoco'
-    id 'org.springframework.boot' version '2.3.1.RELEASE'
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
     id 'uk.gov.hmcts.java' version '0.11.0'
     id 'com.github.ben-manes.versions' version '0.29.0'
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.5.1'
-    id 'au.com.dius.pact' version '4.1.6'
+    id 'au.com.dius.pact' version '4.1.7'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -200,7 +200,7 @@ def versions = [
 ext["rest-assured.version"] = '4.2.0'
 
 ext {
-    springCloudVersion = 'Hoxton.SR6'
+    springCloudVersion = 'Hoxton.SR7'
 }
 
 dependencyManagement {
@@ -212,7 +212,7 @@ dependencyManagement {
         dependency group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.3.72') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.0') {
             entry 'kotlin-stdlib'
         }
 	// CVE-2020-13934, CVE-2020-13935
@@ -257,7 +257,7 @@ dependencies {
     compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.37'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.1'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.2'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
@@ -265,7 +265,7 @@ dependencies {
     compile group: 'io.springfox', name: 'springfox-swagger-ui', version: versions.springfoxSwagger
 
     compile group: 'io.github.openfeign', name: 'feign-httpclient', version: '10.0.1'
-    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.8.0'
+    compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.8.1'
 
     compile group: 'uk.gov.hmcts.reform.auth', name: 'auth-checker-lib', version: '2.1.4'
     compile group: 'uk.gov.hmcts.reform', name: 'properties-volume-spring-boot-starter', version: '0.1.0'
@@ -274,23 +274,22 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'logging-appinsights', version: versions.reformLogging
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.5'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.3.24'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.7'
-
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.4.6'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.8'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
     compile 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.1.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.4.4'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.3.RELEASE'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.0'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.18.1'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.4.4'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.18.1'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
-    
+
     // Added to fix CVE-2020-13934, CVE-2020-13935
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.37'
     testCompile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.37'
@@ -358,10 +357,6 @@ jacocoTestReport {
         xml.enabled = true
         csv.enabled = false
     }
-}
-
-test {
-    useJUnitPlatform()
 }
 
 pitest {
