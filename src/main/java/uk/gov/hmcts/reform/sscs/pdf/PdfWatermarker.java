@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -10,12 +10,13 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.util.Matrix;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.InputStreamWrapper;
 
 /**
  * Copied from https://github.com/keefmarshall/pdfpoc
  */
 @Service
+@Slf4j
 public class PdfWatermarker {
 
     private static final float SCALE_PERCENTAGE = .88f;
@@ -50,18 +51,21 @@ public class PdfWatermarker {
         // - the running code can load form the deployed system but if this is likely to be a Docker image there's
         // no guarantee it will have any TTF fonts present. If we want something else we'll likely have to embed
         // it into the code base, and be really careful about licensing.
-        InputStream fontStream = null;
         PDFont font;
-        try {
-            fontStream = this.getClass().getResourceAsStream(
-                    "/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf");
+        /**
+         * The input stream here is automatically closed by this try-with-resources statement.
+         * If there is an exception closing the input stream, the InputStreamWrapper will
+         * log and swallow the close-exception.
+         * We only need to wrap with an InputStreamWrapper here because we want to
+         * log and swallow any exceptions occurring on the close itself - if we didn't have this requirement we could just
+         * assign the InputStream itself in the try-with-resources statement and the input stream would
+         * be safely closed (eg.  try (InputStream inputStream = this.getClass().getResourceAsStream(... )) {
+         */
+        try (InputStreamWrapper fontStreamWrapper = new InputStreamWrapper(log, this.getClass().getResourceAsStream(
+            "/org/apache/pdfbox/resources/ttf/LiberationSans-Regular.ttf"))){
 
-            font = PDType0Font.load(document, fontStream, true);
+            font = PDType0Font.load(document, fontStreamWrapper.get(), true);
 
-        } finally {
-            if (fontStream != null) {
-                ResourceManager.safeClose(fontStream);
-            }
         }
 
         int fontSize = 12;
