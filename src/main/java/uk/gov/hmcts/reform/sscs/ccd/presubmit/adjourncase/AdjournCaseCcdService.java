@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.service.venue.VenueRpcDetailsService;
 import uk.gov.hmcts.reform.sscs.service.venue.VenueRpcDetails;
+import uk.gov.hmcts.reform.sscs.service.venue.VenueRpcDetailsService;
 
 @Component
 @Slf4j

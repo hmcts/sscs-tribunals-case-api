@@ -1407,7 +1407,10 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected("someVenueId");
+
+        DynamicListItem item = new DynamicListItem("someVenueId", "");
+        DynamicList list = new DynamicList(item, Arrays.asList());
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -1424,7 +1427,11 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected("someVenueId");
+
+        DynamicListItem item = new DynamicListItem("someVenueId", "");
+        DynamicList list = new DynamicList(item, Arrays.asList());
+
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -1442,7 +1449,11 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected("someUnknownVenueId");
+
+        DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
+        DynamicList list = new DynamicList(listItem, Arrays.asList(listItem));
+
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -1460,7 +1471,11 @@ public class AdjournCasePreviewServiceTest {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
         sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected("someUnknownVenueId");
+
+        DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
+        DynamicList list = new DynamicList(listItem, Arrays.asList(listItem));
+
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));

@@ -4,11 +4,6 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +15,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @RestController
 @Slf4j
@@ -73,7 +65,7 @@ public class CcdMideventCallbackController {
     }
 
     private String getVenueDisplayString(VenueDetails venueDetails, boolean prefix) {
-        return (prefix ? (getRPC(venueDetails) + " - " ) : "") + venueDetails.getVenName() + ", "
+        return (prefix ? (getRpc(venueDetails) + " - ") : "") + venueDetails.getVenName() + ", "
             + venueDetails.getVenAddressLine1() + ", "
             + venueDetails.getVenAddressLine2() + ", "
             + venueDetails.getVenAddressTown() + ", "
@@ -85,7 +77,7 @@ public class CcdMideventCallbackController {
         return value.substring(5).equalsIgnoreCase(rpc);
     }
 
-    private String getRPC(VenueDetails vd) {
+    private String getRpc(VenueDetails vd) {
         return vd.getRegionalProcessingCentre().substring(5);
     }
 

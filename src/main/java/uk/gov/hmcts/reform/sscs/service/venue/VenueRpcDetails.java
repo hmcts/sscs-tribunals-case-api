@@ -2,9 +2,6 @@ package uk.gov.hmcts.reform.sscs.service.venue;
 
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 
-/**
- * Wrapper around VenueDetails
- */
 public class VenueRpcDetails {
 
     private VenueDetails venueDetails;
@@ -24,7 +21,7 @@ public class VenueRpcDetails {
     }
 
     public String getVenueDisplayString(boolean prefixWithRpc) {
-        return (prefixWithRpc ? (getRpcInCaseDataFormat() + " - " ) : "") + venueDetails.getVenName() + ", "
+        return (prefixWithRpc ? (getRpcInCaseDataFormat() + " - ") : "") + venueDetails.getVenName() + ", "
             + venueDetails.getVenAddressLine1() + ", "
             + venueDetails.getVenAddressLine2() + ", "
             + venueDetails.getVenAddressTown() + ", "
