@@ -49,6 +49,4 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         caseData.setTranslationWorkOutstanding("No");
         return new PreSubmitCallbackResponse<>(caseData);
     }
-
-
 }

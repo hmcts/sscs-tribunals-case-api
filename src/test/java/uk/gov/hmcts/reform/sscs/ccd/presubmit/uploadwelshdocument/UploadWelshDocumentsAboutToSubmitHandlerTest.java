@@ -57,10 +57,6 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-    @Mock
-    private CcdService ccdService;
-    @Mock
-    private IdamService idamService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -73,12 +69,11 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new UploadWelshDocumentsAboutToSubmitHandler(ccdService, idamService);
+        handler = new UploadWelshDocumentsAboutToSubmitHandler();
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_WELSH_DOCUMENT);
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
     }
 
     @Test
@@ -87,7 +82,6 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
                                                                  Callback<SscsCaseData> callback,
                                                                  boolean expectedResult) {
         boolean actualResult = handler.canHandle(callbackType, callback);
-
         assertEquals(expectedResult, actualResult);
     }
 
@@ -95,45 +89,38 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     public void updateCaseWhenOnlyOneDocumentAndOnlyOneSetToRequestTranslationStatusToRequestTranslation() {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()));
 
-        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq(EventType.SEND_TO_DWP.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNotNull(captor.getValue().getOriginalDocuments());
-        assertEquals("english.pdf", captor.getValue().getOriginalDocuments().getListItems().get(0).getCode());
+        assertNotNull(caseData.getOriginalDocuments());
+        assertEquals("english.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
-                captor.getValue().getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
-        assertEquals("No", captor.getValue().getTranslationWorkOutstanding());
+                caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
+        assertEquals("No", caseData.getTranslationWorkOutstanding());
         assertEquals("english.pdf",
-                captor.getValue().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+                caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
-                captor.getValue().getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
+                caseData.getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
+        assertEquals(EventType.SEND_TO_DWP.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
     }
 
     @Test
-    public void updateCaseWhenOnlyOneDocumentAndMorethanOneSetToRequestTranslationStatusToRequestTranslation() {
+    public void updateCaseWhenOnlyOneDocumentAndMoreThanOneSetToRequestTranslationStatusToRequestTranslation() {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(true), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()));
 
-        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq(EventType.SEND_TO_DWP.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        assertNotNull(captor.getValue().getOriginalDocuments());
-        assertEquals("english.pdf", captor.getValue().getOriginalDocuments().getListItems().get(0).getCode());
+        assertNotNull(caseData.getOriginalDocuments());
+        assertEquals("english.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
-                captor.getValue().getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
-        assertEquals("Yes", captor.getValue().getTranslationWorkOutstanding());
+                caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
+        assertEquals("Yes", caseData.getTranslationWorkOutstanding());
         assertEquals("english.pdf",
-                captor.getValue().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+                caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
-                captor.getValue().getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
-
-        verify(ccdService).updateCase(captor.capture(), anyLong(), eq(EventType.SEND_TO_DWP.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class));
+                caseData.getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
+        assertEquals(EventType.SEND_TO_DWP.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
 
     }
 
@@ -142,29 +129,23 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DIRECTION_NOTICE.getValue())), buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
 
-        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq(EventType.DIRECTION_ISSUED_WELSH.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(captor.capture(), anyLong(), eq(EventType.DIRECTION_ISSUED_WELSH.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class));
+
+        assertEquals(EventType.DIRECTION_ISSUED_WELSH.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
     }
 
     @Test
     public void shouldUpdateWithDecisionIssuedWelshNextEventCorrectlyBasedOnDecisionNoticeDocumentType() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DECISION_NOTICE.getValue())), buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DECISION_NOTICE.getValue())), buildSscsWelshDocuments(DocumentType.DECISION_NOTICE.getValue()));
 
-        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq(EventType.DIRECTION_ISSUED_WELSH.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(captor.capture(), anyLong(), eq(EventType.DIRECTION_ISSUED_WELSH.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class));
+
+        assertEquals(EventType.DECISION_ISSUED_WELSH.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
     }
 
     @Test
@@ -172,14 +153,11 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue())), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()));
 
-        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
-        given(ccdService.updateCase(captor.capture(), anyLong(), eq(EventType.UPLOAD_WELSH_DOCUMENT.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class)))
-                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(captor.capture(), anyLong(), eq(UPLOAD_WELSH_DOCUMENT.getCcdType()),
-                anyString(), anyString(), any(IdamTokens.class));
+
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
     }
 
     private Object[] generateCanHandleScenarios() {
