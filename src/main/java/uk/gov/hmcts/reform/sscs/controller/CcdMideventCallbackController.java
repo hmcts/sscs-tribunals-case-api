@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
@@ -37,17 +38,17 @@ public class CcdMideventCallbackController {
     private final SscsCaseCallbackDeserializer deserializer;
     private final WriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService;
     private final AdjournCasePreviewService adjournCasePreviewService;
-    private final VenueDataLoader venueDataLoader;
+    private final AdjournCaseCcdService adjournCaseCcdService;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
                                          WriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService,
-                                            AdjournCasePreviewService adjournCasePreviewService, VenueDataLoader venueDataLoader) {
+                                            AdjournCasePreviewService adjournCasePreviewService, AdjournCaseCcdService adjournCaseCcdService) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.writeFinalDecisionPreviewDecisionService = writeFinalDecisionPreviewDecisionService;
         this.adjournCasePreviewService = adjournCasePreviewService;
-        this.venueDataLoader = venueDataLoader;
+        this.adjournCaseCcdService = adjournCaseCcdService;
     }
 
     @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown")
@@ -56,7 +57,7 @@ public class CcdMideventCallbackController {
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("About to start ccdMidEventPreviewFinalDecision callback `{}` received for Case ID `{}`", callback.getEvent(),
+        log.info("About to start ccdMidEventAdjournCasePopulateVenueDropdown callback `{}` received for Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
@@ -65,31 +66,8 @@ public class CcdMideventCallbackController {
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        List<DynamicListItem> itemList = venueDataLoader.getVenueDetailsMap()
-            .entrySet().stream()
-            .filter(e -> isRegionalProcessingCentreMatch(e.getValue().getRegionalProcessingCentre(),
-                sscsCaseData.getRegionalProcessingCenter().getName()))
-            .map(e -> new DynamicListItem(e.getKey(),
-                getVenueDisplayString(e.getValue(), false))).collect(Collectors.toList());
-
-        List<DynamicListItem> otherRPCitemList = venueDataLoader.getVenueDetailsMap()
-            .entrySet().stream()
-            .filter(e -> !isRegionalProcessingCentreMatch(e.getValue().getRegionalProcessingCentre(),
-                sscsCaseData.getRegionalProcessingCenter().getName()))
-            .map(e -> new DynamicListItem(e.getKey(),
-                getVenueDisplayString(e.getValue(), true))).collect(Collectors.toList());
-
-        Collections.sort(itemList, (d1, d2) -> d1.getLabel().compareTo(d2.getLabel()));
-
-        Collections.sort(otherRPCitemList, (d1, d2) -> d1.getLabel().compareTo(d2.getLabel()));
-
-        List<DynamicListItem> fullList = new ArrayList<>();
-        fullList.addAll(itemList);
-        fullList.addAll(otherRPCitemList);
-
-        DynamicList list = new DynamicList(new DynamicListItem("", ""), fullList);
-
-        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(adjournCaseCcdService.getVenueDynamicListForRpcName(
+            sscsCaseData.getRegionalProcessingCenter().getName()));
 
         return ok(preSubmitCallbackResponse);
     }
