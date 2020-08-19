@@ -109,7 +109,7 @@ public class CreateWelshNoticeAboutToStartHandlerTest {
         oneDoc.add(sscs1Doc);
 
         return new Object[] {
-                new Object[]{oneDoc}
+            new Object[]{oneDoc}
         };
     }
 }

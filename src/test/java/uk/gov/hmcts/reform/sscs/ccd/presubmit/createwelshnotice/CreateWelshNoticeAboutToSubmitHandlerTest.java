@@ -1,19 +1,22 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_WELSH_NOTICE;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import junitparams.JUnitParamsRunner;
-import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,9 +25,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import uk.gov.hmcts.reform.document.domain.Document;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
@@ -38,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
@@ -45,6 +51,7 @@ import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 public class CreateWelshNoticeAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+
     private CreateWelshNoticeAboutToSubmitHandler handler;
 
     @Rule
@@ -72,52 +79,62 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters(method = "generateCanHandleScenarios")
-    public void givenCanHandleIsCalled_shouldReturnCorrectResult(CallbackType callbackType,
-                                                                 Callback<SscsCaseData> callback,
-                                                                 boolean expectedResult) {
-        boolean actualResult = handler.canHandle(callbackType, callback);
-        assertEquals(expectedResult, actualResult);
+    public void canHandle() {
+        boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, callback);
+        assertTrue(actualResult);
     }
 
-    private Object[] generateCanHandleScenarios() {
-        Callback<SscsCaseData> callbackWithValidEventOption =
-                buildCallback("callbackWithValidEventOption", CREATE_WELSH_NOTICE, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()));
-        return new Object[]{new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventOption, true}};
+    @Test
+    public void handle() {
+        byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
+
+        UploadResponse uploadResponse = createUploadResponse();
+        when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
+        when(docmosisPdfService.createPdf(any(),any())).thenReturn(expectedPdf);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", CREATE_WELSH_NOTICE, buildSscsDocuments(),
+                buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback,
+                USER_AUTHORISATION);
+        assertNull(response.getData().getEnglishBodyContent());
+        assertNull(response.getData().getWelshBodyContent());
+        assertNull(response.getData().getSignedBy());
+        assertNull(response.getData().getSignedRole());
+        assertNull(response.getData().getDateAdded());
+        assertEquals(EventType.DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
                                                  List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments) {
 
-        final DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
-                Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
+        final DynamicList dynamicDocumentTypeList = new DynamicList(new DynamicListItem("Direction Notice",
+                "Direction Notice"),
+                Collections.singletonList(new DynamicListItem("Direction Notice", "Direction Notice")));
 
-        SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .originalDocuments(dynamicList)
-                .sscsDocument(sscsDocuments)
-                .sscsWelshPreviewDocuments(welshDocuments)
-                .build();
+        final DynamicList originalNoticeTypeList = new DynamicList(new DynamicListItem(dynamicListItemCode,
+                dynamicListItemCode),
+                Collections.singletonList(new DynamicListItem(dynamicListItemCode, dynamicListItemCode)));
+
+        SscsCaseData sscsCaseData = CaseDataUtils.buildMinimalCaseData();
+        sscsCaseData.setDocumentTypes(dynamicDocumentTypeList);
+        sscsCaseData.setOriginalNoticeDocuments(originalNoticeTypeList);
+        sscsCaseData.setSscsWelshPreviewDocuments(welshDocuments);
+        sscsCaseData.setSscsDocument(sscsDocuments);
+
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
                 State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
-    private List<SscsDocument> buildSscsDocuments(boolean moreThanOneDoc) {
-
-        SscsDocument sscs1Doc = buildSscsDocument("english.pdf", "/anotherUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.SSCS1.getValue());
-
-        SscsDocument sscs2Doc = buildSscsDocument("anything.pdf", "/anotherUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.SSCS1.getValue());
-
+    private List<SscsDocument> buildSscsDocuments() {
+        SscsDocument sscs1Doc = buildSscsDocument("english.pdf");
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         sscsDocuments.add(sscs1Doc);
-        if (moreThanOneDoc) {
-            sscsDocuments.add(sscs2Doc);
-        }
         return sscsDocuments;
     }
 
     private List<SscsWelshDocument> buildSscsWelshDocuments(String documentType) {
-        return Arrays.asList(SscsWelshDocument.builder()
+        return Collections.singletonList(SscsWelshDocument.builder()
                 .value(SscsWelshDocumentDetails.builder()
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("/anotherUrl")
@@ -129,17 +146,35 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
                 .build());
     }
 
-    private SscsDocument buildSscsDocument(String filename, String documentUrl, SscsDocumentTranslationStatus translationRequested, String documentType) {
+    private SscsDocument buildSscsDocument(String filename) {
         return SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
                         .documentLink(DocumentLink.builder()
-                                .documentUrl(documentUrl)
+                                .documentUrl("/anotherUrl")
                                 .documentFilename(filename)
                                 .build())
-                        .documentTranslationStatus(translationRequested)
-                        .documentType(documentType)
+                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
+                        .documentType(DocumentType.DIRECTION_NOTICE.getValue())
                         .build())
                 .build();
     }
 
+    private UploadResponse createUploadResponse() {
+        UploadResponse response = mock(UploadResponse.class);
+        UploadResponse.Embedded embedded = mock(UploadResponse.Embedded.class);
+        when(response.getEmbedded()).thenReturn(embedded);
+        Document document = createDocument();
+        when(embedded.getDocuments()).thenReturn(Collections.singletonList(document));
+        return response;
+    }
+
+    private static Document createDocument() {
+        Document document = new Document();
+        Document.Links links = new Document.Links();
+        Document.Link link = new Document.Link();
+        link.href = "some location";
+        links.self = link;
+        document.links = links;
+        return document;
+    }
 }

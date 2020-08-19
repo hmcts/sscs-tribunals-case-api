@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -77,6 +78,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         createNoticeAndUpload(callback, caseData);
+        clearFields(caseData);
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
@@ -117,7 +119,8 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
                 .build();
 
         if (caseData.getSscsWelshDocuments() == null) {
-            caseData.setSscsWelshDocuments(new ArrayList<>());
+            List<SscsWelshDocument> sscsWelshDocumentsList = new ArrayList<>();
+            caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
         }
         caseData.getSscsWelshDocuments().add(SscsWelshDocument.builder()
                     .value(sscsWelshDocumentDetails)
@@ -167,9 +170,20 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     }
 
     private String getWelshNoticeType(String noticeType) {
-        if (noticeType.equalsIgnoreCase("Decision Notice") || noticeType.equalsIgnoreCase("Direction Notice")) {
+        if (noticeType.equalsIgnoreCase("Decision Notice")) {
+            return "Hysbysiad o Benderfyniad".toUpperCase();
+        }
+        if (noticeType.equalsIgnoreCase("Direction Notice")) {
             return "Hysbysiad o Benderfyniad".toUpperCase();
         }
         return noticeType.toUpperCase();
+    }
+
+    private void clearFields(SscsCaseData caseData) {
+        caseData.setSscsWelshDocuments(null);
+        caseData.setEnglishBodyContent(null);
+        caseData.setSignedBy(null);
+        caseData.setSignedRole(null);
+        caseData.setDateAdded(null);
     }
 }
