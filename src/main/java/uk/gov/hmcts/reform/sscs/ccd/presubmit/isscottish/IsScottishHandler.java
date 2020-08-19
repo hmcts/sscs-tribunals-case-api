@@ -19,7 +19,8 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    List<EventType> permittedEvents = Arrays.asList(EventType.VALID_APPEAL_CREATED, EventType.INCOMPLETE_APPLICATION_RECEIVED);
+    List<EventType> permittedEvents = Arrays.asList(EventType.VALID_APPEAL_CREATED,
+            EventType.INCOMPLETE_APPLICATION_RECEIVED, EventType.NON_COMPLIANT);
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -36,7 +37,12 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
 
         String isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
 
-        caseData.setIsScottishCase(isScotCase);
+        if (isScotCase != caseData.getIsScottishCase()) {
+            log.info("Setting isScottishCase field to " + isScotCase + " for case " + caseData.getCcdCaseId());
+            caseData.setIsScottishCase(isScotCase);
+        } else {
+            log.info("Keeping isScottishCase field as " + isScotCase + " for case " + caseData.getCcdCaseId());
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
@@ -46,11 +52,11 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
     public static String isScottishCase(RegionalProcessingCenter rpc, SscsCaseData caseData) {
 
         if (isNull(rpc) || isNull(rpc.getName())) {
-            log.info("Setting isScottishCase field to No for empty RPC for case " + caseData.getCcdCaseId());
+            log.info("Calculated isScottishCase field to No for empty RPC for case " + caseData.getCcdCaseId());
             return "No";
         } else {
             String isScotCase = rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
-            log.info("Setting isScottishCase field to " + isScotCase + " for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
+            log.info("Calculated isScottishCase field to " + isScotCase + " for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
             return isScotCase;
         }
     }

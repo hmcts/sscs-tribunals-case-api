@@ -52,7 +52,7 @@ public class IsScottishHandlerTest {
 
     @Test
     @Parameters({"Glasgow,Yes", "GLASGOW,Yes", "NotGlas,No"})
-    public void setIsScottishCorrectly(@Nullable String dwpIssuingOffice, @Nullable String expectedIsScottish) {
+    public void setIsScottishCorrectlyWhenExistingIsNull(@Nullable String dwpIssuingOffice, @Nullable String expectedIsScottish) {
 
         RegionalProcessingCenter regionalProcessingCenter = getRegionalProcessingCenter();
 
@@ -93,5 +93,33 @@ public class IsScottishHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("No", response.getData().getIsScottishCase());
+    }
+
+    @Test
+    @Parameters({"Glasgow,Yes,No", "Glasgow,Yes,Yes", "NotGlas,No,No", "NotGlas,No,Yes"})
+    public void changeIsScottishCorrectlyWhenAlreadySet(@Nullable String dwpIssuingOffice,
+                                                                             @Nullable String expectedIsScottish,
+                                                                             @Nullable String existingIsScottish) {
+
+        RegionalProcessingCenter regionalProcessingCenter = getRegionalProcessingCenter();
+
+        RegionalProcessingCenter updatedRpc = regionalProcessingCenter.toBuilder().name(dwpIssuingOffice).build();
+
+        sscsCaseData = SscsCaseData.builder()
+                .ccdCaseId("1234")
+                .isScottishCase(existingIsScottish)
+                .regionalProcessingCenter(updatedRpc)
+                .appeal(Appeal.builder().build())
+                .build();
+
+        when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
     }
 }
