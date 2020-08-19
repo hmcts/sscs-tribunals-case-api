@@ -1,5 +1,16 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_WELSH_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED_WELSH;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -18,18 +29,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CREATE_WELSH_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED_WELSH;
 
 @RunWith(JUnitParamsRunner.class)
 public class CreateWelshNoticeSubmittedHandlerTest {
@@ -75,20 +74,23 @@ public class CreateWelshNoticeSubmittedHandlerTest {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
-            "Create Welsh notice",
-            "Create Welsh notice", idamTokens))
+        when(ccdService
+            .updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
+                "Create Welsh notice",
+                "Create Welsh notice", idamTokens))
             .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
-            "Create Welsh notice", "Create Welsh notice", idamTokens);
+        verify(ccdService)
+            .updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
+                "Create Welsh notice", "Create Welsh notice", idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
 
     }
 
     private Object[] generateCanHandleScenarios() {
-        Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.DIRECTION_ISSUED_WELSH.getCcdType());
+        Callback<SscsCaseData> callbackWithValidEventOption =
+            buildCallback(EventType.DIRECTION_ISSUED_WELSH.getCcdType());
         return new Object[] {new Object[] {SUBMITTED, buildCallback(DIRECTION_ISSUED_WELSH.getCcdType()), true},
             new Object[] {ABOUT_TO_SUBMIT, buildCallback(EventType.DIRECTION_ISSUED_WELSH.getCcdType()), false},
             new Object[] {SUBMITTED, buildCallback(null), false}
