@@ -229,7 +229,7 @@ public class EvidenceUploadService {
         try {
             draftPdfContent = evidenceManagementService.download(new URI(draftDocUrl), "sscs");
         } catch (URISyntaxException e) {
-            throw new EvidenceUploadException("Error when downloading document from Evidence Management Service..", e);
+            throw new RuntimeException("Error when downloading document from Evidence Management Service..", e);
         }
         return draftPdfContent;
     }
@@ -254,7 +254,7 @@ public class EvidenceUploadService {
             return combinedContent.toByteArray();
 
         } else {
-            throw new EvidenceUploadException("Can not combine empty statement or evidence documents");
+            throw new RuntimeException("Can not combine empty statement or evidence documents");
         }
     }
 
@@ -270,7 +270,7 @@ public class EvidenceUploadService {
         try {
             statementDoc.save(combinedContent);
         } catch (IOException e) {
-            throw new EvidenceUploadException("Error when saving Doc..", e);
+            throw new RuntimeException("Error when saving Doc..", e);
         }
     }
 
@@ -278,7 +278,7 @@ public class EvidenceUploadService {
         try {
             merger.appendDocument(statementDoc, uploadDoc);
         } catch (IOException e) {
-            throw new EvidenceUploadException("Error when appending docs..", e);
+            throw new RuntimeException("Error when appending docs..", e);
         }
     }
 
