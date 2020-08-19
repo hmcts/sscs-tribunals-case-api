@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -35,11 +34,12 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_START)
-                && callback.getEvent() == EventType.UPLOAD_WELSH_DOCUMENT;
+            && callback.getEvent() == EventType.UPLOAD_WELSH_DOCUMENT;
     }
 
     @Override
-    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
@@ -55,18 +55,20 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
     private void setOriginalDocumentDropdown(SscsCaseData sscsCaseData) {
         listOptions = new ArrayList<>();
 
-        List<SscsDocument> sscsDocuments =  Optional.ofNullable(sscsCaseData).map(SscsCaseData::getSscsDocument)
-                .orElse(Collections.emptyList())
-                .stream()
-                .filter(Objects::nonNull)
-                .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
-                        && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
-                .filter( b -> Arrays.asList(DocumentType.APPELLANT_EVIDENCE.getValue(), DocumentType.SSCS1.getValue()).contains(b.getValue().getDocumentType()))
-                .collect(Collectors.toList());
+        List<SscsDocument> sscsDocuments = Optional.ofNullable(sscsCaseData).map(SscsCaseData::getSscsDocument)
+            .orElse(Collections.emptyList())
+            .stream()
+            .filter(Objects::nonNull)
+            .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
+                &&
+                a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
+            .filter(b -> Arrays.asList(DocumentType.APPELLANT_EVIDENCE.getValue(), DocumentType.SSCS1.getValue())
+                .contains(b.getValue().getDocumentType()))
+            .collect(Collectors.toList());
 
         sscsDocuments.forEach(sscsDocument -> {
             listOptions.add(new DynamicListItem(sscsDocument.getValue().getDocumentLink().getDocumentFilename(),
-                    sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
+                sscsDocument.getValue().getDocumentLink().getDocumentFilename()));
         });
 
         if (listOptions.size() > 0) {

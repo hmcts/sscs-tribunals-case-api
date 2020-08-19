@@ -1,10 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static java.util.Objects.requireNonNull;
 
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -62,8 +61,8 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
 
     private void setWelshNextEvent(SscsCaseData caseData) {
         caseData.getSscsDocument().stream().filter(sd ->
-            SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(sd.getValue().getDocumentTranslationStatus()) &&
-                nextEventMap.keySet().contains(sd.getValue().getDocumentType())).sorted().findFirst()
+            SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(sd.getValue().getDocumentTranslationStatus())
+                && nextEventMap.keySet().contains(sd.getValue().getDocumentType())).sorted().findFirst()
             .ifPresent(sscsDocument -> caseData
                 .setSscsWelshPreviewNextEvent(nextEventMap.get(sscsDocument.getValue().getDocumentType())));
     }

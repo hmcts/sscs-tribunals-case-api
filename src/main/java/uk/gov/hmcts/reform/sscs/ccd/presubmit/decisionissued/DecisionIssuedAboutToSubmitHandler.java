@@ -66,7 +66,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DECISION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
 
-        if(callback.getEvent() == EventType.DECISION_ISSUED) {
+        if (callback.getEvent() == EventType.DECISION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
                 Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
                     .format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
