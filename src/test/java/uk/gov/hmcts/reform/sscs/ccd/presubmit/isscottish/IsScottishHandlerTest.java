@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -38,8 +39,15 @@ public class IsScottishHandlerTest {
     }
 
     @Test
-    public void givenAHandleDwpLapseEvent_thenReturnTrue() {
+    public void givenAHandledEvent_thenReturnTrue() {
+        when(callback.getEvent()).thenReturn(EventType.VALID_APPEAL_CREATED);
         assertTrue(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    public void givenNonAHandledEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.ADD_NOTE);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
     @Test

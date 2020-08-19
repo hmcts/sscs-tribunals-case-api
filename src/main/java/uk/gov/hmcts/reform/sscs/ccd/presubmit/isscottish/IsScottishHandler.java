@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,13 +19,15 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    List<EventType> permittedEvents = Arrays.asList(EventType.VALID_APPEAL_CREATED, EventType.INCOMPLETE_APPLICATION_RECEIVED);
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() != EventType.CREATE_BUNDLE;
+            && permittedEvents.contains(callback.getEvent());
     }
 
     @Override
