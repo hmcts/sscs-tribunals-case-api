@@ -16,7 +16,7 @@ plugins {
     id 'uk.gov.hmcts.java' version '0.11.0'
     id 'com.github.ben-manes.versions' version '0.29.0'
     id 'net.ltgt.apt' version '0.21'
-    id "info.solidsoft.pitest" version '1.5.1'
+    id "info.solidsoft.pitest" version '1.5.2'
     id 'au.com.dius.pact' version '4.1.7'
 }
 
@@ -283,9 +283,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.3.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.2'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.18.1'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.2'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.18.1'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
