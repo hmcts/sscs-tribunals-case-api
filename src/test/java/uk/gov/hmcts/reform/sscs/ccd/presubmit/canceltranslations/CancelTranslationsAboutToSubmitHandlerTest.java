@@ -1,16 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -22,9 +23,11 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
@@ -51,54 +54,74 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void canHandle() {
+    public void givenCanHandleIsCalled_shouldReturnCorrectResult() {
         boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, callback);
         assertTrue(actualResult);
     }
 
     @Test
-    public void handle() {
+    public void shouldSetTranslationStatusOfDocumentsAndNextWelshEventCorrectly() {
         Callback<SscsCaseData> callback = buildCallback();
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response =
+            handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(1).getValue().getDocumentTranslationStatus());
-        assertEquals("No",response.getData().getTranslationWorkOutstanding());
+        assertNull(response.getData().getSscsDocument().get(2).getValue().getDocumentTranslationStatus());
+        assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
+            response.getData().getSscsDocument().get(3).getValue().getDocumentTranslationStatus());
+        assertNull(response.getData().getSscsDocument().get(4).getValue().getDocumentTranslationStatus());
+        assertEquals("No", response.getData().getTranslationWorkOutstanding());
+
+        assertEquals(EventType.DECISION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
     }
 
     private Callback<SscsCaseData> buildCallback() {
 
-        SscsDocument sscs1Doc = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl("/anotherUrl")
-                                .documentFilename("english.pdf")
-                                .build())
-                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
-                        .documentType("sscs1")
-                        .build())
-                .build();
+        SscsDocument ssc0Doc =
+            buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
+                DocumentType.APPELLANT_EVIDENCE.getValue(), LocalDate.now());
 
-        SscsDocument sscs2Doc = SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl("/anotherUrl")
-                                .documentFilename("anything.pdf")
-                                .build())
-                        .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUIRED)
-                        .documentType("Decision Notice")
-                        .build())
-                .build();
+        SscsDocument sscs1Doc =
+            buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
+                DocumentType.SSCS1.getValue(), LocalDate.now().minusDays(3));
 
-        List<SscsDocument> docs = new ArrayList<>();
-        docs.add(sscs1Doc);
-        docs.add(sscs2Doc);
+        SscsDocument sscs2Doc =
+            buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
+                DocumentType.DECISION_NOTICE
+                    .getValue(), LocalDate.now().minusDays(1));
+
+        SscsDocument sscs3Doc =
+            buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
+                DocumentType.DIRECTION_NOTICE
+                    .getValue(), LocalDate.now().minusDays(2));
+
+        SscsDocument sscs4Doc =
+            buildSscsDocument("anything.pdf", null, DocumentType.DECISION_NOTICE
+                .getValue(), LocalDate.now().minusDays(2));
+
+        List<SscsDocument> docs = Arrays.asList(ssc0Doc, sscs1Doc, sscs2Doc, sscs3Doc, sscs4Doc);
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .sscsDocument(docs)
-                .languagePreferenceWelsh("Yes")
-                .build();
+            .sscsDocument(docs)
+            .languagePreferenceWelsh("Yes")
+            .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
+            State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), CANCEL_TRANSLATIONS, false);
+    }
+
+    private SscsDocument buildSscsDocument(String s, SscsDocumentTranslationStatus translationRequired, String docType,
+                                           LocalDate dateAdded) {
+        return SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/anotherUrl")
+                    .documentFilename(s)
+                    .build())
+                .documentTranslationStatus(translationRequired)
+                .documentType(docType)
+                .documentDateAdded(dateAdded.toString())
+                .build())
+            .build();
     }
 }
