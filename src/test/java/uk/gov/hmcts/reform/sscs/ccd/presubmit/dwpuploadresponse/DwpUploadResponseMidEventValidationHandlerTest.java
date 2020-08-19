@@ -227,7 +227,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().minusYears(1).toString();
 
-        sscsCaseData.setJointPartyDob(dateToTest);
+        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -241,7 +241,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().toString();
 
-        sscsCaseData.setJointPartyDob(dateToTest);
+        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -256,7 +256,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().plusYears(1).toString();
 
-        sscsCaseData.setJointPartyDob(dateToTest);
+        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -279,7 +279,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Test
     public void givenValidJointPartyNinoNoSpaces_thenDoNotDisplayError() {
 
-        sscsCaseData.setJointPartyNino("BB000000B");
+        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("BB000000B").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -291,7 +291,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Test
     public void givenValidJointPartyNinoWithSpaces_thenDoNotDisplayError() {
 
-        sscsCaseData.setJointPartyNino("BB 00 00 00 B");
+        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("BB 00 00 00 B").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -304,7 +304,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Test
     public void givenInvalidJointPartyNino_thenDoDisplayError() {
 
-        sscsCaseData.setJointPartyNino("blah");
+        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("blah").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         
@@ -312,6 +312,101 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Invalid National Insurance number", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyValidAddress_thenDoNoDisplayError() {
+
+        Address jointPartyAddress = Address.builder()
+            .line1("some text")
+            .line2("some text")
+            .town("some text")
+            .county("some text")
+            .postcode("w1p 4df").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInLine1_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().line1("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Line 1 must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInLine2_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().line2("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Line 2 must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInTown_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().town("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Town must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidCharacterInCounty_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().county("some $ text").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("County must not contain special characters", error);
+    }
+
+    @Test
+    public void givenInvalidJointPartyAddressInvalidPostcode_thenDoDisplayError() {
+
+        Address jointPartyAddress = Address.builder().postcode("invalid postcode").build();
+
+        sscsCaseData.setJointPartyAddress(jointPartyAddress);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Please enter a valid postcode", error);
     }
 
     @Test(expected = IllegalStateException.class)
