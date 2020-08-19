@@ -4,6 +4,8 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -242,6 +244,21 @@ public class EvidenceUploadServiceTest {
         boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(nonExistentHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(false));
+    }
+
+    @Test
+    public void throwsOnNonLoadablePdf() {
+
+        byte[] badBytes = "notaPdf".getBytes();
+        String docType = "statement";
+        String caseId = "1234";
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            evidenceUploadService.getLoadSafe(badBytes, docType, caseId);
+
+        });
+        assertTrue(exception.getMessage().contains("Error when getting PDDocument " + docType
+                + " for caseId " + caseId + " with bytes length " + badBytes.length));
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {

@@ -281,7 +281,7 @@ public class EvidenceUploadService {
         }
     }
 
-    private static PDDocument getLoadSafe(byte[] statement, String docType, String caseId) {
+    public static PDDocument getLoadSafe(byte[] statement, String docType, String caseId) {
         try {
             return PDDocument.load(statement);
         } catch (IOException e) {
