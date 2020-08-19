@@ -76,11 +76,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
                 return sscsCaseDataPreSubmitCallbackResponse;
             }
-        } else if (callback.getEvent() == EventType.DIRECTION_ISSUED_WELSH) {
-            Optional<SscsWelshDocument> document = caseData.getLatestWelshDocumentForDocumentType(DocumentType.DIRECTION_NOTICE);
-            url = document.isPresent() ? document.get().getValue().getDocumentLink() : null;
         }
-        if (isNull(url)) {
+        if (isNull(url) && callback.getEvent() != EventType.DIRECTION_ISSUED_WELSH) {
             sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload a PDF document");
             return sscsCaseDataPreSubmitCallbackResponse;
         }
@@ -104,9 +101,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             }
         }
 
-        footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
-                    Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
-                    caseData.getDateAdded(), null, documentTranslationStatus);
+        if(callback.getEvent() == EventType.DIRECTION_ISSUED) {
+            footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
+                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                    .format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
+                caseData.getDateAdded(), null, documentTranslationStatus);
+        }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             State beforeState = callback.getCaseDetailsBefore().map(e -> e.getState()).orElse(null);

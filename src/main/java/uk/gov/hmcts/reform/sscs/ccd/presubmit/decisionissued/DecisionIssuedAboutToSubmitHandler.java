@@ -57,20 +57,21 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
                 sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
                 return sscsCaseDataPreSubmitCallbackResponse;
             }
-        } else if (callback.getEvent() == EventType.DECISION_ISSUED_WELSH) {
-            Optional<SscsWelshDocument> document = caseData.getLatestWelshDocumentForDocumentType(DocumentType.DECISION_NOTICE);
-            url = document.isPresent() ? document.get().getValue().getDocumentLink() : null;
         }
-        if (isNull(url)) {
+
+        if (isNull(url) && callback.getEvent() != EventType.DECISION_ISSUED_WELSH) {
             sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload a PDF document");
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DECISION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
 
-        footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now()).format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
+        if(callback.getEvent() == EventType.DECISION_ISSUED) {
+            footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,
+                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                    .format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
                 caseData.getDateAdded(), null, documentTranslationStatus);
+        }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             State beforeState = callback.getCaseDetailsBefore().map(CaseDetails::getState).orElse(null);
