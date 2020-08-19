@@ -54,9 +54,10 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
 
     private void clearTranslationRequiredDocumentStatuses(SscsCaseData caseData) {
         caseData.getSscsDocument().stream().filter(sd -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED
-            .equals(sd.getValue().getDocumentTranslationStatus())).forEach(td -> {
-            td.getValue().setDocumentTranslationStatus(null);
-        });
+            .equals(sd.getValue().getDocumentTranslationStatus()))
+                .forEach(td -> {
+                    td.getValue().setDocumentTranslationStatus(null);
+                });
     }
 
     private void setWelshNextEvent(SscsCaseData caseData) {
