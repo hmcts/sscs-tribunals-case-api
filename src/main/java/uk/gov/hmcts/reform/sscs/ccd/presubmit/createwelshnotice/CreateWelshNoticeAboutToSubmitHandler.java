@@ -130,6 +130,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         String nextEvent = getNextEvent(caseData.getDocumentTypes().getValue().getCode());
         log.info("Setting next event to {}", nextEvent);
         caseData.setSscsWelshPreviewNextEvent(nextEvent);
+        caseData.updateTranslationWorkOutstandingFlag();
     }
 
     private Map<String, Object> caseDataMap(SscsCaseData caseData) {

@@ -79,13 +79,13 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void canHandle() {
+    public void canHandleCorrectly() {
         boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, callback);
         assertTrue(actualResult);
     }
 
     @Test
-    public void handle() {
+    public void handleMethodCallsCorrectServicesAndSetsDataCorrectly() {
         byte[] expectedPdf = new byte[]{2, 4, 6, 0, 1};
 
         UploadResponse uploadResponse = createUploadResponse();
@@ -102,6 +102,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         assertNull(response.getData().getSignedRole());
         assertNull(response.getData().getDateAdded());
         assertEquals(EventType.DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
+        assertEquals("No",response.getData().getTranslationWorkOutstanding());
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
