@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
@@ -263,8 +264,7 @@ public class DecisionIssuedAboutToSubmitHandlerTest {
         assertEquals("struckOut", response.getData().getOutcome());
         assertEquals(response.getData().getState(), (State.DORMANT_APPEAL_STATE));
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedWelshDocument.getValue().getDocumentLink()),
-                any(), eq(DocumentType.DECISION_NOTICE), any(), any(), eq(null), eq(null));
+        verifyNoInteractions(footerService);
     }
 
     @Test

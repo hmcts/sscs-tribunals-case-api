@@ -386,8 +386,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
         assertEquals("No", response.getData().getTimeExtensionRequested());
 
-        verify(footerService).createFooterAndAddDocToCase(eq(expectedWelshDocument.getValue().getDocumentLink()),
-                any(), eq(DocumentType.DIRECTION_NOTICE), any(), any(), eq(null), eq(null));
+        verifyNoInteractions(footerService);
     }
 
 }
