@@ -49,7 +49,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
 
         clearTranslationRequiredDocumentStatuses(caseData);
 
-        caseData.setTranslationWorkOutstanding("No");
+        caseData.updateTranslationWorkOutstandingFlag();
         return new PreSubmitCallbackResponse<>(caseData);
     }
 

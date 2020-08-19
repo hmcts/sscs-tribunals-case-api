@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import junitparams.JUnitParamsRunner;
@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -100,15 +101,25 @@ public class UploadWelshDocumentsAboutToStartHandlerTest {
                                 .documentFilename("test.pdf")
                                 .build())
                         .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
-                        .documentType("sscs1")
+                        .documentType(DocumentType.SSCS1.getValue())
                         .build())
                 .build();
 
-        List<SscsDocument> oneDoc = new ArrayList<>();
-        oneDoc.add(sscs1Doc);
+        SscsDocument sscs2Doc = SscsDocument.builder()
+            .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/anotherUrl")
+                    .documentFilename("directionNotice.pdf")
+                    .build())
+                .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
+                .documentType(DocumentType.DIRECTION_NOTICE.getValue())
+                .build())
+            .build();
+
+        List<SscsDocument> docs = Arrays.asList(sscs1Doc,sscs2Doc);
 
         return new Object[] {
-            new Object[]{oneDoc}
+            new Object[]{docs}
         };
     }
 }

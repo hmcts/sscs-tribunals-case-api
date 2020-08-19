@@ -50,18 +50,15 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
     }
 
     private void updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
-        int outStandingDocumentFlag = 0;
         String previewDocumentType = null;
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
             if (sscsDocument.getValue().getDocumentTranslationStatus() != null
                     && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
-                outStandingDocumentFlag++;
                 if (sscsDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
                     sscsDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
                 }
             }
         }
-        log.info("outStandingDocumentFlag  {}", outStandingDocumentFlag);
         for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
             previewDocumentType = sscsWelshPreviewDocument.getValue().getDocumentType();
@@ -77,14 +74,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
 
         //clear the Preview collection
         caseData.setSscsWelshPreviewDocuments(new ArrayList<>());
-        if (outStandingDocumentFlag <= 1) {
-            log.info("outStandingDocumentFlag if {}", outStandingDocumentFlag);
-            caseData.setTranslationWorkOutstanding("No");
-        } else {
-            log.info("outStandingDocumentFlag else {}", outStandingDocumentFlag);
-            caseData.setTranslationWorkOutstanding(caseData.getTranslationWorkOutstanding() != null
-                    ? caseData.getTranslationWorkOutstanding() : "Yes");
-        }
+        caseData.updateTranslationWorkOutstandingFlag();
         String nextEvent = getNextEvent(previewDocumentType);
         log.info("Setting next event to {}", nextEvent);
         caseData.setSscsWelshPreviewNextEvent(nextEvent);

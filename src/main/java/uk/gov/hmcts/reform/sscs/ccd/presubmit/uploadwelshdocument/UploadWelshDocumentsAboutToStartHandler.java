@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
@@ -59,6 +61,7 @@ public class UploadWelshDocumentsAboutToStartHandler implements PreSubmitCallbac
                 .filter(Objects::nonNull)
                 .filter(a -> Objects.nonNull(a.getValue().getDocumentTranslationStatus())
                         && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
+                .filter( b -> Arrays.asList(DocumentType.APPELLANT_EVIDENCE.getValue(), DocumentType.SSCS1.getValue()).contains(b.getValue().getDocumentType()))
                 .collect(Collectors.toList());
 
         sscsDocuments.forEach(sscsDocument -> {
