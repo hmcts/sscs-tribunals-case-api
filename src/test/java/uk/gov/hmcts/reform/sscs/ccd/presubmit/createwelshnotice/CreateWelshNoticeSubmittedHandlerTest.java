@@ -11,6 +11,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED_WEL
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -74,23 +75,20 @@ public class CreateWelshNoticeSubmittedHandlerTest {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdService
-            .updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
-                "Create Welsh notice",
-                "Create Welsh notice", idamTokens))
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
+            "Create Welsh notice",
+            "Create Welsh notice", idamTokens))
             .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(ccdService)
-            .updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
-                "Create Welsh notice", "Create Welsh notice", idamTokens);
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.DIRECTION_ISSUED_WELSH.getCcdType(),
+            "Create Welsh notice", "Create Welsh notice", idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
 
     }
 
     private Object[] generateCanHandleScenarios() {
-        Callback<SscsCaseData> callbackWithValidEventOption =
-            buildCallback(EventType.DIRECTION_ISSUED_WELSH.getCcdType());
+        Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.DIRECTION_ISSUED_WELSH.getCcdType());
         return new Object[] {new Object[] {SUBMITTED, buildCallback(DIRECTION_ISSUED_WELSH.getCcdType()), true},
             new Object[] {ABOUT_TO_SUBMIT, buildCallback(EventType.DIRECTION_ISSUED_WELSH.getCcdType()), false},
             new Object[] {SUBMITTED, buildCallback(null), false}
