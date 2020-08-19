@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
@@ -253,7 +254,7 @@ public class EvidenceUploadServiceTest {
         String docType = "statement";
         String caseId = "1234";
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {
+        Exception exception = assertThrows(EvidenceUploadException.class, () -> {
             evidenceUploadService.getLoadSafe(badBytes, docType, caseId);
 
         });

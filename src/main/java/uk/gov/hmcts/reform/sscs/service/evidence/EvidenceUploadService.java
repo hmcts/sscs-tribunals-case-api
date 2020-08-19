@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
@@ -228,7 +229,7 @@ public class EvidenceUploadService {
         try {
             draftPdfContent = evidenceManagementService.download(new URI(draftDocUrl), "sscs");
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Error when downloading document from Evidence Management Service..", e);
+            throw new EvidenceUploadException("Error when downloading document from Evidence Management Service..", e);
         }
         return draftPdfContent;
     }
@@ -253,7 +254,7 @@ public class EvidenceUploadService {
             return combinedContent.toByteArray();
 
         } else {
-            throw new RuntimeException("Can not combine empty statement or evidence documents");
+            throw new EvidenceUploadException("Can not combine empty statement or evidence documents");
         }
     }
 
@@ -261,7 +262,7 @@ public class EvidenceUploadService {
         try {
             statementDoc.close();
         } catch (IOException e) {
-            throw new RuntimeException("Error when closing Doc..", e);
+            throw new EvidenceUploadException("Error when closing Doc..", e);
         }
     }
 
@@ -269,7 +270,7 @@ public class EvidenceUploadService {
         try {
             statementDoc.save(combinedContent);
         } catch (IOException e) {
-            throw new RuntimeException("Error when saving Doc..", e);
+            throw new EvidenceUploadException("Error when saving Doc..", e);
         }
     }
 
@@ -277,7 +278,7 @@ public class EvidenceUploadService {
         try {
             merger.appendDocument(statementDoc, uploadDoc);
         } catch (IOException e) {
-            throw new RuntimeException("Error when appending docs..", e);
+            throw new EvidenceUploadException("Error when appending docs..", e);
         }
     }
 
@@ -285,7 +286,7 @@ public class EvidenceUploadService {
         try {
             return PDDocument.load(statement);
         } catch (IOException e) {
-            throw new RuntimeException("Error when getting PDDocument " + docType + " for caseId " + caseId
+            throw new EvidenceUploadException("Error when getting PDDocument " + docType + " for caseId " + caseId
                     + " with bytes length " + statement.length, e);
         }
     }
