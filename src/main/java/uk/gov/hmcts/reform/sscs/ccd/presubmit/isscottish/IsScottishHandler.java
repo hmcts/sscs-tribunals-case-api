@@ -37,7 +37,7 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
 
         String isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
 
-        if (isScotCase != caseData.getIsScottishCase()) {
+        if (! isScotCase.equals(caseData.getIsScottishCase())) {
             log.info("Setting isScottishCase field to " + isScotCase + " for case " + caseData.getCcdCaseId());
             caseData.setIsScottishCase(isScotCase);
         } else {
