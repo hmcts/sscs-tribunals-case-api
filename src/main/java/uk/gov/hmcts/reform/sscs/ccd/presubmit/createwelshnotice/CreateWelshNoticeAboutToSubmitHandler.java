@@ -181,7 +181,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     }
 
     private void clearFields(SscsCaseData caseData) {
-        caseData.setSscsWelshDocuments(null);
+        caseData.setSscsWelshPreviewDocuments(null);
         caseData.setEnglishBodyContent(null);
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
