@@ -4,8 +4,6 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -15,23 +13,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
 public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private ServiceRequestExecutor serviceRequestExecutor;
-
-    private String bundleUrl;
-
-    private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
-
-    @Autowired
-    public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                           @Value("${bundle.url}") String bundleUrl) {
-        this.serviceRequestExecutor = serviceRequestExecutor;
-        this.bundleUrl = bundleUrl;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -73,14 +57,15 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                     }
                 }
             }
-            return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
+            return new PreSubmitCallbackResponse<>(sscsCaseData);
         }
     }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getDwpResponseDocument() == null
-                || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
+        return false;
+//        return sscsCaseData.getDwpResponseDocument() == null
+//                || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
+//                || sscsCaseData.getDwpEvidenceBundleDocument() == null
+//                || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
     }
 }

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
 public class CreateBundleAboutToStartHandlerTest {
@@ -33,23 +32,17 @@ public class CreateBundleAboutToStartHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    @Mock
-    private ServiceRequestExecutor serviceRequestExecutor;
-
-    private SscsCaseData sscsCaseData;
-
     @Before
     public void setUp() {
-        initMocks(this);
-        handler = new CreateBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com");
+        openMocks(this);
+        handler = new CreateBundleAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
-        sscsCaseData = SscsCaseData.builder().createdInGapsFrom("readyToList").appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().createdInGapsFrom("readyToList").appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-        when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
     }
 
     @Test
@@ -100,13 +93,13 @@ public class CreateBundleAboutToStartHandlerTest {
     }
 
     @Test
-    public void givenCreateBundleEvent_thenTriggerTheExternalCreateBundleEvent() {
+    public void givenCreateBundleEvent_thenThereAreNoErrors() {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
 
-        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        assertEquals(0, response.getErrors().size());
     }
 
     @Test
