@@ -62,10 +62,9 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
     }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
-        return false;
-//        return sscsCaseData.getDwpResponseDocument() == null
-//                || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
-//                || sscsCaseData.getDwpEvidenceBundleDocument() == null
-//                || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
+        return sscsCaseData.getDwpResponseDocument() == null
+                || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
+                || sscsCaseData.getDwpEvidenceBundleDocument() == null
+                || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
     }
 }
