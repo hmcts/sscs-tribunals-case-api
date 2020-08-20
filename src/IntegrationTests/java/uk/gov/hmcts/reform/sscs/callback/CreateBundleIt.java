@@ -74,7 +74,7 @@ public class CreateBundleIt extends AbstractEventIt {
 
         when(responseEntity.getBody()).thenReturn(new PreSubmitCallbackResponse<CaseData>(caseData));
 
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdSubmittedEvent"));
 
         assertHttpStatus(response, HttpStatus.OK);
 
