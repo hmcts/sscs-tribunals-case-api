@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +29,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @RunWith(JUnitParamsRunner.class)
-public class CreateBundleSubmittedTest {
+public class CreateBundleSubmittedHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
 
     private CreateBundleSubmittedHandler handler;
@@ -41,15 +43,15 @@ public class CreateBundleSubmittedTest {
     @Mock
     private ServiceRequestExecutor serviceRequestExecutor;
 
+    private final SscsCaseData sscsCaseData = SscsCaseData.builder().createdInGapsFrom("readyToList").appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
+
+
     @Before
     public void setUp() {
         openMocks(this);
         handler = new CreateBundleSubmittedHandler(serviceRequestExecutor, "bundleUrl.com");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
-
-        SscsCaseData sscsCaseData = SscsCaseData.builder().createdInGapsFrom("readyToList").appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
-
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         when(serviceRequestExecutor.post(any(), any())).thenReturn(new PreSubmitCallbackResponse<>(sscsCaseData));
@@ -80,13 +82,33 @@ public class CreateBundleSubmittedTest {
     }
 
     @Test
-    public void givenCreateBundleEvent_thenThereAreNoErrors() {
+    @Parameters({"warning", "error", ""})
+    public void givenCreateBundleEvent_thenThereAreNoErrors(String errorOrWarning) {
         callback.getCaseDetails().getCaseData().setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        PreSubmitCallbackResponse<SscsCaseData> serviceResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+        if (errorOrWarning.equals("error")) {
+            serviceResponse.addError(errorOrWarning);
+        } else if (errorOrWarning.equals("warning")) {
+            serviceResponse.addWarning(errorOrWarning);
+        }
+        when(serviceRequestExecutor.post(any(), any())).thenReturn(serviceResponse);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
         verify(serviceRequestExecutor).post(callback, "bundleUrl.com/api/new-bundle");
+        if (errorOrWarning.equals("error")) {
+            assertThat(0, is(response.getWarnings().size()));
+            assertThat(1, is(response.getErrors().size()));
+            assertThat(errorOrWarning, is(response.getErrors().iterator().next()));
+        } else if (errorOrWarning.equals("warning")) {
+            assertThat(0, is(response.getErrors().size()));
+            assertThat(1, is(response.getWarnings().size()));
+            assertThat(errorOrWarning, is(response.getWarnings().iterator().next()));
+        } else {
+            assertThat(0, is(response.getErrors().size()));
+            assertThat(0, is(response.getWarnings().size()));
+        }
     }
 
 }

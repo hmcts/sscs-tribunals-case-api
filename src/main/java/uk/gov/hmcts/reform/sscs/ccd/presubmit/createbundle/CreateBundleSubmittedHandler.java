@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.createbundle;
 
 import static java.util.Objects.requireNonNull;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
+@Slf4j
 public class CreateBundleSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final ServiceRequestExecutor serviceRequestExecutor;
@@ -44,7 +46,15 @@ public class CreateBundleSubmittedHandler implements PreSubmitCallbackHandler<Ss
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
+        final PreSubmitCallbackResponse<SscsCaseData> response =
+                serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
+        if (response.getErrors().size() > 0) {
+            log.info("bundling returned an error");
+        }
+        if (response.getWarnings().size() > 0) {
+            log.info("bundling returned a warning");
+        }
+        return response;
     }
 
 }
