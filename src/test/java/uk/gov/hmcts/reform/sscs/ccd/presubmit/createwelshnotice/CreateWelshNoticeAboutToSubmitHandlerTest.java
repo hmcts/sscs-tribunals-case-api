@@ -103,6 +103,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         assertNull(response.getData().getDateAdded());
         assertEquals(EventType.DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
         assertEquals("No",response.getData().getTranslationWorkOutstanding());
+        assertEquals("english.pdf",response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode, EventType eventType,
