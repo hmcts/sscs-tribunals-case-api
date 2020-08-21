@@ -96,6 +96,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .pipWriteFinalDecisionMovingAroundQuestion("")
             .writeFinalDecisionReasons(Arrays.asList(new CollectionItem(null, "")))
             .writeFinalDecisionPageSectionReference("")
+            .writeFinalDecisionAnythingElse("something else")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
             .build();
 
@@ -270,6 +271,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
+        assertNull(sscsCaseData.getWriteFinalDecisionAnythingElse());
     }
 
     @Test
@@ -443,6 +445,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
+        assertNull(sscsCaseData.getWriteFinalDecisionAnythingElse());
     }
 
     @Test
