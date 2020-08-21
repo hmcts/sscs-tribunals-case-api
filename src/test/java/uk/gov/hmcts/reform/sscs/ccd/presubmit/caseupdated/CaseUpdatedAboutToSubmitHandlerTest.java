@@ -103,4 +103,42 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
+    @Test
+    @Parameters({"Birmingham,Glasgow,Yes", "Glasgow,Birmingham,No"})
+    public void givenChangeInRpcChangeIsScottish(String oldRpcName, String newRpcName, String expected) {
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setIsScottishCase("No");
+        RegionalProcessingCenter oldRpc = RegionalProcessingCenter.builder().name(oldRpcName).build();
+        RegionalProcessingCenter newRpc = RegionalProcessingCenter.builder().name(newRpcName).build();
+
+        handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
+
+        assertEquals(expected, caseData.getIsScottishCase());
+    }
+
+    @Test
+    @Parameters({"Birmingham,No", "Glasgow,Yes"})
+    public void givenChangeInNullRpcChangeIsScottish(String newRpcName, String expected) {
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setIsScottishCase("No");
+        RegionalProcessingCenter oldRpc = null;
+        RegionalProcessingCenter newRpc = RegionalProcessingCenter.builder().name(newRpcName).build();
+
+        handler.maybeChangeIsScottish(oldRpc, newRpc, caseData);
+
+        assertEquals(expected, caseData.getIsScottishCase());
+    }
+
+    @Test
+    @Parameters({"Birmingham,No", "Glasgow,Yes"})
+    public void givenAnAppealWithPostcode_updateRpcToScottish(String newRpcName, String expectedIsScottish) {
+        when(regionalProcessingCenterService.getByPostcode("CM120NS")).thenReturn(RegionalProcessingCenter.builder().name(newRpcName).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(newRpcName, response.getData().getRegionalProcessingCenter().getName());
+        assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
+    }
 }
