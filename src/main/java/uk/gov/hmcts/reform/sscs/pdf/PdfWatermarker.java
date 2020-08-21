@@ -10,7 +10,7 @@ import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.util.Matrix;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.InputStreamWrapper;
+import uk.gov.hmcts.reform.sscs.model.InputStreamWrapper;
 
 /**
  * Copied from https://github.com/keefmarshall/pdfpoc
