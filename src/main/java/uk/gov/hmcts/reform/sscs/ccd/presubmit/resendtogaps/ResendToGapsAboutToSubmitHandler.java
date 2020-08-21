@@ -78,7 +78,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
         try {
             roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
         } catch  (NullPointerException e) {
-            throw new RoboticsValidationException(new Exception("Unable to build robototics json to be validated"));
+            throw new RoboticsValidationException(new Exception("Json Mapper Unable to build robotics json due to missing fields"));
         }
         return roboticsJson;
     }
