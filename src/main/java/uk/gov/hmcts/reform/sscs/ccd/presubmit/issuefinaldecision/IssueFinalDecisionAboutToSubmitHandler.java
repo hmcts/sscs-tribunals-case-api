@@ -152,6 +152,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setWriteFinalDecisionGeneratedDate(null);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(null);
+        sscsCaseData.setWriteFinalDecisionAnythingElse(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
