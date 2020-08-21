@@ -193,6 +193,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     @Test
     public void givenDirectionTypeOfProvideInformation_setInterlocStateToAwaitingInformationAndDirectionTypeIsNull() {
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.PROVIDE_INFORMATION.toString()));
+        sscsCaseData.setDirectionDueDate("11/07/2025");
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_INFORMATION.getId(), response.getData().getInterlocReviewState());
@@ -307,6 +308,16 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("You need to upload a PDF document", error);
         }
+    }
+
+    @Test
+    public void shouldErrorWhenDirectionTypeIsProvideInformationAndNoDueDate() {
+        sscsCaseData.setDirectionDueDate(null);
+        sscsCaseData.getDirectionTypeDl().setValue(new DynamicListItem(DirectionType.PROVIDE_INFORMATION.toString(), "appeal To Proceed"));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+
+        assertEquals("Please populate the direction due date", response.getErrors().toArray()[0]);
     }
 
 }
