@@ -98,9 +98,6 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
                 USER_AUTHORISATION);
         assertNull(response.getData().getEnglishBodyContent());
         assertNull(response.getData().getWelshBodyContent());
-        assertNull(response.getData().getSignedBy());
-        assertNull(response.getData().getSignedRole());
-        assertNull(response.getData().getDateAdded());
         assertEquals(EventType.DIRECTION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
         assertEquals("No",response.getData().getTranslationWorkOutstanding());
         assertEquals("english.pdf",response.getData().getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
@@ -129,7 +126,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     }
 
     private List<SscsDocument> buildSscsDocuments() {
-        SscsDocument sscs1Doc = buildSscsDocument("english.pdf");
+        SscsDocument sscs1Doc = buildSscsDocument();
         List<SscsDocument> sscsDocuments = new ArrayList<>();
         sscsDocuments.add(sscs1Doc);
         return sscsDocuments;
@@ -148,12 +145,12 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
                 .build());
     }
 
-    private SscsDocument buildSscsDocument(String filename) {
+    private SscsDocument buildSscsDocument() {
         return SscsDocument.builder()
                 .value(SscsDocumentDetails.builder()
                         .documentLink(DocumentLink.builder()
                                 .documentUrl("/anotherUrl")
-                                .documentFilename(filename)
+                                .documentFilename("english.pdf")
                                 .build())
                         .documentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
                         .documentType(DocumentType.DIRECTION_NOTICE.getValue())
