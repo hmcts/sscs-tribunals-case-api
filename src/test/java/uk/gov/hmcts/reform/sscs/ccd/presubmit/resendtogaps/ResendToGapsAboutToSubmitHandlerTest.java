@@ -99,4 +99,18 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         assertTrue(response.getErrors().iterator().next().contains("Effed it"));
         verify(jsonValidator, atLeastOnce()).validate(any());
     }
+
+    @Test
+    public void jsonMapperFailsReturnErrors() {
+
+        doThrow(new NullPointerException("Use an option dude")).when(jsonMapper).map(any());
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        ResendToGapsAboutToSubmitHandler resendHandler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertTrue(response.getErrors().iterator().next().contains("Unable to build robototics json to be validated"));
+        verify(jsonMapper, atLeastOnce()).map(any());
+    }
 }

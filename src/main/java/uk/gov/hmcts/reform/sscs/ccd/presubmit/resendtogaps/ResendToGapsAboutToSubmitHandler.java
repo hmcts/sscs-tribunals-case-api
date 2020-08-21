@@ -69,9 +69,17 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
     public void isValid(SscsCaseData caseData) throws RoboticsValidationException {
 
         RoboticsWrapper roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(caseData).build();
-
-        JSONObject roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
-
+        JSONObject roboticsJson = toJsonObject(roboticsWrapper);
         roboticsJsonValidator.validate(roboticsJson);
+    }
+
+    public JSONObject toJsonObject(RoboticsWrapper roboticsWrapper) throws RoboticsValidationException  {
+        JSONObject roboticsJson  = null;
+        try {
+            roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
+        } catch  (NullPointerException e) {
+            throw new RoboticsValidationException(new Exception("Unable to build robototics json to be validated"));
+        }
+        return roboticsJson;
     }
 }
