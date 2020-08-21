@@ -74,7 +74,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     public JSONObject toJsonObject(RoboticsWrapper roboticsWrapper) throws RoboticsValidationException  {
-        JSONObject roboticsJson  = null;
+        JSONObject roboticsJson;
         try {
             roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
         } catch  (NullPointerException e) {
