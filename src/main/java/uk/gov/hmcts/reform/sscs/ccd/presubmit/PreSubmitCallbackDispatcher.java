@@ -20,6 +20,7 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
     }
 
     public PreSubmitCallbackResponse<T> handle(CallbackType callbackType, Callback<T> callback, String userAuthorisation) {
+
         requireNonNull(callback, "callback must not be null");
         T caseData = callback.getCaseDetails().getCaseData();
 
