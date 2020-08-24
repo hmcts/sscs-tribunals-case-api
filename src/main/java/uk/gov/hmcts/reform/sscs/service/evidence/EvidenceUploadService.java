@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
@@ -202,7 +203,8 @@ public class EvidenceUploadService {
         removeStatementDocFromDocumentTab(sscsCaseData, storePdfContext.getDocument().getData().getSscsDocument());
         List<byte[]> contentUploads = getContentListFromTheEvidenceUploads(storePdfContext);
         ByteArrayResource statementContent = getContentFromTheStatement(storePdfContext);
-        byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads);
+        byte[] combinedContent = appendEvidenceUploadsToStatement(statementContent.getByteArray(), contentUploads,
+                sscsCaseData.getCcdCaseId());
         SscsDocument combinedPdfEvidence = pdfStoreService.store(combinedContent, filename, "Other evidence").get(0);
         return buildScannedDocumentByGivenSscsDoc(combinedPdfEvidence);
     }
@@ -233,19 +235,24 @@ public class EvidenceUploadService {
     }
 
 
-    private byte[] appendEvidenceUploadsToStatement(byte[] statement, List<byte[]> uploads) {
+    private byte[] appendEvidenceUploadsToStatement(byte[] statement, List<byte[]> uploads, String caseId) {
+
         if (statement != null && uploads != null) {
-            PDDocument statementDoc = getLoadSafe(statement);
+
+            PDDocument statementDoc = getLoadSafe(statement, "statementDoc", caseId);
             final PDFMergerUtility merger = new PDFMergerUtility();
-            uploads.forEach(upload -> {
-                PDDocument uploadDoc = getLoadSafe(upload);
+
+            for (int i = 0; i < uploads.size(); i++) {
+                PDDocument uploadDoc = getLoadSafe(uploads.get(i), "uploadDoc" + i, caseId);
                 appendDocumentSafe(statementDoc, merger, uploadDoc);
                 closeSafe(uploadDoc);
-            });
+            }
+
             ByteArrayOutputStream combinedContent = new ByteArrayOutputStream();
             saveDocSafe(statementDoc, combinedContent);
             closeSafe(statementDoc);
             return combinedContent.toByteArray();
+
         } else {
             throw new RuntimeException("Can not combine empty statement or evidence documents");
         }
@@ -255,7 +262,7 @@ public class EvidenceUploadService {
         try {
             statementDoc.close();
         } catch (IOException e) {
-            throw new RuntimeException("Error when closing Doc..", e);
+            throw new EvidenceUploadException("Error when closing Doc..", e);
         }
     }
 
@@ -275,11 +282,12 @@ public class EvidenceUploadService {
         }
     }
 
-    private static PDDocument getLoadSafe(byte[] statement) {
+    public static PDDocument getLoadSafe(byte[] statement, String docType, String caseId) {
         try {
             return PDDocument.load(statement);
         } catch (IOException e) {
-            throw new RuntimeException("Error when getting PDDocument statement..", e);
+            throw new EvidenceUploadException("Error when getting PDDocument " + docType + " for caseId " + caseId
+                    + " with bytes length " + statement.length, e);
         }
     }
 
