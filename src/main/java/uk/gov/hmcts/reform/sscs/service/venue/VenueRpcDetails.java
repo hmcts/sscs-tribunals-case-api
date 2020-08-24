@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.venue;
 
+import org.jsoup.internal.StringUtil;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 
 public class VenueRpcDetails {
@@ -30,6 +31,6 @@ public class VenueRpcDetails {
     }
 
     private String getAddressComponent(String component) {
-        return component == null ? "" : (", " + component);
+        return StringUtil.isBlank(component) ? "" : (", " + component);
     }
 }
