@@ -21,6 +21,6 @@ public class VenueRpcDetailsService {
 
     public List<VenueRpcDetails> getVenues(Predicate<VenueRpcDetails> predicate) {
         return venueDataLoader.getVenueDetailsMap().values().stream()
-            .map(v -> new VenueRpcDetails(v)).filter(predicate).collect(Collectors.toList());
+            .map(VenueRpcDetails::new).filter(predicate).collect(Collectors.toList());
     }
 }

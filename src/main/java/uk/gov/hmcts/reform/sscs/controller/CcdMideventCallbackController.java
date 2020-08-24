@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
-import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 
 @RestController
@@ -63,24 +62,6 @@ public class CcdMideventCallbackController {
 
         return ok(preSubmitCallbackResponse);
     }
-
-    private String getVenueDisplayString(VenueDetails venueDetails, boolean prefix) {
-        return (prefix ? (getRpc(venueDetails) + " - ") : "") + venueDetails.getVenName() + ", "
-            + venueDetails.getVenAddressLine1() + ", "
-            + venueDetails.getVenAddressLine2() + ", "
-            + venueDetails.getVenAddressTown() + ", "
-            + venueDetails.getVenAddressCounty() + ", "
-            + venueDetails.getVenAddressPostcode();
-    }
-
-    private boolean isRegionalProcessingCentreMatch(String value, String rpc) {
-        return value.substring(5).equalsIgnoreCase(rpc);
-    }
-
-    private String getRpc(VenueDetails vd) {
-        return vd.getRegionalProcessingCentre().substring(5);
-    }
-
 
     @PostMapping(path = "/ccdMidEventPreviewFinalDecision")
     public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventPreviewFinalDecision(
