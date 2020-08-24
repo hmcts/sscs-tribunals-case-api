@@ -34,6 +34,8 @@ public class IssueDocumentHandler {
     protected void clearTransientFields(SscsCaseData caseData, State beforeState) {
         clearBasicTransientFields(caseData);
         caseData.setExtensionNextEventDl(null);
+        caseData.setSignedBy(null);
+        caseData.setSignedRole(null);
 
         if (caseData.getDirectionTypeDl() != null && !DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 || !State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
@@ -44,8 +46,6 @@ public class IssueDocumentHandler {
     protected  void clearBasicTransientFields(SscsCaseData caseData) {
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
-        caseData.setSignedBy(null);
-        caseData.setSignedRole(null);
         caseData.setGenerateNotice(null);
         caseData.setWriteFinalDecisionGenerateNotice(null);
         caseData.setDateAdded(null);
