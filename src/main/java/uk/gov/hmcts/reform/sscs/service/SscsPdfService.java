@@ -86,6 +86,22 @@ public class SscsPdfService {
                 placeholders.put("welsh_exclude_dates",welshExcludesDates);
             }
             placeholders.put("welshCurrentDate",LocalDateToWelshStringConverter.convert(LocalDate.now()));
+            String benefitType;
+            if (sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("PIP")) {
+                benefitType = "Taliad Annibyniaeth Personol (PIP)";
+            } else if (sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("UC")) {
+                benefitType = "Credyd Cynhwysol (UC)";
+            } else if (sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("ESA")) {
+                benefitType = "Lwfans Cyflogaeth a Chymorth (ESA)";
+            } else {
+                benefitType = sscsCaseData.getAppeal().getBenefitType().getDescription() + " (" + sscsCaseData.getAppeal().getBenefitType().getCode() + ")";
+            }
+            placeholders.put("welshBenefitType", benefitType);
+            placeholders.put("welshEvidencePresent",
+                    sscsCaseData.getEvidencePresent() != null && sscsCaseData.getEvidencePresent().equalsIgnoreCase(
+                            "Yes") ? "ydw" : "nac ydw");
+            placeholders.put("welshWantsToAttend", sscsCaseData.getAppeal().getHearingOptions().getWantsToAttend().equalsIgnoreCase(
+                    "Yes") ? "ydw" : "nac ydw");
         }
         return pdfServiceClient.generateFromHtml(template, placeholders);
     }

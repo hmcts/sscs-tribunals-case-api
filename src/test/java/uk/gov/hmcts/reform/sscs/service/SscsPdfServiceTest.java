@@ -66,6 +66,9 @@ public class SscsPdfServiceTest {
         assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_appointee_identity_dob"));
         assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_identity_dob"));
         assertEquals("29 Mehefin 2018",argumentCaptor.getValue().get("date_of_decision"));
+        assertEquals("Taliad Annibyniaeth Personol (PIP)",argumentCaptor.getValue().get("welshBenefitType"));
+        assertEquals("nac ydw",argumentCaptor.getValue().get("welshEvidencePresent"));
+        assertEquals("ydw",argumentCaptor.getValue().get("welshWantsToAttend"));
     }
 
 
