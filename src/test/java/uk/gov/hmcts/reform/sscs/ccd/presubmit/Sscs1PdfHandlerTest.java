@@ -4,7 +4,7 @@ import static junit.framework.TestCase.assertNull;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class Sscs1PdfHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_APPEAL_PDF);
         SscsCaseData caseData = buildCaseDataWithoutPdf();
