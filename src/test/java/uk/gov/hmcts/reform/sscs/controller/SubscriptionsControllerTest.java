@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -45,7 +45,7 @@ public class SubscriptionsControllerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         controller = new SubscriptionsController(macService, tribunalsService);
         mockMvc = standaloneSetup(controller).build();
     }

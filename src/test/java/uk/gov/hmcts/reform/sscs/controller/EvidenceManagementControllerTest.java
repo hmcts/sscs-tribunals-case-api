@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.service.SubmitAppealService.DM_STORE_USER_ID;
 
 import java.util.Collections;
@@ -30,7 +30,7 @@ public class EvidenceManagementControllerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         controller = new EvidenceManagementController(evidenceManagementService, fileToPdfConversionService);
     }
 

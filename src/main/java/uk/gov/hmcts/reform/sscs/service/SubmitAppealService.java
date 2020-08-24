@@ -7,6 +7,8 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 
 import feign.FeignException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.config.CitizenCcdService;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -39,7 +40,7 @@ public class SubmitAppealService {
 
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
-    private final AssociatedCaseLinkHelper associatedCaseLinkHelper;
+    private final SscsPdfService sscsPdfService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
@@ -49,7 +50,7 @@ public class SubmitAppealService {
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
-                        AssociatedCaseLinkHelper associatedCaseLinkHelper,
+                        SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
@@ -57,7 +58,7 @@ public class SubmitAppealService {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
-        this.associatedCaseLinkHelper = associatedCaseLinkHelper;
+        this.sscsPdfService = sscsPdfService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
@@ -144,6 +145,7 @@ public class SubmitAppealService {
     }
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
+
         String firstHalfOfPostcode = regionalProcessingCenterService
             .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
@@ -184,8 +186,20 @@ public class SubmitAppealService {
                 if (caseData.getAppeal().getAppellant().getIdentity() != null
                     && !StringUtils.isEmpty(caseData.getAppeal().getAppellant().getIdentity().getNino())) {
 
-                    caseData = associatedCaseLinkHelper.linkCaseByNino(caseData);
+                    String nino = caseData.getAppeal().getAppellant().getIdentity().getNino();
+                    List<SscsCaseDetails> matchedByNinoCases = getMatchedCases(nino, idamTokens);
+
+                    if (!matchedByNinoCases.isEmpty()) {
+                        log.info("Found " + matchedByNinoCases.size() + " matching cases for Nino " + nino);
+
+                        caseData = addAssociatedCases(caseData, matchedByNinoCases);
+                    }
                 }
+
+                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {}",
+                        caseData.getAppeal().getBenefitType().getCode(),
+                        eventType,
+                        caseData.getIsScottishCase());
 
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
@@ -215,6 +229,32 @@ public class SubmitAppealService {
                         caseData.getAppeal().getMrnDetails().getMrnDate()));
     }
 
+    protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
+        HashMap<String, String> map = new HashMap<String, String>();
+
+        map.put("case.appeal.appellant.identity.nino", nino);
+
+        return ccdService.findCaseBy(map, idamTokens);
+    }
+
+    protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {
+        log.info("Adding " + matchedByNinoCases.size() + " associated cases for case id {}", caseData.getCcdCaseId());
+
+        List<CaseLink> associatedCases = new ArrayList<>();
+
+        for (SscsCaseDetails sscsCaseDetails: matchedByNinoCases) {
+            log.info("Linking case " + sscsCaseDetails.getId().toString());
+            associatedCases.add(CaseLink.builder().value(
+                    CaseLinkDetails.builder().caseReference(sscsCaseDetails.getId().toString()).build()).build());
+        }
+
+        if (!matchedByNinoCases.isEmpty()) {
+            return caseData.toBuilder().associatedCase(associatedCases).linkedCasesBoolean("Yes").build();
+        } else {
+            return caseData.toBuilder().linkedCasesBoolean("No").build();
+        }
+    }
+
     private SaveCaseResult saveDraftCaseInCcd(SscsCaseData caseData, IdamTokens idamTokens) {
         SaveCaseResult result = citizenCcdService.saveCase(caseData, idamTokens);
         log.info("POST Draft case with CCD Id {} , IDAM id {} and roles {} ",
@@ -226,6 +266,7 @@ public class SubmitAppealService {
     }
 
     private EventType findEventType(SscsCaseData caseData) {
+
         if (caseData.getAppeal().getMrnDetails() != null && caseData.getAppeal().getMrnDetails().getMrnDate() != null) {
             LocalDate mrnDate = LocalDate.parse(caseData.getAppeal().getMrnDetails().getMrnDate());
             boolean moveToNoneCompliant = mrnDate.plusMonths(13L).isBefore(LocalDate.now());

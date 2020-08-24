@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.openMocks;
+import static org.mockito.MockitoAnnotations.initMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CASE_UPDATED;
 
@@ -60,7 +60,7 @@ public class LinkCaseAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        openMocks(this);
+        initMocks(this);
         handler = new LinkCaseAboutToSubmitHandler(ccdService, idamService);
 
         when(callback.getEvent()).thenReturn(EventType.LINK_A_CASE);

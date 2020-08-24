@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.controller;
 
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,7 +16,7 @@ public class RootControllerTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
         controller = new RootController();
         this.mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }

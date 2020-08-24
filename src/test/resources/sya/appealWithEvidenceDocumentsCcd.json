@@ -181,5 +181,6 @@
     }
   ],
   "evidencePresent" : "Yes",
-  "dwpRegionalCentre": "Newcastle"
+  "dwpRegionalCentre": "Newcastle",
+  "isScottishCase": "No"
 }
