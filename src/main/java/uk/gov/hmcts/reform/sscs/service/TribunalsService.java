@@ -64,7 +64,9 @@ public class TribunalsService {
     }
 
     public ObjectNode findAppeal(Long caseId, boolean mya) {
+
         CaseDetails caseDetails = ccdClient.readForCaseworker(idamService.getIdamTokens(), caseId);
+
         SscsCaseDetails sscsCaseDetails = sscsCcdConvertService.getCaseDetails(caseDetails);
 
         if (sscsCaseDetails == null) {

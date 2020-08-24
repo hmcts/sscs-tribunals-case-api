@@ -152,6 +152,7 @@ public class UpdateCaseInCcdTest {
     }
 
 
+
     public static SscsCaseData buildCaseData(final String surname, final String nino) {
         Name name = Name.builder()
                 .title("Mr")
