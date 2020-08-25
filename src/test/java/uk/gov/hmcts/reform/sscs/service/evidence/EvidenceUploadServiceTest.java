@@ -4,6 +4,8 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -42,6 +44,7 @@ import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.OnlineHearingService;
 import uk.gov.hmcts.reform.sscs.service.PdfStoreService;
 import uk.gov.hmcts.reform.sscs.service.conversion.FileToPdfConversionService;
+import uk.gov.hmcts.reform.sscs.service.exceptions.EvidenceUploadException;
 import uk.gov.hmcts.reform.sscs.service.pdf.MyaEventActionContext;
 import uk.gov.hmcts.reform.sscs.service.pdf.StoreEvidenceDescriptionService;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.EvidenceDescriptionPdfData;
@@ -242,6 +245,21 @@ public class EvidenceUploadServiceTest {
         boolean hearingFound = evidenceUploadService.deleteDraftHearingEvidence(nonExistentHearingId, someEvidenceId);
 
         assertThat(hearingFound, is(false));
+    }
+
+    @Test
+    public void throwsOnNonLoadablePdf() {
+
+        byte[] badBytes = "notaPdf".getBytes();
+        String docType = "statement";
+        String caseId = "1234";
+
+        Exception exception = assertThrows(EvidenceUploadException.class, () -> {
+            evidenceUploadService.getLoadSafe(badBytes, docType, caseId);
+
+        });
+        assertTrue(exception.getMessage().contains("Error when getting PDDocument " + docType
+                + " for caseId " + caseId + " with bytes length " + badBytes.length));
     }
 
     private SscsDocument getCombinedEvidenceDoc(String combinedEvidenceFilename, String otherEvidenceDocType) {
