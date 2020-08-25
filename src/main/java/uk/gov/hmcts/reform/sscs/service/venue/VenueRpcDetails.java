@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.venue;
 
+import org.jsoup.internal.StringUtil;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 
 public class VenueRpcDetails {
@@ -21,11 +22,15 @@ public class VenueRpcDetails {
     }
 
     public String getVenueDisplayString(boolean prefixWithRpc) {
-        return (prefixWithRpc ? (getRpcInCaseDataFormat() + " - ") : "") + venueDetails.getVenName() + ", "
-            + venueDetails.getVenAddressLine1() + ", "
-            + venueDetails.getVenAddressLine2() + ", "
-            + venueDetails.getVenAddressTown() + ", "
-            + venueDetails.getVenAddressCounty() + ", "
-            + venueDetails.getVenAddressPostcode();
+        return (prefixWithRpc ? (getRpcInCaseDataFormat() + " - ") : "") + venueDetails.getVenName()
+            + getAddressComponent(venueDetails.getVenAddressLine1())
+            + getAddressComponent(venueDetails.getVenAddressLine2())
+            + getAddressComponent(venueDetails.getVenAddressTown())
+            + getAddressComponent(venueDetails.getVenAddressCounty())
+            + getAddressComponent(venueDetails.getVenAddressPostcode());
+    }
+
+    private String getAddressComponent(String component) {
+        return StringUtil.isBlank(component) ? "" : (", " + component);
     }
 }

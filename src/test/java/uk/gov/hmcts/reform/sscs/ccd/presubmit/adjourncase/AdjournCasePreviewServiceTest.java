@@ -1403,6 +1403,28 @@ public class AdjournCasePreviewServiceTest {
 
     @Test
     @Parameters(named = "faceToFaceNextHearingTypeParameter")
+    public void givenCaseWithSameVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeThePreviousVenue(String nextHearingType, String nextHearingTypeText) {
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+
+        DynamicListItem item = new DynamicListItem("someVenueId", "");
+        DynamicList list = new DynamicList(item, Arrays.asList());
+
+        sscsCaseData.setAdjournCaseNextHearingVenue("sameVenue");
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
+        assertEquals("Venue Name", templateBody.getAdjournCaseTemplateBody().getNextHearingVenue());
+    }
+
+    @Test
+    @Parameters(named = "faceToFaceNextHearingTypeParameter")
     public void givenCaseWithSelectedVenueSetForFaceToFace_thenCorrectlySetTheVenueToBeTheNewVenue(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
         sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
@@ -1410,6 +1432,8 @@ public class AdjournCasePreviewServiceTest {
 
         DynamicListItem item = new DynamicListItem("someVenueId", "");
         DynamicList list = new DynamicList(item, Arrays.asList());
+
+        sscsCaseData.setAdjournCaseNextHearingVenue("somewhereElse");
         sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -1431,6 +1455,7 @@ public class AdjournCasePreviewServiceTest {
         DynamicListItem item = new DynamicListItem("someVenueId", "");
         DynamicList list = new DynamicList(item, Arrays.asList());
 
+        sscsCaseData.setAdjournCaseNextHearingVenue("somewhereElse");
         sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -1453,6 +1478,7 @@ public class AdjournCasePreviewServiceTest {
         DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
         DynamicList list = new DynamicList(listItem, Arrays.asList(listItem));
 
+        sscsCaseData.setAdjournCaseNextHearingVenue("somewhereElse");
         sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
@@ -1466,6 +1492,52 @@ public class AdjournCasePreviewServiceTest {
     }
 
     @Test
+    @Parameters(named = "faceToFaceNextHearingTypeParameter")
+    public void givenCaseWithSelectedVenueMissingListItemForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+
+        DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
+        DynamicList list = new DynamicList(null, Arrays.asList(listItem));
+
+        sscsCaseData.setAdjournCaseNextHearingVenue("somewhereElse");
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("A next hearing venue of somewhere else has been specified but no venue has been selected", error);
+        assertNull(response.getData().getAdjournCasePreviewDocument());
+    }
+
+    @Test
+    @Parameters(named = "faceToFaceNextHearingTypeParameter")
+    public void givenCaseWithSelectedVenueMissingListItemCodeForFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseNextHearingDateType("firstAvailableDate");
+
+        DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
+        DynamicList list = new DynamicList(new DynamicListItem(null, ""), Arrays.asList(listItem));
+
+        sscsCaseData.setAdjournCaseNextHearingVenue("somewhereElse");
+        sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("A next hearing venue of somewhere else has been specified but no venue has been selected", error);
+        assertNull(response.getData().getAdjournCasePreviewDocument());
+    }
+
+    @Test
     @Parameters(named = "nonFaceToFaceNextHearingTypeParameters")
     public void givenCaseWithSelectedVenueSetIncorrectlyForNonFaceToFace_thenDisplayErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
@@ -1475,6 +1547,7 @@ public class AdjournCasePreviewServiceTest {
         DynamicListItem listItem = new DynamicListItem("someUnknownVenueId", "");
         DynamicList list = new DynamicList(listItem, Arrays.asList(listItem));
 
+        sscsCaseData.setAdjournCaseNextHearingVenue("somewhereElse");
         sscsCaseData.setAdjournCaseNextHearingVenueSelected(list);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
