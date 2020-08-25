@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Collections;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,6 +25,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.AdjournCaseTemplateBody;
@@ -548,6 +550,22 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("An Test", payload.getAppellantName());
         assertEquals(false, payload.isNextHearingAtVenue());
 
+    }
+
+    @Test
+    public void callToPopulateVenueDropdown_willPopulateNextHearingVenueSelectedList() throws Exception {
+        setup();
+        String nextHearingDateSpecificDate = "2020-07-01";
+        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
+        setJsonAndReplace(
+            "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEventAdjournCasePopulateVenueDropdown"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+        assertEquals(0, result.getErrors().size());
+        DynamicList results = result.getData().getAdjournCaseNextHearingVenueSelected();
+        Assert.assertFalse(results.getListItems().isEmpty());
     }
 
 }
