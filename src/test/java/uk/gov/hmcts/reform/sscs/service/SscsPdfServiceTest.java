@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.buildCaseData;
 
 import java.util.List;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.HearingOptions;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.ResourceManager;
 
 public class SscsPdfServiceTest {
 
@@ -34,12 +35,15 @@ public class SscsPdfServiceTest {
     @Mock
     CcdPdfService ccdPdfService;
 
+    @Mock
+    ResourceManager resourceManager;
+
     SscsCaseData caseData = buildCaseData();
 
     @Before
     public void setup() {
-        initMocks(this);
-        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService);
+        openMocks(this);
+        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager);
     }
 
     @Test
@@ -62,6 +66,9 @@ public class SscsPdfServiceTest {
         assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_appointee_identity_dob"));
         assertEquals("31 Rhagfyr 2000",argumentCaptor.getValue().get("appellant_identity_dob"));
         assertEquals("29 Mehefin 2018",argumentCaptor.getValue().get("date_of_decision"));
+        assertEquals("Taliad Annibyniaeth Personol (PIP)",argumentCaptor.getValue().get("welshBenefitType"));
+        assertEquals("nac ydw",argumentCaptor.getValue().get("welshEvidencePresent"));
+        assertEquals("ydw",argumentCaptor.getValue().get("welshWantsToAttend"));
     }
 
 
