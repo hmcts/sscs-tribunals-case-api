@@ -69,6 +69,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE,
             response.getData().getSscsDocument().get(3).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getSscsDocument().get(4).getValue().getDocumentTranslationStatus());
+        assertNull(response.getData().getSscsDocument().get(5).getValue().getDocumentTranslationStatus());
         assertEquals("No", response.getData().getTranslationWorkOutstanding());
 
         assertEquals(EventType.DECISION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
@@ -98,7 +99,12 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
             buildSscsDocument("anything.pdf", null, DocumentType.DECISION_NOTICE
                 .getValue(), LocalDate.now().minusDays(2));
 
-        List<SscsDocument> docs = Arrays.asList(ssc0Doc, sscs1Doc, sscs2Doc, sscs3Doc, sscs4Doc);
+        SscsDocument sscs5Doc =
+                buildSscsDocument("anything.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED,
+                        DocumentType.DIRECTION_NOTICE
+                                .getValue(), LocalDate.now().minusDays(2));
+
+        List<SscsDocument> docs = Arrays.asList(ssc0Doc, sscs1Doc, sscs2Doc, sscs3Doc, sscs4Doc, sscs5Doc);
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsDocument(docs)
