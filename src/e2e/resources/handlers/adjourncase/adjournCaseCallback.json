@@ -17,7 +17,22 @@
       "adjournCaseNextHearingListingDurationUnits": "hours",
       "adjournCaseNextHearingSpecificTime": "pm",
       "adjournCaseNextHearingVenue": "somewhereElse",
-      "adjournCaseNextHearingVenueSelected": "1256",
+      "adjournCaseNextHearingVenueSelected": {
+        "value": {
+          "code": "1256",
+          "label": ""
+        },
+        "list_items": [
+          {
+            "code": "1256",
+            "label": ""
+          },
+          {
+            "code": “1257”,
+            "label": ""
+          }
+        ]
+      },
       "adjournCaseOtherPanelMemberName": "The Doctor",
       "adjournCasePanelMembersExcluded": "Yes",
       "adjournCasePreviewDocument": {
