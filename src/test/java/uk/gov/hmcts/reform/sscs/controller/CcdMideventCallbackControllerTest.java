@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.apache.commons.io.FileUtils;
@@ -21,6 +22,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
@@ -31,8 +33,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
@@ -67,12 +72,22 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private AdjournCasePreviewService adjournCasePreviewService;
 
+    @Mock
+    private AdjournCaseCcdService adjournCaseCcdService;
+
     private CcdMideventCallbackController controller;
 
     @Before
     public void setUp() {
+
+        DynamicListItem listItem = new DynamicListItem("", "");
+
+        DynamicList dynamicList = new DynamicList(listItem, Arrays.asList(listItem));
+
+        when(adjournCaseCcdService.getVenueDynamicListForRpcName(any())).thenReturn(dynamicList);
+
         controller = new CcdMideventCallbackController(authorisationService, deserializer, writeFinalDecisionPreviewDecisionService,
-            adjournCasePreviewService);
+            adjournCasePreviewService, adjournCaseCcdService);
         mockMvc = standaloneSetup(controller).build();
     }
 
