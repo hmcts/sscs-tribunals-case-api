@@ -35,6 +35,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.domain.pdf.ByteArrayMultipartFile;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.FooterDetails;
+import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 import uk.gov.hmcts.reform.sscs.service.conversion.LocalDateToWelshStringConverter;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
@@ -47,6 +49,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     private DocmosisPdfService docmosisPdfService;
     private EvidenceManagementService evidenceManagementService;
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+    private WelshFooterService welshFooterService;
 
     private static Map<String, String> nextEventMap = new HashMap<>();
 
@@ -58,9 +61,11 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     @Autowired
     public CreateWelshNoticeAboutToSubmitHandler(DocmosisPdfService docmosisPdfService,
                                                  EvidenceManagementService evidenceManagementService,
+                                                 WelshFooterService welshFooterService,
                                                  @Value("${document.bilingual.notice.template}") String template) {
         this.docmosisPdfService = docmosisPdfService;
         this.evidenceManagementService = evidenceManagementService;
+        this.welshFooterService = welshFooterService;
         this.directionTemplatePath  = template;
     }
 
@@ -98,39 +103,53 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
 
         UploadResponse uploadResponse = evidenceManagementService.upload(singletonList(file), DM_STORE_USER_ID);
 
-        for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
-            SscsDocumentDetails sscsDocumentDetails = sscsDocument.getValue();
-            if (sscsDocumentDetails.getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)
-                    && sscsDocumentDetails.getDocumentType().equals(caseData.getDocumentTypes().getValue().getCode())) {
-                sscsDocumentDetails.setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
-            }
-        }
+        markOriginalDocumentsAsTranslationComplete(caseData);
 
         if (uploadResponse != null) {
             String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
-            newDocLink = DocumentLink.builder().documentUrl(location).documentBinaryUrl(location + "/binary").build();
-        }
+            newDocLink = DocumentLink.builder().documentFilename(filename).documentUrl(location).documentBinaryUrl(location + "/binary").build();
+            final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), getDocumentType(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
 
-        SscsWelshDocumentDetails sscsWelshDocumentDetails =  SscsWelshDocumentDetails.builder()
-                .documentType(caseData.getDocumentTypes().getValue().getCode())
-                .documentFileName(filename)
-                .documentLink(newDocLink)
-                .originalDocumentFileName(caseData.getOriginalNoticeDocuments().getValue().getLabel())
-                .build();
+            SscsWelshDocumentDetails sscsWelshDocumentDetails = SscsWelshDocumentDetails.builder()
+                    .documentType(caseData.getDocumentTypes().getValue().getCode())
+                    .documentFileName(footerDetails.getBundleFileName())
+                    .bundleAddition(footerDetails.getBundleAddition())
+                    .documentLink(footerDetails.getUrl())
+                    .originalDocumentFileName(caseData.getOriginalNoticeDocuments().getValue().getLabel())
+                    .build();
 
-        if (caseData.getSscsWelshDocuments() == null) {
-            List<SscsWelshDocument> sscsWelshDocumentsList = new ArrayList<>();
-            caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
-        }
-        caseData.getSscsWelshDocuments().add(SscsWelshDocument.builder()
+            if (caseData.getSscsWelshDocuments() == null) {
+                List<SscsWelshDocument> sscsWelshDocumentsList = new ArrayList<>();
+                caseData.setSscsWelshDocuments(sscsWelshDocumentsList);
+            }
+            caseData.getSscsWelshDocuments().add(SscsWelshDocument.builder()
                     .value(sscsWelshDocumentDetails)
                     .build());
-
+        }
 
         String nextEvent = getNextEvent(caseData.getDocumentTypes().getValue().getCode());
         log.info("Setting next event to {}", nextEvent);
         caseData.setSscsWelshPreviewNextEvent(nextEvent);
         caseData.updateTranslationWorkOutstandingFlag();
+    }
+
+    private DocumentType getDocumentType(String code) {
+        if (DocumentType.DIRECTION_NOTICE.getValue().equals(code)) {
+            return DocumentType.DIRECTION_NOTICE;
+        } else if (DocumentType.DECISION_NOTICE.getValue().equals(code)) {
+            return DocumentType.DECISION_NOTICE;
+        }
+        return null;
+    }
+
+    private void markOriginalDocumentsAsTranslationComplete(SscsCaseData caseData) {
+        for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
+            SscsDocumentDetails sscsDocumentDetails = sscsDocument.getValue();
+            if (SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(sscsDocumentDetails.getDocumentTranslationStatus())
+                    && sscsDocumentDetails.getDocumentType().equals(caseData.getDocumentTypes().getValue().getCode())) {
+                sscsDocumentDetails.setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
+            }
+        }
     }
 
     private Map<String, Object> caseDataMap(SscsCaseData caseData) {

@@ -45,6 +45,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
+import uk.gov.hmcts.reform.sscs.service.FooterDetails;
+import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -60,6 +62,8 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     private DocmosisPdfService docmosisPdfService;
     @Mock
     private EvidenceManagementService evidenceManagementService;
+    @Mock
+    private WelshFooterService welshFooterService;
 
     String template = "TB-SCS-GNO-WEL-00473.docx";
     @Mock
@@ -71,7 +75,7 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        handler = new CreateWelshNoticeAboutToSubmitHandler(docmosisPdfService, evidenceManagementService, template);
+        handler = new CreateWelshNoticeAboutToSubmitHandler(docmosisPdfService, evidenceManagementService, welshFooterService, template);
         when(callback.getEvent()).thenReturn(EventType.CREATE_WELSH_NOTICE);
         SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -91,6 +95,9 @@ public class CreateWelshNoticeAboutToSubmitHandlerTest {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
         when(docmosisPdfService.createPdf(any(),any())).thenReturn(expectedPdf);
+        FooterDetails footerDetails = new FooterDetails(DocumentLink.builder().build(), "bundleAddition", "bundleFilename");
+        when(welshFooterService.addFooterToExistingToContentAndCreateNewUrl(any(),any(), any(), any(), any())).thenReturn(footerDetails);
+
         Callback<SscsCaseData> callback = buildCallback("english.pdf", CREATE_WELSH_NOTICE, buildSscsDocuments(),
                 buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
 
