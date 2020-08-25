@@ -72,7 +72,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseDirectionsDueDate("")
             .adjournCaseTypeOfNextHearing("")
             .adjournCaseNextHearingVenue("")
-            .adjournCaseNextHearingVenueSelected("")
+            .adjournCaseNextHearingVenueSelected(new DynamicList(new DynamicListItem("",""), Arrays.asList(new DynamicListItem("", ""))))
             .adjournCasePanelMembersExcluded("")
             .adjournCaseDisabilityQualifiedPanelMemberName("")
             .adjournCaseMedicallyQualifiedPanelMemberName("")
