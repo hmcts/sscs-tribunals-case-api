@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,14 +36,17 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final FooterService footerService;
     private final ServiceRequestExecutor serviceRequestExecutor;
     private final String bulkScanEndpoint;
+    private boolean reinstatementFeatureFlag;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
                                                @Value("${bulk_scan.url}") String bulkScanUrl,
-                                               @Value("${bulk_scan.validateEndpoint}") String validateEndpoint) {
+                                               @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
+                                               @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
+        this.reinstatementFeatureFlag = reinstatement;
     }
 
     @Override
@@ -60,34 +64,127 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
 
+        return validateDirectionType(caseData)
+                .or(()        -> validateDirectionDueDate(caseData))
+                .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData));
+    }
+
+    private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionType(SscsCaseData caseData) {
         if (caseData.getDirectionTypeDl() == null || caseData.getDirectionTypeDl().getValue() == null) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Direction Type cannot be empty");
-            return errorResponse;
+            return Optional.of(errorResponse);
         }
+        return Optional.empty();
+    }
+
+    private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionDueDate(SscsCaseData caseData) {
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && isBlank(caseData.getDirectionDueDate())) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
             errorResponse.addError("Please populate the direction due date");
-            return errorResponse;
+            return Optional.of(errorResponse);
+        }
+        return Optional.empty();
+    }
+
+    private SscsCaseData updateCaseAfterExtensionRefused(SscsCaseData caseData, String interlocReviewState, State state) {
+        caseData.setHmctsDwpState("sentToDwp");
+        caseData.setDateSentToDwp(LocalDate.now().toString());
+        caseData.setInterlocReviewState(interlocReviewState);
+        caseData.setState(state);
+
+        return caseData;
+    }
+
+    @NotNull
+    private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData) {
+
+        if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+
+            caseData.setInterlocReviewState(AWAITING_INFORMATION.getId());
+
+        } else if (getPreValidStates().contains(caseDetails.getState())
+                && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            caseData.setDateSentToDwp(LocalDate.now().toString());
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
+            caseData = updateCaseAfterExtensionRefused(caseData, AWAITING_ADMIN_ACTION.getId(), State.RESPONSE_RECEIVED);
+
+        } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
+            caseData = updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
+
+        } else if (DirectionTypeItemList.GRANT_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && reinstatementFeatureFlag) {
+            caseData = updateCaseAfterReinstatementGranted(caseData);
+
+        } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+                && reinstatementFeatureFlag) {
+            caseData = updateCaseAfterReinstatementRefused(caseData);
+
+        } else {
+            caseData.setInterlocReviewState(null);
+        }
+        return caseData;
+    }
+
+    private SscsCaseData updateCaseAfterReinstatementGranted(SscsCaseData caseData) {
+
+        caseData.setReinstatementOutcome(ReinstatementOutcome.GRANTED);
+        caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED.getId());
+
+        State previousState = caseData.getPreviousState();
+
+        if (! State.INTERLOCUTORY_REVIEW_STATE.getId().equals(previousState.getId())) {
+            caseData.setState(previousState);
+        } else {
+            caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         }
 
-        final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+        log.info("Case ID {} reinstatement granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+
+        return caseData;
+    }
+
+    private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData) {
+
+        caseData.setReinstatementOutcome(ReinstatementOutcome.REFUSED);
+        caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED.getId());
+        log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+        return caseData;
+    }
+
+    @NotNull
+    private PreSubmitCallbackResponse<SscsCaseData> validateForPdfAndCreateCallbackResponse(
+            Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData) {
+
+        final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse =
+                new PreSubmitCallbackResponse<>(caseData);
+
         DocumentLink url = null;
+
         if (nonNull(caseData.getPreviewDocument()) && callback.getEvent() == EventType.DIRECTION_ISSUED) {
             url = caseData.getPreviewDocument();
         } else if (caseData.getSscsInterlocDirectionDocument() != null && callback.getEvent() == EventType.DIRECTION_ISSUED) {
+
             url = caseData.getSscsInterlocDirectionDocument().getDocumentLink();
             caseData.setDateAdded(caseData.getSscsInterlocDirectionDocument().getDocumentDateAdded());
+
             if (!isFileAPdf(caseData.getSscsInterlocDirectionDocument().getDocumentLink())) {
                 sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload PDF documents only");
                 return sscsCaseDataPreSubmitCallbackResponse;
             }
         }
+
         if (isNull(url) && callback.getEvent() != EventType.DIRECTION_ISSUED_WELSH) {
             sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload a PDF document");
             return sscsCaseDataPreSubmitCallbackResponse;
         }
+
 
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
 
@@ -107,19 +204,37 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 caseData.setInterlocReviewState(null);
             }
         }
+        return buildResponse(callback, caseDetails, caseData, sscsCaseDataPreSubmitCallbackResponse, url, documentTranslationStatus);
+    }
+
+    private PreSubmitCallbackResponse<SscsCaseData> buildResponse(Callback<SscsCaseData> callback,
+                                                                  CaseDetails<SscsCaseData> caseDetails,
+                                                                  SscsCaseData caseData,
+                                                                  PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse,
+                                                                  DocumentLink url,
+                                                                  SscsDocumentTranslationStatus documentTranslationStatus) {
+
+        caseData = updateCaseForDirectionType(caseDetails, caseData);
+
 
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DIRECTION_NOTICE,
-                Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
-                    .format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
-                caseData.getDateAdded(), null, documentTranslationStatus);
+                    Optional.ofNullable(caseData.getDateAdded()).orElse(LocalDate.now())
+                            .format(DateTimeFormatter.ofPattern("dd-MM-YYYY")),
+                    caseData.getDateAdded(), null, documentTranslationStatus);
         }
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
+
             State beforeState = callback.getCaseDetailsBefore().map(e -> e.getState()).orElse(null);
             clearTransientFields(caseData, beforeState);
-            caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+
+            if (shouldSetDwpState(caseData)) {
+                caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
+            }
+
             caseData.setTimeExtensionRequested("No");
+
             if (caseDetails.getState().equals(State.INTERLOCUTORY_REVIEW_STATE) && caseData.getDirectionTypeDl() != null && StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(), caseData.getDirectionTypeDl().getValue().getCode())) {
                 PreSubmitCallbackResponse<SscsCaseData> response = serviceRequestExecutor.post(callback, bulkScanEndpoint);
                 sscsCaseDataPreSubmitCallbackResponse.addErrors(response.getErrors());
@@ -129,16 +244,25 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setTranslationWorkOutstanding("Yes");
             clearBasicTransientFields(caseData);
 
-        }
-        log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
 
+            if (caseDetails.getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
+                    && caseData.getDirectionTypeDl() != null
+                    && StringUtils.equals(DirectionType.APPEAL_TO_PROCEED.toString(), caseData.getDirectionTypeDl().getValue().getCode())) {
+
+                PreSubmitCallbackResponse<SscsCaseData> response = serviceRequestExecutor.post(callback, bulkScanEndpoint);
+                sscsCaseDataPreSubmitCallbackResponse.addErrors(response.getErrors());
+
+            }
+            log.info("Saved the new interloc direction document for case id: " + caseData.getCcdCaseId());
+        }
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
-    private void updateCaseAfterExtensionRefused(SscsCaseData caseData, String interlocReviewState, State state) {
-        caseData.setHmctsDwpState("sentToDwp");
-        caseData.setDateSentToDwp(LocalDate.now().toString());
-        caseData.setInterlocReviewState(interlocReviewState);
-        caseData.setState(state);
+    private boolean shouldSetDwpState(SscsCaseData caseData) {
+        return ! reinstatementFeatureFlag
+                || isNull(caseData.getReinstatementOutcome())
+                || (!caseData.getReinstatementOutcome().equals(ReinstatementOutcome.GRANTED)
+                && !caseData.getReinstatementOutcome().equals(ReinstatementOutcome.REFUSED));
     }
+
 }
