@@ -3,6 +3,8 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
+import java.util.Arrays;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -17,13 +19,16 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
+    List<EventType> permittedEvents = Arrays.asList(EventType.VALID_APPEAL_CREATED,
+            EventType.INCOMPLETE_APPLICATION_RECEIVED, EventType.NON_COMPLIANT);
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() != EventType.CREATE_BUNDLE;
+            && permittedEvents.contains(callback.getEvent());
     }
 
     @Override
@@ -32,7 +37,12 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
 
         String isScotCase = isScottishCase(caseData.getRegionalProcessingCenter(), caseData);
 
-        caseData.setIsScottishCase(isScotCase);
+        if (! isScotCase.equals(caseData.getIsScottishCase())) {
+            log.info("Setting isScottishCase field to " + isScotCase + " for case " + caseData.getCcdCaseId());
+            caseData.setIsScottishCase(isScotCase);
+        } else {
+            log.info("Keeping isScottishCase field as " + isScotCase + " for case " + caseData.getCcdCaseId());
+        }
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
@@ -42,11 +52,11 @@ public class IsScottishHandler implements PreSubmitCallbackHandler<SscsCaseData>
     public static String isScottishCase(RegionalProcessingCenter rpc, SscsCaseData caseData) {
 
         if (isNull(rpc) || isNull(rpc.getName())) {
-            log.info("Setting isScottishCase field to No for empty RPC for case " + caseData.getCcdCaseId());
+            log.info("Calculated isScottishCase field to No for empty RPC for case " + caseData.getCcdCaseId());
             return "No";
         } else {
             String isScotCase = rpc.getName().equalsIgnoreCase("GLASGOW") ? "Yes" : "No";
-            log.info("Setting isScottishCase field to " + isScotCase + " for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
+            log.info("Calculated isScottishCase field to " + isScotCase + " for RPC " + rpc.getName() + " for case " + caseData.getCcdCaseId());
             return isScotCase;
         }
     }
