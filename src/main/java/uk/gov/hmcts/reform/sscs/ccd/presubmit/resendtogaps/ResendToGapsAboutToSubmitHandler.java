@@ -12,6 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
@@ -57,7 +58,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         try {
-            isValid(sscsCaseData);
+            isValid(sscsCaseData, caseDetails.getId(), caseDetails.getState());
         } catch (RoboticsValidationException ve) {
             preSubmitCallbackResponse.addError("Unable to validate robotics json for case id"
                     + sscsCaseData.getCcdCaseId() + " with error: " + ve.getMessage());
@@ -66,9 +67,15 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
         return preSubmitCallbackResponse;
     }
 
-    public void isValid(SscsCaseData caseData) throws RoboticsValidationException {
+    public void isValid(SscsCaseData caseData, Long caseId, State caseState) throws RoboticsValidationException {
 
-        RoboticsWrapper roboticsWrapper = RoboticsWrapper.builder().sscsCaseData(caseData).build();
+        RoboticsWrapper roboticsWrapper = RoboticsWrapper
+                .builder()
+                .sscsCaseData(caseData)
+                .ccdCaseId(caseId)
+                .evidencePresent(caseData.getEvidencePresent())
+                .state(caseState).build();
+
         JSONObject roboticsJson = toJsonObject(roboticsWrapper);
         roboticsJsonValidator.validate(roboticsJson);
     }
@@ -78,7 +85,8 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
         try {
             roboticsJson = roboticsJsonMapper.map(roboticsWrapper);
         } catch  (NullPointerException e) {
-            throw new RoboticsValidationException(new Exception("Json Mapper Unable to build robotics json due to missing fields"));
+            log.error("Json Mapper throws NPE", e);
+            throw new RoboticsValidationException(new Exception("Json Mapper Unable to build robotics json due to missing fields", e));
         }
         return roboticsJson;
     }
