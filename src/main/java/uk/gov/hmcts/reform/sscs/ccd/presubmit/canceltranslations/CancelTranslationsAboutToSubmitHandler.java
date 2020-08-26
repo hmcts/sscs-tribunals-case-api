@@ -64,7 +64,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
     private void setWelshNextEvent(SscsCaseData caseData) {
         caseData.getSscsDocument().stream().filter(sd ->
                 (SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(sd.getValue().getDocumentTranslationStatus())
-                        || SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(sd.getValue().getDocumentTranslationStatus()))
+                        || SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(sd.getValue().getDocumentTranslationStatus()))
                 && nextEventMap.keySet().contains(sd.getValue().getDocumentType())).sorted().findFirst()
             .ifPresent(sscsDocument -> caseData
                 .setSscsWelshPreviewNextEvent(nextEventMap.get(sscsDocument.getValue().getDocumentType())));

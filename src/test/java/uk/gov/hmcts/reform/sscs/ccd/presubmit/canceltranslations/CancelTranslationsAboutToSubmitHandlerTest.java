@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
@@ -13,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,6 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
@@ -53,14 +54,39 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenCanHandleIsCalled_shouldReturnCorrectResult() {
+    public void givenCanHandleIsCalledWithValidCallBack_shouldReturnTrue() {
         boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, callback);
         assertTrue(actualResult);
     }
 
     @Test
+    @Parameters({
+            "ABOUT_TO_SUBMIT,UPLOAD_DOCUMENT_FURTHER_EVIDENCE",
+            "ABOUT_TO_START,CANCEL_TRANSLATIONS"
+    })
+    public void givenCanHandleIsCalledWithInvalidCallBack_shouldReturnCorrectFalse(@Nullable CallbackType callbackType, @Nullable EventType eventType) {
+        Callback<SscsCaseData> callback = buildCallback(eventType);
+        boolean actualResult = handler.canHandle(callbackType, callback);
+        assertFalse(actualResult);
+    }
+
+
+    @Test(expected = NullPointerException.class)
+    public void givenCanHandleIsCalled_shouldThrowExceptionWhenCallBackTypeNull() {
+        boolean actualResult = handler.canHandle(null, callback);
+        assertTrue(actualResult);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void givenCanHandleIsCalled_shouldThrowExceptionWhenCallBackNull() {
+        boolean actualResult = handler.canHandle(ABOUT_TO_SUBMIT, null);
+        assertTrue(actualResult);
+    }
+
+
+    @Test
     public void shouldSetTranslationStatusOfDocumentsAndNextWelshEventCorrectly() {
-        Callback<SscsCaseData> callback = buildCallback();
+        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS);
         PreSubmitCallbackResponse<SscsCaseData> response =
             handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
@@ -75,7 +101,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertEquals(EventType.DECISION_ISSUED_WELSH.getCcdType(), response.getData().getSscsWelshPreviewNextEvent());
     }
 
-    private Callback<SscsCaseData> buildCallback() {
+    private Callback<SscsCaseData> buildCallback(EventType eventType) {
 
         SscsDocument ssc0Doc =
             buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
@@ -112,7 +138,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
-        return new Callback<>(caseDetails, Optional.empty(), CANCEL_TRANSLATIONS, false);
+        return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
     private SscsDocument buildSscsDocument(String s, SscsDocumentTranslationStatus translationRequired, String docType,
