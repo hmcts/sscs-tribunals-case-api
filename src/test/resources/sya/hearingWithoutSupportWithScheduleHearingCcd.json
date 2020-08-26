@@ -148,7 +148,8 @@
       "subscribeSms":"Yes",
       "reason":null,
       "lastLoggedIntoMya": null
-    }
+    },
+    "jointPartySubscription": null
   },
   "evidencePresent" : "No",
   "sscsDocument":[],

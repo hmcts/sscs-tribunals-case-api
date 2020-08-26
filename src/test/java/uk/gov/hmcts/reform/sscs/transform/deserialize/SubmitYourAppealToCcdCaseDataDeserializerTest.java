@@ -92,7 +92,7 @@ public class SubmitYourAppealToCcdCaseDataDeserializerTest {
         final Subscription rep = removeTyaNumber(caseData.getSubscriptions().getRepresentativeSubscription());
         final Subscription appellant = removeTyaNumber(caseData.getSubscriptions().getAppellantSubscription());
         final Subscription appointee = removeTyaNumber(caseData.getSubscriptions().getAppointeeSubscription());
-        return caseData.toBuilder().subscriptions(new Subscriptions(appellant, null, rep, appointee)).build();
+        return caseData.toBuilder().subscriptions(new Subscriptions(appellant, null, rep, appointee, null)).build();
     }
 
     @Test

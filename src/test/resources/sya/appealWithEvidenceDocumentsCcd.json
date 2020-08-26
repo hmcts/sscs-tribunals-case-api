@@ -156,7 +156,8 @@
       "subscribeSms":"Yes",
       "reason":null,
       "lastLoggedIntoMya": null
-    }
+    },
+    "jointPartySubscription": null
   },
   "sscsDocument" : [
     {
