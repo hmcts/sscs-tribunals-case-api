@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -97,7 +96,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return caseData;
     }
 
-    @NotNull
     private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData) {
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
@@ -122,6 +120,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData = updateCaseAfterReinstatementGranted(caseData);
 
         } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())
+
                 && reinstatementFeatureFlag) {
             caseData = updateCaseAfterReinstatementRefused(caseData);
 
@@ -138,7 +137,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         State previousState = caseData.getPreviousState();
 
-        if (! State.INTERLOCUTORY_REVIEW_STATE.getId().equals(previousState.getId())) {
+        if (!State.INTERLOCUTORY_REVIEW_STATE.getId().equals(previousState.getId())) {
             caseData.setState(previousState);
         } else {
             caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
@@ -158,7 +157,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return caseData;
     }
 
-    @NotNull
+
     private PreSubmitCallbackResponse<SscsCaseData> validateForPdfAndCreateCallbackResponse(
             Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData) {
 
@@ -229,7 +228,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             State beforeState = callback.getCaseDetailsBefore().map(e -> e.getState()).orElse(null);
             clearTransientFields(caseData, beforeState);
 
-            if (shouldSetDwpState(caseData)) {
+            if (shouldSetDwpStateDependentOnReinstatementOutcome(caseData)) {
                 caseData.setDwpState(DwpState.DIRECTION_ACTION_REQUIRED.getId());
             }
 
@@ -258,8 +257,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         return sscsCaseDataPreSubmitCallbackResponse;
     }
 
-    private boolean shouldSetDwpState(SscsCaseData caseData) {
-        return ! reinstatementFeatureFlag
+    private boolean shouldSetDwpStateDependentOnReinstatementOutcome(SscsCaseData caseData) {
+        return !reinstatementFeatureFlag
                 || isNull(caseData.getReinstatementOutcome())
                 || (!caseData.getReinstatementOutcome().equals(ReinstatementOutcome.GRANTED)
                 && !caseData.getReinstatementOutcome().equals(ReinstatementOutcome.REFUSED));
