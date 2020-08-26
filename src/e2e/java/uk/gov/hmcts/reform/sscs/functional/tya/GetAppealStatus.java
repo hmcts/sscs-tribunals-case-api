@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.functional.tya;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.RestAssured;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +30,7 @@ public class GetAppealStatus extends BaseHandler {
     }
 
     @Test
-    public void testDwpRespond() throws IOException {
+    public void testDwpRespond() throws Exception {
 
         SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState();
 
@@ -52,7 +51,7 @@ public class GetAppealStatus extends BaseHandler {
     }
 
     @Test
-    public void testResponseReceived() throws IOException {
+    public void testResponseReceived() throws Exception {
         SscsCaseDetails sscsCaseDetails = createCaseInResponseReceivedState();
 
         RestAssured.baseURI = testUrl;

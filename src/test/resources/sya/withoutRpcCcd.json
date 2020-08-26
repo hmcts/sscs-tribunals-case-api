@@ -149,6 +149,5 @@
   "sscsDocument":[],
   "dwpRegionalCentre": "Newcastle",
   "pcqId": "12345678",
-  "languagePreferenceWelsh" : "No",
-  "isScottishCase": "No"
+  "languagePreferenceWelsh" : "No"
 }
