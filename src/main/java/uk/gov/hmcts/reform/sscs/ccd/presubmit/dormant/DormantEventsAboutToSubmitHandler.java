@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
-
 @Service
 @Slf4j
 public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
@@ -38,15 +37,14 @@ public class DormantEventsAboutToSubmitHandler implements PreSubmitCallbackHandl
             throw new IllegalStateException("Cannot handle callback");
         }
 
-        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        final SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         log.info("Handling {} event for case id {}", callback.getEvent(), callback.getCaseDetails().getId());
 
         caseData.setInterlocReviewState(null);
         caseData.setDirectionDueDate(null);
+        callback.getCaseDetailsBefore().ifPresent(f -> caseData.setPreviousState(f.getState()));
 
-        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
-        return sscsCaseDataPreSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(caseData);
     }
 }
