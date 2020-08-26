@@ -97,8 +97,8 @@ public class UpdateCaseInCcdTest {
         return testCaseData;
     }
 
-    public static SscsCaseData buildSscsCaseDataForTesting() {
-        SscsCaseData testCaseData = buildCaseData("Test");
+    public static SscsCaseData buildSscsCaseDataForTesting(final String surname, final String nino) {
+        SscsCaseData testCaseData = buildCaseData(surname, nino);
 
         addFurtherEvidenceActionData(testCaseData);
 
@@ -152,7 +152,7 @@ public class UpdateCaseInCcdTest {
     }
 
 
-    public static SscsCaseData buildCaseData(final String surname) {
+    public static SscsCaseData buildCaseData(final String surname, final String nino) {
         Name name = Name.builder()
                 .title("Mr")
                 .firstName("User")
@@ -172,7 +172,7 @@ public class UpdateCaseInCcdTest {
                 .build();
         Identity identity = Identity.builder()
                 .dob("1904-03-10")
-                .nino("AB 22 55 66 B")
+                .nino(nino)
                 .build();
 
         Appellant appellant = Appellant.builder()

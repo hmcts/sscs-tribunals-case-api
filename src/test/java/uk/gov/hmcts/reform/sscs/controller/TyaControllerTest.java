@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.controller;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,7 +34,7 @@ public class TyaControllerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         controller = new TyaController(tribunalsService);
     }
 

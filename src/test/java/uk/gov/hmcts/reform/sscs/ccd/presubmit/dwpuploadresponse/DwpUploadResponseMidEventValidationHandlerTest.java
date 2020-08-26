@@ -227,7 +227,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().minusYears(1).toString();
 
-        sscsCaseData.setJointPartyDob(dateToTest);
+        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -241,7 +241,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().toString();
 
-        sscsCaseData.setJointPartyDob(dateToTest);
+        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -256,7 +256,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         String dateToTest = LocalDate.now().plusYears(1).toString();
 
-        sscsCaseData.setJointPartyDob(dateToTest);
+        sscsCaseData.setJointPartyIdentity(Identity.builder().dob(dateToTest).build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -279,7 +279,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Test
     public void givenValidJointPartyNinoNoSpaces_thenDoNotDisplayError() {
 
-        sscsCaseData.setJointPartyNino("BB000000B");
+        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("BB000000B").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -291,7 +291,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Test
     public void givenValidJointPartyNinoWithSpaces_thenDoNotDisplayError() {
 
-        sscsCaseData.setJointPartyNino("BB 00 00 00 B");
+        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("BB 00 00 00 B").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
@@ -304,7 +304,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Test
     public void givenInvalidJointPartyNino_thenDoDisplayError() {
 
-        sscsCaseData.setJointPartyNino("blah");
+        sscsCaseData.setJointPartyIdentity(Identity.builder().nino("blah").build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         
