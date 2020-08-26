@@ -5,12 +5,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.INTERLOCUTORY_REVIEW_STATE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -25,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 
 @RunWith(JUnitParamsRunner.class)
 public class StruckOutAboutToSubmitHandlerTest {
@@ -43,7 +44,7 @@ public class StruckOutAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new StruckOutAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.STRUCK_OUT);
@@ -53,11 +54,13 @@ public class StruckOutAboutToSubmitHandlerTest {
                 .interlocReviewState(AWAITING_INFORMATION.getId())
                 .directionDueDate(LocalDate.now().toString())
                 .dwpState(DwpState.IN_PROGRESS.getId())
-                .state(State.INTERLOCUTORY_REVIEW_STATE)
+                .state(INTERLOCUTORY_REVIEW_STATE)
                 .appeal(Appeal.builder().build())
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetails));
+        when(caseDetails.getState()).thenReturn(INTERLOCUTORY_REVIEW_STATE);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
 
@@ -86,6 +89,7 @@ public class StruckOutAboutToSubmitHandlerTest {
 
         assertThat(response.getData().getInterlocReviewState(), is(nullValue()));
         assertThat(response.getData().getDirectionDueDate(), is(nullValue()));
+        assertThat(response.getData().getPreviousState(), is(INTERLOCUTORY_REVIEW_STATE));
         assertThat(response.getData().getDwpState(), is(DwpState.STRIKE_OUT_ACTIONED.getId()));
     }
 }
