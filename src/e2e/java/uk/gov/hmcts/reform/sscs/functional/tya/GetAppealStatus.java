@@ -2,10 +2,10 @@ package uk.gov.hmcts.reform.sscs.functional.tya;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.github.artsok.RepeatedIfExceptionsTest;
 import io.restassured.RestAssured;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +29,7 @@ public class GetAppealStatus extends BaseHandler {
         super.setUp();
     }
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
+    @Test
     public void testDwpRespond() throws Exception {
 
         SscsCaseDetails sscsCaseDetails = createCaseInWithDwpState();
@@ -51,7 +51,7 @@ public class GetAppealStatus extends BaseHandler {
     }
 
 
-    @RepeatedIfExceptionsTest(repeats = 3, suspend = 5000L)
+    @Test
     public void testResponseReceived() throws Exception {
 
         SscsCaseDetails sscsCaseDetails = createCaseInResponseReceivedState();
