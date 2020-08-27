@@ -78,14 +78,19 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         HearingType nextHearingType = HearingType.getByKey(caseData.getAdjournCaseTypeOfNextHearing());
 
         if (HearingType.FACE_TO_FACE.equals(nextHearingType)) {
-            if (caseData.getAdjournCaseNextHearingVenueSelected() != null) {
-                VenueDetails venueDetails =
-                    venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected());
-                if (venueDetails == null) {
-                    throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected());
+            if ("somewhereElse".equalsIgnoreCase(caseData.getAdjournCaseNextHearingVenue())) {
+                if (caseData.getAdjournCaseNextHearingVenueSelected() != null && caseData.getAdjournCaseNextHearingVenueSelected().getValue() != null
+                        && caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode() != null) {
+                    VenueDetails venueDetails =
+                            venueDataLoader.getVenueDetailsMap().get(caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
+                    if (venueDetails == null) {
+                        throw new IllegalStateException("Unable to load venue details for id:" + caseData.getAdjournCaseNextHearingVenueSelected().getValue().getCode());
+                    }
+                    adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
+                    adjournCaseBuilder.nextHearingAtVenue(true);
+                } else {
+                    throw new IllegalStateException("A next hearing venue of somewhere else has been specified but no venue has been selected");
                 }
-                adjournCaseBuilder.nextHearingVenue(venueDetails.getVenName());
-                adjournCaseBuilder.nextHearingAtVenue(true);
             } else {
                 adjournCaseBuilder.nextHearingAtVenue(!IN_CHAMBERS.equals(venueName));
                 adjournCaseBuilder.nextHearingVenue(venueName);
@@ -102,7 +107,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
                     throw new IllegalStateException("Timeslot duration units not supplied on case data");
                 }
                 adjournCaseBuilder.nextHearingTimeslot(getTimeslotString(caseData.getAdjournCaseNextHearingListingDuration(),
-                    caseData.getAdjournCaseNextHearingListingDurationUnits()));
+                        caseData.getAdjournCaseNextHearingListingDurationUnits()));
             } else {
                 adjournCaseBuilder.nextHearingTimeslot("a standard time slot");
             }

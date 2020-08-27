@@ -1,4 +1,4 @@
-{
+  {
   "caseCreated" : "${json-unit.ignore}",
   "benefitCode" : "002",
   "issueCode" : "DD",
@@ -181,6 +181,5 @@
   },
   "evidencePresent" : "No",
   "sscsDocument":[],
-  "dwpRegionalCentre": "Newcastle",
-  "isScottishCase": "No"
+  "dwpRegionalCentre": "Newcastle"
 }
