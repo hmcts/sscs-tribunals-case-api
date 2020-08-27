@@ -50,9 +50,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     private EvidenceManagementService evidenceManagementService;
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     private WelshFooterService welshFooterService;
-
     private static Map<String, String> nextEventMap = new HashMap<>();
-
     static {
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
@@ -108,7 +106,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         if (uploadResponse != null) {
             String location = uploadResponse.getEmbedded().getDocuments().get(0).links.self.href;
             newDocLink = DocumentLink.builder().documentFilename(filename).documentUrl(location).documentBinaryUrl(location + "/binary").build();
-            final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), getDocumentType(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
+            final FooterDetails footerDetails = welshFooterService.addFooterToExistingToContentAndCreateNewUrl(newDocLink, caseData.getSscsWelshDocuments(), DocumentType.fromValue(caseData.getDocumentTypes().getValue().getCode()), null, LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
 
             SscsWelshDocumentDetails sscsWelshDocumentDetails = SscsWelshDocumentDetails.builder()
                     .documentType(caseData.getDocumentTypes().getValue().getCode())
@@ -133,14 +131,6 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
         caseData.updateTranslationWorkOutstandingFlag();
     }
 
-    private DocumentType getDocumentType(String code) {
-        if (DocumentType.DIRECTION_NOTICE.getValue().equals(code)) {
-            return DocumentType.DIRECTION_NOTICE;
-        } else if (DocumentType.DECISION_NOTICE.getValue().equals(code)) {
-            return DocumentType.DECISION_NOTICE;
-        }
-        return null;
-    }
 
     private void markOriginalDocumentsAsTranslationComplete(SscsCaseData caseData) {
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
