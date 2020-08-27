@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
 import static java.util.Objects.requireNonNull;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
