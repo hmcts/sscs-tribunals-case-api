@@ -44,11 +44,10 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
 
     private void setBenefitTypeDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listOptions = new ArrayList<>();
-
         if (sscsCaseData.getAppeal() != null && sscsCaseData.getAppeal().getBenefitType() != null) {
             Optional<BenefitTypeDynamicListItems> item = BenefitTypeDynamicListItems.findByBenefitType(sscsCaseData.getAppeal().getBenefitType());
             if (item.isPresent()) {
-                populateListWithItems(listOptions, BenefitTypeDynamicListItems.UC);
+                populateListWithItems(listOptions, item.get());
             }
         }
         if (!listOptions.isEmpty()) {

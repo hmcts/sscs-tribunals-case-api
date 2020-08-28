@@ -67,11 +67,11 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
         assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
 
-        assertNotNull("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertNotNull("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
+        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertNotNull("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertNotNull("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
+        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -86,11 +86,11 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
         assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
 
-        assertNotNull("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertNotNull("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
+        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertNotNull("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertNotNull("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
+        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -105,11 +105,11 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
         assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
 
-        assertNotNull("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertNotNull("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
+        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertNotNull("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertNotNull("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
+        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -124,11 +124,11 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
         assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
 
-        assertNotNull("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertNotNull("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
+        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertNotNull("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertNotNull("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
+        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -143,11 +143,11 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
         assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
 
-        assertNotNull("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertNotNull("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
+        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertNotNull("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertNotNull("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
+        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -162,11 +162,11 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
         assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
 
-        assertNotNull("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertNotNull("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
+        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertNotNull("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertNotNull("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
+        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
