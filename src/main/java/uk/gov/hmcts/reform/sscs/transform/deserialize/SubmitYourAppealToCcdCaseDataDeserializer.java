@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.utility.PhoneNumbersUtil;
@@ -31,12 +30,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
     public static SscsCaseData convertSyaToCcdCaseData(SyaCaseWrapper syaCaseWrapper, String region, RegionalProcessingCenter rpc) {
         SscsCaseData caseData = convertSyaToCcdCaseData(syaCaseWrapper);
 
-        String isScottishCase = IsScottishHandler.isScottishCase(rpc, caseData);
-
         return caseData.toBuilder()
                 .region(region)
                 .regionalProcessingCenter(rpc)
-                .isScottishCase(isScottishCase)
                 .build();
     }
 
@@ -48,7 +44,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         String benefitCode = isDraft ? null : generateBenefitCode(appeal.getBenefitType().getCode());
         String issueCode = isDraft ? null : generateIssueCode();
         String caseCode = isDraft ? null : generateCaseCode(benefitCode, issueCode);
-        String isScottish = isDraft ? null : "No";
 
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         return SscsCaseData.builder()
@@ -64,7 +59,6 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         appeal.getMrnDetails().getDwpIssuingOffice()))
                 .pcqId(syaCaseWrapper.getPcqId())
                 .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
-                .isScottishCase(isScottish)
                 .translationWorkOutstanding(booleanToYesNull(!sscsDocuments.isEmpty()
                         && syaCaseWrapper.getLanguagePreferenceWelsh() != null
                         && syaCaseWrapper.getLanguagePreferenceWelsh()))
