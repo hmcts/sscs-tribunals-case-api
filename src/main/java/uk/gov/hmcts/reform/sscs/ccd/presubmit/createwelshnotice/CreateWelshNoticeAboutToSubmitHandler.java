@@ -51,6 +51,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
     private WelshFooterService welshFooterService;
     private static Map<String, String> nextEventMap = new HashMap<>();
+
     static {
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
