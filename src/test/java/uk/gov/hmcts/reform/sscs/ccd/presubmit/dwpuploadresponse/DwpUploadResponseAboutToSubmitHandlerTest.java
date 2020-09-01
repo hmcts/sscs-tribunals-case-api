@@ -44,7 +44,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode("002")
-            .dwpUploadResponseDynamicBenefitType(new DynamicList(new DynamicListItem("uc", "UC"), Arrays.asList(new DynamicListItem("uc", "UC"))))
+            .dynamicBenefitType(new DynamicList(new DynamicListItem("uc", "UC"), Arrays.asList(new DynamicListItem("uc", "UC"))))
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
             .appeal(Appeal.builder().build())
@@ -87,7 +87,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         }
         // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
         // submission was unsuccessful
-        assertNotNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNotNull(response.getData().getDynamicBenefitType());
 
     }
 
@@ -104,7 +104,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
         // submission was unsuccessful
-        assertNotNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNotNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -118,7 +118,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
         // submission was unsuccessful
-        assertNotNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNotNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(0, response.getErrors().size());
 
         // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
-        assertNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -146,7 +146,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
         // submission was unsuccessful
-        assertNotNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNotNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -194,7 +194,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()));
 
         // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
-        assertNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNull(response.getData().getDynamicBenefitType());
 
     }
 
@@ -213,7 +213,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("001US", response.getData().getCaseCode());
 
         // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
-        assertNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNull(response.getData().getDynamicBenefitType());
 
     }
 
@@ -232,6 +232,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("001UM", response.getData().getCaseCode());
 
         // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
-        assertNull(response.getData().getDwpUploadResponseDynamicBenefitType());
+        assertNull(response.getData().getDynamicBenefitType());
     }
 }

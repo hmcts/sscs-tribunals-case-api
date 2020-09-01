@@ -62,16 +62,16 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("PIP").build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
-        assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
+        assertNotNull(sscsCaseData.getDynamicBenefitType());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getValue());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getListItems());
+        assertEquals(1, sscsCaseData.getDynamicBenefitType().getListItems().size());
 
-        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("pip", sscsCaseData.getDynamicBenefitType().getValue().getCode());
+        assertEquals("pip", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("PIP", sscsCaseData.getDynamicBenefitType().getValue().getLabel());
+        assertEquals("PIP", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -81,16 +81,16 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("pip").build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
-        assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
+        assertNotNull(sscsCaseData.getDynamicBenefitType());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getValue());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getListItems());
+        assertEquals(1, sscsCaseData.getDynamicBenefitType().getListItems().size());
 
-        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertEquals("pip", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("pip", sscsCaseData.getDynamicBenefitType().getValue().getCode());
+        assertEquals("pip", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertEquals("PIP", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("PIP", sscsCaseData.getDynamicBenefitType().getValue().getLabel());
+        assertEquals("PIP", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -100,16 +100,16 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("ESA").build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
-        assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
+        assertNotNull(sscsCaseData.getDynamicBenefitType());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getValue());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getListItems());
+        assertEquals(1, sscsCaseData.getDynamicBenefitType().getListItems().size());
 
-        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("esa", sscsCaseData.getDynamicBenefitType().getValue().getCode());
+        assertEquals("esa", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("ESA", sscsCaseData.getDynamicBenefitType().getValue().getLabel());
+        assertEquals("ESA", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -119,16 +119,16 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("esa").build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
-        assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
+        assertNotNull(sscsCaseData.getDynamicBenefitType());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getValue());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getListItems());
+        assertEquals(1, sscsCaseData.getDynamicBenefitType().getListItems().size());
 
-        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertEquals("esa", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("esa", sscsCaseData.getDynamicBenefitType().getValue().getCode());
+        assertEquals("esa", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertEquals("ESA", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("ESA", sscsCaseData.getDynamicBenefitType().getValue().getLabel());
+        assertEquals("ESA", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -138,16 +138,16 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("UC").build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
-        assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
+        assertNotNull(sscsCaseData.getDynamicBenefitType());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getValue());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getListItems());
+        assertEquals(1, sscsCaseData.getDynamicBenefitType().getListItems().size());
 
-        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("uc", sscsCaseData.getDynamicBenefitType().getValue().getCode());
+        assertEquals("uc", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("UC", sscsCaseData.getDynamicBenefitType().getValue().getLabel());
+        assertEquals("UC", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -157,16 +157,16 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue());
-        assertNotNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems());
-        assertEquals(1, sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().size());
+        assertNotNull(sscsCaseData.getDynamicBenefitType());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getValue());
+        assertNotNull(sscsCaseData.getDynamicBenefitType().getListItems());
+        assertEquals(1, sscsCaseData.getDynamicBenefitType().getListItems().size());
 
-        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getCode());
-        assertEquals("uc", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getCode());
+        assertEquals("uc", sscsCaseData.getDynamicBenefitType().getValue().getCode());
+        assertEquals("uc", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getCode());
 
-        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getValue().getLabel());
-        assertEquals("UC", sscsCaseData.getDwpUploadResponseDynamicBenefitType().getListItems().get(0).getLabel());
+        assertEquals("UC", sscsCaseData.getDynamicBenefitType().getValue().getLabel());
+        assertEquals("UC", sscsCaseData.getDynamicBenefitType().getListItems().get(0).getLabel());
 
     }
 
@@ -176,7 +176,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("unknown").build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
+        assertNull(sscsCaseData.getDynamicBenefitType());
     }
 
     @Test
@@ -185,20 +185,20 @@ public class DwpUploadResponseAboutToStartHandlerTest {
         sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().build());
 
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
+        assertNull(sscsCaseData.getDynamicBenefitType());
     }
 
     @Test
     public void givenCaseHasNoBenefitType_thenDoNotPopulateDwpUploadResponseDynamicBenefitType() {
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
+        assertNull(sscsCaseData.getDynamicBenefitType());
     }
 
     @Test
     public void givenCaseHasNoAppeal_thenDoNotPopulateDwpUploadResponseDynamicBenefitType() {
         sscsCaseData.setAppeal(null);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-        assertNull(sscsCaseData.getDwpUploadResponseDynamicBenefitType());
+        assertNull(sscsCaseData.getDynamicBenefitType());
     }
 
     @Test
