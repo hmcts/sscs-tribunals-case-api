@@ -95,7 +95,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
         // Ensure that we always clear the dwpUploadResponseDynamicBenefitType as this is a temporary
         // workaround field that we may wish to remove in future.
-        sscsCaseData.setDwpUploadResponseDynamicBenefitType(null);
+        sscsCaseData.setDynamicBenefitType(null);
     }
     
     private void setUcCaseCode(SscsCaseData sscsCaseData) {

@@ -51,7 +51,7 @@ public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHa
             }
         }
         if (!listOptions.isEmpty()) {
-            sscsCaseData.setDwpUploadResponseDynamicBenefitType(new DynamicList(listOptions.get(0), listOptions));
+            sscsCaseData.setDynamicBenefitType(new DynamicList(listOptions.get(0), listOptions));
         }
     }
 
