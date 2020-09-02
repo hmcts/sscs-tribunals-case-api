@@ -183,7 +183,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()));
 
-        // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
         assertNull(response.getData().getDynamicBenefitType());
 
     }
@@ -202,7 +201,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001US", response.getData().getCaseCode());
 
-        // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
         assertNull(response.getData().getDynamicBenefitType());
 
     }
