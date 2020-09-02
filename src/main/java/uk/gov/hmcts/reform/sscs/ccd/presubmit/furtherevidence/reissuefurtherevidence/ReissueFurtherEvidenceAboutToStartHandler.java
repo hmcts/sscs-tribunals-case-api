@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,13 +39,17 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        ArrayList<SscsDocument> availableDocumentsToReIssue =
-                Optional.ofNullable(sscsCaseData.getSscsDocument()).map(Collection::stream)
+
+        List<? extends AbstractDocument> allSscsDocs = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
+
+        ArrayList<? extends AbstractDocument> availableDocumentsToReIssue =
+                Optional.ofNullable(allSscsDocs).map(Collection::stream)
                         .orElse(Stream.empty()).filter(f ->
                         APPELLANT_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
                                 || REPRESENTATIVE_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
                                 || DWP_EVIDENCE.getValue().equals(f.getValue().getDocumentType())
         ).collect(Collectors.toCollection(ArrayList::new));
+
 
         if (CollectionUtils.isNotEmpty(availableDocumentsToReIssue)) {
             setDocumentDropdown(sscsCaseData, availableDocumentsToReIssue);
@@ -61,16 +66,21 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         return response;
     }
 
-    private void setDocumentDropdown(SscsCaseData sscsCaseData, List<SscsDocument> availableDocumentsToReIssue) {
+    private void setDocumentDropdown(SscsCaseData sscsCaseData, List<? extends AbstractDocument> availableDocumentsToReIssue) {
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
-        for (SscsDocument doc: availableDocumentsToReIssue) {
-            String label = String.format("%s -  %s", doc.getValue().getDocumentFileName(), userFriendlyName(doc.getValue().getDocumentType()));
+        for (AbstractDocument doc: availableDocumentsToReIssue) {
+            String label = buildFormattedLabel(doc);
             if (doc.getValue().getDocumentLink() != null) {
                 listCostOptions.add(new DynamicListItem(doc.getValue().getDocumentLink().getDocumentUrl(), label));
             }
         }
 
         sscsCaseData.setReissueFurtherEvidenceDocument(new DynamicList(listCostOptions.get(0), listCostOptions));
+    }
+
+    private String buildFormattedLabel(AbstractDocument doc) {
+        String filenameLabel = doc instanceof  SscsWelshDocument ? "Bilingual - " +  doc.getValue().getDocumentFileName() : doc.getValue().getDocumentFileName();
+        return String.format("%s -  %s", filenameLabel, userFriendlyName(doc.getValue().getDocumentType()));
     }
 }

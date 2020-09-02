@@ -2,14 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.reissuefurtherevi
 
 import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.DWP;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.REPRESENTATIVE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -50,7 +46,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
         ArrayList<String> errors = new ArrayList<>();
 
         boolean caseHasARepresentative = StringUtils.equalsIgnoreCase("YES", Optional.ofNullable(sscsCaseData.getAppeal().getRep()).map(Representative::getHasRepresentative).orElse("No"));
-        boolean somewhereToResend = sscsCaseData.isResendToAppellant() ||  (sscsCaseData.isResendToRepresentative() && caseHasARepresentative);
+        boolean somewhereToResend = sscsCaseData.isResendToAppellant() || (sscsCaseData.isResendToRepresentative() && caseHasARepresentative);
 
         if (!somewhereToResend) {
             errors.add("Select a party to reissue the further evidence.");
@@ -62,11 +58,11 @@ public class ReissueFurtherEvidenceAboutToSubmitHandler implements PreSubmitCall
             errors.add("Cannot re-issue to the representative as there is no representative on the appeal.");
         }
         if (errors.isEmpty() && selectedDocumentUrl.isPresent()) {
-            Optional<SscsDocument> optionalSelectedDocument = sscsCaseData.getSscsDocument().stream().filter(f -> selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl())).findFirst();
+            Optional<? extends AbstractDocument> optionalSelectedDocument  = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(f -> selectedDocumentUrl.get().equals(f.getValue().getDocumentLink().getDocumentUrl())).findFirst();
             if (!optionalSelectedDocument.isPresent()) {
                 errors.add(String.format("Could not find the selected document with url '%s' to re-issue further evidence in the appeal with id '%s'.", selectedDocumentUrl.get(), sscsCaseData.getCcdCaseId()));
             } else {
-                SscsDocumentDetails documentDetails = optionalSelectedDocument.get().getValue();
+                AbstractDocumentDetails documentDetails = optionalSelectedDocument.get().getValue();
                 documentDetails.setEvidenceIssued("No");
                 String documentType = originalSenderToDocumentType.get(
                         Optional.ofNullable(sscsCaseData.getOriginalSender())

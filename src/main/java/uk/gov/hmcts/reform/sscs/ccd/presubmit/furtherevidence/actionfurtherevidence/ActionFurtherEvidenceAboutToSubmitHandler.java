@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -47,10 +47,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
     private final FooterService footerService;
+    private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
 
     @Autowired
-    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService) {
+    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService, BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder) {
         this.footerService = footerService;
+        this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
     }
 
     @Override
@@ -230,7 +232,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             url = footerService.addFooter(url, documentFooterText, bundleAddition);
         }
 
-        String fileName = buildAdditionFileName(documentType, bundleAddition, scannedDocument.getValue().getScannedDate());
+        String fileName = bundleAdditionFilenameBuilder.build(documentType, bundleAddition, scannedDocument.getValue().getScannedDate());
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
                 .documentType(documentType.getValue())
@@ -242,18 +244,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .evidenceIssued("No")
                 .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
                 .build()).build();
-    }
-
-    private String buildAdditionFileName(DocumentType documentType, String bundleAddition, String scannedDate) {
-        String bundleText = "";
-        if (bundleAddition != null) {
-            bundleText = "Addition " + bundleAddition + " - ";
-        }
-        scannedDate = scannedDate != null ? LocalDateTime.parse(scannedDate).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-        String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-
-        return bundleText + label + " received on " + scannedDate;
     }
 
     private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {
