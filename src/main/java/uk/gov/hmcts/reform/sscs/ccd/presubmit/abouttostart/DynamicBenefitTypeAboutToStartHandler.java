@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart;
 
 import static java.util.Objects.requireNonNull;
 
@@ -17,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
-public class DwpUploadResponseAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class DynamicBenefitTypeAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {

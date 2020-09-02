@@ -85,10 +85,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Benefit code cannot be empty", error);
         }
-        // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
-        // submission was unsuccessful
         assertNotNull(response.getData().getDynamicBenefitType());
-
     }
 
     @Test
@@ -102,8 +99,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             assertEquals("Issue code cannot be empty", error);
         }
 
-        // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
-        // submission was unsuccessful
         assertNotNull(response.getData().getDynamicBenefitType());
     }
 
@@ -116,8 +111,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals("Further information to assist the tribunal cannot be empty.", response.getErrors().iterator().next());
 
-        // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
-        // submission was unsuccessful
         assertNotNull(response.getData().getDynamicBenefitType());
     }
 
@@ -129,7 +122,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertEquals(0, response.getErrors().size());
 
-        // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
         assertNull(response.getData().getDynamicBenefitType());
     }
 
@@ -144,8 +136,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             assertEquals("Issue code cannot be set to the default value of DD", error);
         }
 
-        // Ensure that we have not cleared the dwpUploadResponseDynamicBenefitType as
-        // submission was unsuccessful
         assertNotNull(response.getData().getDynamicBenefitType());
     }
 
@@ -231,7 +221,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
 
-        // Ensure that we have cleared the dwpUploadResponseDynamicBenefitType
         assertNull(response.getData().getDynamicBenefitType());
     }
 }

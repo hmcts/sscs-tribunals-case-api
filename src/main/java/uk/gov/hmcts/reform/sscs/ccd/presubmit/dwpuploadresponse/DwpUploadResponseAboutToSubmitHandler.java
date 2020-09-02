@@ -93,7 +93,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
-        // Ensure that we always clear the dwpUploadResponseDynamicBenefitType as this is a temporary
+        // Ensure that we always clear the dynamicBenefitType as this is a temporary
         // workaround field that we may wish to remove in future.
         sscsCaseData.setDynamicBenefitType(null);
     }

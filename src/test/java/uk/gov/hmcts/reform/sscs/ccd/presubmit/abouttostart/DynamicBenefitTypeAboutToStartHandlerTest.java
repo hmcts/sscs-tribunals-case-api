@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,12 +22,13 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.abouttostart.DynamicBenefitTypeAboutToStartHandler;
 
 @RunWith(JUnitParamsRunner.class)
-public class DwpUploadResponseAboutToStartHandlerTest {
+public class DynamicBenefitTypeAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private DwpUploadResponseAboutToStartHandler handler;
+    private DynamicBenefitTypeAboutToStartHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -40,7 +41,7 @@ public class DwpUploadResponseAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new DwpUploadResponseAboutToStartHandler();
+        handler = new DynamicBenefitTypeAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
