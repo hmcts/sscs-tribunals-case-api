@@ -1,7 +1,4 @@
 {
- 
-}
-{
   "10023_Information Disclosure - Debug Error Messages_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/api/citizen/tya_POST" : "ignore",
   "10023_Information Disclosure - Debug Error Messages_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/ccdMidEventPreviewAdjournCase_POST" : "ignore",
   "10023_Information Disclosure - Debug Error Messages_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/statement_POST" : "ignore",
