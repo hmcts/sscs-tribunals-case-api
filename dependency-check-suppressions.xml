@@ -15,7 +15,7 @@
         <packageUrl regex="true">^pkg:maven/edu\.usc\.ir/sentiment-analysis-parser@0.*$</packageUrl>
         <cve>CVE-2018-18749</cve>
     </suppress>
-    <suppress until="2020-09-31">
+    <suppress until="2020-09-30">
         <notes><![CDATA[
          file name: kotlin-stdlib-common-1.3.72.jar
         ]]></notes>
