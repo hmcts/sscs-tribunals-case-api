@@ -15,8 +15,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
 
 @Service
@@ -74,7 +74,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
 
             if (DocumentType.APPELLANT_EVIDENCE.getValue().equals(previewDocumentType)) {
                 Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByTypeAndName(DocumentType.APPELLANT_EVIDENCE, sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
-                sscsDocumentByTypeAndName.ifPresent( sscsDocument -> {
+                sscsDocumentByTypeAndName.ifPresent(sscsDocument -> {
                     if (StringUtils.isNotEmpty(sscsDocument.getValue().getBundleAddition())) {
                         setBundleAdditionDetails(caseData, sscsWelshPreviewDocument);
                     }

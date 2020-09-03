@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 @Component
 public class BundleAdditionFilenameBuilder {
 
-    public  String build(DocumentType documentType, String bundleAddition, String scannedDate) {
+    public String build(DocumentType documentType, String bundleAddition, String scannedDate) {
         String bundleText = "";
         if (bundleAddition != null) {
             bundleText = "Addition " + bundleAddition + " - ";
