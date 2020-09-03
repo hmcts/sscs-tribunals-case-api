@@ -42,8 +42,11 @@ public class DocumentDownloadService {
                 USER_ID,
                 getDownloadUrl(urlString)
             );
-            if (response != null && (response.getStatusCode() == HttpStatus.OK) && response.getBody() != null) {
-                return response.getBody().contentLength();
+            if (response != null && response.getStatusCode() == HttpStatus.OK) {
+                Resource responseBody = response.getBody();
+                if (responseBody != null) {
+                    return responseBody.contentLength();
+                }
             }
         } catch (Exception e) {
             log.info("Error when downloading the following Binary file from the Document Management: {} ", urlString, e);
