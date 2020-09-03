@@ -42,7 +42,6 @@ public class DocumentDownloadService {
                 USER_ID,
                 getDownloadUrl(urlString)
             );
-            
             if (response != null && (response.getStatusCode() == HttpStatus.OK) && response.getBody() != null) {
                 return response.getBody().contentLength();
             }
