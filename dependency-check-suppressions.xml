@@ -22,4 +22,11 @@
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib@.*$</packageUrl>
         <cpe>cpe:/a:jetbrains:kotlin</cpe>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: kotlin-stdlib-common-1.4.0.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib\-common@.*$</packageUrl>
+        <cpe>cpe:/a:jetbrains:kotlin</cpe>
+    </suppress>
 </suppressions>
