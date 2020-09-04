@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.LanguageService;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
-import uk.gov.hmcts.reform.sscs.util.StringUtils;
+import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Component
 @Slf4j
