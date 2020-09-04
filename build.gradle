@@ -282,7 +282,6 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.9'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
-    testCompile group: 'org.apache.sling', name: 'org.apache.sling.javax.activation', version: '0.2.0'
 
     compile 'org.projectlombok:lombok:1.18.12'
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
