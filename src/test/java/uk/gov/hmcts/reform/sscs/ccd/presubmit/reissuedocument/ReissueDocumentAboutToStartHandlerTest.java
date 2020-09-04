@@ -80,29 +80,9 @@ public class ReissueDocumentAboutToStartHandlerTest {
 
         List<SscsDocument> sscsDocuments = asList(document1, document2, document3, document4, document5);
 
-        SscsWelshDocument documentWelsh1 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
-                .documentFileName("file5.pdf")
-                .documentType(null)
-                .documentLink(DocumentLink.builder().documentUrl("url5").build())
-                .build()).build();
-
-        SscsWelshDocument documentWelsh2 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
-                .documentFileName("file1.pdf")
-                .documentType(DECISION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl("url1").build())
-                .build()).build();
-
-        SscsWelshDocument documentWelsh3 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
-                .documentFileName("file1.pdf")
-                .documentType(DIRECTION_NOTICE.getValue())
-                .documentLink(DocumentLink.builder().documentUrl("url1").build())
-                .build()).build();
-
-        List<SscsWelshDocument> sscsWelshDocuments = asList(documentWelsh1, documentWelsh2, documentWelsh3);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
-                .sscsWelshDocuments(sscsWelshDocuments)
                 .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -145,6 +125,29 @@ public class ReissueDocumentAboutToStartHandlerTest {
 
     @Test
     public void populateDocumentDropdownWithWelshDocumentTypesAvailableToReissue() {
+
+        SscsWelshDocument documentWelsh1 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("file5.pdf")
+                .documentType(null)
+                .documentLink(DocumentLink.builder().documentUrl("url5").build())
+                .build()).build();
+
+        SscsWelshDocument documentWelsh2 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("file1.pdf")
+                .documentType(DECISION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
+
+        SscsWelshDocument documentWelsh3 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("file1.pdf")
+                .documentType(DIRECTION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
+
+        List<SscsWelshDocument> sscsWelshDocuments = asList(documentWelsh1, documentWelsh2, documentWelsh3);
+
+        sscsCaseData.setSscsWelshDocuments(sscsWelshDocuments);
+
         sscsCaseData.setLanguagePreferenceWelsh("Yes");
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
