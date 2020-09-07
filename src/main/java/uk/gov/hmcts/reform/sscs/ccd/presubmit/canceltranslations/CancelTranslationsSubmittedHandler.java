@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -35,20 +36,21 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent().equals(EventType.CANCEL_TRANSLATIONS)
+            && !callback.getCaseDetails().getCaseData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
             && StringUtils.isNotEmpty(callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent());
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-        String sscsWelshPreviewNextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
-        callback.getCaseDetails().getCaseData().setSscsWelshPreviewNextEvent(null);
-        SscsCaseDetails
-            sscsCaseDetails = ccdService
-            .updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
-                sscsWelshPreviewNextEvent, "Cancel welsh translations", "Cancel welsh translations",
-                idamService.getIdamTokens());
+            String sscsWelshPreviewNextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
+            callback.getCaseDetails().getCaseData().setSscsWelshPreviewNextEvent(null);
+            SscsCaseDetails
+                    sscsCaseDetails = ccdService
+                    .updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
+                            sscsWelshPreviewNextEvent, "Cancel welsh translations", "Cancel welsh translations",
+                            idamService.getIdamTokens());
 
-        return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
+            return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
     }
 }

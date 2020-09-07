@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -44,8 +45,13 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        setWelshNextEvent(caseData);
-
+        if(!caseData.getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+            setWelshNextEvent(caseData);
+        }
+        else{
+            caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+            caseData.setWelshInterlocNextReviewState(null);
+        }
         clearTranslationRequiredDocumentStatuses(caseData);
 
         caseData.updateTranslationWorkOutstandingFlag();

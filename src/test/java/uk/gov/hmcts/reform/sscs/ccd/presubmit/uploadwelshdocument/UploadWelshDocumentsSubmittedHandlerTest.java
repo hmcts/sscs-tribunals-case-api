@@ -93,17 +93,27 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
         Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType());
         return new Object[] {new Object[] {SUBMITTED, buildCallback("sendToDwp"), true},
             new Object[] {ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType()), false},
-            new Object[] {SUBMITTED, buildCallback(null), false}
+            new Object[] {SUBMITTED, buildCallback(null), false},
+                new Object[] {SUBMITTED, buildCallbackInterlocReviewState(), false}
         };
     }
 
     private Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
+                .state(State.VALID_APPEAL)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), UPLOAD_WELSH_DOCUMENT, false);
     }
 
+    private Callback<SscsCaseData> buildCallbackInterlocReviewState() {
+        SscsCaseData sscsCaseData = SscsCaseData.builder()
+                .state(State.INTERLOCUTORY_REVIEW_STATE)
+                .build();
+        CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
+                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+        return new Callback<>(caseDetails, Optional.empty(), UPLOAD_WELSH_DOCUMENT, false);
+    }
 }

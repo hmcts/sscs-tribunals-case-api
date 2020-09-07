@@ -71,16 +71,19 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         //clear the Preview collection
         caseData.setSscsWelshPreviewDocuments(new ArrayList<>());
         caseData.updateTranslationWorkOutstandingFlag();
-        String nextEvent = getNextEvent(caseData, previewDocumentType);
-        log.info("Setting next event to {}", nextEvent);
-        caseData.setSscsWelshPreviewNextEvent(nextEvent);
+        if(!caseData.getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+            String nextEvent = getNextEvent(caseData, previewDocumentType);
+            log.info("Setting next event to {}", nextEvent);
+            caseData.setSscsWelshPreviewNextEvent(nextEvent);
+        }
+        else{
+            caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+            caseData.setWelshInterlocNextReviewState(null);
+        }
         return;
     }
 
     private String getNextEvent(SscsCaseData caseData, String documentType) {
-        if(caseData.getState().equals(State.INTERLOCUTORY_REVIEW_STATE)){
-            return caseData.getWelshInterlocPrevalidNextEvent();
-        }
         return nextEventMap.get(documentType);
     }
 }

@@ -89,19 +89,21 @@ public class CancelTranslationsSubmittedHandlerTest {
     }
 
     private Object[] generateCanHandleScenarios() {
-        Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType());
-        return new Object[] {new Object[] {SUBMITTED, buildCallback("sendToDwp"), true},
-            new Object[] {ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType()), false},
-            new Object[] {SUBMITTED, buildCallback(null), false}
+        Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType(), State.VALID_APPEAL);
+        return new Object[] {new Object[] {SUBMITTED, buildCallback("sendToDwp", State.VALID_APPEAL), true},
+            new Object[] {ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType(), State.VALID_APPEAL), false},
+            new Object[] {SUBMITTED, buildCallback(null, State.VALID_APPEAL), false},
+                new Object[] {SUBMITTED, buildCallback(null, State.INTERLOCUTORY_REVIEW_STATE), false}
         };
     }
 
-    private Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent) {
+    private Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent, State state) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
+                .state(state)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
+                state, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), CANCEL_TRANSLATIONS, false);
     }
 

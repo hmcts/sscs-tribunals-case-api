@@ -60,7 +60,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         MockitoAnnotations.openMocks(this);
         handler = new UploadWelshDocumentsAboutToSubmitHandler();
         when(callback.getEvent()).thenReturn(EventType.UPLOAD_WELSH_DOCUMENT);
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build()).build();
+        sscsCaseData = SscsCaseData.builder().state(State.VALID_APPEAL).appeal(Appeal.builder().build()).build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -79,6 +79,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()));
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNotNull(caseData.getOriginalDocuments());
@@ -98,6 +99,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(true), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()));
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNotNull(caseData.getOriginalDocuments());
@@ -119,6 +121,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DIRECTION_NOTICE.getValue())), buildSscsWelshDocuments(DocumentType.DIRECTION_NOTICE.getValue()));
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -131,6 +134,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.DECISION_NOTICE.getValue())), buildSscsWelshDocuments(DocumentType.DECISION_NOTICE.getValue()));
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -143,10 +147,26 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue())), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()));
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(caseData.getSscsWelshPreviewNextEvent());
+    }
+
+    @Test
+    public void givenInterlocReviewStateshouldNotSetReviewState() {
+
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("filename", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue())), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()));
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
+        caseData.setWelshInterlocNextReviewState("reviewByTcw");
+
+        handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("reviewByTcw", caseData.getInterlocReviewState());
+        assertNull( caseData.getSscsWelshPreviewNextEvent());
     }
 
     private Object[] generateCanHandleScenarios() {

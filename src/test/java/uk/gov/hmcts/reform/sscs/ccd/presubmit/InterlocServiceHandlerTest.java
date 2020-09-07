@@ -130,6 +130,27 @@ public class InterlocServiceHandlerTest {
         assertNull(response.getData().getDirectionDueDate());
     }
 
+    @Test
+    @Parameters({
+            "NON_COMPLIANT, reviewByTcw",
+            "NON_COMPLIANT_SEND_TO_INTERLOC, reviewByTcw",
+            "REINSTATE_APPEAL, awaitingAdminAction"
+    })
+    public void givenWelshCaseEvent_thenSetInterlocReviewStateAndSetInterlocReferralDateToExpectedAndClearDirectionDueDate(
+            EventType eventType,
+            String expectedInterlocReviewState) {
+
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        when(callback.getEvent()).thenReturn(eventType);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
+        assertThat(response.getData().getSscsWelshPreviewNextEvent(), is(expectedInterlocReviewState));
+        assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
+        assertNull(response.getData().getDirectionDueDate());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void throwExceptionIfCannotHandleEventType() {
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
