@@ -1,10 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +12,6 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -37,14 +33,9 @@ public class IssueDocumentHandler {
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
 
-        if (caseData.getDirectionTypeDl() != null && !DirectionType
-                .APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
-                || !State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
-            caseData.setDirectionTypeDl(null);
-        }
     }
 
-    protected  void clearBasicTransientFields(SscsCaseData caseData) {
+    protected void clearBasicTransientFields(SscsCaseData caseData) {
         caseData.setBodyContent(null);
         caseData.setPreviewDocument(null);
         caseData.setGenerateNotice(null);
@@ -56,17 +47,17 @@ public class IssueDocumentHandler {
 
     protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
-            .appellantFullName(buildFullName(caseData))
-            .appointeeFullName(buildAppointeeName(caseData).orElse(null))
-            .caseId(caseData.getCcdCaseId())
-            .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
-            .noticeBody(caseData.getBodyContent())
-            .userName(caseData.getSignedBy())
-            .noticeType(documentTypeLabel.toUpperCase())
-            .userRole(caseData.getSignedRole())
-            .dateAdded(dateAdded)
-            .generatedDate(generatedDate)
-            .build();
+                .appellantFullName(buildFullName(caseData))
+                .appointeeFullName(buildAppointeeName(caseData).orElse(null))
+                .caseId(caseData.getCcdCaseId())
+                .nino(caseData.getAppeal().getAppellant().getIdentity().getNino())
+                .noticeBody(caseData.getBodyContent())
+                .userName(caseData.getSignedBy())
+                .noticeType(documentTypeLabel.toUpperCase())
+                .userRole(caseData.getSignedRole())
+                .dateAdded(dateAdded)
+                .generatedDate(generatedDate)
+                .build();
 
         if (isScottish) {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
