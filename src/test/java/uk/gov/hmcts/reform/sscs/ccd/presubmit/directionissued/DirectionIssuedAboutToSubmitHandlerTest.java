@@ -210,7 +210,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_INFORMATION.getId(), response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionTypeDl());
     }
 
     @Test
