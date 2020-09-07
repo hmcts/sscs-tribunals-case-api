@@ -23,14 +23,17 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
     private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
+    private String bundleWelshConfig;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
     public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                           @Value("${bundle.url}") String bundleUrl) {
+                                           @Value("${bundle.url}") String bundleUrl,
+                                           @Value("${bundle.welsh.config}") String bundleWelshConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
+        this.bundleWelshConfig = bundleWelshConfig;
     }
 
     @Override
@@ -65,13 +68,15 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
             if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
                 sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
             }
-
             if (sscsCaseData.getSscsDocument() != null) {
                 for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
                     if (sscsDocument.getValue() != null && sscsDocument.getValue().getDocumentFileName() == null) {
                         sscsDocument.getValue().setDocumentFileName(sscsDocument.getValue().getDocumentLink().getDocumentFilename());
                     }
                 }
+            }
+            if(sscsCaseData.isLanguagePreferenceWelsh()){
+                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
             }
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
         }

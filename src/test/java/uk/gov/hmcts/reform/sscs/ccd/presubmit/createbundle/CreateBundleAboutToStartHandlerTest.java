@@ -12,6 +12,7 @@ import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_
 import java.util.ArrayList;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,7 @@ public class CreateBundleAboutToStartHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new CreateBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com");
+        handler = new CreateBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com", "bundleWelshConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_BUNDLE);
 
@@ -80,6 +81,23 @@ public class CreateBundleAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX, response.getData().getDwpEvidenceBundleDocument().getDocumentFileName());
+    }
+
+    @Test
+    @Parameters({"Yes, bundleWelshConfig"," No, null"})
+    public void givenWelsh_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
+        caseData.setDwpResponseDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().documentFilename("Testing").build()).build());
+        caseData.setLanguagePreferenceWelsh(languagePreference);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        if(caseData.isLanguagePreferenceWelsh()) {
+            assertEquals(configFile, response.getData().getBundleConfiguration());
+        }
+        else{
+            assertNull(configFile, response.getData().getBundleConfiguration());
+        }
     }
 
     @Test
