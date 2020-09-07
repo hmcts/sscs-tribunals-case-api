@@ -15,6 +15,7 @@ import uk.gov.hmcts.reform.docassembly.domain.FormPayload;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -36,7 +37,8 @@ public class IssueDocumentHandler {
         caseData.setSignedBy(null);
         caseData.setSignedRole(null);
 
-        if (caseData.getDirectionTypeDl() != null && !DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+        if (caseData.getDirectionTypeDl() != null && !DirectionType
+                .APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 || !State.INTERLOCUTORY_REVIEW_STATE.equals(beforeState)) {
             caseData.setDirectionTypeDl(null);
         }
