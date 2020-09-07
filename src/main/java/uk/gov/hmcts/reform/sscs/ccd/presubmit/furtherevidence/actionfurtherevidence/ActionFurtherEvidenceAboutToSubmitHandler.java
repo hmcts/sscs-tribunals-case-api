@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -38,9 +39,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
     private final FooterService footerService;
 
+    private boolean reinstatementFeatureFlag;
+
     @Autowired
-    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService) {
+    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService, @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement) {
         this.footerService = footerService;
+        this.reinstatementFeatureFlag = reinstatement;
     }
 
     @Override
@@ -163,17 +167,21 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (documents.size() > 0) {
                         sscsCaseData.setSscsDocument(documents);
                     }
-                    boolean otherDocumentTypeActionManually = isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction());
-                    if (otherDocumentTypeActionManually && hasReinstatementRequestDocument) {
-                        sscsCaseData.setReinstatementRegistered(LocalDate.now());
-                        sscsCaseData.setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
-                        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
-                        State previousState = sscsCaseData.getPreviousState();
-                        if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
-                            log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
-                            sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+
+                    if (reinstatementFeatureFlag) {
+                        boolean otherDocumentTypeActionManually = isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction());
+                        if (otherDocumentTypeActionManually && hasReinstatementRequestDocument) {
+                            sscsCaseData.setReinstatementRegistered(LocalDate.now());
+                            sscsCaseData.setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+                            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+                            State previousState = sscsCaseData.getPreviousState();
+                            if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
+                                log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
+                                sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+                            }
                         }
                     }
+
                     sscsCaseData.setEvidenceHandled("Yes");
                 } else {
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
@@ -252,8 +260,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private DocumentType getDocumentType(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
-        return (REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) ? REINSTATEMENT_REQUEST
-                : getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
+        return (REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) && reinstatementFeatureFlag
+                ? REINSTATEMENT_REQUEST : getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
                         sscsCaseData.getOriginalSender().getValue().getCode());
     }
 
