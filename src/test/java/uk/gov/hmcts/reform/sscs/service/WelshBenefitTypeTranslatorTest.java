@@ -22,11 +22,12 @@ public class WelshBenefitTypeTranslatorTest {
     }
 
     @Test
-    @Parameters({"PIP, welshPipTranslation", "UC, welshUcTranslation", "ESA, welshEsaTranslation"})
-    public void shouldTranslateBenefitType(String benefitTypeCode, String translation) {
+    @Parameters({"PIP, desc, welshPipTranslation", "UC, description, welshUcTranslation", "ESA, description, welshEsaTranslation", "BB, description, description (BB)"})
+    public void shouldTranslateBenefitType(String benefitTypeCode,String benefitDescription, String translation) {
 
         BenefitType benefitType = BenefitType.builder()
                 .code(benefitTypeCode)
+                .description(benefitDescription)
                 .build();
 
         SscsCaseData caseData = buildCaseData();
@@ -35,6 +36,7 @@ public class WelshBenefitTypeTranslatorTest {
 
         assertEquals(translation, result);
     }
+
 
 
 }
