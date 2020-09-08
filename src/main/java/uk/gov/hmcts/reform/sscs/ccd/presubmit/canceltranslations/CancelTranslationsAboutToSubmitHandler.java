@@ -45,7 +45,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        if(!caseData.getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+        if(!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
             setWelshNextEvent(caseData);
         }
         else{

@@ -58,7 +58,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
             "ABOUT_TO_START,CANCEL_TRANSLATIONS"
     })
     public void givenCanHandleIsCalledWithInvalidCallBack_shouldReturnCorrectFalse(@Nullable CallbackType callbackType, @Nullable EventType eventType) {
-        Callback<SscsCaseData> callback = buildCallback(eventType);
+        Callback<SscsCaseData> callback = buildCallback(eventType, State.VALID_APPEAL);
         boolean actualResult = handler.canHandle(callbackType, callback);
         assertFalse(actualResult);
     }
@@ -79,7 +79,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
 
     @Test
     public void shouldSetTranslationStatusOfDocumentsAndNextWelshEventCorrectly() {
-        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS);
+        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS, State.VALID_APPEAL);
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNull(response.getData().getSscsDocument().get(0).getValue().getDocumentTranslationStatus());
@@ -96,8 +96,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
 
     @Test
     public void shouldSetInterlocReviewStateIfInterlocReview() {
-        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS);
-        callback.getCaseDetails().getCaseData().setState(State.INTERLOCUTORY_REVIEW_STATE);
+        Callback<SscsCaseData> callback = buildCallback(CANCEL_TRANSLATIONS, State.INTERLOCUTORY_REVIEW_STATE);
         callback.getCaseDetails().getCaseData().setWelshInterlocNextReviewState("reviewByTcw");
         PreSubmitCallbackResponse<SscsCaseData> response =
                 handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -113,7 +112,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
         assertEquals("reviewByTcw", response.getData().getInterlocReviewState());
     }
 
-    private Callback<SscsCaseData> buildCallback(EventType eventType) {
+    private Callback<SscsCaseData> buildCallback(EventType eventType, State state) {
 
         SscsDocument ssc0Doc =
                 buildSscsDocument("english.pdf", SscsDocumentTranslationStatus.TRANSLATION_REQUIRED,
@@ -150,7 +149,7 @@ public class CancelTranslationsAboutToSubmitHandlerTest {
                 .languagePreferenceWelsh("Yes")
                 .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
+                state, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 

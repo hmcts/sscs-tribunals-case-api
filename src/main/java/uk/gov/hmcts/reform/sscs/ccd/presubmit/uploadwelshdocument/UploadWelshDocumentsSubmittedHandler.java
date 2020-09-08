@@ -37,7 +37,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
         return callbackType.equals(CallbackType.SUBMITTED)
                 && callback.getEvent().equals(EventType.UPLOAD_WELSH_DOCUMENT)
-                && !callback.getCaseDetails().getCaseData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
+                && !callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
                 && StringUtils.isNotEmpty(callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent());
     }
 

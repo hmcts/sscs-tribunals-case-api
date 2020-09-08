@@ -42,13 +42,14 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
     }
 
     protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
-        log.info("Case({}): Setting interloc review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
-
         if(newSscsCaseData.isLanguagePreferenceWelsh()){
+            log.info("Case({}): Setting Welsh next review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
             newSscsCaseData.setWelshInterlocNextReviewState(newValue);
             newSscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            log.info("Case({}): Set interloc review  field to {}", newSscsCaseData.getCcdCaseId(), newSscsCaseData.getInterlocReviewState());
         }
         else {
+            log.info("Case({}): Setting interloc review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
             newSscsCaseData.setInterlocReviewState(newValue);
         }
 

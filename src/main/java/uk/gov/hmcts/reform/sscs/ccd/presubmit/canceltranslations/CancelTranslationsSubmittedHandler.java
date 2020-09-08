@@ -36,7 +36,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent().equals(EventType.CANCEL_TRANSLATIONS)
-            && !callback.getCaseDetails().getCaseData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
+            && !callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
             && StringUtils.isNotEmpty(callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent());
     }
 
