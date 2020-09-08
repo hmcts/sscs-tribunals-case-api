@@ -72,7 +72,7 @@
           "documentType" : "appellantEvidence",
           "documentFileName" : "11111.pdf",
           "documentDateAdded" : "2018-10-10",
-          "documentTranslationStatus" : "translationRequired",
+          "evidenceIssued": "Yes",
           "documentLink" : {
             "document_url" : "http://www.bbc.com",
             "document_binary_url" : "http://www.bbc.com/binary",
@@ -82,14 +82,28 @@
       },
         {
           "value" : {
-            "documentType" : "sscs1",
+            "documentType" : "representativeEvidence",
             "documentFileName" : "22222.pdf",
             "documentDateAdded" : "2018-10-11",
-            "documentTranslationStatus" : "translationRequired",
+            "evidenceIssued": "Yes",
             "documentLink" : {
               "document_url" : "http://www.itv.com",
               "document_binary_url" : "http://www.itv.com/binary",
               "document_filename" : "myfile2.jpg"
+            }
+          }
+        },
+        {
+          "value" : {
+            "documentType" : "decisionIssued",
+            "documentFileName" : "oldDecisionIssued.pdf",
+            "documentDateAdded" : "2018-10-12",
+            "evidenceIssued": "Yes",
+            "bundleAddition": "A",
+            "documentLink" : {
+              "document_url" : "http://www.itv3.com",
+              "document_binary_url" : "http://www.itv3.com/binary",
+              "document_filename" : "myfile3.jpg"
             }
           }
         }],
@@ -211,9 +225,7 @@
         }
       ],
       "originalSender": {},
-      "furtherEvidenceAction": {},
-      "languagePreferenceWelsh" : "Yes",
-      "translationWorkOutstanding" : "Yes"
+      "furtherEvidenceAction": {}
     },
     "data_classification": {
       "dwpTimeExtension": {
@@ -627,5 +639,5 @@
       }
     }
   },
-  "event_id": "markDocumentsForTranslation"
+  "event_id": "cancelTranslations"
 }

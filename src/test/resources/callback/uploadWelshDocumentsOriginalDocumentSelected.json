@@ -24,6 +24,22 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "originalDocuments": {
+        "value": {
+          "code": "sscs1.pdf",
+          "label": "sscs1.pdf"
+        },
+        "list_items": [
+          {
+            "code": "sscs1.pdf",
+            "label": "sscs1.pdf"
+          },
+          {
+            "code": "appellantEvidence.pdf",
+            "label": "appellantEvidence.pdf"
+          }
+        ]
+      },
       "dwpTimeExtension": [
       ],
       "hearings": [
@@ -72,11 +88,12 @@
           "documentType" : "appellantEvidence",
           "documentFileName" : "11111.pdf",
           "documentDateAdded" : "2018-10-10",
-          "documentTranslationStatus" : "translationRequired",
+          "evidenceIssued": "Yes",
+          "documentTranslationStatus" : "translationRequested",
           "documentLink" : {
             "document_url" : "http://www.bbc.com",
             "document_binary_url" : "http://www.bbc.com/binary",
-            "document_filename" : "myfile1.jpg"
+            "document_filename" : "appellantEvidence.pdf"
           }
         }
       },
@@ -85,11 +102,64 @@
             "documentType" : "sscs1",
             "documentFileName" : "22222.pdf",
             "documentDateAdded" : "2018-10-11",
-            "documentTranslationStatus" : "translationRequired",
+            "evidenceIssued": "Yes",
+            "documentTranslationStatus" : "translationRequested",
             "documentLink" : {
               "document_url" : "http://www.itv.com",
               "document_binary_url" : "http://www.itv.com/binary",
-              "document_filename" : "myfile2.jpg"
+              "document_filename" : "sscs1.pdf"
+            }
+          }
+        }],
+      "sscsWelshDocuments" : [ {
+        "value" : {
+          "documentType" : "appellantEvidence",
+          "documentFileName" : "11111.pdf",
+          "originalDocumentFileName" : "appellantEvidence.pdf",
+          "documentDateAdded" : "2018-10-10",
+          "documentLink" : {
+            "document_url" : "http://www.bbc.com",
+            "document_binary_url" : "http://www.bbc.com/binary",
+            "document_filename" : "appellantEvidence.pdf"
+          }
+        }
+      },
+        {
+          "value" : {
+            "documentType" : "sscs1",
+            "documentFileName" : "22222.pdf",
+            "documentDateAdded" : "2018-10-11",
+            "originalDocumentFileName" : "sscs1.pdf",
+            "documentLink" : {
+              "document_url" : "http://www.itv.com",
+              "document_binary_url" : "http://www.itv.com/binary",
+              "document_filename" : "sscs1.pdf"
+            }
+          }
+        }],
+      "sscsWelshPreviewDocuments" : [ {
+        "value" : {
+          "documentType" : "appellantEvidence",
+          "documentFileName" : "11111.pdf",
+          "originalDocumentFileName" : "appellantEvidence.pdf",
+          "documentDateAdded" : "2018-10-10",
+          "documentLink" : {
+            "document_url" : "http://www.bbc.com",
+            "document_binary_url" : "http://www.bbc.com/binary",
+            "document_filename" : "appellantEvidence.pdf"
+          }
+        }
+      },
+        {
+          "value" : {
+            "documentType" : "sscs1",
+            "documentFileName" : "22222.pdf",
+            "documentDateAdded" : "2018-10-11",
+            "originalDocumentFileName" : "sscs1.pdf",
+            "documentLink" : {
+              "document_url" : "http://www.itv.com",
+              "document_binary_url" : "http://www.itv.com/binary",
+              "document_filename" : "sscs1.pdf"
             }
           }
         }],
@@ -213,7 +283,8 @@
       "originalSender": {},
       "furtherEvidenceAction": {},
       "languagePreferenceWelsh" : "Yes",
-      "translationWorkOutstanding" : "Yes"
+      "sscsWelshPreviewNextEvent" : "sendToDwp",
+      "translationWorkOutstanding": "Yes"
     },
     "data_classification": {
       "dwpTimeExtension": {
@@ -627,5 +698,5 @@
       }
     }
   },
-  "event_id": "markDocumentsForTranslation"
+  "event_id": "uploadWelshDocument"
 }

@@ -212,8 +212,7 @@
       ],
       "originalSender": {},
       "furtherEvidenceAction": {},
-      "languagePreferenceWelsh" : "Yes",
-      "translationWorkOutstanding" : "Yes"
+      "languagePreferenceWelsh" : "Yes"
     },
     "data_classification": {
       "dwpTimeExtension": {
@@ -627,5 +626,5 @@
       }
     }
   },
-  "event_id": "markDocumentsForTranslation"
+  "event_id": "updateWelshPreference"
 }

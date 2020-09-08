@@ -1,8 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.markdocsfortranslation;
 
-import java.util.function.Consumer;
-
 import static java.util.Objects.requireNonNull;
+
+import java.util.function.Consumer;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class MarkDocumentsForTranslationAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-   @Override
+    @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
         requireNonNull(callbackType, "callbackType must not be null");
@@ -31,7 +31,6 @@ public class MarkDocumentsForTranslationAboutToSubmitHandler implements PreSubmi
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         setTranslationRequiredStatus.accept(caseData);
         caseData.setTranslationWorkOutstanding("Yes");
