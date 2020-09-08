@@ -79,6 +79,8 @@ public class ReissueDocumentAboutToStartHandlerTest {
             .build()).build();
 
         List<SscsDocument> sscsDocuments = asList(document1, document2, document3, document4, document5);
+
+
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().build())
                 .sscsDocument(sscsDocuments)
                 .build();
@@ -106,7 +108,7 @@ public class ReissueDocumentAboutToStartHandlerTest {
     }
 
     @Test
-    public void populateDocumentDropdownWithAllDocumentTypesAvailableToReissu() {
+    public void populateDocumentDropdownWithAllDocumentTypesAvailableToReissue() {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -115,6 +117,46 @@ public class ReissueDocumentAboutToStartHandlerTest {
         assertEquals(4, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
         assertEquals(new DynamicListItem("decisionIssued", "Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
         assertEquals(new DynamicListItem("directionIssued", "Directions Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
+        assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
+        assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(3));
+        assertNull(response.getData().getResendToAppellant());
+        assertNull(response.getData().getResendToRepresentative());
+    }
+
+    @Test
+    public void populateDocumentDropdownWithWelshDocumentTypesAvailableToReissue() {
+
+        SscsWelshDocument documentWelsh1 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("file5.pdf")
+                .documentType(null)
+                .documentLink(DocumentLink.builder().documentUrl("url5").build())
+                .build()).build();
+
+        SscsWelshDocument documentWelsh2 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("file1.pdf")
+                .documentType(DECISION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
+
+        SscsWelshDocument documentWelsh3 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
+                .documentFileName("file1.pdf")
+                .documentType(DIRECTION_NOTICE.getValue())
+                .documentLink(DocumentLink.builder().documentUrl("url1").build())
+                .build()).build();
+
+        List<SscsWelshDocument> sscsWelshDocuments = asList(documentWelsh1, documentWelsh2, documentWelsh3);
+
+        sscsCaseData.setSscsWelshDocuments(sscsWelshDocuments);
+
+        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(Collections.EMPTY_SET, response.getErrors());
+        assertEquals(4, response.getData().getReissueFurtherEvidenceDocument().getListItems().size());
+        assertEquals(new DynamicListItem("decisionIssuedWelsh", "Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(0));
+        assertEquals(new DynamicListItem("directionIssuedWelsh", "Directions Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(1));
         assertEquals(new DynamicListItem("issueFinalDecision", "Final Decision Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(2));
         assertEquals(new DynamicListItem("issueAdjournmentNotice", "Adjournment Notice"), response.getData().getReissueFurtherEvidenceDocument().getListItems().get(3));
         assertNull(response.getData().getResendToAppellant());

@@ -3,14 +3,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.reissuedocument;
 import static java.util.Objects.nonNull;
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DIRECTION_NOTICE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -58,22 +56,22 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
     private List<DynamicListItem> getDocumentDropdown(SscsCaseData sscsCaseData) {
         List<DynamicListItem> listCostOptions = new ArrayList<>();
 
-        if (nonNull(sscsCaseData.getSscsDocument())) {
-            List<SscsDocument> filteredSscsDocuments = sscsCaseData.getSscsDocument().stream().filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
+        if (nonNull(sscsCaseData.getSscsDocument()) || nonNull(sscsCaseData.getSscsWelshDocuments())) {
+            List<? extends AbstractDocument> filteredSscsDocuments = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
             if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(DECISION_NOTICE.getValue()))) {
-                listCostOptions.add(new DynamicListItem(EventType.DECISION_ISSUED.getCcdType(), DECISION_NOTICE.getValue()));
+                listCostOptions.add(new DynamicListItem(sscsCaseData.isLanguagePreferenceWelsh() ? EventType.DECISION_ISSUED_WELSH.getCcdType() : EventType.DECISION_ISSUED.getCcdType(), DECISION_NOTICE.getValue()));
             }
             if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(DIRECTION_NOTICE.getValue()))) {
-                listCostOptions.add(new DynamicListItem(EventType.DIRECTION_ISSUED.getCcdType(), DIRECTION_NOTICE.getLabel()));
+                listCostOptions.add(new DynamicListItem(sscsCaseData.isLanguagePreferenceWelsh() ? EventType.DIRECTION_ISSUED_WELSH.getCcdType() : EventType.DIRECTION_ISSUED.getCcdType(), DIRECTION_NOTICE.getLabel()));
             }
             if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(FINAL_DECISION_NOTICE.getValue()))) {
                 listCostOptions.add(new DynamicListItem(EventType.ISSUE_FINAL_DECISION.getCcdType(), FINAL_DECISION_NOTICE.getLabel()));
             }
             if (filteredSscsDocuments.stream()
-                .anyMatch(doc -> doc.getValue().getDocumentType().equals(ADJOURNMENT_NOTICE.getValue()))) {
+                    .anyMatch(doc -> doc.getValue().getDocumentType().equals(ADJOURNMENT_NOTICE.getValue()))) {
                 listCostOptions.add(new DynamicListItem(EventType.ISSUE_ADJOURNMENT_NOTICE.getCcdType(), ADJOURNMENT_NOTICE.getLabel()));
             }
         }
