@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -41,8 +42,11 @@ public class DocumentDownloadService {
                 USER_ID,
                 getDownloadUrl(urlString)
             );
-            if (response != null && response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                return response.getBody().contentLength();
+            if (response != null && response.getStatusCode() == HttpStatus.OK) {
+                Resource responseBody = response.getBody();
+                if (responseBody != null) {
+                    return responseBody.contentLength();
+                }
             }
         } catch (Exception e) {
             log.info("Error when downloading the following Binary file from the Document Management: {} ", urlString, e);
@@ -61,7 +65,8 @@ public class DocumentDownloadService {
                     getDownloadUrl(urlString)
             );
             if (HttpStatus.OK.equals(response.getStatusCode())) {
-                return new UploadedEvidence(response.getBody(), response.getHeaders().get("originalfilename").get(0), response.getHeaders().get(HttpHeaders.CONTENT_TYPE).get(0));
+                return new UploadedEvidence(response.getBody(), Objects.requireNonNull(response.getHeaders().get("originalfilename")).get(0), Objects
+                    .requireNonNull(response.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0));
             } else {
                 throw new IllegalStateException("Cannot download document that is stored in CCD got "
                         + "[" + response.getStatusCode() + "] " + response.getBody());
