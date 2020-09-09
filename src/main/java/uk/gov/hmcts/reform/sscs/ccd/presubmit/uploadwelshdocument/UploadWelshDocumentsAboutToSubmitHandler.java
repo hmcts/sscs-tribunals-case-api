@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
 import static java.util.Objects.requireNonNull;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -47,7 +46,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent().equals(EventType.UPLOAD_WELSH_DOCUMENT);
+            && callback.getEvent().equals(EventType.UPLOAD_WELSH_DOCUMENT);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         String previewDocumentType = null;
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
             if (sscsDocument.getValue().getDocumentTranslationStatus() != null
-                    && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
+                && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
                 if (sscsDocument.getValue().getDocumentLink().getDocumentFilename().equals(caseData.getOriginalDocuments().getValue().getCode())) {
                     sscsDocument.getValue().setDocumentTranslationStatus(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE);
                 }
@@ -118,9 +117,9 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
 
     private Optional<SscsDocument> getSscsDocumentByTypeAndName(DocumentType documentType, String fileName, SscsCaseData caseData) {
         return Optional.ofNullable(caseData.getSscsDocument()).map(Collection::stream).orElseGet(Stream::empty)
-                .filter(doc -> doc.getValue().getDocumentType().equals(documentType.getValue()) && doc.getValue().getDocumentLink().getDocumentFilename().equals(fileName))
-                .sorted()
-                .findFirst();
+            .filter(doc -> doc.getValue().getDocumentType().equals(documentType.getValue()) && doc.getValue().getDocumentLink().getDocumentFilename().equals(fileName))
+            .sorted()
+            .findFirst();
     }
 
     private String getNextEvent(String documentType) {
