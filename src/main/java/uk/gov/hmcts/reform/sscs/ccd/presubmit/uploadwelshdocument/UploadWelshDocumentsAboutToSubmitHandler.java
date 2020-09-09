@@ -73,7 +73,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
             previewDocumentType = sscsWelshPreviewDocument.getValue().getDocumentType();
             log.info("previewDocumentType  {}", previewDocumentType);
             sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
-                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")));
 
             if (DocumentType.APPELLANT_EVIDENCE.getValue().equals(previewDocumentType)) {
                 Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByTypeAndName(DocumentType.APPELLANT_EVIDENCE, sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
