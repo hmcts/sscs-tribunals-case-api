@@ -53,7 +53,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
-
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
