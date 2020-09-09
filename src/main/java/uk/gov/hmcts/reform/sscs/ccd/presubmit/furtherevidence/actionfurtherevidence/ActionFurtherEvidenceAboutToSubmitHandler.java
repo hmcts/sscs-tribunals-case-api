@@ -19,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.AbstractFooterService;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
@@ -139,7 +140,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
                         documents.add(sscsDocument);
-                        if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                        if (sscsCaseData.isLanguagePreferenceWelsh() && equalsIgnoreCase(scannedDocument.getValue().getType(), APPELLANT_EVIDENCE.getValue())) {
                             sscsCaseData.setTranslationWorkOutstanding(YES);
                         }
                     }
