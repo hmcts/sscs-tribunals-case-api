@@ -140,7 +140,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
                         documents.add(sscsDocument);
-                        if (sscsCaseData.isLanguagePreferenceWelsh() && equalsIgnoreCase(scannedDocument.getValue().getType(), APPELLANT_EVIDENCE.getValue())) {
+                        if (sscsCaseData.isLanguagePreferenceWelsh()) {
                             sscsCaseData.setTranslationWorkOutstanding(YES);
                         }
                     }
