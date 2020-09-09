@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.*;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
@@ -58,6 +59,9 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                         appeal.getMrnDetails().getDwpIssuingOffice()))
                 .pcqId(syaCaseWrapper.getPcqId())
                 .languagePreferenceWelsh(booleanToYesNo(syaCaseWrapper.getLanguagePreferenceWelsh()))
+                .translationWorkOutstanding(booleanToYesNull(!sscsDocuments.isEmpty()
+                        && syaCaseWrapper.getLanguagePreferenceWelsh() != null
+                        && syaCaseWrapper.getLanguagePreferenceWelsh()))
                 .build();
     }
 
@@ -81,6 +85,13 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             return null;
         }
         return flag ? "Yes" : "No";
+    }
+
+    private static String booleanToYesNull(Boolean flag) {
+        if (flag == null) {
+            return null;
+        }
+        return flag ? "Yes" : null;
     }
 
     private static Subscriptions getSubscriptions(SyaCaseWrapper syaCaseWrapper) {
@@ -656,12 +667,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                                 .documentDateAdded(syaEvidence.getUploadedDate().format(DateTimeFormatter.ISO_DATE))
                                 .documentLink(documentLink)
                                 .documentType("appellantEvidence")
+                                .documentTranslationStatus(getDocumentTranslationStatus(syaCaseWrapper))
                                 .documentComment(syaCaseWrapper.getReasonsForAppealing().getEvidenceDescription())
                                 .build();
                         return SscsDocument.builder().value(sscsDocumentDetails).build();
                     }).collect(Collectors.toList());
         }
         return Collections.emptyList();
+    }
+
+    @Nullable
+    private static SscsDocumentTranslationStatus getDocumentTranslationStatus(SyaCaseWrapper syaCaseWrapper) {
+        return syaCaseWrapper.getLanguagePreferenceWelsh() != null && syaCaseWrapper.getLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
     }
 
     private static String getPhoneNumberWithOutSpaces(String phoneNumber) {
