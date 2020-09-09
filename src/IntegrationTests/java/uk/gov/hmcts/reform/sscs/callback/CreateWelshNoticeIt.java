@@ -45,6 +45,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
 import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
+import uk.gov.hmcts.reform.sscs.thirdparty.pdfservice.DocmosisPdfService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -52,6 +53,9 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
 
     @Autowired
     private WelshFooterService welshFooterService;
+
+    @MockBean
+    private DocmosisPdfService docmosisPdfService;
 
     @MockBean
     private CoreCaseDataApi coreCaseDataApi;
