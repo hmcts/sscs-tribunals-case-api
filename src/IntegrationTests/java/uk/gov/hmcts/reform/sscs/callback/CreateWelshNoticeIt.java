@@ -169,7 +169,7 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
     private void mockCcd() {
         given(coreCaseDataApi.startEventForCaseWorker(eq("Bearer authToken"), eq("s2s token"),
                 eq("userId"), eq("SSCS"), eq("Benefit"), eq("12345656789"),
-                eq("sendToDwp")))
+                eq("directionIssuedWelsh")))
                 .willReturn(StartEventResponse.builder().build());
 
         Map<String, Object> data = new HashMap<>();
