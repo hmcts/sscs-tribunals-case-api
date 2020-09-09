@@ -185,7 +185,7 @@ public class CreateWelshNoticeAboutToSubmitHandler implements PreSubmitCallbackH
             return "Hysbysiad o Benderfyniad".toUpperCase();
         }
         if (noticeType.equalsIgnoreCase("Direction Notice")) {
-            return "Hysbysiad o Benderfyniad".toUpperCase();
+            return "Hysbysiad Cyfarwyddiadau".toUpperCase();
         }
         return noticeType.toUpperCase();
     }

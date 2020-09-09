@@ -96,7 +96,7 @@ public class UploadWelshDocumentsIt extends AbstractEventIt {
     }
 
     @Test
-    public void givenSubmittedCallbackForCancelTranslation_shouldUpdateFieldAndTriggerEvent() throws Exception {
+    public void givenSubmittedCallbackForCancelTranslation_shouldUpdateCaseAndTriggerEvent() throws Exception {
         mockIdam();
         mockCcd();
 
