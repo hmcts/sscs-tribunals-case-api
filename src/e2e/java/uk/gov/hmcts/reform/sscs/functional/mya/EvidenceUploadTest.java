@@ -14,8 +14,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 public class EvidenceUploadTest extends BaseFunctionTest {
 
     @Test
-    public void uploadThenSubmitEvidenceToAppeal() throws IOException, JSONException {
+    public void uploadThenSubmitEvidenceToAppeal() throws IOException, JSONException, InterruptedException {
         CreatedCcdCase createdCcdCase = createCase();
+
+        Thread.sleep(5000L);
 
         JSONArray draftHearingEvidence = sscsMyaBackendRequests.getDraftHearingEvidence(createdCcdCase.getCaseId());
         assertThat(draftHearingEvidence.length(), is(0));
