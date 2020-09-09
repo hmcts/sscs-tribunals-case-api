@@ -165,7 +165,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
         String documentFooterText = "Appellant evidence";
-        when( welshFooterService.getNextBundleAddition(caseData.getSscsWelshDocuments())).thenReturn("A");
+        when(welshFooterService.getNextBundleAddition(caseData.getSscsWelshDocuments())).thenReturn("A");
         SscsWelshDocumentDetails welshDocumentDetails = caseData.getSscsWelshPreviewDocuments().get(0).getValue();
         when(welshFooterService.addFooter(welshDocumentDetails.getDocumentLink(), documentFooterText, "A")).thenReturn(DocumentLink.builder().documentFilename("New Doc").build());
         when(bundleAdditionFilenameBuilder.build(DocumentType.APPELLANT_EVIDENCE, "A", welshDocumentDetails.getDocumentDateAdded())).thenReturn("Bundle addition file name");

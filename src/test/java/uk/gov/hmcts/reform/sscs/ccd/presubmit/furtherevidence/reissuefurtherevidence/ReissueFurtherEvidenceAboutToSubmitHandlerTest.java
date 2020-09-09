@@ -9,12 +9,13 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.DWP;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -107,7 +108,7 @@ public class ReissueFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"url1, file1.pdf - representativeEvidence, APPELLANT", "url2, file2.pdf - appellantEvidence, DWP", "welshUrl1, welshFile1.pdf - appellantEvidence, APPELLANT", "welshUrl2, welshFile2.pdf - representativeEvidence, APPELLANT" })
+    @Parameters({"url1, file1.pdf - representativeEvidence, APPELLANT", "url2, file2.pdf - appellantEvidence, DWP", "welshUrl1, welshFile1.pdf - appellantEvidence, APPELLANT", "welshUrl2, welshFile2.pdf - representativeEvidence, APPELLANT"})
     public void setsEvidenceHandledFlagToNoForDocumentSelected(String selectedUrl, String selectedLabel, OriginalSenderItemList newSender) {
 
         sscsCaseData = sscsCaseData.toBuilder()

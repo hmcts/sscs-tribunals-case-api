@@ -127,7 +127,7 @@ public class ReissueFurtherEvidenceAboutToStartHandlerTest {
     }
 
     @Test
-    public void shouldIncludeValidWelshDocumentsInDropdown(){
+    public void shouldIncludeValidWelshDocumentsInDropdown() {
 
         SscsWelshDocument document1 = SscsWelshDocument.builder().value(SscsWelshDocumentDetails.builder()
                 .documentFileName("welshFile1.pdf")
