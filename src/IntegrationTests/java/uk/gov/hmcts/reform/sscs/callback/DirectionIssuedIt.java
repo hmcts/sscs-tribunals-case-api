@@ -97,7 +97,6 @@ public class DirectionIssuedIt extends AbstractEventIt {
         assertNull(result.getData().getGenerateNotice());
         assertNull(result.getData().getDateAdded());
         assertNull(result.getData().getExtensionNextEventDl());
-        assertNull(result.getData().getDirectionTypeDl());
         assertEquals(4, result.getData().getSscsDocument().size());
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
@@ -130,7 +129,6 @@ public class DirectionIssuedIt extends AbstractEventIt {
         assertNull(result.getData().getGenerateNotice());
         assertNull(result.getData().getDateAdded());
         assertNull(result.getData().getExtensionNextEventDl());
-        assertNull(result.getData().getDirectionTypeDl());
         assertEquals(4, result.getData().getSscsDocument().size());
         assertEquals(DocumentType.DIRECTION_NOTICE.getValue(), result.getData().getSscsDocument().get(0).getValue().getDocumentType());
         assertEquals("some location", result.getData().getSscsDocument().get(0).getValue().getDocumentLink().getDocumentUrl());
