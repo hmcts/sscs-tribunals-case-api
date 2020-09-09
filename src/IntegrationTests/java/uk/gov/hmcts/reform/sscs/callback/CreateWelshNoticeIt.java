@@ -142,6 +142,8 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
         UploadResponse uploadResponse = createUploadResponse();
         when(evidenceManagementService.upload(any(), anyString())).thenReturn(uploadResponse);
 
+        when(docmosisPdfService.createPdf(any(),any())).thenReturn(pdfBytes);
+
         HttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
 
         assertHttpStatus(response, HttpStatus.OK);
