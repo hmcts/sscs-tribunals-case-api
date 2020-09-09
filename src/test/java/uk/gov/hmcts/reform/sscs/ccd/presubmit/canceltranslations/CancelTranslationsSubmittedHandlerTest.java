@@ -19,12 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -90,20 +85,20 @@ public class CancelTranslationsSubmittedHandlerTest {
 
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType(), State.VALID_APPEAL);
-        return new Object[] {new Object[] {SUBMITTED, buildCallback("sendToDwp", State.VALID_APPEAL), true},
-            new Object[] {ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType(), State.VALID_APPEAL), false},
-            new Object[] {SUBMITTED, buildCallback(null, State.VALID_APPEAL), false},
-                new Object[] {SUBMITTED, buildCallback(null, State.INTERLOCUTORY_REVIEW_STATE), false}
+        return new Object[]{new Object[]{SUBMITTED, buildCallback("sendToDwp", State.VALID_APPEAL), true},
+            new Object[]{ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType(), State.VALID_APPEAL), false},
+            new Object[]{SUBMITTED, buildCallback(null, State.VALID_APPEAL), false},
+            new Object[]{SUBMITTED, buildCallback(null, State.INTERLOCUTORY_REVIEW_STATE), false}
         };
     }
 
     private Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent, State state) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
-                .state(state)
+            .state(state)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                state, sscsCaseData, LocalDateTime.now());
+            state, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), CANCEL_TRANSLATIONS, false);
     }
 

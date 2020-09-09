@@ -10,7 +10,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMEN
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -20,12 +19,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -91,17 +85,17 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption = buildCallback(EventType.SEND_TO_DWP.getCcdType());
-        return new Object[] {new Object[] {SUBMITTED, buildCallback("sendToDwp"), true},
-            new Object[] {ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType()), false},
-            new Object[] {SUBMITTED, buildCallback(null), false},
-                new Object[] {SUBMITTED, buildCallbackInterlocReviewState(), false}
+        return new Object[]{new Object[]{SUBMITTED, buildCallback("sendToDwp"), true},
+            new Object[]{ABOUT_TO_SUBMIT, buildCallback(EventType.SEND_TO_DWP.getCcdType()), false},
+            new Object[]{SUBMITTED, buildCallback(null), false},
+            new Object[]{SUBMITTED, buildCallbackInterlocReviewState(), false}
         };
     }
 
     private Callback<SscsCaseData> buildCallback(String sscsWelshPreviewNextEvent) {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
             .sscsWelshPreviewNextEvent(sscsWelshPreviewNextEvent)
-                .state(State.VALID_APPEAL)
+            .state(State.VALID_APPEAL)
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             State.VALID_APPEAL, sscsCaseData, LocalDateTime.now());
@@ -110,10 +104,10 @@ public class UploadWelshDocumentsSubmittedHandlerTest {
 
     private Callback<SscsCaseData> buildCallbackInterlocReviewState() {
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .state(State.INTERLOCUTORY_REVIEW_STATE)
-                .build();
+            .state(State.INTERLOCUTORY_REVIEW_STATE)
+            .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
+            State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), UPLOAD_WELSH_DOCUMENT, false);
     }
 }

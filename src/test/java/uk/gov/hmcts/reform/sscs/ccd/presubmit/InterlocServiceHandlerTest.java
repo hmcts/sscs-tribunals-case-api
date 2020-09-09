@@ -146,7 +146,7 @@ public class InterlocServiceHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertThat(response.getData().getInterlocReviewState(), is(InterlocReviewState.WELSH_TRANSLATION.getId()));
-        assertThat(response.getData().getSscsWelshPreviewNextEvent(), is(expectedInterlocReviewState));
+        assertThat(response.getData().getWelshInterlocNextReviewState(), is(expectedInterlocReviewState));
         assertThat(response.getData().getInterlocReferralDate(), is(LocalDate.now().toString()));
         assertNull(response.getData().getDirectionDueDate());
     }
