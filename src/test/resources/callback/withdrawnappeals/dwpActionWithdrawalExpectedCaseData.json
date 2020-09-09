@@ -81,6 +81,7 @@
       }
     },
     "signer": null,
+    "hearingSubtype":null,
     "hearingType": "paper",
     "receivedVia": "Paper"
   },

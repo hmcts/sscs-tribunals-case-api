@@ -112,6 +112,7 @@
       "organisation": "HP Ltd"
     },
     "signer": "Joe Bloggs",
+    "hearingSubtype":null,
     "hearingType": "oral",
     "receivedVia": "Online"
   },
