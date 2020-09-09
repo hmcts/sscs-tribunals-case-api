@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 
 import static java.util.Objects.requireNonNull;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 
 @Service
+@Slf4j
 public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
@@ -53,6 +55,8 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String template = documentConfiguration.getCover().get(sscsCaseData.getLanguagePreference());
+        log.info("EditBundleAboutToStartHandler getLanguagePreference  {}",sscsCaseData.getLanguagePreference());
+        log.info("EditBundleAboutToStartHandler Coversheet Template {}",template);
         if (sscsCaseData.getCaseBundles() != null) {
             boolean eligibleForStitching = false;
             for (Bundle bundle : sscsCaseData.getCaseBundles()) {

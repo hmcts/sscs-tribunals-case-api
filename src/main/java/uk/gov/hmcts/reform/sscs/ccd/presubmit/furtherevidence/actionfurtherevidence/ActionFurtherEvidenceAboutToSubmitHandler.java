@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -42,6 +43,7 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
     private static final String FURTHER_EVIDENCE_RECEIVED = "furtherEvidenceReceived";
     private static final String COVERSHEET = "coversheet";
+    public static final String YES = "Yes";
 
     private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
     private final FooterService footerService;
@@ -151,6 +153,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
                         documents.add(sscsDocument);
+                        if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                            sscsCaseData.setTranslationWorkOutstanding(YES);
+                        }
                     }
                     if (sscsCaseData.getSscsDocument() != null) {
                         documents.addAll(sscsCaseData.getSscsDocument());
@@ -159,7 +164,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                     if (documents.size() > 0) {
                         sscsCaseData.setSscsDocument(documents);
                     }
-                    sscsCaseData.setEvidenceHandled("Yes");
+                    sscsCaseData.setEvidenceHandled(YES);
+
                 } else {
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
                 }
@@ -234,6 +240,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 .documentDateAdded(scannedDate)
                 .controlNumber(scannedDocument.getValue().getControlNumber())
                 .evidenceIssued("No")
+                .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
                 .build()).build();
     }
 

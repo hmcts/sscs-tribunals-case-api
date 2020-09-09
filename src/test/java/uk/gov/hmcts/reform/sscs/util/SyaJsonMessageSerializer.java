@@ -38,6 +38,8 @@ public enum SyaJsonMessageSerializer {
     HEARING_WITH_SUPPORT_EMPTY_CCD("hearingWithSupportEmptyCcd.json"),
     EVIDENCE_DOCUMENT("appealWithEvidenceDocuments.json"),
     EVIDENCE_DOCUMENT_CCD("appealWithEvidenceDocumentsCcd.json"),
+    EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH("appealWithEvidenceDocumentsLanguagePreferenceWelsh.json"),
+    EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH_CCD("appealWithEvidenceDocumentsLanguagePreferenceWelshCcd.json"),
     APPELLANT_PHONE_WITH_SPACES("appellantPhoneNumbersWithSpaces.json"),
     APPELLANT_PHONE_WITHOUT_SPACES_CCD("appellantPhoneNumberWithoutSpacesCcd.json"),
     NINO_WITH_SPACES("ninoWithSpaces.json"),
