@@ -518,7 +518,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"null", "DORMANT_APPEAL_STATE", "VOID_STATE"})
         public void shouldReviewByJudgeAndUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, true);
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, true);
 
         List<ScannedDocument> docs = new ArrayList<>();
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -541,7 +541,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Parameters({"VALID_APPEAL", "READY_TO_LIST"})
     public void shouldReviewByJudgeButNotUpdatePreviousStateWhenActionManuallyAndHasReinstatementRequestDocument(@Nullable State previousState) {
 
-        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, true);
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder, true);
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
         sscsCaseData.setPreviousState(previousState);
