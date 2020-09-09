@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -80,7 +81,21 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
     }
 
     private String buildFormattedLabel(AbstractDocument doc) {
-        String filenameLabel = doc instanceof  SscsWelshDocument ? "Bilingual - " +  doc.getValue().getDocumentFileName() : doc.getValue().getDocumentFileName();
+        String filenameLabel = doc.getValue().getDocumentFileName();
+        if (doc instanceof  SscsWelshDocument ){
+            filenameLabel = getBilingualLabel(doc);
+        }
         return String.format("%s -  %s", filenameLabel, userFriendlyName(doc.getValue().getDocumentType()));
+    }
+
+    @NotNull
+    private String getBilingualLabel(AbstractDocument doc) {
+        StringBuilder sb = new StringBuilder("Bilingual - ");
+        if (doc.getValue().getDocumentLink().getDocumentFilename() != null ) {
+            sb.append(doc.getValue().getDocumentLink().getDocumentFilename());
+        }
+        sb.append(" received on ");
+        sb.append(doc.getValue().getDocumentDateAdded());
+        return sb.toString();
     }
 }

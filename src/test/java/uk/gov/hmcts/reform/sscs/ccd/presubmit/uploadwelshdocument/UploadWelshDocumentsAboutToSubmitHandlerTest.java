@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
@@ -168,7 +170,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         when(welshFooterService.getNextBundleAddition(caseData.getSscsWelshDocuments())).thenReturn("A");
         SscsWelshDocumentDetails welshDocumentDetails = caseData.getSscsWelshPreviewDocuments().get(0).getValue();
         when(welshFooterService.addFooter(welshDocumentDetails.getDocumentLink(), documentFooterText, "A")).thenReturn(DocumentLink.builder().documentFilename("New Doc").build());
-        when(bundleAdditionFilenameBuilder.build(DocumentType.APPELLANT_EVIDENCE, "A", welshDocumentDetails.getDocumentDateAdded())).thenReturn("Bundle addition file name");
+        when(bundleAdditionFilenameBuilder.build(any(DocumentType.class), anyString(), anyString())).thenReturn("Bundle addition file name");
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

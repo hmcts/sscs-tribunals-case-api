@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -71,6 +72,8 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
             previewDocumentType = sscsWelshPreviewDocument.getValue().getDocumentType();
             log.info("previewDocumentType  {}", previewDocumentType);
+            sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
+                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
 
             if (DocumentType.APPELLANT_EVIDENCE.getValue().equals(previewDocumentType)) {
                 Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByTypeAndName(DocumentType.APPELLANT_EVIDENCE, sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
@@ -109,8 +112,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         sscsWelshPreviewDocument.getValue().setDocumentLink(newUrl);
         sscsWelshPreviewDocument.getValue().setEvidenceIssued("No");
         sscsWelshPreviewDocument.getValue().setBundleAddition(bundleAddition);
-        sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
-                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
+
     }
 
 
