@@ -147,8 +147,11 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
 
         assertEquals(2, documentList.size());
         assertEquals("Direction Notice", documentList.get(0).getValue().getDocumentType());
+        assertEquals("22222.pdf", documentList.get(0).getValue().getDocumentFileName());
         assertEquals("No", result.getData().getTranslationWorkOutstanding());
         assertEquals("directionIssuedWelsh", result.getData().getSscsWelshPreviewNextEvent());
+        assertEquals("Direction Notice", documentList.get(1).getValue().getDocumentType());
+        assertEquals("Addition A - Directions Notice issued on 09-09-2020.pdf", documentList.get(1).getValue().getDocumentFileName());
     }
 
     @Test
