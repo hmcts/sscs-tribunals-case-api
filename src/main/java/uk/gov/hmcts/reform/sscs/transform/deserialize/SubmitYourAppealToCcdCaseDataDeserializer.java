@@ -125,6 +125,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .rep(representative)
                 .signer(syaCaseWrapper.getSignAndSubmit() != null ? syaCaseWrapper.getSignAndSubmit().getSigner() : null)
                 .hearingType(getHearingType(hearingOptions))
+                .hearingSubtype(HearingSubtype.builder().build())
                 .receivedVia("Online")
                 .build();
     }
