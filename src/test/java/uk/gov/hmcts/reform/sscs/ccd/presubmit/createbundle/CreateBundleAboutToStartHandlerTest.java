@@ -84,7 +84,7 @@ public class CreateBundleAboutToStartHandlerTest {
     }
 
     @Test
-    @Parameters({"Yes, bundleWelshConfig"," No, null"})
+    @Parameters({"Yes, bundleWelshConfig", " No, null"})
     public void givenWelsh_thenPopulateWelshConfigFileName(String languagePreference, String configFile) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setDwpEvidenceBundleDocument(DwpResponseDocument.builder().documentLink(DocumentLink.builder().build()).build());
@@ -92,10 +92,9 @@ public class CreateBundleAboutToStartHandlerTest {
         caseData.setLanguagePreferenceWelsh(languagePreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        if(caseData.isLanguagePreferenceWelsh()) {
+        if (caseData.isLanguagePreferenceWelsh()) {
             assertEquals(configFile, response.getData().getBundleConfiguration());
-        }
-        else{
+        } else {
             assertNull(configFile, response.getData().getBundleConfiguration());
         }
     }
@@ -103,7 +102,7 @@ public class CreateBundleAboutToStartHandlerTest {
     @Test
     public void givenSscsDocumentHasEmptyFileName_thenPopulateFileName() {
         SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName(null).documentLink(
-                DocumentLink.builder().documentFilename("test.com").build()).build()).build();
+            DocumentLink.builder().documentFilename("test.com").build()).build()).build();
         List<SscsDocument> docs = new ArrayList<>();
 
         docs.add(sscsDocument);
@@ -136,8 +135,8 @@ public class CreateBundleAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
+            .findFirst()
+            .orElse("");
         assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
     }
 
@@ -150,8 +149,8 @@ public class CreateBundleAboutToStartHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream()
-                .findFirst()
-                .orElse("");
+            .findFirst()
+            .orElse("");
         assertEquals("The bundle cannot be created as mandatory DWP documents are missing", error);
     }
 }

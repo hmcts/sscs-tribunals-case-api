@@ -42,7 +42,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CREATE_BUNDLE;
+            && callback.getEvent() == EventType.CREATE_BUNDLE;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 
         if (checkMandatoryFilesMissing(sscsCaseData)) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(
-                    callback.getCaseDetails().getCaseData());
+                callback.getCaseDetails().getCaseData());
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
         } else {
@@ -75,7 +75,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                     }
                 }
             }
-            if(sscsCaseData.isLanguagePreferenceWelsh()){
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 sscsCaseData.setBundleConfiguration(bundleWelshConfig);
             }
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
@@ -84,8 +84,8 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         return sscsCaseData.getDwpResponseDocument() == null
-                || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
+            || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
+            || sscsCaseData.getDwpEvidenceBundleDocument() == null
+            || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
     }
 }
