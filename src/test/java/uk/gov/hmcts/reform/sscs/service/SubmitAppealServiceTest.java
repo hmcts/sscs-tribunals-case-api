@@ -89,6 +89,9 @@ public class SubmitAppealServiceTest {
     @Mock
     private ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
 
+    @Mock
+    private WelshBenefitTypeTranslator welshBenefitTypeTranslator;
+
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
     private SscsPdfService sscsPdfService;
@@ -149,7 +152,7 @@ public class SubmitAppealServiceTest {
         offices.add("Watford DRT");
         offices.add("Sheffield DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager);
+        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager, welshBenefitTypeTranslator);
 
         submitAppealService = new SubmitAppealService(
             ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,

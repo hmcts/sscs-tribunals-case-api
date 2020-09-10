@@ -38,18 +38,23 @@ public class SscsPdfServiceTest {
     @Mock
     ResourceManager resourceManager;
 
+    @Mock
+    private WelshBenefitTypeTranslator welshBenefitTranslator;
+
     SscsCaseData caseData = buildCaseData();
+
 
     @Before
     public void setup() {
         openMocks(this);
-        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager);
+        service = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager, welshBenefitTranslator);
     }
 
     @Test
     public void createValidWelshPdfAndSendEmailAndStoreInDocumentStore() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+        given(welshBenefitTranslator.translate(caseData)).willReturn("Taliad Annibyniaeth Personol (PIP)");
         caseData.setLanguagePreferenceWelsh("Yes");
         caseData.getAppeal().getAppellant().getIdentity().setDob("2000-12-31");
         service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");

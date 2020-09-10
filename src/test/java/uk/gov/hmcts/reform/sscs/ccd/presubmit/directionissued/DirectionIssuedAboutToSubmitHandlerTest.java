@@ -210,7 +210,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(AWAITING_INFORMATION.getId(), response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionTypeDl());
     }
 
     @Test
@@ -247,8 +246,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDateSentToDwp());
-        assertNull(response.getData().getDirectionTypeDl());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
@@ -257,8 +255,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionTypeDl());
-        assertThat(response.getData().getDwpState(), is(DIRECTION_ACTION_REQUIRED.getId()));
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
     }
 
     @Test
@@ -405,7 +402,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     private void assertValues(PreSubmitCallbackResponse<SscsCaseData> response, String intterlocReviewState, String dwpState, State state) {
         assertEquals(intterlocReviewState, response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDirectionTypeDl());
         assertThat(response.getData().getDwpState(), is(dwpState));
         assertThat(response.getData().getState(), is(state));
         assertThat(response.getData().getHmctsDwpState(), is("sentToDwp"));
