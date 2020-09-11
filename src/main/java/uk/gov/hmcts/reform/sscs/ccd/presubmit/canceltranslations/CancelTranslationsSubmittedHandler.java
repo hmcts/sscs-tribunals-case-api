@@ -11,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -35,6 +36,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
 
         return callbackType.equals(CallbackType.SUBMITTED)
             && callback.getEvent().equals(EventType.CANCEL_TRANSLATIONS)
+            && !callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
             && StringUtils.isNotEmpty(callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent());
     }
 
