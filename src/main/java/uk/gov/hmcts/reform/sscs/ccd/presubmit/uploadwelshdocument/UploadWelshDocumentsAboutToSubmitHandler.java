@@ -12,11 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsWelshDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -75,13 +71,18 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         //clear the Preview collection
         caseData.setSscsWelshPreviewDocuments(new ArrayList<>());
         caseData.updateTranslationWorkOutstandingFlag();
-        String nextEvent = getNextEvent(previewDocumentType);
-        log.info("Setting next event to {}", nextEvent);
-        caseData.setSscsWelshPreviewNextEvent(nextEvent);
+        if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+            String nextEvent = getNextEvent(caseData, previewDocumentType);
+            log.info("Setting next event to {}", nextEvent);
+            caseData.setSscsWelshPreviewNextEvent(nextEvent);
+        } else if (!caseData.isTranslationWorkOutstanding()) {
+            caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+            caseData.setWelshInterlocNextReviewState(null);
+        }
         return;
     }
 
-    private String getNextEvent(String documentType) {
+    private String getNextEvent(SscsCaseData caseData, String documentType) {
         return nextEventMap.get(documentType);
     }
 }
