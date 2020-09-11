@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -33,7 +34,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         requireNonNull(callbackType, "callbackType must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent().equals(EventType.CANCEL_TRANSLATIONS);
+                && callback.getEvent().equals(EventType.CANCEL_TRANSLATIONS);
     }
 
     @Override
@@ -44,8 +45,12 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        setWelshNextEvent(caseData);
-
+        if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+            setWelshNextEvent(caseData);
+        } else {
+            caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+            caseData.setWelshInterlocNextReviewState(null);
+        }
         clearTranslationRequiredDocumentStatuses(caseData);
 
         caseData.updateTranslationWorkOutstandingFlag();
@@ -54,7 +59,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
 
     private void clearTranslationRequiredDocumentStatuses(SscsCaseData caseData) {
         caseData.getSscsDocument().stream().filter(sd -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED
-            .equals(sd.getValue().getDocumentTranslationStatus()) || SscsDocumentTranslationStatus.TRANSLATION_REQUESTED
+                .equals(sd.getValue().getDocumentTranslationStatus()) || SscsDocumentTranslationStatus.TRANSLATION_REQUESTED
                 .equals(sd.getValue().getDocumentTranslationStatus()))
                 .forEach(td -> {
                     td.getValue().setDocumentTranslationStatus(null);
@@ -65,8 +70,8 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
         caseData.getSscsDocument().stream().filter(sd ->
                 (SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(sd.getValue().getDocumentTranslationStatus())
                         || SscsDocumentTranslationStatus.TRANSLATION_REQUESTED.equals(sd.getValue().getDocumentTranslationStatus()))
-                && nextEventMap.keySet().contains(sd.getValue().getDocumentType())).sorted().findFirst()
-            .ifPresent(sscsDocument -> caseData
-                .setSscsWelshPreviewNextEvent(nextEventMap.get(sscsDocument.getValue().getDocumentType())));
+                        && nextEventMap.keySet().contains(sd.getValue().getDocumentType())).sorted().findFirst()
+                .ifPresent(sscsDocument -> caseData
+                        .setSscsWelshPreviewNextEvent(nextEventMap.get(sscsDocument.getValue().getDocumentType())));
     }
 }

@@ -95,9 +95,14 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         //clear the Preview collection
         caseData.setSscsWelshPreviewDocuments(new ArrayList<>());
         caseData.updateTranslationWorkOutstandingFlag();
-        String nextEvent = getNextEvent(previewDocumentType);
-        log.info("Setting next event to {}", nextEvent);
-        caseData.setSscsWelshPreviewNextEvent(nextEvent);
+        if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
+            String nextEvent = getNextEvent(caseData, previewDocumentType);
+            log.info("Setting next event to {}", nextEvent);
+            caseData.setSscsWelshPreviewNextEvent(nextEvent);
+        } else if (!caseData.isTranslationWorkOutstanding()) {
+            caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
+            caseData.setWelshInterlocNextReviewState(null);
+        }
         return;
     }
 
@@ -122,7 +127,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
             .findFirst();
     }
 
-    private String getNextEvent(String documentType) {
+    private String getNextEvent(SscsCaseData caseData, String documentType) {
         return nextEventMap.get(documentType);
     }
 }
