@@ -292,7 +292,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.toString()));
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.getCode()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getData().getState().equals(State.APPEAL_CREATED));
@@ -312,7 +313,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.toString()));
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.getCode()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE));
@@ -332,7 +333,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
 
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_REINSTATEMENT.toString()));
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));

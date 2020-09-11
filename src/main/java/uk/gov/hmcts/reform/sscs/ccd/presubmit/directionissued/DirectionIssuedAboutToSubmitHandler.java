@@ -117,11 +117,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && ExtensionNextEvent.SEND_TO_VALID_APPEAL.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
             caseData = updateCaseAfterExtensionRefused(caseData, null, State.WITH_DWP);
 
-        } else if (DirectionTypeItemList.GRANT_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+        } else if (DirectionTypeItemList.GRANT_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && reinstatementFeatureFlag) {
             caseData = updateCaseAfterReinstatementGranted(caseData);
 
-        } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
+        } else if (DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && reinstatementFeatureFlag) {
             caseData = updateCaseAfterReinstatementRefused(caseData);
 
