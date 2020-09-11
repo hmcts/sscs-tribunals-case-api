@@ -95,8 +95,6 @@ public class ReissueFurtherEvidenceAboutToStartHandler implements PreSubmitCallb
         if (doc.getValue().getDocumentLink().getDocumentFilename() != null) {
             sb.append(doc.getValue().getDocumentLink().getDocumentFilename());
         }
-        sb.append(" received on ");
-        sb.append(doc.getValue().getDocumentDateAdded());
         return sb.toString();
     }
 }
