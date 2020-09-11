@@ -178,7 +178,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
     @Test
     public void givenInterlocReviewStateshouldNotSetReviewState() {
 
-        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("english.pdf", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue())), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), State.INTERLOCUTORY_REVIEW_STATE);
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, Arrays.asList(buildSscsDocument("english.pdf", "docUrl", SscsDocumentTranslationStatus.TRANSLATION_REQUESTED, DocumentType.APPELLANT_EVIDENCE.getValue(), null)), buildSscsWelshDocuments(DocumentType.APPELLANT_EVIDENCE.getValue()), State.INTERLOCUTORY_REVIEW_STATE);
 
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
