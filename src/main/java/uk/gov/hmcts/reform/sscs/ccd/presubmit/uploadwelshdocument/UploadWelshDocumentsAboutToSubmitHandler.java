@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -70,9 +71,10 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
             previewDocumentType = sscsWelshPreviewDocument.getValue().getDocumentType();
             log.info("previewDocumentType  {}", previewDocumentType);
-            sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
-                LocalDateTime.now().toString());
-
+            if (sscsWelshPreviewDocument.getValue().getDocumentDateAdded() == null) {
+                sscsWelshPreviewDocument.getValue().setDocumentDateAdded(
+                    LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
+            }
             if (DocumentType.APPELLANT_EVIDENCE.getValue().equals(previewDocumentType)) {
                 Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByTypeAndName(DocumentType.APPELLANT_EVIDENCE, sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
                 sscsDocumentByTypeAndName.ifPresent(sscsDocument -> {
@@ -110,7 +112,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         String bundleAddition = welshFooterService.getNextBundleAddition(caseData.getSscsWelshDocuments());
         DocumentLink newUrl = welshFooterService.addFooter(sscsWelshPreviewDocument.getValue().getDocumentLink(), documentFooterText, bundleAddition);
 
-        String fileName = bundleAdditionFilenameBuilder.build(DocumentType.APPELLANT_EVIDENCE, bundleAddition, sscsWelshPreviewDocument.getValue().getDocumentDateAdded());
+        String fileName = bundleAdditionFilenameBuilder.build(DocumentType.APPELLANT_EVIDENCE, bundleAddition, sscsWelshPreviewDocument.getValue().getDocumentDateAdded(), DateTimeFormatter.ISO_LOCAL_DATE);
         sscsWelshPreviewDocument.getValue().setDocumentFileName(fileName);
         sscsWelshPreviewDocument.getValue().setDocumentLink(newUrl);
         sscsWelshPreviewDocument.getValue().setEvidenceIssued("No");

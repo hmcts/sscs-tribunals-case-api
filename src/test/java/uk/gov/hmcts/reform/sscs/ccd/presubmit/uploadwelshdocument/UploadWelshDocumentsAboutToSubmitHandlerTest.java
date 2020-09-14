@@ -8,6 +8,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.UPLOAD_WELSH_DOCUMENT;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -78,12 +79,12 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         assertNotNull(caseData.getOriginalDocuments());
         assertEquals("english.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
-                caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
+            caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
         assertEquals("No", caseData.getTranslationWorkOutstanding());
         assertEquals("english.pdf",
-                caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+            caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
-                caseData.getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
+            caseData.getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
         assertEquals(EventType.SEND_TO_DWP.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
     }
 
@@ -98,12 +99,12 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         assertNotNull(caseData.getOriginalDocuments());
         assertEquals("english.pdf", caseData.getOriginalDocuments().getListItems().get(0).getCode());
         assertEquals(SscsDocumentTranslationStatus.TRANSLATION_COMPLETE.getId(),
-                caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
+            caseData.getSscsDocument().get(0).getValue().getDocumentTranslationStatus().getId());
         assertEquals("Yes", caseData.getTranslationWorkOutstanding());
         assertEquals("english.pdf",
-                caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
+            caseData.getSscsWelshDocuments().get(0).getValue().getOriginalDocumentFileName());
         assertEquals("welsh",
-                caseData.getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
+            caseData.getSscsWelshDocuments().get(0).getValue().getDocumentLanguage());
         assertEquals(EventType.SEND_TO_DWP.getCcdType(), caseData.getSscsWelshPreviewNextEvent());
 
     }
@@ -158,7 +159,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         when(welshFooterService.getNextBundleAddition(caseData.getSscsWelshDocuments())).thenReturn("A");
         SscsWelshDocumentDetails welshDocumentDetails = caseData.getSscsWelshPreviewDocuments().get(0).getValue();
         when(welshFooterService.addFooter(welshDocumentDetails.getDocumentLink(), documentFooterText, "A")).thenReturn(DocumentLink.builder().documentFilename("New Doc").build());
-        when(bundleAdditionFilenameBuilder.build(any(DocumentType.class), anyString(), anyString())).thenReturn("Bundle addition file name");
+        when(bundleAdditionFilenameBuilder.build(any(DocumentType.class), anyString(), anyString(), any(DateTimeFormatter.class))).thenReturn("Bundle addition file name");
 
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -192,7 +193,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     private Object[] generateCanHandleScenarios() {
         Callback<SscsCaseData> callbackWithValidEventOption =
-                buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), State.VALID_APPEAL);
+            buildCallback("callbackWithValidEventOption", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildSscsWelshDocuments(DocumentType.SSCS1.getValue()), State.VALID_APPEAL);
         return new Object[]{new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventOption, true}};
     }
 
@@ -200,15 +201,15 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
                                                  List<SscsDocument> sscsDocuments, List<SscsWelshDocument> welshDocuments, State state) {
 
         final DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
-                Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
+            Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
 
         SscsCaseData sscsCaseData = SscsCaseData.builder()
-                .originalDocuments(dynamicList)
-                .sscsDocument(sscsDocuments)
-                .sscsWelshPreviewDocuments(welshDocuments)
-                .build();
+            .originalDocuments(dynamicList)
+            .sscsDocument(sscsDocuments)
+            .sscsWelshPreviewDocuments(welshDocuments)
+            .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-                state, sscsCaseData, LocalDateTime.now());
+            state, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
@@ -228,30 +229,30 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
     private List<SscsWelshDocument> buildSscsWelshDocuments(String documentType) {
         return Arrays.asList(SscsWelshDocument.builder()
-                .value(SscsWelshDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl("/anotherUrl")
-                                .documentFilename("welsh.pdf")
-                                .build())
-                        .documentLanguage("welsh")
-                        .documentType(documentType)
-                        .build())
-                .build());
+            .value(SscsWelshDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl("/anotherUrl")
+                    .documentFilename("welsh.pdf")
+                    .build())
+                .documentLanguage("welsh")
+                .documentType(documentType)
+                .build())
+            .build());
     }
 
     private SscsDocument buildSscsDocument(String filename, String documentUrl, SscsDocumentTranslationStatus translationRequested, String documentType, String bundleAddition) {
         return SscsDocument.builder()
-                .value(SscsDocumentDetails.builder()
-                        .documentLink(DocumentLink.builder()
-                                .documentUrl(documentUrl)
-                                .documentFilename(filename)
-                                .build())
-                        .documentTranslationStatus(translationRequested)
-                        .documentType(documentType)
-                        .documentFileName(filename)
-                        .bundleAddition(bundleAddition)
-                        .build())
-                .build();
+            .value(SscsDocumentDetails.builder()
+                .documentLink(DocumentLink.builder()
+                    .documentUrl(documentUrl)
+                    .documentFilename(filename)
+                    .build())
+                .documentTranslationStatus(translationRequested)
+                .documentType(documentType)
+                .documentFileName(filename)
+                .bundleAddition(bundleAddition)
+                .build())
+            .build();
     }
 
 }

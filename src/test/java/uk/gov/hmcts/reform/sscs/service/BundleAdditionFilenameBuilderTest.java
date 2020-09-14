@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 
@@ -22,4 +25,9 @@ public class BundleAdditionFilenameBuilderTest {
         assertEquals("Appellant evidence received on 29-08-2020", result);
     }
 
+    @Test
+    public void shouldBuildDateFromFormatter() {
+        String result = bundleAdditionFilenameBuilder.build(DocumentType.APPELLANT_EVIDENCE, null, "2020-09-09", DateTimeFormatter.ISO_LOCAL_DATE);
+        assertEquals("Appellant evidence received on 09-09-2020", result);
+    }
 }
