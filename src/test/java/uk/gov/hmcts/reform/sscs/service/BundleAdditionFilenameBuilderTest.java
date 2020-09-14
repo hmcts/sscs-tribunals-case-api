@@ -2,8 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;

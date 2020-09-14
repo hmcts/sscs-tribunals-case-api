@@ -18,10 +18,9 @@ public class BundleAdditionFilenameBuilder {
         if (bundleAddition != null) {
             bundleText = "Addition " + bundleAddition + " - ";
         }
-        if(dateTimeFormatter!=null) {
+        if (dateTimeFormatter != null) {
             scannedDate = scannedDate != null ? LocalDate.parse(scannedDate, DateTimeFormatter.ISO_LOCAL_DATE).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-        }
-        else{
+        } else {
             scannedDate = scannedDate != null ? LocalDateTime.parse(scannedDate).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         }
         String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
