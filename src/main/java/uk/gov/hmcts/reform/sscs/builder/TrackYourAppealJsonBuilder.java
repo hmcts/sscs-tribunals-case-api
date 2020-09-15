@@ -84,7 +84,7 @@ public class TrackYourAppealJsonBuilder {
             PaperCaseEventFilterUtil.removeNonPaperCaseEvents(eventList);
         }
 
-        
+
 
         ObjectNode caseNode = JsonNodeFactory.instance.objectNode();
         caseNode.put("caseId", String.valueOf(caseId));
@@ -100,7 +100,7 @@ public class TrackYourAppealJsonBuilder {
 
             List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
 
-            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived");
+            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived", "notListable");
 
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
 
@@ -118,6 +118,8 @@ public class TrackYourAppealJsonBuilder {
             }  else if (closedStates.contains(state)) {
                 caseNode.put("status", "CLOSED");
             }
+
+            caseNode.put("notListable", "notListable".equalsIgnoreCase(state));
 
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
