@@ -1,14 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REINSTATEMENT_REQUEST;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static org.apache.commons.lang3.StringUtils.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
@@ -26,20 +20,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Component
@@ -51,12 +34,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
     private final FooterService footerService;
+    private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
 
     private boolean reinstatementFeatureFlag;
 
     @Autowired
-    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService, @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement) {
+    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService, BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder, @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement) {
         this.footerService = footerService;
+        this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
         this.reinstatementFeatureFlag = reinstatement;
     }
 
@@ -100,7 +85,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean isIssueFurtherEvidenceToAllParties(DynamicList furtherEvidenceActionList) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
-                && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
+            && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
             return furtherEvidenceActionList.getValue().getCode().equals(ISSUE_FURTHER_EVIDENCE.getCode());
         }
         return false;
@@ -108,7 +93,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private boolean isOtherDocumentTypeActionManually(DynamicList furtherEvidenceActionList) {
         if (furtherEvidenceActionList != null && furtherEvidenceActionList.getValue() != null
-                && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
+            && isNotBlank(furtherEvidenceActionList.getValue().getCode())) {
             return furtherEvidenceActionList.getValue().getCode().equals(OTHER_DOCUMENT_MANUAL.getCode());
         }
         return false;
@@ -127,7 +112,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private boolean isAppellantOrAppointeeAddressInvalid(SscsCaseData caseData) {
         if (null != caseData.getAppeal().getAppellant() && "yes".equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
             return null == caseData.getAppeal().getAppellant().getAppointee()
-                    || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
+                || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
         } else {
             return null == caseData.getAppeal().getAppellant()
                 || isAddressInvalid(caseData.getAppeal().getAppellant().getAddress());
@@ -138,8 +123,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         Representative rep = caseData.getAppeal().getRep();
 
         return null != rep
-                && "yes".equalsIgnoreCase(rep.getHasRepresentative())
-                && isAddressInvalid(rep.getAddress());
+            && "yes".equalsIgnoreCase(rep.getHasRepresentative())
+            && isAddressInvalid(rep.getAddress());
     }
 
     private boolean isAddressInvalid(Address address) {
@@ -255,9 +240,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         String bundleAddition = null;
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
-                && (caseState.equals(State.DORMANT_APPEAL_STATE)
-                || caseState.equals(State.RESPONSE_RECEIVED)
-                || caseState.equals(State.READY_TO_LIST))) {
+            && (caseState.equals(State.DORMANT_APPEAL_STATE)
+            || caseState.equals(State.RESPONSE_RECEIVED)
+            || caseState.equals(State.READY_TO_LIST))) {
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
 
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
@@ -268,24 +253,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             url = footerService.addFooter(url, documentFooterText, bundleAddition);
         }
 
-        String fileName = buildAdditionFileName(documentType, bundleAddition, scannedDocument.getValue().getScannedDate());
+        String fileName = bundleAdditionFilenameBuilder.build(documentType, bundleAddition, scannedDocument.getValue().getScannedDate());
 
         return SscsDocument.builder().value(SscsDocumentDetails.builder()
-                .documentType(documentType.getValue())
-                .documentFileName(fileName)
-                .bundleAddition(bundleAddition)
-                .documentLink(url)
-                .documentDateAdded(scannedDate)
-                .controlNumber(scannedDocument.getValue().getControlNumber())
-                .evidenceIssued("No")
-                .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
-                .build()).build();
+            .documentType(documentType.getValue())
+            .documentFileName(fileName)
+            .bundleAddition(bundleAddition)
+            .documentLink(url)
+            .documentDateAdded(scannedDate)
+            .controlNumber(scannedDocument.getValue().getControlNumber())
+            .evidenceIssued("No")
+            .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
+            .build()).build();
     }
 
     private DocumentType getDocumentType(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
         return (REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) && reinstatementFeatureFlag
-                ? REINSTATEMENT_REQUEST : getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
-                        sscsCaseData.getOriginalSender().getValue().getCode());
+            ? REINSTATEMENT_REQUEST : getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
+            sscsCaseData.getOriginalSender().getValue().getCode());
     }
 
     private String buildAdditionFileName(DocumentType documentType, String bundleAddition, String scannedDate) {
