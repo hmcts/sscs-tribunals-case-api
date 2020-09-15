@@ -331,7 +331,7 @@ public class TrackYourAppealJsonBuilderTest {
         SscsCaseData caseData = DWP_RESPOND_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "responseReceived");
-        assertJsonEquals(DWP_RESPOND.getSerializedMessage(), objectNode);
+        assertJsonEquals(DWP_RESPOND_MYA.getSerializedMessage(), objectNode);
     }
 
     @Test
@@ -348,6 +348,14 @@ public class TrackYourAppealJsonBuilderTest {
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "dormantAppealState");
         assertJsonEquals(DORMANT_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnNotListableFlagInTheMyaNotListableResponse() {
+        SscsCaseData caseData = NOT_LISTABLE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "notListable");
+        assertJsonEquals(NOT_LISTABLE_MYA.getSerializedMessage(), objectNode);
     }
 
     private RegionalProcessingCenter populateRegionalProcessingCenter() {

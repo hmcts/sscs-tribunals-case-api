@@ -32,6 +32,8 @@ public enum SerializeJsonMessageManager {
     HEARING("tya/hearing.json"),
     HEARING_MYA("tya/hearingMya.json"),
     HEARING_CCD("tya/hearingCcd.json"),
+    NOT_LISTABLE_MYA("tya/notListableMya.json"),
+    NOT_LISTABLE_CCD("tya/notListableCcd.json"),
     NEW_HEARING_BOOKED("tya/newHearingBooked.json"),
     NEW_HEARING_BOOKED_CCD("tya/newHearingBookedCcd.json"),
     NOT_PAST_HEARING_BOOKED("tya/notPastHearingBooked.json"),
