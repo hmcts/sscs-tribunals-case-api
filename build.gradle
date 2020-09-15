@@ -307,7 +307,7 @@ dependencies {
     e2eCompile 'org.projectlombok:lombok:1.18.8'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
 
-    testCompile "org.junit.jupiter:junit-jupiter-api:5.6.2"
+    testCompile "org.junit.jupiter:junit-jupiter-api:5.7.0"
     testRuntime "org.junit.jupiter:junit-jupiter-engine:5.6.2"
     testImplementation "org.junit.jupiter:junit-jupiter-api:5.6.2"
 
@@ -315,7 +315,7 @@ dependencies {
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-junit5_2.12', version: versions.pact
     contractTestCompile group: 'au.com.dius', name: 'pact-jvm-consumer-java8_2.12', version: versions.pact
 
-    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.6.0")
+    contractTestCompile("org.junit.jupiter:junit-jupiter-api:5.7.0")
     contractTestRuntime("org.junit.jupiter:junit-jupiter-engine:5.6.1")
     contractTestImplementation('org.junit.jupiter:junit-jupiter-api:5.6.2')
 
