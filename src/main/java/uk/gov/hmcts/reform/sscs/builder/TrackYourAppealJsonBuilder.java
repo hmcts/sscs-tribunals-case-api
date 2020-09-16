@@ -52,6 +52,7 @@ public class TrackYourAppealJsonBuilder {
     public static final String ORAL = "oral";
     public static final String YES = "Yes";
     public static final String PAPER = "paper";
+    public static final String NOT_LISTABLE = "notListable";
 
     public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
@@ -100,7 +101,7 @@ public class TrackYourAppealJsonBuilder {
 
             List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
 
-            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived", "notListable");
+            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived", NOT_LISTABLE);
 
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
 
@@ -119,7 +120,7 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.put("status", "CLOSED");
             }
 
-            caseNode.put("notListable", "notListable".equalsIgnoreCase(state));
+            caseNode.put(NOT_LISTABLE, NOT_LISTABLE.equalsIgnoreCase(state));
 
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
