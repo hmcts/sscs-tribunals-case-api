@@ -43,14 +43,23 @@ public class RestoreCasesService {
         this.objectMapper = objectMapper;
     }
 
-    public String getRestoreCasesDate(String message) throws JsonProcessingException {
-        JsonNode jsonNode = objectMapper.readTree(message);
-        TextNode textNode = (TextNode)jsonNode.get("case_details").get("case_data")
-            .get("restoreCasesDate");
-        if (textNode == null) {
+    private JsonNode getFrom(JsonNode node, String propertyName) {
+        JsonNode jsonNode = node.get(propertyName);
+        if (jsonNode == null) {
             throw new IllegalStateException("Unable to extract restoreCasesDate");
         }
-        return textNode.asText();
+        return jsonNode;
+    }
+
+    public String getRestoreCasesDate(String message) throws JsonProcessingException {
+        JsonNode jsonNode = objectMapper.readTree(message);
+        if (jsonNode == null) {
+            throw new IllegalStateException("Unable to extract restoreCasesDate");
+        }
+        JsonNode caseDetailsNode = getFrom(jsonNode, "case_details");
+        JsonNode caseDataNode = getFrom(caseDetailsNode, "case_data");
+        TextNode restoreCasesDateNode = (TextNode)getFrom(caseDataNode, "restoreCasesDate");
+        return restoreCasesDateNode.asText();
     }
 
     public RestoreCasesStatus restoreNextBatchOfCases(String date) {
@@ -78,7 +87,7 @@ public class RestoreCasesService {
         return new RestoreCasesStatus(processedCount, successIds.size(), failureIds, matchedCases.isEmpty());
     }
 
-    public List<SscsCaseDetails> getMatchedCases(IdamTokens idamTokens, String date) {
+    private List<SscsCaseDetails> getMatchedCases(IdamTokens idamTokens, String date) {
         List<SscsCaseDetails> matchedCases = getMatchedCasesForDate(idamTokens, date);
 
         // Defensively double-check that the matched cases do match the checkable criteria
@@ -111,7 +120,7 @@ public class RestoreCasesService {
     }
 
     private void triggerEvent(SscsCaseDetails caseDetails) {
-        log.info("About to update case with readyToList event for id {}", caseDetails.getId());
+        log.info("About to update case with {} event for id {}", POST_STATE_EVENT_TYPE, caseDetails.getId());
         try {
             ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), POST_STATE_EVENT_TYPE.getCcdType(), "Ready to list", "Ready to list event triggered", idamService.getIdamTokens());
         } catch (FeignException.UnprocessableEntity e) {
