@@ -16,6 +16,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -30,8 +32,12 @@ public class RestoreCasesService {
 
     private final IdamService idamService;
 
-    public static final String LAST_STATE_MODIFIED_VALUE_START = "2020-08-28";
-    public static final String LAST_STATE_MODIFIED_VALUE_END = "2020-09-10";
+    private static final String LAST_STATE_MODIFIED_VALUE_START = "2020-08-28";
+    private static final String LAST_STATE_MODIFIED_VALUE_END = "2020-09-10";
+    private static final String DWP_FURTHER_INFO_REQUIRED_VALUE = "No";
+    private static final State REQUIRED_PRE_STATE = RESPONSE_RECEIVED;
+    private static final EventType POST_STATE_EVENT_TYPE = EventType.READY_TO_LIST;
+
     public static final int MAX_CASES_PER_BATCH = 25;
 
     @Autowired
@@ -106,8 +112,8 @@ public class RestoreCasesService {
 
     private List<SscsCaseDetails> getMatchedCasesForDate(IdamTokens idamTokens, String date) {
         HashMap<String, String> map = new HashMap<String, String>();
-        map.put("state", RESPONSE_RECEIVED.getId());
-        map.put("case.dwpFurtherInfo", "No");
+        map.put("state", REQUIRED_PRE_STATE.getId());
+        map.put("case.dwpFurtherInfo", DWP_FURTHER_INFO_REQUIRED_VALUE);
         addDateRangeCriteria(map, date);
         return ccdService.findCaseBy(map, idamTokens);
     }
@@ -121,16 +127,16 @@ public class RestoreCasesService {
     }
     
     private boolean caseMatchesStateAndFurtherInfoCriteria(SscsCaseDetails caseDetails) {
-        return "No".equals(caseDetails.getData().getDwpFurtherInfo()) 
-            && "responseReceived".equals(caseDetails.getState())
-                && State.RESPONSE_RECEIVED.equals(caseDetails.getState());
+        return (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
+            && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState())
+                && State.RESPONSE_RECEIVED.equals(caseDetails.getState()));
     }
 
     private void triggerEvent(SscsCaseDetails caseDetails) {
         log.info("About to update case with readyToList event for id {}", caseDetails.getId());
         try {
 
-            ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), READY_TO_LIST.getCcdType(), "Ready to list", "Ready to list event triggered", idamService.getIdamTokens());
+            ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), POST_STATE_EVENT_TYPE.getCcdType(), "Ready to list", "Ready to list event triggered", idamService.getIdamTokens());
         } catch (FeignException.UnprocessableEntity e) {
             e.printStackTrace();
             log.error(format("readyToList event failed for caseId %s, root cause is %s", caseDetails.getId(), getRootCauseMessage(e), e));
