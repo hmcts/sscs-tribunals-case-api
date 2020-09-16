@@ -41,6 +41,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
 
 @SuppressWarnings("unchecked")
 @RunWith(JUnitParamsRunner.class)
@@ -75,6 +76,9 @@ public class CcdMideventCallbackControllerTest {
     @Mock
     private AdjournCaseCcdService adjournCaseCcdService;
 
+    @Mock
+    private RestoreCasesService restoreCasesService;
+
     private CcdMideventCallbackController controller;
 
     @Before
@@ -87,7 +91,7 @@ public class CcdMideventCallbackControllerTest {
         when(adjournCaseCcdService.getVenueDynamicListForRpcName(any())).thenReturn(dynamicList);
 
         controller = new CcdMideventCallbackController(authorisationService, deserializer, writeFinalDecisionPreviewDecisionService,
-            adjournCasePreviewService, adjournCaseCcdService);
+            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService);
         mockMvc = standaloneSetup(controller).build();
     }
 
