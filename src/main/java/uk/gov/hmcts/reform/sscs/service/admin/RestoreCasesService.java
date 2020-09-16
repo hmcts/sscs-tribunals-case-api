@@ -2,21 +2,18 @@ package uk.gov.hmcts.reform.sscs.service.admin;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DWP_RESPOND;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.READY_TO_LIST;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.State.RESPONSE_RECEIVED;
 
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import feign.FeignException;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Event;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
@@ -31,40 +28,37 @@ public class RestoreCasesService {
     private final CcdService ccdService;
 
     private final IdamService idamService;
+    
+    private final ObjectMapper objectMapper;
 
-    private static final String LAST_STATE_MODIFIED_VALUE_START = "2020-08-28";
-    private static final String LAST_STATE_MODIFIED_VALUE_END = "2020-09-10";
     private static final String DWP_FURTHER_INFO_REQUIRED_VALUE = "No";
-    private static final State REQUIRED_PRE_STATE = RESPONSE_RECEIVED;
+    private static final State REQUIRED_PRE_STATE = State.VALID_APPEAL;
     private static final EventType POST_STATE_EVENT_TYPE = EventType.READY_TO_LIST;
-
-    public static final int MAX_CASES_PER_BATCH = 25;
 
     @Autowired
     public RestoreCasesService(CcdService ccdService,
-        IdamService idamService) {
+        IdamService idamService, ObjectMapper objectMapper) {
         this.ccdService = ccdService;
         this.idamService = idamService;
+        this.objectMapper = objectMapper;
     }
 
-    private List<String> getDateRange(String start, String end) {
-        List<String> dates = new ArrayList<>();
-        LocalDate endDate = LocalDate.parse(LAST_STATE_MODIFIED_VALUE_END);
-
-        LocalDate date = LocalDate.parse(LAST_STATE_MODIFIED_VALUE_START);
-        while (!date.isAfter(endDate)) {
-            dates.add(date.toString());
-            date = date.plusDays(1);
+    public String getRestoreCasesDate(String message) throws JsonProcessingException {
+        JsonNode jsonNode = objectMapper.readTree(message);
+        TextNode textNode = (TextNode)jsonNode.get("case_details").get("case_data")
+            .get("restoreCasesDate");
+        if (textNode == null) {
+            throw new IllegalStateException("Unable to extract restoreCasesDate");
         }
-        return dates;
+        return textNode.asText();
     }
 
-    public RestoreCasesStatus restoreNextBatchOfCases() {
+    public RestoreCasesStatus restoreNextBatchOfCases(String date) {
         List<Long> successIds = new ArrayList<>();
         List<Long> failureIds = new ArrayList<>();
         int processedCount = 0;
 
-        List<SscsCaseDetails> matchedCases = getMatchedCases(idamService.getIdamTokens());
+        List<SscsCaseDetails> matchedCases = getMatchedCases(idamService.getIdamTokens(), date);
 
         log.info("About to submit " + matchedCases.size() + " cases to the queue to be restored");
 
@@ -84,8 +78,8 @@ public class RestoreCasesService {
         return new RestoreCasesStatus(processedCount, successIds.size(), failureIds, matchedCases.isEmpty());
     }
 
-    public List<SscsCaseDetails> getMatchedCases(IdamTokens idamTokens) {
-        List<SscsCaseDetails> matchedCases = getMatchedCasesForDateRange(idamTokens, LAST_STATE_MODIFIED_VALUE_START, LAST_STATE_MODIFIED_VALUE_END);
+    public List<SscsCaseDetails> getMatchedCases(IdamTokens idamTokens, String date) {
+        List<SscsCaseDetails> matchedCases = getMatchedCasesForDate(idamTokens, date);
 
         // Defensively double-check that the matched cases do match the checkable criteria
         if (!validateCasesMatchStateAndDwpFurtherInfoCriteria(matchedCases)) {
@@ -94,26 +88,10 @@ public class RestoreCasesService {
         return matchedCases;
     }
 
-    private List<SscsCaseDetails> getMatchedCasesForDateRange(IdamTokens idamTokens, String startDate, String endDate) {
-        List<SscsCaseDetails> matchedCases = new ArrayList<>();
-        // We are making 14 queries here - do we need to introduce a delay to rate limit ?
-        for (String date : getDateRange(LAST_STATE_MODIFIED_VALUE_START, LAST_STATE_MODIFIED_VALUE_END)) {
-            matchedCases.addAll(getMatchedCasesForDate(idamTokens, date));
-        }
-        // Shuffle the cases and truncate to MAX_CASES_PER_BATCH
-        // This is so that if there are any problematic cases that we cannot process
-        // we have a good chance of selecting other cases
-        Collections.shuffle(matchedCases);
-        if (matchedCases.size() > MAX_CASES_PER_BATCH) {
-            matchedCases = matchedCases.subList(0, MAX_CASES_PER_BATCH);
-        }
-        return matchedCases;
-    }
-
     private List<SscsCaseDetails> getMatchedCasesForDate(IdamTokens idamTokens, String date) {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("state", REQUIRED_PRE_STATE.getId());
-        map.put("case.dwpFurtherInfo", DWP_FURTHER_INFO_REQUIRED_VALUE);
+        //map.put("case.dwpFurtherInfo", DWP_FURTHER_INFO_REQUIRED_VALUE);
         addDateRangeCriteria(map, date);
         return ccdService.findCaseBy(map, idamTokens);
     }
@@ -127,7 +105,7 @@ public class RestoreCasesService {
     }
     
     private boolean caseMatchesStateAndFurtherInfoCriteria(SscsCaseDetails caseDetails) {
-        return (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
+        return (true || DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
             && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState())
                 && State.RESPONSE_RECEIVED.equals(caseDetails.getState()));
     }

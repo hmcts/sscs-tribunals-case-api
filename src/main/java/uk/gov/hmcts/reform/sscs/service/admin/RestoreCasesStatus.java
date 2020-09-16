@@ -18,17 +18,16 @@ public class RestoreCasesStatus {
 
     @Override
     public String toString() {
-        return "RestoreCasesStatus{" +
-            "processedCount=" + processedCount +
-            ", successCount=" + successCount +
-            ", failureCount=" + failureIds.size() +
-            ", failureIds=" + getFailureIds(failureIds) +
-            ", completed=" + completed +
-            '}';
+        return "RestoreCasesStatus{"
+            + "processedCount=" + processedCount
+            + ", successCount=" + successCount
+            + ", failureCount=" + failureIds.size()
+            + ", failureIds=" + getFailureIds(failureIds)
+            + ", completed=" + completed
+            + '}';
     }
 
     private String getFailureIds(List<Long> ids) {
-        // We can truncate this string if it's too long to display - or just display count
         return ids.toString();
     }
 

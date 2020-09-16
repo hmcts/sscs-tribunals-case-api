@@ -101,6 +101,7 @@ public class CcdMideventCallbackController {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
+
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to start ccdMidEventAdminRestoreCases callback `{}` received for Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
@@ -110,8 +111,11 @@ public class CcdMideventCallbackController {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
 
         try {
+
+            String date = restoreCasesService.getRestoreCasesDate(message);
+
             RestoreCasesStatus status =
-                restoreCasesService.restoreNextBatchOfCases();
+                restoreCasesService.restoreNextBatchOfCases(date);
 
             if (!status.isCompleted()) {
                 if (!status.isOk()) {
@@ -122,7 +126,7 @@ public class CcdMideventCallbackController {
             } else {
                 preSubmitCallbackResponse.addWarning("Completed - no more cases");
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             preSubmitCallbackResponse.addError(e.getMessage());
         }
         return ok(preSubmitCallbackResponse);
