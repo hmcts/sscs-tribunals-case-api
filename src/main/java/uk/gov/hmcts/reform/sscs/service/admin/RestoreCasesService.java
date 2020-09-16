@@ -113,10 +113,8 @@ public class RestoreCasesService {
     private void triggerEvent(SscsCaseDetails caseDetails) {
         log.info("About to update case with readyToList event for id {}", caseDetails.getId());
         try {
-
             ccdService.updateCase(caseDetails.getData(), caseDetails.getId(), POST_STATE_EVENT_TYPE.getCcdType(), "Ready to list", "Ready to list event triggered", idamService.getIdamTokens());
         } catch (FeignException.UnprocessableEntity e) {
-            e.printStackTrace();
             log.error(format("readyToList event failed for caseId %s, root cause is %s", caseDetails.getId(), getRootCauseMessage(e), e));
             throw e;
         }
