@@ -107,7 +107,7 @@ public class RestoreCasesService {
     private boolean caseMatchesStateAndFurtherInfoCriteria(SscsCaseDetails caseDetails) {
         return (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
             && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState())
-                && State.RESPONSE_RECEIVED.equals(caseDetails.getState()));
+                && REQUIRED_PRE_STATE.equals(caseDetails.getData().getState()));
     }
 
     private void triggerEvent(SscsCaseDetails caseDetails) {
