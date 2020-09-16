@@ -249,7 +249,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("faceToFace", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -303,7 +303,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("faceToFace", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -384,7 +384,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("faceToFace", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -438,7 +438,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("telephone", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -491,7 +491,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("video", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -544,7 +544,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("paper", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
