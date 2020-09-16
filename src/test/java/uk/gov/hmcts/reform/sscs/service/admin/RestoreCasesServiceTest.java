@@ -64,8 +64,8 @@ public class RestoreCasesServiceTest {
         String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -94,14 +94,84 @@ public class RestoreCasesServiceTest {
         Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
     }
 
+    @Test
+    public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneIsNonDigital() {
+        String date = "2020-08-28";
+
+        List<SscsCaseDetails> cases = new ArrayList<>();
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("somethingElse").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("last_state_modified_date", date);
+        searchCriteria.put("case.dwpFurtherInfo", "No");
+        searchCriteria.put("state", "responseReceived");
+
+        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+
+        restoreCasesService.restoreNextBatchOfCases(date);
+
+        ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<IdamTokens> idamTokensCaptor = ArgumentCaptor.forClass(IdamTokens.class);
+
+        Mockito.verify(ccdService, Mockito.times(1)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
+            eventTypeCaptor.capture(),
+            summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
+
+        Assert.assertEquals(Arrays.asList(1L), caseIdCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("readyToList"), eventTypeCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list"), summaryCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList(idamTokens), idamTokensCaptor.getAllValues());
+    }
+
+    @Test
+    public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneHasNoCreatedInGapsFrom() {
+        String date = "2020-08-28";
+
+        List<SscsCaseDetails> cases = new ArrayList<>();
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("last_state_modified_date", date);
+        searchCriteria.put("case.dwpFurtherInfo", "No");
+        searchCriteria.put("state", "responseReceived");
+
+        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+
+        restoreCasesService.restoreNextBatchOfCases(date);
+
+        ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<IdamTokens> idamTokensCaptor = ArgumentCaptor.forClass(IdamTokens.class);
+
+        Mockito.verify(ccdService, Mockito.times(1)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
+            eventTypeCaptor.capture(),
+            summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
+
+        Assert.assertEquals(Arrays.asList(1L), caseIdCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("readyToList"), eventTypeCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list"), summaryCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList(idamTokens), idamTokensCaptor.getAllValues());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testRestoreNextBatchOfCasesThrowsIllegalStateExceptionWhenAReturnedCaseHasIncorrectDwpFurtherInfo() {
         final String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("Something else").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("Something else").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -119,9 +189,9 @@ public class RestoreCasesServiceTest {
         final String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -139,9 +209,9 @@ public class RestoreCasesServiceTest {
         final String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().state(State.APPEAL_CREATED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.APPEAL_CREATED).dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
