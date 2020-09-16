@@ -32,7 +32,7 @@ public class RestoreCasesService {
     private final ObjectMapper objectMapper;
 
     private static final String DWP_FURTHER_INFO_REQUIRED_VALUE = "No";
-    private static final State REQUIRED_PRE_STATE = State.VALID_APPEAL;
+    private static final State REQUIRED_PRE_STATE = State.RESPONSE_RECEIVED;
     private static final EventType POST_STATE_EVENT_TYPE = EventType.READY_TO_LIST;
 
     @Autowired
@@ -91,7 +91,7 @@ public class RestoreCasesService {
     private List<SscsCaseDetails> getMatchedCasesForDate(IdamTokens idamTokens, String date) {
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("state", REQUIRED_PRE_STATE.getId());
-        //map.put("case.dwpFurtherInfo", DWP_FURTHER_INFO_REQUIRED_VALUE);
+        map.put("case.dwpFurtherInfo", DWP_FURTHER_INFO_REQUIRED_VALUE);
         addDateRangeCriteria(map, date);
         return ccdService.findCaseBy(map, idamTokens);
     }
@@ -105,7 +105,7 @@ public class RestoreCasesService {
     }
     
     private boolean caseMatchesStateAndFurtherInfoCriteria(SscsCaseDetails caseDetails) {
-        return (true || DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
+        return (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
             && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState())
                 && State.RESPONSE_RECEIVED.equals(caseDetails.getState()));
     }
