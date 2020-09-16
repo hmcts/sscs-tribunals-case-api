@@ -48,6 +48,7 @@ public class RestoreCasesService {
         LocalDate date = LocalDate.parse(LAST_STATE_MODIFIED_VALUE_START);
         while (!date.isAfter(endDate)) {
             dates.add(date.toString());
+            date = date.plusDays(1);
         }
         return dates;
     }
