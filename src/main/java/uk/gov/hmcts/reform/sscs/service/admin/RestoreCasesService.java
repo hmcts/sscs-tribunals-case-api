@@ -94,11 +94,12 @@ public class RestoreCasesService {
     private List<SscsCaseDetails> getMatchedCases(IdamTokens idamTokens, String date) {
         List<SscsCaseDetails> matchedCases = getMatchedCasesForDate(idamTokens, date);
 
-        // Filter to only digital cases
-        List<SscsCaseDetails> filteredMatchedCases = matchedCases.stream().filter(c -> isDigitalCase(c)).collect(Collectors.toList());
+        // Filter to only digital cases - this is to prevent known problems adding to the queue
+        // for non-digital cases that will feedback irrelevant errors
+        List<SscsCaseDetails> filteredMatchedCases = matchedCases.stream().filter(this::isDigitalCase).collect(Collectors.toList());
         if (filteredMatchedCases.size() < matchedCases.size()) {
-            Set<Long> matchedIds = matchedCases.stream().map(c -> c.getId()).collect(Collectors.toSet());
-            Set<Long> filteredMatchedIds = filteredMatchedCases.stream().map(c -> c.getId()).collect(Collectors.toSet());
+            Set<Long> matchedIds = matchedCases.stream().map(SscsCaseDetails::getId).collect(Collectors.toSet());
+            Set<Long> filteredMatchedIds = filteredMatchedCases.stream().map(SscsCaseDetails::getId).collect(Collectors.toSet());
             List<Long> skippedIds = matchedIds.stream().filter(id -> !filteredMatchedIds.contains(id)).collect(Collectors.toList());
             log.warn("Some cases were returned by the query which are non-digital - skipping the following ids {}", skippedIds);
         }
