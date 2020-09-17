@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.admin;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException.UnprocessableEntity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -74,7 +75,7 @@ public class RestoreCasesServiceTest {
 
         Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
 
-        restoreCasesService.restoreNextBatchOfCases(date);
+        final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
 
         ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
         ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
@@ -92,7 +93,134 @@ public class RestoreCasesServiceTest {
         Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
         Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
         Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+
+        Assert.assertFalse(status.isCompleted());
+        Assert.assertTrue(status.isOk());
+        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=2, failureCount=0, failureIds=[], completed=false}", status.toString());
+
     }
+
+    @Test
+    public void testRestoreNextBatchOfCasesWhenNoReturnedCases() {
+        String date = "2020-08-28";
+
+        final List<SscsCaseDetails> cases = new ArrayList<>();
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("last_state_modified_date", date);
+        searchCriteria.put("case.dwpFurtherInfo", "No");
+        searchCriteria.put("state", "responseReceived");
+
+        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+
+        RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
+
+        ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<IdamTokens> idamTokensCaptor = ArgumentCaptor.forClass(IdamTokens.class);
+
+        Mockito.verify(ccdService, Mockito.times(0)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
+            eventTypeCaptor.capture(),
+            summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
+
+        Assert.assertTrue(status.isCompleted());
+        Assert.assertTrue(status.isOk());
+        Assert.assertEquals("RestoreCasesStatus{processedCount=0, successCount=0, failureCount=0, failureIds=[], completed=true}", status.toString());
+
+    }
+
+    @Test
+    public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsAndUpdateCaseThrowsUnprocessableEntityExceptionForOne() {
+        String date = "2020-08-28";
+
+        List<SscsCaseDetails> cases = new ArrayList<>();
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("last_state_modified_date", date);
+        searchCriteria.put("case.dwpFurtherInfo", "No");
+        searchCriteria.put("state", "responseReceived");
+
+        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+
+        UnprocessableEntity unprocessableEntity = Mockito.mock(UnprocessableEntity.class);
+        Mockito.when(unprocessableEntity.getMessage()).thenReturn("some exception message");
+
+        Mockito.when(ccdService.updateCase(Mockito.any(), Mockito.eq(2L), Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(unprocessableEntity);
+
+        final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
+
+        ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<IdamTokens> idamTokensCaptor = ArgumentCaptor.forClass(IdamTokens.class);
+
+        Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
+            eventTypeCaptor.capture(),
+            summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
+
+        Assert.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+
+        Assert.assertFalse(status.isCompleted());
+        Assert.assertFalse(status.isOk());
+        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=1, failureCount=1, failureIds=[2], completed=false}", status.toString());
+
+    }
+
+    @Test
+    public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsAndUpdateCaseThrowsRuntimeExceptionForOne() {
+        String date = "2020-08-28";
+
+        List<SscsCaseDetails> cases = new ArrayList<>();
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("last_state_modified_date", date);
+        searchCriteria.put("case.dwpFurtherInfo", "No");
+        searchCriteria.put("state", "responseReceived");
+
+        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+
+        Mockito.when(ccdService.updateCase(Mockito.any(), Mockito.eq(2L), Mockito.anyString(),
+            Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(new RuntimeException("some exception message"));
+
+        final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
+
+        ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<IdamTokens> idamTokensCaptor = ArgumentCaptor.forClass(IdamTokens.class);
+
+        Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
+            eventTypeCaptor.capture(),
+            summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
+
+        Assert.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+
+        Assert.assertFalse(status.isCompleted());
+        Assert.assertFalse(status.isOk());
+        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=1, failureCount=1, failureIds=[2], completed=false}", status.toString());
+
+    }
+
+
 
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneIsNonDigital() {
@@ -123,6 +251,41 @@ public class RestoreCasesServiceTest {
             summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
 
         Assert.assertEquals(Arrays.asList(1L), caseIdCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("readyToList"), eventTypeCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list"), summaryCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList(idamTokens), idamTokensCaptor.getAllValues());
+    }
+
+    @Test
+    public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneHasNoCaseData() {
+        String date = "2020-08-28";
+
+        List<SscsCaseDetails> cases = new ArrayList<>();
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("last_state_modified_date", date);
+        searchCriteria.put("case.dwpFurtherInfo", "No");
+        searchCriteria.put("state", "responseReceived");
+
+        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+
+        restoreCasesService.restoreNextBatchOfCases(date);
+
+        ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<IdamTokens> idamTokensCaptor = ArgumentCaptor.forClass(IdamTokens.class);
+
+        Mockito.verify(ccdService, Mockito.times(1)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
+            eventTypeCaptor.capture(),
+            summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
+
+        Assert.assertEquals(Arrays.asList(2L), caseIdCaptor.getAllValues());
         Assert.assertEquals(Arrays.asList("readyToList"), eventTypeCaptor.getAllValues());
         Assert.assertEquals(Arrays.asList("Ready to list"), summaryCaptor.getAllValues());
         Assert.assertEquals(Arrays.asList("Ready to list event triggered"), descriptionCaptor.getAllValues());
