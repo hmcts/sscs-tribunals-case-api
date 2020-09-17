@@ -98,8 +98,8 @@ public class RestoreCasesService {
         // for non-digital cases that will feedback irrelevant errors
         List<SscsCaseDetails> filteredMatchedCases = matchedCases.stream().filter(this::isDigitalCase).collect(Collectors.toList());
         if (filteredMatchedCases.size() < matchedCases.size()) {
-            Set<Long> matchedIds = matchedCases.stream().map(SscsCaseDetails::getId).collect(Collectors.toSet());
-            Set<Long> filteredMatchedIds = filteredMatchedCases.stream().map(SscsCaseDetails::getId).collect(Collectors.toSet());
+            Set<Long> matchedIds = matchedCases.stream().map(c -> c.getId()).collect(Collectors.toSet());
+            Set<Long> filteredMatchedIds = filteredMatchedCases.stream().map(c -> c.getId()).collect(Collectors.toSet());
             List<Long> skippedIds = matchedIds.stream().filter(id -> !filteredMatchedIds.contains(id)).collect(Collectors.toList());
             log.warn("Some cases were returned by the query which are non-digital - skipping the following ids {}", skippedIds);
         }

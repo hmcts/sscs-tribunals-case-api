@@ -124,6 +124,7 @@ public class CcdMideventCallbackController {
                     preSubmitCallbackResponse.addWarning(status.toString());
                 }
             } else {
+                preSubmitCallbackResponse.addWarning(status.toString());
                 preSubmitCallbackResponse.addWarning("Completed - no more cases");
             }
         } catch (Exception e) {
