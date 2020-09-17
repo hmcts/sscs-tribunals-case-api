@@ -118,11 +118,7 @@ public class CcdMideventCallbackController {
                 restoreCasesService.restoreNextBatchOfCases(date);
 
             if (!status.isCompleted()) {
-                if (!status.isOk()) {
-                    preSubmitCallbackResponse.addError(status.toString());
-                } else {
-                    preSubmitCallbackResponse.addWarning(status.toString());
-                }
+                preSubmitCallbackResponse.addError(status.toString());
             } else {
                 preSubmitCallbackResponse.addWarning(status.toString());
                 preSubmitCallbackResponse.addWarning("Completed - no more cases");

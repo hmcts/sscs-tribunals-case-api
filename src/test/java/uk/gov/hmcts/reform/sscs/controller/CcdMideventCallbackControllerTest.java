@@ -176,9 +176,9 @@ public class CcdMideventCallbackControllerTest {
             new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
             Optional.empty(), ADMIN_RESTORE_CASES, false));
 
-        String expectedWarningsString = Arrays.asList("\"" + status.toString() + "\"").toString();
+        String expectedErrorsString = Arrays.asList("\"" + status.toString() + "\"").toString();
 
-        String expectedJsonErrorsAndWarningsString = "{'warnings': " + expectedWarningsString + "}, {'errors' : []}";
+        String expectedJsonErrorsAndWarningsString = "{'errors': " + expectedErrorsString + "}, {'warnings' : []}";
 
         mockMvc.perform(post("/ccdMidEventAdminRestoreCases")
             .contentType(MediaType.APPLICATION_JSON)
