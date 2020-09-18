@@ -101,13 +101,12 @@ public class TrackYourAppealJsonBuilder {
 
             List<String> withDwpStates = Arrays.asList("appealCreated", "validAppeal", "withDwp");
 
-            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived");
+            List<String> dwpRespondStates = Arrays.asList("readyToList", "responseReceived", NOT_LISTABLE);
 
             List<String> hearingStates = Arrays.asList("hearing", "outcome");
 
-            List<String> closedStates = Arrays.asList("closed", "voidState", "dormantAppealState");
-
-            List<String> responseReceivedStates = Arrays.asList(NOT_LISTABLE);
+            List<String> closedStates = Arrays.asList("closed",
+                    "voidState", "dormantAppealState");
 
             if (appealReceivedStates.contains(state)) {
                 caseNode.put("status", "APPEAL_RECEIVED");
@@ -119,9 +118,9 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.put("status", "HEARING_BOOKED");
             }  else if (closedStates.contains(state)) {
                 caseNode.put("status", "CLOSED");
-            }  else if (responseReceivedStates.contains(state)) {
-                caseNode.put("status", "RESPONSE_RECEIVED");
             }
+
+            caseNode.put(NOT_LISTABLE, NOT_LISTABLE.equalsIgnoreCase(state));
 
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
@@ -257,7 +256,7 @@ public class TrackYourAppealJsonBuilder {
         return eventList.size() > 1
             && HEARING_BOOKED.equals(getEventType(eventList.get(0)))
             && (POSTPONED.equals(getEventType(eventList.get(1)))
-            || EventType.ADJOURNED.equals(getEventType(eventList.get(1))));
+            || ADJOURNED.equals(getEventType(eventList.get(1))));
     }
 
     private boolean isAppealClosed(Event event) {

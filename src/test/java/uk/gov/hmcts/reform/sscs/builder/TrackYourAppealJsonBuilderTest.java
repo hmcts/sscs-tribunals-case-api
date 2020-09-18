@@ -351,7 +351,7 @@ public class TrackYourAppealJsonBuilderTest {
     }
 
     @Test
-    public void shouldReturnNotListableAppealWithResponseReceivedResponse() {
+    public void shouldReturnNotListableFlagInTheMyaNotListableResponse() {
         SscsCaseData caseData = NOT_LISTABLE_CCD.getDeserializeMessage();
         ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
                 populateRegionalProcessingCenter(), 1L, true, "notListable");
