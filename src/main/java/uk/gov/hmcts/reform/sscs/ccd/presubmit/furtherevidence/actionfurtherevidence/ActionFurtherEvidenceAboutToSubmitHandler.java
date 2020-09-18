@@ -171,7 +171,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                         sscsCaseData.setSscsDocument(documents);
                     }
 
-
                     sscsCaseData.setEvidenceHandled(YES);
 
                     if (reinstatementFeatureFlag) {
