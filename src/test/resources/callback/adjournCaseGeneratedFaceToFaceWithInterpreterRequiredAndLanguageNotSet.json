@@ -35,8 +35,8 @@
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
       "adjournCaseNextHearingSpecificTime" : "am",
-      "adjournCaseAdditionalDirections" : "something else",
-      "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
+      "adjournCaseAdditionalDirections": [{"id":null, "value":"something else"}],
+      "adjournCaseReasons": [{"id":null, "value":"Reasons 1"}],
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
