@@ -90,7 +90,7 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseNextHearingSpecificDate("")
             .adjournCaseNextHearingSpecificTime("")
             .adjournCaseReasons(Arrays.asList(new CollectionItem(null, "")))
-            .adjournCaseAdditionalDirections("")
+            .adjournCaseAdditionalDirections(Arrays.asList(new CollectionItem(null, "")))
         .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

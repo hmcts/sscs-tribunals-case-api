@@ -76,7 +76,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate");
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false);
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
 
@@ -278,6 +278,68 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertValues(response, null, DIRECTION_ACTION_REQUIRED.getId(), State.WITH_DWP);
 
+    }
+
+
+    @Test
+    public void givenDirectionTypeOfGrantReinstatementAndNotInterlocReview_setState() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", true);
+
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.APPEAL_CREATED));
+        assertTrue(response.getData().getReinstatementOutcome().equals(ReinstatementOutcome.GRANTED));
+        assertEquals(DwpState.REINSTATEMENT_GRANTED.getId(), response.getData().getDwpState());
+        assertNull(response.getData().getInterlocReviewState());
+    }
+
+    @Test
+    public void givenDirectionTypeOfGrantReinstatementAndInterlocReview_setState() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", true);
+
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE));
+        assertTrue(response.getData().getReinstatementOutcome().equals(ReinstatementOutcome.GRANTED));
+        assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION.getId()));
+        assertEquals(DwpState.REINSTATEMENT_GRANTED.getId(), response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenDirectionTypeOfRefuseReinstatementkeepState() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", true);
+
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getReinstatementOutcome().equals(ReinstatementOutcome.REFUSED));
+        assertNull(response.getData().getInterlocReviewState());
+        assertEquals(DwpState.REINSTATEMENT_REFUSED.getId(), response.getData().getDwpState());
     }
 
     @Test
