@@ -150,7 +150,7 @@ public class AdjournCasePreviewServiceTest {
 
     private void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
         sscsCaseData.setAdjournCaseReasons(Arrays.asList(new CollectionItem<>(null, "My reasons for decision")));
-        sscsCaseData.setAdjournCaseAdditionalDirections("Something else.");
+        sscsCaseData.setAdjournCaseAdditionalDirections(Arrays.asList(new CollectionItem<>(null, "Something else.")));
         sscsCaseData.setAdjournCaseTypeOfHearing("faceToFace");
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -166,7 +166,7 @@ public class AdjournCasePreviewServiceTest {
             assertFalse(body.getReasonsForDecision().isEmpty());
             assertEquals("My reasons for decision", body.getReasonsForDecision().get(0));
         }
-        assertEquals("Something else.", body.getAdditionalDirections());
+        assertEquals("Something else.", body.getAdditionalDirections().get(0));
         assertEquals("faceToFace", body.getHearingType());
     }
 
