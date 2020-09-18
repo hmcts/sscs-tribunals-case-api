@@ -65,8 +65,48 @@ public class RestoreCasesServiceTest {
         String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+
+        Map<String, String> searchCriteria = new HashMap<>();
+        searchCriteria.put("last_state_modified_date", date);
+        searchCriteria.put("case.dwpFurtherInfo", "No");
+        searchCriteria.put("state", "responseReceived");
+
+        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+
+        final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
+
+        ArgumentCaptor<SscsCaseData> sscsCaseDataCaptor = ArgumentCaptor.forClass(SscsCaseData.class);
+        ArgumentCaptor<Long> caseIdCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<String> eventTypeCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> summaryCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> descriptionCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<IdamTokens> idamTokensCaptor = ArgumentCaptor.forClass(IdamTokens.class);
+
+        Mockito.verify(ccdService, Mockito.times(2)).updateCase(sscsCaseDataCaptor.capture(), caseIdCaptor.capture(),
+            eventTypeCaptor.capture(),
+            summaryCaptor.capture(), descriptionCaptor.capture(), idamTokensCaptor.capture());
+
+        Assert.assertEquals(Arrays.asList(1L, 2L), caseIdCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("readyToList", "readyToList"), eventTypeCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list", "Ready to list"), summaryCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList("Ready to list event triggered", "Ready to list event triggered"), descriptionCaptor.getAllValues());
+        Assert.assertEquals(Arrays.asList(idamTokens, idamTokens), idamTokensCaptor.getAllValues());
+
+        Assert.assertFalse(status.isCompleted());
+        Assert.assertTrue(status.isOk());
+        Assert.assertEquals("RestoreCasesStatus{processedCount=2, successCount=2, failureCount=0, failureIds=[], completed=false}", status.toString());
+
+    }
+
+    @Test
+    public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsWillNotBeAffectedWhenOneHasUnexpectedCaseDataState() {
+        String date = "2020-08-28";
+
+        List<SscsCaseDetails> cases = new ArrayList<>();
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.DORMANT_APPEAL_STATE).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -136,8 +176,8 @@ public class RestoreCasesServiceTest {
         String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -182,8 +222,8 @@ public class RestoreCasesServiceTest {
         String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -220,15 +260,13 @@ public class RestoreCasesServiceTest {
 
     }
 
-
-
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneIsNonDigital() {
         String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("somethingElse").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("somethingElse").dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -263,7 +301,7 @@ public class RestoreCasesServiceTest {
 
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -297,8 +335,8 @@ public class RestoreCasesServiceTest {
         String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -332,9 +370,9 @@ public class RestoreCasesServiceTest {
         final String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("Something else").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("Something else").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -352,9 +390,9 @@ public class RestoreCasesServiceTest {
         final String date = "2020-08-28";
 
         List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
+        cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
         Map<String, String> searchCriteria = new HashMap<>();
         searchCriteria.put("last_state_modified_date", date);
@@ -366,27 +404,6 @@ public class RestoreCasesServiceTest {
         restoreCasesService.restoreNextBatchOfCases(date);
 
     }
-
-    @Test(expected = IllegalStateException.class)
-    public void testRestoreNextBatchOfCasesThrowsIllegalStateExceptionWhenAReturnedCaseHasIncorrectCaseDataState() {
-        final String date = "2020-08-28";
-
-        List<SscsCaseDetails> cases = new ArrayList<>();
-        cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.RESPONSE_RECEIVED).dwpFurtherInfo("No").build()).build());
-        cases.add(SscsCaseDetails.builder().id(3L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.APPEAL_CREATED).dwpFurtherInfo("No").build()).build());
-
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
-
-        restoreCasesService.restoreNextBatchOfCases(date);
-
-    }
-
 
     @Test(expected = JsonProcessingException.class)
     public void testGetRestoreCasesDateWhenInvalidJson() throws JsonProcessingException {
