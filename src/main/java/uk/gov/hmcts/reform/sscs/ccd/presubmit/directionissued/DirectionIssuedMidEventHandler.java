@@ -49,6 +49,7 @@ public class DirectionIssuedMidEventHandler extends IssueDocumentHandler impleme
             errorResponse.addError("Direction Type cannot be empty");
             return errorResponse;
         }
+
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && StringUtils.isBlank(caseData.getDirectionDueDate())) {
             final PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
