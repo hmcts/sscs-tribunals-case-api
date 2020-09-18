@@ -138,9 +138,13 @@ public class RestoreCasesService {
     }
     
     private boolean caseMatchesStateAndFurtherInfoCriteria(SscsCaseDetails caseDetails) {
-        return (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
-            && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState())
-                && REQUIRED_PRE_STATE.equals(caseDetails.getData().getState()));
+        boolean matchesCriteria = (DWP_FURTHER_INFO_REQUIRED_VALUE.equals(caseDetails.getData().getDwpFurtherInfo())
+            && REQUIRED_PRE_STATE.getId().equals(caseDetails.getState()));
+        if (!matchesCriteria) {
+            log.error(format("Matched case with id %s has state of %s and dwpFurtherInfo of %s which is inconsistent with search",
+                caseDetails.getId(), caseDetails.getState(), caseDetails.getData().getDwpFurtherInfo()));
+        }
+        return matchesCriteria;
     }
 
     private void triggerEvent(SscsCaseDetails caseDetails) {
