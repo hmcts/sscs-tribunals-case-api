@@ -33,20 +33,21 @@ public class AdjournCaseCcdServiceTest {
         openMocks(this);
         service = new AdjournCaseCcdService(new VenueRpcDetailsService(venueDataLoader));
         Map<String, VenueDetails> venueDetailsMap = new HashMap<>();
-        venueDetailsMap.put("venue1Rpc1", VenueDetails.builder().venueId("venue1Rpc1").venName("Zebedee Venue 1")
+        venueDetailsMap.put("venue1Rpc1", VenueDetails.builder().venueId("venue1Rpc1").active("Yes").venName("Zebedee Venue 1")
                 .regionalProcessingCentre("SSCS Rpc 1").build());
-        venueDetailsMap.put("venue2Rpc1", VenueDetails.builder().venueId("venue2Rpc1").venName("Apple Venue 2")
+        venueDetailsMap.put("venue2Rpc1", VenueDetails.builder().venueId("venue2Rpc1").active("Yes").venName("Apple Venue 2")
                 .regionalProcessingCentre("SSCS Rpc 1").build());
-        venueDetailsMap.put("venue3Rpc2", VenueDetails.builder().venueId("venue3Rpc2").venName("Zebedee Venue 3")
+        venueDetailsMap.put("venue3Rpc2", VenueDetails.builder().venueId("venue3Rpc2").active("Yes").venName("Zebedee Venue 3")
                 .regionalProcessingCentre("SSCS Rpc 2").build());
-        venueDetailsMap.put("venue4Rpc2", VenueDetails.builder().venueId("venue4Rpc2").venName("Apple Venue 4")
+        venueDetailsMap.put("venue4Rpc2", VenueDetails.builder().venueId("venue4Rpc2").active("Yes").venName("Apple Venue 4")
                 .regionalProcessingCentre("SSCS Rpc 2").build());
-        venueDetailsMap.put("venue5Rpc3", VenueDetails.builder().venueId("venue5Rpc3").venName("Zebedee Venue 5")
+        venueDetailsMap.put("venue5Rpc3", VenueDetails.builder().venueId("venue5Rpc3").active("Yes").venName("Zebedee Venue 5")
                 .regionalProcessingCentre("SSCS Rpc 3").build());
-        venueDetailsMap.put("venue6Rpc3", VenueDetails.builder().venueId("venue6Rpc3").venName("Apple Venue 6")
+        venueDetailsMap.put("venue6Rpc3", VenueDetails.builder().venueId("venue6Rpc3").active("Yes").venName("Apple Venue 6")
                 .regionalProcessingCentre("SSCS Rpc 3").build());
+        venueDetailsMap.put("venue7Rpc3", VenueDetails.builder().venueId("venue7Rpc3").active("No").venName("Apple Venue 7")
+            .regionalProcessingCentre("SSCS Rpc 3").build());
         Mockito.when(venueDataLoader.getVenueDetailsMap()).thenReturn(venueDetailsMap);
-
     }
 
     @Test
