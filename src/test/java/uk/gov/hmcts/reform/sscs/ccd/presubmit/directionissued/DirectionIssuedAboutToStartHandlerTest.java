@@ -38,7 +38,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        handler = new DirectionIssuedAboutToStartHandler();
+        handler = new DirectionIssuedAboutToStartHandler(false);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
@@ -126,6 +126,28 @@ public class DirectionIssuedAboutToStartHandlerTest {
         listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
         listOptions.add(new DynamicListItem(GRANT_EXTENSION.getCode(), GRANT_EXTENSION.getLabel()));
         listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(4, listOptions.size());
+    }
+
+    @Test
+    public void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
+
+        handler = new DirectionIssuedAboutToStartHandler(true);
+
+        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(GRANT_REINSTATEMENT.getCode(), GRANT_REINSTATEMENT.getLabel()));
+        listOptions.add(new DynamicListItem(REFUSE_REINSTATEMENT.getCode(), REFUSE_REINSTATEMENT.getLabel()));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
