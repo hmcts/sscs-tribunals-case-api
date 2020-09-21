@@ -197,8 +197,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
         StringBuilder stringBuilder = new StringBuilder("");
         if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
                 && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
-            stringBuilder.append("first in the ");
+            stringBuilder.append("first ");
         }
+        stringBuilder.append("in the ");
+
         if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
                 && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime().equalsIgnoreCase("am")) {
             stringBuilder.append("morning ");
