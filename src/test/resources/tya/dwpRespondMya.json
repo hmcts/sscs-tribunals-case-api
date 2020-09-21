@@ -8,7 +8,7 @@
     "benefitType": "esa",
     "hearingType": "oral",
     "status": "DWP_RESPOND",
-    "notListable": false,
+    "hideHearing": false,
     "latestEvents": [
       {
         "evidenceType": "EvidenceType2",

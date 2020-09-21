@@ -8,7 +8,7 @@
     "name": "Mr. C Charlie",
     "surname": "Charlie",
     "status": "DWP_RESPOND",
-    "notListable": true,
+    "hideHearing": true,
     "latestEvents": [
       {
         "decisionLetterReceiveByDate": "2017-07-11T12:02:09.770Z",
