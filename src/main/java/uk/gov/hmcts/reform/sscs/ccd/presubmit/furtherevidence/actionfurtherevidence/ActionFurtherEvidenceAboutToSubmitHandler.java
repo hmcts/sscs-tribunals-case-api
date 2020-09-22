@@ -3,8 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 import static java.util.Objects.requireNonNull;
 import static org.apache.commons.lang3.StringUtils.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,12 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
-import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.callback.*;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -36,13 +31,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     private final FooterService footerService;
     private final BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder;
 
-    private boolean reinstatementFeatureFlag;
-
     @Autowired
-    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService, BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder, @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement) {
+    public ActionFurtherEvidenceAboutToSubmitHandler(FooterService footerService, BundleAdditionFilenameBuilder bundleAdditionFilenameBuilder) {
         this.footerService = footerService;
         this.bundleAdditionFilenameBuilder = bundleAdditionFilenameBuilder;
-        this.reinstatementFeatureFlag = reinstatement;
     }
 
     @Override
@@ -142,12 +134,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState, Boolean ignoreWarnings) {
 
+        boolean confidentialCase = false;
+
         if (sscsCaseData.getScannedDocuments() != null) {
-            boolean hasReinstatementRequestDocument = false;
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
 
-                    checkWarningsAndErrors(scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings);
+                    if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+                        confidentialCase = true;
+                    }
+
+                    checkWarningsAndErrors(sscsCaseData, scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings);
 
                     List<SscsDocument> documents = new ArrayList<>();
 
@@ -155,9 +152,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
                         SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
 
-                        if (reinstatementFeatureFlag && REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-                            hasReinstatementRequestDocument = true;
+                        if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
+                            if (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction())) {
+                                setReinstateCaseFields(sscsCaseData);
+                            }
                         }
+
                         documents.add(sscsDocument);
                         if (sscsCaseData.isLanguagePreferenceWelsh()) {
                             sscsCaseData.setTranslationWorkOutstanding(YES);
@@ -173,21 +173,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
                     sscsCaseData.setEvidenceHandled(YES);
 
-                    if (reinstatementFeatureFlag) {
-                        boolean otherDocumentTypeActionManually = isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction());
-                        if (otherDocumentTypeActionManually && hasReinstatementRequestDocument) {
-                            sscsCaseData.setReinstatementRegistered(LocalDate.now());
-                            sscsCaseData.setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
-                            sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
-                            State previousState = sscsCaseData.getPreviousState();
-                            if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
-                                log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
-                                sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
-                            }
-                        }
-                    }
-
-                    sscsCaseData.setEvidenceHandled("Yes");
 
                 } else {
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
@@ -199,9 +184,29 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         sscsCaseData.setScannedDocuments(null);
 
+        if (confidentialCase) {
+            setConfidentialCaseFields(sscsCaseData);
+        }
     }
 
-    private void checkWarningsAndErrors(ScannedDocument scannedDocument, String caseId, boolean ignoreWarnings) {
+    private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.setIsConfidentialCase(YES);
+        sscsCaseData.setConfidentialityRequestDate(LocalDate.now());
+        sscsCaseData.setConfidentialityRequestOutcome(RequestOutcome.IN_PROGRESS);
+    }
+
+    private void setReinstateCaseFields(SscsCaseData sscsCaseData) {
+        sscsCaseData.setReinstatementRegistered(LocalDate.now());
+        sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
+        State previousState = sscsCaseData.getPreviousState();
+        if (previousState == null || State.DORMANT_APPEAL_STATE == previousState || State.VOID_STATE == previousState) {
+            log.info("{} setting previousState from {}} to interlocutoryReviewState}", sscsCaseData.getCcdCaseId(), previousState);
+            sscsCaseData.setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+        }
+    }
+
+    private void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId, boolean ignoreWarnings) {
         if (scannedDocument.getValue().getUrl() == null) {
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
@@ -224,6 +229,18 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 log.info("Coversheet not moved over for {}} - {}}", caseId, scannedDocument.getValue().getUrl().getDocumentUrl());
             }
         }
+
+        if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+
+            if (!SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+                preSubmitCallbackResponse.addError("Further evidence action must be 'Send to Interloc - Review by Judge' for a confidential document");
+            }
+
+            if (!OriginalSenderItemList.APPELLANT.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())
+                && !OriginalSenderItemList.JOINT_PARTY.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
+                preSubmitCallbackResponse.addError("Original sender must be appellant or joint party for a confidential document");
+            }
+        }
     }
 
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
@@ -235,7 +252,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         DocumentLink url = scannedDocument.getValue().getUrl();
 
-        DocumentType documentType = getDocumentType(sscsCaseData, scannedDocument);
+        DocumentType documentType = getSubtype(
+                sscsCaseData.getFurtherEvidenceAction().getValue().getCode(), sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
         if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
@@ -266,25 +284,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .build()).build();
     }
 
-    private DocumentType getDocumentType(SscsCaseData sscsCaseData, ScannedDocument scannedDocument) {
-        return (REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) && reinstatementFeatureFlag
-            ? REINSTATEMENT_REQUEST : getSubtype(sscsCaseData.getFurtherEvidenceAction().getValue().getCode(),
-            sscsCaseData.getOriginalSender().getValue().getCode());
-    }
-
-    private String buildAdditionFileName(DocumentType documentType, String bundleAddition, String scannedDate) {
-        String bundleText = "";
-        if (bundleAddition != null) {
-            bundleText = "Addition " + bundleAddition + " - ";
+    private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode, ScannedDocument scannedDocument) {
+        if (ScannedDocumentType.REINSTATEMENT_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+            return REINSTATEMENT_REQUEST;
         }
-        scannedDate = scannedDate != null ? LocalDateTime.parse(scannedDate).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) : LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-
-        String label = documentType.getLabel() != null ? documentType.getLabel() : documentType.getValue();
-
-        return bundleText + label + " received on " + scannedDate;
-    }
-
-    private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode) {
+        if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+            return CONFIDENTIALITY_REQUEST;
+        }
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(furtherEvidenceActionItemCode)) {
             return OTHER_DOCUMENT;
         }
