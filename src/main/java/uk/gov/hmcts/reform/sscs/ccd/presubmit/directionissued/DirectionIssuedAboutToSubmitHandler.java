@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
@@ -37,16 +38,19 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final ServiceRequestExecutor serviceRequestExecutor;
     private final String bulkScanEndpoint;
     private boolean reinstatementFeatureFlag;
+    private final DwpAddressLookupService dwpAddressLookupService;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
                                                @Value("${bulk_scan.url}") String bulkScanUrl,
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
-                                               @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement) {
+                                               @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement,
+                                               DwpAddressLookupService dwpAddressLookupService) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.reinstatementFeatureFlag = reinstatement;
+        this.dwpAddressLookupService = dwpAddressLookupService;
     }
 
     @Override
@@ -63,6 +67,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
+        Appeal appeal = caseData.getAppeal();
+        if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
+            caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
+                    appeal.getMrnDetails().getDwpIssuingOffice()));
+        }
 
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
