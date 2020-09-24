@@ -8,6 +8,7 @@
     "benefitType": "pip",
     "hearingType": "oral",
     "status": "WITH_DWP",
+    "hideHearing": false,
     "latestEvents": [
       {
         "evidenceType": "General",
