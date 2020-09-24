@@ -1,0 +1,111 @@
+{
+  "caseId" : "1",
+  "caseReference": "SC333/33/33333",
+  "state": "notListable",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
+      }
+    },
+    "benefitType": {
+      "code": "PIP"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "hearings": [
+    {
+      "value": {
+        "venue": {
+          "name": "Chester Magistrate's Court",
+          "address": {
+            "line1": "Chester Magistrate's Court",
+            "line2": "Grosvenor Street",
+            "town": "Chester",
+            "postcode": "CH1 2XA"
+          },
+          "googleMapLink": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632"
+        },
+        "hearingDate": "2017-07-17",
+        "time": "23:00"
+      }
+    },
+    {
+      "value": {
+        "venue": {
+          "name": "Prudential House",
+          "address": {
+            "line1": "36 Dale Street",
+            "line2": "",
+            "town": "Liverpool",
+            "postcode": "L2 5UZ"
+          },
+          "googleMapLink": "https://www.google.com/maps/place/36+Dale+Street+Liverpool+Merseyside+L2+5UZ/@53.407820,-2.988509"
+        },
+        "hearingDate": "2017-07-12",
+        "time": "23:00",
+        "eventDate": "2017-06-24T18:11:34.013"
+      }
+    }
+  ],
+  "events": [
+    {
+      "value": {
+        "date": "2017-06-29T12:50:11.437",
+        "type": "appealDormant",
+        "description": "Dormant"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-06-30T13:02:09.77",
+        "type": "hearing",
+        "description": "Hearing"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-06-28T14:11:34.013",
+        "type": "hearingBooked",
+        "description": "Hearing booked"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-06-26T12:17:37.497",
+        "type": "hearingAdjourned",
+        "description": "Hearing adjourned"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-06-24T14:11:34.013",
+        "type": "hearingBooked",
+        "description": "Hearing booked"
+      }
+    },
+    {
+      "value": {
+        "date": "2009-06-16T10:43:16.297",
+        "type": "responseReceived",
+        "description": "Dwp Respond"
+      }
+    },
+    {
+      "value": {
+        "date": "2009-06-12T17:03:45.39",
+        "type": "appealReceived",
+        "description": "Appeal received"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}
