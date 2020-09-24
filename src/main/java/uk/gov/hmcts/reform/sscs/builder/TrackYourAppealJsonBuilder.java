@@ -94,6 +94,9 @@ public class TrackYourAppealJsonBuilder {
         if (appellantSubscription != null) {
             caseNode.put("appealNumber", appellantSubscription.getTya());
         }
+
+        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+
         if (mya) {
             log.info("Is MYA case with state {}", state);
             List<String> appealReceivedStates = Arrays.asList("incompleteApplication",
@@ -108,11 +111,13 @@ public class TrackYourAppealJsonBuilder {
             List<String> closedStates = Arrays.asList("closed",
                     "voidState", "dormantAppealState");
 
+            boolean hearingAdjourned = isHearingAdjourned(eventHearingMap);
+
             if (appealReceivedStates.contains(state)) {
                 caseNode.put("status", "APPEAL_RECEIVED");
             } else if (withDwpStates.contains(state)) {
                 caseNode.put("status", "WITH_DWP");
-            } else if (dwpRespondStates.contains(state)) {
+            } else if (dwpRespondStates.contains(state) || hearingAdjourned) {
                 caseNode.put("status", "DWP_RESPOND");
             } else if (hearingStates.contains(state)) {
                 caseNode.put("status", "HEARING_BOOKED");
@@ -120,7 +125,7 @@ public class TrackYourAppealJsonBuilder {
                 caseNode.put("status", "CLOSED");
             }
 
-            caseNode.put(NOT_LISTABLE, NOT_LISTABLE.equalsIgnoreCase(state));
+            caseNode.put("hideHearing", hearingAdjourned || NOT_LISTABLE.equalsIgnoreCase(state));
 
         } else {
             caseNode.put("status", getAppealStatus(caseData.getEvents()));
@@ -140,13 +145,9 @@ public class TrackYourAppealJsonBuilder {
         }
 
         boolean isDigitalCase = isCaseStateReadyToList(caseData);
-
-
         List<Event> latestEvents = buildLatestEvents(caseData.getEvents());
-
-
         Map<Event, Document> eventDocumentMap = buildEventDocumentMap(caseData);
-        Map<Event, Hearing> eventHearingMap = buildEventHearingMap(caseData);
+
         caseNode.set("latestEvents", buildEventArray(latestEvents, eventDocumentMap, eventHearingMap));
         List<Event> historicalEvents = buildHistoricalEvents(caseData.getEvents(), latestEvents);
         if (!historicalEvents.isEmpty()) {
@@ -160,6 +161,12 @@ public class TrackYourAppealJsonBuilder {
         root.set("subscriptions", buildSubscriptions(caseData.getSubscriptions()));
 
         return root;
+    }
+
+    private boolean isHearingAdjourned(Map<Event, Hearing> eventHearingMap) {
+        List<Hearing> hearing = new ArrayList(eventHearingMap.values());
+        hearing.sort(Comparator.reverseOrder());
+        return !hearing.isEmpty() && YES.equalsIgnoreCase(hearing.get(0).getValue().getAdjourned());
     }
 
     private ObjectNode getContactNode(SscsCaseData caseData) {
