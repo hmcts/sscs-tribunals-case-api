@@ -134,14 +134,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
     private void buildSscsDocumentFromScan(SscsCaseData sscsCaseData, State caseState, Boolean ignoreWarnings) {
 
-        boolean confidentialCase = false;
-
         if (sscsCaseData.getScannedDocuments() != null) {
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
 
                     if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
-                        confidentialCase = true;
+                        setConfidentialCaseFields(sscsCaseData);
                     }
 
                     checkWarningsAndErrors(sscsCaseData, scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings);
@@ -183,16 +181,16 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         sscsCaseData.setScannedDocuments(null);
-
-        if (confidentialCase) {
-            setConfidentialCaseFields(sscsCaseData);
-        }
     }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.setIsConfidentialCase(YES);
         sscsCaseData.setConfidentialityRequestDate(LocalDate.now());
-        sscsCaseData.setConfidentialityRequestOutcome(RequestOutcome.IN_PROGRESS);
+
+        if (OriginalSenderItemList.APPELLANT.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
+            sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
+        } else if (OriginalSenderItemList.JOINT_PARTY.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
+            sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        }
     }
 
     private void setReinstateCaseFields(SscsCaseData sscsCaseData) {
