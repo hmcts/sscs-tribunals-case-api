@@ -269,59 +269,18 @@ public class AdjournCaseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateIsAfterToday_ThenDoNotDisplayAnError() {
+    public void givenNextHearingTimeNotSet_ThenDisplayAnError() {
 
-        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-    }
-
-    @Test
-    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateIsToday_ThenDoNotDisplayAnError() {
-
-        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().toString());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        assertEquals(0, response.getErrors().size());
-    }
-
-    @Test
-    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateBeforeToday_ThenDisplayAnError() {
-
-        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate(LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Specified date cannot be in the past", error);
-    }
-
-    @Test
-    public void givenNextHearingDateSpecifiedDateAndTimeAndNextHearingSpecificDateNotSet_ThenDisplayAnError() {
-
-        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Specified date must be provided", error);
+        assertEquals("Must select a specific time option", error);
 
     }
-
 
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheEvent() {

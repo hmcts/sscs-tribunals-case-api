@@ -87,8 +87,6 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseNextHearingDateOrTime("")
             .adjournCaseNextHearingFirstAvailableDateAfterDate("")
             .adjournCaseNextHearingFirstAvailableDateAfterPeriod("")
-            .adjournCaseNextHearingSpecificDate("")
-            .adjournCaseNextHearingSpecificTime("")
             .adjournCaseReasons(Arrays.asList(new CollectionItem(null, "")))
             .adjournCaseAdditionalDirections(Arrays.asList(new CollectionItem(null, "")))
         .build();

@@ -11,11 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.VenueDetails;
@@ -161,51 +157,62 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
 
 
     private void setNextHearingDateAndTime(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData, LocalDate issueDate) {
-        String dateString = null;
-        String timeString = null;
+        String hearingDateSentence;
         if ("firstAvailableDate".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            dateString = "the first available date";
+            hearingDateSentence = "on the first available date";
         } else if ("firstAvailableDateAfter".equals(caseData.getAdjournCaseNextHearingDateType())) {
             if ("provideDate".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
                 if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterDate in case data");
                 }
-                dateString = "the first available date after " + LocalDate.parse(caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate())
+                hearingDateSentence = "on the first available date after " + LocalDate.parse(caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate())
                     .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             } else if ("providePeriod".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
                 if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
                 }
-                dateString = "the first available date after " + getDateForPeriodAfterIssueDate(issueDate,
+                hearingDateSentence = "on the first available date after " + getDateForPeriodAfterIssueDate(issueDate,
                     caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             } else {
                 throw new IllegalStateException("Date or period indicator not available in case data");
             }
-        } else if ("specificDateAndTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            if (caseData.getAdjournCaseNextHearingSpecificDate() == null) {
-                throw new IllegalStateException("adjournCaseNextHearingSpecificDate not available in case data");
-            }
-            if (caseData.getAdjournCaseNextHearingSpecificTime() == null) {
-                throw new IllegalStateException("adjournCaseNextHearingSpecificTime not available in case data");
-            }
-            dateString = LocalDate.parse(caseData.getAdjournCaseNextHearingSpecificDate())
-                .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
-            timeString = caseData.getAdjournCaseNextHearingSpecificTime();
         } else if ("specificTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            if (caseData.getAdjournCaseNextHearingSpecificTime() == null) {
-                throw new IllegalStateException("adjournCaseNextHearingSpecificTime not available in case data");
+            if (caseData.getAdjournCaseTime() == null) {
+                throw new IllegalStateException("adjournCaseTime not available in case data");
             }
-            dateString = "a date to be decided";
-            timeString = caseData.getAdjournCaseNextHearingSpecificTime();
+
+            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime());
+
         } else if ("dateToBeFixed".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            dateString = "a date to be fixed";
+            hearingDateSentence = "on a date to be fixed ";
         } else {
             throw new IllegalStateException("Unknown next hearing date type for:" + caseData.getAdjournCaseNextHearingDateType());
         }
 
-        adjournCaseBuilder.nextHearingDate(dateString);
-        adjournCaseBuilder.nextHearingTime(timeString);
+        adjournCaseBuilder.nextHearingDate(hearingDateSentence);
 
+    }
+
+    private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
+                && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
+            stringBuilder.append("first ");
+        }
+        stringBuilder.append("in the ");
+
+        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
+                && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime().equalsIgnoreCase("am")) {
+            stringBuilder.append("morning ");
+        }
+        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
+                && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime().equalsIgnoreCase("pm")) {
+            stringBuilder.append("afternoon ");
+        }
+
+        stringBuilder.append("session on a date to be decided ");
+
+        return stringBuilder.toString();
     }
 
     protected void validateRequiredProperties(AdjournCaseTemplateBody payload) {
