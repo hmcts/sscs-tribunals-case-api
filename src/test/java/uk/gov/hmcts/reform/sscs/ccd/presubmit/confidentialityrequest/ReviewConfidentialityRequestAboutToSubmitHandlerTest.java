@@ -131,6 +131,33 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
         Assert.assertEquals(RequestOutcome.GRANTED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+
+        Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+    }
+
+    @Test
+    public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfAppellantGrantedSetAndJointPartyGrantedSet() {
+
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
+        sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
+
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        Assert.assertEquals(1, response.getErrors().size());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Joint Party confidentiality request is not in progress but value set for granted or refused is:grantConfidentialityRequest. Please check case data. If problem continues please contact support", error);
+
+        Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
+        Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
+        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
+
+        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
     }
 
     @Test
@@ -147,6 +174,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(RequestOutcome.REFUSED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.NONE.getId(), sscsCaseData.getInterlocReviewState());
         Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+
+        Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+        Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
     }
 
     @Test

@@ -42,6 +42,12 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
 
             if (isAtLeastOneRequestInProgress(sscsCaseData)) {
 
+                validatePartySubmissionFieldsAreValid(sscsCaseData, "Appellant",
+                    isAppellantRequestInProgress(sscsCaseData), sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
+
+                validatePartySubmissionFieldsAreValid(sscsCaseData, "Joint Party",
+                    isJointPartyRequestInProgress(sscsCaseData), sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
+
                 // Set the request status on Appellant and Joint Party and return whether either
                 // status update represents a granting of confidentiality now.
                 boolean appellantGrantedNow = processAppellantAndReturnWhetherGrantedNow(sscsCaseData);
@@ -69,19 +75,38 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
         return preSubmitCallbackResponse;
     }
 
+    private void validatePartySubmissionFieldsAreValid(SscsCaseData sscsCaseData, String partyName, boolean requestInProgress, String grantedOrRefusedText) {
+        if (requestInProgress) {
+            if (!isValidPopulatedGrantedOrRefusedValue(grantedOrRefusedText)) {
+                throw new IllegalStateException(partyName + " confidentiality request is in progress but value set for granted or refused is:" + grantedOrRefusedText);
+            }
+        } else {
+            if (isPopulatedGrantedOrRefusedValue(grantedOrRefusedText)) {
+                throw new IllegalStateException(partyName + " confidentiality request is not in progress but value set for granted or refused is:" + grantedOrRefusedText);
+            }
+        }
+    }
+
+    private boolean isValidPopulatedGrantedOrRefusedValue(String value) {
+        return "grantConfidentialityRequest".equals(value) ||  "refuseConfidentialityRequest".equals(value);
+    }
+
+    private boolean isPopulatedGrantedOrRefusedValue(String value) {
+        return value != null;
+    }
+
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused(null);
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused(null);
     }
 
-    private boolean processAPartyAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData, boolean partyInProgress,
+    private boolean processAPartyAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData,
         String grantedOrRefusedText,
         Consumer<RequestOutcome> setOutcomeCallback, String partyName) {
 
         boolean grantedNow = false;
 
-        if (partyInProgress) {
             if ("grantConfidentialityRequest".equals(grantedOrRefusedText)) {
                 setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.GRANTED);
                 log.info("'Confidentiality Granted for " + partyName + " for case id " +  sscsCaseData.getCcdCaseId());
@@ -89,13 +114,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
             } else if ("refuseConfidentialityRequest".equals(grantedOrRefusedText)) {
                 log.info("'Confidentiality Refused for " + partyName + " for case id " +  sscsCaseData.getCcdCaseId());
                 setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.REFUSED);
-            } else {
-                throw new IllegalStateException(partyName + " confidentiality request is in progress but value set for granted or refused is:" + grantedOrRefusedText);
             }
-        } else if (grantedOrRefusedText != null) {
-            throw new IllegalStateException(partyName + " confidentiality request is not in progress but value set for granted or refused is:" + grantedOrRefusedText);
-        }
-        return grantedNow;
+            return grantedNow;
     }
 
     private void setOutcome(SscsCaseData sscsCaseData, Consumer<RequestOutcome> setOutcomeCallback, RequestOutcome outcome) {
@@ -105,14 +125,14 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
 
     private boolean processJointPartyAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData) {
         return processAPartyAndReturnWhetherGrantedNow(sscsCaseData,
-            isJointPartyRequestInProgress(sscsCaseData), sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused(),
+            sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused(),
             o -> sscsCaseData.setConfidentialityRequestOutcomeJointParty(o),
             "Joint Party");
     }
 
     private boolean processAppellantAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData) {
         return processAPartyAndReturnWhetherGrantedNow(sscsCaseData,
-            isAppellantRequestInProgress(sscsCaseData), sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused(),
+            sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused(),
             o -> sscsCaseData.setConfidentialityRequestOutcomeAppellant(o),
             "Appellant");
     }
