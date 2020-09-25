@@ -79,7 +79,7 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertNotNull(response);
-        assertEquals( "Please select a document to upload", response.getErrors().stream().findFirst().get());
+        assertEquals("Please select a document to upload", response.getErrors().stream().findFirst().get());
     }
 
 
