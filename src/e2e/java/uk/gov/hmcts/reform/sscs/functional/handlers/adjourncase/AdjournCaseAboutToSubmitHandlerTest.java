@@ -43,7 +43,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
             .assertThat().body("adjournCaseNextHearingListingDuration", equalTo("12"))
             .assertThat().body("adjournCaseNextHearingListingDurationType", equalTo("setTime"))
             .assertThat().body("adjournCaseNextHearingListingDurationUnits", equalTo("hours"))
-            .assertThat().body("adjournCaseNextHearingSpecificTime", equalTo("pm"))
+            .assertThat().body("adjournCaseTime.adjournCaseNextHearingSpecificTime", equalTo("am"))
             .assertThat().body("adjournCaseNextHearingVenue", equalTo("somewhereElse"))
             .assertThat().body("adjournCaseNextHearingVenueSelected.value.code", equalTo("1256"))
             .assertThat().body("adjournCaseOtherPanelMemberName", equalTo("The Doctor"))

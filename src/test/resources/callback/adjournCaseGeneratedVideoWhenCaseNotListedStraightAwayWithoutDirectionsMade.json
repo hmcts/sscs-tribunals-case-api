@@ -29,17 +29,16 @@
       "adjournCaseCanCaseBeListedRightAway" : "No",
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateType" : "specificTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
+      "adjournCaseTime": {
+        "adjournCaseNextHearingFirstOnSession": [
+          "firstOnSession"
+        ]
+      },
       "adjournCaseAdditionalDirections": [{"id":null, "value":"something else"}],
       "adjournCaseReasons": [{"id":null, "value":"Reasons 1"}],
       "adjournCaseTypeOfNextHearing" : "video",
-      "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
-      "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -757,16 +756,14 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "video",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateType" : "specificTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
+      "adjournCaseTime" : {
+        "adjournCaseNextHearingFirstOnSession" :  ["firstOnSession"],
+        "adjournCaseNextHearingSpecificTime" : "am"
+      },
       "adjournCaseAnythingElse" : "something else",
       "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
-      "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
-      "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",

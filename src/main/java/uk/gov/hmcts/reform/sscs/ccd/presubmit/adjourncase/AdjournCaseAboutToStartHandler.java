@@ -78,8 +78,7 @@ public class AdjournCaseAboutToStartHandler implements PreSubmitCallbackHandler<
             sscsCaseData.setAdjournCaseNextHearingDateOrTime(null);
             sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterDate(null);
             sscsCaseData.setAdjournCaseNextHearingFirstAvailableDateAfterPeriod(null);
-            sscsCaseData.setAdjournCaseNextHearingSpecificDate(null);
-            sscsCaseData.setAdjournCaseNextHearingSpecificTime(null);
+            sscsCaseData.setAdjournCaseTime(null);
             sscsCaseData.setAdjournCaseReasons(null);
             sscsCaseData.setAdjournCaseAdditionalDirections(null);
         }

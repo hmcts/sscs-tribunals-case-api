@@ -1139,8 +1139,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("the first available date", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
-        assertNull(templateBody.getAdjournCaseTemplateBody().getNextHearingTime());
+        assertEquals("on the first available date", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test
@@ -1156,8 +1155,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("a date to be fixed", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
-        assertNull(templateBody.getAdjournCaseTemplateBody().getNextHearingTime());
+        assertEquals("on a date to be fixed ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test
@@ -1216,8 +1214,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("the first available date after 01/01/2020", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
-        assertNull(templateBody.getAdjournCaseTemplateBody().getNextHearingTime());
+        assertEquals("on the first available date after 01/01/2020", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test
@@ -1277,92 +1274,82 @@ public class AdjournCasePreviewServiceTest {
         String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("the first available date after " + expectedDate, templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
-        assertNull(templateBody.getAdjournCaseTemplateBody().getNextHearingTime());
-    }
-
-    @Test
-    @Parameters(named = "allNextHearingTypeParameters")
-    public void givenCaseWithFirstWithSpecifiedDateAndTime_thenCorrectlyDisplayTheNextHearingDateString(String nextHearingType, String nextHearingTypeText) {
-
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
-        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate("2020-01-01");
-        sscsCaseData.setAdjournCaseNextHearingSpecificTime("am");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-
-        String expectedDate = LocalDate.now().plusDays(28).format(DateTimeFormatter.ofPattern("dd/MM/YYYY"));
-
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("01/01/2020", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
-        assertEquals("am", templateBody.getAdjournCaseTemplateBody().getNextHearingTime());
-    }
-
-    @Test
-    @Parameters(named = "allNextHearingTypeParameters")
-    public void givenCaseWithFirstWithSpecifiedDateAndTimeWithDateMissing_thenDisplayAnErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
-
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
-        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
-        sscsCaseData.setAdjournCaseNextHearingSpecificTime("am");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("adjournCaseNextHearingSpecificDate not available in case data", error);
-        assertNull(response.getData().getAdjournCasePreviewDocument());
+        assertEquals("on the first available date after " + expectedDate, templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
 
     @Test
-    @Parameters(named = "allNextHearingTypeParameters")
-    public void givenCaseWithFirstWithSpecifiedDateAndTimeWithTimeMissing_thenDisplayAnErrorAndDoNotDisplayTheDocument(String nextHearingType, String nextHearingTypeText) {
+    public void givenCaseWithSpecifiedTime_thenCorrectlyDisplayTheNextHearingDateStringForMorningSession() {
 
         sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
-        sscsCaseData.setAdjournCaseNextHearingDateType("specificDateAndTime");
-        sscsCaseData.setAdjournCaseNextHearingSpecificDate("2020-01-01");
-
-        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
-            .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
-
-        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("adjournCaseNextHearingSpecificTime not available in case data", error);
-        assertNull(response.getData().getAdjournCasePreviewDocument());
-    }
-
-    @Test
-    @Parameters(named = "allNextHearingTypeParameters")
-    public void givenCaseWithFirstWithSpecifiedTime_thenCorrectlyDisplayTheNextHearingDateString(String nextHearingType, String nextHearingTypeText) {
-
-        sscsCaseData.setAdjournCaseGenerateNotice("yes");
-        sscsCaseData.setAdjournCaseTypeOfNextHearing(nextHearingType);
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
         sscsCaseData.setAdjournCaseNextHearingDateType("specificTime");
-        sscsCaseData.setAdjournCaseNextHearingSpecificTime("am");
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("am").build());
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
 
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", nextHearingTypeText, true);
-        assertEquals("a date to be decided", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
-        assertEquals("am", templateBody.getAdjournCaseTemplateBody().getNextHearingTime());
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        assertEquals("in the morning session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
+    }
+
+    @Test
+    public void givenCaseWithSpecifiedTime_thenCorrectlyDisplayTheNextHearingDateStringForAfternoonSession() {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("specificTime");
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().adjournCaseNextHearingSpecificTime("pm").build());
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        assertEquals("in the afternoon session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
+    }
+
+    @Test
+    public void givenCaseWithSpecifiedTime_thenCorrectlyDisplayTheNextHearingDateStringForFirstOnSessionWithSpecificTime() {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("specificTime");
+
+        List<String> sessions = new ArrayList<>();
+        sessions.add("firstOnSession");
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().adjournCaseNextHearingFirstOnSession(sessions).adjournCaseNextHearingSpecificTime("pm").build());
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        assertEquals("first in the afternoon session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
+    }
+
+    @Test
+    public void givenCaseWithSpecifiedTime_thenCorrectlyDisplayTheNextHearingDateStringForFirstOnSessionWithNoSpecificTime() {
+
+        sscsCaseData.setAdjournCaseGenerateNotice("yes");
+        sscsCaseData.setAdjournCaseTypeOfNextHearing("faceToFace");
+        sscsCaseData.setAdjournCaseNextHearingDateType("specificTime");
+
+        List<String> sessions = new ArrayList<>();
+        sessions.add("firstOnSession");
+        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().adjournCaseNextHearingFirstOnSession(sessions).build());
+
+        sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
+                .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
+
+        service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
+        assertEquals("first in the session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test
@@ -1379,7 +1366,7 @@ public class AdjournCasePreviewServiceTest {
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, false);
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("adjournCaseNextHearingSpecificTime not available in case data", error);
+        assertEquals("adjournCaseTime not available in case data", error);
         assertNull(response.getData().getAdjournCasePreviewDocument());
     }
 

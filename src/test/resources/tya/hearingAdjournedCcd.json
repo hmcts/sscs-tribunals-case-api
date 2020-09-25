@@ -1,0 +1,57 @@
+{
+  "caseId" : "1",
+  "caseReference": "SC333/33/33333",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
+      }
+    },
+    "benefitType": {
+      "code": "PIP"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "hearings": [{
+    "value": {
+      "venue": {
+        "name": "Chester Magistrate's Court",
+        "address": {
+          "line1": "Grosvenor Street",
+          "line2": "Chester",
+          "postcode": "CH1 2XA"
+        },
+        "googleMapLink": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632"
+      },
+      "hearingDate": "2017-07-17",
+      "time": "23:00",
+      "eventDate": "2017-03-02T18:11:34.013",
+      "adjourned": "Yes"
+    }
+  }],
+  "events": [
+    {
+      "value": {
+        "date": "2017-06-24T17:27:50.297",
+        "type": "hearingAdjourned",
+        "description": "Hearing adjourned"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-03-02T14:11:34.013",
+        "type": "hearingBooked",
+        "description": "Hearing booked"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}

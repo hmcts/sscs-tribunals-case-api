@@ -258,7 +258,7 @@ dependencies {
     // Added to fix CVE-2020-13934, CVE-2020-13935
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: '9.0.38'
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.38'
-    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.37'
+    compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.38'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.2'
@@ -288,7 +288,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.4.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.11'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.19.0'
     testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.11'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
