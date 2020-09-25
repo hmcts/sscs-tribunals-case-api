@@ -88,7 +88,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
     }
 
     private boolean isValidPopulatedGrantedOrRefusedValue(String value) {
-        return "grantConfidentialityRequest".equals(value) ||  "refuseConfidentialityRequest".equals(value);
+        return "grantConfidentialityRequest".equals(value) || "refuseConfidentialityRequest".equals(value);
     }
 
     private boolean isPopulatedGrantedOrRefusedValue(String value) {
@@ -107,15 +107,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
 
         boolean grantedNow = false;
 
-            if ("grantConfidentialityRequest".equals(grantedOrRefusedText)) {
-                setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.GRANTED);
-                log.info("'Confidentiality Granted for " + partyName + " for case id " +  sscsCaseData.getCcdCaseId());
-                grantedNow = true;
-            } else if ("refuseConfidentialityRequest".equals(grantedOrRefusedText)) {
-                log.info("'Confidentiality Refused for " + partyName + " for case id " +  sscsCaseData.getCcdCaseId());
-                setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.REFUSED);
-            }
-            return grantedNow;
+        if ("grantConfidentialityRequest".equals(grantedOrRefusedText)) {
+            setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.GRANTED);
+            log.info("'Confidentiality Granted for " + partyName + " for case id " + sscsCaseData.getCcdCaseId());
+            grantedNow = true;
+        } else if ("refuseConfidentialityRequest".equals(grantedOrRefusedText)) {
+            log.info("'Confidentiality Refused for " + partyName + " for case id " + sscsCaseData.getCcdCaseId());
+            setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.REFUSED);
+        }
+        return grantedNow;
     }
 
     private void setOutcome(SscsCaseData sscsCaseData, Consumer<RequestOutcome> setOutcomeCallback, RequestOutcome outcome) {
