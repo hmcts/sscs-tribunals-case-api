@@ -1,0 +1,134 @@
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.confidentialityrequest;
+
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.CONFIDENTIALITY_ACTION_REQUIRED;
+
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.function.Consumer;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+
+@Component
+@Slf4j
+public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    @Override
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        return callbackType == CallbackType.ABOUT_TO_SUBMIT
+            && callback.getEvent() == EventType.REVIEW_CONFIDENTIALITY_REQUEST
+            && Objects.nonNull(callback.getCaseDetails())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData());
+    }
+
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        try {
+
+            if (isAtLeastOneRequestInProgress(sscsCaseData)) {
+
+                // Set the request status on Appellant and Joint Party and return whether either
+                // status update represents a granting of confidentiality now.
+                boolean appellantGrantedNow = processAppellantAndReturnWhetherGrantedNow(sscsCaseData);
+                boolean jointPartyGrantedNow = processJointPartyAndReturnWhetherGrantedNow(sscsCaseData);
+
+                if (appellantGrantedNow || jointPartyGrantedNow) {
+                    sscsCaseData.setDwpState(CONFIDENTIALITY_ACTION_REQUIRED.getId());
+                    sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
+                    log.info("'Confidentiality - Action Required' set on case id " + sscsCaseData.getCcdCaseId());
+                } else {
+                    sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
+                }
+
+                clearTransientFields(preSubmitCallbackResponse);
+
+            } else {
+                throw new IllegalStateException("At least one confidentiality request should be in progress");
+            }
+
+        } catch (IllegalStateException e) {
+            preSubmitCallbackResponse.addError(e.getMessage() + ". Please check case data. If problem continues please contact support");
+            log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
+        }
+
+        return preSubmitCallbackResponse;
+    }
+
+    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
+        sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused(null);
+        sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused(null);
+    }
+
+    private boolean processAPartyAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData, boolean partyInProgress,
+        String grantedOrRefusedText,
+        Consumer<RequestOutcome> setOutcomeCallback, String partyName) {
+
+        boolean grantedNow = false;
+
+        if (partyInProgress) {
+            if ("grantConfidentialityRequest".equals(grantedOrRefusedText)) {
+                setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.GRANTED);
+                log.info("'Confidentiality Granted for " + partyName + " for case id " +  sscsCaseData.getCcdCaseId());
+                grantedNow = true;
+            } else if ("refuseConfidentialityRequest".equals(grantedOrRefusedText)) {
+                log.info("'Confidentiality Refused for " + partyName + " for case id " +  sscsCaseData.getCcdCaseId());
+                setOutcome(sscsCaseData, setOutcomeCallback, RequestOutcome.REFUSED);
+            } else {
+                throw new IllegalStateException(partyName + " confidentiality request is in progress but value set for granted or refused is:" + grantedOrRefusedText);
+            }
+        } else if (grantedOrRefusedText != null) {
+            throw new IllegalStateException(partyName + " confidentiality request is not in progress but value set for granted or refused is:" + grantedOrRefusedText);
+        }
+        return grantedNow;
+    }
+
+    private void setOutcome(SscsCaseData sscsCaseData, Consumer<RequestOutcome> setOutcomeCallback, RequestOutcome outcome) {
+        sscsCaseData.setConfidentialityRequestDate(LocalDate.now());
+        setOutcomeCallback.accept(outcome);
+    }
+
+    private boolean processJointPartyAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData) {
+        return processAPartyAndReturnWhetherGrantedNow(sscsCaseData,
+            isJointPartyRequestInProgress(sscsCaseData), sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused(),
+            o -> sscsCaseData.setConfidentialityRequestOutcomeJointParty(o),
+            "Joint Party");
+    }
+
+    private boolean processAppellantAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData) {
+        return processAPartyAndReturnWhetherGrantedNow(sscsCaseData,
+            isAppellantRequestInProgress(sscsCaseData), sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused(),
+            o -> sscsCaseData.setConfidentialityRequestOutcomeAppellant(o),
+            "Appellant");
+    }
+
+    private boolean isAtLeastOneRequestInProgress(SscsCaseData sscsCaseData) {
+        return isAppellantRequestInProgress(sscsCaseData)
+            || isJointPartyRequestInProgress(sscsCaseData);
+    }
+
+    private boolean isAppellantRequestInProgress(SscsCaseData sscsCaseData) {
+        return RequestOutcome.IN_PROGRESS
+            .equals(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+    }
+
+    private boolean isJointPartyRequestInProgress(SscsCaseData sscsCaseData) {
+        return RequestOutcome.IN_PROGRESS
+            .equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+    }
+}
