@@ -373,17 +373,18 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
 
     private static HearingSubtype getHearingSubType(SyaHearingOptions syaHearingOptions) {
-        if (syaHearingOptions == null || syaHearingOptions.getOptions() == null) {
-            return null;
+        HearingSubtype.HearingSubtypeBuilder builder = HearingSubtype.builder();
+        if (syaHearingOptions != null && syaHearingOptions.getOptions() != null) {
+            SyaOptions options = syaHearingOptions.getOptions();
+            return HearingSubtype.builder()
+                    .wantsHearingTypeTelephone(options.getHearingTypeTelephone() ? YES : NO)
+                    .hearingTelephoneNumber(options.getTelephone())
+                    .wantsHearingTypeVideo(options.getHearingTypeVideo() ? YES : NO)
+                    .hearingVideoEmail(options.getEmail())
+                    .wantsHearingTypeFaceToFace(options.getHearingTypeFaceToFace() ? YES : NO)
+                    .build();
         }
-        SyaOptions options = syaHearingOptions.getOptions();
-        return HearingSubtype.builder()
-                .wantsHearingTypeTelephone(options.getHearingTypeTelephone() ? YES : NO)
-                .hearingTelephoneNumber(options.getTelephone())
-                .wantsHearingTypeVideo(options.getHearingTypeVideo() ? YES : NO)
-                .hearingVideoEmail(options.getEmail())
-                .wantsHearingTypeFaceToFace(options.getHearingTypeFaceToFace() ? YES : NO)
-                .build();
+        return builder.build();
     }
 
     private static HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {
