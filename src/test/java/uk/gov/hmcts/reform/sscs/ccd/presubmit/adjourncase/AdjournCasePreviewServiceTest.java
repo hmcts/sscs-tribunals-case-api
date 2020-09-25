@@ -1292,7 +1292,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
-        assertEquals("in the morning session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
+        assertEquals(". It will be in the morning session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test
@@ -1309,7 +1309,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
-        assertEquals("in the afternoon session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
+        assertEquals(". It will be in the afternoon session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test
@@ -1329,7 +1329,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
-        assertEquals("first in the afternoon session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
+        assertEquals(". It will be first in the afternoon session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test
@@ -1349,7 +1349,7 @@ public class AdjournCasePreviewServiceTest {
         service.preview(callback, DocumentType.DRAFT_ADJOURNMENT_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody templateBody = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", "face to face hearing", true);
-        assertEquals("first in the session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
+        assertEquals(". It will be first in the session on a date to be decided ", templateBody.getAdjournCaseTemplateBody().getNextHearingDate());
     }
 
     @Test

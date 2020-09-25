@@ -194,7 +194,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime) {
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder(". It will be ");
         if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
                 && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
             stringBuilder.append("first ");
