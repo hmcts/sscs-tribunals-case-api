@@ -53,12 +53,19 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        log.info("About to submit Upload Welsh Document for caseID:  {}", caseData.getCcdCaseId());
+        PreSubmitCallbackResponse<SscsCaseData>  preSubmitCallbackResponse = new PreSubmitCallbackResponse<SscsCaseData>(caseData);
+        if (caseData.getSscsWelshPreviewDocuments() == null ||  caseData.getSscsWelshPreviewDocuments().isEmpty() || caseData.getSscsWelshPreviewDocuments().stream().findFirst().get().getValue().getDocumentLink() == null) {
+            preSubmitCallbackResponse.addError("Please select a document to upload");
+            return preSubmitCallbackResponse;
+        }
         updateCase(callback, caseData);
-        return new PreSubmitCallbackResponse<>(caseData);
+        return preSubmitCallbackResponse;
     }
 
     private void updateCase(Callback<SscsCaseData> callback, SscsCaseData caseData) {
         String previewDocumentType = null;
+        log.info("Set the Translation Status to complete for originalDocs for caseID:  {}", caseData.getCcdCaseId());
         for (SscsDocument sscsDocument : caseData.getSscsDocument()) {
             if (sscsDocument.getValue().getDocumentTranslationStatus() != null
                 && sscsDocument.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED)) {
@@ -67,6 +74,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                 }
             }
         }
+        log.info("Set up welsh document for caseId:  {}", caseData.getCcdCaseId());
         for (SscsWelshDocument sscsWelshPreviewDocument : caseData.getSscsWelshPreviewDocuments()) {
             sscsWelshPreviewDocument.getValue().setOriginalDocumentFileName(caseData.getOriginalDocuments().getValue().getCode());
             previewDocumentType = sscsWelshPreviewDocument.getValue().getDocumentType();
@@ -76,9 +84,11 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
                     LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
             }
             if (DocumentType.APPELLANT_EVIDENCE.getValue().equals(previewDocumentType)) {
+                log.info("Set up Applant Evidence welsh document for caseId:  {}", caseData.getCcdCaseId());
                 Optional<SscsDocument> sscsDocumentByTypeAndName = getSscsDocumentByTypeAndName(DocumentType.APPELLANT_EVIDENCE, sscsWelshPreviewDocument.getValue().getOriginalDocumentFileName(), caseData);
                 sscsDocumentByTypeAndName.ifPresent(sscsDocument -> {
                     if (StringUtils.isNotEmpty(sscsDocument.getValue().getBundleAddition())) {
+                        log.info("Adding bundle addition for  appelant evidence for caseId:  {}", caseData.getCcdCaseId());
                         setBundleAdditionDetails(caseData, sscsWelshPreviewDocument);
                     }
                 });
