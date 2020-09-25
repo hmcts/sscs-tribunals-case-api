@@ -56,7 +56,7 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
         log.info("About to submit Upload Welsh Document for caseID:  {}", caseData.getCcdCaseId());
         PreSubmitCallbackResponse<SscsCaseData>  preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
         if (caseData.getSscsWelshPreviewDocuments() == null ||  caseData.getSscsWelshPreviewDocuments().isEmpty()
-            || (caseData.getSscsWelshPreviewDocuments().stream().findFirst().isPresent() && caseData.getSscsWelshPreviewDocuments().stream().findFirst().get().getValue().getDocumentLink() == null)) {
+            || (caseData.getSscsWelshPreviewDocuments().get(0).getValue().getDocumentLink() == null)) {
             preSubmitCallbackResponse.addError("Please select a document to upload");
             return preSubmitCallbackResponse;
         }
