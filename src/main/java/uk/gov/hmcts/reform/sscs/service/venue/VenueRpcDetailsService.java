@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.model.VenueDetails;
 import uk.gov.hmcts.reform.sscs.service.VenueDataLoader;
 
 @Service
@@ -20,7 +21,11 @@ public class VenueRpcDetailsService {
     }
 
     public List<VenueRpcDetails> getVenues(Predicate<VenueRpcDetails> predicate) {
-        return venueDataLoader.getVenueDetailsMap().values().stream()
+        return venueDataLoader.getVenueDetailsMap().values().stream().filter(this::isActiveVenue)
             .map(VenueRpcDetails::new).filter(predicate).collect(Collectors.toList());
+    }
+
+    private boolean isActiveVenue(VenueDetails venueDetails) {
+        return venueDetails != null && "Yes".equalsIgnoreCase(venueDetails.getActive());
     }
 }
