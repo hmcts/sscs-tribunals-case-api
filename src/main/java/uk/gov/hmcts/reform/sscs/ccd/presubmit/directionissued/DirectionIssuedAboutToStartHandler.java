@@ -63,7 +63,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
         }
 
-        if (ReinstatementOutcome.IN_PROGRESS.equals(sscsCaseData.getReinstatementOutcome()) && reinstatementFeatureFlag) {
+        if (RequestOutcome.IN_PROGRESS.equals(sscsCaseData.getReinstatementOutcome()) && reinstatementFeatureFlag) {
             listOptions.add(new DynamicListItem(GRANT_REINSTATEMENT.getCode(), GRANT_REINSTATEMENT.getLabel()));
             listOptions.add(new DynamicListItem(REFUSE_REINSTATEMENT.getCode(), REFUSE_REINSTATEMENT.getLabel()));
         }
