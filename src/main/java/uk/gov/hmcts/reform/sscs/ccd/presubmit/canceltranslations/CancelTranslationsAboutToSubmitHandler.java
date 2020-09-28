@@ -39,21 +39,23 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-                                                          String userAuthorisation) {
+                                                          String userAuthorisatUploadWelshDocumentsAboutToSubmitHandlerTestion) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-
+        log.info("Can handle for case id : {}", caseData.getCcdCaseId());
         if (!callback.getCaseDetails().getState().equals(State.INTERLOCUTORY_REVIEW_STATE)) {
             setWelshNextEvent(caseData);
+            log.info("Set Welsh next event to : {} for case id: {}", caseData.getWelshInterlocNextReviewState(), caseData.getCcdCaseId());
         } else {
             caseData.setInterlocReviewState(caseData.getWelshInterlocNextReviewState());
             caseData.setWelshInterlocNextReviewState(null);
+            log.info("Set InterlocReviewState : {} for case id: {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
         }
         clearTranslationRequiredDocumentStatuses(caseData);
-
         caseData.updateTranslationWorkOutstandingFlag();
+        log.info("Cleared tranlsation reqd statuses on docs and updated translation Ouststanding flag  for case id : {}", caseData.getCcdCaseId());
         return new PreSubmitCallbackResponse<>(caseData);
     }
 

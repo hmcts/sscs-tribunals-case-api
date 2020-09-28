@@ -43,11 +43,13 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
-        String sscsWelshPreviewNextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
-        callback.getCaseDetails().getCaseData().setSscsWelshPreviewNextEvent(null);
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        String sscsWelshPreviewNextEvent = caseData.getSscsWelshPreviewNextEvent();
+        log.info("sscsWelshPreviewNextEvent is {}  for case id : {}", sscsWelshPreviewNextEvent, caseData.getCcdCaseId());
+        caseData.setSscsWelshPreviewNextEvent(null);
         SscsCaseDetails
             sscsCaseDetails = ccdService
-            .updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
+            .updateCase(caseData, callback.getCaseDetails().getId(),
                 sscsWelshPreviewNextEvent, "Cancel welsh translations", "Cancel welsh translations",
                 idamService.getIdamTokens());
 

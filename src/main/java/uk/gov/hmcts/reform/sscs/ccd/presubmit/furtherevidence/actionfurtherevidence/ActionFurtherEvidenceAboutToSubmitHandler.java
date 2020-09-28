@@ -161,6 +161,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                         documents.add(sscsDocument);
                         if (sscsCaseData.isLanguagePreferenceWelsh()) {
                             sscsCaseData.setTranslationWorkOutstanding(YES);
+                            log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
                         }
                     }
                     if (sscsCaseData.getSscsDocument() != null) {
