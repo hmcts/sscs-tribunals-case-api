@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionTypeItemList.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
@@ -37,7 +37,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new DirectionIssuedAboutToStartHandler(false);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
@@ -141,7 +141,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
