@@ -39,7 +39,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
-                                                          String userAuthorisatUploadWelshDocumentsAboutToSubmitHandlerTestion) {
+                                                          String userAuthorisation) {
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
