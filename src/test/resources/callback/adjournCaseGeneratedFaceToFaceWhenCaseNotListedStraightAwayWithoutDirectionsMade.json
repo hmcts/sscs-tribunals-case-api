@@ -30,10 +30,14 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateType" : "specificTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
+      "adjournCaseTime": {
+        "adjournCaseNextHearingFirstOnSession": [
+          "firstOnSession"
+        ],
+        "adjournCaseNextHearingSpecificTime": "am"
+      },
       "adjournCaseAdditionalDirections": [{"id":null, "value":"something else"}],
       "adjournCaseReasons": [{"id":null, "value":"Reasons 1"}],
       "dwpTimeExtension": [
@@ -747,16 +751,31 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "adjournCaseGenerateNotice" : "Yes",
-      "adjournCaseTypeOfHearing" : "faceToFace",
-      "adjournCaseCanCaseBeListedRightAway" : "No",
-      "adjournCaseAreDirectionsBeingMadeToParties" : "No",
-      "adjournCaseTypeOfNextHearing" : "faceToFace",
-      "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
-      "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
+      "adjournCaseAdditionalDirections": null,
+      "adjournCaseCanCaseBeListedRightAway": "Yes",
+      "adjournCaseDisabilityQualifiedPanelMemberName": null,
+      "adjournCaseGenerateNotice": "Yes",
+      "adjournCaseInterpreterRequired": "No",
+      "adjournCaseMedicallyQualifiedPanelMemberName": null,
+      "adjournCaseNextHearingDateType": "specificTime",
+      "adjournCaseNextHearingListingDurationType": "standardTimeSlot",
+      "adjournCaseNextHearingVenue": "sameVenue",
+      "adjournCaseOtherPanelMemberName": null,
+      "adjournCasePanelMembersExcluded": "Yes",
+      "adjournCaseReasons": [
+        {
+          "id": null,
+          "value": "wefefwe"
+        }
+      ],
+      "adjournCaseTime": {
+        "adjournCaseNextHearingFirstOnSession": [
+          "firstOnSession"
+        ],
+        "adjournCaseNextHearingSpecificTime": "am"
+      },
+      "adjournCaseTypeOfHearing": "faceToFace",
+      "adjournCaseTypeOfNextHearing": "faceToFace",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",

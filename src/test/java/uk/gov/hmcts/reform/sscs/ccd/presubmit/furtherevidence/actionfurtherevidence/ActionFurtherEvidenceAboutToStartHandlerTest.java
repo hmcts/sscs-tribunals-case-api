@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevid
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import junitparams.JUnitParamsRunner;
@@ -33,8 +33,8 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
-        handler = new ActionFurtherEvidenceAboutToStartHandler();
+        openMocks(this);
+        handler = new ActionFurtherEvidenceAboutToStartHandler(false);
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -143,5 +143,20 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
         assertEquals(2, response.getData().getOriginalSender().getListItems().size());
+    }
+
+    @Test
+    public void populateOriginalSenderDropdownWithJointParty_whenUniversalCreditFeatureFlagOn() {
+        handler = new ActionFurtherEvidenceAboutToStartHandler(true);
+
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("No").build()).build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
+        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
+        assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
+        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
     }
 }
