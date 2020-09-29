@@ -378,7 +378,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
             SyaOptions options = syaHearingOptions.getOptions();
             return HearingSubtype.builder()
                     .wantsHearingTypeTelephone(options.getHearingTypeTelephone() ? YES : NO)
-                    .hearingTelephoneNumber(options.getTelephone())
+                    .hearingTelephoneNumber(getPhoneNumberWithOutSpaces(options.getTelephone()))
                     .wantsHearingTypeVideo(options.getHearingTypeVideo() ? YES : NO)
                     .hearingVideoEmail(options.getEmail())
                     .wantsHearingTypeFaceToFace(options.getHearingTypeFaceToFace() ? YES : NO)
