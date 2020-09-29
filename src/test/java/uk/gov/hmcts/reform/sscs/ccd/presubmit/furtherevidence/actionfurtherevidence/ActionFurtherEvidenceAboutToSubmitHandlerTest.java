@@ -570,9 +570,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenConfidentialRequestFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFields() {
+    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
+    public void givenConfidentialRequestFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
 
-        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -641,7 +642,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
         for (String error : response.getErrors()) {
-            assertEquals("Further evidence action must be 'Send to Interloc - Review by Judge' for a confidential document", error);
+            assertEquals("Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document", error);
         }
     }
 }

@@ -159,6 +159,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                         documents.add(sscsDocument);
                         if (sscsCaseData.isLanguagePreferenceWelsh()) {
                             sscsCaseData.setTranslationWorkOutstanding(YES);
+                            log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
                         }
                     }
                     if (sscsCaseData.getSscsDocument() != null) {
@@ -230,8 +231,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
 
-            if (!SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
-                preSubmitCallbackResponse.addError("Further evidence action must be 'Send to Interloc - Review by Judge' for a confidential document");
+            if (!SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())
+                && !INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+                preSubmitCallbackResponse.addError("Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document");
             }
 
             if (!OriginalSenderItemList.APPELLANT.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())
