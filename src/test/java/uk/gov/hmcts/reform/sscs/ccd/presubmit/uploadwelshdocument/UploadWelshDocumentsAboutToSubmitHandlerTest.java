@@ -23,6 +23,7 @@ import org.mockito.junit.MockitoRule;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.WelshFooterService;
@@ -67,6 +68,20 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
         boolean actualResult = handler.canHandle(callbackType, callback);
         assertEquals(expectedResult, actualResult);
     }
+
+
+    @Test
+    public void shouldAddAnErrorIfNoWelshDocumentSelected() {
+        Callback<SscsCaseData> callback = buildCallback("english.pdf", UPLOAD_WELSH_DOCUMENT, buildSscsDocuments(false), buildInvalidSscsWelshDocuments(DocumentType.SSCS1.getValue()), State.VALID_APPEAL);
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        caseData.setState(State.VALID_APPEAL);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertNotNull(response);
+        assertEquals("Please select a document to upload", response.getErrors().stream().findFirst().get());
+    }
+
 
     @Test
     public void updateCaseWhenOnlyOneDocumentAndOnlyOneSetToRequestTranslationStatusToRequestTranslation() {
@@ -234,6 +249,15 @@ public class UploadWelshDocumentsAboutToSubmitHandlerTest {
                     .documentUrl("/anotherUrl")
                     .documentFilename("welsh.pdf")
                     .build())
+                .documentLanguage("welsh")
+                .documentType(documentType)
+                .build())
+            .build());
+    }
+
+    private List<SscsWelshDocument> buildInvalidSscsWelshDocuments(String documentType) {
+        return Arrays.asList(SscsWelshDocument.builder()
+            .value(SscsWelshDocumentDetails.builder()
                 .documentLanguage("welsh")
                 .documentType(documentType)
                 .build())

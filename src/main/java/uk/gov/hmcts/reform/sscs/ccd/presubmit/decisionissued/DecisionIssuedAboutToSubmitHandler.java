@@ -89,9 +89,12 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             }
             caseData.setState(State.DORMANT_APPEAL_STATE);
         } else {
+            log.info("Case is a Welsh case so Decsion Notice requires translation for case id : {}", caseData.getCcdCaseId());
             clearBasicTransientFields(caseData);
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
             caseData.setTranslationWorkOutstanding("Yes");
+
         }
 
         log.info("Saved the new interloc decision document for case id: " + caseData.getCcdCaseId());
