@@ -67,17 +67,38 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
-        Appeal appeal = caseData.getAppeal();
-        if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
-            caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
-                    appeal.getMrnDetails().getDwpIssuingOffice()));
-        }
+        updateDwpRegionalCentre(caseData);
 
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
                 .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData));
     }
 
+    private void updateDwpRegionalCentre(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+        if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
+
+            caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
+                    appeal.getMrnDetails().getDwpIssuingOffice()));
+
+        } else if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null)) {
+
+            if (dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode()).isPresent()) {
+                String defaultDwpIssuingOffice = dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode()).get().getMapping().getCcd();
+                // set default dwp office and regional centre
+                if (appeal.getMrnDetails() == null) {
+                    caseData.getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice(defaultDwpIssuingOffice).build());
+                } else {
+                    caseData.getAppeal().getMrnDetails().setDwpIssuingOffice(defaultDwpIssuingOffice);
+                }
+
+                caseData.setDwpRegionalCentre(dwpAddressLookupService.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode()));
+                log.info("Update Case {} default DWP Issuing Office {} and DWP Handling Office {}", caseData.getCcdCaseId(), defaultDwpIssuingOffice, caseData.getDwpRegionalCentre());
+            }
+
+        }
+    }
+    
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionType(SscsCaseData caseData) {
         if (caseData.getDirectionTypeDl() == null || caseData.getDirectionTypeDl().getValue() == null) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);

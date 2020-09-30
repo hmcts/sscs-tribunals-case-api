@@ -35,6 +35,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
+import uk.gov.hmcts.reform.sscs.model.dwp.Mapping;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
@@ -44,7 +46,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
-    public static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
+    private static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
+    private static final String DEFAULT_REGIONAL_CENTER = "dummyRegionalCenter";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -125,6 +128,8 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         when(response.getErrors()).thenReturn(emptySet());
 
         when(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(anyString(), anyString())).thenReturn(DUMMY_REGIONAL_CENTER);
+        when(dwpAddressLookupService.getDefaultDwpMappingByOffice(anyString())).thenReturn(Optional.of(OfficeMapping.builder().isDefault(true).mapping(Mapping.builder().ccd("DWP PIP (1)").build()).build()));
+        when(dwpAddressLookupService.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(anyString())).thenReturn(DEFAULT_REGIONAL_CENTER);
     }
 
     @Test
@@ -273,7 +278,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsNull_shouldNotSetDwpRegionalCentre() {
+    public void givenDirectionTypeOfAppealToProceedWhenDwpIssuingOfficeIsNull_shouldSetDefaultDwpRegionalCentre() {
         Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
         appeal.setBenefitType(BenefitType.builder().code("PIP").build());
         appeal.setMrnDetails(MrnDetails.builder().build());
@@ -286,7 +291,24 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDateSentToDwp());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
-        assertNull(response.getData().getDwpRegionalCentre());
+        assertEquals(DEFAULT_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
+    }
+
+    @Test
+    public void givenDirectionTypeOfAppealToProceedWhenNoMrnDetails_shouldSetDefaultDwpRegionalCentre() {
+        Appeal appeal = callback.getCaseDetails().getCaseData().getAppeal();
+        appeal.setBenefitType(BenefitType.builder().code("PIP").build());
+        appeal.setMrnDetails(null);
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
+        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDateSentToDwp());
+        assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
+        assertEquals(DEFAULT_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
 
     @Test
