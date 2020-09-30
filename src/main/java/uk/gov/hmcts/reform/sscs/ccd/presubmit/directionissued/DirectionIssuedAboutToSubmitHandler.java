@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
 import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
@@ -77,15 +78,18 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateDwpRegionalCentre(SscsCaseData caseData) {
         Appeal appeal = caseData.getAppeal();
 
-        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null) && dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode()).isPresent()) {
-            String defaultDwpIssuingOffice = dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode()).get().getMapping().getCcd();
-            // set default dwp office and regional centre
-            if (appeal.getMrnDetails() == null) {
-                caseData.getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice(defaultDwpIssuingOffice).build());
-            } else {
-                caseData.getAppeal().getMrnDetails().setDwpIssuingOffice(defaultDwpIssuingOffice);
+        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null)) {
+            Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode());
+            if (defaultOfficeMapping.isPresent()) {
+                String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
+                // set default dwp office and regional centre
+                if (appeal.getMrnDetails() == null) {
+                    caseData.getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice(defaultDwpIssuingOffice).build());
+                } else {
+                    caseData.getAppeal().getMrnDetails().setDwpIssuingOffice(defaultDwpIssuingOffice);
+                }
+                log.info("Update Case {} default DWP Issuing Office {}", caseData.getCcdCaseId(), defaultDwpIssuingOffice);
             }
-            log.info("Update Case {} default DWP Issuing Office {}", caseData.getCcdCaseId(), defaultDwpIssuingOffice);
         }
         if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
 
