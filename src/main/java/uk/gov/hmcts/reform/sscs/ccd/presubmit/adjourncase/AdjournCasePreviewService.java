@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase;
 
+import static org.apache.commons.lang3.StringUtils.stripToEmpty;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -184,17 +186,17 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime());
 
         } else if ("dateToBeFixed".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            hearingDateSentence = "on a date to be fixed ";
+            hearingDateSentence = "on a date to be fixed";
         } else {
             throw new IllegalStateException("Unknown next hearing date type for:" + caseData.getAdjournCaseNextHearingDateType());
         }
 
-        adjournCaseBuilder.nextHearingDate(hearingDateSentence);
+        adjournCaseBuilder.nextHearingDate(stripToEmpty(hearingDateSentence));
 
     }
 
     private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime) {
-        StringBuilder stringBuilder = new StringBuilder("");
+        StringBuilder stringBuilder = new StringBuilder("It will be ");
         if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
                 && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
             stringBuilder.append("first ");
@@ -210,7 +212,7 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
             stringBuilder.append("afternoon ");
         }
 
-        stringBuilder.append("session on a date to be decided ");
+        stringBuilder.append("session on a date to be decided");
 
         return stringBuilder.toString();
     }
