@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
@@ -387,6 +388,48 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("At least one of Mobility or Daily Living must be considered", error);
+    }
+
+    @Test
+    @Parameters({
+        "STANDARD_RATE, STANDARD_RATE",
+        "ENHANCED_RATE, ENHANCED_RATE",
+        "NOT_CONSIDERED, STANDARD_RATE",
+        "STANDARD_RATE, NO_AWARD",
+        "NO_AWARD, ENHANCED_RATE"
+    })
+    public void shouldDisplayActivitiesWarningWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(dailyLiving.key);
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(mobility.key);
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(emptyList());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getWarnings().size());
+        String error = response.getWarnings().stream().findFirst().orElse("");
+        assertEquals("At least one activity must be selected unless there is no award", error);
+    }
+
+    @Test
+    public void shouldNotDisplayActivitiesWarningWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.key);
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.key);
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(emptyList());
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+    }
+
+    @Test
+    public void shouldNotDisplayActivitiesWarningWhenActivitiesAreNotYetSelected() {
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.STANDARD_RATE.key);
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.STANDARD_RATE.key);
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
     }
 
     @Test(expected = IllegalStateException.class)
