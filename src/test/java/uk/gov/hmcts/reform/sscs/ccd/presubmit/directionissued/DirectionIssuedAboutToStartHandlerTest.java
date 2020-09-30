@@ -141,7 +141,7 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
         when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
         when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
-        sscsCaseData.setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
 
         List<DynamicListItem> listOptions = new ArrayList<>();
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));

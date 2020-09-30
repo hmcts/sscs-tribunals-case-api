@@ -20,7 +20,9 @@
       "adjournCaseNextHearingListingDuration": "12",
       "adjournCaseNextHearingListingDurationType": "setTime",
       "adjournCaseNextHearingListingDurationUnits": "hours",
-      "adjournCaseNextHearingSpecificTime": "pm",
+      "adjournCaseTime": {
+        "adjournCaseNextHearingSpecificTime": "am"
+      },
       "adjournCaseNextHearingVenue": "somewhereElse",
       "adjournCaseNextHearingVenueSelected": {
         "value": {

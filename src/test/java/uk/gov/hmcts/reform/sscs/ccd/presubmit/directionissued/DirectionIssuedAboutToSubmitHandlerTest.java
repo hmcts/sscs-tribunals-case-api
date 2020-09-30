@@ -329,7 +329,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
-        callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
 
 
@@ -337,7 +337,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getData().getState().equals(State.APPEAL_CREATED));
-        assertTrue(response.getData().getReinstatementOutcome().equals(ReinstatementOutcome.GRANTED));
+        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.GRANTED));
         assertEquals(DwpState.REINSTATEMENT_GRANTED.getId(), response.getData().getDwpState());
         assertNull(response.getData().getInterlocReviewState());
     }
@@ -350,14 +350,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
-        callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_REINSTATEMENT.getCode()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getData().getState().equals(State.INTERLOCUTORY_REVIEW_STATE));
-        assertTrue(response.getData().getReinstatementOutcome().equals(ReinstatementOutcome.GRANTED));
+        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.GRANTED));
         assertTrue(response.getData().getInterlocReviewState().equals(AWAITING_ADMIN_ACTION.getId()));
         assertEquals(DwpState.REINSTATEMENT_GRANTED.getId(), response.getData().getDwpState());
     }
@@ -370,14 +370,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
-        callback.getCaseDetails().getCaseData().setReinstatementOutcome(ReinstatementOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_REINSTATEMENT.getCode()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
-        assertTrue(response.getData().getReinstatementOutcome().equals(ReinstatementOutcome.REFUSED));
+        assertTrue(response.getData().getReinstatementOutcome().equals(RequestOutcome.REFUSED));
         assertNull(response.getData().getInterlocReviewState());
         assertEquals(DwpState.REINSTATEMENT_REFUSED.getId(), response.getData().getDwpState());
     }

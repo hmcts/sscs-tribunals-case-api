@@ -142,7 +142,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private SscsCaseData updateCaseAfterReinstatementGranted(SscsCaseData caseData) {
 
-        caseData.setReinstatementOutcome(ReinstatementOutcome.GRANTED);
+        caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
         caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED.getId());
 
         State previousState = caseData.getPreviousState();
@@ -161,7 +161,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData) {
 
-        caseData.setReinstatementOutcome(ReinstatementOutcome.REFUSED);
+        caseData.setReinstatementOutcome(RequestOutcome.REFUSED);
         caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED.getId());
         log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
@@ -194,8 +194,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 
-
         SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
@@ -252,7 +252,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             caseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
             caseData.setTranslationWorkOutstanding("Yes");
             clearBasicTransientFields(caseData);
-
+            log.info("Set the InterlocReviewState to {},  for case id : {}", caseData.getInterlocReviewState(), caseData.getCcdCaseId());
 
             if (caseDetails.getState().equals(State.INTERLOCUTORY_REVIEW_STATE)
                     && caseData.getDirectionTypeDl() != null
@@ -270,8 +270,8 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private boolean shouldSetDwpState(SscsCaseData caseData) {
         return ! reinstatementFeatureFlag
                 || isNull(caseData.getReinstatementOutcome())
-                || (!caseData.getReinstatementOutcome().equals(ReinstatementOutcome.GRANTED)
-                && !caseData.getReinstatementOutcome().equals(ReinstatementOutcome.REFUSED));
+                || (!caseData.getReinstatementOutcome().equals(RequestOutcome.GRANTED)
+                && !caseData.getReinstatementOutcome().equals(RequestOutcome.REFUSED));
     }
 
 }

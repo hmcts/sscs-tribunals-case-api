@@ -196,10 +196,11 @@ public class SubmitAppealService {
                     }
                 }
 
-                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {}",
+                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {} and languagePreference {}",
                         caseData.getAppeal().getBenefitType().getCode(),
                         eventType,
-                        caseData.getIsScottishCase());
+                        caseData.getIsScottishCase(),
+                        caseData.getLanguagePreference().getCode());
 
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
