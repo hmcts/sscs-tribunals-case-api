@@ -460,6 +460,27 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(InterlocReviewState.NONE.getId(), sscsCaseData.getInterlocReviewState());
     }
 
+    @Parameters(named = "populatedRequestReviewValues")
+    public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantReviewValuePopulatedAndJointPartyReviewValueSetIncorrectly(String appellantReviewValue) {
+
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+
+        sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused(appellantReviewValue);
+        sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("something");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        Assert.assertEquals(1, response.getErrors().size());
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Joint Party confidentiality request is in progress but value set for granted or refused is:something. Please check case data. If problem continues please contact support", error);
+
+        Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
+    }
+
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantGrantedAndJointPartyReviewValueSetIncorrectly() {
 
@@ -474,27 +495,6 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Joint Party confidentiality request is in progress but value set for granted or refused is:something. Please check case data. If problem continues please contact support", error);
-
-
-        Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-    }
-
-    @Test
-    public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantGrantedAndJointPartyReviewValueNotSet() {
-
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
-
-        sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        Assert.assertEquals(1, response.getErrors().size());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Joint Party confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
@@ -560,26 +560,6 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
-
-        Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-    }
-
-    @Test
-    public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantNotSetAndJointPartyReviewValueNotSet() {
-
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
-
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        Assert.assertEquals(1, response.getErrors().size());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
-
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
