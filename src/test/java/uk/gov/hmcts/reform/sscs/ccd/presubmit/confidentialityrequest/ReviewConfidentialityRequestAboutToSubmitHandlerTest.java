@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
@@ -71,14 +72,21 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     private Object[] noConfidentialityRequestsAreInProgress() {
         return new Object[] {
             new RequestOutcome[] {null, null},
+            new RequestOutcome[] {null, RequestOutcome.NOT_SET},
             new RequestOutcome[] {null, RequestOutcome.GRANTED},
             new RequestOutcome[] {null, RequestOutcome.REFUSED},
             new RequestOutcome[] {RequestOutcome.GRANTED, null},
+            new RequestOutcome[] {RequestOutcome.GRANTED, RequestOutcome.NOT_SET},
             new RequestOutcome[] {RequestOutcome.GRANTED, RequestOutcome.GRANTED},
             new RequestOutcome[] {RequestOutcome.GRANTED, RequestOutcome.REFUSED},
             new RequestOutcome[] {RequestOutcome.REFUSED, null},
+            new RequestOutcome[] {RequestOutcome.REFUSED, RequestOutcome.NOT_SET},
             new RequestOutcome[] {RequestOutcome.REFUSED, RequestOutcome.GRANTED},
             new RequestOutcome[] {RequestOutcome.REFUSED, RequestOutcome.REFUSED},
+            new RequestOutcome[] {RequestOutcome.NOT_SET, null},
+            new RequestOutcome[] {RequestOutcome.NOT_SET, RequestOutcome.NOT_SET},
+            new RequestOutcome[] {RequestOutcome.NOT_SET, RequestOutcome.GRANTED},
+            new RequestOutcome[] {RequestOutcome.NOT_SET, RequestOutcome.REFUSED},
         };
     }
 
@@ -89,6 +97,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
             new RequestOutcome[] {null},
             new RequestOutcome[] {RequestOutcome.GRANTED},
             new RequestOutcome[] {RequestOutcome.REFUSED},
+            new RequestOutcome[] {RequestOutcome.NOT_SET},
+
         };
     }
 
@@ -109,6 +119,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
             new Object[] {null, "something"},
             new Object[] {null, "grantConfidentialityRequest"},
             new Object[] {null, "refuseConfidentialityRequest"},
+            new Object[] {RequestOutcome.NOT_SET, "something"},
+            new Object[] {RequestOutcome.NOT_SET, "grantConfidentialityRequest"},
+            new Object[] {RequestOutcome.NOT_SET, "refuseConfidentialityRequest"},
             new Object[] {RequestOutcome.GRANTED, "something"},
             new Object[] {RequestOutcome.GRANTED, "grantConfidentialityRequest"},
             new Object[] {RequestOutcome.GRANTED, "refuseConfidentialityRequest"},
@@ -118,33 +131,40 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         };
     }
 
+    private DatedRequestOutcome createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome outcome, boolean treatNotSetAsNull) {
+        return outcome == null || (treatNotSetAsNull && RequestOutcome.NOT_SET.equals(outcome)) ? null : DatedRequestOutcome.builder().date(LocalDate.now().minusDays(1)).requestOutcome(outcome).build();
+    }
+
+    private DatedRequestOutcome createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome outcome, boolean treatNotSetAsNull) {
+        return outcome == null || (treatNotSetAsNull && RequestOutcome.NOT_SET.equals(outcome)) ? null : DatedRequestOutcome.builder().date(LocalDate.now()).requestOutcome(outcome).build();
+    }
+
     @Parameters(named = "noConfidentialityRequestsAreInProgress")
     @Test
     public void givenNoConfidentialityRequestsAreInProgressShouldDisplayAnError(RequestOutcome appellantOutcome, RequestOutcome jointPartyOutcome) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(appellantOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(jointPartyOutcome);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome, false));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         Assert.assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("At least one confidentiality request should be in progress. Please check case data. If problem continues please contact support", error);
+        assertEquals("There is no confidentiality request to review. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertNull(sscsCaseData.getConfidentialityRequestDate());
 
-        Assert.assertEquals(appellantOutcome, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(jointPartyOutcome, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
     }
 
     @Parameters(named = "noRequestIsInProgress")
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfGrantedOrRefusedSetIncorrectly(RequestOutcome jointPartyRequestOutcome) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(jointPartyRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("something");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -153,11 +173,10 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:something. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
 
-        Assert.assertEquals(jointPartyRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
     }
 
@@ -165,9 +184,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfGrantedSet(RequestOutcome jointPartyRequestOutcome) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(jointPartyRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -175,12 +194,11 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         
         Assert.assertEquals(DwpState.CONFIDENTIALITY_ACTION_REQUIRED.getId(), sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.GRANTED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
         Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
-        Assert.assertEquals(jointPartyRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
     }
 
@@ -188,9 +206,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfAppellantGrantedSetAndJointPartyReviewValueSet(RequestOutcome jointPartyRequestOutcome, String jointPartyReviewValue) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(jointPartyRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused(jointPartyReviewValue);
 
@@ -202,10 +220,10 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
 
-        Assert.assertEquals(jointPartyRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
@@ -215,9 +233,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfRefusedSet(RequestOutcome jointPartyRequestOutcome) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(jointPartyRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("refuseConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -225,12 +242,11 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.NONE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.REFUSED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
         Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
-        Assert.assertEquals(jointPartyRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
     }
 
@@ -238,8 +254,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenAppellantConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfAppellantRefusedSetAndJointPartyReviewValueSet(String jointPartyReviewValue) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("refuseConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused(jointPartyReviewValue);
 
@@ -251,10 +266,10 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
         Assert.assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
@@ -264,9 +279,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfGrantedOrRefusedSetIncorrectly(RequestOutcome appellantRequestOutcome) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(appellantRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("something");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -275,11 +289,10 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Joint Party confidentiality request is in progress but value set for granted or refused is:something. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
 
-        Assert.assertEquals(appellantRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
     }
 
@@ -287,9 +300,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfGrantedSet(RequestOutcome appellantRequestOutcome) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(appellantRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -297,10 +309,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals(DwpState.CONFIDENTIALITY_ACTION_REQUIRED.getId(), sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.GRANTED, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
-        Assert.assertEquals(appellantRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
@@ -310,9 +321,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfJointPartyGrantedSetAndAppellantReviewValueSet(RequestOutcome appellantRequestOutcome, String appellantReviewValue) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(appellantRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused(appellantReviewValue);
 
@@ -324,10 +334,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
-        Assert.assertEquals(appellantRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
@@ -338,9 +347,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldNotDisplayAnErrorIfRefusedSet(RequestOutcome appellantRequestOutcome) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(appellantRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("refuseConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -348,10 +356,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.NONE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.REFUSED, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
-        Assert.assertEquals(appellantRequestOutcome, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
@@ -361,8 +368,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenJointPartyConfidentialityRequestOnlyIsInProgressShouldDisplayAnErrorIfAppellantRefusedSetAndAppellantReviewValueSet(String appellantReviewValue) {
 
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("refuseConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused(appellantReviewValue);
 
@@ -374,9 +380,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
 
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
@@ -386,10 +391,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     @Test
     public void givenBothRequestsInProgressShouldNotDisplayAnErrorIfAppellantGrantedAndJointPartyGranted() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
 
@@ -397,19 +401,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(0, response.getErrors().size());
 
         Assert.assertEquals("confidentialityActionRequired", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.GRANTED, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.GRANTED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldNotDisplayAnErrorIfAppellantGrantedAndJointPartyRefused() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("refuseConfidentialityRequest");
 
@@ -417,19 +419,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(0, response.getErrors().size());
 
         Assert.assertEquals("confidentialityActionRequired", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.REFUSED, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.GRANTED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldNotDisplayAnErrorIfAppellantRefusedAndJointPartyGranted() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("refuseConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
 
@@ -437,19 +437,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(0, response.getErrors().size());
 
         Assert.assertEquals("confidentialityActionRequired", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.GRANTED, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.REFUSED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldNotDisplayAnErrorIfAppellantRefusedAndJointPartyRefused() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("refuseConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("refuseConfidentialityRequest");
 
@@ -457,19 +455,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(0, response.getErrors().size());
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.REFUSED, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.REFUSED, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.REFUSED, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.NONE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantGrantedAndJointPartyReviewValueSetIncorrectly() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("something");
 
@@ -481,19 +477,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantGrantedAndJointPartyReviewValueNotSet() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -504,19 +498,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantRefusedAndJointPartyReviewValueSetIncorrectly() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("refuseConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("something");
 
@@ -528,19 +520,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantRefusedAndJointPartyReviewValueNotSet() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("refuseConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -552,19 +542,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Joint Party confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantNotSetAndJointPartyReviewValueSetIncorrectly() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("something");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -574,19 +562,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantNotSetAndJointPartyReviewValueNotSet() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         Assert.assertEquals(1, response.getErrors().size());
@@ -596,19 +582,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantSetIncorrectlyAndJointPartyReviewValueSetIncorrectly() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("something");
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("something");
 
@@ -619,21 +603,18 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:something. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfAppellantSetIncorrectlyAndJointPartyReviewValueNotSet() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("something");
-
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         Assert.assertEquals(1, response.getErrors().size());
@@ -643,19 +624,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfJointPartyGrantedAndAppellantReviewValueSetIncorrectly() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("something");
 
@@ -667,19 +646,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfJointPartyGrantedAndAppellantReviewValueNotSet() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -689,19 +666,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfJointPartyRefusedAndAppellantReviewValueSetIncorrectly() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("refuseConfidentialityRequest");
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("something");
 
@@ -713,19 +688,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfJointPartyRefusedAndAppellantReviewValueNotSet() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("refuseConfidentialityRequest");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -735,19 +708,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfJointPartyNotSetAndAppellantReviewValueSetIncorrectly() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("something");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -758,21 +729,18 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
     @Test
     public void givenBothRequestsInProgressShouldDisplayAnErrorIfJointPartySetIncorrectlyAndAppellantReviewValueNotSet() {
 
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false));
 
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("something");
-
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now().minusDays(1));
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         Assert.assertEquals(1, response.getErrors().size());
@@ -781,10 +749,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertEquals("Appellant confidentiality request is in progress but value set for granted or refused is:null. Please check case data. If problem continues please contact support", error);
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(LocalDate.now().minusDays(1), sscsCaseData.getConfidentialityRequestDate());
     }
 
 

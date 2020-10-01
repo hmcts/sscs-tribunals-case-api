@@ -584,9 +584,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
         assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
     }
 
     @Test
@@ -603,10 +603,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome());
         assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestDate());
+        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeJointParty().getDate());
     }
+
+
 
     @Test
     public void givenConfidentialRequestFromRep_thenShowAnError() {
@@ -645,5 +647,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             assertEquals("Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document", error);
         }
     }
+
 }
 

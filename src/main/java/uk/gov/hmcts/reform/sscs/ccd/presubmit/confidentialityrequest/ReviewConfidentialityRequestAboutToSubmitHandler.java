@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -64,7 +65,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                 clearTransientFields(preSubmitCallbackResponse);
 
             } else {
-                throw new IllegalStateException("At least one confidentiality request should be in progress");
+                throw new IllegalStateException("There is no confidentiality request to review");
             }
 
         } catch (IllegalStateException e) {
@@ -99,11 +100,21 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused(null);
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused(null);
+        if (sscsCaseData.getConfidentialityRequestOutcomeAppellant() != null
+            && RequestOutcome.NOT_SET.equals(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome())) {
+            // Should never happen, but just to be sure, we don't want to persist not set
+            sscsCaseData.setConfidentialityRequestOutcomeAppellant(null);
+        }
+        if (sscsCaseData.getConfidentialityRequestOutcomeJointParty() != null
+            && RequestOutcome.NOT_SET.equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome())) {
+            // Should never happen, but just to be sure, we don't want to persist not set
+            sscsCaseData.setConfidentialityRequestOutcomeJointParty(null);
+        }
     }
 
     private boolean processAPartyAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData,
         String grantedOrRefusedText,
-        Consumer<RequestOutcome> setOutcomeCallback, String partyName) {
+        Consumer<DatedRequestOutcome> setOutcomeCallback, String partyName) {
 
         boolean grantedNow = false;
 
@@ -118,22 +129,21 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
         return grantedNow;
     }
 
-    private void setOutcome(SscsCaseData sscsCaseData, Consumer<RequestOutcome> setOutcomeCallback, RequestOutcome outcome) {
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now());
-        setOutcomeCallback.accept(outcome);
+    private void setOutcome(SscsCaseData sscsCaseData, Consumer<DatedRequestOutcome> setOutcomeCallback, RequestOutcome outcome) {
+        setOutcomeCallback.accept(DatedRequestOutcome.builder().requestOutcome(outcome).date(LocalDate.now()).build());
     }
 
     private boolean processJointPartyAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData) {
         return processAPartyAndReturnWhetherGrantedNow(sscsCaseData,
             sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused(),
-            o -> sscsCaseData.setConfidentialityRequestOutcomeJointParty(o),
+            sscsCaseData::setConfidentialityRequestOutcomeJointParty,
             "Joint Party");
     }
 
     private boolean processAppellantAndReturnWhetherGrantedNow(SscsCaseData sscsCaseData) {
         return processAPartyAndReturnWhetherGrantedNow(sscsCaseData,
             sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused(),
-            o -> sscsCaseData.setConfidentialityRequestOutcomeAppellant(o),
+            sscsCaseData::setConfidentialityRequestOutcomeAppellant,
             "Appellant");
     }
 
@@ -144,11 +154,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
 
     private boolean isAppellantRequestInProgress(SscsCaseData sscsCaseData) {
         return RequestOutcome.IN_PROGRESS
-            .equals(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+            .equals(getRequestOutcome(sscsCaseData.getConfidentialityRequestOutcomeAppellant()));
     }
 
     private boolean isJointPartyRequestInProgress(SscsCaseData sscsCaseData) {
         return RequestOutcome.IN_PROGRESS
-            .equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+            .equals(getRequestOutcome(sscsCaseData.getConfidentialityRequestOutcomeJointParty()));
+    }
+
+    private RequestOutcome getRequestOutcome(DatedRequestOutcome datedRequestOutcome) {
+        return datedRequestOutcome == null ? null : datedRequestOutcome.getRequestOutcome();
     }
 }
