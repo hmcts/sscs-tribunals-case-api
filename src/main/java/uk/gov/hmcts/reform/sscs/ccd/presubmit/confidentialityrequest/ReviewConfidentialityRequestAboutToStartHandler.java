@@ -53,7 +53,7 @@ public class ReviewConfidentialityRequestAboutToStartHandler implements PreSubmi
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (!isAtLeastOneRequestInProgress(sscsCaseData)) {
+        if (!isAtLeastOneRequestInProgress(sscsCaseData) || !sscsCaseData.isThereAJointParty()) {
 
             preSubmitCallbackResponse.addError("There is no confidentiality request to review");
             return preSubmitCallbackResponse;
