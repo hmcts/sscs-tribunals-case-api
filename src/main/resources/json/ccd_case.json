@@ -115,6 +115,14 @@
       "mobile": "07411333333",
       "subscribeEmail": "Yes",
       "subscribeSms": "Yes"
+    },
+    "jointPartySubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL6",
+      "email": "joint@bloggs.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
     }
   },
   "generatedNino": "AB877533C",
