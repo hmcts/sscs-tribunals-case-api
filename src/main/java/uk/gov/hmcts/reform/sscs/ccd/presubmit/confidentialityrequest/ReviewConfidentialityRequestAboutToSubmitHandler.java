@@ -39,6 +39,14 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        // Undo the temporary change to the outcomes made by the about-to-start handler
+        if (sscsCaseData.getConfidentialityRequestOutcomeJointParty() != null && RequestOutcome.NOT_SET.equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome())) {
+            sscsCaseData.setConfidentialityRequestOutcomeJointParty(null);
+        }
+        if (sscsCaseData.getConfidentialityRequestOutcomeAppellant() != null && RequestOutcome.NOT_SET.equals(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome())) {
+            sscsCaseData.setConfidentialityRequestOutcomeAppellant(null);
+        }
+
         try {
 
             if (isAtLeastOneRequestInProgress(sscsCaseData)) {

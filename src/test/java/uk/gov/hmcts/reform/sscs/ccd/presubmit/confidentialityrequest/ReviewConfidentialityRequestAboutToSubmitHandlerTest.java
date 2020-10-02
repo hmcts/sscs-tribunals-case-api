@@ -90,6 +90,48 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         };
     }
 
+    @NamedParameters("allValidConfidentialityRequestCombinations")
+    @SuppressWarnings("unused")
+    private Object[] allValidConfidentialityRequestCombinations() {
+        return new Object[] {
+            new Object[] {null, null, null, null},
+            new Object[] {null, RequestOutcome.NOT_SET, null, null},
+            new Object[] {null, RequestOutcome.GRANTED, null, null},
+            new Object[] {null, RequestOutcome.REFUSED, null, null},
+            new Object[] {null, RequestOutcome.IN_PROGRESS, null, "grantConfidentialityRequest"},
+            new Object[] {null, RequestOutcome.IN_PROGRESS, null, "refuseConfidentialityRequest"},
+            new Object[] {RequestOutcome.GRANTED, null, null, null},
+            new Object[] {RequestOutcome.GRANTED, RequestOutcome.NOT_SET, null, null},
+            new Object[] {RequestOutcome.GRANTED, RequestOutcome.GRANTED, null, null},
+            new Object[] {RequestOutcome.GRANTED, RequestOutcome.REFUSED, null, null},
+            new Object[] {RequestOutcome.GRANTED, RequestOutcome.IN_PROGRESS, null, "grantConfidentialityRequest"},
+            new Object[] {RequestOutcome.GRANTED, RequestOutcome.IN_PROGRESS, null, "refuseConfidentialityRequest"},
+            new Object[] {RequestOutcome.REFUSED, null, null, null},
+            new Object[] {RequestOutcome.REFUSED, RequestOutcome.NOT_SET, null, null},
+            new Object[] {RequestOutcome.REFUSED, RequestOutcome.GRANTED, null, null},
+            new Object[] {RequestOutcome.REFUSED, RequestOutcome.REFUSED, null, null},
+            new Object[] {RequestOutcome.REFUSED, RequestOutcome.IN_PROGRESS, null, "grantConfidentialityRequest"},
+            new Object[] {RequestOutcome.REFUSED, RequestOutcome.IN_PROGRESS, null, "refuseConfidentialityRequest"},
+            new Object[] {RequestOutcome.NOT_SET, null, null, null},
+            new Object[] {RequestOutcome.NOT_SET, RequestOutcome.NOT_SET, null, null},
+            new Object[] {RequestOutcome.NOT_SET, RequestOutcome.GRANTED, null, null},
+            new Object[] {RequestOutcome.NOT_SET, RequestOutcome.REFUSED, null, null},
+            new Object[] {RequestOutcome.NOT_SET, RequestOutcome.IN_PROGRESS, null, "grantConfidentialityRequest"},
+            new Object[] {RequestOutcome.NOT_SET, RequestOutcome.IN_PROGRESS, null, "refuseConfidentialityRequest"},
+            new Object[] {RequestOutcome.IN_PROGRESS, null, "grantConfidentialityRequest", null},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.NOT_SET, "grantConfidentialityRequest", null},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.GRANTED, "grantConfidentialityRequest", null},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.REFUSED, "grantConfidentialityRequest", null},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.IN_PROGRESS, "grantConfidentialityRequest", "grantConfidentialityRequest"},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.IN_PROGRESS, "grantConfidentialityRequest", "refuseConfidentialityRequest"},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.NOT_SET, "refuseConfidentialityRequest", null},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.GRANTED, "refuseConfidentialityRequest", null},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.REFUSED, "refuseConfidentialityRequest", null},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.IN_PROGRESS, "refuseConfidentialityRequest", "grantConfidentialityRequest"},
+            new Object[] {RequestOutcome.IN_PROGRESS, RequestOutcome.IN_PROGRESS, "refuseConfidentialityRequest", "refuseConfidentialityRequest"}
+        };
+    }
+
     @NamedParameters("noRequestIsInProgress")
     @SuppressWarnings("unused")
     private Object[] noRequestIsInProgress() {
@@ -109,6 +151,17 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
             new String[] {"something"},
             new String[] {"grantConfidentialityRequest"},
             new String[] {"refuseConfidentialityRequest"}
+        };
+    }
+
+    @NamedParameters("validRequestReviewValueCombinations")
+    @SuppressWarnings("unused")
+    private Object[] validRequestReviewValueCombinations() {
+        return new Object[] {
+            new String[] {"grantConfidentialityRequest", "grantConfidentialityRequest"},
+            new String[] {"refuseConfidentialityRequest", "refuseConfidentialityRequest"},
+            new String[] {"refuseConfidentialityRequest", "grantConfidentialityRequest"},
+            new String[] {"refuseConfidentialityRequest", "refuseConfidentialityRequest"}
         };
     }
 
@@ -154,8 +207,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
 
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
     }
 
     @Parameters(named = "noRequestIsInProgress")
@@ -175,8 +228,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
 
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
     }
 
@@ -221,8 +274,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
 
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
@@ -291,8 +344,8 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
 
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
 
     }
 
@@ -334,9 +387,9 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         Assert.assertEquals("previousDwpState", sscsCaseData.getDwpState());
         Assert.assertEquals(InterlocReviewState.REVIEW_BY_JUDGE.getId(), sscsCaseData.getInterlocReviewState());
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, false), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
 
-        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, false), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantRequestOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNotNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
 
@@ -556,5 +609,37 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
     public void throwsExceptionIfItCannotHandleTheRequest() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+    }
+
+    @Parameters(named = "allValidConfidentialityRequestCombinations")
+    @Test
+    public void givenConfidentialityRequestsCombinationShouldResetNotSetValuesToNull(RequestOutcome appellantOutcome, RequestOutcome jointPartyOutcome, String appellantReviewText, String jointPartyReviewText) {
+
+        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome, false));
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome, false));
+        if (RequestOutcome.IN_PROGRESS.equals(appellantOutcome)) {
+            sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused(appellantReviewText);
+        }
+        if (RequestOutcome.IN_PROGRESS.equals(jointPartyOutcome)) {
+            sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused(jointPartyReviewText);
+        }
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        if (RequestOutcome.IN_PROGRESS.equals(appellantOutcome) || RequestOutcome.IN_PROGRESS.equals(jointPartyOutcome)) {
+            Assert.assertEquals(0, response.getErrors().size());
+        } else {
+            Assert.assertEquals(1, response.getErrors().size());
+            String error = response.getErrors().stream().findFirst().orElse("");
+            assertEquals("There is no confidentiality request to review. Please check case data. If problem continues please contact support", error);
+        }
+
+        if (!RequestOutcome.IN_PROGRESS.equals(appellantOutcome)) {
+            Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(appellantOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        }
+        if (!RequestOutcome.IN_PROGRESS.equals(jointPartyOutcome)) {
+            Assert.assertEquals(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(jointPartyOutcome, true), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        }
     }
 }
