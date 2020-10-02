@@ -13,7 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Component
 @Slf4j
-public class ReviewConfidentialityRequestMidEventValidationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ReviewConfidentialityRequestMidEventHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
