@@ -54,6 +54,12 @@ public class SubscriptionUpdatedAboutToSubmitHandler implements PreSubmitCallbac
             repSubscription.setTya(getTyaNumber(repSubscription));
         }
 
+        Subscription jointPartySubscription = sscsCaseData.getSubscriptions().getJointPartySubscription();
+
+        if (jointPartySubscription != null && !jointPartySubscription.isEmpty()) {
+            jointPartySubscription.setTya(getTyaNumber(jointPartySubscription));
+        }
+
         return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
