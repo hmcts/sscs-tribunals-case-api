@@ -76,7 +76,8 @@ public class SscsMyaBackendRequests {
         System.out.println("Case id " + jsonObject.getString("id"));
         return new CreatedCcdCase(
                 jsonObject.getString("id"),
-                jsonObject.getString("appellant_tya")
+                jsonObject.getString("appellant_tya"),
+                jsonObject.getString("joint_party_tya")
         );
     }
 
