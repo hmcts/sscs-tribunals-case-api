@@ -90,6 +90,18 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenJointPartySubscriptionWithNoExistingTya_thenAutomaticallyGenerateARandomNumberForTya() {
+        Subscription jointPartySubscription = Subscription.builder().tya(null).email("email").build();
+        Subscriptions subscriptions = Subscriptions.builder().jointPartySubscription(jointPartySubscription).build();
+        sscsCaseData.setSubscriptions(subscriptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNotNull(response.getData().getSubscriptions().getJointPartySubscription().getTya());
+        assertEquals("email", response.getData().getSubscriptions().getJointPartySubscription().getEmail());
+    }
+
+    @Test
     public void givenAppellantSubscriptionWithExistingTya_thenUseExistingTyaNumber() {
         Subscription appellantSubscription = Subscription.builder().tya("123").email("email").build();
         Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).build();
@@ -126,11 +138,24 @@ public class SubscriptionUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenJointPartySubscriptionWithExistingTya_thenUseExistingTyaNumber() {
+        Subscription jointPartySubscription = Subscription.builder().tya("123").email("email").build();
+        Subscriptions subscriptions = Subscriptions.builder().jointPartySubscription(jointPartySubscription).build();
+        sscsCaseData.setSubscriptions(subscriptions);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("123", response.getData().getSubscriptions().getJointPartySubscription().getTya());
+        assertEquals("email", response.getData().getSubscriptions().getJointPartySubscription().getEmail());
+    }
+
+    @Test
     public void givenEmptySubscriptions_thenDoNotUpdateTyaNumber() {
         Subscription repSubscription = Subscription.builder().build();
         Subscription appellantSubscription = Subscription.builder().build();
         Subscription appointeeSubscription = Subscription.builder().build();
-        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).appointeeSubscription(appointeeSubscription).representativeSubscription(repSubscription).build();
+        Subscription jointPartySubscription = Subscription.builder().build();
+        Subscriptions subscriptions = Subscriptions.builder().appellantSubscription(appellantSubscription).appointeeSubscription(appointeeSubscription).representativeSubscription(repSubscription).jointPartySubscription(jointPartySubscription).build();
 
         sscsCaseData.setSubscriptions(subscriptions);
 
