@@ -69,7 +69,7 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
                 &&  sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion() != null
                 &&  sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion().isEmpty()
                 &&  sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion().isEmpty()) {
-            preSubmitCallbackResponse.addWarning("At least one activity must be selected unless there is no award");
+            preSubmitCallbackResponse.addError("At least one activity must be selected unless there is no award");
         }
 
         if (AwardType.NO_AWARD.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
