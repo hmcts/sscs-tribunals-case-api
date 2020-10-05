@@ -29,4 +29,24 @@ public class CitizenLoginTest extends BaseFunctionTest {
         assertThat(onlineHearingForTya.length(), is(1));
         assertThat(onlineHearingForTya.getJSONObject(0).get("case_id"), is(expectedCaseId));
     }
+
+    @Test
+    public void checkJointDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException {
+        String userEmail = createRandomEmail();
+        idamTestApiRequests.createUser(userEmail);
+        CreatedCcdCase ccdCase = createCcdCase(userEmail);
+
+        String jointPartyTya = ccdCase.getJointPartyTya();
+
+        JSONArray onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen(jointPartyTya, userEmail);
+        assertThat(onlineHearingForTya.length(), is(0));
+
+        JSONObject jsonObject = sscsMyaBackendRequests.assignCaseToUser(jointPartyTya, userEmail, "TN32 6PL");
+        Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
+        assertThat(jsonObject.getLong("case_id"), is(expectedCaseId));
+
+        onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen("", userEmail);
+        assertThat(onlineHearingForTya.length(), is(1));
+        assertThat(onlineHearingForTya.getJSONObject(0).get("case_id"), is(expectedCaseId));
+    }
 }
