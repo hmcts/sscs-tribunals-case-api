@@ -3,3 +3,4 @@ java:
   ingressHost: ${SERVICE_FQDN}
   environment:
     CREATE_CCD_ENDPOINT: true
+    UC_ENABLED: true
