@@ -47,7 +47,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     private static final String DOCUMENT_URL = "dm-store/documents/123";
     private static final String DOCUMENT_URL2 = "dm-store/documents/456";
     private static final String DUMMY_REGIONAL_CENTER = "dummyRegionalCenter";
-    private static final String DEFAULT_REGIONAL_CENTER = "defaultRegionalCenter";
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -129,7 +128,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         when(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(anyString(), anyString())).thenReturn(DUMMY_REGIONAL_CENTER);
         when(dwpAddressLookupService.getDefaultDwpMappingByOffice(anyString())).thenReturn(Optional.of(OfficeMapping.builder().isDefault(true).mapping(Mapping.builder().ccd("DWP PIP (1)").build()).build()));
-        when(dwpAddressLookupService.getDefaultDwpRegionalCenterByBenefitTypeAndOffice(anyString())).thenReturn(DEFAULT_REGIONAL_CENTER);
     }
 
     @Test
@@ -284,14 +282,14 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         appeal.setMrnDetails(MrnDetails.builder().build());
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDateSentToDwp());
+        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNotNull(response.getData().getDateSentToDwp());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
-        assertEquals(DEFAULT_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
+        assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
 
     @Test
@@ -301,7 +299,6 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         appeal.setMrnDetails(null);
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        
         when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -309,7 +306,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNotNull(response.getData().getDateSentToDwp());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
-        assertNull(response.getData().getDwpRegionalCentre());
+        assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
 
     }
 
