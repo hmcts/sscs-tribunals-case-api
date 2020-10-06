@@ -67,11 +67,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
-        Appeal appeal = caseData.getAppeal();
-        if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
-            caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
-                    appeal.getMrnDetails().getDwpIssuingOffice()));
-        }
 
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
@@ -117,6 +112,11 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+            Appeal appeal = caseData.getAppeal();
+            if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
+                caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
+                        appeal.getMrnDetails().getDwpIssuingOffice()));
+            }
 
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {

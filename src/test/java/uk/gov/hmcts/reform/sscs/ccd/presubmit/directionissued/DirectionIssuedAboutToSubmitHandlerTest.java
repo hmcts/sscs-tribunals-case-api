@@ -261,13 +261,13 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         appeal.setBenefitType(BenefitType.builder().code("PIP").build());
         appeal.setMrnDetails(MrnDetails.builder().dwpIssuingOffice("DWP PIP (1)").build());
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
-        when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetailsBefore.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDateSentToDwp());
+        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNotNull(response.getData().getDateSentToDwp());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertEquals(DUMMY_REGIONAL_CENTER, response.getData().getDwpRegionalCentre());
     }
@@ -279,12 +279,12 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         appeal.setMrnDetails(MrnDetails.builder().build());
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()));
         when(caseDetailsBefore.getState()).thenReturn(State.WITH_DWP);
-        when(caseDetails.getState()).thenReturn(State.WITH_DWP);
+        when(caseDetails.getState()).thenReturn(State.INTERLOCUTORY_REVIEW_STATE);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        assertNull(response.getData().getInterlocReviewState());
-        assertNull(response.getData().getDateSentToDwp());
+        assertEquals(AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNotNull(response.getData().getDateSentToDwp());
         assertThat(response.getData().getDwpState(), is(DwpState.DIRECTION_ACTION_REQUIRED.getId()));
         assertNull(response.getData().getDwpRegionalCentre());
     }
