@@ -33,6 +33,7 @@ public class MarkDocumentsForTranslationAboutToSubmitHandler implements PreSubmi
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         setTranslationRequiredStatus.accept(caseData);
+        log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", caseData.getCcdCaseId());
         caseData.setTranslationWorkOutstanding("Yes");
         return new PreSubmitCallbackResponse<>(caseData);
     }

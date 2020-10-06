@@ -132,7 +132,8 @@ public class CitizenLoginService {
     private boolean caseHasSubscriptionWithTyaAndEmail(SscsCaseDetails sscsCaseDetails, String tya, String email) {
         Subscriptions subscriptions = sscsCaseDetails.getData().getSubscriptions();
 
-        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription())
+        return of(subscriptions.getAppellantSubscription(), subscriptions.getAppointeeSubscription(), subscriptions.getRepresentativeSubscription(),
+                subscriptions.getJointPartySubscription())
                 .anyMatch(subscription -> subscription != null && tya.equals(subscription.getTya()) && email.equalsIgnoreCase(subscription.getEmail()));
     }
 
