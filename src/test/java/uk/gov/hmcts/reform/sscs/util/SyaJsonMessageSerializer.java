@@ -36,6 +36,8 @@ public enum SyaJsonMessageSerializer {
     HEARING_WITH_SUPPORT_WITHOUT_SCHEDULE_HEARING_CCD("hearingWithSupportWithoutScheduleHearingCcd.json"),
     HEARING_WITH_SUPPORT_EMPTY("hearingWithSupportEmpty.json"),
     HEARING_WITH_SUPPORT_EMPTY_CCD("hearingWithSupportEmptyCcd.json"),
+    HEARING_WITH_OPTIONS("hearingWithOptions.json"),
+    HEARING_WITH_OPTIONS_CCD("hearingWithOptionsCcd.json"),
     EVIDENCE_DOCUMENT("appealWithEvidenceDocuments.json"),
     EVIDENCE_DOCUMENT_CCD("appealWithEvidenceDocumentsCcd.json"),
     EVIDENCE_DOCUMENT_LANGUAGE_PREFERENCE_WELSH("appealWithEvidenceDocumentsLanguagePreferenceWelsh.json"),
