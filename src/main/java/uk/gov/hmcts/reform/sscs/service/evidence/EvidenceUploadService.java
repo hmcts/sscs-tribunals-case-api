@@ -340,7 +340,7 @@ public class EvidenceUploadService {
     private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
         String fileNamePrefix = "Appellant";
         Subscriptions subscriptions = caseDetails.getData().getSubscriptions();
-        if (subscriptions != null && idamEmail != null) {
+        if (subscriptions != null) {
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
             Subscription jpSubs = subscriptions.getJointPartySubscription();
             if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {

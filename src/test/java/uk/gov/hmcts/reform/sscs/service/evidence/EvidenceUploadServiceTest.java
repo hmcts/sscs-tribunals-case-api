@@ -169,7 +169,8 @@ public class EvidenceUploadServiceTest {
 
 
     @Test
-    @Parameters(method = "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, evidenceUploadByJointPartyScenario")
+    @Parameters(method = "evidenceUploadByAppellantScenario, evidenceUploadByRepScenario, "
+            + "evidenceUploadByJointPartyScenario, evidenceUploadByAppellantWithOtherSubscribersPresenceScenario")
     public void givenANonCorCaseWithScannedDocumentsAndDraftDocument_thenMoveDraftToScannedDocumentsAndUpdateCaseInCcd(
             SscsCaseDetails sscsCaseDetails, EvidenceDescription someDescription, String expectedEvidenceUploadFilename)
         throws IOException {
@@ -353,8 +354,26 @@ public class EvidenceUploadServiceTest {
         EvidenceDescription someDescription = new EvidenceDescription("some description",
                 "jp@email.com");
 
-        return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Joint party upload 1 - 123.pdf"}
-        };
+        return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Joint party upload 1 - 123.pdf"}};
+    }
+
+    private Object[] evidenceUploadByAppellantWithOtherSubscribersPresenceScenario() {
+        initCommonParams();
+        SscsCaseDetails sscsCaseDetails = createSscsCaseDetails(someQuestionId, fileName,
+                documentUrl, evidenceCreatedOn);
+        sscsCaseDetails.getData().setSubscriptions(Subscriptions.builder()
+                .jointPartySubscription(Subscription.builder()
+                        .email("jp@email.com")
+                        .build())
+                .representativeSubscription(Subscription.builder()
+                        .email("rep@email.com")
+                        .build())
+                .build());
+        sscsCaseDetails.getData().setScannedDocuments(getScannedDocuments());
+        sscsCaseDetails.getData().setSscsDocument(buildSscsDocumentList());
+        sscsCaseDetails.getData().setAppeal(Appeal.builder().hearingType("sya").build());
+
+        return new Object[]{new Object[]{sscsCaseDetails, someDescription, "Appellant upload 1 - 123.pdf"}};
     }
 
     @NotNull
