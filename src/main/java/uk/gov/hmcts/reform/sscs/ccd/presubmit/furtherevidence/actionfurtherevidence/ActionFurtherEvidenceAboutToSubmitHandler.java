@@ -185,12 +185,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
-        sscsCaseData.setConfidentialityRequestDate(LocalDate.now());
-
         if (OriginalSenderItemList.APPELLANT.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
-            sscsCaseData.setConfidentialityRequestOutcomeAppellant(RequestOutcome.IN_PROGRESS);
+            sscsCaseData.setConfidentialityRequestOutcomeAppellant(DatedRequestOutcome.builder()
+                .requestOutcome(RequestOutcome.IN_PROGRESS).date(LocalDate.now()).build());
         } else if (OriginalSenderItemList.JOINT_PARTY.getCode().equals(sscsCaseData.getOriginalSender().getValue().getCode())) {
-            sscsCaseData.setConfidentialityRequestOutcomeJointParty(RequestOutcome.IN_PROGRESS);
+            sscsCaseData.setConfidentialityRequestOutcomeJointParty(DatedRequestOutcome.builder()
+                .requestOutcome(RequestOutcome.IN_PROGRESS).date(LocalDate.now()).build());
         }
     }
 
