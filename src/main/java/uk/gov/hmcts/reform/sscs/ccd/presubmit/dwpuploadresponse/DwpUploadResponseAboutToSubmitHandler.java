@@ -79,6 +79,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
     }
 
     private DwpResponseDocument buildDwpResponseDocumentWithDate(String documentType, String dateForFile, DocumentLink documentLink) {
+
+        if (documentLink.getDocumentFilename() == null) {
+            return null;
+        }
+
         String fileExtension = documentLink.getDocumentFilename().substring(documentLink.getDocumentFilename().lastIndexOf("."));
         return (DwpResponseDocument.builder()
                 .documentFileName(documentType + " on " + dateForFile)
