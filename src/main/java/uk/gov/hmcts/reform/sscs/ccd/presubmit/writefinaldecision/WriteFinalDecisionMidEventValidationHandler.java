@@ -59,7 +59,26 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
+        if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
+            if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+                && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
+                sscsCaseData.setWriteFinalDecisionEndDateType("na");
+            }
+        }
+
         return preSubmitCallbackResponse;
+    }
+
+    private boolean isNoAwardOrNotConsideredForDailyLiving(SscsCaseData sscsCaseData) {
+        return "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
+            && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()) ||
+            "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()));
+    }
+
+    private boolean isNoAwardOrNotConsideredForMobility(SscsCaseData sscsCaseData) {
+        return "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
+            && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()) ||
+            "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()));
     }
 
     private void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -94,6 +113,13 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         if (AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
             && AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())) {
             preSubmitCallbackResponse.addError("At least one of Mobility or Daily Living must be considered");
+        }
+
+        if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
+            if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+                && isNoAwardOrNotConsideredForMobility(sscsCaseData) && sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                preSubmitCallbackResponse.addError("End date is not applicable for this decision");
+            }
         }
 
     }
