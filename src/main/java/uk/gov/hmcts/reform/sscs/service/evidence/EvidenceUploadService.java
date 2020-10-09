@@ -183,7 +183,7 @@ public class EvidenceUploadService {
 
     private String getFilenameForTheNextUploadEvidence(SscsCaseDetails caseDetails, Long ccdCaseId,
                                                        MyaEventActionContext storePdfContext, String idamEmail) {
-        String appellantOrRepsFileNamePrefix = workOutAppellantOrRepsFileNamePrefix(caseDetails, idamEmail);
+        String appellantOrRepsFileNamePrefix = workOutFileNamePrefix(caseDetails, idamEmail);
         SscsCaseData data = storePdfContext.getDocument().getData();
         long uploadCounter = getCountOfNextUploadDoc(data.getScannedDocuments(), data.getSscsDocument());
         return String.format("%s upload %s - %s.pdf", appellantOrRepsFileNamePrefix, uploadCounter, ccdCaseId);
@@ -337,15 +337,16 @@ public class EvidenceUploadService {
     }
 
     @NotNull
-    private String workOutAppellantOrRepsFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
+    private String workOutFileNamePrefix(SscsCaseDetails caseDetails, String idamEmail) {
         String fileNamePrefix = "Appellant";
         Subscriptions subscriptions = caseDetails.getData().getSubscriptions();
         if (subscriptions != null) {
             Subscription repSubs = subscriptions.getRepresentativeSubscription();
-            if (repSubs != null && StringUtils.isNotBlank(repSubs.getEmail())) {
-                if (repSubs.getEmail().equalsIgnoreCase(idamEmail)) {
-                    fileNamePrefix = "Representative";
-                }
+            Subscription jpSubs = subscriptions.getJointPartySubscription();
+            if (repSubs != null && idamEmail.equalsIgnoreCase(repSubs.getEmail())) {
+                fileNamePrefix = "Representative";
+            } else if (jpSubs != null && idamEmail.equalsIgnoreCase(jpSubs.getEmail())) {
+                fileNamePrefix = "Joint party";
             }
         }
         return fileNamePrefix;
