@@ -71,14 +71,14 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
     private boolean isNoAwardOrNotConsideredForDailyLiving(SscsCaseData sscsCaseData) {
         return "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
-            && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()) ||
-            "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()));
+            && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+            || "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()));
     }
 
     private boolean isNoAwardOrNotConsideredForMobility(SscsCaseData sscsCaseData) {
         return "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
-            && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()) ||
-            "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()));
+            && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
+            || "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()));
     }
 
     private void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
