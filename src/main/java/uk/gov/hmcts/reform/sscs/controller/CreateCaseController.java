@@ -70,9 +70,6 @@ public class CreateCaseController {
         body.put("id", caseDetails.getId().toString());
         body.put("case_reference", caseDetails.getData().getCaseReference());
         body.put("appellant_tya", caseDetails.getData().getSubscriptions().getAppellantSubscription().getTya());
-        if (caseDetails.getData().getSubscriptions().getJointPartySubscription() != null) {
-            body.put("joint_party_tya", caseDetails.getData().getSubscriptions().getJointPartySubscription().getTya());
-        }
         return ResponseEntity.created(new URI("case/someId")).body(body);
     }
 
@@ -97,15 +94,6 @@ public class CreateCaseController {
                     .subscriptions(
                             Subscriptions.builder()
                                     .appellantSubscription(
-                                            Subscription.builder()
-                                                    .email(email)
-                                                    .mobile(mobile)
-                                                    .subscribeEmail("yes")
-                                                    .subscribeSms((mobile != null) ? "yes" : "no")
-                                                    .tya(UUID.randomUUID().toString())
-                                                    .build()
-                                    )
-                                    .jointPartySubscription(
                                             Subscription.builder()
                                                     .email(email)
                                                     .mobile(mobile)
