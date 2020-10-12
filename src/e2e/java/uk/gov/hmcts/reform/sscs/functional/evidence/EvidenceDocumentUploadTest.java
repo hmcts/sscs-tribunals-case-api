@@ -37,10 +37,6 @@ import uk.gov.hmcts.reform.sscs.functional.sya.SubmitHelper;
 @SpringBootTest
 public class EvidenceDocumentUploadTest {
 
-    private static final String APPLICATION_PDF = "application/pdf";
-    private static final String MULTIPART_FORM_DATA = "multipart/form-data";
-    private static final String UTF_8 = "UTF-8";
-
     @Value("${test-url}")
     private String testUrl;
 
@@ -82,8 +78,8 @@ public class EvidenceDocumentUploadTest {
         URL resource = getClass().getClassLoader().getResource("evidence/evidence-document.pdf");
 
         return given()
-            .multiPart("file", new File(Objects.requireNonNull(resource).getPath()), APPLICATION_PDF)
-            .contentType(MULTIPART_FORM_DATA)
+            .multiPart("file", new File(Objects.requireNonNull(resource).getPath()), MediaType.APPLICATION_PDF_VALUE)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
             .expect()
             .statusCode(200)
             .response().contentType(MediaType.APPLICATION_JSON_VALUE)
