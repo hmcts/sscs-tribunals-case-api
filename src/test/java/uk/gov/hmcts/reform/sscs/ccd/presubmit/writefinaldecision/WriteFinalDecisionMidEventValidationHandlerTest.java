@@ -450,7 +450,6 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         assertEquals(0, response.getErrors().size());
 
         assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
-
     }
 
     @Test

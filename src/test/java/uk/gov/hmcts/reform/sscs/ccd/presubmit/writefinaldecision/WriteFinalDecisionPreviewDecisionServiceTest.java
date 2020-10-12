@@ -293,9 +293,12 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
+
+        if ("noAward".equals(rate) || "notConsidered".equals(rate)) {
+            sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        }
 
         // Mobility specific parameters
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
@@ -370,6 +373,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertNull(body.getDailyLivingDescriptors());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
     }
 
     @Test
