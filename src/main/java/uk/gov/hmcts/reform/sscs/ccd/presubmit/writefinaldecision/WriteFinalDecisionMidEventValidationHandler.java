@@ -59,9 +59,15 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
-        if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
-            if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+        if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
+            if (sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
+                sscsCaseData.setWriteFinalDecisionEndDateType("na");
+            } else if (sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() == null && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
+                && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
+                sscsCaseData.setWriteFinalDecisionEndDateType("na");
+            } else if (sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() == null && sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
+                && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)) {
                 sscsCaseData.setWriteFinalDecisionEndDateType("na");
             }
         }
@@ -116,9 +122,18 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         }
 
         if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
-            if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+            if (sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData) && sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
                 preSubmitCallbackResponse.addError("End date is not applicable for this decision");
+            } else if (sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() == null && sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+                && sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                preSubmitCallbackResponse.addError("End date is not applicable for this decision");
+            } else if (sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() == null && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null && isNoAwardOrNotConsideredForMobility(sscsCaseData)
+                && sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                preSubmitCallbackResponse.addError("End date is not applicable for this decision");
+            } else if (((sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null && !isNoAwardOrNotConsideredForDailyLiving(sscsCaseData))
+                || (sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null && !isNoAwardOrNotConsideredForMobility(sscsCaseData))) && "na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                preSubmitCallbackResponse.addError("An end date must be provided set to indefinite for this decision");
             }
         }
 
