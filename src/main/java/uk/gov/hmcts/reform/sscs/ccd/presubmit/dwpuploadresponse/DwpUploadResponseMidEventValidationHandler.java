@@ -56,9 +56,22 @@ public class DwpUploadResponseMidEventValidationHandler implements PreSubmitCall
             preSubmitCallbackResponse.addError(violation.getMessage());
         }
 
+        checkAt38DocIsPresent(sscsCaseData);
+
         checkForDuplicateIssueCodes(sscsCaseData);
 
         return preSubmitCallbackResponse;
+    }
+    
+    private void checkAt38DocIsPresent(SscsCaseData sscsCaseData) {
+        if ((!"uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
+                && sscsCaseData.getDwpAT38Document() == null)
+            || ("uc".equalsIgnoreCase(sscsCaseData.getAppeal().getBenefitType().getCode())
+                && "yes".equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo())
+                && sscsCaseData.getDwpAT38Document() == null)) {
+
+            preSubmitCallbackResponse.addError("AT38 document is missing");
+        }
     }
 
     private void checkForDuplicateIssueCodes(SscsCaseData sscsCaseData) {

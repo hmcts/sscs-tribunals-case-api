@@ -9,7 +9,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
@@ -44,7 +43,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("1234")
             .benefitCode("002")
-            .dynamicBenefitType(new DynamicList(new DynamicListItem("uc", "UC"), Arrays.asList(new DynamicListItem("uc", "UC"))))
             .issueCode("CC")
             .dwpFurtherInfo("Yes")
             .appeal(Appeal.builder().build())
@@ -85,7 +83,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Benefit code cannot be empty", error);
         }
-        assertNotNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -98,8 +95,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Issue code cannot be empty", error);
         }
-
-        assertNotNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -110,8 +105,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         assertEquals("Further information to assist the tribunal cannot be empty.", response.getErrors().iterator().next());
-
-        assertNotNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -121,8 +114,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(0, response.getErrors().size());
-
-        assertNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -135,8 +126,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Issue code cannot be set to the default value of DD", error);
         }
-
-        assertNotNull(response.getData().getDynamicBenefitType());
     }
 
     @Test
@@ -183,8 +172,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()));
 
-        assertNull(response.getData().getDynamicBenefitType());
-
     }
 
     @Test
@@ -201,8 +188,6 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001US", response.getData().getCaseCode());
 
-        assertNull(response.getData().getDynamicBenefitType());
-
     }
 
     @Test
@@ -218,7 +203,5 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
-
-        assertNull(response.getData().getDynamicBenefitType());
     }
 }
