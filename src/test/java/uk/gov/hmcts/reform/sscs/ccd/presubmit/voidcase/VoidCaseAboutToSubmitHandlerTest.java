@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.voidcase;
 
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import junitparams.JUnitParamsRunner;
@@ -34,7 +34,7 @@ public class VoidCaseAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new VoidCaseAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.ADMIN_SEND_TO_VOID_STATE);

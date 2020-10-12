@@ -71,10 +71,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
-        if (preSubmitCallbackResponse.getErrors().isEmpty()) {
-            clearTransientFields(preSubmitCallbackResponse);
-        }
-
         return preSubmitCallbackResponse;
     }
 
@@ -96,13 +92,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 ).build());
     }
 
-    private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
-        // Ensure that we always clear the dynamicBenefitType as this is a temporary
-        // workaround field that we may wish to remove in future.
-        sscsCaseData.setDynamicBenefitType(null);
-    }
-    
     private void setUcCaseCode(SscsCaseData sscsCaseData) {
         boolean multiElementAppeal = null != sscsCaseData.getElementsDisputedList() && sscsCaseData.getElementsDisputedList().size() > 1;
         String issueCode = multiElementAppeal ? "UM" : "US";
