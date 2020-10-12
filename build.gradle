@@ -285,8 +285,8 @@ dependencies {
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
-    compile 'org.projectlombok:lombok:1.18.12'
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    compile 'org.projectlombok:lombok:1.18.14'
+    annotationProcessor 'org.projectlombok:lombok:1.18.14'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.4.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
@@ -304,7 +304,7 @@ dependencies {
     testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 
     testCompileOnly 'org.projectlombok:lombok:1.18.12'
-    testAnnotationProcessor "org.projectlombok:lombok:1.18.8"
+    testAnnotationProcessor "org.projectlombok:lombok:1.18.14"
     e2eCompile 'org.projectlombok:lombok:1.18.8'
     e2eAnnotationProcessor "org.projectlombok:lombok:1.18.8"
 
