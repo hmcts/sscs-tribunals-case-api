@@ -18,6 +18,9 @@ def component = "tribunals-api"
 
 def secrets = [
     'sscs-${env}'      : [
+        secret('sscs-email-mac-secret-text', 'SUBSCRIPTIONS_MAC_SECRET'),
+        secret('ccd-jid', 'CORE_CASE_DATA_JURISDICTION_ID'),
+        secret('ccd-tid', 'CORE_CASE_DATA_CASE_TYPE_ID'),
         secret('idam-api', 'IDAM_API_URL'),
         secret('idam-oauth-user', 'IDAM_OAUTH2_CLIENT_ID'),
         secret('ccd-api', 'CORE_CASE_DATA_API_URL'),
@@ -30,7 +33,7 @@ def secrets = [
         secret('s2s-micro', 'IDAM_S2S_AUTH_MICROSERVICE'),
         secret('docmosis-endpoint', 'PDF_SERVICE_CONVERT_URL'),
         secret('docmosis-api-key', 'PDF_SERVICE_ACCESS_KEY'),
-        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY'),
+        secret('AppInsightsInstrumentationKey', 'APPINSIGHTS_INSTRUMENTATIONKEY')
     ]
 ]
 
