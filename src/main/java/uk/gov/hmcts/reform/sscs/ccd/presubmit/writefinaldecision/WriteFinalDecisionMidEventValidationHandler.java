@@ -61,20 +61,20 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
 
-            boolean isNAEndDateTypeForBoth = sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
+            boolean isNaEndDateTypeForBoth = sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
                 && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
                 && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData);
 
-            boolean isNAEndDateTypeForDailyLivingOnly = sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() == null &&
-                sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
+            boolean isNaEndDateTypeForDailyLivingOnly = sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() == null
+                && sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
                 && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData);
 
-            boolean isNAEndDateTypeForMobilityOnly = sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() == null
+            boolean isNaEndDateTypeForMobilityOnly = sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() == null
                 && sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
                 && isNoAwardOrNotConsideredForMobility(sscsCaseData);
 
-            if (isNAEndDateTypeForBoth || isNAEndDateTypeForDailyLivingOnly || isNAEndDateTypeForMobilityOnly) {
+            if (isNaEndDateTypeForBoth || isNaEndDateTypeForDailyLivingOnly || isNaEndDateTypeForMobilityOnly) {
                 sscsCaseData.setWriteFinalDecisionEndDateType("na");
             }
         }
