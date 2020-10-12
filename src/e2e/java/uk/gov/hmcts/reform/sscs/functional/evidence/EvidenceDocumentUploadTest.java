@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
@@ -38,7 +39,6 @@ public class EvidenceDocumentUploadTest {
 
     private static final String APPLICATION_PDF = "application/pdf";
     private static final String MULTIPART_FORM_DATA = "multipart/form-data";
-    private static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json;charset=UTF-8";
     private static final String UTF_8 = "UTF-8";
 
     @Value("${test-url}")
@@ -83,11 +83,10 @@ public class EvidenceDocumentUploadTest {
 
         return given()
             .multiPart("file", new File(Objects.requireNonNull(resource).getPath()), APPLICATION_PDF)
-            .accept(APPLICATION_JSON_CHARSET_UTF_8)
             .contentType(MULTIPART_FORM_DATA)
             .expect()
             .statusCode(200)
-            .response().contentType(APPLICATION_JSON_CHARSET_UTF_8)
+            .response().contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
             .post("/evidence/upload");
     }
