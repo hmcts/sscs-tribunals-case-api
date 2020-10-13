@@ -304,6 +304,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     })
     public void givenDailyLivingValidAwardAndDwpComparison_thenDoNotDisplayAnError(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -311,6 +312,11 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+
+        if (response.getErrors().size() > 0) {
+            System.out.println(response.getErrors().iterator().next());
+        }
 
         assertEquals(0, response.getErrors().size());
 
@@ -331,6 +337,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     })
     public void givenDailyLivingValidAwardAndDwpComparisonWhenEndDateTypeIsNA_thenDisplayAnErrorForAwards(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -358,6 +365,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     })
     public void givenMobilityValidAwardAndDwpComparisonWhenEndDateTypeIsNA_thenDisplayAnErrorForAwards(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -370,7 +378,6 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
-
 
         assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -487,6 +494,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     })
     public void givenDailyLivingValidAwardAndDwpComparisonWhenEndDateTypeIsIndefinite_thenDisplayAnErrorForNoAwardsAndNotConsidered(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -514,6 +522,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     })
     public void givenMobilityValidAwardAndDwpComparisonWhenEndDateTypeIsIndefinite_thenDisplayAnErrorForNoAwardsAndNotConsidered(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -618,6 +627,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     })
     public void givenMobilityValidAwardAndDwpComparisonWhenEndDateTypeIsSetEndDate_thenDisplayAnErrorForNoAwardsAndNotConsidered(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -656,10 +666,6 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        if (response.getErrors().size() > 0) {
-            System.out.println(response.getErrors().iterator().next());
-        }
 
         assertEquals(0, response.getErrors().size());
 
@@ -823,6 +829,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     public void givenMobilityValidAwardAndDwpComparison_thenDoNotDisplayAnError(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
