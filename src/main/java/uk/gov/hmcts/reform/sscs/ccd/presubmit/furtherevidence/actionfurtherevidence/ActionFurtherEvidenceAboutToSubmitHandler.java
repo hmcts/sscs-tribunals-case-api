@@ -303,6 +303,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (OriginalSenderItemList.DWP.getCode().equals(originalSenderCode)) {
             return DWP_EVIDENCE;
         }
+        if (OriginalSenderItemList.JOINT_PARTY.getCode().equals(originalSenderCode)) {
+            return JOINT_PARTY_EVIDENCE;
+        }
         throw new IllegalStateException("document Type could not be worked out");
     }
 
