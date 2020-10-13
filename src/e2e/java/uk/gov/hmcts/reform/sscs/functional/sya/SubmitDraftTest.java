@@ -54,7 +54,7 @@ public class SubmitDraftTest {
     @Autowired
     private CitizenCcdService citizenCcdService;
 
-    @Value("${idam.oauth2.client.secret}")
+    @Value("${idam.client.secret}")
     private String idamOauth2ClientSecret;
 
     @Value("${idam.oauth2.redirectUrl}")
