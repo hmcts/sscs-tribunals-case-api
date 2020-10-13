@@ -141,11 +141,11 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
                 endDateIsNotApplicable = true;
             } else if (((sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion() != null && !isNoAwardOrNotConsideredForDailyLiving(sscsCaseData))
                 || (sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null && !isNoAwardOrNotConsideredForMobility(sscsCaseData))) && "na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
-                preSubmitCallbackResponse.addError("An end date must be provided set to indefinite for this decision");
+                preSubmitCallbackResponse.addError("An end date must be provided or set to Indefinite for this decision.");
             }
 
             if (endDateIsNotApplicable) {
-                preSubmitCallbackResponse.addError("End date is not applicable for this decision");
+                preSubmitCallbackResponse.addError("End date is not applicable for this decision - please specify 'N/A - No Award'.");
             }
         }
 

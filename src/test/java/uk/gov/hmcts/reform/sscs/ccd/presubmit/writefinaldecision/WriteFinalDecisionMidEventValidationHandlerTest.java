@@ -342,7 +342,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("An end date must be provided set to indefinite for this decision", error);
+        assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
 
         assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -369,7 +369,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("An end date must be provided set to indefinite for this decision", error);
+        assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
 
 
         assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
@@ -498,7 +498,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("End date is not applicable for this decision", error);
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
         
         assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -525,7 +525,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("End date is not applicable for this decision", error);
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
         assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -602,7 +602,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("End date is not applicable for this decision", error);
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
         assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -629,7 +629,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("End date is not applicable for this decision", error);
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", error);
 
         assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -694,7 +694,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("An end date must be provided set to indefinite for this decision", error);
+        assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
 
         assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -724,7 +724,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("An end date must be provided set to indefinite for this decision", error);
+        assertEquals("An end date must be provided or set to Indefinite for this decision.", error);
         
         assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
 
@@ -960,7 +960,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
-        assertEquals("End date is not applicable for this decision", response.getErrors().iterator().next());
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
         assertEquals(0, response.getWarnings().size());
 
         assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
@@ -978,7 +978,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(1, response.getErrors().size());
-        assertEquals("End date is not applicable for this decision", response.getErrors().iterator().next());
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
         assertEquals(0, response.getWarnings().size());
 
         assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
