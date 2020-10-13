@@ -70,8 +70,8 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
     }
 
     private boolean bothDailyLivingAndMobilityQuestionsAnswered(SscsCaseData caseData) {
-        return caseData.getPipWriteFinalDecisionDailyLivingQuestion() != null &&
-            caseData.getPipWriteFinalDecisionMobilityQuestion() != null;
+        return caseData.getPipWriteFinalDecisionDailyLivingQuestion() != null
+            && caseData.getPipWriteFinalDecisionMobilityQuestion() != null;
     }
 
     private boolean isNoAwardOrNotConsideredForDailyLiving(SscsCaseData sscsCaseData) {
