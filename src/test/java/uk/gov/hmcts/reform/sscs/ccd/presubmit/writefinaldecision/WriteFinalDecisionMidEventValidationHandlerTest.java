@@ -312,12 +312,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-
-        if (response.getErrors().size() > 0) {
-            System.out.println(response.getErrors().iterator().next());
-        }
-
+        
         assertEquals(0, response.getErrors().size());
 
         if ("noAward".equals(award) || "notConsidered".equals(award)) {
