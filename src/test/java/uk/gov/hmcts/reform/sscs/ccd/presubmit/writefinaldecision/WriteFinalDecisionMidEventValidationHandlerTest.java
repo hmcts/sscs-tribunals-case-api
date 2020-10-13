@@ -600,6 +600,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     })
     public void givenDailyLivingValidAwardAndDwpComparisonWhenEndDateTypeIsSetEndDate_thenDisplayAnErrorForNoAwardsAndNotConsidered(String award, String comparison) {
 
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(award);
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(comparison);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
