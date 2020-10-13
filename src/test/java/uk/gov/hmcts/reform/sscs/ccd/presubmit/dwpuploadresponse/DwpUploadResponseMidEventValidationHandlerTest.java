@@ -48,7 +48,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         sscsCaseData = SscsCaseData.builder()
             .ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build()).build();
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("UC").build()).build()).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
@@ -330,7 +330,6 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        String error = response.getErrors().stream().findFirst().orElse("");
         assertTrue(response.getErrors().isEmpty());
     }
 
@@ -340,8 +339,6 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
         Address jointPartyAddress = Address.builder().line1("some $ text").build();
 
         sscsCaseData.setJointPartyAddress(jointPartyAddress);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -356,8 +353,6 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         sscsCaseData.setJointPartyAddress(jointPartyAddress);
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
@@ -370,8 +365,6 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
         Address jointPartyAddress = Address.builder().town("some $ text").build();
 
         sscsCaseData.setJointPartyAddress(jointPartyAddress);
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
@@ -386,8 +379,6 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         sscsCaseData.setJointPartyAddress(jointPartyAddress);
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
@@ -401,12 +392,55 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
 
         sscsCaseData.setJointPartyAddress(jointPartyAddress);
 
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("Please enter a valid postcode", error);
+    }
+
+    @Test
+    public void givenUniversalCreditCaseWithFurtherInfoSetToYesAndNoAT38Document_thenShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("UC");
+        sscsCaseData.setDwpFurtherInfo("Yes");
+        sscsCaseData.setDwpAT38Document(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("AT38 document is missing", error);
+    }
+
+    @Test
+    public void givenUniversalCreditCaseWithFurtherInfoSetToNoAndAT38DocumentExists_thenDoNotShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("UC");
+        sscsCaseData.setDwpFurtherInfo("No");
+        sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenNonUniversalCreditCaseWithNoAT38Document_thenShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
+        sscsCaseData.setDwpAT38Document(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("AT38 document is missing", error);
+    }
+
+    @Test
+    public void givenNonUniversalCreditCaseWithAT38Document_thenDoNotShowError() {
+        sscsCaseData.getAppeal().getBenefitType().setCode("PIP");
+        sscsCaseData.setDwpAT38Document(DwpResponseDocument.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
+
     }
 
     @Test(expected = IllegalStateException.class)
