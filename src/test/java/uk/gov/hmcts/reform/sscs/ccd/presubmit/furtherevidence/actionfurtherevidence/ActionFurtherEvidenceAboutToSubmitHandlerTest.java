@@ -243,6 +243,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             "Representative");
         DynamicList dwpOriginalSender = buildOriginalSenderItemListForGivenOption("dwp",
             "Dwp");
+        DynamicList jointPartyOriginalSender = buildOriginalSenderItemListForGivenOption("jointParty",
+                "Joint Party");
 
         return new Object[]{
             //other options scenarios
@@ -265,6 +267,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "No", DWP_EVIDENCE},
             new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "Yes", DWP_EVIDENCE},
             new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, null, DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, "No", JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, "Yes", JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE},
             //interloc scenarios
             new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, APPELLANT_EVIDENCE},
             new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", APPELLANT_EVIDENCE},
@@ -275,6 +280,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, null, DWP_EVIDENCE},
             new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "No", DWP_EVIDENCE},
             new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "Yes", DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, "No", JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, "Yes", JOINT_PARTY_EVIDENCE},
             //edge cases scenarios
             new Object[]{null, representativeOriginalSender, "", null}, //edge case: furtherEvidenceActionOption is null
             new Object[]{furtherEvidenceActionListIssueParties, null, null, null} //edge case: originalSender is null
