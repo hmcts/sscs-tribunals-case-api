@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.makecaseurgent;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +42,7 @@ public class MakeCaseUrgentAboutToSubmitHandler implements PreSubmitCallbackHand
 
         sscsCaseData.setUrgentCase("Yes");
         sscsCaseData.setInterlocReviewState(InterlocReviewState.REVIEW_BY_JUDGE.getId());
-        sscsCaseData.setUrgentHearingRegistered(LocalDate.now());
+        sscsCaseData.setUrgentHearingRegistered(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE));
         sscsCaseData.setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
