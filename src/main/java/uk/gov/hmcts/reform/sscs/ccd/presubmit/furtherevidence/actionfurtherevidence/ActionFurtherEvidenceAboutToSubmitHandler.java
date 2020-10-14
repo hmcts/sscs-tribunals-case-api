@@ -60,6 +60,15 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        if ((sscsCaseData.getConfidentialityRequestOutcomeAppellant() != null
+                && RequestOutcome.GRANTED.equals(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome()))
+                || (sscsCaseData.getConfidentialityRequestOutcomeJointParty() != null
+                && RequestOutcome.GRANTED.equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome()))) {
+            if (!callback.isIgnoreWarnings()) {
+                preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
+            }
+        }
+
         if (isIssueFurtherEvidenceToAllParties(callback.getCaseDetails().getCaseData().getFurtherEvidenceAction())) {
             checkAddressesValidToIssueEvidenceToAllParties(sscsCaseData);
 
@@ -206,6 +215,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId, boolean ignoreWarnings) {
+        
         if (scannedDocument.getValue().getUrl() == null) {
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
@@ -218,7 +228,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             if (!ignoreWarnings) {
                 preSubmitCallbackResponse.addWarning("Document type is empty, are you happy to proceed?");
             } else {
-                log.info("Document type is empty for {}} - {}}", caseId, scannedDocument.getValue().getUrl().getDocumentUrl());
+                log.info("Document type is empty for {}} - {}}", caseId, scannedDocument.getValue().getUrl() == null ? null : scannedDocument.getValue().getUrl().getDocumentUrl());
             }
         }
         if (equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
@@ -230,6 +240,10 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+
+            if (!"Yes".equalsIgnoreCase(sscsCaseData.getJointParty())) {
+                preSubmitCallbackResponse.addError("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
+            }
 
             if (!SEND_TO_INTERLOC_REVIEW_BY_JUDGE.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())
                 && !INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
