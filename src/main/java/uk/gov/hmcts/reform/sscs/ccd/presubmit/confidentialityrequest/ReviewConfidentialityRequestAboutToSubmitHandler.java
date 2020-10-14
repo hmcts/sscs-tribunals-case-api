@@ -52,7 +52,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                 boolean jointPartyGrantedNow = processJointPartyAndReturnWhetherGrantedNow(sscsCaseData);
 
                 if (appellantGrantedNow || jointPartyGrantedNow) {
-                    if (!State.RESPONSE_RECEIVED.equals(sscsCaseData.getState())) {
+                    if (!State.RESPONSE_RECEIVED.equals(callback.getCaseDetails().getState())) {
                         sscsCaseData.setDwpState(CONFIDENTIALITY_ACTION_REQUIRED.getId());
                         sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
                         sscsCaseData.setState(State.NOT_LISTABLE);

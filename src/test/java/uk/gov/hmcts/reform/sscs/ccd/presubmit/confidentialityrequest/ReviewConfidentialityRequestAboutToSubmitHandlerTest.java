@@ -576,7 +576,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         sscsCaseData.setConfidentialityRequestOutcomeAppellant(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS));
         sscsCaseData.setConfidentialityRequestAppellantGrantedOrRefused("grantConfidentialityRequest");
-        sscsCaseData.setState(State.RESPONSE_RECEIVED);
+        when(callback.getCaseDetails().getState()).thenReturn(State.RESPONSE_RECEIVED);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         Assert.assertEquals(0, response.getErrors().size());
@@ -584,7 +584,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getDwpState());
         assertNull(sscsCaseData.getInterlocReviewState());
         assertEquals("Yes", sscsCaseData.getIsProgressingViaGaps());
-        assertEquals(State.RESPONSE_RECEIVED, sscsCaseData.getState());
+        assertEquals(State.RESPONSE_RECEIVED, callback.getCaseDetails().getState());
     }
 
     @Test
@@ -592,7 +592,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
 
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedOutcomeForPreviousDateIfOutcomeIsPopulated(RequestOutcome.IN_PROGRESS));
         sscsCaseData.setConfidentialityRequestJointPartyGrantedOrRefused("grantConfidentialityRequest");
-        sscsCaseData.setState(State.RESPONSE_RECEIVED);
+        when(callback.getCaseDetails().getState()).thenReturn(State.RESPONSE_RECEIVED);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         Assert.assertEquals(0, response.getErrors().size());
@@ -600,7 +600,7 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getDwpState());
         assertNull(sscsCaseData.getInterlocReviewState());
         assertEquals("Yes", sscsCaseData.getIsProgressingViaGaps());
-        assertEquals(State.RESPONSE_RECEIVED, sscsCaseData.getState());
+        assertEquals(State.RESPONSE_RECEIVED, callback.getCaseDetails().getState());
     }
 
     @Test
