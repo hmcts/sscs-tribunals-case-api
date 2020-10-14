@@ -10,10 +10,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
@@ -55,8 +52,15 @@ public class ReviewConfidentialityRequestAboutToSubmitHandler implements PreSubm
                 boolean jointPartyGrantedNow = processJointPartyAndReturnWhetherGrantedNow(sscsCaseData);
 
                 if (appellantGrantedNow || jointPartyGrantedNow) {
-                    sscsCaseData.setDwpState(CONFIDENTIALITY_ACTION_REQUIRED.getId());
-                    sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
+                    if (!State.RESPONSE_RECEIVED.equals(sscsCaseData.getState())) {
+                        sscsCaseData.setDwpState(CONFIDENTIALITY_ACTION_REQUIRED.getId());
+                        sscsCaseData.setInterlocReviewState(InterlocReviewState.AWAITING_ADMIN_ACTION.getId());
+                    } else {
+                        sscsCaseData.setDwpState(null);
+                        sscsCaseData.setInterlocReviewState(null);
+                    }
+                    sscsCaseData.setIsProgressingViaGaps("Yes");
+                    sscsCaseData.setState(State.NOT_LISTABLE);
                     log.info("'Confidentiality - Action Required' set on case id " + sscsCaseData.getCcdCaseId());
                 } else {
                     sscsCaseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
