@@ -219,7 +219,6 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         Assert.assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), sscsCaseData.getInterlocReviewState());
         Assert.assertEquals(createDatedOutcomeForTodaysDateIfOutcomeIsPopulated(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeAppellant());
         assertEquals("Yes", sscsCaseData.getIsProgressingViaGaps());
-        assertEquals(State.NOT_LISTABLE, sscsCaseData.getState());
 
         Assert.assertNull(sscsCaseData.getConfidentialityRequestAppellantGrantedOrRefused());
         Assert.assertNull(sscsCaseData.getConfidentialityRequestJointPartyGrantedOrRefused());
@@ -584,7 +583,6 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getDwpState());
         assertNull(sscsCaseData.getInterlocReviewState());
         assertEquals("Yes", sscsCaseData.getIsProgressingViaGaps());
-        assertEquals(State.NOT_LISTABLE, sscsCaseData.getState());
     }
 
     @Test
@@ -600,7 +598,6 @@ public class ReviewConfidentialityRequestAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getDwpState());
         assertNull(sscsCaseData.getInterlocReviewState());
         assertEquals("Yes", sscsCaseData.getIsProgressingViaGaps());
-        assertEquals(State.NOT_LISTABLE, sscsCaseData.getState());
     }
 
     @Test
