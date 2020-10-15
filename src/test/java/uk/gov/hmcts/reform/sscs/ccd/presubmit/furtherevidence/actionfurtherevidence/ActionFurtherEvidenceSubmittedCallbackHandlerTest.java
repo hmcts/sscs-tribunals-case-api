@@ -77,7 +77,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             buildCallback("informationReceivedForInterlocJudge", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithValidEventAndIssueFurtherEvidenceOption =
             buildCallback("issueFurtherEvidence", ACTION_FURTHER_EVIDENCE);
-        Callback<SscsCaseData> callbackWithValidEventAndWrongOption =
+        Callback<SscsCaseData> callbackWithValidEventAndOtherDocumentManual =
             buildCallback("otherDocumentManual", ACTION_FURTHER_EVIDENCE);
         Callback<SscsCaseData> callbackWithWrongEventAndValidOption =
             buildCallback("informationReceivedForInterlocJudge", APPEAL_RECEIVED);
@@ -97,7 +97,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
             new Object[]{SUBMITTED, callbackWithValidEventAndInformationReceivedForInterlocJudgeOption, true},
             new Object[]{SUBMITTED, callbackWithValidEventAndIssueFurtherEvidenceOption, true},
             new Object[]{ABOUT_TO_SUBMIT, callbackWithValidEventAndInformationReceivedForInterlocTcwOption, false},
-            new Object[]{SUBMITTED, callbackWithValidEventAndWrongOption, false},
+            new Object[]{SUBMITTED, callbackWithValidEventAndOtherDocumentManual, true},
             new Object[]{SUBMITTED, callbackWithWrongEventAndValidOption, false},
             new Object[]{SUBMITTED, callbackWithRightEventAndNullField, false},
             new Object[]{SUBMITTED, callbackWithValidEventAndSendToInterlocReviewByJudgeOption, true},
