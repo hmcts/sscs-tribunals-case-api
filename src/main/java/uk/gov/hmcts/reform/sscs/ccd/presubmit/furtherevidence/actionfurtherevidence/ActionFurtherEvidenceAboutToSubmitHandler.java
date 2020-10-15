@@ -241,6 +241,12 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 preSubmitCallbackResponse.addError("Original sender must be appellant or joint party for a confidential document");
             }
         }
+
+        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals((scannedDocument.getValue().getType()))) {
+            if (!OTHER_DOCUMENT_MANUAL.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+                preSubmitCallbackResponse.addError(String.format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(), URGENT_HEARING_REQUEST.getLabel()));
+            }
+        }
     }
 
     private SscsDocument buildSscsDocument(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
@@ -290,6 +296,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
             return CONFIDENTIALITY_REQUEST;
+        }
+        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+            return URGENT_HEARING_REQUEST;
         }
         if (OTHER_DOCUMENT_MANUAL.getCode().equals(furtherEvidenceActionItemCode)) {
             return OTHER_DOCUMENT;
