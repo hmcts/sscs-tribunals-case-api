@@ -173,11 +173,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             for (ScannedDocument scannedDocument : sscsCaseData.getScannedDocuments()) {
                 if (scannedDocument != null && scannedDocument.getValue() != null) {
 
-                    if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
-                        setConfidentialCaseFields(sscsCaseData);
-                    }
-
                     checkWarningsAndErrors(sscsCaseData, scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings);
+
+
+                    if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
+                        if (preSubmitCallbackResponse.getErrors().size() == 0) {
+                            setConfidentialCaseFields(sscsCaseData);
+                        }
+                    }
 
                     List<SscsDocument> documents = new ArrayList<>();
 
