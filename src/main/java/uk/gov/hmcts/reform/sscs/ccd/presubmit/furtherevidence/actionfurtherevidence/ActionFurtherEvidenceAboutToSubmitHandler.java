@@ -242,10 +242,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
         }
 
-        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals((scannedDocument.getValue().getType()))) {
-            if (!OTHER_DOCUMENT_MANUAL.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
-                preSubmitCallbackResponse.addError(String.format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(), URGENT_HEARING_REQUEST.getLabel()));
-            }
+        if (ScannedDocumentType.URGENT_HEARING_REQUEST.getValue().equals((scannedDocument.getValue().getType()))
+                && !OTHER_DOCUMENT_MANUAL.getCode().equals(sscsCaseData.getFurtherEvidenceAction().getValue().getCode())) {
+            preSubmitCallbackResponse.addError(String.format("Further evidence action must be '%s' for a %s", OTHER_DOCUMENT_MANUAL.getLabel(), URGENT_HEARING_REQUEST.getLabel()));
         }
     }
 
