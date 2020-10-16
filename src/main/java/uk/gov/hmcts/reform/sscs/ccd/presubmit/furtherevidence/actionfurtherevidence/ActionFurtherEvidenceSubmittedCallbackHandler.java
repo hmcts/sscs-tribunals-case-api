@@ -103,7 +103,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 && !CollectionUtils.isEmpty(caseData.getSscsDocument())
                 && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0) {
             return setMakeCaseUrgentTriggerEvent(caseData, callback.getCaseDetails().getId(),
-                    OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Set a case to urgent hearing");
+                    OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Semd a case to urgent hearing");
         }
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
             EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
