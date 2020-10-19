@@ -165,6 +165,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
         caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED.getId());
+        if("Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
+            caseData.setUrgentHearingOutcome(RequestOutcome.GRANTED.getValue());
+        }
 
         State previousState = caseData.getPreviousState();
 
@@ -184,6 +187,9 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         caseData.setReinstatementOutcome(RequestOutcome.REFUSED);
         caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED.getId());
+        if("Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
+            caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
+        }
         log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
     }
