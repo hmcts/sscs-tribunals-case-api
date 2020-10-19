@@ -18,7 +18,7 @@ plugins {
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.5.2'
     id 'org.owasp.dependencycheck' version '6.0.2'
-    id 'au.com.dius.pact' version '4.1.8'
+    id 'au.com.dius.pact' version '4.1.9'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -252,7 +252,7 @@ dependencies {
 
     compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.3.0'
-    compile group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    compile group: 'com.google.guava', name: 'guava', version: '30.0-jre'
 
     compile group: 'uk.gov.hmcts.reform', name: 'service-auth-provider-client', version: '3.1.2'
 
