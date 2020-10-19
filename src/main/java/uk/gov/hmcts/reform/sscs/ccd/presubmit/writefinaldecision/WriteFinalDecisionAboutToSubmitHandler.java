@@ -14,20 +14,21 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipPointsCondition;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @Component
 @Slf4j
 public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private final PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
     private final PreviewDocumentService previewDocumentService;
 
     @Autowired
-    public WriteFinalDecisionAboutToSubmitHandler(DecisionNoticeQuestionService decisionNoticeQuestionService,
+    public WriteFinalDecisionAboutToSubmitHandler(PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService,
                                                   PreviewDocumentService previewDocumentService) {
-        this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.pipDecisionNoticeQuestionService = pipDecisionNoticeQuestionService;
         this.previewDocumentService = previewDocumentService;
     }
 
@@ -64,10 +65,10 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private List<String> getDecisionNoticePointsValidationErrorMessages(SscsCaseData sscsCaseData) {
 
-        return Arrays.stream(PointsCondition.values())
-            .filter(pointsCondition -> pointsCondition.isApplicable(sscsCaseData))
-            .map(pointsCondition ->
-                getOptionalErrorMessage(pointsCondition, sscsCaseData))
+        return Arrays.stream(PipPointsCondition.values())
+            .filter(pipPointsCondition -> pipPointsCondition.isApplicable(sscsCaseData))
+            .map(pipPointsCondition ->
+                getOptionalErrorMessage(pipPointsCondition, sscsCaseData))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
@@ -76,22 +77,22 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     /**
      * Given a points condition, and an SscsCaseData instance, obtain an error message for that condition if the condition has failed to be satified, or an empty optional if the condition is met.
      *
-     * @param pointsCondition The condition to evaluate against the SscsCaseData
+     * @param pipPointsCondition The condition to evaluate against the SscsCaseData
      * @param sscsCaseData The SscsCaseData to evaluate against the condition.
      * @return An optional error message if the condition has failed to be satified, or an empty optional if the condition is met.
      */
-    private Optional<String> getOptionalErrorMessage(PointsCondition pointsCondition, SscsCaseData sscsCaseData) {
+    private Optional<String> getOptionalErrorMessage(PipPointsCondition pipPointsCondition, SscsCaseData sscsCaseData) {
 
-        Collection<String> collection = emptyIfNull(pointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData));
+        Collection<String> collection = emptyIfNull(pipPointsCondition.getActivityType().getAnswersExtractor().apply(sscsCaseData));
 
         if (collection.isEmpty()) {
             return Optional.empty();
         }
-        int totalPoints = collection.stream().map(answerText -> decisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
+        int totalPoints = collection.stream().map(answerText -> pipDecisionNoticeQuestionService.getAnswerForActivityQuestionKey(sscsCaseData,
                 answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
 
-        return pointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
-            Optional.of(pointsCondition.getErrorMessage());
+        return pipPointsCondition.getPointsRequirementCondition().test(totalPoints) ? Optional.empty() :
+            Optional.of(pipPointsCondition.getErrorMessage());
 
     }
 }

@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionPreviewDecisionServiceTest {
@@ -62,7 +62,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     private SscsCaseData sscsCaseData;
 
     private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
-    private DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
 
 
     @Before
@@ -86,9 +86,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         documentConfiguration.setDocuments(documents);
 
         this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
-        this.decisionNoticeQuestionService = new DecisionNoticeQuestionService();
+        this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
         service = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, decisionNoticeOutcomeService,
-            decisionNoticeQuestionService, documentConfiguration);
+            pipDecisionNoticeQuestionService, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

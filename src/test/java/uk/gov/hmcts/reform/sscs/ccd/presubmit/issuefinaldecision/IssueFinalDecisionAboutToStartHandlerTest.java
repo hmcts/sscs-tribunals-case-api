@@ -34,7 +34,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFinalDecisionAboutToStartHandlerTest {
@@ -145,9 +145,9 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
-        DecisionNoticeQuestionService decisionNoticeQuestionService = new DecisionNoticeQuestionService();
+        PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
         final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
-            decisionNoticeQuestionService, documentConfiguration);
+            pipDecisionNoticeQuestionService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -178,9 +178,9 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequestNonDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
-        DecisionNoticeQuestionService decisionNoticeQuestionService = new DecisionNoticeQuestionService();
+        PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
         final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
-            decisionNoticeQuestionService, documentConfiguration);
+            pipDecisionNoticeQuestionService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 

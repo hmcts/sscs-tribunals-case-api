@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
 
 @Component
 @Slf4j
@@ -63,8 +64,8 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
     }
 
     private void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if ((!equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
-                || !equalsIgnoreCase(AwardType.NO_AWARD.getKey(), sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()))
+        if ((!equalsIgnoreCase(PipAwardType.NO_AWARD.getKey(), sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+                || !equalsIgnoreCase(PipAwardType.NO_AWARD.getKey(), sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()))
                 &&  sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion() != null
                 &&  sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion() != null
                 &&  sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion().isEmpty()
@@ -72,27 +73,27 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             preSubmitCallbackResponse.addError("At least one activity must be selected unless there is no award");
         }
 
-        if (AwardType.NO_AWARD.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+        if (PipAwardType.NO_AWARD.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
             && "higher".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
             preSubmitCallbackResponse.addError("Daily living decision of No Award cannot be higher than DWP decision");
         }
 
-        if (AwardType.NO_AWARD.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
+        if (PipAwardType.NO_AWARD.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
             && "higher".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
             preSubmitCallbackResponse.addError("Mobility decision of No Award cannot be higher than DWP decision");
 
         }
-        if (AwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+        if (PipAwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
             && "lower".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion())) {
             preSubmitCallbackResponse.addError("Daily living award at Enhanced Rate cannot be lower than DWP decision");
         }
-        if (AwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
+        if (PipAwardType.ENHANCED_RATE.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
             && "lower".equals(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion())) {
             preSubmitCallbackResponse.addError("Mobility award at Enhanced Rate cannot be lower than DWP decision");
         }
 
-        if (AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
-            && AwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())) {
+        if (PipAwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+            && PipAwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())) {
             preSubmitCallbackResponse.addError("At least one of Mobility or Daily Living must be considered");
         }
 

@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 
 @Slf4j
@@ -42,20 +42,20 @@ public class DecisionNoticeOutcomeService {
 
         // Daily living and or/mobility
 
-        if ((!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
+        if ((!PipAwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
             && sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion() == null)
-            || (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
+            || (!PipAwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
             && sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion() == null)) {
             return null;
         } else {
 
             try {
 
-                ComparedRate dailyLivingComparedRate = AwardType.NOT_CONSIDERED.getKey()
+                ComparedRate dailyLivingComparedRate = PipAwardType.NOT_CONSIDERED.getKey()
                     .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()) ? null :
                     ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
 
-                ComparedRate mobilityComparedRate = AwardType.NOT_CONSIDERED.getKey()
+                ComparedRate mobilityComparedRate = PipAwardType.NOT_CONSIDERED.getKey()
                     .equalsIgnoreCase(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()) ? null : ComparedRate.getByKey(sscsCaseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
 
                 Set<ComparedRate> comparedRates = new HashSet<>();

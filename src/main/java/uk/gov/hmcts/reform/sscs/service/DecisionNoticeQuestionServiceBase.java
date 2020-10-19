@@ -10,24 +10,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 
 @Slf4j
-@Service
-public class DecisionNoticeQuestionService {
+public abstract class DecisionNoticeQuestionServiceBase {
 
     private JSONArray decisionNoticeJson;
+    private ActivityQuestionLookup activityQuestionLookup;
 
-    @Autowired
-    public DecisionNoticeQuestionService() throws IOException {
-        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/decision-notice-questions.txt",
+    public DecisionNoticeQuestionServiceBase(String benefitType, ActivityQuestionLookup activityQuestionLookup) throws IOException {
+        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
         decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
+        this.activityQuestionLookup = activityQuestionLookup;
     }
 
     /**
@@ -40,7 +38,7 @@ public class DecisionNoticeQuestionService {
     public Optional<ActivityAnswer> getAnswerForActivityQuestionKey(SscsCaseData sscsCaseData, String activityQuestionKey) {
 
         Function<SscsCaseData, String> answerExtractor =
-            ActivityQuestion.getByKey(activityQuestionKey).getAnswerExtractor();
+            activityQuestionLookup.getByKey(activityQuestionKey).getAnswerExtractor();
         return extractAnswerFromSelectedValue(answerExtractor.apply(sscsCaseData));
     }
 
