@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class ClearHmctsDwpStateHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new ClearHmctsDwpStateHandler();
 
         when(callback.getEvent()).thenReturn(EventType.SEND_TO_DWP_OFFLINE);
