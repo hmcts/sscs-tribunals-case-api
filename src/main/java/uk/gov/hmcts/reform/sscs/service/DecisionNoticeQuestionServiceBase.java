@@ -20,7 +20,7 @@ public abstract class DecisionNoticeQuestionServiceBase {
     private JSONArray decisionNoticeJson;
     private ActivityQuestionLookup activityQuestionLookup;
 
-    public DecisionNoticeQuestionServiceBase(String benefitType, ActivityQuestionLookup activityQuestionLookup) throws IOException {
+    protected DecisionNoticeQuestionServiceBase(String benefitType, ActivityQuestionLookup activityQuestionLookup) throws IOException {
         String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 

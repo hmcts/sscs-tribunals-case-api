@@ -235,7 +235,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getDescriptorsFromQuestionKeys(key -> PipActivityQuestion.getByKey(key), caseData, questionKeys);
+        return getDescriptorsFromQuestionKeys(PipActivityQuestion::getByKey, caseData, questionKeys);
     }
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
