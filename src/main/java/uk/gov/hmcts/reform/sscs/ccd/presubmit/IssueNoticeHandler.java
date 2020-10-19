@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import java.util.function.Function;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.WordUtils;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
