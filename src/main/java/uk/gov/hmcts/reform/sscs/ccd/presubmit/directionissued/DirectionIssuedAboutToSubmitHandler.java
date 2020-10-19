@@ -26,6 +26,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.model.dwp.OfficeMapping;
+import uk.gov.hmcts.reform.sscs.service.DwpAddressLookupService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
@@ -37,16 +39,19 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final ServiceRequestExecutor serviceRequestExecutor;
     private final String bulkScanEndpoint;
     private boolean reinstatementFeatureFlag;
+    private final DwpAddressLookupService dwpAddressLookupService;
 
     @Autowired
     public DirectionIssuedAboutToSubmitHandler(FooterService footerService, ServiceRequestExecutor serviceRequestExecutor,
                                                @Value("${bulk_scan.url}") String bulkScanUrl,
                                                @Value("${bulk_scan.validateEndpoint}") String validateEndpoint,
-                                               @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement) {
+                                               @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement,
+                                               DwpAddressLookupService dwpAddressLookupService) {
         this.footerService = footerService;
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bulkScanEndpoint = String.format("%s%s", trimToEmpty(bulkScanUrl), trimToEmpty(validateEndpoint));
         this.reinstatementFeatureFlag = reinstatement;
+        this.dwpAddressLookupService = dwpAddressLookupService;
     }
 
     @Override
@@ -69,6 +74,30 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData));
     }
 
+    private void updateDwpRegionalCentre(SscsCaseData caseData) {
+        Appeal appeal = caseData.getAppeal();
+
+        if (appeal != null && appeal.getBenefitType() != null && (appeal.getMrnDetails() == null || appeal.getMrnDetails().getDwpIssuingOffice() == null)) {
+            Optional<OfficeMapping> defaultOfficeMapping = dwpAddressLookupService.getDefaultDwpMappingByOffice(appeal.getBenefitType().getCode());
+            if (defaultOfficeMapping.isPresent()) {
+                String defaultDwpIssuingOffice = defaultOfficeMapping.get().getMapping().getCcd();
+                // set default dwp office and regional centre
+                if (appeal.getMrnDetails() == null) {
+                    caseData.getAppeal().setMrnDetails(MrnDetails.builder().dwpIssuingOffice(defaultDwpIssuingOffice).build());
+                } else {
+                    caseData.getAppeal().getMrnDetails().setDwpIssuingOffice(defaultDwpIssuingOffice);
+                }
+                log.info("Update Case {} default DWP Issuing Office {}", caseData.getCcdCaseId(), defaultDwpIssuingOffice);
+            }
+        }
+        if (appeal != null && appeal.getBenefitType() != null && appeal.getMrnDetails() != null && appeal.getMrnDetails().getDwpIssuingOffice() != null) {
+
+            caseData.setDwpRegionalCentre(dwpAddressLookupService.getDwpRegionalCenterByBenefitTypeAndOffice(appeal.getBenefitType().getCode(),
+                    appeal.getMrnDetails().getDwpIssuingOffice()));
+
+        }
+    }
+    
     private Optional<PreSubmitCallbackResponse<SscsCaseData>> validateDirectionType(SscsCaseData caseData) {
         if (caseData.getDirectionTypeDl() == null || caseData.getDirectionTypeDl().getValue() == null) {
             PreSubmitCallbackResponse<SscsCaseData> errorResponse = new PreSubmitCallbackResponse<>(caseData);
@@ -108,6 +137,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && DirectionType.APPEAL_TO_PROCEED.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData.setDateSentToDwp(LocalDate.now().toString());
             caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+            updateDwpRegionalCentre(caseData);
 
         } else if (DirectionType.REFUSE_EXTENSION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())
                 && ExtensionNextEvent.SEND_TO_LISTING.toString().equals(caseData.getExtensionNextEventDl().getValue().getCode())) {
