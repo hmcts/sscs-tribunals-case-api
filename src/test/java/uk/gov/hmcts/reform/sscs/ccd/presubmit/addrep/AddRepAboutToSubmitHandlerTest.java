@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.addrep;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import junitparams.JUnitParamsRunner;
@@ -32,7 +32,7 @@ public class AddRepAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new AddRepEvidenceAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.ADD_REPRESENTATIVE);

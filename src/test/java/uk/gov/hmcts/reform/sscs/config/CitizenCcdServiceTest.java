@@ -8,7 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DRAFT_ARCHIVED;
 
 import java.util.Collections;
@@ -45,7 +45,7 @@ public class CitizenCcdServiceTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
         citizenCcdService = new CitizenCcdService(citizenCcdClient, sscsCcdConvertService, ccdService);
     }
 

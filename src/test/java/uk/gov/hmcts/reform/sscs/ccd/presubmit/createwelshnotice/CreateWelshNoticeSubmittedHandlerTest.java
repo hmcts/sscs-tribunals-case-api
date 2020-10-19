@@ -11,7 +11,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.DIRECTION_ISSUED_WEL
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;

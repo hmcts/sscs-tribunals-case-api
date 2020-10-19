@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import junitparams.JUnitParamsRunner;
 import org.junit.Assert;
@@ -19,7 +19,7 @@ public class PointsConditionTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
     }
 
     /**
