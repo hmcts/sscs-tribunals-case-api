@@ -90,6 +90,17 @@ public class SscsPdfServiceTest {
     }
 
     @Test
+    public void createValidWelshPdfWithMrnDateNull() {
+        byte[] expected = {};
+        given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
+        caseData.getAppeal().getMrnDetails().setMrnDate(null);
+        caseData.setLanguagePreferenceWelsh("yes");
+        service.generatePdf(caseData, 1L, "appellantEvidence", "fileName");
+
+        verify(pdfServiceClient).generateFromHtml(any(), any());
+    }
+
+    @Test
     public void givenUserDoesNotWantToAttendHearing_createValidPdfAndSendEmailAndStoreInDocumentStore() {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);

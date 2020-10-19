@@ -1,6 +1,6 @@
 package uk.gov.hmcts.reform.sscs.healthcheck;
 
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ public class TribunalCaseApiHealthAggregatorTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         tribunalCaseApiHealthAggregator = new TribunalCaseApiHealthAggregator();
     }
 
