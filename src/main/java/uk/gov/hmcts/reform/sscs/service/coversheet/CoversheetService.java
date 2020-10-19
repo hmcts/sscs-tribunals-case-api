@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service.coversheet;
 
 import java.util.Optional;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
