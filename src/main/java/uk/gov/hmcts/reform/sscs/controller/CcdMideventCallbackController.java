@@ -4,6 +4,7 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +17,11 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
@@ -101,10 +103,22 @@ public class CcdMideventCallbackController {
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         int totalPoints = esaDecisionNoticeQuestionService.getTotalPoints(sscsCaseData);
-        System.out.println("Total points is:" + totalPoints);
 
-        if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-            System.out.println("Points satisfied");
+        try {
+            Optional<EsaPointsAndActivitiesCondition> condition = EsaPointsAndActivitiesCondition.getPointsAndActivitiesCondition(sscsCaseData, totalPoints);
+            sscsCaseData.setShowRegulation29Page(YesNo.NO);
+            sscsCaseData.setShowRegulation35Page(YesNo.NO);
+
+            if (condition.isPresent()) {
+                if (condition.get().isRegulation29QuestionRequired()) {
+                    sscsCaseData.setShowRegulation29Page(YesNo.YES);
+                }
+                if (condition.get().isRegulation35QuestionRequired()) {
+                    sscsCaseData.setShowRegulation35Page(YesNo.YES);
+                }
+            }
+        } catch (IllegalStateException e) {
+            preSubmitCallbackResponse.addError(e.getMessage());
         }
 
         return ok(preSubmitCallbackResponse);

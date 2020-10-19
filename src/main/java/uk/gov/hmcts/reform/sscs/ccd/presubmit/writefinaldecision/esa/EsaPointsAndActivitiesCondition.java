@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import java.util.Optional;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+
 /**
  * Enum encapsulating the attributes of a points-related condition on SscsCaseData. Each condition specifies the type of award the condition applies for, the activity type it applies to, along with
  * points criteria and an error message to display if the points criteria are not met.
@@ -50,6 +54,30 @@ public enum EsaPointsAndActivitiesCondition {
         this.schedule3ActivitiesSelected = schedule3ActivitesSelected;
         this.doesRegulation35Apply = doesRegulation35Apply;
         this.errorMessage = "";
+    }
+
+    public boolean isRegulation29QuestionRequired() {
+        return regulation29Applies != null;
+    }
+
+    public boolean isRegulation35QuestionRequired() {
+        return doesRegulation35Apply != null;
+    }
+
+    public static Optional<EsaPointsAndActivitiesCondition> getPointsAndActivitiesCondition(SscsCaseData caseData, int points) {
+        for (EsaPointsAndActivitiesCondition condition : EsaPointsAndActivitiesCondition.values()) {
+            if (condition.isSatisified(points,
+                caseData.getDoesRegulation29Apply() == null ? null : Boolean.valueOf(YesNo.YES.equals(caseData.getDoesRegulation29Apply())),
+                getSchedule3ActivitiesSelected(caseData),
+                caseData.getDoesRegulation35Apply() == null ? null : Boolean.valueOf(YesNo.YES.equals(caseData.getDoesRegulation35Apply())))) {
+                return Optional.of(condition);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private static Boolean getSchedule3ActivitiesSelected(SscsCaseData caseData) {
+        return false;
     }
 
     public boolean isSatisified(int points, Boolean regulation29Applies, Boolean schedule3ActivitiesSelected, Boolean doesRegulation35Apply) {

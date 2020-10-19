@@ -58,12 +58,14 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
         }
 
-        validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+        validatePipAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+
+        validateEsaAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
         return preSubmitCallbackResponse;
     }
 
-    private void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void validatePipAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         if ((!equalsIgnoreCase(PipAwardType.NO_AWARD.getKey(), sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion())
                 || !equalsIgnoreCase(PipAwardType.NO_AWARD.getKey(), sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()))
                 &&  sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion() != null
@@ -96,7 +98,19 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             && PipAwardType.NOT_CONSIDERED.getKey().equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())) {
             preSubmitCallbackResponse.addError("At least one of Mobility or Daily Living must be considered");
         }
+    }
 
+    private void validateEsaAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+        if (sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() != null
+            || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() != null) {
+
+            if ((sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
+                || sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
+                && (sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
+                || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())) {
+                preSubmitCallbackResponse.addError("At least one activity must be selected");
+            }
+        }
     }
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
