@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.config;
 
 import java.util.Map;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;

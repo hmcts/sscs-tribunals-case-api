@@ -6,7 +6,6 @@ import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.assertHttpSt
 import static uk.gov.hmcts.reform.sscs.helper.IntegrationTestHelper.getRequestWithAuthHeader;
 
 import java.io.IOException;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
