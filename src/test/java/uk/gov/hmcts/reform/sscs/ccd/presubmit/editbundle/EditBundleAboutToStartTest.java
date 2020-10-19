@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.editbundle;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class EditBundleAboutToStartTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         handler = new EditBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com", documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.EDIT_BUNDLE);
