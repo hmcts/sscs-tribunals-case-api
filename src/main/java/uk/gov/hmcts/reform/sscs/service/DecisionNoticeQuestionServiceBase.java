@@ -18,15 +18,15 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestio
 public abstract class DecisionNoticeQuestionServiceBase {
 
     private JSONArray decisionNoticeJson;
-    private ActivityQuestionLookup activityQuestionLookup;
 
-    protected DecisionNoticeQuestionServiceBase(String benefitType, ActivityQuestionLookup activityQuestionLookup) throws IOException {
+    protected DecisionNoticeQuestionServiceBase(String benefitType) throws IOException {
         String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
         decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
-        this.activityQuestionLookup = activityQuestionLookup;
     }
+
+    protected abstract ActivityQuestionLookup getActivityQuestionLookup();
 
     /**
      * Obtain the answer details for an activity question, given an SscsCaseData instance.
@@ -38,12 +38,12 @@ public abstract class DecisionNoticeQuestionServiceBase {
     public Optional<ActivityAnswer> getAnswerForActivityQuestionKey(SscsCaseData sscsCaseData, String activityQuestionKey) {
 
         Function<SscsCaseData, String> answerExtractor =
-            activityQuestionLookup.getByKey(activityQuestionKey).getAnswerExtractor();
+            getActivityQuestionLookup().getByKey(activityQuestionKey).getAnswerExtractor();
         return extractAnswerFromSelectedValue(answerExtractor.apply(sscsCaseData));
     }
 
     public Optional<ActivityAnswer> extractAnswerFromSelectedValue(String selectedValue) {
-        String answerText = findSelectedAnswerInJson(selectedValue);
+        String answerText = findSelectedAnswerOrQuestionInJson(selectedValue);
 
         if (answerText != null) {
             @SuppressWarnings(value = "java:S4784")
@@ -61,7 +61,7 @@ public abstract class DecisionNoticeQuestionServiceBase {
         return Optional.empty();
     }
 
-    private String findSelectedAnswerInJson(String selectedValue) {
+    protected String findSelectedAnswerOrQuestionInJson(String selectedValue) {
         for (int i = 0; i < decisionNoticeJson.length(); ++i) {
             JSONObject obj = decisionNoticeJson.getJSONObject(i);
             String id = obj.getString("ListElementCode");
@@ -71,6 +71,4 @@ public abstract class DecisionNoticeQuestionServiceBase {
         }
         return null;
     }
-
-
 }
