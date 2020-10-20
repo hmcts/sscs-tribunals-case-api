@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;

@@ -95,7 +95,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
 
         writeFinalDecisionBuilder.appellantName(buildName(caseData));
-
+        if ("na".equals(caseData.getWriteFinalDecisionEndDateType())) {
+            caseData.setWriteFinalDecisionEndDateType(null);
+        }
         writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
         writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
