@@ -6,35 +6,20 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestio
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
 
 /**
- * Enum to encapsulate binding between an activity question key, and the corresponding getter method on SscsCaseData that yields that answer to that question.
+ * Enum to encapsulate binding between an activity question key, and the actual question text.
  */
-public enum EsaActivityQuestion implements ActivityQuestion {
+public class EsaActivityQuestion implements ActivityQuestion {
 
-    MOBILISING_UNAIDED("mobilisingUnaided", "Mobilising Unaided", EsaActivityType.PHYSICAL_DISABLITIES, SscsCaseData::getEsaWriteFinalDecisionMobilisingUnaidedQuestion);
-
-    final String key;
+    final EsaActivityQuestionKey key;
     final String value;
-    final ActivityType activityType;
-    final Function<SscsCaseData, String> answerExtractor;
 
-    EsaActivityQuestion(String key, String value, ActivityType activityType, Function<SscsCaseData, String> answerExtractor) {
+    public EsaActivityQuestion(EsaActivityQuestionKey key, String value) {
         this.key = key;
-        this.answerExtractor = answerExtractor;
-        this.activityType = activityType;
         this.value = value;
     }
 
-    public static EsaActivityQuestion getByKey(String key) {
-        for (EsaActivityQuestion mapping : EsaActivityQuestion.values()) {
-            if (mapping.key.equals(key)) {
-                return mapping;
-            }
-        }
-        throw new IllegalArgumentException("Unknown ActivityQuestion for question key:" + key);
-    }
-
     public String getKey() {
-        return key;
+        return key.getKey();
     }
 
     public String getValue() {
@@ -43,10 +28,10 @@ public enum EsaActivityQuestion implements ActivityQuestion {
 
     @Override
     public ActivityType getActivityType() {
-        return activityType;
+        return key.getActivityType();
     }
 
     public Function<SscsCaseData, String> getAnswerExtractor() {
-        return answerExtractor;
+        return key.getAnswerExtractor();
     }
 }

@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestion;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityType;
 
 public class EsaDecisionNoticeQuestionServiceTest {
 
@@ -23,6 +25,7 @@ public class EsaDecisionNoticeQuestionServiceTest {
         Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue("mobilisingUnaided1a");
         Assert.assertNotNull(answer);
         Assert.assertTrue(answer.isPresent());
+
         assertEquals(15, answer.get().getActivityAnswerPoints());
         assertEquals("1", answer.get().getActivityAnswerNumber());
         assertEquals("a", answer.get().getActivityAnswerLetter());
@@ -31,6 +34,15 @@ public class EsaDecisionNoticeQuestionServiceTest {
             + "order to avoid significant discomfort or exhaustion; or (ii) repeatedly "
             + "mobilise 50 metres within a reasonable timescale because of significant "
             + "discomfort or exhaustion.", answer.get().getActivityAnswerValue());
+    }
+
+    @Test
+    public void givenASelectedQuestionKey_thenExtractTheQuestionFromTheText() {
+        EsaActivityQuestion question = service.extractQuestionFromSelectedValue("mobilisingUnaided");
+        Assert.assertNotNull(question);
+        Assert.assertEquals("mobilisingUnaided", question.getKey());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", question.getValue());
+        assertEquals(EsaActivityType.PHYSICAL_DISABILITIES, question.getActivityType());
     }
 
     @Test

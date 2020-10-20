@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
  */
 public enum EsaActivityType implements ActivityType {
 
-    PHYSICAL_DISABLITIES("Physical Disabilities",
+    PHYSICAL_DISABILITIES("Physical Disabilities",
         SscsCaseData::getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion),
     MENTAL_ASSESSMENT("Mental, cognitive and intellectual function assessment",
         SscsCaseData::getEsaWriteFinalDecisionMentalAssessmentQuestion);

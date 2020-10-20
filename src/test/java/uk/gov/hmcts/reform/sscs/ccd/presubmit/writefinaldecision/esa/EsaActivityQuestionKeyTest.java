@@ -11,10 +11,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
 
 @RunWith(JUnitParamsRunner.class)
-public class EsaActivityQuestionTest {
+public class EsaActivityQuestionKeyTest {
 
     @Mock
     private SscsCaseData sscsCaseData;
@@ -27,38 +26,36 @@ public class EsaActivityQuestionTest {
     @Test
     public void testGetMobilisingUnaidedQuestion() {
         Mockito.when(sscsCaseData.getEsaWriteFinalDecisionMobilisingUnaidedQuestion()).thenReturn("testAnswer");
-        ActivityQuestion activityQuestion = EsaActivityQuestion.getByKey("mobilisingUnaided");
+        EsaActivityQuestionKey activityQuestion = EsaActivityQuestionKey.getByKey("mobilisingUnaided");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());
         Assert.assertNotNull(activityQuestion.getKey());
         Assert.assertEquals("mobilisingUnaided", activityQuestion.getKey());
-        Assert.assertNotNull(activityQuestion.getValue());
-        Assert.assertEquals("Mobilising Unaided", activityQuestion.getValue());
-        Assert.assertEquals(EsaActivityType.PHYSICAL_DISABLITIES, activityQuestion.getActivityType());
+        Assert.assertEquals(EsaActivityType.PHYSICAL_DISABILITIES, activityQuestion.getActivityType());
         Function<SscsCaseData, String> answerExtractor = activityQuestion.getAnswerExtractor();
         Assert.assertEquals("testAnswer", answerExtractor.apply(sscsCaseData));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetByInvalidQuestionKey() {
-        EsaActivityQuestion.getByKey("invalidQuestion");
+        EsaActivityQuestionKey.getByKey("invalidQuestion");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetByNullQuestionKey() {
-        EsaActivityQuestion.getByKey(null);
+        EsaActivityQuestionKey.getByKey(null);
     }
 
     @Test
     public void testAllActivityQuestionsHaveNonNullAnswerExtractors() {
-        for (ActivityQuestion activityQuestion : EsaActivityQuestion.values()) {
+        for (EsaActivityQuestionKey activityQuestion : EsaActivityQuestionKey.values()) {
             Assert.assertNotNull(activityQuestion.getAnswerExtractor());
         }
     }
 
     @Test
     public void testAllActivityQuestionsHaveNonNullKeys() {
-        for (ActivityQuestion activityQuestion : EsaActivityQuestion.values()) {
+        for (EsaActivityQuestionKey activityQuestion : EsaActivityQuestionKey.values()) {
             Assert.assertNotNull(activityQuestion.getKey());
         }
     }

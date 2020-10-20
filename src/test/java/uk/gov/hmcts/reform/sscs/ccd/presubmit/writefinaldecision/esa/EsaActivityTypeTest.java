@@ -27,7 +27,7 @@ public class EsaActivityTypeTest {
 
     @Test
     public void testPhysicalDisablitiesName() {
-        Assert.assertEquals("Physical Disabilities", EsaActivityType.PHYSICAL_DISABLITIES.getName());
+        Assert.assertEquals("Physical Disabilities", EsaActivityType.PHYSICAL_DISABILITIES.getName());
     }
 
     @Test
@@ -38,7 +38,7 @@ public class EsaActivityTypeTest {
     @Test
     public void testPhysicalDisabilitiesAnswersExtractor() {
 
-        Function<SscsCaseData, List<String>> answersExtractor = EsaActivityType.PHYSICAL_DISABLITIES.getAnswersExtractor();
+        Function<SscsCaseData, List<String>> answersExtractor = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor();
         Assert.assertNotNull(answersExtractor);
 
         Mockito.when(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()).thenReturn(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"));
