@@ -20,7 +20,7 @@ public abstract class DecisionNoticeQuestionServiceBase {
     private JSONArray decisionNoticeJson;
 
     protected DecisionNoticeQuestionServiceBase(String benefitType) throws IOException {
-        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType + "-decision-notice-questions.txt",
+        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
         decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
