@@ -1,10 +1,19 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DWP_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.JOINT_PARTY_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.OTHER_DOCUMENT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.REPRESENTATIVE_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.OriginalSenderItemList.JOINT_PARTY;
 
@@ -12,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -29,7 +39,25 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.callback.ScannedDocumentType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Address;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DatedRequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Representative;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RequestOutcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentTranslationStatus;
+import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.service.BundleAdditionFilenameBuilder;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -86,7 +114,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         scannedDocumentList.add(scannedDocument);
         scannedDocumentList.add(scannedDocument2);
         DynamicList furtherEvidenceActionList = buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-            "Other document type - action manually");
+            "Other document type - action manually");
 
         DynamicListItem value = new DynamicListItem("appellant", "Appellant (or Appointee)");
         DynamicList originalSender = new DynamicList(value, Collections.singletonList(value));
@@ -118,9 +146,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     @Test
     @Parameters(method = "generateFurtherEvidenceActionListScenarios")
     public void givenACaseWithScannedDocuments_shouldMoveToSscsDocuments(@Nullable DynamicList furtherEvidenceActionList,
-                                                                         @Nullable DynamicList originalSender,
-                                                                         @Nullable String evidenceHandle,
-                                                                         DocumentType expectedDocumentType) {
+        @Nullable DynamicList originalSender,
+        @Nullable String evidenceHandle,
+        DocumentType expectedDocumentType) {
         sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
         sscsCaseData.setOriginalSender(originalSender);
         sscsCaseData.setEvidenceHandled(evidenceHandle);
@@ -211,7 +239,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     private void assertHappyPaths(DocumentType expectedDocumentType,
-                                  PreSubmitCallbackResponse<SscsCaseData> response) {
+        PreSubmitCallbackResponse<SscsCaseData> response) {
 
         SscsDocumentDetails sscsDocumentDetail = response.getData().getSscsDocument().get(1).getValue();
         assertEquals((expectedDocumentType.getLabel() != null ? expectedDocumentType.getLabel() : expectedDocumentType.getValue()) + " received on 13-06-2019", sscsDocumentDetail.getDocumentFileName());
@@ -227,7 +255,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private Object[] generateFurtherEvidenceActionListScenarios() {
         DynamicList furtherEvidenceActionListOtherDocuments =
             buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
-                "Other document type - action manually");
+                "Other document type - action manually");
 
         DynamicList furtherEvidenceActionListInterloc =
             buildFurtherEvidenceActionItemListForGivenOption("informationReceivedForInterlocJudge",
@@ -244,7 +272,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         DynamicList dwpOriginalSender = buildOriginalSenderItemListForGivenOption("dwp",
             "Dwp");
         DynamicList jointPartyOriginalSender = buildOriginalSenderItemListForGivenOption("jointParty",
-                "Joint Party");
+            "Joint Party");
 
         return new Object[]{
             //other options scenarios
@@ -612,33 +640,82 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
-    public void givenConfidentialRequestFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
+    public void givenConfidentialRequestWhenJointPartyExistsFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFields(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.setJointParty("Yes");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+
         assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
         assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
     }
 
     @Test
-    public void givenConfidentialRequestFromOriginalSenderJointParty_thenUpdateCaseWithConfidentialFields() {
+    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
+    public void givenConfidentialRequestWhenJointPartyExistsAndAlreadyHasConfidentialityFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFieldsAndDisplayWarning(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedRequestOutcome(RequestOutcome.GRANTED));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(1, response.getWarnings().size());
+
+        assertEquals("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.", response.getWarnings().iterator().next());
+        assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
+        assertEquals(createDatedRequestOutcome(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
+    }
+
+    @Test
+    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
+    public void givenConfidentialRequestWhenJointPartyDoesNotExistFromOriginalSenderAppellant_thenShowError(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case", response.getErrors().iterator().next());
+        assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+        assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+    }
+
+    @Test
+    public void givenConfidentialRequestWhenJointPartyExistsFromOriginalSenderJointParty_thenUpdateCaseWithConfidentialFields() {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
+        sscsCaseData.setJointParty("Yes");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -649,6 +726,24 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeJointParty().getDate());
     }
 
+    @Test
+    public void givenConfidentialRequestWhenJointPartyDoesNotExistFromOriginalSenderJointParty_thenUpdateCaseWithConfidentialFields() {
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
+        sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case", response.getErrors().iterator().next());
+        assertNull(sscsCaseData.getConfidentialityRequestOutcomeJointParty());
+        assertNull(sscsCaseData.getConfidentialityRequestOutcomeAppellant());
+    }
 
 
     @Test
@@ -656,10 +751,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OriginalSenderItemList.REPRESENTATIVE.getCode(), OriginalSenderItemList.REPRESENTATIVE.getLabel()));
+        sscsCaseData.setJointParty("Yes");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -675,10 +771,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
+        sscsCaseData.setJointParty("Yes");
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
-                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
-                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+            ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
+                .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
         List<ScannedDocument> docs = new ArrayList<>();
         docs.add(scannedDocument);
         sscsCaseData.setScannedDocuments(docs);
@@ -686,6 +783,117 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
         for (String error : response.getErrors()) {
             assertEquals("Further evidence action must be 'Send to Interloc - Review by Judge' or 'Information received for Interloc - send to Judge' for a confidential document", error);
+        }
+    }
+
+    private DatedRequestOutcome createDatedRequestOutcome(RequestOutcome requestOutcome) {
+        return DatedRequestOutcome.builder().date(LocalDate.now().minusDays(1))
+            .requestOutcome(requestOutcome).build();
+    }
+
+    private Object[][] generateWrappedFurtherEvidenceActionListScenarios() {
+        return wrapWithConfidentialityAndWarningCombinationScenarios(generateFurtherEvidenceActionListScenarios());
+    }
+
+    private Object[][] wrapWithConfidentialityAndWarningCombinationScenarios(Object[] scenarios) {
+
+        Object[][] results = new Object[scenarios.length * confidentialityAndWarningRequestStateCombinations().length][];
+        int index = 0;
+        for (Object scenario : scenarios) {
+            for (Object[] confidentialityRequestStateCombination : confidentialityAndWarningRequestStateCombinations()) {
+                results[index++] = wrapScenario((Object[])scenario, confidentialityRequestStateCombination);
+            }
+        }
+        return results;
+    }
+
+    private Object[] wrapScenario(Object[] scenario, Object[] confidentialityRequestStateCombination) {
+        Object[] result = new Object[scenario.length + confidentialityRequestStateCombination.length];
+        for (int i = 0; i < confidentialityRequestStateCombination.length; i++) {
+            result[i] = confidentialityRequestStateCombination[i];
+        }
+        for (int i = 0; i < scenario.length; i++) {
+            result[confidentialityRequestStateCombination.length + i] = scenario[i];
+        }
+        return result;
+    }
+
+    protected Object[][] confidentialityAndWarningRequestStateCombinations() {
+        return new Object[][]{
+            new Object[]{null, null, false, false},
+            new Object[]{null, createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, false},
+            new Object[]{null, createDatedRequestOutcome(RequestOutcome.REFUSED), false, false},
+            new Object[]{null, createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), null, false, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.REFUSED), false, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), null, false, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.REFUSED), false, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), null, false, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.REFUSED), false, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
+            new Object[]{null, null, true, false},
+            new Object[]{null, createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, false},
+            new Object[]{null, createDatedRequestOutcome(RequestOutcome.REFUSED), true, false},
+            new Object[]{null, createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), null, true, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.REFUSED), true, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), null, true, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.REFUSED), true, false},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), null, true, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.REFUSED), true, true},
+            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
+        };
+    }
+
+    @Test
+    @Parameters(method = "generateWrappedFurtherEvidenceActionListScenarios")
+    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocumentsAndDisplayAppropriatesConfidentialityWarning(@Nullable DatedRequestOutcome appellantConfidentialityRequestOutcome,
+        @Nullable DatedRequestOutcome jointPartyConfidentialityRequestOutcome,
+        boolean ignoreWarnings,
+        boolean expectConfidentialityWarning,
+        @Nullable DynamicList furtherEvidenceActionList,
+        @Nullable DynamicList originalSender,
+        @Nullable String evidenceHandle,
+        DocumentType expectedDocumentType) {
+        sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
+        sscsCaseData.setOriginalSender(originalSender);
+        sscsCaseData.setEvidenceHandled(evidenceHandle);
+        sscsCaseData.setConfidentialityRequestOutcomeAppellant(appellantConfidentialityRequestOutcome);
+        sscsCaseData.setConfidentialityRequestOutcomeJointParty(jointPartyConfidentialityRequestOutcome);
+
+        when(callback.isIgnoreWarnings()).thenReturn(ignoreWarnings);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = null;
+        try {
+            response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+            if (ignoreWarnings) {
+                assertEquals(0, response.getWarnings().size());
+            } else {
+                Iterator<String> iterator = response.getWarnings().iterator();
+                if (expectConfidentialityWarning) {
+                    String warning1 = iterator.next();
+                    assertEquals("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.", warning1);
+                }
+                String warning2 = iterator.next();
+                assertEquals("Document type is empty, are you happy to proceed?", warning2);
+            }
+
+        } catch (IllegalStateException e) {
+            assertTrue(furtherEvidenceActionList == null || originalSender == null);
+        }
+        if (null != furtherEvidenceActionList && null != originalSender) {
+            assertHappyPaths(expectedDocumentType, response);
         }
     }
 

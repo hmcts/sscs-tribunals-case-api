@@ -262,7 +262,7 @@ dependencies {
     compile group: 'org.apache.tomcat', name: 'tomcat-annotations-api', version: '9.0.39'
 
     // Safe to remove once Spring update their dependencies - see CVE-2019-14439 and add 'com.fasterxml.jackson.core' configurations.all above
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.11.3'
 
     compile group: 'net.objectlab.kit', name: 'datecalc-jdk8', version: '1.4.2'
 
@@ -291,7 +291,7 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.4.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.19.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.13'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.15'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.19.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'

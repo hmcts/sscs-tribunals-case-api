@@ -77,8 +77,10 @@ public class SscsPdfService {
                     LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
             placeholders.put("appellant_appointee_identity_dob",
                     LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
-            placeholders.put("date_of_decision",
-                    LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
+            if (sscsCaseData.getAppeal().getMrnDetails() != null && sscsCaseData.getAppeal().getMrnDetails().getMrnDate() != null) {
+                placeholders.put("date_of_decision",
+                        LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getMrnDetails().getMrnDate()));
+            }
 
             List<String> welshExcludesDates = new ArrayList<>();
             List<ExcludeDate> excludesDates = sscsCaseData.getAppeal().getHearingOptions().getExcludeDates();

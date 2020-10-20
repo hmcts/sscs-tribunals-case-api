@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.elementsdisputed;
 
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.ElementsDisputed.*;
 
@@ -17,10 +17,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.ElementDisputed;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse.ElementsDisputed;
 
 @Component
 @Slf4j
-public class DwpUploadResponseMidEventValidationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
 
@@ -29,16 +30,17 @@ public class DwpUploadResponseMidEventValidationHandler implements PreSubmitCall
     private Validator validator;
 
     @Autowired
-    public DwpUploadResponseMidEventValidationHandler(Validator validator) {
+    public ElementsDisputedMidEventValidationHandler(Validator validator) {
         this.validator = validator;
     }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT
-            && callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
             && Objects.nonNull(callback.getCaseDetails())
-            && Objects.nonNull(callback.getCaseDetails().getCaseData());
+            && Objects.nonNull(callback.getCaseDetails().getCaseData())
+            && (callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
+                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED);
     }
 
     @Override
