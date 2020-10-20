@@ -9,13 +9,13 @@ import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 
-public class DecisionNoticeQuestionServiceTest {
+public class PipDecisionNoticeQuestionServiceTest {
 
-    private DecisionNoticeQuestionService service;
+    private PipDecisionNoticeQuestionService service;
 
     @Before
     public void setup() throws IOException {
-        service = new DecisionNoticeQuestionService();
+        service = new PipDecisionNoticeQuestionService();
     }
 
     @Test

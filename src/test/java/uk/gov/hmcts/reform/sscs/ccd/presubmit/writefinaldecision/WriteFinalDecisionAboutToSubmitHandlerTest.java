@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -40,16 +40,16 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
 
-    private DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
     private PreviewDocumentService previewDocumentService;
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        decisionNoticeQuestionService = new DecisionNoticeQuestionService();
+        pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
         previewDocumentService = new PreviewDocumentService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeQuestionService, previewDocumentService);
+        handler = new WriteFinalDecisionAboutToSubmitHandler(pipDecisionNoticeQuestionService, previewDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

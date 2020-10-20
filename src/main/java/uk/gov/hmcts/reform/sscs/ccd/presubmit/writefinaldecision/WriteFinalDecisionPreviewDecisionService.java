@@ -22,6 +22,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -30,7 +33,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.Notic
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Component
@@ -38,15 +41,15 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler {
 
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
-    private final DecisionNoticeQuestionService decisionNoticeQuestionService;
+    private final PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
 
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
-        DecisionNoticeQuestionService decisionNoticeQuestionService,  DocumentConfiguration documentConfiguration) {
+        PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService,  DocumentConfiguration documentConfiguration) {
         super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
-        this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.pipDecisionNoticeQuestionService = pipDecisionNoticeQuestionService;
     }
 
     private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
@@ -138,10 +141,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
     private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
         List<String> consideredComparissons = new ArrayList<>();
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+        if (!PipAwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
             consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
         }
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+        if (!PipAwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
             consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         }
         return consideredComparissons;
@@ -176,10 +179,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.dailyLivingAwardRate(null);
         }
 
-        if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
+        if (PipAwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
             builder.dailyLivingIsEntited(true);
             builder.dailyLivingIsSeverelyLimited(true);
-        } else if (AwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
+        } else if (PipAwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
             builder.dailyLivingIsEntited(true);
             builder.dailyLivingIsSeverelyLimited(false);
         } else {
@@ -194,10 +197,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.mobilityAwardRate(null);
         }
 
-        if (AwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
+        if (PipAwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
             builder.mobilityIsEntited(true);
             builder.mobilityIsSeverelyLimited(true);
-        } else if (AwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
+        } else if (PipAwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
             builder.mobilityIsEntited(true);
             builder.mobilityIsSeverelyLimited(false);
         } else {
@@ -207,10 +210,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-        List<String> dailyLivingAnswers = ActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
-        if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+        List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
+        if (dailyLivingAnswers != null && !PipAwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
 
-            List<Descriptor> dailyLivingDescriptors = getDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
+            List<Descriptor> dailyLivingDescriptors = getPipDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
 
             builder.dailyLivingNumberOfPoints(dailyLivingDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
 
@@ -220,9 +223,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.dailyLivingNumberOfPoints(null);
         }
 
-        List<String> mobilityAnswers = ActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
-        if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
-            List<Descriptor> mobilityDescriptors = getDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
+        List<String> mobilityAnswers = PipActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
+        if (mobilityAnswers != null && !PipAwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            List<Descriptor> mobilityDescriptors = getPipDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
 
             builder.mobilityDescriptors(mobilityDescriptors);
 
@@ -233,13 +236,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
-    protected List<Descriptor> getDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+    protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+        return getDescriptorsFromQuestionKeys(PipActivityQuestion::getByKey, caseData, questionKeys);
+    }
+
+    protected List<Descriptor> getDescriptorsFromQuestionKeys(ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
         List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,
-                decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
+                pipDecisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
                     questionKey))).filter(pair -> pair.getRight().isPresent()).map(pair ->
                 new ImmutablePair<>(pair.getLeft(), pair.getRight().get())).map(pair ->
-                buildDescriptorFromActivityAnswer(ActivityQuestion.getByKey(pair.getLeft()),
+                buildDescriptorFromActivityAnswer(activityQuestionlookup.getByKey(pair.getLeft()),
                     pair.getRight())).collect(Collectors.toList());
 
         descriptors.sort(new DescriptorLexicographicalComparator());
