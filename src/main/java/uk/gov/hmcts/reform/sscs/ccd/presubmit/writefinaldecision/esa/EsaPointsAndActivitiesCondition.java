@@ -1,8 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAwardType.HIGHER_RATE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAwardType.LOWER_RATE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAwardType.NO_AWARD;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN;
+
 import java.util.Optional;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+
 
 /**
  * Enum encapsulating the attributes of a points-related condition on SscsCaseData. Each condition specifies the type of award the condition applies for, the activity type it applies to, along with
@@ -11,31 +18,31 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 public enum EsaPointsAndActivitiesCondition {
 
     POINTS_LESS_THAN_FIFTEEN_AND_REGULATION_29_DOES_NOT_APPLY(
-        EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
+        POINTS_LESS_THAN_FIFTEEN,
         false,
         null, null,
-        EsaAwardType.NO_AWARD),
+        NO_AWARD),
     POINTS_LESS_THAN_FIFTEEN_AND_REGULATION_29_DOES_APPLY_AND_SCHEDULE_3_ACTIVITIES_SELECTED(
-        EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
+        POINTS_LESS_THAN_FIFTEEN,
         true,
         true, null,
-        EsaAwardType.HIGHER_RATE),
+        HIGHER_RATE),
     POINTS_LESS_THAN_FIFTEEN_AND_REGULATION_29_DOES_APPLY_AND_SCHEDULE_3_ACTIVITIES_NOT_SELECTED_AND_REGULATION_35_APPLIES(
-        EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
+        POINTS_LESS_THAN_FIFTEEN,
         true, false, true,
-        EsaAwardType.HIGHER_RATE),
-    POINTS_LESS_THAN_FIFTEEN_AND_REGULATION_29_DOES_APPLY_AND_SCHEDULE_3_ACTIVITIES_NOT_SELECTED_AND_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
+        HIGHER_RATE),
+    POINTS_LESS_THAN_FIFTEEN_AND_REGULATION_29_DOES_APPLY_AND_SCHEDULE_3_ACTIVITIES_NOT_SELECTED_AND_REGULATION_35_DOES_NOT_APPLY(POINTS_LESS_THAN_FIFTEEN,
         true, false, false,
-        EsaAwardType.LOWER_RATE),
-    POINTS_NOT_LESS_THAN_FIFTEEN_AND_SCHEDULE_3_ACTIVITIES_SELECTED(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
+        LOWER_RATE),
+    POINTS_NOT_LESS_THAN_FIFTEEN_AND_SCHEDULE_3_ACTIVITIES_SELECTED(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         null, true, null,
-        EsaAwardType.HIGHER_RATE),
-    POINTS_NOT_LESS_THAN_FIFTEEN_AND_SCHEDULE_3_ACTIVITIES_NOT_SELECTED_AND_REGULATION_35_APPLIES(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
+        HIGHER_RATE),
+    POINTS_NOT_LESS_THAN_FIFTEEN_AND_SCHEDULE_3_ACTIVITIES_NOT_SELECTED_AND_REGULATION_35_APPLIES(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         null, false, true,
-        EsaAwardType.HIGHER_RATE),
-    POINTS_NOT_LESS_THAN_FIFTEEN_AND_SCHEDULE_3_ACTIVITIES_NOT_SELECTED_AND_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
+        HIGHER_RATE),
+    POINTS_NOT_LESS_THAN_FIFTEEN_AND_SCHEDULE_3_ACTIVITIES_NOT_SELECTED_AND_REGULATION_35_DOES_NOT_APPLY(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         null, false, false,
-        EsaAwardType.LOWER_RATE);
+        LOWER_RATE);
 
     final EsaAwardType awardType;
     final String errorMessage;

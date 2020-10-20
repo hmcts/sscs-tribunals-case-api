@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -21,7 +20,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 
@@ -155,22 +154,10 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         int totalPoints = esaDecisionNoticeQuestionService.getTotalPoints(sscsCaseData);
 
-        try {
-
-            Optional<EsaPointsAndActivitiesCondition> condition = EsaPointsAndActivitiesCondition.getPointsAndActivitiesCondition(sscsCaseData, totalPoints);
+        if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
+            sscsCaseData.setShowRegulation29Page(YesNo.YES);
+        } else {
             sscsCaseData.setShowRegulation29Page(YesNo.NO);
-            sscsCaseData.setShowRegulation35Page(YesNo.NO);
-
-            if (condition.isPresent()) {
-                if (condition.get().isRegulation29QuestionRequired()) {
-                    sscsCaseData.setShowRegulation29Page(YesNo.YES);
-                }
-                if (condition.get().isRegulation35QuestionRequired()) {
-                    sscsCaseData.setShowRegulation35Page(YesNo.YES);
-                }
-            }
-        } catch (IllegalStateException e) {
-            preSubmitCallbackResponse.addError(e.getMessage());
         }
     }
 
