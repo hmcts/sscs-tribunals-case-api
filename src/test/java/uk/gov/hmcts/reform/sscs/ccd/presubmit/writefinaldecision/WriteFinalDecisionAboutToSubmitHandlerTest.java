@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
@@ -543,6 +544,68 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenEndDateTypeOfIndefinite_thenDoNotSetEndTypeTypeToNull() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
+        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+            Arrays.asList("preparingFood"));
+
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+            Arrays.asList("movingAround"));
+
+
+        // 8 points - correct for daily living standard award
+        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+
+        // 0 points - correct for mobility no award
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals("indefinite", sscsCaseData.getWriteFinalDecisionEndDateType());
+
+    }
+
+    @Test
+    public void givenEndDateTypeOfSetEndDate_thenDoNotSetEndTypeTypeToNull() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("standardRate");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
+        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(
+            Arrays.asList("preparingFood"));
+
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(
+            Arrays.asList("movingAround"));
+
+
+        // 8 points - correct for daily living standard award
+        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f"); // 8 points
+
+        // 0 points - correct for mobility no award
+        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals("setEndDate", sscsCaseData.getWriteFinalDecisionEndDateType());
+
+    }
+
+    @Test
     public void givenBothDailyLivingAndMobilityPointsAreIncorrect_thenDisplayTwoErrors() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -567,6 +630,25 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
         String error2 = iterator.next();
         assertEquals("You have previously selected a standard rate award for Daily Living. The points awarded don't match. Please review your previous selection.", error1);
         assertEquals("You have previously selected a standard rate award for Mobility. The points awarded don't match. Please review your previous selection.", error2);
+
+    }
+
+    @Test
+    public void givenEndDateTypeOfNA_thenSetEndDateTypeToNull() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("noAward");
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("noAward");
+        sscsCaseData.setWriteFinalDecisionEndDateType("na");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+
+        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
 
     }
 

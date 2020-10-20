@@ -54,12 +54,16 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         // This is a temporary workaround for this issue.
         sscsCaseData.setWriteFinalDecisionGeneratedDate(LocalDate.now().toString());
 
+        if ("na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+            sscsCaseData.setWriteFinalDecisionEndDateType(null);
+        }
+
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         getDecisionNoticePointsValidationErrorMessages(sscsCaseData).forEach(preSubmitCallbackResponse::addError);
 
         previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getWriteFinalDecisionPreviewDocument());
-
+        
         return preSubmitCallbackResponse;
     }
 
