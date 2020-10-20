@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.elementsdisputed;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -22,10 +22,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 
 @RunWith(JUnitParamsRunner.class)
-public class DwpUploadResponseMidEventValidationHandlerTest {
+public class ElementsDisputedMidEventValidationHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
-    private DwpUploadResponseMidEventValidationHandler handler;
+    private ElementsDisputedMidEventValidationHandler handler;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -41,7 +41,7 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        handler = new DwpUploadResponseMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
+        handler = new ElementsDisputedMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -54,7 +54,15 @@ public class DwpUploadResponseMidEventValidationHandlerTest {
     }
 
     @Test
-    public void givenANonDwpUploadResponseEvent_thenReturnFalse() {
+    @Parameters({"DWP_UPLOAD_RESPONSE", "HMCTS_RESPONSE_REVIEWED"})
+    public void givenAnElementsDisputedEventType_thenReturnTrue(EventType eventType) {
+        when(callback.getEvent()).thenReturn(eventType);
+
+        assertTrue(handler.canHandle(MID_EVENT, callback));
+    }
+
+    @Test
+    public void givenANonElementsDisputedEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         assertFalse(handler.canHandle(MID_EVENT, callback));
     }
