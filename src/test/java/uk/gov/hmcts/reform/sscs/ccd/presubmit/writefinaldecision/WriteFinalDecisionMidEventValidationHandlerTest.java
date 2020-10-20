@@ -23,6 +23,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionMidEventValidationHandlerTest {
@@ -42,12 +43,15 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
     @Mock
     private UserDetails userDetails;
 
+    @Mock
+    private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
+
     private SscsCaseData sscsCaseData;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new WriteFinalDecisionMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
+        handler = new WriteFinalDecisionMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator(), esaDecisionNoticeQuestionService);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -61,6 +65,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
             .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
             .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
             .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
                         .lastName("LastNamE")

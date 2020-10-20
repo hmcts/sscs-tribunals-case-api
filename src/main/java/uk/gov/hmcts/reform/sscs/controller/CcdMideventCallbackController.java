@@ -4,7 +4,6 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.ResponseEntity.ok;
 import static uk.gov.hmcts.reform.sscs.service.AuthorisationService.SERVICE_AUTHORISATION_HEADER;
 
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +16,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
@@ -37,21 +33,18 @@ public class CcdMideventCallbackController {
     private final AdjournCasePreviewService adjournCasePreviewService;
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService restoreCasesService;
-    private final EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
                                          WriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService,
                                             AdjournCasePreviewService adjournCasePreviewService, AdjournCaseCcdService adjournCaseCcdService,
-                                            RestoreCasesService restoreCasesService,
-                                            EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService) {
+                                            RestoreCasesService restoreCasesService) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
         this.writeFinalDecisionPreviewDecisionService = writeFinalDecisionPreviewDecisionService;
         this.adjournCasePreviewService = adjournCasePreviewService;
         this.adjournCaseCcdService = adjournCaseCcdService;
         this.restoreCasesService = restoreCasesService;
-        this.esaDecisionNoticeQuestionService = esaDecisionNoticeQuestionService;
     }
 
     @PostMapping(path = "/ccdMidEventAdjournCasePopulateVenueDropdown")
@@ -87,41 +80,6 @@ public class CcdMideventCallbackController {
         authorisationService.authorise(serviceAuthHeader);
 
         return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
-    }
-
-    @PostMapping(path = "/ccdMidEventEsaWriteFinalDecisionScores")
-    public ResponseEntity<PreSubmitCallbackResponse<SscsCaseData>> ccdMidEventEsaWriteFinalDecisionScores(
-        @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
-        @RequestHeader(AUTHORIZATION) String userAuthorisation,
-        @RequestBody String message) {
-        Callback<SscsCaseData> callback = deserializer.deserialize(message);
-        log.info("About to start ccdMidEventEsaWriteFinalDecisionScores callback `{}` received for Case ID `{}`", callback.getEvent(),
-            callback.getCaseDetails().getId());
-
-        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
-
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        int totalPoints = esaDecisionNoticeQuestionService.getTotalPoints(sscsCaseData);
-
-        try {
-            Optional<EsaPointsAndActivitiesCondition> condition = EsaPointsAndActivitiesCondition.getPointsAndActivitiesCondition(sscsCaseData, totalPoints);
-            sscsCaseData.setShowRegulation29Page(YesNo.NO);
-            sscsCaseData.setShowRegulation35Page(YesNo.NO);
-
-            if (condition.isPresent()) {
-                if (condition.get().isRegulation29QuestionRequired()) {
-                    sscsCaseData.setShowRegulation29Page(YesNo.YES);
-                }
-                if (condition.get().isRegulation35QuestionRequired()) {
-                    sscsCaseData.setShowRegulation35Page(YesNo.YES);
-                }
-            }
-        } catch (IllegalStateException e) {
-            preSubmitCallbackResponse.addError(e.getMessage());
-        }
-
-        return ok(preSubmitCallbackResponse);
     }
 
     @PostMapping(path = "/ccdMidEventPreviewAdjournCase")

@@ -5,10 +5,12 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -16,9 +18,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 
 @Component
 @Slf4j
@@ -26,9 +31,12 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
     private final Validator validator;
 
+    private final EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
+
     @Autowired
-    WriteFinalDecisionMidEventValidationHandler(Validator validator) {
+    WriteFinalDecisionMidEventValidationHandler(Validator validator, EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService) {
         this.validator = validator;
+        this.esaDecisionNoticeQuestionService = esaDecisionNoticeQuestionService;
     }
     
     @Override
@@ -60,9 +68,38 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         validatePipAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
-        validateEsaAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+        if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "ESA")) {
+
+            validateEsaAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+
+            // reg 29 page should be shown based on a calculation
+            setShowPageFlags(sscsCaseData, preSubmitCallbackResponse);
+        }
 
         return preSubmitCallbackResponse;
+    }
+
+    private void setShowPageFlags(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        int totalPoints = esaDecisionNoticeQuestionService.getTotalPoints(sscsCaseData);
+
+        try {
+
+            Optional<EsaPointsAndActivitiesCondition> condition = EsaPointsAndActivitiesCondition.getPointsAndActivitiesCondition(sscsCaseData, totalPoints);
+            sscsCaseData.setShowRegulation29Page(YesNo.NO);
+            sscsCaseData.setShowRegulation35Page(YesNo.NO);
+
+            if (condition.isPresent()) {
+                if (condition.get().isRegulation29QuestionRequired()) {
+                    sscsCaseData.setShowRegulation29Page(YesNo.YES);
+                }
+                if (condition.get().isRegulation35QuestionRequired()) {
+                    sscsCaseData.setShowRegulation35Page(YesNo.YES);
+                }
+            }
+        } catch (IllegalStateException e) {
+            preSubmitCallbackResponse.addError(e.getMessage());
+        }
     }
 
     private void validatePipAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {

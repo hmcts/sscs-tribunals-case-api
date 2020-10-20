@@ -43,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
@@ -83,9 +82,6 @@ public class CcdMideventCallbackControllerTest {
     @MockBean
     private RestoreCasesService restoreCasesService;
 
-    @MockBean
-    private EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
-
     private CcdMideventCallbackController controller;
 
     @Before
@@ -98,7 +94,7 @@ public class CcdMideventCallbackControllerTest {
         when(adjournCaseCcdService.getVenueDynamicListForRpcName(any())).thenReturn(dynamicList);
 
         controller = new CcdMideventCallbackController(authorisationService, deserializer, writeFinalDecisionPreviewDecisionService,
-            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService, esaDecisionNoticeQuestionService);
+            adjournCasePreviewService, adjournCaseCcdService, restoreCasesService);
         mockMvc = standaloneSetup(controller).build();
     }
 
