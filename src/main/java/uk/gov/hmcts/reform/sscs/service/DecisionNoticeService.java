@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipPointsCo
 public class DecisionNoticeService {
 
     private List<DecisionNoticeQuestionService> decisionNoticeQuestionServices;
+    private List<DecisionNoticeOutcomeService> decisionNoticeOutcomeServices;
 
     @Autowired
     public DecisionNoticeService(List<DecisionNoticeQuestionService> decisionNoticeQuestionServices) {
@@ -29,7 +30,13 @@ public class DecisionNoticeService {
         }
     }
 
-    public Class<? extends PointsCondition<?>> getPointsConditionEnumClass(String benefitType) {
-        return PipPointsCondition.class;
+    public DecisionNoticeOutcomeService getOutcomeService(String benefitType) {
+        Optional<DecisionNoticeOutcomeService> matchingService = decisionNoticeOutcomeServices.stream().filter(s -> s.getBenefitType().equals(benefitType)).findFirst();
+
+        if (matchingService.isPresent()) {
+            return matchingService.get();
+        } else {
+            throw new IllegalStateException("No outcome service registered for benefit type:" + benefitType);
+        }
     }
 }

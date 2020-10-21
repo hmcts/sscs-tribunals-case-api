@@ -40,14 +40,12 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 @Slf4j
 public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler {
 
-    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeService decisionNoticeService;
 
     @Autowired
-    public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
+    public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
         DecisionNoticeService decisionNoticeService,  DocumentConfiguration documentConfiguration) {
         super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
-        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
         this.decisionNoticeService = decisionNoticeService;
     }
 
@@ -72,7 +70,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
         setHearings(writeFinalDecisionBuilder, caseData);
 
-        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
+        String benefitType = caseData.getAppeal().getBenefitType().getCode();
+
+        Outcome outcome = decisionNoticeService.getOutcomeService(benefitType).determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
@@ -104,8 +104,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
 
-        setPipEntitlements(writeFinalDecisionBuilder, caseData);
-        setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        if ("PIP".equals(benefitType)) {
+            setPipEntitlements(writeFinalDecisionBuilder, caseData);
+            setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        }
 
         writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
         writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
