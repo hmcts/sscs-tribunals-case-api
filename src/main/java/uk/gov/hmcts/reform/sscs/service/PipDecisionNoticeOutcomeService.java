@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.service;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_APPELLANT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_UPHELD;
 
-
 import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +16,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 @Service
 public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
-    public PipDecisionNoticeOutcomeService(String benefitType) {
-        super(benefitType);
+    public PipDecisionNoticeOutcomeService() {
+        super("PIP");
     }
 
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {

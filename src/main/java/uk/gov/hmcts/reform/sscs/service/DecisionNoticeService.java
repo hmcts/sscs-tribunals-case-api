@@ -16,9 +16,11 @@ public class DecisionNoticeService {
     private List<DecisionNoticeOutcomeService> decisionNoticeOutcomeServices;
 
     @Autowired
-    public DecisionNoticeService(List<DecisionNoticeQuestionService> decisionNoticeQuestionServices) {
+    public DecisionNoticeService(List<DecisionNoticeQuestionService> decisionNoticeQuestionServices, List<DecisionNoticeOutcomeService> decisionNoticeOutcomeServices) {
         this.decisionNoticeQuestionServices = decisionNoticeQuestionServices;
+        this.decisionNoticeOutcomeServices = decisionNoticeOutcomeServices;
     }
+    
 
     public DecisionNoticeQuestionService getQuestionService(String benefitType) {
         Optional<DecisionNoticeQuestionService> matchingService = decisionNoticeQuestionServices.stream().filter(s -> s.getBenefitType().equals(benefitType)).findFirst();
@@ -38,5 +40,9 @@ public class DecisionNoticeService {
         } else {
             throw new IllegalStateException("No outcome service registered for benefit type:" + benefitType);
         }
+    }
+
+    public Class<? extends PointsCondition<?>> getPointsConditionEnumClass(String benefitType) {
+        return PipPointsCondition.class;
     }
 }

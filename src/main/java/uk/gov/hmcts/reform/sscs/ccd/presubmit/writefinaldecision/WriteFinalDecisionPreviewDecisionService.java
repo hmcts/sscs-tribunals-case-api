@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -69,8 +68,12 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
         setHearings(writeFinalDecisionBuilder, caseData);
+       
+        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
 
-        String benefitType = caseData.getAppeal().getBenefitType().getCode();
+        if (benefitType == null) {
+            throw new IllegalStateException("Unable to determine benefit type");
+        }
 
         Outcome outcome = decisionNoticeService.getOutcomeService(benefitType).determineOutcome(caseData);
         if (outcome == null) {

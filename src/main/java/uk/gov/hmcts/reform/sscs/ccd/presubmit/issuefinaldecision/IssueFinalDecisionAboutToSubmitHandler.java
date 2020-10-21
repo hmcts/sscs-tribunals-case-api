@@ -22,6 +22,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @Component
@@ -29,14 +30,14 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private final FooterService footerService;
-    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    private final DecisionNoticeService decisionNoticeService;
     private final Validator validator;
 
     @Autowired
     public IssueFinalDecisionAboutToSubmitHandler(FooterService footerService,
-        DecisionNoticeOutcomeService decisionNoticeOutcomeService, Validator validator) {
+        DecisionNoticeService decisionNoticeService, Validator validator) {
         this.footerService = footerService;
-        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
+        this.decisionNoticeService = decisionNoticeService;
         this.validator = validator;
     }
 
@@ -85,6 +86,14 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     }
 
     private void calculateOutcomeCode(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+
+        String benefitType = sscsCaseData.getAppeal().getBenefitType() == null ? null : sscsCaseData.getAppeal().getBenefitType().getCode();
+
+        if (benefitType == null) {
+            throw new IllegalStateException("Unable to determine benefit type");
+        }
+
+        DecisionNoticeOutcomeService decisionNoticeOutcomeService = decisionNoticeService.getOutcomeService(benefitType);
 
         Outcome outcome = decisionNoticeOutcomeService.determineOutcome(sscsCaseData);
 
