@@ -1767,6 +1767,6 @@
       "issueCode": "PUBLIC"
     }
   },
-  "event_id": "dwpRaiseExceptionNotListable",
+  "event_id": "dwpRaiseException",
   "ignore_warning": false
 }
