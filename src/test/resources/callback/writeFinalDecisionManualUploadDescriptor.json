@@ -43,7 +43,7 @@
           }
         },
         "benefitType": {
-          "code": "1325",
+          "code": "PIP",
           "description": null
         },
         "hearingOptions": {
@@ -757,7 +757,7 @@
           }
         },
         "benefitType": {
-          "code": "1325",
+          "code": "PIP",
           "description": null
         },
         "hearingOptions": {
