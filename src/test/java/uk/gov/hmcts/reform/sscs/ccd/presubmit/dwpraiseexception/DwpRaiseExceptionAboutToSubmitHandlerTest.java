@@ -34,9 +34,9 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        handler = new DwpRaiseExceptionAboutToSubmitHandler();
+        handler = new DwpRaiseExceptionAboutToSubmitHandler(true);
 
-        when(callback.getEvent()).thenReturn(EventType.DWP_RAISE_EXCEPTION_NOT_LISTABLE);
+        when(callback.getEvent()).thenReturn(EventType.DWP_RAISE_EXCEPTION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
 
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
@@ -47,7 +47,15 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenANonReviewConfidentialityRequestEvent_thenReturnFalse() {
+    public void givenANonDwpRaiseExceptionEvent_thenReturnFalse() {
+        when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
+        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
+    }
+
+    @Test
+    public void givenADwpRaiseExceptionEventUcFalse_thenReturnFalse() {
+        handler = new DwpRaiseExceptionAboutToSubmitHandler(false);
+
         when(callback.getEvent()).thenReturn(EventType.DWP_RAISE_EXCEPTION);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
@@ -58,7 +66,7 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void setInterlocReviewToAdmin() {
+    public void setMoveToGapsFields() {
         sscsCaseData = sscsCaseData.toBuilder().state(State.WITH_DWP).build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpraiseexception;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -15,10 +16,17 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Service
 @Slf4j
 public class DwpRaiseExceptionAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private boolean ucEnabled;
+
+    public DwpRaiseExceptionAboutToSubmitHandler(@Value("${feature.universal-credit.enabled}") boolean ucEnabled) {
+        this.ucEnabled = ucEnabled;
+    }
+
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
-        return callbackType == CallbackType.ABOUT_TO_SUBMIT
-                && callback.getEvent() == EventType.DWP_RAISE_EXCEPTION_NOT_LISTABLE
+        return ucEnabled && callbackType == CallbackType.ABOUT_TO_SUBMIT
+                && callback.getEvent() == EventType.DWP_RAISE_EXCEPTION
                 && Objects.nonNull(callback.getCaseDetails())
                 && Objects.nonNull(callback.getCaseDetails().getCaseData());
     }
