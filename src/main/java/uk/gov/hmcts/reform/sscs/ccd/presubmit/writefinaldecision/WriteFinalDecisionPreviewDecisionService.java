@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -33,7 +32,8 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.Notic
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Component
@@ -41,15 +41,14 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler {
 
     private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
-    private final PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
-
+    private final DecisionNoticeService decisionNoticeService;
 
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
-        PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService,  DocumentConfiguration documentConfiguration) {
+        DecisionNoticeService decisionNoticeService,  DocumentConfiguration documentConfiguration) {
         super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
         this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
-        this.pipDecisionNoticeQuestionService = pipDecisionNoticeQuestionService;
+        this.decisionNoticeService = decisionNoticeService;
     }
 
     private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
@@ -105,8 +104,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
 
-        setEntitlements(writeFinalDecisionBuilder, caseData);
-        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        setPipEntitlements(writeFinalDecisionBuilder, caseData);
+        setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+
         writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
         writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
 
@@ -141,10 +141,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
     private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
         List<String> consideredComparissons = new ArrayList<>();
-        if (!PipAwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
             consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
         }
-        if (!PipAwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
             consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
         }
         return consideredComparissons;
@@ -167,7 +167,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
-    private void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+    private void setPipEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
         String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
         String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
@@ -179,10 +179,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.dailyLivingAwardRate(null);
         }
 
-        if (PipAwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
+        if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
             builder.dailyLivingIsEntited(true);
             builder.dailyLivingIsSeverelyLimited(true);
-        } else if (PipAwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
+        } else if (AwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
             builder.dailyLivingIsEntited(true);
             builder.dailyLivingIsSeverelyLimited(false);
         } else {
@@ -197,10 +197,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.mobilityAwardRate(null);
         }
 
-        if (PipAwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
+        if (AwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
             builder.mobilityIsEntited(true);
             builder.mobilityIsSeverelyLimited(true);
-        } else if (PipAwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
+        } else if (AwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
             builder.mobilityIsEntited(true);
             builder.mobilityIsSeverelyLimited(false);
         } else {
@@ -209,9 +209,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
-    protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+    protected void setPipDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
         List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
-        if (dailyLivingAnswers != null && !PipAwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+        if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
 
             List<Descriptor> dailyLivingDescriptors = getPipDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
 
@@ -224,7 +224,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
 
         List<String> mobilityAnswers = PipActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
-        if (mobilityAnswers != null && !PipAwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+        if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
             List<Descriptor> mobilityDescriptors = getPipDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
 
             builder.mobilityDescriptors(mobilityDescriptors);
@@ -237,13 +237,16 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getDescriptorsFromQuestionKeys(PipActivityQuestion::getByKey, caseData, questionKeys);
+        return getDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
     }
 
-    protected List<Descriptor> getDescriptorsFromQuestionKeys(ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
+    protected List<Descriptor> getDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
+
+        DecisionNoticeQuestionService decisionNoticeQuestionService = decisionNoticeService.getQuestionService(benefitType);
+
         List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,
-                pipDecisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
+                decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
                     questionKey))).filter(pair -> pair.getRight().isPresent()).map(pair ->
                 new ImmutablePair<>(pair.getLeft(), pair.getRight().get())).map(pair ->
                 buildDescriptorFromActivityAnswer(activityQuestionlookup.getByKey(pair.getLeft()),

@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -87,8 +88,11 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
         this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+
+        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService));
+
         service = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, decisionNoticeOutcomeService,
-            pipDecisionNoticeQuestionService, documentConfiguration);
+            decisionNoticeService, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

@@ -25,6 +25,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
@@ -41,6 +42,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     private PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
+    private DecisionNoticeService decisionNoticeService;
     private PreviewDocumentService previewDocumentService;
     private SscsCaseData sscsCaseData;
 
@@ -48,13 +50,15 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     public void setUp() throws IOException {
         openMocks(this);
         pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+        decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService));
         previewDocumentService = new PreviewDocumentService();
-        handler = new WriteFinalDecisionAboutToSubmitHandler(pipDecisionNoticeQuestionService, previewDocumentService);
+        handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
+
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
             .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }

@@ -13,20 +13,33 @@ import org.json.JSONObject;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 
 @Slf4j
-public abstract class DecisionNoticeQuestionServiceBase {
+public abstract class DecisionNoticeQuestionService {
 
     private JSONArray decisionNoticeJson;
+    private String benefitType;
+    private Class<? extends PointsCondition<?>> pointsConditionClass;
 
-    protected DecisionNoticeQuestionServiceBase(String benefitType) throws IOException {
+    protected DecisionNoticeQuestionService(String benefitType, Class<? extends PointsCondition<?>> pointsConditionClass) throws IOException {
         String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
         decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
+        this.benefitType = benefitType;
+        this.pointsConditionClass = pointsConditionClass;
     }
 
     protected abstract ActivityQuestionLookup getActivityQuestionLookup();
+
+    public Class<? extends PointsCondition<?>> getPointsConditionEnumClass() {
+        return pointsConditionClass;
+    }
+
+    public String getBenefitType() {
+        return benefitType;
+    }
 
     /**
      * Obtain the answer details for an activity question, given an SscsCaseData instance.
