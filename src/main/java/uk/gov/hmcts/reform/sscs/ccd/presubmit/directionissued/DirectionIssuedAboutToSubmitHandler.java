@@ -38,7 +38,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private final FooterService footerService;
     private final ServiceRequestExecutor serviceRequestExecutor;
     private final String bulkScanEndpoint;
-    private boolean reinstatementFeatureFlag;
+    private final boolean reinstatementFeatureFlag;
     private final DwpAddressLookupService dwpAddressLookupService;
 
     @Autowired
@@ -155,6 +155,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && reinstatementFeatureFlag) {
             caseData = updateCaseAfterReinstatementRefused(caseData);
 
+        } else if (DirectionTypeItemList.GRANT_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            caseData = updateCaseAfterUrgentHearingGranted(caseData);
+
+        } else if (DirectionTypeItemList.REFUSE_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+            caseData = updateCaseAfterUrgentHearingRefused(caseData);
+
         } else {
             caseData.setInterlocReviewState(null);
         }
@@ -165,33 +171,48 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
         caseData.setReinstatementOutcome(RequestOutcome.GRANTED);
         caseData.setDwpState(DwpState.REINSTATEMENT_GRANTED.getId());
-        if ("Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
-            caseData.setUrgentHearingOutcome(RequestOutcome.GRANTED.getValue());
-        }
 
-        State previousState = caseData.getPreviousState();
-
-        if (! State.INTERLOCUTORY_REVIEW_STATE.getId().equals(previousState.getId())) {
-            caseData.setState(previousState);
-        } else {
-            caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
-            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
-        }
+        updateStateIfInterLockReviewState(caseData);
 
         log.info("Case ID {} reinstatement granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
 
         return caseData;
     }
 
+
+
     private SscsCaseData updateCaseAfterReinstatementRefused(SscsCaseData caseData) {
 
         caseData.setReinstatementOutcome(RequestOutcome.REFUSED);
         caseData.setDwpState(DwpState.REINSTATEMENT_REFUSED.getId());
-        if ("Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
-            caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
-        }
         log.info("Case ID {} reinstatement refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
+    }
+
+    private SscsCaseData updateCaseAfterUrgentHearingGranted(SscsCaseData caseData) {
+
+        caseData.setUrgentHearingOutcome(RequestOutcome.GRANTED.getValue());
+        updateStateIfInterLockReviewState(caseData);
+        log.info("Case ID {} urgent hearing granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+        return caseData;
+    }
+
+    private SscsCaseData updateCaseAfterUrgentHearingRefused(SscsCaseData caseData) {
+
+        caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
+        log.info("Case ID {} urgent hearing refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
+        return caseData;
+    }
+
+    private void updateStateIfInterLockReviewState(SscsCaseData caseData) {
+        State previousState = caseData.getPreviousState();
+
+        if (!State.INTERLOCUTORY_REVIEW_STATE.getId().equals(previousState.getId())) {
+            caseData.setState(previousState);
+        } else {
+            caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
+            caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+        }
     }
 
     @NotNull
