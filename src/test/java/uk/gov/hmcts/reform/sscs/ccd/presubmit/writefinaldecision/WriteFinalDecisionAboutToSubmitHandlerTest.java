@@ -50,7 +50,7 @@ public class WriteFinalDecisionAboutToSubmitHandlerTest {
     public void setUp() throws IOException {
         openMocks(this);
         pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
-        decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService));
+        decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService), new ArrayList<>());
         previewDocumentService = new PreviewDocumentService();
         handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService);
 

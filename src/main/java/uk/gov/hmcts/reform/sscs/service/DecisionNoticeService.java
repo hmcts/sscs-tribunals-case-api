@@ -13,11 +13,14 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipPointsCo
 public class DecisionNoticeService {
 
     private List<DecisionNoticeQuestionService> decisionNoticeQuestionServices;
+    private List<DecisionNoticeOutcomeService> decisionNoticeOutcomeServices;
 
     @Autowired
-    public DecisionNoticeService(List<DecisionNoticeQuestionService> decisionNoticeQuestionServices) {
+    public DecisionNoticeService(List<DecisionNoticeQuestionService> decisionNoticeQuestionServices, List<DecisionNoticeOutcomeService> decisionNoticeOutcomeServices) {
         this.decisionNoticeQuestionServices = decisionNoticeQuestionServices;
+        this.decisionNoticeOutcomeServices = decisionNoticeOutcomeServices;
     }
+    
 
     public DecisionNoticeQuestionService getQuestionService(String benefitType) {
         Optional<DecisionNoticeQuestionService> matchingService = decisionNoticeQuestionServices.stream().filter(s -> s.getBenefitType().equals(benefitType)).findFirst();
@@ -26,6 +29,16 @@ public class DecisionNoticeService {
             return matchingService.get();
         } else {
             throw new IllegalStateException("No question service registered for benefit type:" + benefitType);
+        }
+    }
+
+    public DecisionNoticeOutcomeService getOutcomeService(String benefitType) {
+        Optional<DecisionNoticeOutcomeService> matchingService = decisionNoticeOutcomeServices.stream().filter(s -> s.getBenefitType().equals(benefitType)).findFirst();
+
+        if (matchingService.isPresent()) {
+            return matchingService.get();
+        } else {
+            throw new IllegalStateException("No outcome service registered for benefit type:" + benefitType);
         }
     }
 

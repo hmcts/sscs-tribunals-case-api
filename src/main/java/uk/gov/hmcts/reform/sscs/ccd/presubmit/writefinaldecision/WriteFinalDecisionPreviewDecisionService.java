@@ -31,7 +31,6 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -40,14 +39,12 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 @Slf4j
 public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler {
 
-    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     private final DecisionNoticeService decisionNoticeService;
 
     @Autowired
-    public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
+    public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
         DecisionNoticeService decisionNoticeService,  DocumentConfiguration documentConfiguration) {
         super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
-        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
         this.decisionNoticeService = decisionNoticeService;
     }
 
@@ -71,8 +68,14 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
         setHearings(writeFinalDecisionBuilder, caseData);
+       
+        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
 
-        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
+        if (benefitType == null) {
+            throw new IllegalStateException("Unable to determine benefit type");
+        }
+
+        Outcome outcome = decisionNoticeService.getOutcomeService(benefitType).determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
