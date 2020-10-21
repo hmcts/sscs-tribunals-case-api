@@ -1,16 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.INFORMATION_RECEIVED_FOR_INTERLOC_TCW;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.ISSUE_FURTHER_EVIDENCE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.SEND_TO_INTERLOC_REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -50,7 +48,8 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, INFORMATION_RECEIVED_FOR_INTERLOC_TCW)
             || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, ISSUE_FURTHER_EVIDENCE)
             || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_JUDGE)
-            || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW);
+            || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, SEND_TO_INTERLOC_REVIEW_BY_TCW)
+            || isFurtherEvidenceActionOptionValid(furtherEvidenceAction, OTHER_DOCUMENT_MANUAL);
     }
 
     private boolean isFurtherEvidenceActionOptionValid(DynamicList furtherEvidenceActionList,
@@ -100,6 +99,12 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 REVIEW_BY_TCW.getId(), SEND_TO_INTERLOC_REVIEW_BY_TCW,
                 EventType.VALID_SEND_TO_INTERLOC, "Send a case to a judge for review");
         }
+        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)
+                && !CollectionUtils.isEmpty(caseData.getSscsDocument())
+                && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0) {
+            return setMakeCaseUrgentTriggerEvent(caseData, callback.getCaseDetails().getId(),
+                    OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
+        }
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
             EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
             "Issue to all parties", idamService.getIdamTokens());
@@ -118,6 +123,14 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         return ccdService.updateCase(caseData, caseId,
             eventType.getCcdType(), summary,
             interlocType.getLabel(), idamService.getIdamTokens());
+    }
+
+    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
+            SscsCaseData caseData, Long caseId,
+            FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
+        return ccdService.updateCase(caseData, caseId,
+                eventType.getCcdType(), summary,
+                interlocType.getLabel(), idamService.getIdamTokens());
     }
 
 }
