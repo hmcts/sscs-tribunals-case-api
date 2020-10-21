@@ -12,14 +12,15 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
 
 @Slf4j
 @Service
-public class EsaDecisionNoticeQuestionService extends DecisionNoticeQuestionServiceBase {
+public class EsaDecisionNoticeQuestionService extends DecisionNoticeQuestionService {
 
     @Autowired
     public EsaDecisionNoticeQuestionService() throws IOException {
-        super("ESA");
+        super("ESA", EsaPointsAndActivitiesCondition.class);
     }
 
     @Override

@@ -9,6 +9,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import junitparams.JUnitParamsRunner;
@@ -34,6 +35,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -146,8 +148,11 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
         PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+
+        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService));
+
         final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
-            pipDecisionNoticeQuestionService, documentConfiguration);
+            decisionNoticeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -179,8 +184,11 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     public void givenAboutToStartRequestNonDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
         PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+
+        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService));
+
         final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, outcomeService,
-            pipDecisionNoticeQuestionService, documentConfiguration);
+            decisionNoticeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 

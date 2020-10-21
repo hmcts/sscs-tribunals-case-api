@@ -2,6 +2,10 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,7 +14,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class PipPointsConditionTest {
@@ -18,8 +25,11 @@ public class PipPointsConditionTest {
     @Mock
     private SscsCaseData sscsCaseData;
 
+    @Mock
+    private DecisionNoticeQuestionService decisionNoticeQuestionService;
+
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         openMocks(this);
     }
 
@@ -46,15 +56,134 @@ public class PipPointsConditionTest {
         }
     }
 
+    @Test
+    public void testOptionalErrorMessageIsEmptyWhenQuestionFullyAnsweredAndPointsMatch() {
+
+        ActivityAnswer preparingFoodAnswer = ActivityAnswer.builder().activityAnswerPoints(8).activityAnswerValue("Answer Text").activityAnswerLetter("f").activityAnswerNumber("1").build();
+        Optional<ActivityAnswer> answer = Optional.of(preparingFoodAnswer);
+        PipPointsCondition pointsCondition = PipPointsCondition.DAILY_LIVING_STANDARD;
+        List<String> answers = Arrays.asList("preparingFood");
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+
+        Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
+
+        Optional<String> optionalErrorMessage = pointsCondition
+            .getOptionalErrorMessage(decisionNoticeQuestionService, caseData);
+
+        Assert.assertFalse(optionalErrorMessage.isPresent());
+
+    }
+
+    @Test
+    public void testOptionalErrorMessageIsPresentWhenQuestionFullyAnsweredWhenPointsDontMatch() {
+
+        ActivityAnswer preparingFoodAnswer = ActivityAnswer.builder().activityAnswerPoints(8).activityAnswerValue("Answer Text").activityAnswerLetter("f").activityAnswerNumber("1").build();
+        Optional<ActivityAnswer> answer = Optional.of(preparingFoodAnswer);
+        PipPointsCondition pointsCondition = PipPointsCondition.DAILY_LIVING_ENHANCED;
+        List<String> answers = Arrays.asList("preparingFood");
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+
+        Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
+
+        Optional<String> optionalErrorMessage = pointsCondition
+            .getOptionalErrorMessage(this.decisionNoticeQuestionService,
+                SscsCaseData.builder()
+                    .pipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f")
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+
+        Assert.assertTrue(optionalErrorMessage.isPresent());
+        Assert.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
+        Assert.assertEquals("You have previously selected an enhanced rate award "
+            + "for Daily Living. The points awarded don't match. "
+            + "Please review your previous selection.", optionalErrorMessage.get());
+    }
+
+    @Test
+    public void testOptionalErrorMessageIsPresentWhenPointsDontMatchWhenTopLevelQuestionAnsweredAndBottomLevelQuestionNotAnswered() {
+
+        ActivityAnswer preparingFoodAnswer = ActivityAnswer.builder().activityAnswerPoints(8).activityAnswerValue("Answer Text").activityAnswerLetter("f").activityAnswerNumber("1").build();
+        Optional<ActivityAnswer> answer = Optional.of(preparingFoodAnswer);
+        List<String> answers = Arrays.asList("preparingFood");
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+
+        Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(Optional.empty());
+
+        PipPointsCondition pointsCondition = PipPointsCondition.DAILY_LIVING_STANDARD;
+
+        Optional<String> optionalErrorMessage = pointsCondition
+            .getOptionalErrorMessage(this.decisionNoticeQuestionService,
+                SscsCaseData.builder()
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+
+        Assert.assertTrue(optionalErrorMessage.isPresent());
+        Assert.assertEquals(pointsCondition.getErrorMessage(), optionalErrorMessage.get());
+        Assert.assertEquals("You have previously selected a standard rate award "
+            + "for Daily Living. The points awarded don't match. "
+            + "Please review your previous selection.", optionalErrorMessage.get());
+    }
+
+    @Test
+    public void testOptionalErrorMessageIsNotPresentWhenPointsMatchWhenTopLevelQuestionAnsweredAndBottomLevelQuestionNotAnswered() {
+
+        ActivityAnswer preparingFoodAnswer = ActivityAnswer.builder().activityAnswerPoints(8).activityAnswerValue("Answer Text").activityAnswerLetter("f").activityAnswerNumber("1").build();
+        Optional<ActivityAnswer> answer = Optional.of(preparingFoodAnswer);
+        List<String> answers = Arrays.asList("preparingFood", "someothercategory");
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+
+        Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(Optional.empty());
+        Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
+
+
+        PipPointsCondition pointsCondition = PipPointsCondition.DAILY_LIVING_STANDARD;
+
+        Optional<String> optionalErrorMessage = pointsCondition
+            .getOptionalErrorMessage(this.decisionNoticeQuestionService,
+                SscsCaseData.builder()
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+
+        Assert.assertFalse(optionalErrorMessage.isPresent());
+
+    }
+
+    @Test
+    public void testOptionalErrorMessageIsEmptyWhenTopLevelQuestionNotAnsweredAndBottomLevelQuestionAnswered() {
+
+        ActivityAnswer preparingFoodAnswer = ActivityAnswer.builder().activityAnswerPoints(8).activityAnswerValue("Answer Text").activityAnswerLetter("f").activityAnswerNumber("1").build();
+        Optional<ActivityAnswer> answer = Optional.of(preparingFoodAnswer);
+
+        List<String> answers = Arrays.asList();
+
+        SscsCaseData caseData = SscsCaseData.builder()
+            .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build();
+
+        Mockito.when(decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData, "preparingFood")).thenReturn(answer);
+
+        PipPointsCondition pointsCondition = PipPointsCondition.DAILY_LIVING_ENHANCED;
+        Optional<String> optionalErrorMessage = pointsCondition
+            .getOptionalErrorMessage(this.decisionNoticeQuestionService,
+                SscsCaseData.builder()
+                    .pipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f")
+                    .pipWriteFinalDecisionDailyLivingActivitiesQuestion(answers).build());
+
+        Assert.assertTrue(optionalErrorMessage.isEmpty());
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetStandardErrorMessage_WhenNotConsideredDailyLiving() {
-        PipPointsCondition.getStandardErrorMessage(PipAwardType.NOT_CONSIDERED, PipActivityType.DAILY_LIVING);
+        PipPointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, PipActivityType.DAILY_LIVING);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetStandardErrorMessage_WhenNotConsideredMobility() {
-        PipPointsCondition.getStandardErrorMessage(PipAwardType.NOT_CONSIDERED, PipActivityType.MOBILITY);
+        PipPointsCondition.getStandardErrorMessage(AwardType.NOT_CONSIDERED, PipActivityType.MOBILITY);
     }
 
     /**
@@ -599,6 +728,9 @@ public class PipPointsConditionTest {
             Assert.assertNotNull(pipPointsCondition.getErrorMessage());
             Assert.assertNotNull(pipPointsCondition.getActivityType());
             Assert.assertNotNull(pipPointsCondition.getPointsRequirementCondition());
+            Assert.assertNotNull(pipPointsCondition.getAnswersExtractor());
+            Assert.assertNotNull(pipPointsCondition.getEnumClass());
+            Assert.assertEquals(PipPointsCondition.class, pipPointsCondition.getEnumClass());
             Assert.assertNotNull(pipPointsCondition.awardType);
         }
     }

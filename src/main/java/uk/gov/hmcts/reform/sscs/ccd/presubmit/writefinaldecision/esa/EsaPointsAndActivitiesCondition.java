@@ -1,21 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAwardType.HIGHER_RATE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAwardType.LOWER_RATE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAwardType.NO_AWARD;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType.HIGHER_RATE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType.LOWER_RATE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType.NO_AWARD;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.IntPredicate;
+import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 
 /**
  * Enum encapsulating the attributes of a points-related condition on SscsCaseData. Each condition specifies the type of award the condition applies for, the activity type it applies to, along with
  * points criteria and an error message to display if the points criteria are not met.
  */
-public enum EsaPointsAndActivitiesCondition {
+public enum EsaPointsAndActivitiesCondition implements PointsCondition<EsaPointsAndActivitiesCondition> {
 
     POINTS_LESS_THAN_FIFTEEN_AND_REGULATION_29_DOES_NOT_APPLY(
         POINTS_LESS_THAN_FIFTEEN,
@@ -44,7 +49,7 @@ public enum EsaPointsAndActivitiesCondition {
         null, false, false,
         LOWER_RATE);
 
-    final EsaAwardType awardType;
+    final AwardType awardType;
     final String errorMessage;
     final EsaPointsCondition esaPointsCondition;
     final Boolean regulation29Applies;
@@ -54,7 +59,7 @@ public enum EsaPointsAndActivitiesCondition {
     EsaPointsAndActivitiesCondition(EsaPointsCondition esaPointsCondition, Boolean regulation29Applies,
         Boolean schedule3ActivitesSelected,
         Boolean doesRegulation35Apply,
-        EsaAwardType awardType) {
+        AwardType awardType) {
         this.awardType = awardType;
         this.esaPointsCondition = esaPointsCondition;
         this.regulation29Applies = regulation29Applies;
@@ -109,8 +114,29 @@ public enum EsaPointsAndActivitiesCondition {
         }
     }
 
+    @Override
+    public boolean isApplicable(SscsCaseData caseData) {
+        return true;
+    }
+
+    @Override
+    public IntPredicate getPointsRequirementCondition() {
+        return esaPointsCondition.getPointsRequirementCondition();
+    }
+
     public String getErrorMessage() {
         return errorMessage;
+    }
+
+    @Override
+    public Class<EsaPointsAndActivitiesCondition> getEnumClass() {
+        return EsaPointsAndActivitiesCondition.class;
+    }
+
+    @Override
+    public Function<SscsCaseData, List<String>> getAnswersExtractor() {
+        return sscsCaseData -> CollectionUtils.collate(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(),
+            sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion());
     }
 
     public EsaPointsCondition getPointsCondition() {

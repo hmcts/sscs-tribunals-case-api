@@ -24,7 +24,6 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipAwardType;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -913,7 +912,7 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
         "STANDARD_RATE, NO_AWARD",
         "NO_AWARD, ENHANCED_RATE"
     })
-    public void shouldDisplayActivitiesErrorWhenAnAnAwardIsGivenAndNoActivitiesSelected(PipAwardType dailyLiving, PipAwardType mobility) {
+    public void shouldDisplayActivitiesErrorWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
         sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(dailyLiving.getKey());
         sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(mobility.getKey());
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
@@ -929,8 +928,8 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     @Test
     public void shouldNotDisplayActivitiesErrorWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(PipAwardType.NO_AWARD.getKey());
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(PipAwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(emptyList());
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -944,8 +943,8 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     @Test
     public void shouldNotDisplayActivitiesErrorWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsNA() {
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(PipAwardType.NO_AWARD.getKey());
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(PipAwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(emptyList());
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -960,8 +959,8 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     @Test
     public void shouldDisplayActivitiesErrorWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsSetEndDate() {
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(PipAwardType.NO_AWARD.getKey());
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(PipAwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(emptyList());
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -978,8 +977,8 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     @Test
     public void shouldDisplayActivitiesErrorWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(PipAwardType.NO_AWARD.getKey());
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(PipAwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(emptyList());
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(emptyList());
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");
@@ -996,8 +995,8 @@ public class WriteFinalDecisionMidEventValidationHandlerTest {
 
     @Test
     public void shouldNotDisplayActivitiesErrorWhenActivitiesAreNotYetSelected() {
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(PipAwardType.STANDARD_RATE.getKey());
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(PipAwardType.STANDARD_RATE.getKey());
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.STANDARD_RATE.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.STANDARD_RATE.getKey());
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("Yes");

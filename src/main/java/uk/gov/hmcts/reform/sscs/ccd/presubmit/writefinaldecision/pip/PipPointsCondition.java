@@ -1,40 +1,44 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 
 /**
  * Enum encapsulating the attributes of a points-related condition on SscsCaseData. Each condition specifies the type of award the condition applies for, the activity type it applies to, along with
  * points criteria and an error message to display if the points criteria are not met.
  */
-public enum PipPointsCondition {
+public enum PipPointsCondition implements PointsCondition<PipPointsCondition> {
 
-    DAILY_LIVING_STANDARD(PipAwardType.STANDARD_RATE,
+    DAILY_LIVING_STANDARD(AwardType.STANDARD_RATE,
         PipActivityType.DAILY_LIVING,
         points -> points >= 8 && points <= 11),
-    DAILY_LIVING_ENHANCED(PipAwardType.ENHANCED_RATE,
+    DAILY_LIVING_ENHANCED(AwardType.ENHANCED_RATE,
         PipActivityType.DAILY_LIVING,
         points -> points >= 12),
-    DAILY_LIVING_NO_AWARD(PipAwardType.NO_AWARD,
+    DAILY_LIVING_NO_AWARD(AwardType.NO_AWARD,
         PipActivityType.DAILY_LIVING,
         points -> points <= 7),
-    MOBILITY_STANDARD(PipAwardType.STANDARD_RATE,
+    MOBILITY_STANDARD(AwardType.STANDARD_RATE,
         PipActivityType.MOBILITY,
         points -> points >= 8 && points <= 11),
-    MOBILITY_ENHANCED(PipAwardType.ENHANCED_RATE,
+    MOBILITY_ENHANCED(AwardType.ENHANCED_RATE,
         PipActivityType.MOBILITY,
         points -> points >= 12),
-    MOBILITY_NO_AWARD(PipAwardType.NO_AWARD,
+    MOBILITY_NO_AWARD(AwardType.NO_AWARD,
         PipActivityType.MOBILITY,
         points -> points <= 7);
 
-    final PipAwardType awardType;
+    final AwardType awardType;
     final String errorMessage;
     final PipActivityType activityType;
     final IntPredicate pointsRequirementCondition;
 
-    PipPointsCondition(PipAwardType awardType, PipActivityType activityType,
+    PipPointsCondition(AwardType awardType, PipActivityType activityType,
         IntPredicate pointsRequirementCondition) {
         this.awardType = awardType;
         this.pointsRequirementCondition = pointsRequirementCondition;
@@ -54,17 +58,27 @@ public enum PipPointsCondition {
         return errorMessage;
     }
 
+    @Override
+    public Class<PipPointsCondition> getEnumClass() {
+        return PipPointsCondition.class;
+    }
+
+    @Override
+    public Function<SscsCaseData, List<String>> getAnswersExtractor() {
+        return activityType.getAnswersExtractor();
+    }
+
     public IntPredicate getPointsRequirementCondition() {
         return pointsRequirementCondition;
     }
 
-    protected static String getStandardErrorMessage(PipAwardType awardType, ActivityType activityType) {
+    protected static String getStandardErrorMessage(AwardType awardType, ActivityType activityType) {
         final String awardDescription;
-        if (awardType == PipAwardType.NO_AWARD) {
+        if (awardType == AwardType.NO_AWARD) {
             awardDescription = "No Award";
-        } else if (awardType == PipAwardType.STANDARD_RATE) {
+        } else if (awardType == AwardType.STANDARD_RATE) {
             awardDescription = "a standard rate award";
-        } else if (awardType == PipAwardType.ENHANCED_RATE) {
+        } else if (awardType == AwardType.ENHANCED_RATE) {
             awardDescription = "an enhanced rate award";
         } else {
             throw new IllegalArgumentException("Unable to construct a "
