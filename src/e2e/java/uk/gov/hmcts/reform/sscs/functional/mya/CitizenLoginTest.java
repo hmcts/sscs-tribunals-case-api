@@ -49,4 +49,15 @@ public class CitizenLoginTest extends BaseFunctionTest {
         assertThat(onlineHearingForTya.length(), is(1));
         assertThat(onlineHearingForTya.getJSONObject(0).get("case_id"), is(expectedCaseId));
     }
+
+    @Test
+    public void logUserWithCase_returnsNoContent() throws IOException {
+        String userEmail = createRandomEmail();
+        idamTestApiRequests.createUser(userEmail);
+        CreatedCcdCase ccdCase = createCcdCase(userEmail);
+        sscsMyaBackendRequests.assignCaseToUser(ccdCase.getAppellantTya(), userEmail, "TN32 6PL");
+
+        Long caseId = Long.valueOf(ccdCase.getCaseId());
+        sscsMyaBackendRequests.logUserWithCase(caseId);
+    }
 }
