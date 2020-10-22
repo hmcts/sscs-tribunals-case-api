@@ -22,12 +22,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
 @Slf4j
-public class CcdMidEventControllerIt extends BaseFunctionTest {
+public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    public CcdMidEventControllerIt() {
+    public CcdMidEventControllerFunctionalTest() {
         baseURI = baseUrl;
     }
 
