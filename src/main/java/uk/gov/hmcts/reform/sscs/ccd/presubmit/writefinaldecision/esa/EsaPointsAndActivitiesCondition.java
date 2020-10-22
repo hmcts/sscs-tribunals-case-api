@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType.HIGHER_RATE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType.LOWER_RATE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType.NO_AWARD;
@@ -133,10 +134,14 @@ public enum EsaPointsAndActivitiesCondition implements PointsCondition<EsaPoints
         return EsaPointsAndActivitiesCondition.class;
     }
 
+    public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
+        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
+            emptyIfNull(sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion()));
+    }
+
     @Override
     public Function<SscsCaseData, List<String>> getAnswersExtractor() {
-        return sscsCaseData -> CollectionUtils.collate(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(),
-            sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion());
+        return getAllAnswersExtractor();
     }
 
     public EsaPointsCondition getPointsCondition() {

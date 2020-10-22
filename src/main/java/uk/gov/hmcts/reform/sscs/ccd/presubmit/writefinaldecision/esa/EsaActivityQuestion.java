@@ -31,6 +31,8 @@ public class EsaActivityQuestion implements ActivityQuestion {
         return key.getActivityType();
     }
 
+
+
     public Function<SscsCaseData, String> getAnswerExtractor() {
         return key.getAnswerExtractor();
     }

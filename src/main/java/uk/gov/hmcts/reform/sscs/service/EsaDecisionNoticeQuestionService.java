@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,8 +28,9 @@ public class EsaDecisionNoticeQuestionService extends DecisionNoticeQuestionServ
     }
 
     public int getTotalPoints(SscsCaseData sscsCaseData) {
-        return Arrays.stream(EsaActivityQuestionKey.values())
-            .map(q -> getAnswerForActivityQuestionKey(sscsCaseData, q.getKey()))
+        return
+            EsaPointsAndActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData).stream()
+            .map(q -> getAnswerForActivityQuestionKey(sscsCaseData, q))
             .filter(Optional::isPresent).mapToInt(o -> o.get().getActivityAnswerPoints()).sum();
     }
 
