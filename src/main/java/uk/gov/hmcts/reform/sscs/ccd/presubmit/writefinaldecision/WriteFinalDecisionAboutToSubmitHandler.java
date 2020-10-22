@@ -77,9 +77,9 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private <T extends PointsCondition<?>> List<String> getDecisionNoticePointsValidationErrorMessages(Class<T> enumType, DecisionNoticeQuestionService decisionNoticeQuestionService, SscsCaseData sscsCaseData) {
         return Arrays.stream(enumType.getEnumConstants())
-            .filter(pipPointsCondition -> pipPointsCondition.isApplicable(sscsCaseData))
-            .map(pipPointsCondition ->
-                pipPointsCondition.getOptionalErrorMessage(decisionNoticeQuestionService, sscsCaseData))
+            .filter(pointsCondition -> pointsCondition.isApplicable(sscsCaseData))
+            .map(pointsCondition ->
+                pointsCondition.getOptionalErrorMessage(decisionNoticeQuestionService, sscsCaseData))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .collect(Collectors.toList());
