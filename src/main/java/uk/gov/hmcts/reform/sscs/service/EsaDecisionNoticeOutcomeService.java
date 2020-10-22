@@ -9,8 +9,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @Service
 public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
-    public EsaDecisionNoticeOutcomeService(String benefitType) {
-        super(benefitType);
+    public EsaDecisionNoticeOutcomeService() {
+        super("ESA");
     }
     
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
