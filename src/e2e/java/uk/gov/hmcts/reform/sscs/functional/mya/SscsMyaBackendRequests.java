@@ -200,4 +200,8 @@ public class SscsMyaBackendRequests {
                 .setEntity(body)
                 .build());
     }
+
+    public HttpResponse midEvent(HttpEntity body, String postfixUrl) throws IOException {
+        return client.execute(addHeaders(post(format("%s/ccdMidEvent%s", baseUrl, postfixUrl))).setEntity(body).build());
+    }
 }
