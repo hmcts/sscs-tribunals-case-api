@@ -2,16 +2,13 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
-import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -90,17 +86,10 @@ public class TribunalsServiceTest {
     }
 
     @Test(expected = AppealNotFoundException.class)
-    public void shouldThrowExceptionIfAppealNumberNotFound() throws CcdException {
-        given(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).willReturn(null);
-
-        tribunalsService.findAppeal(APPEAL_NUMBER);
-    }
-
-    @Test(expected = AppealNotFoundException.class)
     public void shouldThrowExceptionIfCaseIdNotFound() throws CcdException {
         given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(null);
 
-        tribunalsService.findAppeal(CASE_ID);
+        tribunalsService.findAppeal(CASE_ID, true);
     }
 
     @Test
@@ -119,29 +108,6 @@ public class TribunalsServiceTest {
     }
 
     @Test
-    public void shouldLoadCaseForCaseId() throws CcdException {
-        CaseDetails caseDetails = CaseDetails.builder().build();
-        given(ccdClient.readForCaseworker(idamTokens, CASE_ID)).willReturn(caseDetails);
-        SscsCaseDetails sscsCaseDetails = SscsCaseDetails.builder().id(CASE_ID).data(getCaseData()).build();
-        given(sscsCcdConvertService.getCaseDetails(caseDetails)).willReturn(sscsCaseDetails);
-        ObjectNode objectNode = mock(ObjectNode.class);
-        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(CASE_ID), eq(false), eq(null))).willReturn(objectNode);
-
-        ObjectNode appeal = tribunalsService.findAppeal(CASE_ID);
-        assertThat(appeal, is(objectNode));
-    }
-
-    @Test
-    public void shouldThrowExceptionAndReturnEmptyWhenGivenNotValidSurname() throws CcdException {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens))
-                .willThrow(uk.gov.hmcts.reform.sscs.ccd.exception.AppealNotFoundException.class);
-
-        Optional<SurnameResponse> actualResponse = tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
-
-        assertFalse(actualResponse.isPresent());
-    }
-
-    @Test
     public void shouldUnsubscribe() throws CcdException {
         when(ccdService.updateSubscription(APPEAL_NUMBER, null, idamTokens)).thenReturn(sscsCaseDetails);
         String result = tribunalsService.unsubscribe(APPEAL_NUMBER);
@@ -157,60 +123,6 @@ public class TribunalsServiceTest {
 
         verify(ccdService).updateSubscription(eq(APPEAL_NUMBER), any(), eq(idamTokens));
         assertEquals(result, "jsa");
-    }
-
-    @Test
-    public void shouldAddRegionalProcessingCenterFromCcdIfItsPresent() {
-        SscsCaseDetails caseDetailsWithRpc = getCaseDetailsWithRpc();
-        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(caseDetailsWithRpc);
-        given(trackYourAppealJsonBuilder.build(eq(caseDetailsWithRpc.getData()), any(), eq(caseDetailsWithRpc.getId()))).willReturn(rootObjectNode);
-
-        tribunalsService.findAppeal(APPEAL_NUMBER);
-
-        verify(regionalProcessingCenterService, never()).getByScReferenceCode(anyString());
-
-    }
-
-    @Test
-    public void shouldGetRpcfromRegionalProcessingServiceIfItsNotPresentInCcdCase() {
-
-        SscsCaseDetails caseDetails = getCaseDetails();
-        when(ccdService.findCaseByAppealNumber(APPEAL_NUMBER, idamTokens)).thenReturn(caseDetails);
-        given(trackYourAppealJsonBuilder.build(eq(caseDetails.getData()), any(), eq(caseDetails.getId()))).willReturn(rootObjectNode);
-
-        tribunalsService.findAppeal(APPEAL_NUMBER);
-
-        verify(regionalProcessingCenterService, times(1)).getByScReferenceCode(eq(null));
-    }
-
-    @Test
-    public void findAppealWillReturnTheCalledAppealNumberInResponse() {
-
-        final String appealNumber = "MyAppealNumber";
-        when(ccdService.findCaseByAppealNumber(appealNumber, idamTokens)).thenReturn(sscsCaseDetails);
-        given(trackYourAppealJsonBuilder.build(eq(sscsCaseDetails.getData()), any(), eq(sscsCaseDetails.getId()))).willReturn(rootObjectNode);
-
-        ObjectNode objectNode = tribunalsService.findAppeal(appealNumber);
-        assertEquals(appealNumber, objectNode.findValue("appeal").get("appealNumber").asText());
-
-    }
-
-    @Test
-    public void shouldReturnSurnameResponseWithCcdIdIfSurnameIsValidForGivenAppealNumber() {
-        given(ccdService.findCcdCaseByAppealNumberAndSurname(APPEAL_NUMBER, SURNAME, idamTokens)).willReturn(getCaseData());
-
-        Optional<SurnameResponse> surnameResponse =  tribunalsService.validateSurname(APPEAL_NUMBER, SURNAME);
-
-        assertTrue(surnameResponse.isPresent());
-        assertThat(surnameResponse.get().getCaseId(), equalTo(CCD_CASE_ID));
-    }
-
-    private SscsCaseDetails getCaseDetailsWithRpc() {
-        return SscsCaseDetails.builder().data(SscsCaseData.builder().regionalProcessingCenter(getRegionalProcessingCenter()).build()).build();
-    }
-
-    private SscsCaseDetails getCaseDetails() {
-        return SscsCaseDetails.builder().data(getCaseData()).build();
     }
 
     private SscsCaseData getCaseData() {
