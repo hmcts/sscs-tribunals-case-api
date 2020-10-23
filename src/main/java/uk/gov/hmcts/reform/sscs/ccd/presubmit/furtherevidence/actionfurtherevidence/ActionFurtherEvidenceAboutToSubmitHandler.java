@@ -89,10 +89,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (!callback.isIgnoreWarnings() && ((sscsCaseData.getConfidentialityRequestOutcomeAppellant() != null
+        if (!callback.isIgnoreWarnings() && (((sscsCaseData.getConfidentialityRequestOutcomeAppellant() != null
             && RequestOutcome.GRANTED.equals(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome()))
             || (sscsCaseData.getConfidentialityRequestOutcomeJointParty() != null
-            && RequestOutcome.GRANTED.equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome())))) {
+            && RequestOutcome.GRANTED.equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome())))
+            || equalsIgnoreCase(sscsCaseData.getIsProgressingViaGaps(), "yes"))) {
             preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
         }
 
