@@ -79,7 +79,7 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
     private <T extends PointsCondition<?>> List<String> getDecisionNoticePointsValidationErrorMessages(Class<T> enumType, DecisionNoticeQuestionService decisionNoticeQuestionService, SscsCaseData sscsCaseData) {
 
-        Collection<String> collection = emptyIfNull(EsaPointsAndActivitiesCondition.getCommonAnswersExtractor().apply(sscsCaseData));
+        Collection<String> collection = emptyIfNull(EsaPointsAndActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
         int totalPoints = decisionNoticeQuestionService.getTotalPoints(sscsCaseData, collection);
 

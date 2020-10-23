@@ -68,7 +68,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     protected abstract void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue);
 
-        @Before
+    @Before
     public void setUp() {
         openMocks(this);
         handler = new WriteFinalDecisionMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator(), decisionNoticeService);
@@ -375,7 +375,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     }
 
     @Test
-    public void shouldDisplayActivitiesErrorForPIPOnlyWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
+    public void shouldDisplayActivitiesErrorForPipOnlyWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
 
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
         setEmptyActivitiesListScenario(sscsCaseData);

@@ -1,8 +1,5 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -18,7 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
 
 @Slf4j
 public abstract class DecisionNoticeQuestionService {

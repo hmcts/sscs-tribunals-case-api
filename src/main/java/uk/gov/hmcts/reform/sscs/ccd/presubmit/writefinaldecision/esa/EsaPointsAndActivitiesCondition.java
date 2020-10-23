@@ -7,7 +7,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardTyp
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,6 @@ import java.util.function.IntPredicate;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
@@ -172,15 +170,14 @@ public enum EsaPointsAndActivitiesCondition implements PointsCondition<EsaPoints
         return EsaPointsAndActivitiesCondition.class;
     }
 
-
-    public static Function<SscsCaseData, List<String>> getCommonAnswersExtractor() {
+    public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
         return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
             emptyIfNull(sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion()));
     }
 
     @Override
     public Function<SscsCaseData, List<String>> getAnswersExtractor() {
-        return getCommonAnswersExtractor();
+        return getAllAnswersExtractor();
     }
 
     public EsaPointsCondition getPointsCondition() {
