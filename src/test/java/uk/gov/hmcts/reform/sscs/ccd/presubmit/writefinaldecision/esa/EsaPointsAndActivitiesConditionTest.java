@@ -144,7 +144,8 @@ public class EsaPointsAndActivitiesConditionTest {
     }
 
     /**
-     * We have separate tests above to ensure that only a single PointsCondition per activity type exists given an activity type and points - this method returns that condition.
+     * We have separate tests above to ensure that only a single PointsCondition exists for all valid activity/points combinations - this method returns that condition,
+     * or throws an exception if no matching condition.
      */
     private EsaPointsAndActivitiesCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(
         Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,

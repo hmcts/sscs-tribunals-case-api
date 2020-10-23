@@ -4,6 +4,7 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipPointsCondition;
@@ -21,4 +22,5 @@ public class PipDecisionNoticeQuestionService extends DecisionNoticeQuestionServ
     protected ActivityQuestionLookup getActivityQuestionLookup() {
         return PipActivityQuestion::getByKey;
     }
+
 }

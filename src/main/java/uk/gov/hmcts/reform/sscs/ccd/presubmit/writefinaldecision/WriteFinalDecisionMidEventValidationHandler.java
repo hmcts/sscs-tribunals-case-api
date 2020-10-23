@@ -4,8 +4,10 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 
 @Component
@@ -29,12 +34,12 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
     private final Validator validator;
 
-    private final EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
+    private final DecisionNoticeService decisionNoticeService;
 
     @Autowired
-    WriteFinalDecisionMidEventValidationHandler(Validator validator, EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService) {
+    WriteFinalDecisionMidEventValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService) {
         this.validator = validator;
-        this.esaDecisionNoticeQuestionService = esaDecisionNoticeQuestionService;
+        this.decisionNoticeService = decisionNoticeService;
     }
 
     @Override
@@ -151,7 +156,8 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
     private void setEsaShowPageFlags(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
 
-        int totalPoints = esaDecisionNoticeQuestionService.getTotalPoints(sscsCaseData);
+        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, Arrays.stream(EsaActivityQuestionKey.values())
+                .map(k -> k.getKey()).collect(Collectors.toList()));
 
         if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
@@ -168,7 +174,7 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
                 || sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
                 && (sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
                 || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())) {
-                preSubmitCallbackResponse.addError("At least one activity must be selected");
+                preSubmitCallbackResponse.addError("At least one activity must be selected.");
                 if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
                     if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
                         && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {

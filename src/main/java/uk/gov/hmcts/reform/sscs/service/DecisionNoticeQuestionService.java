@@ -1,7 +1,11 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -14,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
 
 @Slf4j
 public abstract class DecisionNoticeQuestionService {
@@ -83,5 +88,10 @@ public abstract class DecisionNoticeQuestionService {
             }
         }
         return null;
+    }
+
+    public int getTotalPoints(SscsCaseData sscsCaseData, Collection<String> answerKeys) {
+        return answerKeys.stream().map(answerText -> getAnswerForActivityQuestionKey(sscsCaseData,
+            answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
     }
 }
