@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,6 @@ import uk.gov.hmcts.reform.sscs.ccd.service.SscsCcdConvertService;
 import uk.gov.hmcts.reform.sscs.exception.AppealNotFoundException;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.model.tya.SubscriptionRequest;
-import uk.gov.hmcts.reform.sscs.model.tya.SurnameResponse;
-
 
 @Service
 @Slf4j
@@ -42,25 +39,6 @@ public class TribunalsService {
         this.idamService = idamService;
         this.ccdClient = ccdClient;
         this.sscsCcdConvertService = sscsCcdConvertService;
-    }
-
-    public ObjectNode findAppeal(String appealNumber) {
-        SscsCaseDetails caseByAppealNumber = ccdService.findCaseByAppealNumber(appealNumber, idamService.getIdamTokens());
-        if (caseByAppealNumber == null) {
-            log.info("Appeal does not exist for appeal number: " + appealNumber);
-            throw new AppealNotFoundException(appealNumber);
-        }
-
-        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseByAppealNumber.getData(), getRegionalProcessingCenter(caseByAppealNumber.getData()), caseByAppealNumber.getId());
-        ObjectNode appealNode = objectNode.with("appeal");
-        if (appealNode != null) {
-            appealNode.put("appealNumber", appealNumber);
-        }
-        return objectNode;
-    }
-
-    public ObjectNode findAppeal(Long caseId) {
-        return findAppeal(caseId, false);
     }
 
     public ObjectNode findAppeal(Long caseId, boolean mya) {
@@ -98,19 +76,5 @@ public class TribunalsService {
         SscsCaseDetails sscsCaseDetails = ccdService.updateSubscription(appealNumber, subscriptionRequest.getEmail(), idamService.getIdamTokens());
 
         return sscsCaseDetails != null ? sscsCaseDetails.getData().getAppeal().getBenefitType().getCode().toLowerCase() : "";
-    }
-
-    public Optional<SurnameResponse> validateSurname(String appealNumber, String surname) {
-        SscsCaseData caseData = null;
-        try {
-            caseData = ccdService.findCcdCaseByAppealNumberAndSurname(appealNumber, surname, idamService.getIdamTokens());
-        } catch (uk.gov.hmcts.reform.sscs.ccd.exception.AppealNotFoundException e) {
-            log.error("Appeal does not exist for appeal number: {} with given surname", appealNumber);
-        }
-        if (caseData == null) {
-            log.error("Not a valid surname: " + surname);
-            return Optional.empty();
-        }
-        return Optional.of(new SurnameResponse(caseData.getCcdCaseId(), appealNumber, surname));
     }
 }

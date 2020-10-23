@@ -34,6 +34,8 @@
       "pipWriteFinalDecisionMobilityActivitiesQuestion": [
         "planningAndFollowing"
       ],
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
       "pipWriteFinalDecisionMobilityQuestion": "standardRate",
       "pipWriteFinalDecisionPlanningAndFollowingQuestion": "planningAndFollowing11d",
       "pipWriteFinalDecisionPreparingFoodQuestion": "preparingFood1f",
