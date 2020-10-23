@@ -207,7 +207,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private void updateStateIfInterLockReviewState(SscsCaseData caseData) {
         State previousState = caseData.getPreviousState();
 
-        if (!State.INTERLOCUTORY_REVIEW_STATE.getId().equals(previousState.getId())) {
+        if (previousState != null && !State.INTERLOCUTORY_REVIEW_STATE.getId().equals(previousState.getId())) {
             caseData.setState(previousState);
         } else {
             caseData.setState(State.INTERLOCUTORY_REVIEW_STATE);
