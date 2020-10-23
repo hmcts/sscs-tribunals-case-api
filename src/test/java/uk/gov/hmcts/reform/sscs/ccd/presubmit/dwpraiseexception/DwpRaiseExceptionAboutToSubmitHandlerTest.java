@@ -74,7 +74,5 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
 
         assertEquals("Yes", response.getData().getIsProgressingViaGaps());
         assertEquals(State.NOT_LISTABLE, response.getData().getState());
-        assertEquals(State.VALID_APPEAL.getId(), response.getData().getCreatedInGapsFrom());
-
     }
 }

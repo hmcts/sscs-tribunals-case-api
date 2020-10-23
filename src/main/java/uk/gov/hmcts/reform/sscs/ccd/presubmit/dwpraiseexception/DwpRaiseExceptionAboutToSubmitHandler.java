@@ -41,7 +41,6 @@ public class DwpRaiseExceptionAboutToSubmitHandler implements PreSubmitCallbackH
 
         sscsCaseData.setIsProgressingViaGaps("Yes");
         sscsCaseData.setState(State.NOT_LISTABLE);
-        sscsCaseData.setCreatedInGapsFrom(State.VALID_APPEAL.getId());
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
