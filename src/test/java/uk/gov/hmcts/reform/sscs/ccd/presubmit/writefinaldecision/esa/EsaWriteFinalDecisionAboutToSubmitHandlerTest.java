@@ -320,7 +320,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assert.assertEquals(1, response.getErrors().size());
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You have awarded less than 15 points, specified that Regulation 29 applies and specified that Regulation 35 does not apply, but have made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+
     }
 
     @Test
@@ -340,7 +343,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(0, response.getErrors().size());
+        Assert.assertEquals(1, response.getErrors().size());
+        Assert.assertEquals(1, response.getErrors().size());
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("You have awarded less than 15 points, specified that Regulation 29 applies and specified that Regulation 35 applies, but have made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
     }
 
     @Test
