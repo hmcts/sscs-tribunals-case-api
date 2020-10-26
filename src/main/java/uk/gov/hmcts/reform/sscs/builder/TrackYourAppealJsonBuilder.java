@@ -55,11 +55,6 @@ public class TrackYourAppealJsonBuilder {
     public static final String NOT_LISTABLE = "notListable";
 
     public ObjectNode build(SscsCaseData caseData,
-                            RegionalProcessingCenter regionalProcessingCenter, Long caseId) {
-        return build(caseData, regionalProcessingCenter,caseId, false, null);
-    }
-
-    public ObjectNode build(SscsCaseData caseData,
                             RegionalProcessingCenter regionalProcessingCenter, Long caseId, boolean mya, String state) {
 
         // Create appealReceived eventType for appealCreated CCD event
