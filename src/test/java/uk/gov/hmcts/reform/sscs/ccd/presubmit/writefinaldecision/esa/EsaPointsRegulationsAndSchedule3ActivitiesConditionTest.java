@@ -10,13 +10,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class EsaPointsAndActivitiesConditionTest {
+public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
 
     @Mock
     private SscsCaseData sscsCaseData;
+
+    @Mock
+    private DecisionNoticeQuestionService questionService;
 
     @Before
     public void setUp() {
@@ -60,6 +66,7 @@ public class EsaPointsAndActivitiesConditionTest {
     private boolean isValidCombinationFromSelectSchedule3ActivitiesOnwards(Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply) {
 
+
         if (schedule3ActivitiesSelected == null) {
             return false;
         } else {
@@ -76,7 +83,7 @@ public class EsaPointsAndActivitiesConditionTest {
         return true;
     }
 
-    private boolean isValidCombination(int points, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
+    private boolean isValidCombinationExpected(int points, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply) {
 
         if (points < 15) {
@@ -101,58 +108,76 @@ public class EsaPointsAndActivitiesConditionTest {
         }
     }
 
+    private YesNo getYesNoFieldValue(Boolean value) {
+        return value == null ? null : (value.booleanValue() ? YesNo.YES : YesNo.NO);
+    }
+
     /**
      * Test the continuity of boundaries between point ranges and regulation and schedule answers. (ie. this test will fail if there are any gaps, or overlap between the boundaries)
      */
     @Test
     @Parameters(named = "scheduleAndRegulationQuestionCombinations")
-    public void testThatAtExactlyOneConditionPassesForAllPossiblePointAndActivityCombinations(
+    public void testThatAtExactlyOneConditionIsApplicableForAllPointsAndActivityCombinations(
         Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply) {
 
-        int minPoints = 14;
-        int maxPoints = 16;
-        for (int points = minPoints; points <= maxPoints; points++) {
+        int minPointsValue = 14;
+        int maxPointsValue = 15;
 
-            boolean validCombination = isValidCombination(points, doesRegulation29Apply,
-                schedule3ActivitiesSelected, doesRegulation35Apply);
+        for (int points = minPointsValue; points <= maxPointsValue; points++) {
 
-            int pointsConditionSatisfiedCount = 0;
-            for (EsaPointsAndActivitiesCondition esaPointsCondition : EsaPointsAndActivitiesCondition.values()) {
+            int conditionApplicableCount = 0;
 
-                try {
-                    if (esaPointsCondition.isSatisified(points, doesRegulation29Apply, schedule3ActivitiesSelected,
-                        doesRegulation35Apply)) {
-                        pointsConditionSatisfiedCount++;
-                    }
-                } catch (IllegalStateException e) {
-                   // Do not increment points condition satisified count if it's not a valid combination
+            final boolean isValidCombinationExpected =
+                isValidCombinationExpected(points, doesRegulation29Apply, schedule3ActivitiesSelected,
+                    doesRegulation35Apply);
+
+            SscsCaseData caseData = SscsCaseData.builder()
+                .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
+                .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build();
+
+            Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData),Mockito.any())).thenReturn(points);
+
+            EsaPointsRegulationsAndSchedule3ActivitiesCondition matchingCondition = null;
+
+            for (EsaPointsRegulationsAndSchedule3ActivitiesCondition esaPointsCondition : EsaPointsRegulationsAndSchedule3ActivitiesCondition.values()) {
+
+                if (esaPointsCondition.isApplicable(questionService, caseData)) {
+                    conditionApplicableCount++;
+                    matchingCondition = esaPointsCondition;
                 }
             }
-            if (validCombination) {
-                Assert.assertEquals(
-                    "Expected 1 condition to be satisfied for points:" + points + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + " but "
-                        + pointsConditionSatisfiedCount + " were satisfied",
-                    1, pointsConditionSatisfiedCount);
+
+            Assert.assertEquals(
+                "Expected 1 condition to be satisfied for points:" + points + ":"  + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + " but "
+                    + conditionApplicableCount + " were satisfied",
+                1, conditionApplicableCount);
+
+
+            if (isValidCombinationExpected) {
+                Assert.assertTrue("Unexpected error for:" + points + ":"  + doesRegulation29Apply
+                    + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+                    .getOptionalErrorMessage(questionService, caseData).isEmpty());
             } else {
-                Assert.assertEquals(
-                    "Expected 0 conditions to be satisfied for points:" + points + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + " but "
-                        + pointsConditionSatisfiedCount + " were satisfied",
-                    0, pointsConditionSatisfiedCount);
+                // FIXME Once activities are implemented, assert that we always get
+                // a non-empty error message here
             }
+
         }
     }
+
 
     /**
      * We have separate tests above to ensure that only a single PointsCondition exists for all valid activity/points combinations - this method returns that condition,
      * or throws an exception if no matching condition.
      */
+    /*
     private EsaPointsAndActivitiesCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(
         Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply, int points) {
         for (EsaPointsAndActivitiesCondition esaPointsAndActivitiesCondition : EsaPointsAndActivitiesCondition.values()) {
 
-            if (esaPointsAndActivitiesCondition.isSatisified(points, doesRegulation29Apply, schedule3ActivitiesSelected,
+            if (esaPointsAndActivitiesCondition.isSatisfied(points, doesRegulation29Apply, schedule3ActivitiesSelected,
                 doesRegulation35Apply)) {
                 if (esaPointsAndActivitiesCondition.getPointsCondition().getPointsRequirementCondition().test(points)) {
                     return esaPointsAndActivitiesCondition;
@@ -162,15 +187,16 @@ public class EsaPointsAndActivitiesConditionTest {
         throw new IllegalStateException("No points condition found for points:" + points + " and " + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply);
     }
 
+     */
+
     @Test
     public void testAllPointsConditionAttributesAreNotNull() {
-        for (EsaPointsAndActivitiesCondition esaPointsCondition : EsaPointsAndActivitiesCondition.values()) {
-            Assert.assertNotNull(esaPointsCondition.getPointsCondition());
-
-            //Assert.assertNotNull(pipPointsCondition.getErrorMessage());
-            //Assert.assertNotNull(pipPointsCondition.getActivityType());
-            //Assert.assertNotNull(pipPointsCondition.getPointsRequirementCondition());
-            //Assert.assertNotNull(pipPointsCondition.awardType);
+        for (EsaPointsRegulationsAndSchedule3ActivitiesCondition esaPointsCondition : EsaPointsRegulationsAndSchedule3ActivitiesCondition.values()) {
+            Assert.assertNotNull(esaPointsCondition.getAnswersExtractor());
+            Assert.assertSame(esaPointsCondition.getAnswersExtractor(), EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor());
+            Assert.assertNotNull(esaPointsCondition.getEnumClass());
+            Assert.assertEquals(EsaPointsRegulationsAndSchedule3ActivitiesCondition.class, esaPointsCondition.getEnumClass());
+            Assert.assertNotNull(esaPointsCondition.getPointsRequirementCondition());
         }
     }
 }

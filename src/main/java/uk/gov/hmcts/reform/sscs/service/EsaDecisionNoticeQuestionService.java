@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsAndActivitiesCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
 
 @Slf4j
 @Service
@@ -19,7 +19,7 @@ public class EsaDecisionNoticeQuestionService extends DecisionNoticeQuestionServ
 
     @Autowired
     public EsaDecisionNoticeQuestionService() throws IOException {
-        super("ESA", EsaPointsAndActivitiesCondition.class);
+        super("ESA", EsaPointsRegulationsAndSchedule3ActivitiesCondition.class);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class EsaDecisionNoticeQuestionService extends DecisionNoticeQuestionServ
 
     public int getTotalPoints(SscsCaseData sscsCaseData) {
         return
-            EsaPointsAndActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData).stream()
+            EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData).stream()
             .map(q -> getAnswerForActivityQuestionKey(sscsCaseData, q))
             .filter(Optional::isPresent).mapToInt(o -> o.get().getActivityAnswerPoints()).sum();
     }

@@ -90,4 +90,6 @@ public abstract class DecisionNoticeQuestionService {
         return answerKeys.stream().map(answerText -> getAnswerForActivityQuestionKey(sscsCaseData,
             answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
     }
+    
+    
 }

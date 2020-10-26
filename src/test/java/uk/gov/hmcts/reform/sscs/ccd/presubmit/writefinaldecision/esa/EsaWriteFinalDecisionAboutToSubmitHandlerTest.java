@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import java.io.IOException;
 import java.util.Arrays;
 import junitparams.JUnitParamsRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -37,8 +38,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        Assert.assertEquals(1, response.getErrors().size());
+
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("No value expected for:regulation29Applies but value was true", error);
+        assertEquals("You have submitted an unexpected answer for the Regulation 29 question. The points awarded don't match. Please review your previous selection.", error);
     }
 
     @Test
@@ -47,7 +50,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
 
         sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
@@ -56,8 +59,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        Assert.assertEquals(1, response.getErrors().size());
+
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("No value expected for:regulation29Applies but value was true", error);
+        assertEquals("You have submitted an unexpected answer for the Regulation 29 question. The points awarded don't match. Please review your previous selection.", error);
     }
 
     @Test
@@ -70,12 +75,14 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
         // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1w");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        Assert.assertEquals(1, response.getErrors().size());
+
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Value expected for:regulation29Applies but value was null", error);
+        assertEquals("You have submitted a missing answer for the Regulation 29 question. The points awarded don't match. Please review your previous selection.", error);
     }
 
     @Test
@@ -94,8 +101,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
+        Assert.assertEquals(1, response.getErrors().size());
+
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("No value expected for:doesRegulation35Apply but value was true", error);
+        assertEquals("You have submitted an unexpected answer for the Regulation 35 question. The points awarded don't match. Please review your previous selection.", error);
     }
 
     @Test
@@ -113,9 +122,11 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+        
+        Assert.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("No value expected for:doesRegulation35Apply but value was false", error);
+        assertEquals("You have submitted an unexpected answer for the Regulation 35 question. The points awarded don't match. Please review your previous selection.", error);
     }
     
     @Override
