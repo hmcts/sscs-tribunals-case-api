@@ -66,10 +66,12 @@ import uk.gov.hmcts.reform.sscs.service.FooterService;
 @RunWith(JUnitParamsRunner.class)
 public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
+    private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String NO = "No";
+    private static final String YES = "Yes";
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-
-    private static final String USER_AUTHORISATION = "Bearer token";
 
     private ActionFurtherEvidenceAboutToSubmitHandler actionFurtherEvidenceAboutToSubmitHandler;
 
@@ -184,14 +186,14 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             "\"Appellant (or Appointee)"));
         sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
             "Appellant (or Appointee)"));
-        sscsCaseData.setEvidenceHandled("No");
+        sscsCaseData.setEvidenceHandled(NO);
 
         when(callback.isIgnoreWarnings()).thenReturn(ignoreWarnings);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertTrue(CollectionUtils.isEmpty(response.getData().getSscsDocument()));
-        assertEquals("Yes", response.getData().getEvidenceHandled());
+        assertEquals(YES, response.getData().getEvidenceHandled());
 
         if (ignoreWarnings) {
             assertEquals(0, response.getWarnings().size());
@@ -221,7 +223,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
                 "\"Appellant (or Appointee)"));
         sscsCaseData.setOriginalSender(buildOriginalSenderItemListForGivenOption("appellant",
             "Appellant (or Appointee)"));
-        sscsCaseData.setEvidenceHandled("No");
+        sscsCaseData.setEvidenceHandled(NO);
 
         when(callback.isIgnoreWarnings()).thenReturn(ignoreWarnings);
 
@@ -229,7 +231,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals(response.getData().getSscsDocument().size(), 1);
-        assertEquals("Yes", response.getData().getEvidenceHandled());
+        assertEquals(YES, response.getData().getEvidenceHandled());
 
         if (ignoreWarnings) {
             assertEquals(0, response.getWarnings().size());
@@ -248,9 +250,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("www.test.com", sscsDocumentDetail.getDocumentLink().getDocumentUrl());
         assertEquals("2019-06-13", sscsDocumentDetail.getDocumentDateAdded());
         assertEquals("123", sscsDocumentDetail.getControlNumber());
-        assertEquals("No", response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
+        assertEquals(NO, response.getData().getSscsDocument().get(1).getValue().getEvidenceIssued());
         assertNull(response.getData().getScannedDocuments());
-        assertEquals("Yes", response.getData().getEvidenceHandled());
+        assertEquals(YES, response.getData().getEvidenceHandled());
     }
 
     private Object[] generateFurtherEvidenceActionListScenarios() {
@@ -278,40 +280,40 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         return new Object[]{
             //other options scenarios
             new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, null, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "No", OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, "Yes", OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "No", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, NO, OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, appellantOriginalSender, YES, OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, NO, OTHER_DOCUMENT},
             new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, null, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, "Yes", OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "No", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, representativeOriginalSender, YES, OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, NO, OTHER_DOCUMENT},
             new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, null, OTHER_DOCUMENT},
-            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, "Yes", OTHER_DOCUMENT},
+            new Object[]{furtherEvidenceActionListOtherDocuments, dwpOriginalSender, YES, OTHER_DOCUMENT},
             //issue parties scenarios
             new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, null, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "No", APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, "Yes", APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "No", REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, "Yes", REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, NO, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, appellantOriginalSender, YES, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE},
             new Object[]{furtherEvidenceActionListIssueParties, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "No", DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, "Yes", DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, NO, DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, YES, DWP_EVIDENCE},
             new Object[]{furtherEvidenceActionListIssueParties, dwpOriginalSender, null, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, "No", JOINT_PARTY_EVIDENCE},
-            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, "Yes", JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, NO, JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, YES, JOINT_PARTY_EVIDENCE},
             new Object[]{furtherEvidenceActionListIssueParties, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE},
             //interloc scenarios
             new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, null, APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "No", APPELLANT_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, "Yes", APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, NO, APPELLANT_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, appellantOriginalSender, YES, APPELLANT_EVIDENCE},
             new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, null, REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "No", REPRESENTATIVE_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, "Yes", REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, NO, REPRESENTATIVE_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, representativeOriginalSender, YES, REPRESENTATIVE_EVIDENCE},
             new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, null, DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "No", DWP_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, "Yes", DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, NO, DWP_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, dwpOriginalSender, YES, DWP_EVIDENCE},
             new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, null, JOINT_PARTY_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, "No", JOINT_PARTY_EVIDENCE},
-            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, "Yes", JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, NO, JOINT_PARTY_EVIDENCE},
+            new Object[]{furtherEvidenceActionListInterloc, jointPartyOriginalSender, YES, JOINT_PARTY_EVIDENCE},
             //edge cases scenarios
             new Object[]{null, representativeOriginalSender, "", null}, //edge case: furtherEvidenceActionOption is null
             new Object[]{furtherEvidenceActionListIssueParties, null, null, null} //edge case: originalSender is null
@@ -366,7 +368,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.setScannedDocuments(scannedDocumentList);
         sscsCaseData.setSscsDocument(sscsDocuments);
-        sscsCaseData.setLanguagePreferenceWelsh("Yes");
+        sscsCaseData.setLanguagePreferenceWelsh(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -381,7 +383,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
         assertNull(response.getData().getSscsDocument().get(2).getValue().getDocumentTranslationStatus());
         assertNull(response.getData().getScannedDocuments());
-        assertEquals("Yes", response.getData().getTranslationWorkOutstanding());
+        assertEquals(YES, response.getData().getTranslationWorkOutstanding());
     }
 
     @Test
@@ -460,13 +462,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             new Object[]{Appeal.builder().appellant(Appellant.builder().address(Address.builder().postcode("TS1 2BA").build()).build()).build(), "Appellant"},
             new Object[]{Appeal.builder().appellant(Appellant.builder().address(null).build()).build(), "Appellant"},
             new Object[]{Appeal.builder().appellant(null).build(), "Appellant"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().build()).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().address(Address.builder().build()).build()).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee("Yes").appointee(Appointee.builder().address(null).build()).build()).build(), "Appointee"},
-            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").address(Address.builder().build()).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
-            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").address(null).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
-            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").address(Address.builder().build()).build()).appellant(Appellant.builder().address(null).build()).build(), "Appellant", "Representative"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().build()).build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().address(Address.builder().build()).build()).build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().appellant(Appellant.builder().isAppointee(YES).appointee(Appointee.builder().address(null).build()).build()).build(), "Appointee"},
+            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(Address.builder().build()).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
+            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(null).build()).appellant(Appellant.builder().address(Address.builder().line1("The road").build()).build()).build(), "Representative"},
+            new Object[]{Appeal.builder().rep(Representative.builder().hasRepresentative(YES).address(Address.builder().build()).build()).appellant(Appellant.builder().address(null).build()).build(), "Appellant", "Representative"},
         };
     }
 
@@ -645,7 +647,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setJointParty(YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -663,12 +665,21 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
-    @Parameters({"SEND_TO_INTERLOC_REVIEW_BY_JUDGE", "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE"})
-    public void givenConfidentialRequestWhenJointPartyExistsAndAlreadyHasConfidentialityFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFieldsAndDisplayWarning(FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem) {
-
+    @Parameters({
+            "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, Yes",
+            "SEND_TO_INTERLOC_REVIEW_BY_JUDGE, No",
+            "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, Yes",
+            "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, No",
+            "INFORMATION_RECEIVED_FOR_INTERLOC_JUDGE, null"
+    })
+    public void givenConfidentialRequestWhenJointPartyExistsAndAlreadyHasConfidentialityFromOriginalSenderAppellant_thenUpdateCaseWithConfidentialFieldsAndDisplayWarning(
+            FurtherEvidenceActionDynamicListItems furtherEvidenceActionDynamicListItem,
+            @Nullable String isProgressingViaGaps
+    ) {
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(furtherEvidenceActionDynamicListItem.code, furtherEvidenceActionDynamicListItem.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setJointParty(YES);
+        sscsCaseData.setIsProgressingViaGaps(isProgressingViaGaps);
         sscsCaseData.setConfidentialityRequestOutcomeJointParty(createDatedRequestOutcome(RequestOutcome.GRANTED));
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
@@ -679,9 +690,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         sscsCaseData.setScannedDocuments(docs);
         PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        assertEquals(1, response.getWarnings().size());
 
-        assertEquals("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.", response.getWarnings().iterator().next());
+        if (YES.equals(isProgressingViaGaps)) {
+            assertEquals(1, response.getWarnings().size());
+            assertEquals("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.", response.getWarnings().iterator().next());
+        } else {
+            assertEquals(0, response.getWarnings().size());
+        }
         assertEquals(RequestOutcome.IN_PROGRESS, sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome());
         assertEquals(createDatedRequestOutcome(RequestOutcome.GRANTED), sscsCaseData.getConfidentialityRequestOutcomeJointParty());
         assertEquals(LocalDate.now(), sscsCaseData.getConfidentialityRequestOutcomeAppellant().getDate());
@@ -712,7 +727,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setJointParty(YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -752,7 +767,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(SEND_TO_INTERLOC_REVIEW_BY_JUDGE.code, SEND_TO_INTERLOC_REVIEW_BY_JUDGE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(OriginalSenderItemList.REPRESENTATIVE.getCode(), OriginalSenderItemList.REPRESENTATIVE.getLabel()));
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setJointParty(YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -772,7 +787,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
 
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
         sscsCaseData.getOriginalSender().setValue(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
-        sscsCaseData.setJointParty("Yes");
+        sscsCaseData.setJointParty(YES);
 
         ScannedDocument scannedDocument = ScannedDocument.builder().value(
             ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue())
@@ -790,112 +805,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     private DatedRequestOutcome createDatedRequestOutcome(RequestOutcome requestOutcome) {
         return DatedRequestOutcome.builder().date(LocalDate.now().minusDays(1))
             .requestOutcome(requestOutcome).build();
-    }
-
-    private Object[][] generateWrappedFurtherEvidenceActionListScenarios() {
-        return wrapWithConfidentialityAndWarningCombinationScenarios(generateFurtherEvidenceActionListScenarios());
-    }
-
-    private Object[][] wrapWithConfidentialityAndWarningCombinationScenarios(Object[] scenarios) {
-
-        Object[][] results = new Object[scenarios.length * confidentialityAndWarningRequestStateCombinations().length][];
-        int index = 0;
-        for (Object scenario : scenarios) {
-            for (Object[] confidentialityRequestStateCombination : confidentialityAndWarningRequestStateCombinations()) {
-                results[index++] = wrapScenario((Object[])scenario, confidentialityRequestStateCombination);
-            }
-        }
-        return results;
-    }
-
-    private Object[] wrapScenario(Object[] scenario, Object[] confidentialityRequestStateCombination) {
-        Object[] result = new Object[scenario.length + confidentialityRequestStateCombination.length];
-        for (int i = 0; i < confidentialityRequestStateCombination.length; i++) {
-            result[i] = confidentialityRequestStateCombination[i];
-        }
-        for (int i = 0; i < scenario.length; i++) {
-            result[confidentialityRequestStateCombination.length + i] = scenario[i];
-        }
-        return result;
-    }
-
-    protected Object[][] confidentialityAndWarningRequestStateCombinations() {
-        return new Object[][]{
-            new Object[]{null, null, false, false},
-            new Object[]{null, createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, false},
-            new Object[]{null, createDatedRequestOutcome(RequestOutcome.REFUSED), false, false},
-            new Object[]{null, createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), null, false, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.REFUSED), false, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), null, false, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.REFUSED), false, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), null, false, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), false, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.REFUSED), false, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.GRANTED), false, true},
-            new Object[]{null, null, true, false},
-            new Object[]{null, createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, false},
-            new Object[]{null, createDatedRequestOutcome(RequestOutcome.REFUSED), true, false},
-            new Object[]{null, createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), null, true, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.REFUSED), true, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), null, true, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.REFUSED), true, false},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.REFUSED), createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), null, true, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.IN_PROGRESS), true, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.REFUSED), true, true},
-            new Object[]{createDatedRequestOutcome(RequestOutcome.GRANTED), createDatedRequestOutcome(RequestOutcome.GRANTED), true, true},
-        };
-    }
-
-    @Test
-    @Parameters(method = "generateWrappedFurtherEvidenceActionListScenarios")
-    public void givenACaseWithScannedDocuments_shouldMoveToSscsDocumentsAndDisplayAppropriatesConfidentialityWarning(@Nullable DatedRequestOutcome appellantConfidentialityRequestOutcome,
-        @Nullable DatedRequestOutcome jointPartyConfidentialityRequestOutcome,
-        boolean ignoreWarnings,
-        boolean expectConfidentialityWarning,
-        @Nullable DynamicList furtherEvidenceActionList,
-        @Nullable DynamicList originalSender,
-        @Nullable String evidenceHandle,
-        DocumentType expectedDocumentType) {
-        sscsCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
-        sscsCaseData.setOriginalSender(originalSender);
-        sscsCaseData.setEvidenceHandled(evidenceHandle);
-        sscsCaseData.setConfidentialityRequestOutcomeAppellant(appellantConfidentialityRequestOutcome);
-        sscsCaseData.setConfidentialityRequestOutcomeJointParty(jointPartyConfidentialityRequestOutcome);
-
-        when(callback.isIgnoreWarnings()).thenReturn(ignoreWarnings);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = null;
-        try {
-            response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-            if (ignoreWarnings) {
-                assertEquals(0, response.getWarnings().size());
-            } else {
-                Iterator<String> iterator = response.getWarnings().iterator();
-                if (expectConfidentialityWarning) {
-                    String warning1 = iterator.next();
-                    assertEquals("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.", warning1);
-                }
-                String warning2 = iterator.next();
-                assertEquals("Document type is empty, are you happy to proceed?", warning2);
-            }
-
-        } catch (IllegalStateException e) {
-            assertTrue(furtherEvidenceActionList == null || originalSender == null);
-        }
-        if (null != furtherEvidenceActionList && null != originalSender) {
-            assertHappyPaths(expectedDocumentType, response);
-        }
     }
 
 }
