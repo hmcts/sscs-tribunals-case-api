@@ -37,6 +37,7 @@ import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
 import uk.gov.hmcts.reform.document.domain.Classification;
@@ -142,7 +143,7 @@ public class SyaEndpointsIt {
     public void givenAValidAppeal_createAppealCreatedCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -157,7 +158,7 @@ public class SyaEndpointsIt {
     public void givenAValidAppealWithNoMrnDate_createIncompleteAppealCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -173,7 +174,7 @@ public class SyaEndpointsIt {
     public void givenAValidAppealWithMrnDateMoreThan13MonthsAgo_createNonCompliantAppealCase() throws Exception {
         given(ccdClient.startCaseForCaseworker(any(), anyString())).willReturn(StartEventResponse.builder().build());
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.emptyList());
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.emptyList()).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON)
@@ -189,7 +190,7 @@ public class SyaEndpointsIt {
     public void shouldNotAddDuplicateCaseToCcdAndShouldNotGeneratePdf() throws Exception {
         CaseDetails caseDetails = CaseDetails.builder().id(1L).data(new HashMap<>()).build();
 
-        given(ccdClient.searchForCaseworker(any(), any())).willReturn(Collections.singletonList(caseDetails));
+        given(ccdClient.searchCases(any(), any())).willReturn(SearchResult.builder().cases(Collections.singletonList(caseDetails)).build());
 
         mockMvc.perform(post("/appeals")
             .contentType(MediaType.APPLICATION_JSON))
