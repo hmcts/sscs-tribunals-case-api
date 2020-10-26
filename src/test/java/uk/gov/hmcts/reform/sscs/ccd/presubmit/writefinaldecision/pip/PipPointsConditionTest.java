@@ -236,7 +236,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -287,7 +287,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -343,7 +343,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -399,7 +399,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -456,7 +456,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -521,7 +521,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -580,7 +580,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -631,7 +631,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;
@@ -688,7 +688,7 @@ public class PipPointsConditionTest {
                 int conditionFails = 0;
 
                 for (PipPointsCondition pipPointsCondition : PipPointsCondition.values()) {
-                    if (pipPointsCondition.isApplicable(sscsCaseData)) {
+                    if (pipPointsCondition.isApplicable(decisionNoticeQuestionService, sscsCaseData)) {
                         if (pipPointsCondition.getActivityType() == PipActivityType.DAILY_LIVING) {
                             if (pipPointsCondition.getPointsRequirementCondition().test(dailyLivingPoints)) {
                                 conditionPasses++;

@@ -39,7 +39,7 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         this.validator = validator;
         this.decisionNoticeService = decisionNoticeService;
     }
-
+    
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         return callbackType == CallbackType.MID_EVENT

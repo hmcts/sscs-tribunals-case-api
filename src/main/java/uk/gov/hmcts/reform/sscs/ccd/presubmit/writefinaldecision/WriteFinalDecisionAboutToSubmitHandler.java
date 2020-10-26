@@ -101,7 +101,8 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         }
 
         return Arrays.stream(enumType.getEnumConstants())
-            .filter(pointsCondition -> pointsCondition.isApplicable(sscsCaseData))
+            .filter(pointsCondition -> pointsCondition.isApplicable(
+                decisionNoticeQuestionService, sscsCaseData))
             .map(pointsCondition ->
                 pointsCondition.getOptionalErrorMessage(decisionNoticeQuestionService, sscsCaseData))
             .filter(Optional::isPresent)
