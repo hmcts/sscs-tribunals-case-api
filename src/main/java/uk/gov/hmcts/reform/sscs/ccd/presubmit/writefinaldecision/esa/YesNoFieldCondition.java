@@ -9,9 +9,17 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldConditionB
 
 public class YesNoFieldCondition extends FieldConditionBase<YesNo> {
 
+    boolean displayIsSatisfiedMessage;
+
     public YesNoFieldCondition(String fieldName, Predicate<YesNo> predicate,
-        Function<SscsCaseData, YesNo> fieldExtractor) {
+        Function<SscsCaseData, YesNo> fieldExtractor, boolean displayIsSatisfiedMessage) {
         super(fieldName, predicate, fieldExtractor);
+        this.displayIsSatisfiedMessage = displayIsSatisfiedMessage;
+    }
+
+    public YesNoFieldCondition(String fieldName, Predicate<YesNo> predicate,
+                               Function<SscsCaseData, YesNo> fieldExtractor) {
+        this(fieldName, predicate, fieldExtractor, true);
     }
     
     public Optional<String> getOptionalErrorMessage(SscsCaseData caseData) {
@@ -19,7 +27,7 @@ public class YesNoFieldCondition extends FieldConditionBase<YesNo> {
         YesNo value = fieldExtractor.apply(caseData);
         if (!predicate.test(value)) {
             if (YesNoPredicate.UNSPECIFIED.equals(predicate)) {
-                return Optional.of("an unexpected answer for the " + fieldName + " question");
+                return Optional.of("submitted an unexpected answer for the " + fieldName + " question");
             } else {
                 if (value == null) {
                     return Optional.of("a missing answer for the " + fieldName + " question");
@@ -29,6 +37,23 @@ public class YesNoFieldCondition extends FieldConditionBase<YesNo> {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> getOptionalIsSatisfiedMessage() {
+        if (displayIsSatisfiedMessage) {
+            if (YesNoPredicate.TRUE.equals(predicate)) {
+                return Optional.of("specified that " + fieldName + " applies");
+            } else if (YesNoPredicate.FALSE.equals(predicate)) {
+                return Optional.of("specified that " + fieldName + " does not apply");
+            } else if (YesNoPredicate.UNSPECIFIED.equals(predicate)) {
+                return Optional.of("not provided an answer to the " + fieldName + " question");
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
+        }
     }
 }
 

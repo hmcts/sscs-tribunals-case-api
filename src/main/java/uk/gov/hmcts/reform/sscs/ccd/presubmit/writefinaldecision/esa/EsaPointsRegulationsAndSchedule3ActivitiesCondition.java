@@ -6,6 +6,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesN
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.TRUE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.UNSPECIFIED;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements PointsCondition<EsaPointsRegulationsAndSchedule3ActivitiesCondition> {
 
     LOW_POINTS_REGULATION_29_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        isRegulation29(UNSPECIFIED), Optional.empty(), isRegulation29(SPECIFIED)),
+        isRegulation29(UNSPECIFIED, false), Optional.empty(), isRegulation29(SPECIFIED)),
     LOW_POINTS_REGULATION_29_DOES_NOT_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         isRegulation29(FALSE), Optional.of(AwardType.NO_AWARD), isRegulation35(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
@@ -33,7 +34,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         Arrays.asList(isRegulation29(TRUE), isRegulation35(TRUE)), Optional.of(AwardType.HIGHER_RATE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_UNSPECIFIED(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isRegulation35(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
+        isRegulation35(UNSPECIFIED, false), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isRegulation35(FALSE), Optional.of(AwardType.LOWER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
@@ -60,22 +61,27 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isRegulation29(YesNoPredicate predicate) {
         return new YesNoFieldCondition("Regulation 29", predicate,
-            c -> c.getDoesRegulation29Apply());
+                SscsCaseData::getDoesRegulation29Apply);
+    }
+
+    static YesNoFieldCondition isRegulation29(YesNoPredicate predicate, boolean displaySatisifiedMessageOnError) {
+        return new YesNoFieldCondition("Regulation 29", predicate,
+                SscsCaseData::getDoesRegulation29Apply, displaySatisifiedMessageOnError);
     }
 
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-            c -> c.getDoesRegulation35Apply());
+                SscsCaseData::getDoesRegulation35Apply);
     }
 
-    private static List<String> getActivities(SscsCaseData caseData) {
-        // FIXME Implement once activities supported
-        return null;
+    static YesNoFieldCondition isRegulation35(YesNoPredicate predicate, boolean displaySatisifiedMessageOnError) {
+        return new YesNoFieldCondition("Regulation 35", predicate,
+                SscsCaseData::getDoesRegulation35Apply, displaySatisifiedMessageOnError);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
-        return new StringListFieldCondition("Activities", predicate,
-            c -> getActivities(c));
+        return new StringListFieldCondition("Schedule 3 Activities", predicate,
+                SscsCaseData::getEsaWriteFinalDecisionSchedule3ActivitiesQuestion);
     }
 
     @Override
@@ -101,16 +107,29 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
-        List<String> errorMessages =
-            validationConditions.stream()
-                .filter(c -> !(c instanceof StringListFieldCondition)) // FIXME Remove once activities supported
+
+        List<String> primaryCriteriaSatisfiedMessages =
+            primaryConditions.stream()
+                .map(YesNoFieldCondition::getOptionalIsSatisfiedMessage)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
+        List<String> validationErrorMessages =
+                validationConditions.stream()
                 .map(e -> e.getOptionalErrorMessage(sscsCaseData))
                 .filter(Optional::isPresent)
-                .map(o -> o.get())
+                .map(Optional::get)
                 .collect(Collectors.toList());
-        if (!errorMessages.isEmpty()) {
-            return Optional.of("You have submitted " + StringUtils.getGramaticallyJoinedStrings(errorMessages)
-               + ". The points awarded don't match. Please review your previous selection.");
+
+        List<String> criteriaSatisfiedMessages = new ArrayList<>();
+        criteriaSatisfiedMessages.add(pointsCondition.getIsSatisfiedMessage());
+        criteriaSatisfiedMessages.addAll(primaryCriteriaSatisfiedMessages);
+
+        if (!validationErrorMessages.isEmpty()) {
+            return Optional.of("You have " + StringUtils.getGramaticallyJoinedStrings(criteriaSatisfiedMessages)
+                    + (criteriaSatisfiedMessages.isEmpty() ? "" : ", but have ") + StringUtils.getGramaticallyJoinedStrings(validationErrorMessages)
+               + ". Please review your previous selection.");
         }
         return Optional.empty();
     }

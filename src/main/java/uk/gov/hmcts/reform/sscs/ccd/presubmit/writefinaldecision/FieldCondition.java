@@ -8,4 +8,7 @@ public interface FieldCondition {
     boolean isSatisified(SscsCaseData caseData);
 
     Optional<String> getOptionalErrorMessage(SscsCaseData sscsCaseData);
+
+    Optional<String> getOptionalIsSatisfiedMessage();
+
 }

@@ -81,7 +81,7 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             validateEsaAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
             // reg 29 page should be shown based on a calculation
-            setEsaShowPageFlags(sscsCaseData, preSubmitCallbackResponse);
+            setEsaShowPageFlags(sscsCaseData);
         }
 
         return preSubmitCallbackResponse;
@@ -152,10 +152,10 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         }
     }
 
-    private void setEsaShowPageFlags(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
+    private void setEsaShowPageFlags(SscsCaseData sscsCaseData) {
 
         int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, Arrays.stream(EsaActivityQuestionKey.values())
-                .map(k -> k.getKey()).collect(Collectors.toList()));
+                .map(EsaActivityQuestionKey::getKey).collect(Collectors.toList()));
 
         if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);

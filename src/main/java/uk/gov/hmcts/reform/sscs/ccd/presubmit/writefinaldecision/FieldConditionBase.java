@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -20,6 +19,4 @@ public abstract class FieldConditionBase<F> implements FieldCondition {
     public boolean isSatisified(SscsCaseData caseData) {
         return predicate.test(fieldExtractor.apply(caseData));
     }
-
-    public abstract Optional<String> getOptionalErrorMessage(SscsCaseData sscsCaseData);
 }

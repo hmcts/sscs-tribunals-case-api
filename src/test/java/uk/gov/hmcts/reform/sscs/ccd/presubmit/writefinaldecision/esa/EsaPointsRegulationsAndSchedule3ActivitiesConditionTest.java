@@ -2,6 +2,9 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.mockito.MockitoAnnotations.openMocks;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
@@ -65,7 +68,6 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
 
     private boolean isValidCombinationFromSelectSchedule3ActivitiesOnwards(Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply) {
-
 
         if (schedule3ActivitiesSelected == null) {
             return false;
@@ -132,9 +134,15 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                 isValidCombinationExpected(points, doesRegulation29Apply, schedule3ActivitiesSelected,
                     doesRegulation35Apply);
 
+            List<String> schedule3Activities = null;
+            if (schedule3ActivitiesSelected != null) {
+                schedule3Activities = schedule3ActivitiesSelected.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>();
+            }
+
             SscsCaseData caseData = SscsCaseData.builder()
                 .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
-                .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build();
+                .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply))
+                .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build();
 
             Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData),Mockito.any())).thenReturn(points);
 
@@ -159,8 +167,9 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
                     .getOptionalErrorMessage(questionService, caseData).isEmpty());
             } else {
-                // FIXME Once activities are implemented, assert that we always get
-                // a non-empty error message here
+                Assert.assertTrue("Expected an error for:" + points + ":"  + doesRegulation29Apply
+                        + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+                        .getOptionalErrorMessage(questionService, caseData).isPresent());
             }
 
         }

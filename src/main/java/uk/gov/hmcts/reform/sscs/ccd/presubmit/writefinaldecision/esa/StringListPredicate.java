@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public enum StringListPredicate implements Predicate<List<String>> {
 
-    UNSPECIFIED(v -> v == null),
+    UNSPECIFIED(Objects::isNull),
     EMPTY(v -> v != null && v.isEmpty()),
     NOT_EMPTY(v -> v != null && !v.isEmpty());
 
