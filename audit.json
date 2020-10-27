@@ -144,6 +144,7 @@
   "90022_Application Error Disclosure_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/ccdMidEventAdminRestoreCases_POST" : "ignore",
   "100000_A Server Error response code was returned by the server_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/ccdMidEventAdminRestoreCases_POST" : "ignore",
   "100000_A Client Error response code was returned by the server_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore",
-  "100001_Unexpected Content-Type was returned_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore"
-
+  "100001_Unexpected Content-Type was returned_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/v2/api-docs_GET" : "ignore",
+  "10054_Cookie Without SameSite Attribute_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence_POST" : "ignore",
+  "10054_Cookie Without SameSite Attribute_http://sscs-tribunals-api-staging.service.core-compute-aat.internal/ccdAboutToSubmit_POST" : "ignore"
 }
