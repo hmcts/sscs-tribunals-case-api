@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -83,5 +84,10 @@ public abstract class DecisionNoticeQuestionService {
             }
         }
         return null;
+    }
+
+    public int getTotalPoints(SscsCaseData sscsCaseData, Collection<String> answerKeys) {
+        return answerKeys.stream().map(answerText -> getAnswerForActivityQuestionKey(sscsCaseData,
+            answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
     }
 }
