@@ -280,7 +280,7 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.6'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.5.13-RC-SSCS-7986'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '3.5.16'
     compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.14'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
@@ -289,9 +289,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.14'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.4.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.13'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.5.15'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.19.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.5.15'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.0'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.7'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.19.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
