@@ -4,3 +4,4 @@ java:
   environment:
     CREATE_CCD_ENDPOINT: true
     UC_ENABLED: true
+    URGENT_HEARING_ENABLED: true
