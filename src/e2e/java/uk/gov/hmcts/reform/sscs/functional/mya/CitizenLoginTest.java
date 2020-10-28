@@ -11,7 +11,7 @@ import org.junit.Test;
 
 public class CitizenLoginTest extends BaseFunctionTest {
     @Test
-    public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException {
+    public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
         String userEmail = createRandomEmail();
         idamTestApiRequests.createUser(userEmail);
         CreatedCcdCase ccdCase = createCcdCase(userEmail);

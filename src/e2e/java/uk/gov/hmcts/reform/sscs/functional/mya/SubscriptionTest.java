@@ -12,10 +12,14 @@ public class SubscriptionTest extends BaseFunctionTest {
     private static final String NO = "no";
 
     @Test
-    public void shouldUpdateSubscription() throws IOException {
+    public void shouldUpdateSubscription() throws IOException, InterruptedException {
         String newUserEmail = createRandomEmail();
         CreatedCcdCase ccdCase = createCcdCase(createRandomEmail());
         String appellantTya = ccdCase.getAppellantTya();
+
+        // Give ES time to index
+        Thread.sleep(2000L);
+
         String benefitType = sscsMyaBackendRequests.updateSubscription(appellantTya, newUserEmail);
         assertThat(benefitType, is("{\"benefitType\":\"pip\"}"));
         SscsCaseDetails updatedCase = getCaseDetails(ccdCase.getCaseId());
@@ -26,10 +30,14 @@ public class SubscriptionTest extends BaseFunctionTest {
     }
 
     @Test
-    public void shouldUnsubscribeSubscription() throws IOException {
+    public void shouldUnsubscribeSubscription() throws IOException, InterruptedException {
         String userEmail = createRandomEmail();
         CreatedCcdCase ccdCase = createCcdCase(userEmail);
         String appellantTya = ccdCase.getAppellantTya();
+
+        // Give ES time to index
+        Thread.sleep(2000L);
+
         sscsMyaBackendRequests.unsubscribeSubscription(appellantTya, userEmail);
         SscsCaseDetails updatedCase = getCaseDetails(ccdCase.getCaseId());
         assertThat(updatedCase.getData().getSubscriptions().getAppellantSubscription().getTya(), is(appellantTya));
