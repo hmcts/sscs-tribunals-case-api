@@ -18,7 +18,7 @@ public class DecisionNoticeOutcomeServiceTest {
 
     @Before
     public void setup() {
-        service = new DecisionNoticeOutcomeService();
+        service = new PipDecisionNoticeOutcomeService();
     }
 
     @Test

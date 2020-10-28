@@ -27,8 +27,9 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFinalDecisionAboutToSubmitHandlerTest {
@@ -36,7 +37,9 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToSubmitHandler handler;
 
-    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    private PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
+
+    private DecisionNoticeService decisionNoticeService;
 
     @Mock
     private Callback<SscsCaseData> callback;
@@ -54,8 +57,11 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeOutcomeService, Validation.buildDefaultValidatorFactory().getValidator());
+        pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
+
+        decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService));
+
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, Validation.buildDefaultValidatorFactory().getValidator());
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -65,7 +71,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         SscsDocumentDetails details = SscsDocumentDetails.builder().documentType(DRAFT_DECISION_NOTICE.getValue()).build();
         documentList.add(new SscsDocument(details));
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
-            .appeal(Appeal.builder().build())
+            .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
             .sscsDocument(documentList)
             .writeFinalDecisionTypeOfHearing("")
             .writeFinalDecisionPresentingOfficerAttendedQuestion("")
