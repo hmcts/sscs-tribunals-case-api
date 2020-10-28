@@ -36,6 +36,17 @@
     </suppress>
     <suppress until="2020-11-30">
         <notes><![CDATA[
+         file name: sscs-pdf-email-common-1.4.14.jar
+         Jquery included from SpringCloud. We are on latest release awaiting patch (Hoxton SR8)
+        ]]></notes>
+        <cve>CVE-2015-9251</cve>
+        <cve>CVE-2019-11358</cve>
+        <cve>CVE-2019-11358</cve>
+        <cve>CVE-2020-11022</cve>
+        <cve>CVE-2020-11023</cve>
+    </suppress>
+    <suppress until="2020-11-30">
+        <notes><![CDATA[
          file name: tomcat-embed-core-9.0.39.jar/tomcat-embed-websocket-9.0.39.jar
          Awaiting patch for Tomcat
         ]]></notes>
