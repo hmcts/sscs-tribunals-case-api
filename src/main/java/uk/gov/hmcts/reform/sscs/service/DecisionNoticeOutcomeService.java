@@ -4,12 +4,10 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_IN_FAVOUR_OF_
 import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.DECISION_UPHELD;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
 @Slf4j
-@Service
 public abstract class DecisionNoticeOutcomeService {
 
     private String benefitType;

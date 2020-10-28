@@ -107,8 +107,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
 
-        setPipEntitlements(writeFinalDecisionBuilder, caseData);
-        setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        if ("PIP".equals(benefitType)) {
+            setPipEntitlements(writeFinalDecisionBuilder, caseData);
+            setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        }
 
         writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
         writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());

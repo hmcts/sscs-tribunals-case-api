@@ -24,7 +24,7 @@ public abstract class DecisionNoticeQuestionService {
     private Class<? extends PointsCondition<?>> pointsConditionClass;
 
     protected DecisionNoticeQuestionService(String benefitType, Class<? extends PointsCondition<?>> pointsConditionClass) throws IOException {
-        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/decision-notice-questions.txt",
+        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
         decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
@@ -90,4 +90,6 @@ public abstract class DecisionNoticeQuestionService {
         return answerKeys.stream().map(answerText -> getAnswerForActivityQuestionKey(sscsCaseData,
             answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
     }
+    
+    
 }

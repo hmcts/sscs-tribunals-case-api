@@ -476,6 +476,4 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         assertEquals("You have previously selected a standard rate award for Mobility. The points awarded don't match. Please review your previous selection.", error2);
 
     }
-
-
 }

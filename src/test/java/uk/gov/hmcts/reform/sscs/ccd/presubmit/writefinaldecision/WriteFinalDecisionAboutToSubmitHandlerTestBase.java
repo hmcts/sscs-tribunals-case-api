@@ -8,6 +8,7 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase {
     }
 
     @Before
-    public void setUp()  {
+    public void setUp() throws IOException {
         openMocks(this);
         decisionNoticeService = new DecisionNoticeService(Arrays.asList(decisionNoticeQuestionService), new ArrayList<>());
         previewDocumentService = new PreviewDocumentService();
