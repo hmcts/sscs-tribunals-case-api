@@ -198,8 +198,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independent Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
@@ -920,8 +920,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -13,9 +13,10 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
 
 @RunWith(JUnitParamsRunner.class)
-public class ActivityTypeTest {
+public class PipActivityTypeTest {
 
 
     @Mock
@@ -28,18 +29,18 @@ public class ActivityTypeTest {
 
     @Test
     public void testDailyLivingGetName() {
-        Assert.assertEquals("Daily Living", ActivityType.DAILY_LIVING.getName());
+        Assert.assertEquals("Daily Living", PipActivityType.DAILY_LIVING.getName());
     }
 
     @Test
     public void testMobilityGetName() {
-        Assert.assertEquals("Mobility", ActivityType.MOBILITY.getName());
+        Assert.assertEquals("Mobility", PipActivityType.MOBILITY.getName());
     }
 
     @Test
     public void testDailyLivingAwardTypeExtractor() {
 
-        Function<SscsCaseData, String> awardTypeExtractor = ActivityType.DAILY_LIVING.getAwardTypeExtractor();
+        Function<SscsCaseData, String> awardTypeExtractor = PipActivityType.DAILY_LIVING.getAwardTypeExtractor();
         Assert.assertNotNull(awardTypeExtractor);
 
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingQuestion()).thenReturn("dailyLivingAnswer");
@@ -50,7 +51,7 @@ public class ActivityTypeTest {
     @Test
     public void testMobilityAwardTypeExtractor() {
 
-        Function<SscsCaseData, String> awardTypeExtractor = ActivityType.MOBILITY.getAwardTypeExtractor();
+        Function<SscsCaseData, String> awardTypeExtractor = PipActivityType.MOBILITY.getAwardTypeExtractor();
         Assert.assertNotNull(awardTypeExtractor);
 
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()).thenReturn("mobilityAnswer");
@@ -61,7 +62,7 @@ public class ActivityTypeTest {
     @Test
     public void testDailyLivingAnswersExtractor() {
 
-        Function<SscsCaseData, List<String>> answersExtractor = ActivityType.DAILY_LIVING.getAnswersExtractor();
+        Function<SscsCaseData, List<String>> answersExtractor = PipActivityType.DAILY_LIVING.getAnswersExtractor();
         Assert.assertNotNull(answersExtractor);
 
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionDailyLivingActivitiesQuestion()).thenReturn(Arrays.asList("dailyLivingAnswer1", "dailyLivingAnswer2"));
@@ -72,7 +73,7 @@ public class ActivityTypeTest {
     @Test
     public void testMobilityAnswersExtractor() {
 
-        Function<SscsCaseData, List<String>> answersExtractor = ActivityType.MOBILITY.getAnswersExtractor();
+        Function<SscsCaseData, List<String>> answersExtractor = PipActivityType.MOBILITY.getAnswersExtractor();
         Assert.assertNotNull(answersExtractor);
 
         Mockito.when(sscsCaseData.getPipWriteFinalDecisionMobilityActivitiesQuestion()).thenReturn(Arrays.asList("mobilityAnswer1", "mobilityAnswer2"));
