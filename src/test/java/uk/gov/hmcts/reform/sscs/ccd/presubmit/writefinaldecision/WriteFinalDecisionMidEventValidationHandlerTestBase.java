@@ -35,6 +35,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
 import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
@@ -56,6 +58,12 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Mock
     protected UserDetails userDetails;
 
+    @Mock
+    protected DecisionNoticeService decisionNoticeService;
+
+    @Mock
+    protected DecisionNoticeQuestionService decisionNoticeQuestionService;
+
     protected SscsCaseData sscsCaseData;
 
     protected abstract void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue);
@@ -63,7 +71,9 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new WriteFinalDecisionMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
+        handler = new WriteFinalDecisionMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator(), decisionNoticeService);
+
+        when(decisionNoticeService.getQuestionService(getBenefitType())).thenReturn(decisionNoticeQuestionService);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);

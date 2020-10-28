@@ -21,4 +21,5 @@ public class PipDecisionNoticeQuestionService extends DecisionNoticeQuestionServ
     protected ActivityQuestionLookup getActivityQuestionLookup() {
         return PipActivityQuestion::getByKey;
     }
+
 }
