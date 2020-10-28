@@ -243,7 +243,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private void checkWarningsAndErrors(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, String caseId, boolean ignoreWarnings) {
-        
+
         if (scannedDocument.getValue().getUrl() == null) {
             preSubmitCallbackResponse.addError("No document URL so could not process");
         }
@@ -303,10 +303,11 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 sscsCaseData.getFurtherEvidenceAction().getValue().getCode(), sscsCaseData.getOriginalSender().getValue().getCode(), scannedDocument);
 
         String bundleAddition = null;
-        if (caseState != null && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
-            && (caseState.equals(State.DORMANT_APPEAL_STATE)
-            || caseState.equals(State.RESPONSE_RECEIVED)
-            || caseState.equals(State.READY_TO_LIST))) {
+
+        if (caseState != null
+            && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
+            && isCaseStateAddtitionValid(caseState)) {
+
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
 
             String originalSenderCode = sscsCaseData.getOriginalSender().getValue().getCode();
@@ -329,6 +330,17 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .evidenceIssued("No")
             .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
             .build()).build();
+    }
+
+    private Boolean isCaseStateAddtitionValid(State caseState) {
+        if (caseState.equals(State.DORMANT_APPEAL_STATE)
+                || caseState.equals(State.RESPONSE_RECEIVED)
+                || caseState.equals(State.READY_TO_LIST)
+                || caseState.equals(State.HEARING)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private DocumentType getSubtype(String furtherEvidenceActionItemCode, String originalSenderCode, ScannedDocument scannedDocument) {
