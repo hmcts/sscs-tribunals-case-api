@@ -1,19 +1,20 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.uploadwelshdocument;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.URGENT_HEARING_REQUEST;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.State;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 
@@ -49,6 +50,26 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         SscsCaseDetails sscsCaseDetails = ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
                 nextEvent, "Upload welsh document",
                 "Upload welsh document", idamService.getIdamTokens());
+
+        if (isValidUrgentDocument(callback.getCaseDetails().getCaseData())) {
+            setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
+                    OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
+        }
         return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
+    }
+
+    private boolean isValidUrgentDocument(SscsCaseData caseData) {
+        return (!"Yes".equalsIgnoreCase(caseData.getUrgentCase())
+                && !CollectionUtils.isEmpty(caseData.getSscsDocument())
+                && caseData.getSscsDocument().stream().filter(d -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(d.getValue().getDocumentTranslationStatus())).count() == 0
+                && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0);
+    }
+
+    private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
+            SscsCaseData caseData, Long caseId,
+            FurtherEvidenceActionDynamicListItems interlocType, EventType eventType, String summary) {
+        return ccdService.updateCase(caseData, caseId,
+                eventType.getCcdType(), summary,
+                interlocType.getLabel(), idamService.getIdamTokens());
     }
 }
