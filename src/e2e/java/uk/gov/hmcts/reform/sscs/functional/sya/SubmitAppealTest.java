@@ -181,6 +181,76 @@ public class SubmitAppealTest {
         log.info("Duplicate case " + secondCaseId);
         SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
 
+        log.info("Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
+
+        assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
+        assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
+        log.info(secondCaseSscsCaseDetails.toString());
+
+        // check duplicate returns 409
+        httpRequest = RestAssured.given()
+                .body(body)
+                .header("Content-Type", "application/json");
+
+        response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CONFLICT);
+
+    }
+
+    @Test
+    @Parameters({"ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
+    public void appealShouldCreateDuplicateAndLinkedTesting(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) throws InterruptedException {
+        String body = syaJsonMessageSerializer.getSerializedMessage();
+        String nino = submitHelper.getRandomNino();
+
+        body = submitHelper.setNino(body, nino);
+
+        LocalDate mrnDate = LocalDate.now();
+        body = submitHelper.setLatestMrnDate(body, mrnDate);
+
+        SyaCaseWrapper wrapper = syaJsonMessageSerializer.getDeserializeMessage();
+        wrapper.getAppellant().setNino(nino);
+
+        RegionalProcessingCenter rpc = getRegionalProcessingCenter();
+
+        RequestSpecification httpRequest = RestAssured.given()
+                .body(body)
+                .header("Content-Type", "application/json");
+
+        Response response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CREATED);
+
+        final Long id = getCcdIdFromLocationHeader(response.getHeader("Location"));
+        SscsCaseDetails sscsCaseDetails = submitHelper.findCaseInCcd(id, idamTokens);
+
+        log.info(String.format("Test 2: SYA created with CCD ID %s", id));
+        assertEquals(expectedState, sscsCaseDetails.getState());
+
+        //create a case with different mrn date
+        body = syaJsonMessageSerializer.getSerializedMessage();
+        body = submitHelper.setNino(body, nino);
+
+        mrnDate = LocalDate.now().minusMonths(12);
+        body = submitHelper.setLatestMrnDate(body, mrnDate);
+
+        Thread.sleep(10000L);
+
+        httpRequest = RestAssured.given()
+                .body(body)
+                .header("Content-Type", "application/json");
+
+        response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CREATED);
+
+        final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
+        log.info("Test 2: Duplicate case " + secondCaseId);
+        SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+
+        log.info("Test 2: Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
+
         assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
         assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
         log.info(secondCaseSscsCaseDetails.toString());
