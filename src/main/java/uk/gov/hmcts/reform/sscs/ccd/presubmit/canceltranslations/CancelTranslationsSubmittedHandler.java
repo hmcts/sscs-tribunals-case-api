@@ -66,7 +66,7 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
         return (!"Yes".equalsIgnoreCase(caseData.getUrgentCase())
                 && !CollectionUtils.isEmpty(caseData.getSscsDocument())
                 && caseData.getSscsDocument().stream().filter(d -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(d.getValue().getDocumentTranslationStatus())).count() == 0
-                && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0);
+                && caseData.getSscsDocument().stream().anyMatch(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())));
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
