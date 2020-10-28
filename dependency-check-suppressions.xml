@@ -34,4 +34,11 @@
         <cve>CVE-2016-5394</cve>
         <cve>CVE-2016-6798</cve>
     </suppress>
+    <suppress until="2020-11-30">
+        <notes><![CDATA[
+         file name: tomcat-embed-core-9.0.39.jar/tomcat-embed-websocket-9.0.39.jar
+         Awaiting patch for Tomcat
+        ]]></notes>
+        <cve>CVE-2020-13943</cve>
+    </suppress>
 </suppressions>
