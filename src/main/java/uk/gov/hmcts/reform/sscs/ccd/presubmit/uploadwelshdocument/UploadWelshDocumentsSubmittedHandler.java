@@ -63,7 +63,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
                 && !CollectionUtils.isEmpty(caseData.getSscsDocument())
                 && caseData.getSscsDocument().stream().filter(d -> SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(d.getValue().getDocumentTranslationStatus())).count() == 0
                 && (caseData.getSscsDocument().stream().anyMatch(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))
-                || caseData.getSscsWelshDocuments().stream().anyMatch(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))));
+                || (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && caseData.getSscsWelshDocuments().stream().anyMatch(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())))));
     }
 
     private SscsCaseDetails setMakeCaseUrgentTriggerEvent(
