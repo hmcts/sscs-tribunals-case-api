@@ -35,7 +35,7 @@ public class EsaSchedule3QuestionKeyTest {
         Assert.assertEquals("schedule3MobilisingUnaided", activityQuestion.getKey());
         Assert.assertEquals(EsaActivityType.PHYSICAL_DISABILITIES, activityQuestion.getActivityType());
         Function<SscsCaseData, Boolean> answerExtractor = activityQuestion.getAnswerExtractor();
-        Assert.assertEquals("true", answerExtractor.apply(sscsCaseData));
+        Assert.assertEquals(Boolean.TRUE, answerExtractor.apply(sscsCaseData));
     }
 
     @Test(expected = IllegalArgumentException.class)
