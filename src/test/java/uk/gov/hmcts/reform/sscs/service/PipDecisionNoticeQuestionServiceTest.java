@@ -1,21 +1,18 @@
 package uk.gov.hmcts.reform.sscs.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.Optional;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
 
-public class DecisionNoticeQuestionServiceTest {
+public class PipDecisionNoticeQuestionServiceTest extends DecisionNoticeQuestionServiceTestBase<PipDecisionNoticeQuestionService> {
 
-    private DecisionNoticeQuestionService service;
-
-    @Before
-    public void setup() throws IOException {
-        service = new DecisionNoticeQuestionService();
+    @Override
+    protected PipDecisionNoticeQuestionService createDecisionNoticeQuestionService() throws IOException {
+        return new PipDecisionNoticeQuestionService();
     }
 
     @Test
@@ -27,19 +24,5 @@ public class DecisionNoticeQuestionServiceTest {
         assertEquals("1", answer.get().getActivityAnswerNumber());
         assertEquals("f", answer.get().getActivityAnswerLetter());
         assertEquals("Cannot prepare and cook food.", answer.get().getActivityAnswerValue());
-    }
-
-    @Test
-    public void givenANonMatchedNumber_thenReturnEmptyAnswer() {
-        Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue("random");
-        Assert.assertNotNull(answer);
-        Assert.assertFalse(answer.isPresent());
-    }
-
-    @Test
-    public void givenANullNumber_thenReturnEmptyAnswer() {
-        Optional<ActivityAnswer> answer = service.extractAnswerFromSelectedValue(null);
-        Assert.assertNotNull(answer);
-        Assert.assertFalse(answer.isPresent());
     }
 }

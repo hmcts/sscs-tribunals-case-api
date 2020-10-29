@@ -89,11 +89,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (!callback.isIgnoreWarnings() && (((sscsCaseData.getConfidentialityRequestOutcomeAppellant() != null
-            && RequestOutcome.GRANTED.equals(sscsCaseData.getConfidentialityRequestOutcomeAppellant().getRequestOutcome()))
-            || (sscsCaseData.getConfidentialityRequestOutcomeJointParty() != null
-            && RequestOutcome.GRANTED.equals(sscsCaseData.getConfidentialityRequestOutcomeJointParty().getRequestOutcome())))
-            || equalsIgnoreCase(sscsCaseData.getIsProgressingViaGaps(), "yes"))) {
+
+        if (!callback.isIgnoreWarnings() && YES.equalsIgnoreCase(sscsCaseData.getIsProgressingViaGaps())) {
             preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
         }
 
@@ -139,7 +136,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
     }
 
     private boolean isAppellantOrAppointeeAddressInvalid(SscsCaseData caseData) {
-        if (null != caseData.getAppeal().getAppellant() && "yes".equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
+        if (null != caseData.getAppeal().getAppellant() && YES.equalsIgnoreCase(caseData.getAppeal().getAppellant().getIsAppointee())) {
             return null == caseData.getAppeal().getAppellant().getAppointee()
                 || isAddressInvalid(caseData.getAppeal().getAppellant().getAppointee().getAddress());
         } else {
@@ -152,7 +149,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         Representative rep = caseData.getAppeal().getRep();
 
         return null != rep
-            && "yes".equalsIgnoreCase(rep.getHasRepresentative())
+            && YES.equalsIgnoreCase(rep.getHasRepresentative())
             && isAddressInvalid(rep.getAddress());
     }
 
@@ -272,7 +269,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
 
-            if (!"Yes".equalsIgnoreCase(sscsCaseData.getJointParty())) {
+            if (!YES.equalsIgnoreCase(sscsCaseData.getJointParty())) {
                 preSubmitCallbackResponse.addError("Document type \"Confidentiality Request\" is invalid as there is no joint party on the case");
             }
 

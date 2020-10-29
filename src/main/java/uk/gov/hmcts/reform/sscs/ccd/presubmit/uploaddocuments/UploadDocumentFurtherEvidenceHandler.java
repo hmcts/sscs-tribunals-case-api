@@ -40,7 +40,9 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         if (!canHandle(callbackType, callback)) {
             throw new IllegalStateException("Cannot handle callback");
         }
+
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
         if (!validDraftFurtherEvidenceDocument(caseData.getDraftSscsFurtherEvidenceDocument())) {
             initDraftSscsFurtherEvidenceDocument(caseData);
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
@@ -53,9 +55,12 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
             response.addError("You need to upload PDF documents only");
             return response;
         }
+
         moveDraftsToSscsDocs(caseData);
         initDraftSscsFurtherEvidenceDocument(caseData);
+        caseData.setEvidenceHandled("No");
         caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+
         return new PreSubmitCallbackResponse<>(caseData);
     }
 
