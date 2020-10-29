@@ -30,7 +30,9 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class WriteFinalDecisionPreviewDecisionServiceTest {
@@ -62,8 +64,8 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     private SscsCaseData sscsCaseData;
 
     private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
-    private DecisionNoticeQuestionService decisionNoticeQuestionService;
 
+    private PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
 
     @Before
     public void setUp() throws IOException {
@@ -85,10 +87,14 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         documentConfiguration.setDocuments(documents);
 
-        this.decisionNoticeOutcomeService = new DecisionNoticeOutcomeService();
-        this.decisionNoticeQuestionService = new DecisionNoticeQuestionService();
-        service = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient, decisionNoticeOutcomeService,
-            decisionNoticeQuestionService, documentConfiguration);
+        this.decisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
+        this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+
+        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService),
+            Arrays.asList(decisionNoticeOutcomeService));
+
+        service = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+            decisionNoticeService, documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -102,6 +108,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
             .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
             .appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
                         .lastName("LastNamE")
