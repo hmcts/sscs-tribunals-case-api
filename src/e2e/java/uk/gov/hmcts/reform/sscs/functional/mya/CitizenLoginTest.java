@@ -6,16 +6,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 
 
 public class CitizenLoginTest extends BaseFunctionTest {
-    @Test
-    public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
-        String userEmail = createRandomEmail();
-        idamTestApiRequests.createUser(userEmail);
-        CreatedCcdCase ccdCase = createCcdCase(userEmail);
 
+    CreatedCcdCase ccdCase;
+    String userEmail;
+
+    @Before
+    public void setup() throws IOException {
+        userEmail = createRandomEmail();
+        idamTestApiRequests.createUser(userEmail);
+        ccdCase = createCcdCase(userEmail);
+    }
+
+    @Test
+    public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException {
         String appellantTya = ccdCase.getAppellantTya();
 
         JSONArray onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen(appellantTya, userEmail);
@@ -32,9 +40,6 @@ public class CitizenLoginTest extends BaseFunctionTest {
 
     @Test
     public void checkJointDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException {
-        String userEmail = createRandomEmail();
-        idamTestApiRequests.createUser(userEmail);
-        CreatedCcdCase ccdCase = createCcdCase(userEmail);
 
         String jointPartyTya = ccdCase.getJointPartyTya();
 
@@ -52,9 +57,7 @@ public class CitizenLoginTest extends BaseFunctionTest {
 
     @Test
     public void logUserWithCase_returnsNoContent() throws IOException {
-        String userEmail = createRandomEmail();
-        idamTestApiRequests.createUser(userEmail);
-        CreatedCcdCase ccdCase = createCcdCase(userEmail);
+
         sscsMyaBackendRequests.assignCaseToUser(ccdCase.getAppellantTya(), userEmail, "TN32 6PL");
 
         Long caseId = Long.valueOf(ccdCase.getCaseId());
