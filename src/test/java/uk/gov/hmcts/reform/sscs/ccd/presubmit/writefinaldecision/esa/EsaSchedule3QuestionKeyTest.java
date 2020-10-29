@@ -40,24 +40,24 @@ public class EsaSchedule3QuestionKeyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetByInvalidQuestionKey() {
-        EsaActivityQuestionKey.getByKey("invalidQuestion");
+        EsaSchedule3QuestionKey.getByKey("invalidQuestion");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testGetByNullQuestionKey() {
-        EsaActivityQuestionKey.getByKey(null);
+        EsaSchedule3QuestionKey.getByKey(null);
     }
 
     @Test
     public void testAllActivityQuestionsHaveNonNullAnswerExtractors() {
-        for (EsaActivityQuestionKey activityQuestion : EsaActivityQuestionKey.values()) {
+        for (EsaSchedule3QuestionKey activityQuestion : EsaSchedule3QuestionKey.values()) {
             Assert.assertNotNull(activityQuestion.getAnswerExtractor());
         }
     }
 
     @Test
     public void testAllActivityQuestionsHaveNonNullKeys() {
-        for (EsaActivityQuestionKey activityQuestion : EsaActivityQuestionKey.values()) {
+        for (EsaSchedule3QuestionKey activityQuestion : EsaSchedule3QuestionKey.values()) {
             Assert.assertNotNull(activityQuestion.getKey());
         }
     }
