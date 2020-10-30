@@ -23,11 +23,14 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
-    public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException {
+    public void checkUserDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
         String appellantTya = ccdCase.getAppellantTya();
 
         JSONArray onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen(appellantTya, userEmail);
         assertThat(onlineHearingForTya.length(), is(0));
+
+        // Give ES time to index
+        Thread.sleep(2000L);
 
         JSONObject jsonObject = sscsMyaBackendRequests.assignCaseToUser(appellantTya, userEmail, "TN32 6PL");
         Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
@@ -39,12 +42,15 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
-    public void checkJointDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException {
+    public void checkJointDoesNotHaveCaseAssignCaseAndCheckUserHasCase() throws IOException, InterruptedException {
 
         String jointPartyTya = ccdCase.getJointPartyTya();
 
         JSONArray onlineHearingForTya = sscsMyaBackendRequests.getOnlineHearingForCitizen(jointPartyTya, userEmail);
         assertThat(onlineHearingForTya.length(), is(0));
+
+        // Give ES time to index
+        Thread.sleep(2000L);
 
         JSONObject jsonObject = sscsMyaBackendRequests.assignCaseToUser(jointPartyTya, userEmail, "TN32 6PL");
         Long expectedCaseId = Long.valueOf(ccdCase.getCaseId());
@@ -56,7 +62,10 @@ public class CitizenLoginTest extends BaseFunctionTest {
     }
 
     @Test
-    public void logUserWithCase_returnsNoContent() throws IOException {
+    public void logUserWithCase_returnsNoContent() throws IOException, InterruptedException {
+
+        // Give ES time to index
+        Thread.sleep(2000L);
 
         sscsMyaBackendRequests.assignCaseToUser(ccdCase.getAppellantTya(), userEmail, "TN32 6PL");
 
