@@ -297,5 +297,6 @@
   "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdMidEventPreviewFinalDecision_POST" : "ignore",
   "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/ccdAboutToStart_POST" : "ignore",
   "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/api/continuous-online-hearings/identifier/evidence/evidenceId_DELETE" : "ignore",
-  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/appealNumber/subscriptions/subscriptionId_POST" : "ignore"
+  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/appealNumber/subscriptions/subscriptionId_POST" : "ignore",
+  "10054_Cookie Without SameSite Attribute_http://****-tribunals-api-aat.service.core-compute-aat.internal/ccdAboutToSubmit_POST" : "ignore"
 }
