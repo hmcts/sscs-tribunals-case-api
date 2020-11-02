@@ -89,6 +89,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+
         if (!callback.isIgnoreWarnings() && YES.equalsIgnoreCase(sscsCaseData.getIsProgressingViaGaps())) {
             preSubmitCallbackResponse.addWarning("This case is progressing via GAPS. Please ensure any documents are emailed to the Regional Processing Centre to be attached to the paper file.");
         }
