@@ -8,10 +8,12 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
 
@@ -684,6 +686,28 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("At least one of Mobility or Daily Living must be considered", error);
+    }
+
+    @Test
+    @Parameters({
+            "Yes, Yes, NO",
+            "Yes, No, NO",
+            "No, Yes, YES",
+            "No, No, NO",
+            "null, No, NO",
+            "No, null, NO",
+    })
+    public void givenPipCaseWithDescriptorFlowAndGenerateNoticeFlow_thenSetShowSummaryOfOutcomePage(
+            @Nullable String descriptorFlow, @Nullable String generateNoticeFlow, YesNo expectedShowResult) {
+
+        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(descriptorFlow);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice(generateNoticeFlow);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedShowResult, response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
     }
 
     @Override
