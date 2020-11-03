@@ -1,8 +1,7 @@
 package uk.gov.hmcts.reform.sscs.tya;
 
 import static java.util.Collections.singletonList;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -21,6 +20,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.sscs.ccd.client.CcdClient;
 import uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils;
@@ -45,14 +45,14 @@ public class SubscriptionEndPointsIt {
     IdamService idamService;
 
     CaseDetails caseDetails = CaseDataUtils.buildCaseDetails();
-
+    SearchResult searchResult = SearchResult.builder().cases(singletonList(caseDetails)).build();
 
     @Test
     public void shouldReturnBenefitTypeForSubscriptionUpdate() throws Exception {
 
         String subscriptionRequest = "{\"subscription\":{\"email\":\"email@email.com\"}}";
 
-        when(ccdClient.searchForCaseworker(any(), any())).thenReturn(singletonList(caseDetails));
+        when(ccdClient.searchCases(any(), any())).thenReturn(searchResult);
         when(ccdClient.startEvent(any(), any(), any())).thenReturn(StartEventResponse.builder().build());
         when(ccdClient.submitEventForCaseworker(any(), any(), any())).thenReturn(caseDetails);
 
@@ -66,14 +66,13 @@ public class SubscriptionEndPointsIt {
 
         String result = mvcResult.getResponse().getContentAsString();
 
-        assertThat(result, equalTo(BENEFIT_TYPE_RESPONSE));
-
+        assertEquals(BENEFIT_TYPE_RESPONSE, result);
     }
 
     @Test
     public void shouldReturnBenefitTypeForDeleteSubscription() throws Exception {
 
-        when(ccdClient.searchForCaseworker(any(), any())).thenReturn(singletonList(caseDetails));
+        when(ccdClient.searchCases(any(), any())).thenReturn(searchResult);
         when(ccdClient.startEvent(any(), any(), any())).thenReturn(StartEventResponse.builder().build());
         when(ccdClient.submitEventForCaseworker(any(), any(), any())).thenReturn(caseDetails);
 
@@ -86,7 +85,6 @@ public class SubscriptionEndPointsIt {
 
         String result = mvcResult.getResponse().getContentAsString();
 
-        assertThat(result, equalTo(BENEFIT_TYPE_RESPONSE));
-
+        assertEquals(BENEFIT_TYPE_RESPONSE, result);
     }
 }

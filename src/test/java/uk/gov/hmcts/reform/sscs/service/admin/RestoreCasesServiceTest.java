@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service.admin;
 
+import static org.mockito.ArgumentMatchers.any;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException.UnprocessableEntity;
@@ -8,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,6 +40,8 @@ public class RestoreCasesServiceTest {
     @Mock
     private IdamTokens idamTokens;
 
+    private String date = "2020-08-28";
+
     @Before
     public void setup() {
         restoreCasesService = new RestoreCasesService(ccdService, idamService, new ObjectMapper());
@@ -44,36 +49,12 @@ public class RestoreCasesServiceTest {
     }
 
     @Test
-    public void testRestoreNextBatchOfCasesCreatesExpectedCriteria() {
-        String date = "2020-08-28";
-
-        restoreCasesService.restoreNextBatchOfCases(date);
-
-        ArgumentCaptor<Map<String, String>> captor = ArgumentCaptor.forClass(Map.class);
-        Mockito.verify(ccdService, Mockito.times(1)).findCaseBy(captor.capture(), Mockito.eq(idamTokens));
-
-        Map<String, String> searchCriteria = captor.getValue();
-        Assert.assertEquals(3, searchCriteria.size());
-
-        Assert.assertEquals("responseReceived", searchCriteria.get("state"));
-        Assert.assertEquals("No", searchCriteria.get("case.dwpFurtherInfo"));
-        Assert.assertEquals(date, searchCriteria.get("last_state_modified_date"));
-    }
-
-    @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditions() {
-        String date = "2020-08-28";
-
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
 
@@ -102,18 +83,11 @@ public class RestoreCasesServiceTest {
 
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsWillNotBeAffectedWhenOneHasUnexpectedCaseDataState() {
-        String date = "2020-08-28";
-
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").state(State.DORMANT_APPEAL_STATE).dwpFurtherInfo("No").build()).build());
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
 
@@ -145,12 +119,7 @@ public class RestoreCasesServiceTest {
         String date = "2020-08-28";
 
         final List<SscsCaseDetails> cases = new ArrayList<>();
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
 
@@ -173,23 +142,16 @@ public class RestoreCasesServiceTest {
 
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsAndUpdateCaseThrowsUnprocessableEntityExceptionForOne() {
-        String date = "2020-08-28";
-
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         UnprocessableEntity unprocessableEntity = Mockito.mock(UnprocessableEntity.class);
         Mockito.when(unprocessableEntity.getMessage()).thenReturn("some exception message");
 
-        Mockito.when(ccdService.updateCase(Mockito.any(), Mockito.eq(2L), Mockito.anyString(),
+        Mockito.when(ccdService.updateCase(any(), Mockito.eq(2L), Mockito.anyString(),
             Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(unprocessableEntity);
 
         final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
@@ -219,20 +181,13 @@ public class RestoreCasesServiceTest {
 
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsAndUpdateCaseThrowsRuntimeExceptionForOne() {
-        String date = "2020-08-28";
-
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
-
-        Mockito.when(ccdService.updateCase(Mockito.any(), Mockito.eq(2L), Mockito.anyString(),
+        Mockito.when(ccdService.updateCase(any(), Mockito.eq(2L), Mockito.anyString(),
             Mockito.anyString(), Mockito.anyString(), Mockito.eq(idamTokens))).thenThrow(new RuntimeException("some exception message"));
 
         final RestoreCasesStatus status = restoreCasesService.restoreNextBatchOfCases(date);
@@ -262,18 +217,11 @@ public class RestoreCasesServiceTest {
 
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneIsNonDigital() {
-        String date = "2020-08-28";
-
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("somethingElse").dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         restoreCasesService.restoreNextBatchOfCases(date);
 
@@ -297,18 +245,11 @@ public class RestoreCasesServiceTest {
 
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneHasNoCaseData() {
-        String date = "2020-08-28";
-
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").build());
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         restoreCasesService.restoreNextBatchOfCases(date);
 
@@ -332,18 +273,11 @@ public class RestoreCasesServiceTest {
 
     @Test
     public void testRestoreNextBatchOfCasesWhenAllReturnedCasesMatchExpectedConditionsButOneHasNoCreatedInGapsFrom() {
-        String date = "2020-08-28";
-
         List<SscsCaseDetails> cases = new ArrayList<>();
         cases.add(SscsCaseDetails.builder().id(1L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         restoreCasesService.restoreNextBatchOfCases(date);
 
@@ -379,7 +313,7 @@ public class RestoreCasesServiceTest {
         searchCriteria.put("case.dwpFurtherInfo", "No");
         searchCriteria.put("state", "responseReceived");
 
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         restoreCasesService.restoreNextBatchOfCases(date);
 
@@ -394,12 +328,7 @@ public class RestoreCasesServiceTest {
         cases.add(SscsCaseDetails.builder().id(2L).state("responseReceived").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
         cases.add(SscsCaseDetails.builder().id(3L).state("somethingElse").data(SscsCaseData.builder().createdInGapsFrom("readyToList").dwpFurtherInfo("No").build()).build());
 
-        Map<String, String> searchCriteria = new HashMap<>();
-        searchCriteria.put("last_state_modified_date", date);
-        searchCriteria.put("case.dwpFurtherInfo", "No");
-        searchCriteria.put("state", "responseReceived");
-
-        Mockito.when(ccdService.findCaseBy(Mockito.eq(searchCriteria), Mockito.eq(idamTokens))).thenReturn(cases);
+        Mockito.when(ccdService.findCaseByQuery(any(SearchSourceBuilder.class), Mockito.eq(idamTokens))).thenReturn(cases);
 
         restoreCasesService.restoreNextBatchOfCases(date);
 

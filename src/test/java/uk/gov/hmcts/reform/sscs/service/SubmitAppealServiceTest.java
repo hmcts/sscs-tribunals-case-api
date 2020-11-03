@@ -177,7 +177,7 @@ public class SubmitAppealServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData, userToken);
 
@@ -189,7 +189,7 @@ public class SubmitAppealServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
+        given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
                 SscsCaseDetails.builder().id(12345678L).build()
         ));
 
@@ -207,7 +207,7 @@ public class SubmitAppealServiceTest {
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData, userToken);
 
@@ -222,7 +222,7 @@ public class SubmitAppealServiceTest {
 
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData, userToken);
 
@@ -410,7 +410,7 @@ public class SubmitAppealServiceTest {
 
     @Test(expected = CcdException.class)
     public void givenExceptionWhenSearchingForCaseInCcd_shouldThrowException() {
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
             .willThrow(RuntimeException.class);
 
         submitAppealService.submitAppeal(appealData, userToken);
@@ -418,7 +418,7 @@ public class SubmitAppealServiceTest {
 
     @Test(expected = CcdException.class)
     public void givenCaseDoesNotExistInCcdAndGivenExceptionWhenCreatingCaseInCcd_shouldThrowException() {
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
             .willReturn(null);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
@@ -430,7 +430,7 @@ public class SubmitAppealServiceTest {
     @Test(expected = DuplicateCaseException.class)
     public void givenCaseIsADuplicate_shouldNotResendEmails() {
         SscsCaseDetails duplicateCase = SscsCaseDetails.builder().build();
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(SscsCaseData.class), any(IdamTokens.class)))
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any(IdamTokens.class)))
             .willReturn(duplicateCase);
 
         submitAppealService.submitAppeal(appealData, userToken);
@@ -440,7 +440,7 @@ public class SubmitAppealServiceTest {
 
     @Test(expected = DuplicateCaseException.class)
     public void givenCaseAlreadyExistsInCcd_shouldNotCreateCaseWithAppealDetails() {
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any()))
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any()))
             .willReturn(SscsCaseDetails.builder().build());
 
         submitAppealService.submitAppeal(appealData, userToken);
@@ -454,7 +454,7 @@ public class SubmitAppealServiceTest {
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
 
-        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(any(), any())).willReturn(null);
+        given(ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(anyString(), anyString(), anyString(), any())).willReturn(null);
 
         submitAppealService.submitAppeal(appealData, userToken);
 
@@ -511,7 +511,7 @@ public class SubmitAppealServiceTest {
 
     @Test
     public void getMatchedCases() {
-        given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
+        given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
             SscsCaseDetails.builder().id(12345678L).build()
         ));
         List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
