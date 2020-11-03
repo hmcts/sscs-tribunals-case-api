@@ -17,12 +17,23 @@ public class ResponseEventsAboutToSubmit {
     }
 
     public void setCaseCode(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getBenefitCode() != null && sscsCaseData.getIssueCode() != null) {
+        if (sscsCaseData.getAppeal().getBenefitType() != null && sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("uc")) {
+            setUcCaseCode(sscsCaseData);
+        } else if (sscsCaseData.getBenefitCode() != null && sscsCaseData.getIssueCode() != null) {
             sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
         }
     }
 
     private String buildCaseCode(SscsCaseData sscsCaseData) {
         return sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
+    }
+
+    protected void setUcCaseCode(SscsCaseData sscsCaseData) {
+        boolean multiElementAppeal = null != sscsCaseData.getElementsDisputedList() && sscsCaseData.getElementsDisputedList().size() > 1;
+        String issueCode = multiElementAppeal ? "UM" : "US";
+
+        sscsCaseData.setIssueCode(issueCode);
+        sscsCaseData.setBenefitCode("001");
+        sscsCaseData.setCaseCode("001" + issueCode);
     }
 }
