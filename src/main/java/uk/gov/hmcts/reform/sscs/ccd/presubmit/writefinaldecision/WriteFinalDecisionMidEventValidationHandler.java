@@ -82,6 +82,8 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
             // reg 29 page should be shown based on a calculation
             setEsaShowPageFlags(sscsCaseData);
+
+            setEsaDefaultFields(sscsCaseData);
         }
 
         return preSubmitCallbackResponse;
@@ -161,6 +163,12 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
         } else {
             sscsCaseData.setShowRegulation29Page(YesNo.NO);
+        }
+    }
+
+    private void setEsaDefaultFields(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
     }
 
