@@ -37,7 +37,7 @@ public class SubscriptionTest extends BaseFunctionTest {
         String appealNumber = ccdCase.getCaseId();
 
         // Give ES time to index
-        Thread.sleep(2000L);
+        Thread.sleep(3000L);
 
         sscsMyaBackendRequests.unsubscribeSubscription(appealNumber, appellantTya);
         SscsCaseDetails updatedCase = getCaseDetails(ccdCase.getCaseId());
