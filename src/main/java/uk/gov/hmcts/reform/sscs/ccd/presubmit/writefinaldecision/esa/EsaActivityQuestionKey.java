@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityType;
 /**
  * Enum to encapsulate binding between an activity question key, and the corresponding getter method on SscsCaseData that yields that answer to that question.
  */
-public enum EsaActivityQuestionKey {
+public enum EsaActivityQuestionKey implements EsaQuestionKey<String> {
 
     MOBILISING_UNAIDED("mobilisingUnaided", EsaActivityType.PHYSICAL_DISABILITIES, SscsCaseData::getEsaWriteFinalDecisionMobilisingUnaidedQuestion),
     STANDING_AND_SITTING("standingAndSitting", EsaActivityType.PHYSICAL_DISABILITIES, SscsCaseData::getEsaWriteFinalDecisionStandingAndSittingQuestion),
