@@ -34,11 +34,12 @@ public class SubscriptionTest extends BaseFunctionTest {
         String userEmail = createRandomEmail();
         CreatedCcdCase ccdCase = createCcdCase(userEmail);
         String appellantTya = ccdCase.getAppellantTya();
+        String appealNumber = ccdCase.getCaseId();
 
         // Give ES time to index
         Thread.sleep(2000L);
 
-        sscsMyaBackendRequests.unsubscribeSubscription(appellantTya, userEmail);
+        sscsMyaBackendRequests.unsubscribeSubscription(appealNumber, appellantTya);
         SscsCaseDetails updatedCase = getCaseDetails(ccdCase.getCaseId());
         assertThat(updatedCase.getData().getSubscriptions().getAppellantSubscription().getTya(), is(appellantTya));
         assertThat(updatedCase.getData().getSubscriptions().getAppellantSubscription().getSubscribeEmail(), is(NO));

@@ -155,8 +155,8 @@ public class SscsMyaBackendRequests {
         return EntityUtils.toString(response.getEntity());
     }
 
-    public void unsubscribeSubscription(String appellantTya, String userEmail) throws IOException {
-        HttpResponse response = client.execute(addHeaders(delete(format("%s/appeals/%s/subscriptions/%s", baseUrl, appellantTya, appellantTya))).build());
+    public void unsubscribeSubscription(String appealNumber, String appellantTya) throws IOException {
+        HttpResponse response = client.execute(addHeaders(delete(format("%s/appeals/%s/subscriptions/%s", baseUrl, appealNumber, appellantTya))).build());
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
