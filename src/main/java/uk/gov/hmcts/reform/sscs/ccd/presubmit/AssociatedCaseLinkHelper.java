@@ -46,11 +46,7 @@ public class AssociatedCaseLinkHelper {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        HashMap<String, String> map = new HashMap<String, String>();
-
-        map.put("case.appeal.appellant.identity.nino", nino);
-
-        return ccdService.findCaseBy(map, idamTokens);
+        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {

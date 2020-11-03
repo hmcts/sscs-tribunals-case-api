@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service.admin;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static uk.gov.hmcts.reform.sscs.ccd.service.SscsQueryBuilder.findCaseByResponseReceivedStateAndNoDwpFurtherInfoAndLastModifiedDateQuery;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,12 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
 import feign.FeignException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -122,17 +123,11 @@ public class RestoreCasesService {
     }
     
     private List<SscsCaseDetails> getMatchedCasesForDate(IdamTokens idamTokens, String date) {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("state", REQUIRED_PRE_STATE.getId());
-        map.put("case.dwpFurtherInfo", DWP_FURTHER_INFO_REQUIRED_VALUE);
-        addDateRangeCriteria(map, date);
-        return ccdService.findCaseBy(map, idamTokens);
+        SearchSourceBuilder searchBuilder = findCaseByResponseReceivedStateAndNoDwpFurtherInfoAndLastModifiedDateQuery(date);
+
+        return ccdService.findCaseByQuery(searchBuilder, idamTokens);
     }
 
-    private void addDateRangeCriteria(HashMap<String, String> map, String date) {
-        map.put("last_state_modified_date", date);
-    }
-    
     private boolean validateCasesMatchStateAndDwpFurtherInfoCriteria(List<SscsCaseDetails> cases) {
         return cases.stream().allMatch(this::caseMatchesStateAndFurtherInfoCriteria);
     }

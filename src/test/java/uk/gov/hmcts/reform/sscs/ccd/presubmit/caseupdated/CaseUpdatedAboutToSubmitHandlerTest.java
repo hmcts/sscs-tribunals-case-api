@@ -128,7 +128,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         matchedByNinoCases.add(matchingCase1);
         matchedByNinoCases.add(matchingCase2);
 
-        when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
+        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
         callback.getCaseDetails().getCaseData().setBenefitCode(null);
         callback.getCaseDetails().getCaseData().setIssueCode(null);
         callback.getCaseDetails().getCaseData().setCaseCode("002DD");
