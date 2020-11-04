@@ -28,7 +28,7 @@ public class ResponseEventsAboutToSubmit {
         return sscsCaseData.getBenefitCode() + sscsCaseData.getIssueCode();
     }
 
-    protected void setUcCaseCode(SscsCaseData sscsCaseData) {
+    private void setUcCaseCode(SscsCaseData sscsCaseData) {
         boolean multiElementAppeal = null != sscsCaseData.getElementsDisputedList() && sscsCaseData.getElementsDisputedList().size() > 1;
         String issueCode = multiElementAppeal ? "UM" : "US";
 
