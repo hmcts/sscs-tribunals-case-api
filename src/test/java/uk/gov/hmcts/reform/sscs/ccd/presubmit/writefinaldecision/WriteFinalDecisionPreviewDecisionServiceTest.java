@@ -70,22 +70,38 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        final Map<EventType, String> englishEventTypePipDocs = new HashMap<>();
+        final Map<EventType, String> englishEventTypeEsaDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
         englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
-
+        englishEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
+        englishEventTypeEsaDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642.docx");
 
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        Map<EventType, String> welshEventTypePipDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
         welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
-        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
 
-        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        welshEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
+
+        final Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        final Map<LanguagePreference, Map<EventType, String>> pipDocuments =  new HashMap<>();
+        final Map<LanguagePreference, Map<EventType, String>> esaDocuments =  new HashMap<>();
+
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
         documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+        pipDocuments.put(LanguagePreference.ENGLISH, englishEventTypePipDocs);
+        pipDocuments.put(LanguagePreference.WELSH, welshEventTypePipDocs);
+        esaDocuments.put(LanguagePreference.ENGLISH, englishEventTypeEsaDocs);
 
         documentConfiguration.setDocuments(documents);
+
+        Map<String, Map<LanguagePreference, Map<EventType, String>>> benefitSpecificDocuments = new HashMap<>();
+        benefitSpecificDocuments.put("PIP", pipDocuments);
+        benefitSpecificDocuments.put("ESA", esaDocuments);
+
+        documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
 
         this.decisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
         this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
@@ -243,7 +259,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         boolean setAsideExpectation = true;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -328,7 +344,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             !"same".equalsIgnoreCase(comparission));
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -417,7 +433,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             !"same".equalsIgnoreCase(comparission));
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -492,7 +508,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         boolean setAsideExpectation = appealAllowedExpectation;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, true, false, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -541,7 +557,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         boolean setAsideExpectation = appealAllowedExpectation;
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, false, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            appealAllowedExpectation, setAsideExpectation, true, false, false, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
@@ -603,7 +619,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
             appealAllowedExpectation, setAsideExpectation, false,
-            true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DECISION NOTICE", payload.getNoticeType());
@@ -815,7 +831,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -941,7 +957,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -966,7 +982,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true,  true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,  true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1005,7 +1021,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1095,7 +1111,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1127,7 +1143,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1159,7 +1175,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true,true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true,true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1193,7 +1209,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true,true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
@@ -1218,7 +1234,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     @Test
@@ -1244,7 +1260,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "Appointee Surname", "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     @Test
@@ -1258,7 +1274,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getDateIssued());
     }
@@ -1275,7 +1291,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1290,7 +1306,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1306,7 +1322,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, false, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1322,7 +1338,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-            false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            false, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
@@ -1339,7 +1355,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-                false, true, documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
+                false, true, documentConfiguration.getBenefitSpecificDocuments().get("PIP").get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }

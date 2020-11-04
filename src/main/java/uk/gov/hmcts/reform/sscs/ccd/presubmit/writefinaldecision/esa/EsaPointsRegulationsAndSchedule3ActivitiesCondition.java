@@ -51,6 +51,10 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
         this(pointsCondition, Arrays.asList(primaryCondition), awardType, validationConditions);
     }
 
+    public Optional<AwardType> getAwardType() {
+        return awardType;
+    }
+
     EsaPointsRegulationsAndSchedule3ActivitiesCondition(EsaPointsCondition pointsCondition, List<YesNoFieldCondition> primaryConditions,
         Optional<AwardType> awardType, FieldCondition...validationConditions) {
         this.pointsCondition = pointsCondition;
@@ -103,6 +107,18 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     @Override
     public Function<SscsCaseData, List<String>> getAnswersExtractor() {
         return getAllAnswersExtractor();
+    }
+
+    public static EsaPointsRegulationsAndSchedule3ActivitiesCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+        for (EsaPointsRegulationsAndSchedule3ActivitiesCondition esaPointsAndActivitiesCondition : EsaPointsRegulationsAndSchedule3ActivitiesCondition.values()) {
+
+            if (esaPointsAndActivitiesCondition.isApplicable(questionService, caseData) && esaPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+                return esaPointsAndActivitiesCondition;
+            }
+        }
+        throw new IllegalStateException(
+            "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() + ":" + caseData.getDoesRegulation35Apply());
     }
 
     @Override
