@@ -41,6 +41,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         if (sscsCaseData.getDwpFurtherInfo() == null) {
             preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
         }
+
         setCaseCode(sscsCaseData);
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
@@ -65,10 +66,6 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     sscsCaseData.getDwpResponseDocument().getDocumentLink()));
         }
 
-        if (sscsCaseData.getAppeal().getBenefitType() != null && sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("uc")) {
-            setUcCaseCode(sscsCaseData);
-        }
-
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
 
         return preSubmitCallbackResponse;
@@ -90,14 +87,5 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                                 .documentFilename(documentType + " on " + dateForFile + fileExtension)
                                 .build()
                 ).build());
-    }
-
-    private void setUcCaseCode(SscsCaseData sscsCaseData) {
-        boolean multiElementAppeal = null != sscsCaseData.getElementsDisputedList() && sscsCaseData.getElementsDisputedList().size() > 1;
-        String issueCode = multiElementAppeal ? "UM" : "US";
-
-        sscsCaseData.setIssueCode(issueCode);
-        sscsCaseData.setBenefitCode("001");
-        sscsCaseData.setCaseCode("001" + issueCode);
     }
 }
