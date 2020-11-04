@@ -9,6 +9,8 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import java.util.Arrays;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -28,7 +30,7 @@ public class  EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFi
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
-            Arrays.asList("mobilisingUnaided"));
+                Arrays.asList("mobilisingUnaided"));
 
         // < 15 points - correct for these fields
         sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
@@ -38,7 +40,6 @@ public class  EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFi
     protected void setNoAwardsScenario(SscsCaseData caseData) {
 
     }
-
 
     @Override
     protected void setEmptyActivitiesListScenario(SscsCaseData caseData) {
@@ -72,11 +73,29 @@ public class  EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFi
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals("No", sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    @Parameters({
+            "Yes, NO",
+            "No,YES",
+            "null, NO"
+    })
+    public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
+            @Nullable String wcaFlow, YesNo expectedShowResult) {
+
+        sscsCaseData.setWcaAppeal(wcaFlow);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedShowResult, response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
     }
 }
