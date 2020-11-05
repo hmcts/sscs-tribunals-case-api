@@ -123,8 +123,8 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         pipDocuments.put(LanguagePreference.WELSH, welshEventTypePipDocs);
         esaDocuments.put(LanguagePreference.ENGLISH, englishEventTypeEsaDocs);
         Map<String, Map<LanguagePreference, Map<EventType, String>>> benefitSpecificDocuments = new HashMap<>();
-        benefitSpecificDocuments.put("PIP", pipDocuments);
-        benefitSpecificDocuments.put("ESA", esaDocuments);
+        benefitSpecificDocuments.put("pip", pipDocuments);
+        benefitSpecificDocuments.put("esa", esaDocuments);
 
         documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
     }

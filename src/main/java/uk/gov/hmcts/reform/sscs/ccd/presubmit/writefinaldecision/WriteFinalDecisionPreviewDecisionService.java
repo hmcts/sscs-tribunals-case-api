@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,14 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     private static String getTemplateId(final DocumentConfiguration documentConfiguration, final String benefitType, final LanguagePreference languagePreference) {
-        String templateId = documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(languagePreference).get(EventType.ISSUE_FINAL_DECISION);
+        if (benefitType == null) {
+            throw new IllegalStateException("Benefit type cannot be null");
+        }
+        Map<LanguagePreference, Map<EventType, String>> benefitSpecificDocuments = documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase());
+        if (benefitSpecificDocuments == null) {
+            throw new IllegalStateException("Unable to obtain benefit specific documents for benefit type:" + benefitType.toLowerCase() + " and language:" + languagePreference);
+        }
+        String templateId = benefitSpecificDocuments.get(languagePreference).get(EventType.ISSUE_FINAL_DECISION);
         if (templateId == null) {
             throw new IllegalStateException("Unable to obtain template id for benefit type:" + benefitType + " and language:" + languagePreference);
         }
