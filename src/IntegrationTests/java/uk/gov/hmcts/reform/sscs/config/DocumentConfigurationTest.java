@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
