@@ -188,8 +188,12 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
+            if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+            }
         } else {
             sscsCaseData.setShowRegulation29Page(YesNo.NO);
+            sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
         }
     }
 

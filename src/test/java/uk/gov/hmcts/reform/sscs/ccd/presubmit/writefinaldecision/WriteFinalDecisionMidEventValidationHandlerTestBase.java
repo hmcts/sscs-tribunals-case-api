@@ -275,9 +275,6 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
         setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
         setEmptyActivitiesListScenario(sscsCaseData);
 
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(dailyLiving.getKey());
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(mobility.getKey());
-
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getWarnings().size());
 

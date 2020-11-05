@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
@@ -62,7 +63,11 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         if (benefitSpecificDocuments == null) {
             throw new IllegalStateException("Unable to obtain benefit specific documents for benefit type:" + benefitType.toLowerCase() + " and language:" + languagePreference);
         }
-        String templateId = benefitSpecificDocuments.get(languagePreference).get(EventType.ISSUE_FINAL_DECISION);
+        Map<EventType, String> eventTypeStringMap = benefitSpecificDocuments.get(languagePreference);
+        if (eventTypeStringMap == null) {
+            throw new IllegalStateException("Unable to obtain benefit specific documents for benefit type:" + benefitType.toLowerCase() + " and language:" + languagePreference);
+        }
+        String templateId = eventTypeStringMap.get(EventType.ISSUE_FINAL_DECISION);
         if (templateId == null) {
             throw new IllegalStateException("Unable to obtain template id for benefit type:" + benefitType + " and language:" + languagePreference);
         }
@@ -130,8 +135,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
         }
         if ("ESA".equals(benefitType)) {
-            setEsaEntitlements(writeFinalDecisionBuilder, caseData);
             setEsaDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+            setEsaEntitlements(writeFinalDecisionBuilder, caseData);
         }
 
         writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
@@ -162,9 +167,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
         builder.writeFinalDecisionTemplateBody(payload);
 
-        NoticeIssuedTemplateBody body = builder.build();
+        return builder.build();
 
-        return body;
     }
 
     private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
@@ -313,7 +317,11 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.esaNumberOfPoints(null);
         } else {
             builder.esaSchedule2Descriptors(allDescriptors);
-            builder.esaNumberOfPoints(allDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
+            int numberOfPoints = allDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
+            if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(numberOfPoints)) {
+                caseData.setDoesRegulation29Apply(null);
+            }
+            builder.esaNumberOfPoints(numberOfPoints);
         }
         builder.isSupportGroupOnly(caseData.isSupportGroupOnlyAppeal());
     }
