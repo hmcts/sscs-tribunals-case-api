@@ -54,7 +54,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     private static String getTemplateId(final DocumentConfiguration documentConfiguration, final String benefitType, final LanguagePreference languagePreference) {
-        String templateId = documentConfiguration.getBenefitSpecificDocuments().get(benefitType).get(languagePreference).get(EventType.ISSUE_FINAL_DECISION);
+        String templateId = documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(languagePreference).get(EventType.ISSUE_FINAL_DECISION);
         if (templateId == null) {
             throw new IllegalStateException("Unable to obtain template id for benefit type:" + benefitType + " and language:" + languagePreference);
         }
