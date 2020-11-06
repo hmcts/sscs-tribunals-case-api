@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.commons.compress.utils.Lists;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
