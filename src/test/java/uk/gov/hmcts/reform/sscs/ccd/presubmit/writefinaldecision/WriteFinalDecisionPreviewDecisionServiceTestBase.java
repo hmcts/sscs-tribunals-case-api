@@ -677,7 +677,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
-    public void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore() {
+    public void givenCaseWithMultiplePanelMembers_thenCorrectlySetTheHeldBefore() {
 
         setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -686,6 +686,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
         sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
+        sscsCaseData.setWriteFinalDecisionOtherPanelMemberName("Miss other");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -706,7 +707,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
-        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", body.getHeldBefore());
+        assertEquals("Judge Full Name, Mr Panel Member 1, Ms Panel Member 2 and Miss other", body.getHeldBefore());
     }
 
     @Test
