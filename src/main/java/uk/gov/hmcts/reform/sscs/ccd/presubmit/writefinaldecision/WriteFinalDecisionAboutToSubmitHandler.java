@@ -87,7 +87,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
                 if ("ESA".equals(benefitType) && outcome == null) {
                     throw new IllegalStateException("Unable to determine a validated outcome");
                 }
-
             }
 
             previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getWriteFinalDecisionPreviewDocument());
