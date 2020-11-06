@@ -121,6 +121,19 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
             "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() + ":" + caseData.getDoesRegulation35Apply());
     }
 
+    public static Optional<EsaAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+
+        EsaPointsRegulationsAndSchedule3ActivitiesCondition condition
+            = getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData);
+
+        if (condition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+            return Optional.of(EsaAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
 

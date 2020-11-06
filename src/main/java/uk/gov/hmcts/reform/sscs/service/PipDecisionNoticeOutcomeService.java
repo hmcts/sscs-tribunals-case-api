@@ -42,6 +42,11 @@ public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
         }
     }
 
+    @Override
+    public Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData) {
+        return determineOutcome(sscsCaseData);
+    }
+
     private Outcome determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(SscsCaseData sscsCaseData) {
 
         // Daily living and or/mobility

@@ -22,6 +22,8 @@ public abstract class DecisionNoticeOutcomeService {
 
     public abstract Outcome determineOutcome(SscsCaseData sscsCaseData);
 
+    public abstract Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData);
+
     protected Outcome useExplicitySetOutcome(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
             return null;
@@ -33,4 +35,5 @@ public abstract class DecisionNoticeOutcomeService {
             }
         }
     }
+
 }

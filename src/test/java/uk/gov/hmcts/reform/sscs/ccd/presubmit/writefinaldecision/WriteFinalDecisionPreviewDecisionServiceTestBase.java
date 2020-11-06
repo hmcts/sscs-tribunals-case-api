@@ -144,8 +144,9 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
         this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
 
-        this.esaDecisionNoticeOutcomeService = new EsaDecisionNoticeOutcomeService();
         this.esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
+
+        this.esaDecisionNoticeOutcomeService = new EsaDecisionNoticeOutcomeService(esaDecisionNoticeQuestionService);
 
         DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService, esaDecisionNoticeQuestionService),
             Arrays.asList(pipDecisionNoticeOutcomeService, esaDecisionNoticeOutcomeService));
