@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import org.apache.commons.compress.utils.Lists;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -410,7 +411,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
-        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+        callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_URGENT_HEARING.getCode()));
@@ -420,6 +421,46 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.GRANTED.getValue()));
         assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
         assertNull(response.getData().getInterlocReviewState());
+    }
+
+    @Test
+    public void givenDirectionTypeOfGrantUrgentHearingAndWelshTranslationRequired_ShouldNotSetGrantUrgentHearing() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false, dwpAddressLookupService);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_URGENT_HEARING.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.IN_PROGRESS.getValue()));
+        assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
+    }
+
+    @Test
+    public void givenDirectionTypeOfRefuseUrgentHearingAndWelshTranslationRequired_ShouldNotSetRefuseUrgentHearing() {
+
+        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false, dwpAddressLookupService);
+        callback.getCaseDetails().getCaseData().setLanguagePreferenceWelsh("Yes");
+        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
+        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
+        callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
+        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+
+        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_URGENT_HEARING.getCode()));
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
+        assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.IN_PROGRESS.getValue()));
+        assertEquals(DwpState.LAPSED.getId(), response.getData().getDwpState());
+        assertEquals(InterlocReviewState.WELSH_TRANSLATION.getId(), response.getData().getInterlocReviewState());
     }
 
     @Test
