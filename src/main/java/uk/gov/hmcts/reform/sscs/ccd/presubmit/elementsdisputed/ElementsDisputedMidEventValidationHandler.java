@@ -40,7 +40,8 @@ public class ElementsDisputedMidEventValidationHandler implements PreSubmitCallb
             && Objects.nonNull(callback.getCaseDetails())
             && Objects.nonNull(callback.getCaseDetails().getCaseData())
             && (callback.getEvent() == EventType.DWP_UPLOAD_RESPONSE
-                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED);
+                || callback.getEvent() == EventType.HMCTS_RESPONSE_REVIEWED
+                || callback.getEvent() == EventType.AMEND_ELEMENTS_ISSUES);
     }
 
     @Override

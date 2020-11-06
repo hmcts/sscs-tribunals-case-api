@@ -67,6 +67,8 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
         }
 
+        setShowSummaryOfOutcomePage(sscsCaseData);
+
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
         if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
@@ -77,6 +79,15 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         }
 
         if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "ESA")) {
+
+            // Workaround put in due to the inability in CCD page show conditions to allow a combination of OR with AND statements.
+            // This sets the writeFinalDecisionIsDescriptorFlow to No if we go down the ESA and WCA route so that the Outcome page displays in CCD.
+            // Look at removing this if CCD ever fix this.
+            if (null != sscsCaseData.getWcaAppeal() && sscsCaseData.getWcaAppeal().equals("No")) {
+                sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("No");
+            } else {
+                sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
+            }
 
             validateEsaAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
@@ -104,6 +115,22 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         return sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
             && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
             || "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()));
+    }
+
+    private void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
+        if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "PIP")) {
+            if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() != null && sscsCaseData.getWriteFinalDecisionIsDescriptorFlow().equalsIgnoreCase(YesNo.NO.getValue())
+                    && sscsCaseData.getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
+                sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
+                return;
+            }
+        } else if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "ESA")) {
+            if (sscsCaseData.getWcaAppeal() != null && sscsCaseData.getWcaAppeal().equalsIgnoreCase(YesNo.NO.getValue())) {
+                sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
+                return;
+            }
+        }
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
     }
 
     private void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
