@@ -1,11 +1,11 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.util.function.Predicate;
 
 public enum AllowedOrRefusedPredicate implements Predicate<String> {
 
-    ALLOWED(v -> "allowed".equals(v)),
-    REFUSED(v -> "refused".equals(v));
+    ALLOWED("allowed"::equals),
+    REFUSED("refused"::equals);
 
     Predicate<String> predicate;
 

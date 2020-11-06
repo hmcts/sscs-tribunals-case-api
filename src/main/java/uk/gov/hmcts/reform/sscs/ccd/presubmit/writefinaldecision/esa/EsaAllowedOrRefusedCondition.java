@@ -1,15 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.AllowedOrRefusedPredicate.ALLOWED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.AllowedOrRefusedPredicate.REFUSED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.EMPTY;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.NOT_EMPTY;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.StringListPredicate.EMPTY;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.StringListPredicate.NOT_EMPTY;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.FALSE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.TRUE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.UNSPECIFIED;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,11 +21,22 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListFieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
+/**
+ * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other
+ * attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission),
+ * but not on preview.
+ */
 public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOrRefusedCondition> {
 
     REFUSED_NON_SUPPORT_GROUP_ONLY(

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.FALSE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.SPECIFIED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.TRUE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.UNSPECIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.SPECIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,9 +18,18 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListFieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
+/**
+ * Encapsulates the conditions satisfied by valid journeys through the decision notice flow,
+ * along with additional validation criteria and error message.  To be used as part of validation
+ * before preview.
+ */
 public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements PointsCondition<EsaPointsRegulationsAndSchedule3ActivitiesCondition> {
 
     LOW_POINTS_REGULATION_29_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,

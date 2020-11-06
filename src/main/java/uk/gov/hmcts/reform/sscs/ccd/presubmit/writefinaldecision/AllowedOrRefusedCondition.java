@@ -1,13 +1,14 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.util.Optional;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldConditionBase;
 
 public class AllowedOrRefusedCondition extends FieldConditionBase<String> {
 
-    protected AllowedOrRefusedCondition(AllowedOrRefusedPredicate predicate) {
-        super("Allowed or Refused", predicate, c -> c.getWriteFinalDecisionAllowedOrRefused());
+    public AllowedOrRefusedCondition(AllowedOrRefusedPredicate predicate) {
+        super("Allowed or Refused", predicate, SscsCaseData::getWriteFinalDecisionAllowedOrRefused);
     }
 
     @Override
@@ -25,15 +26,10 @@ public class AllowedOrRefusedCondition extends FieldConditionBase<String> {
 
     @Override
     public Optional<String> getOptionalIsSatisfiedMessage() {
-        boolean displayIsSatisfiedMessage = true;
-        if (displayIsSatisfiedMessage) {
-            if (AllowedOrRefusedPredicate.ALLOWED.equals(predicate)) {
-                return Optional.of("specified that the appeal is allowed");
-            } else if (AllowedOrRefusedPredicate.REFUSED.equals(predicate)) {
-                return Optional.of("specified that the appeal is refused");
-            } else {
-                return Optional.empty();
-            }
+        if (AllowedOrRefusedPredicate.ALLOWED.equals(predicate)) {
+            return Optional.of("specified that the appeal is allowed");
+        } else if (AllowedOrRefusedPredicate.REFUSED.equals(predicate)) {
+            return Optional.of("specified that the appeal is refused");
         } else {
             return Optional.empty();
         }

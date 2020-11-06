@@ -85,6 +85,15 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
         return true;
     }
 
+    /**
+     * Valid allowed/refused combinations described by the following logic after discussion with PO.
+     * If you select allowed, then 15 points or more points awarded. If less than 15 points, then reg 29 needs to apply.
+     * If you select refused less than 15 points awarded & reg 29 doesn’t apply.
+     * There are also appeals when the App is already in the WRAG and appeals because they want to be in the Support Group.
+     * If allowed then at least one schedule 3 activity selected. If no Sch 3 activity then Reg 35 needs to apply.
+     * If refused no sch 3 activity and Reg 35 doesn’t apply.
+     *
+     */
     private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply, boolean allowed, boolean supportGroupOnly) {
         if (allowed && !supportGroupOnly) {
@@ -108,7 +117,6 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                 return true;
             }
         }
-
         return false;
     }
 
