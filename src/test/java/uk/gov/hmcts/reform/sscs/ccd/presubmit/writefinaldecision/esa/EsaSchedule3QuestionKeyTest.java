@@ -21,6 +21,7 @@ public class EsaSchedule3QuestionKeyTest {
 
     @Before
     public void setUp() {
+
         openMocks(this);
     }
 

@@ -32,7 +32,7 @@ public class YesNoFieldCondition extends FieldConditionBase<YesNo> {
                 if (value == null) {
                     return Optional.of("a missing answer for the " + fieldName + " question");
                 } else {
-                    return Optional.of(value + " for the " + fieldName + " question");
+                    return Optional.of("answered " + value + " for the " + fieldName + " question");
                 }
             }
         }
