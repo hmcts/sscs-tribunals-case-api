@@ -54,7 +54,7 @@ public class ElementsDisputedMidEventValidationHandlerTest {
     }
 
     @Test
-    @Parameters({"DWP_UPLOAD_RESPONSE", "HMCTS_RESPONSE_REVIEWED"})
+    @Parameters({"DWP_UPLOAD_RESPONSE", "HMCTS_RESPONSE_REVIEWED", "AMEND_ELEMENTS_ISSUES"})
     public void givenAnElementsDisputedEventType_thenReturnTrue(EventType eventType) {
         when(callback.getEvent()).thenReturn(eventType);
 
