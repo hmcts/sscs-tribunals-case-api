@@ -69,25 +69,19 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         setShowSummaryOfOutcomePage(sscsCaseData);
 
-        validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+        if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "PIP")) {
 
-        if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
-            if (bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData) && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
-                && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
-                sscsCaseData.setWriteFinalDecisionEndDateType("na");
+            validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+
+            if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
+                if (bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData) && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+                        && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
+                    sscsCaseData.setWriteFinalDecisionEndDateType("na");
+                }
             }
         }
 
         if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "ESA")) {
-
-            // Workaround put in due to the inability in CCD page show conditions to allow a combination of OR with AND statements.
-            // This sets the writeFinalDecisionIsDescriptorFlow to No if we go down the ESA and WCA route so that the Outcome page displays in CCD.
-            // Look at removing this if CCD ever fix this.
-            if (null != sscsCaseData.getWcaAppeal() && sscsCaseData.getWcaAppeal().equals("No")) {
-                sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("No");
-            } else {
-                sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
-            }
 
             validateEsaAwardTypes(sscsCaseData, preSubmitCallbackResponse);
 
@@ -188,8 +182,12 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
         if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
+            if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+            }
         } else {
             sscsCaseData.setShowRegulation29Page(YesNo.NO);
+            sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
         }
     }
 
@@ -206,18 +204,17 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             if ((sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
                 || sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
                 && (sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
-                || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())) {
-                preSubmitCallbackResponse.addError("At least one activity must be selected.");
-                if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
-                    if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
-                        && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
-                        if (sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
-                            preSubmitCallbackResponse.addError("End date is not applicable for this decision - please specify 'N/A - No Award'.");
-                        }
-                    } else {
-                        if ("na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
-                            preSubmitCallbackResponse.addError("An end date must be provided or set to Indefinite for this decision.");
-                        }
+                || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())
+                && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())
+                && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
+                if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+                    && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
+                    if (sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                        preSubmitCallbackResponse.addError("End date is not applicable for this decision - please specify 'N/A - No Award'.");
+                    }
+                } else {
+                    if ("na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                        preSubmitCallbackResponse.addError("An end date must be provided or set to Indefinite for this decision.");
                     }
                 }
             }
