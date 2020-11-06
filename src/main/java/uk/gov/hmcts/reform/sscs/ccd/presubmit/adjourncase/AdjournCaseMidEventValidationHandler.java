@@ -54,12 +54,15 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
             if (sscsCaseData.isAdjournCaseDirectionsMadeToParties()) {
                 checkDirectionsDueDateInvalid(sscsCaseData);
             }
-            if (("specificDateAndTime".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateType()))
-                && isNextHearingSpecifiedDateInvalid(sscsCaseData)) {
-                preSubmitCallbackResponse.addError("Specified date cannot be in the past");
-            } else if ("provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod()) && "firstAvailableDateAfter".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateType())
+            if ("provideDate".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateOrPeriod()) && "firstAvailableDateAfter".equalsIgnoreCase(sscsCaseData.getAdjournCaseNextHearingDateType())
                 && isNextHearingFirstAvailableDateAfterDateInvalid(sscsCaseData)) {
                 preSubmitCallbackResponse.addError("'First available date after' date cannot be in the past");
+            }
+
+            if (sscsCaseData.getAdjournCaseTime() != null
+                    && ((sscsCaseData.getAdjournCaseTime().getAdjournCaseNextHearingFirstOnSession() == null || sscsCaseData.getAdjournCaseTime().getAdjournCaseNextHearingFirstOnSession().size() == 0)
+                            && sscsCaseData.getAdjournCaseTime().getAdjournCaseNextHearingSpecificTime() == null)) {
+                preSubmitCallbackResponse.addError("Must select a specific time option");
             }
 
 
@@ -69,15 +72,6 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
         }
 
         return preSubmitCallbackResponse;
-    }
-
-    private boolean isNextHearingSpecifiedDateInvalid(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAdjournCaseNextHearingSpecificDate() != null) {
-            LocalDate now = LocalDate.now();
-            return LocalDate.parse(sscsCaseData.getAdjournCaseNextHearingSpecificDate()).isBefore(now);
-        } else {
-            throw new IllegalStateException("Specified date must be provided");
-        }
     }
 
     private boolean isNextHearingFirstAvailableDateAfterDateInvalid(SscsCaseData sscsCaseData) {

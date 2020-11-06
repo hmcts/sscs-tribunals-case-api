@@ -4,10 +4,15 @@ import lombok.Getter;
 
 @Getter
 public enum DirectionTypeItemList {
+
     APPEAL_TO_PROCEED("appealToProceed", "Appeal to Proceed"),
     PROVIDE_INFORMATION("provideInformation", "Provide information"),
     GRANT_EXTENSION("grantExtension", "Allow time extension"),
-    REFUSE_EXTENSION("refuseExtension", "Refuse time extension");
+    REFUSE_EXTENSION("refuseExtension", "Refuse time extension"),
+    GRANT_REINSTATEMENT("grantReinstatement", "Grant reinstatement"),
+    REFUSE_REINSTATEMENT("refuseReinstatement", "Refuse reinstatement"),
+    GRANT_URGENT_HEARING("grantUrgentHearing", "Grant urgent hearing"),
+    REFUSE_URGENT_HEARING("refuseUrgentHearing", "Refuse urgent hearing");
 
     private String code;
     private String label;

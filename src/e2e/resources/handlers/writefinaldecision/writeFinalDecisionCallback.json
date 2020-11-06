@@ -34,6 +34,8 @@
       "pipWriteFinalDecisionMobilityActivitiesQuestion": [
         "planningAndFollowing"
       ],
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
+      "writeFinalDecisionAllowedOrRefused": "allowed",
       "pipWriteFinalDecisionMobilityQuestion": "standardRate",
       "pipWriteFinalDecisionPlanningAndFollowingQuestion": "planningAndFollowing11d",
       "pipWriteFinalDecisionPreparingFoodQuestion": "preparingFood1f",
@@ -196,8 +198,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independent Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
@@ -918,8 +920,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {

@@ -71,6 +71,7 @@
         }
       },
       "signer": null,
+      "hearingSubtype":null,
       "hearingType": "paper",
       "receivedVia": "Paper"
     },
@@ -170,7 +171,8 @@
         "subscribeEmail": null,
         "subscribeSms": null,
         "reason": null
-      }
+      },
+      "jointPartySubscription": null
     },
     "regionalProcessingCenter": {
       "faxNumber": "0126 434 7983",
@@ -227,7 +229,8 @@
     "evidencePresent": "No",
     "dateSentToDwp": "2019-09-06",
     "hmctsDwpState": "sentToDwp",
-    "dwpState": "feReceived"
+    "dwpState": "feReceived",
+    "evidenceHandled": "No"
   },
   "errors": [],
   "warnings": []

@@ -30,12 +30,16 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "Yes",
       "adjournCaseTypeOfNextHearing" : "video",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateType" : "specificTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
-      "adjournCaseAdditionalDirections" : "something else",
-      "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
+      "adjournCaseTime": {
+        "adjournCaseNextHearingFirstOnSession": [
+          "firstOnSession"
+        ],
+        "adjournCaseNextHearingSpecificTime": "am"
+      },
+      "adjournCaseAdditionalDirections": [{"id":null, "value":"something else"}],
+      "adjournCaseReasons": [{"id":null, "value":"Reasons 1"}],
       "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",
       "dwpTimeExtension": [
       ],
@@ -754,10 +758,12 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "Yes",
       "adjournCaseTypeOfNextHearing" : "video",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateType" : "specificTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
+      "adjournCaseTime" : {
+        "adjournCaseNextHearingFirstOnSession" :  ["firstOnSession"],
+        "adjournCaseNextHearingSpecificTime" : "am"
+      },
       "adjournCaseAnythingElse" : "something else",
       "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
       "adjournCaseDirectionsDueDate" : "DIRECTIONS_DUE_DATE_PLACEHOLDER",

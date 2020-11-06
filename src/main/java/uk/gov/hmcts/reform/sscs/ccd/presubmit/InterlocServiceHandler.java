@@ -1,10 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_JUDGE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.REVIEW_BY_TCW;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -42,8 +38,15 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
     }
 
     protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
-        log.info("Case({}): Setting interloc review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
-        newSscsCaseData.setInterlocReviewState(newValue);
+        if (newSscsCaseData.isLanguagePreferenceWelsh()) {
+            log.info("Case({}): Setting Welsh next review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
+            newSscsCaseData.setWelshInterlocNextReviewState(newValue);
+            newSscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());
+            log.info("Case({}): Set interloc review  field to {}", newSscsCaseData.getCcdCaseId(), newSscsCaseData.getInterlocReviewState());
+        } else {
+            log.info("Case({}): Setting interloc review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
+            newSscsCaseData.setInterlocReviewState(newValue);
+        }
 
         setInterlocReferralDate(newSscsCaseData, eventType);
 

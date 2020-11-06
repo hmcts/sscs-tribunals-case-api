@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -133,10 +132,9 @@ public class SubmitAppealTest {
         assertEquals(expectedState, sscsCaseDetails.getState());
     }
 
-    @Ignore
     @Test
     @Parameters({"ALL_DETAILS_WITH_APPOINTEE_AND_SAME_ADDRESS, validAppeal"})
-    public void appealShouldCreateDuplicateAndLinked(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) {
+    public void appealShouldCreateDuplicateAndLinked(SyaJsonMessageSerializer syaJsonMessageSerializer, String expectedState) throws InterruptedException {
         String body = syaJsonMessageSerializer.getSerializedMessage();
         String nino = submitHelper.getRandomNino();
 
@@ -175,6 +173,9 @@ public class SubmitAppealTest {
             .body(body)
             .header("Content-Type", "application/json");
 
+        // Give ES time to index
+        Thread.sleep(2000L);
+
         response = httpRequest.post("/appeals");
 
         response.then().statusCode(HttpStatus.SC_CREATED);
@@ -183,9 +184,23 @@ public class SubmitAppealTest {
         log.info("Duplicate case " + secondCaseId);
         SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
 
-        assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
-        assertEquals(true, Boolean.valueOf(secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean()));
-        log.info(secondCaseSscsCaseDetails.toString());
-    }
+        log.info("Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
 
+        assertEquals(1, secondCaseSscsCaseDetails.getData().getAssociatedCase().size());
+        assertEquals("Yes", secondCaseSscsCaseDetails.getData().getLinkedCasesBoolean());
+        log.info(secondCaseSscsCaseDetails.toString());
+
+        // check duplicate returns 409
+        httpRequest = RestAssured.given()
+                .body(body)
+                .header("Content-Type", "application/json");
+
+        // Give ES time to index
+        Thread.sleep(2000L);
+
+        response = httpRequest.post("/appeals");
+
+        response.then().statusCode(HttpStatus.SC_CONFLICT);
+
+    }
 }

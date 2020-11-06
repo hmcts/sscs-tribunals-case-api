@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.healthcheck;
 
-import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.util.*;

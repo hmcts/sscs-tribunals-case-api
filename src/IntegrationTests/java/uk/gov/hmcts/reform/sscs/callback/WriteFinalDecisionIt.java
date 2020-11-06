@@ -254,9 +254,23 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     }
 
     @Test
-    public void callToMidEventCallback_willValidateTheData() throws Exception {
+    public void callToMidEventCallback_willValidateTheDatePip() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptor.json", "START_DATE_PLACEHOLDER", "2019-10-10");
+
+        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
+        assertHttpStatus(response, HttpStatus.OK);
+        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
+
+        assertEquals(1, result.getErrors().size());
+        assertEquals("Decision notice end date must be after decision notice start date", result.getErrors().toArray()[0]);
+
+    }
+
+    @Test
+    public void callToMidEventCallback_willValidateTheDateEsa() throws Exception {
+        setup();
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorESA.json", "START_DATE_PLACEHOLDER", "2019-10-10");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
         assertHttpStatus(response, HttpStatus.OK);

@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -10,24 +11,35 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityAnswer;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 
 @Slf4j
-@Service
-public class DecisionNoticeQuestionService {
+public abstract class DecisionNoticeQuestionService {
 
     private JSONArray decisionNoticeJson;
+    private String benefitType;
+    private Class<? extends PointsCondition<?>> pointsConditionClass;
 
-    @Autowired
-    public DecisionNoticeQuestionService() throws IOException {
-        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/decision-notice-questions.txt",
+    protected DecisionNoticeQuestionService(String benefitType, Class<? extends PointsCondition<?>> pointsConditionClass) throws IOException {
+        String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
         decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
+        this.benefitType = benefitType;
+        this.pointsConditionClass = pointsConditionClass;
+    }
+
+    protected abstract ActivityQuestionLookup getActivityQuestionLookup();
+
+    public Class<? extends PointsCondition<?>> getPointsConditionEnumClass() {
+        return pointsConditionClass;
+    }
+
+    public String getBenefitType() {
+        return benefitType;
     }
 
     /**
@@ -40,12 +52,12 @@ public class DecisionNoticeQuestionService {
     public Optional<ActivityAnswer> getAnswerForActivityQuestionKey(SscsCaseData sscsCaseData, String activityQuestionKey) {
 
         Function<SscsCaseData, String> answerExtractor =
-            ActivityQuestion.getByKey(activityQuestionKey).getAnswerExtractor();
+            getActivityQuestionLookup().getByKey(activityQuestionKey).getAnswerExtractor();
         return extractAnswerFromSelectedValue(answerExtractor.apply(sscsCaseData));
     }
 
     public Optional<ActivityAnswer> extractAnswerFromSelectedValue(String selectedValue) {
-        String answerText = findSelectedAnswerInJson(selectedValue);
+        String answerText = findSelectedAnswerOrQuestionInJson(selectedValue);
 
         if (answerText != null) {
             @SuppressWarnings(value = "java:S4784")
@@ -63,7 +75,7 @@ public class DecisionNoticeQuestionService {
         return Optional.empty();
     }
 
-    private String findSelectedAnswerInJson(String selectedValue) {
+    protected String findSelectedAnswerOrQuestionInJson(String selectedValue) {
         for (int i = 0; i < decisionNoticeJson.length(); ++i) {
             JSONObject obj = decisionNoticeJson.getJSONObject(i);
             String id = obj.getString("ListElementCode");
@@ -74,5 +86,10 @@ public class DecisionNoticeQuestionService {
         return null;
     }
 
-
+    public int getTotalPoints(SscsCaseData sscsCaseData, Collection<String> answerKeys) {
+        return answerKeys.stream().map(answerText -> getAnswerForActivityQuestionKey(sscsCaseData,
+            answerText)).filter(Optional::isPresent).map(Optional::get).mapToInt(ActivityAnswer::getActivityAnswerPoints).sum();
+    }
+    
+    
 }

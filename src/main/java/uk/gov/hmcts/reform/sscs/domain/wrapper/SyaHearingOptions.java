@@ -25,8 +25,13 @@ public class SyaHearingOptions {
 
     private String[] datesCantAttend;
 
+    private String hearingType;
+
     @JsonProperty("arrangements")
     private SyaArrangements arrangements;
+
+    @JsonProperty("options")
+    private SyaOptions options;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class SyaHearingOptionsBuilder {

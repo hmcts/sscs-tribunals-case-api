@@ -22,6 +22,8 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -29,24 +31,21 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.util.StringUtils;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Component
 @Slf4j
 public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler {
 
-    private final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
-    private final DecisionNoticeQuestionService decisionNoticeQuestionService;
-
+    private final DecisionNoticeService decisionNoticeService;
 
     @Autowired
-    public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient, DecisionNoticeOutcomeService decisionNoticeOutcomeService,
-        DecisionNoticeQuestionService decisionNoticeQuestionService,  DocumentConfiguration documentConfiguration) {
+    public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+        DecisionNoticeService decisionNoticeService,  DocumentConfiguration documentConfiguration) {
         super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
-        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
-        this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.decisionNoticeService = decisionNoticeService;
     }
 
     private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
@@ -69,8 +68,14 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
         setHearings(writeFinalDecisionBuilder, caseData);
+       
+        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
 
-        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
+        if (benefitType == null) {
+            throw new IllegalStateException("Unable to determine benefit type");
+        }
+
+        Outcome outcome = decisionNoticeService.getOutcomeService(benefitType).determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
@@ -95,13 +100,18 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
 
         writeFinalDecisionBuilder.appellantName(buildName(caseData));
-
+        if ("na".equals(caseData.getWriteFinalDecisionEndDateType())) {
+            caseData.setWriteFinalDecisionEndDateType(null);
+        }
         writeFinalDecisionBuilder.endDate(caseData.getWriteFinalDecisionEndDate());
         writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
 
-        setEntitlements(writeFinalDecisionBuilder, caseData);
-        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        if ("PIP".equals(benefitType)) {
+            setPipEntitlements(writeFinalDecisionBuilder, caseData);
+            setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        }
+
         writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
         writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
 
@@ -162,7 +172,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
-    private void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+    private void setPipEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
         String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
         String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
@@ -204,11 +214,11 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
-    protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-        List<String> dailyLivingAnswers = ActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
+    protected void setPipDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+        List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
         if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
 
-            List<Descriptor> dailyLivingDescriptors = getDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
+            List<Descriptor> dailyLivingDescriptors = getPipDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
 
             builder.dailyLivingNumberOfPoints(dailyLivingDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
 
@@ -218,9 +228,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.dailyLivingNumberOfPoints(null);
         }
 
-        List<String> mobilityAnswers = ActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
+        List<String> mobilityAnswers = PipActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
         if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
-            List<Descriptor> mobilityDescriptors = getDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
+            List<Descriptor> mobilityDescriptors = getPipDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
 
             builder.mobilityDescriptors(mobilityDescriptors);
 
@@ -231,13 +241,20 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
-    protected List<Descriptor> getDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+    protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+        return getDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
+    }
+
+    protected List<Descriptor> getDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
+
+        DecisionNoticeQuestionService decisionNoticeQuestionService = decisionNoticeService.getQuestionService(benefitType);
+
         List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,
                 decisionNoticeQuestionService.getAnswerForActivityQuestionKey(caseData,
                     questionKey))).filter(pair -> pair.getRight().isPresent()).map(pair ->
                 new ImmutablePair<>(pair.getLeft(), pair.getRight().get())).map(pair ->
-                buildDescriptorFromActivityAnswer(ActivityQuestion.getByKey(pair.getLeft()),
+                buildDescriptorFromActivityAnswer(activityQuestionlookup.getByKey(pair.getLeft()),
                     pair.getRight())).collect(Collectors.toList());
 
         descriptors.sort(new DescriptorLexicographicalComparator());

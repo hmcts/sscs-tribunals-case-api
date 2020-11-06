@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX;
 import static uk.gov.hmcts.reform.sscs.model.AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,19 +19,23 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
 @Service
+@Slf4j
 public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
+    private String bundleWelshConfig;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
     public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                           @Value("${bundle.url}") String bundleUrl) {
+                                           @Value("${bundle.url}") String bundleUrl,
+                                           @Value("${bundle.welsh.config}") String bundleWelshConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
+        this.bundleWelshConfig = bundleWelshConfig;
     }
 
     @Override
@@ -39,7 +44,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.CREATE_BUNDLE;
+            && callback.getEvent() == EventType.CREATE_BUNDLE;
     }
 
     @Override
@@ -53,7 +58,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
 
         if (checkMandatoryFilesMissing(sscsCaseData)) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(
-                    callback.getCaseDetails().getCaseData());
+                callback.getCaseDetails().getCaseData());
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
         } else {
@@ -65,7 +70,6 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
             if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
                 sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
             }
-
             if (sscsCaseData.getSscsDocument() != null) {
                 for (SscsDocument sscsDocument : sscsCaseData.getSscsDocument()) {
                     if (sscsDocument.getValue() != null && sscsDocument.getValue().getDocumentFileName() == null) {
@@ -73,14 +77,18 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                     }
                 }
             }
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                sscsCaseData.setBundleConfiguration(bundleWelshConfig);
+                log.info("Setting the bundleConfiguration on the case: " + bundleWelshConfig);
+            }
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
         }
     }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
         return sscsCaseData.getDwpResponseDocument() == null
-                || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument() == null
-                || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
+            || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
+            || sscsCaseData.getDwpEvidenceBundleDocument() == null
+            || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
     }
 }

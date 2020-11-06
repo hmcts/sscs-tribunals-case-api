@@ -1,10 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
+import java.util.ArrayList;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -15,6 +17,10 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -27,15 +33,24 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private CcdService ccdService;
+    @Mock
+    private IdamService idamService;
+
     private SscsCaseData sscsCaseData;
 
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
+    private AssociatedCaseLinkHelper associatedCaseLinkHelper;
+
     @Before
     public void setUp() {
-        initMocks(this);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService);
+        openMocks(this);
+        associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -45,6 +60,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
                 .issueCode("DD")
                 .build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
     @Test
@@ -103,6 +119,34 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
     }
 
+    @Test
+    public void givenMultipleAssociatedCases_thenAddAllAssociatedCaseLinksToCase() {
+        Appellant appellant = Appellant.builder().identity(Identity.builder().nino("AB223344B").build()).build();
+        SscsCaseDetails matchingCase1 = SscsCaseDetails.builder().id(12345678L).data(SscsCaseData.builder().ccdCaseId("12345678").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        SscsCaseDetails matchingCase2 = SscsCaseDetails.builder().id(56765676L).data(SscsCaseData.builder().ccdCaseId("56765676").appeal(Appeal.builder().appellant(appellant).build()).build()).build();
+        List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
+        matchedByNinoCases.add(matchingCase1);
+        matchedByNinoCases.add(matchingCase2);
+
+        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
+        callback.getCaseDetails().getCaseData().setBenefitCode(null);
+        callback.getCaseDetails().getCaseData().setIssueCode(null);
+        callback.getCaseDetails().getCaseData().setCaseCode("002DD");
+        callback.getCaseDetails().getCaseData().getAppeal().setAppellant(appellant);
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(2, response.getData().getAssociatedCase().size());
+        assertEquals("Yes", response.getData().getLinkedCasesBoolean());
+        assertEquals("56765676", response.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+        assertEquals("12345678", response.getData().getAssociatedCase().get(1).getValue().getCaseReference());
+
+        assertEquals("Yes", matchingCase1.getData().getLinkedCasesBoolean());
+        assertEquals("ccdId", matchingCase1.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+
+        assertEquals("Yes", matchingCase2.getData().getLinkedCasesBoolean());
+        assertEquals("ccdId", matchingCase2.getData().getAssociatedCase().get(0).getValue().getCaseReference());
+    }
+  
     @Test
     @Parameters({"Birmingham,Glasgow,Yes", "Glasgow,Birmingham,No"})
     public void givenChangeInRpcChangeIsScottish(String oldRpcName, String newRpcName, String expected) {

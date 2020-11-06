@@ -31,12 +31,13 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateType" : "specificTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
-      "adjournCaseAdditionalDirections" : "something else",
-      "adjournCaseReasons": [{"id":null,"value":"Reasons 1"}],
+      "adjournCaseTime": {
+        "adjournCaseNextHearingSpecificTime": "am"
+      },
+      "adjournCaseAdditionalDirections": [{"id":null, "value":"something else"}],
+      "adjournCaseReasons": [{"id":null, "value":"Reasons 1"}],
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -755,10 +756,11 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificDateAndTime",
+      "adjournCaseNextHearingDateType" : "specificTime",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
-      "adjournCaseNextHearingSpecificDate" : "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER",
-      "adjournCaseNextHearingSpecificTime" : "am",
+      "adjournCaseTime" : {
+        "adjournCaseNextHearingSpecificTime" : "am"
+      },
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
