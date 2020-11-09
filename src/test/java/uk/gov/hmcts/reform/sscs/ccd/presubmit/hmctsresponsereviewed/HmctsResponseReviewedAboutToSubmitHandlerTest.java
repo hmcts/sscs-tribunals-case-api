@@ -7,6 +7,8 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -109,6 +111,35 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("Issue code cannot be set to the default value of DD", error);
         }
+    }
+
+    @Test
+    public void givenAUcCaseWithSingleElementSelected_thenSetCaseCodeToUs() {
+        List<String> elementList = new ArrayList<>();
+        elementList.add("testElement");
+        sscsCaseData.setElementsDisputedList(elementList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("US", response.getData().getIssueCode());
+        assertEquals("001", response.getData().getBenefitCode());
+        assertEquals("001US", response.getData().getCaseCode());
+    }
+
+    @Test
+    public void givenAUcCaseWithMultipleElementSelected_thenSetCaseCodeToUm() {
+        List<String> elementList = new ArrayList<>();
+        elementList.add("testElement");
+        elementList.add("testElement2");
+        sscsCaseData.setElementsDisputedList(elementList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("UM", response.getData().getIssueCode());
+        assertEquals("001", response.getData().getBenefitCode());
+        assertEquals("001UM", response.getData().getCaseCode());
     }
 
     @Test(expected = IllegalStateException.class)

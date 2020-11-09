@@ -1,19 +1,20 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.postpone;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.amendelementsissues;
 
 import static java.util.Objects.requireNonNull;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 
 @Service
-public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+@Slf4j
+public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAboutToSubmit implements PreSubmitCallbackHandler<SscsCaseData> {
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -21,16 +22,23 @@ public class PostponeHearingHandler implements PreSubmitCallbackHandler<SscsCase
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-                && callback.getEvent() == EventType.POSTPONED;
+                && callback.getEvent() == EventType.AMEND_ELEMENTS_ISSUES;
     }
 
     @Override
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
-        final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
-        final SscsCaseData sscsCaseData = caseDetails.getCaseData();
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
 
-        sscsCaseData.setDwpState(DwpState.HEARING_POSTPONED.getId());
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
 
-        return new PreSubmitCallbackResponse<>(sscsCaseData);
+        log.info("Setting case code for case id {}", callback.getCaseDetails().getId());
+
+        setCaseCode(caseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
+
+        return sscsCaseDataPreSubmitCallbackResponse;
     }
 }

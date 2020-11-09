@@ -28,11 +28,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
 
-public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase {
+public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase<T extends DecisionNoticeQuestionService> {
 
     protected static final String USER_AUTHORISATION = "Bearer token";
     protected WriteFinalDecisionAboutToSubmitHandler handler;
@@ -43,19 +44,23 @@ public abstract class WriteFinalDecisionAboutToSubmitHandlerTestBase {
     @Mock
     protected CaseDetails<SscsCaseData> caseDetails;
 
-    protected DecisionNoticeQuestionService decisionNoticeQuestionService;
+    protected T decisionNoticeQuestionService;
+    protected DecisionNoticeOutcomeService decisionNoticeOutcomeService;
     protected DecisionNoticeService decisionNoticeService;
     protected PreviewDocumentService previewDocumentService;
     protected SscsCaseData sscsCaseData;
 
-    public WriteFinalDecisionAboutToSubmitHandlerTestBase(DecisionNoticeQuestionService decisionNoticeQuestionService) {
+    protected abstract DecisionNoticeOutcomeService createOutcomeService(T decisionNoticeQuestionService);
+
+    public WriteFinalDecisionAboutToSubmitHandlerTestBase(T decisionNoticeQuestionService) {
         this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.decisionNoticeOutcomeService = createOutcomeService(decisionNoticeQuestionService);
     }
 
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        decisionNoticeService = new DecisionNoticeService(Arrays.asList(decisionNoticeQuestionService), new ArrayList<>());
+        decisionNoticeService = new DecisionNoticeService(Arrays.asList(decisionNoticeQuestionService), Arrays.asList(createOutcomeService(decisionNoticeQuestionService)));
         previewDocumentService = new PreviewDocumentService();
         handler = new WriteFinalDecisionAboutToSubmitHandler(decisionNoticeService, previewDocumentService);
 
