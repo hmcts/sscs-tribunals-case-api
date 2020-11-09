@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.service;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -21,21 +22,21 @@ public abstract class DecisionNoticeQuestionService {
 
     private JSONArray decisionNoticeJson;
     private String benefitType;
-    private Class<? extends PointsCondition<?>> pointsConditionClass;
+    private List<Class<? extends PointsCondition<?>>> pointsConditionClasses;
 
-    protected DecisionNoticeQuestionService(String benefitType, Class<? extends PointsCondition<?>> pointsConditionClass) throws IOException {
+    protected DecisionNoticeQuestionService(String benefitType, List<Class<? extends PointsCondition<?>>> pointsConditionClasses) throws IOException {
         String decisionNoticeQuestions = IOUtils.resourceToString("reference-data/" + benefitType.toLowerCase() + "-decision-notice-questions.txt",
             StandardCharsets.UTF_8, Thread.currentThread().getContextClassLoader());
 
         decisionNoticeJson = new JSONArray("[" + decisionNoticeQuestions + "]");
         this.benefitType = benefitType;
-        this.pointsConditionClass = pointsConditionClass;
+        this.pointsConditionClasses = pointsConditionClasses;
     }
 
     protected abstract ActivityQuestionLookup getActivityQuestionLookup();
 
-    public Class<? extends PointsCondition<?>> getPointsConditionEnumClass() {
-        return pointsConditionClass;
+    public List<Class<? extends PointsCondition<?>>> getPointsConditionEnumClasses() {
+        return pointsConditionClasses;
     }
 
     public String getBenefitType() {

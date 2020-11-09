@@ -9,15 +9,18 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import java.util.Arrays;
 import java.util.Collections;
 import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerTestBase;
 
 @RunWith(JUnitParamsRunner.class)
-public class  EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFinalDecisionMidEventValidationHandlerTestBase {
+public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     @Override
     protected String getBenefitType() {
@@ -28,7 +31,7 @@ public class  EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFi
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
-            Arrays.asList("mobilisingUnaided"));
+                Arrays.asList("mobilisingUnaided"));
 
         // < 15 points - correct for these fields
         sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
@@ -38,7 +41,6 @@ public class  EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFi
     protected void setNoAwardsScenario(SscsCaseData caseData) {
 
     }
-
 
     @Override
     protected void setEmptyActivitiesListScenario(SscsCaseData caseData) {
@@ -72,11 +74,91 @@ public class  EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFi
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        
+
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
         assertEquals("No", sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
     }
+
+    @Test
+    @Parameters({
+            "Yes, NO",
+            "No,YES",
+            "null, NO"
+    })
+    public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
+            @Nullable String wcaFlow, YesNo expectedShowResult) {
+
+        sscsCaseData.setWcaAppeal(wcaFlow);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedShowResult, response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
+    }
+
+    @Test
+    @Parameters({"STANDARD_RATE, STANDARD_RATE",})
+    @Override
+    public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setNoAwardsScenario(sscsCaseData);
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsSetEndDate() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setNoAwardsScenario(sscsCaseData);
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+
+        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+
+    }
+
+    @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+
+        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+
+    }
+
 }

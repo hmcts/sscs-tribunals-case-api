@@ -13,6 +13,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.PreviewDocumentService;
@@ -67,8 +68,27 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
             DecisionNoticeQuestionService questionService = decisionNoticeService.getQuestionService(benefitType);
 
-            getDecisionNoticePointsValidationErrorMessages(questionService.getPointsConditionEnumClass(), questionService, sscsCaseData)
-                .forEach(preSubmitCallbackResponse::addError);
+            List<String> validationErrorMessages = new ArrayList<>();
+            for (Class<? extends PointsCondition<?>> pointsConditionEnumClass : questionService.getPointsConditionEnumClasses()) {
+                if (validationErrorMessages.isEmpty()) {
+                    getDecisionNoticePointsValidationErrorMessages(pointsConditionEnumClass, questionService, sscsCaseData)
+                        .forEach(validationErrorMessages::add);
+                }
+            }
+
+            validationErrorMessages.stream().forEach(preSubmitCallbackResponse::addError);
+
+            if (validationErrorMessages.isEmpty()) {
+
+                DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
+
+                // Validate that we can determine an outcome
+                Outcome outcome = outcomeService.determineOutcomeWithValidation(preSubmitCallbackResponse.getData());
+                if ("ESA".equals(benefitType) && outcome == null) {
+                    throw new IllegalStateException("Unable to determine a validated outcome");
+                }
+
+            }
 
             previewDocumentService.writePreviewDocumentToSscsDocument(sscsCaseData, DRAFT_DECISION_NOTICE, sscsCaseData.getWriteFinalDecisionPreviewDocument());
         }
