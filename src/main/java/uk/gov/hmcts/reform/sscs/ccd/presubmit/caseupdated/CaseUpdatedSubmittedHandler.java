@@ -1,0 +1,85 @@
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
+
+import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
+
+import com.microsoft.applicationinsights.boot.dependencies.apachecommons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
+import uk.gov.hmcts.reform.sscs.idam.IdamService;
+
+
+@Service
+@Slf4j
+public class CaseUpdatedSubmittedHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+    private CcdService ccdService;
+    private IdamService idamService;
+
+    @Autowired
+    public CaseUpdatedSubmittedHandler(CcdService ccdService, IdamService idamService) {
+        this.ccdService = ccdService;
+        this.idamService = idamService;
+    }
+
+    @Override
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        requireNonNull(callback, "callback must not be null");
+        requireNonNull(callbackType, "callbackType must not be null");
+
+        CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
+
+        return callbackType.equals(CallbackType.SUBMITTED)
+                && callback.getEvent() == EventType.CASE_UPDATED
+                && READY_TO_LIST.getId().equals(callback.getCaseDetails().getCaseData().getCreatedInGapsFrom());
+    }
+
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        if (!canHandle(callbackType, callback)) {
+            log.info("Cannot handle this event");
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
+        if (callback.getCaseDetails().getCaseData().getAppeal() == null
+                || callback.getCaseDetails().getCaseData().getAppeal().getBenefitType() == null) {
+            log.info("Cannot handle this event as no data");
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+
+        BenefitType benefitType = caseData.getAppeal().getBenefitType();
+        log.info("Benefit type {} for case id {} ", benefitType, callback.getCaseDetails().getId());
+
+        if (StringUtils.equalsIgnoreCase(benefitType.getCode(), "uc") && isANewJointParty(callback, caseData)) {
+            SscsCaseDetails sscsCaseDetails = ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                    EventType.JOINT_PARTY_ADDED.getCcdType(), "Joint party added",
+                    "", idamService.getIdamTokens());
+            log.info("jointPartyAdded event updated");
+            return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
+        }
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
+    }
+
+    protected static boolean isANewJointParty(Callback<SscsCaseData> callback, SscsCaseData caseData) {
+        boolean wasNotAlreadyJointParty = false;
+        CaseDetails oldCaseDetails = callback.getCaseDetailsBefore().orElse(null);
+        if (oldCaseDetails != null) {
+            SscsCaseData oldCaseData = (SscsCaseData) oldCaseDetails.getCaseData();
+            if (oldCaseData.getJointParty() == null || StringUtils.equalsIgnoreCase(oldCaseData.getJointParty(),"No")) {
+                wasNotAlreadyJointParty = true;
+            }
+        } else {
+            wasNotAlreadyJointParty = true;
+        }
+        return wasNotAlreadyJointParty && caseData.getJointParty() != null && StringUtils.equalsIgnoreCase("Yes", caseData.getJointParty());
+    }
+}
