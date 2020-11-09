@@ -37,6 +37,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
@@ -77,6 +78,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     @Override
     protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
+
+        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
+
+        if (benefitType == null) {
+            throw new IllegalStateException("Unable to determine benefit type");
+        }
+
+        DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
+
+        outcomeService.performPreOutcomeIntegrityAdjustments(caseData);
+
         NoticeIssuedTemplateBody formPayload = super
             .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
@@ -91,14 +103,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
         setHearings(writeFinalDecisionBuilder, caseData);
-       
-        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
 
-        if (benefitType == null) {
-            throw new IllegalStateException("Unable to determine benefit type");
-        }
-
-        Outcome outcome = decisionNoticeService.getOutcomeService(benefitType).determineOutcome(caseData);
+        Outcome outcome = outcomeService.determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
@@ -386,6 +392,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
         if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
             names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionOtherPanelMemberName())) {
+            names.add(caseData.getWriteFinalDecisionOtherPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
