@@ -81,19 +81,22 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isAllowedOrRefused(ALLOWED),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
-        isSchedule3(NOT_EMPTY)),
+        isSchedule3(NOT_EMPTY),
+        isRegulation29(TRUE.or(UNSPECIFIED))),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(EMPTY),
+        isRegulation29(TRUE.or(UNSPECIFIED)),
         isRegulation35(YesNoPredicate.TRUE)),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(StringListPredicate.UNSPECIFIED),
-        isRegulation35(TRUE));
+        isRegulation29(TRUE.or(UNSPECIFIED)),
+    isRegulation35(TRUE));
 
     Optional<EsaPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule3ActivitiesSelected;
