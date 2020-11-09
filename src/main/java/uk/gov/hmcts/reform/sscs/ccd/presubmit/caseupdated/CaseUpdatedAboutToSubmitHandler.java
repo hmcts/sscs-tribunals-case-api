@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,6 +71,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
+        checkAddresses(sscsCaseData, preSubmitCallbackResponse);
+
         return preSubmitCallbackResponse;
     }
 
@@ -78,5 +81,42 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             String isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
             caseData.setIsScottishCase(isScottishCase);
         }
+    }
+
+    private void checkAddresses(SscsCaseData sscsCaseData, PreSubmitCallbackResponse response) {
+
+        Appeal appeal = sscsCaseData.getAppeal();
+
+        if (appeal.getAppellant() != null && appeal.getAppellant().getAddress() != null
+                && checkSingleAddress(appeal.getAppellant().getAddress())) {
+            addAddressError(response);
+        }
+        if (appeal.getRep() != null && appeal.getRep().getAddress() != null && checkSingleAddress(appeal.getRep().getAddress())) {
+            addAddressError(response);
+        }
+        if (appeal.getAppellant().getAppointee() != null && appeal.getAppellant().getAppointee().getAddress() != null
+                && checkSingleAddress(appeal.getAppellant().getAppointee().getAddress())) {
+            addAddressError(response);
+        }
+        if (sscsCaseData.getJointPartyAddress() != null && checkSingleAddress(sscsCaseData.getJointPartyAddress())) {
+            addAddressError(response);
+        }
+    }
+
+    private boolean checkSingleAddress(Address address) {
+        Pattern p = Pattern.compile("^[a-zA-ZÀ-ž0-9]{1}[a-zA-ZÀ-ž0-9 \\r\\n.“”\",’?![\\]()/£:\\\\_+\\-%&;]]{1,}$");
+        if (address.getLine1() != null && !p.matcher(address.getLine1()).find()) {
+            return true;
+        } else if (address.getLine2() != null && !p.matcher(address.getLine2()).find()) {
+            return true;
+        } else if (address.getTown() != null && !p.matcher(address.getTown()).find()) {
+            return true;
+        } else {
+            return address.getCounty() != null && !p.matcher(address.getCounty()).find();
+        }
+    }
+
+    private void addAddressError(PreSubmitCallbackResponse response) {
+        response.addError("Invalid characters are being used at the beginning of address fields, please correct");
     }
 }
