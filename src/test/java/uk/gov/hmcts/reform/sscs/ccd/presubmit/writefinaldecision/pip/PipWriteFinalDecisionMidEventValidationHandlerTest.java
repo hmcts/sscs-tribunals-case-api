@@ -710,6 +710,101 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals(expectedShowResult, response.getData().getShowFinalDecisionNoticeSummaryOfOutcomePage());
     }
 
+    @Test
+    @Parameters({
+            "STANDARD_RATE, STANDARD_RATE",
+            "ENHANCED_RATE, ENHANCED_RATE",
+            "NOT_CONSIDERED, STANDARD_RATE",
+            "STANDARD_RATE, NO_AWARD",
+            "NO_AWARD, ENHANCED_RATE"
+    })
+    @Override
+    public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(dailyLiving.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(mobility.getKey());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getWarnings().size());
+
+        assertEquals(1, response.getErrors().size());
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("At least one activity must be selected unless there is no award", error);
+    }
+
+    @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelected() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setNoAwardsScenario(sscsCaseData);
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(0, response.getErrors().size());
+        assertEquals("na", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+    }
+
+    @Test
+    public void shouldNotDisplayActivitiesErrorWhenActivitiesAreNotYetSelected() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.STANDARD_RATE.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.STANDARD_RATE.getKey());
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
+        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+        assertEquals(0, response.getErrors().size());
+        assertEquals(0, response.getWarnings().size());
+
+        assertNull(caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+
+    }
+
+    @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsSetEndDate() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setNoAwardsScenario(sscsCaseData);
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionEndDateType("setEndDate");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
+        assertEquals(0, response.getWarnings().size());
+        assertEquals("setEndDate", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+
+    }
+
+    @Test
+    public void shouldExhibitBenefitSpecificBehaviourWhenNoAwardsAreGivenAndNoActivitiesAreSelectedAndEndDateTypeIsIndefinite() {
+
+        setValidPointsAndActivitiesScenario(sscsCaseData, "Yes");
+        setEmptyActivitiesListScenario(sscsCaseData);
+
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(AwardType.NO_AWARD.getKey());
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(AwardType.NO_AWARD.getKey());
+        sscsCaseData.setWriteFinalDecisionEndDateType("indefinite");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getWarnings().size());
+        assertEquals(1, response.getErrors().size());
+        assertEquals("End date is not applicable for this decision - please specify 'N/A - No Award'.", response.getErrors().iterator().next());
+
+        assertEquals("indefinite", caseDetails.getCaseData().getWriteFinalDecisionEndDateType());
+
+    }
+
     @Override
     protected String getBenefitType() {
         return "PIP";

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.validation.Validation;
+import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -54,6 +55,8 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
     private SscsDocument document;
 
+    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     @Before
     public void setUp() throws IOException {
         openMocks(this);
@@ -61,7 +64,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
 
         decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService));
 
-        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, Validation.buildDefaultValidatorFactory().getValidator());
+        handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
