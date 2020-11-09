@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import javax.validation.Validation;
+import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -38,10 +39,12 @@ public class ElementsDisputedMidEventValidationHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        handler = new ElementsDisputedMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
+        handler = new ElementsDisputedMidEventValidationHandler(validator);
 
         when(callback.getEvent()).thenReturn(EventType.DWP_UPLOAD_RESPONSE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
