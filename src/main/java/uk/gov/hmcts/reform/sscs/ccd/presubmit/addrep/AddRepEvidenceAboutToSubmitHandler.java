@@ -17,8 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 @Slf4j
 public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse;
-
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
         requireNonNull(callback, "callback must not be null");
@@ -37,10 +35,9 @@ public class AddRepEvidenceAboutToSubmitHandler implements PreSubmitCallbackHand
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
-        preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
         sscsCaseData.setDwpState(REP_ADDED.getId());
 
-        return preSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
+
     }
 }
