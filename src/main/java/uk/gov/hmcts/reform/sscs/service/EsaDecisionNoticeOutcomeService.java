@@ -34,8 +34,10 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
 
         if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setDoesRegulation29Apply(null);
-            // Ensure that the following values are set correctly, using the intelligent helper methods that
-            // check other relevant fields.
+            // Ensure that we set the following fields taking into account the radio button
+            // for whether schedule 3 activities apply.   The getRegulation35Selection and
+            // getSchedule3Selections methods peform this check,  and we use these methods
+            // to set the final values of doesRegulation35Apply and esaWriteFinalDecisionSchedule3ActivitiesQuestion
             sscsCaseData.setDoesRegulation35Apply(sscsCaseData.getRegulation35Selection());
             sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(sscsCaseData.getSchedule3Selections());
         } else if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
