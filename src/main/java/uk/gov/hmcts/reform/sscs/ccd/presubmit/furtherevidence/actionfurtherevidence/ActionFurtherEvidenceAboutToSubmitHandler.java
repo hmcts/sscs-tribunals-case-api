@@ -172,41 +172,13 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
                     checkWarningsAndErrors(sscsCaseData, scannedDocument, sscsCaseData.getCcdCaseId(), ignoreWarnings, preSubmitCallbackResponse);
 
-
                     if (ScannedDocumentType.CONFIDENTIALITY_REQUEST.getValue().equals(scannedDocument.getValue().getType())) {
                         if (preSubmitCallbackResponse.getErrors().size() == 0) {
                             setConfidentialCaseFields(sscsCaseData);
                         }
                     }
 
-                    List<SscsDocument> documents = new ArrayList<>();
-
-                    if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
-
-                        SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
-
-                        if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
-                            if (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction())) {
-                                setReinstateCaseFields(sscsCaseData);
-                            }
-                        }
-
-                        documents.add(sscsDocument);
-                        if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                            sscsCaseData.setTranslationWorkOutstanding(YES);
-                            log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
-                        }
-                    }
-                    if (sscsCaseData.getSscsDocument() != null) {
-                        documents.addAll(sscsCaseData.getSscsDocument());
-                    }
-
-                    if (documents.size() > 0) {
-                        sscsCaseData.setSscsDocument(documents);
-                    }
-
-                    sscsCaseData.setEvidenceHandled(YES);
-
+                    buildSscsDocuments(sscsCaseData, scannedDocument, caseState);
 
                 } else {
                     log.info("Not adding any scanned document as there aren't any or the type is a coversheet for case Id {}.", sscsCaseData.getCcdCaseId());
@@ -217,6 +189,37 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         }
 
         sscsCaseData.setScannedDocuments(null);
+    }
+
+    private void buildSscsDocuments(SscsCaseData sscsCaseData, ScannedDocument scannedDocument, State caseState) {
+        List<SscsDocument> documents = new ArrayList<>();
+
+        if (!equalsIgnoreCase(scannedDocument.getValue().getType(), COVERSHEET)) {
+
+            SscsDocument sscsDocument = buildSscsDocument(sscsCaseData, scannedDocument, caseState);
+
+            if (REINSTATEMENT_REQUEST.getValue().equals(sscsDocument.getValue().getDocumentType())) {
+                if (isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction())) {
+                    setReinstateCaseFields(sscsCaseData);
+                }
+            }
+
+            documents.add(sscsDocument);
+
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
+                sscsCaseData.setTranslationWorkOutstanding(YES);
+                log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
+            }
+        }
+        if (sscsCaseData.getSscsDocument() != null) {
+            documents.addAll(sscsCaseData.getSscsDocument());
+        }
+
+        if (documents.size() > 0) {
+            sscsCaseData.setSscsDocument(documents);
+        }
+
+        sscsCaseData.setEvidenceHandled(YES);
     }
 
     private void setConfidentialCaseFields(SscsCaseData sscsCaseData) {
