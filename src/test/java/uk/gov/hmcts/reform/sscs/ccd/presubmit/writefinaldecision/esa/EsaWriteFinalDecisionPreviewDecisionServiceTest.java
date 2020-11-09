@@ -100,6 +100,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("approved");
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
