@@ -84,17 +84,17 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-                SscsCaseData::getDoesRegulation35Apply);
+                SscsCaseData::getRegulation35Selection);
     }
 
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate, boolean displaySatisifiedMessageOnError) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-                SscsCaseData::getDoesRegulation35Apply, displaySatisifiedMessageOnError);
+                SscsCaseData::getRegulation35Selection, displaySatisifiedMessageOnError);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
         return new StringListFieldCondition("Schedule 3 Activities", predicate,
-                SscsCaseData::getEsaWriteFinalDecisionSchedule3ActivitiesQuestion);
+            SscsCaseData::getSchedule3Selections);
     }
 
     @Override
@@ -127,7 +127,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
             }
         }
         throw new IllegalStateException(
-            "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() + ":" + caseData.getDoesRegulation35Apply());
+            "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getSchedule3Selections() + ":" + caseData.getRegulation35Selection());
     }
 
     public static Optional<EsaAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,

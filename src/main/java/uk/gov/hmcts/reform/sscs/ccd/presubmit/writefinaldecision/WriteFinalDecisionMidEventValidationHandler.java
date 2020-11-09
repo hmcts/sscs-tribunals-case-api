@@ -87,7 +87,6 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
             // reg 29 page should be shown based on a calculation
             setEsaShowPageFlags(sscsCaseData);
-
             setEsaDefaultFields(sscsCaseData);
         }
 
@@ -184,6 +183,8 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
             if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
                 sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+            } else {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.NO);
             }
         } else {
             sscsCaseData.setShowRegulation29Page(YesNo.NO);

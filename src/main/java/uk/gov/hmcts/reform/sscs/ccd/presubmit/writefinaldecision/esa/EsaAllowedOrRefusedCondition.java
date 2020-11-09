@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -48,11 +49,20 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation29(FALSE),
         isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED),
         isRegulation35(UNSPECIFIED)),
-    REFUSED_SUPPORT_GROUP_ONLY(
+    REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(REFUSED),
         isSupportGroupOnly(YesNoPredicate.TRUE),
-        isAnyPoints(),
+        isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule3(),
+        isRegulation29(TRUE),
+        isSchedule3ActivitiesAnswer(EMPTY),
+        isRegulation35(FALSE)),
+    REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS(
+        isAllowedOrRefused(REFUSED),
+        isSupportGroupOnly(YesNoPredicate.TRUE),
+        isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
+        isAnySchedule3(),
+        isRegulation29(UNSPECIFIED),
         isSchedule3ActivitiesAnswer(EMPTY),
         isRegulation35(FALSE)),
     ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS(
@@ -114,12 +124,12 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         this.validationConditions = Arrays.asList(validationConditions);
     }
 
-    static YesNoFieldCondition isRegulation29(YesNoPredicate predicate) {
+    static YesNoFieldCondition isRegulation29(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Regulation 29", predicate,
                 SscsCaseData::getDoesRegulation29Apply);
     }
 
-    static YesNoFieldCondition isSupportGroupOnly(YesNoPredicate predicate) {
+    static YesNoFieldCondition isSupportGroupOnly(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Support Group Only Appeal", predicate,
             s -> s.isSupportGroupOnlyAppeal() ? YesNo.YES : YesNo.NO);
     }
@@ -146,12 +156,12 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-                SscsCaseData::getDoesRegulation35Apply);
+            SscsCaseData::getRegulation35Selection);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
         return new StringListFieldCondition("Schedule 3 Activities", predicate,
-                SscsCaseData::getEsaWriteFinalDecisionSchedule3ActivitiesQuestion);
+            SscsCaseData::getSchedule3Selections);
     }
 
     @Override
@@ -192,7 +202,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             }
         }
         throw new IllegalStateException(
-            "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getEsaWriteFinalDecisionSchedule3ActivitiesQuestion() + ":" + caseData.getDoesRegulation35Apply());
+            "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getSchedule3Selections() + ":" + caseData.getRegulation35Selection());
     }
 
     @Override
