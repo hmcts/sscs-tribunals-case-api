@@ -393,6 +393,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
             names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
         }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionOtherPanelMemberName())) {
+            names.add(caseData.getWriteFinalDecisionOtherPanelMemberName());
+        }
         return StringUtils.getGramaticallyJoinedStrings(names);
     }
 
