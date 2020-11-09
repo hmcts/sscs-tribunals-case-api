@@ -193,8 +193,9 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         return getAllAnswersExtractor();
     }
 
-    public static EsaAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
+    protected static EsaAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
         SscsCaseData caseData) {
+
         for (EsaAllowedOrRefusedCondition esaPointsAndActivitiesCondition : EsaAllowedOrRefusedCondition.values()) {
 
             if (esaPointsAndActivitiesCondition.isApplicable(questionService, caseData) && esaPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {

@@ -56,72 +56,14 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
     @Test
     @Parameters(named = "schedule3ActivityAndRegulation35Combinations")
-    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreTooHigh_thenDisplayAnError(Boolean schedule3Activities, Boolean regulation35) {
+    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule3ActivitiesNotPopulated(Boolean schedule3Activities, Boolean regulation35) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
 
-        if (schedule3Activities != null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
-        }
-        if (regulation35 != null) {
-            sscsCaseData.setDoesRegulation35Apply(regulation35.booleanValue() ? YesNo.YES : YesNo.NO);
-        }
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
-
-        // 15 points - too high for regulation 29 to apply
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        Assert.assertEquals(1, response.getErrors().size());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        if (schedule3Activities == null) {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                }
-            }
-        } else if (!schedule3Activities.booleanValue()) {
-            if (regulation35 == null) {
-                assertEquals(
-                    "You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.",
-                    error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                }
-            }
-        } else {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                }
-            }
-        }
-    }
-
-    @Test
-    @Parameters(named = "schedule3ActivityAndRegulation35Combinations")
-    public void givenRegulation29FieldIsPopulatedWithNoAndPointsAreTooHigh_thenDisplayAnError(Boolean schedule3Activities, Boolean regulation35) {
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         if (schedule3Activities != null) {
             sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
             sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
@@ -138,43 +80,122 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        if ((schedule3Activities != null && schedule3Activities.booleanValue())
+            || schedule3Activities != null && !schedule3Activities.booleanValue() && regulation35 != null) {
+            Assert.assertEquals(0, response.getErrors().size());
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        if (schedule3Activities == null) {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                }
-            }
-        } else if (!schedule3Activities.booleanValue()) {
-            if (regulation35 == null) {
-                assertEquals(
-                        "You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and made no selections for the Schedule 3 Activities question. Please review your previous selection.",
-                        error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 applies, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-                }
-            }
         } else {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
+            Assert.assertEquals(1, response.getErrors().size());
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            if (schedule3Activities == null) {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
                 } else {
-                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else if (!schedule3Activities.booleanValue()) {
+                if (regulation35 == null) {
+                    assertEquals(
+                        "You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.",
+                        error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
                 }
             }
+
         }
     }
+
+    @Test
+    @Parameters(named = "schedule3ActivityAndRegulation35Combinations")
+    public void givenRegulation29FieldIsPopulatedWithNoAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule3ActivitiesNotPopulated(Boolean schedule3Activities, Boolean regulation35) {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+
+        if (schedule3Activities != null) {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+        } else {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+        }
+        if (regulation35 != null) {
+            sscsCaseData.setDoesRegulation35Apply(regulation35.booleanValue() ? YesNo.YES : YesNo.NO);
+        }
+        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points - too high for regulation 29 to apply
+        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        if ((schedule3Activities != null && schedule3Activities.booleanValue())
+            || schedule3Activities != null && !schedule3Activities.booleanValue() && regulation35 != null) {
+            Assert.assertEquals(0, response.getErrors().size());
+
+        } else {
+            Assert.assertEquals(1, response.getErrors().size());
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            if (schedule3Activities == null) {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else if (!schedule3Activities.booleanValue()) {
+                if (regulation35 == null) {
+                    assertEquals(
+                        "You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.",
+                        error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            }
+
+        }
+    }
+
 
     @Test
     @Parameters(named = "schedule3ActivityAndRegulation35Combinations")
@@ -567,8 +588,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         Assert.assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question "
-                + "and made no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
     }
 
     @Override

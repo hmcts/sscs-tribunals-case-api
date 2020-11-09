@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
@@ -43,7 +45,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         Arrays.asList(isRegulation29(TRUE), isRegulation35(TRUE)), Optional.of(AwardType.HIGHER_RATE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_UNSPECIFIED(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isRegulation35(UNSPECIFIED, false), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
+        isRegulation35(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isRegulation35(FALSE), Optional.of(AwardType.LOWER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
@@ -82,7 +84,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
                 SscsCaseData::getDoesRegulation29Apply, displaySatisifiedMessageOnError);
     }
 
-    static YesNoFieldCondition isRegulation35(YesNoPredicate predicate) {
+    static YesNoFieldCondition isRegulation35(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Regulation 35", predicate,
                 SscsCaseData::getRegulation35Selection);
     }
