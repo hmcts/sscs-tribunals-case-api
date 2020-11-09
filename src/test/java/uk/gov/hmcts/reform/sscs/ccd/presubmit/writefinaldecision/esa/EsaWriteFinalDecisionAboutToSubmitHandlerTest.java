@@ -56,15 +56,19 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
     @Test
     @Parameters(named = "schedule3ActivityAndRegulation35Combinations")
-    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreTooHigh_thenDisplayAnError(Boolean schedule3Activities, Boolean regulation35) {
+    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule3ActivitiesNotPopulated(Boolean schedule3Activities, Boolean regulation35) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
 
         if (schedule3Activities != null) {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
             sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+        } else {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         }
         if (regulation35 != null) {
             sscsCaseData.setDoesRegulation35Apply(regulation35.booleanValue() ? YesNo.YES : YesNo.NO);
@@ -76,54 +80,66 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        if ((schedule3Activities != null && schedule3Activities.booleanValue())
+            || schedule3Activities != null && !schedule3Activities.booleanValue() && regulation35 != null) {
+            Assert.assertEquals(0, response.getErrors().size());
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        if (schedule3Activities == null) {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 applies, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                }
-            }
-        } else if (!schedule3Activities.booleanValue()) {
-            if (regulation35 == null) {
-                assertEquals(
-                    "You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and made no selections for the Schedule 3 Activities question. Please review your previous selection.",
-                    error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 applies, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-                }
-            }
         } else {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have submitted an unexpected answer for the Regulation 29 question and made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+            Assert.assertEquals(1, response.getErrors().size());
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            if (schedule3Activities == null) {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
                 } else {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 applies, but have submitted an unexpected answer for the Regulation 29 question and made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else if (!schedule3Activities.booleanValue()) {
+                if (regulation35 == null) {
+                    assertEquals(
+                        "You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.",
+                        error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
                 }
             }
+
         }
     }
 
     @Test
     @Parameters(named = "schedule3ActivityAndRegulation35Combinations")
-    public void givenRegulation29FieldIsPopulatedWithNoAndPointsAreTooHigh_thenDisplayAnError(Boolean schedule3Activities, Boolean regulation35) {
+    public void givenRegulation29FieldIsPopulatedWithNoAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule3ActivitiesNotPopulated(Boolean schedule3Activities, Boolean regulation35) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+
         if (schedule3Activities != null) {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
             sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+        } else {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         }
         if (regulation35 != null) {
             sscsCaseData.setDoesRegulation35Apply(regulation35.booleanValue() ? YesNo.YES : YesNo.NO);
@@ -135,43 +151,51 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
+        if ((schedule3Activities != null && schedule3Activities.booleanValue())
+            || schedule3Activities != null && !schedule3Activities.booleanValue() && regulation35 != null) {
+            Assert.assertEquals(0, response.getErrors().size());
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        if (schedule3Activities == null) {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 applies, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-                }
-            }
-        } else if (!schedule3Activities.booleanValue()) {
-            if (regulation35 == null) {
-                assertEquals(
-                        "You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and made no selections for the Schedule 3 Activities question. Please review your previous selection.",
-                        error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-                } else {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 applies, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-                }
-            }
         } else {
-            if (regulation35 == null) {
-                assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question. Please review your previous selection.", error);
-            } else {
-                if (!regulation35.booleanValue()) {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have submitted an unexpected answer for the Regulation 29 question and made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+            Assert.assertEquals(1, response.getErrors().size());
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            if (schedule3Activities == null) {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
                 } else {
-                    assertEquals("You have awarded 15 points or more and specified that Regulation 35 applies, but have submitted an unexpected answer for the Regulation 29 question and made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else if (!schedule3Activities.booleanValue()) {
+                if (regulation35 == null) {
+                    assertEquals(
+                        "You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.",
+                        error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
+                }
+            } else {
+                if (regulation35 == null) {
+                    assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                } else {
+                    if (!regulation35.booleanValue()) {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    } else {
+                        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question and have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+                    }
                 }
             }
+
         }
     }
+
 
     @Test
     @Parameters(named = "schedule3ActivityAndRegulation35Combinations")
@@ -202,10 +226,11 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
     @Test
     @Parameters(named = "schedule3ActivityCombinations")
-    public void givenRegulation35FieldIsPopulatedWithYesAndRegulation29FieldIsPopulatedWithNoAndPointsAreCorrectForRegulation29ButIncorrectForRegulation35_thenDisplayAnError(Boolean schedule3Activities) {
+    public void givenRegulation35FieldIsPopulatedWithYesAndRegulation29FieldIsPopulatedWithNoAndPointsAreCorrectForRegulation29ButIncorrectForRegulation35_thenDoNoDisplayAnError(Boolean schedule3Activities) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
@@ -219,18 +244,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-
-        if (schedule3Activities == null) {
-            assertEquals("You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question. Please review your previous selection.", error);
-
-        } else if (!schedule3Activities.booleanValue()) {
-            assertEquals("You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question and submitted an unexpected answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-        } else {
-            assertEquals("You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question and submitted an unexpected answer for the Schedule 3 Activities question. Please review your previous selection.", error);
-        }
+        Assert.assertEquals(0, response.getErrors().size());
 
     }
 
@@ -240,11 +254,15 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
         if (schedule3Activities != null) {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
             sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+        } else {
+            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         }
 
         sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
@@ -253,20 +271,29 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-        
-        Assert.assertEquals(1, response.getErrors().size());
 
-        String error = response.getErrors().stream().findFirst().orElse("");
-        if (schedule3Activities == null) {
-            assertEquals("You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question. Please review your previous selection.", error);
-        } else if (!schedule3Activities.booleanValue()) {
-            assertEquals("You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question and submitted an unexpected answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+        if (sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply() != null) {
+            Assert.assertEquals(1, response.getErrors().size());
+
+            String error = response.getErrors().stream().findFirst().orElse("");
+            if (schedule3Activities == null) {
+                assertEquals(
+                    "You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question. Please review your previous selection.",
+                    error);
+            } else if (!schedule3Activities.booleanValue()) {
+                assertEquals(
+                    "You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question and submitted an unexpected answer for the Schedule 3 Activities question. Please review your previous selection.",
+                    error);
+            } else {
+                assertEquals(
+                    "You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Schedule 3 Activities question. Please review your previous selection.",
+                    error);
+            }
         } else {
-            assertEquals("You have awarded less than 15 points and specified that Regulation 29 does not apply, but have submitted an unexpected answer for the Regulation 35 question and submitted an unexpected answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+            Assert.assertEquals(0, response.getErrors().size());
+
         }
     }
-
-
 
     @Test
     public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreCorrectForRegulation29AndActivitiesSelectedOnly_thenDoNotDisplayAnError() {
@@ -277,6 +304,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -292,11 +320,13 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     }
 
     @Test
-    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToNo_thenDisplayAnError() {
+    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToNo_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -308,18 +338,21 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You have awarded less than 15 points, specified that Regulation 29 applies and specified that Regulation 35 does not apply, but have made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+        Assert.assertNull(sscsCaseData.getRegulation35Selection());
+        Assert.assertNotNull(sscsCaseData.getSchedule3Selections());
+        Assert.assertFalse(sscsCaseData.getSchedule3Selections().isEmpty());
+
+        Assert.assertEquals(0, response.getErrors().size());
 
     }
 
     @Test
-    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToYes_thenDisplayAnError() {
+    public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToYes_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -331,10 +364,11 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
-        Assert.assertEquals(1, response.getErrors().size());
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You have awarded less than 15 points, specified that Regulation 29 applies and specified that Regulation 35 applies, but have made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+        Assert.assertNull(sscsCaseData.getRegulation35Selection());
+        Assert.assertNotNull(sscsCaseData.getSchedule3Selections());
+        Assert.assertFalse(sscsCaseData.getSchedule3Selections().isEmpty());
+
+        Assert.assertEquals(0, response.getErrors().size());
     }
 
     @Test
@@ -346,6 +380,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
@@ -370,6 +405,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
 
@@ -391,6 +427,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -417,6 +454,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -432,10 +470,11 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     }
 
     @Test
-    public void givenRegulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToNo_thenDisplayAnError() {
+    public void givenRegulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToNo_thenDoNotDisplayAnErrorButResetRegulation35OnSubmit() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -447,16 +486,19 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1, response.getErrors().size());
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+        Assert.assertNull(sscsCaseData.getRegulation35Selection());
+        Assert.assertNotNull(sscsCaseData.getSchedule3Selections());
+        Assert.assertFalse(sscsCaseData.getSchedule3Selections().isEmpty());
+
+        Assert.assertEquals(0, response.getErrors().size());
     }
 
     @Test
     public void givenRegulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToYes_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -468,9 +510,11 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        Assert.assertEquals(1,  response.getErrors().size());
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You have awarded 15 points or more and specified that Regulation 35 does not apply, but have made selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+        Assert.assertNull(sscsCaseData.getRegulation35Selection());
+        Assert.assertNotNull(sscsCaseData.getSchedule3Selections());
+        Assert.assertFalse(sscsCaseData.getSchedule3Selections().isEmpty());
+
+        Assert.assertEquals(0,  response.getErrors().size());
     }
 
     @Test
@@ -481,6 +525,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
@@ -507,7 +552,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
-
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
 
@@ -529,6 +574,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -542,8 +588,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         Assert.assertEquals(1, response.getErrors().size());
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You have awarded 15 points or more, but have submitted an unexpected answer for the Regulation 29 question "
-                + "and made no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+        assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
     }
 
     @Override
@@ -638,7 +683,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal applies, but have have a missing answer for the Schedule 3 Activities question and a missing answer for the Regulation 35 question. Please review your previous selection.", error);
+        Assert.assertEquals("You have awarded less than 15 points, specified that the appeal is refused and specified that Support Group Only Appeal applies, but have answered No for the Regulation 29 question, have a missing answer for the Schedule 3 Activities question and a missing answer for the Regulation 35 question. Please review your previous selection.", error);
     }
 
     // Refused scenario 2
@@ -652,6 +697,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
@@ -678,6 +724,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
@@ -709,6 +756,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
@@ -740,6 +788,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
@@ -765,6 +814,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
@@ -795,6 +845,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 

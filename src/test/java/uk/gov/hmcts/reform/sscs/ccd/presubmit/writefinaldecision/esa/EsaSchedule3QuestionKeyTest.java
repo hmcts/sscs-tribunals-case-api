@@ -27,7 +27,7 @@ public class EsaSchedule3QuestionKeyTest {
 
     @Test
     public void testGetMobilisingUnaidedQuestion() {
-        Mockito.when(sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesQuestion()).thenReturn(
+        Mockito.when(sscsCaseData.getSchedule3Selections()).thenReturn(
             Arrays.asList("schedule3MobilisingUnaided"));
         EsaSchedule3QuestionKey activityQuestion = EsaSchedule3QuestionKey.getByKey("schedule3MobilisingUnaided");
         Assert.assertNotNull(activityQuestion);
