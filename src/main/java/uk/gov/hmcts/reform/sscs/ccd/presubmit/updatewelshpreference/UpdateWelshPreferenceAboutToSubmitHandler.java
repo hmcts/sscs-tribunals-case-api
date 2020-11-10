@@ -28,7 +28,7 @@ public class UpdateWelshPreferenceAboutToSubmitHandler implements PreSubmitCallb
     public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback,
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
-        if (!caseData.isLanguagePreferenceWelshAsBoolean()) {
+        if (!caseData.isLanguagePreferenceWelsh()) {
             caseData.setTranslationWorkOutstanding("No");
         }
         return new PreSubmitCallbackResponse<>(caseData);

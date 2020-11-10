@@ -64,7 +64,7 @@ public class DecisionIssuedAboutToSubmitHandler extends IssueDocumentHandler imp
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 
-        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelshAsBoolean() && callback.getEvent() == EventType.DECISION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DECISION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
 
         if (callback.getEvent() == EventType.DECISION_ISSUED) {
             footerService.createFooterAndAddDocToCase(url, caseData, DocumentType.DECISION_NOTICE,

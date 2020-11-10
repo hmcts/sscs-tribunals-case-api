@@ -63,7 +63,7 @@ public class IssueDocumentHandler {
             formPayload = formPayload.toBuilder().image(NoticeIssuedTemplateBody.SCOTTISH_IMAGE).build();
         }
 
-        if (caseData.isLanguagePreferenceWelshAsBoolean()) {
+        if (caseData.isLanguagePreferenceWelsh()) {
             formPayload = formPayload.toBuilder()
                     .welshDateAdded(LocalDateToWelshStringConverter.convert(dateAdded))
                     .welshGeneratedDate(LocalDateToWelshStringConverter.convert(generatedDate))

@@ -92,7 +92,7 @@ public class CreateBundleAboutToStartHandlerTest {
         caseData.setLanguagePreferenceWelsh(languagePreference);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        if (caseData.isLanguagePreferenceWelshAsBoolean()) {
+        if (caseData.isLanguagePreferenceWelsh()) {
             assertEquals(configFile, response.getData().getBundleConfiguration());
         } else {
             assertNull(configFile, response.getData().getBundleConfiguration());

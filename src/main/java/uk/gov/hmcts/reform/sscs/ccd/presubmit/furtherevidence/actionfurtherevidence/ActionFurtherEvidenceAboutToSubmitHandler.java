@@ -206,7 +206,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
 
             documents.add(sscsDocument);
 
-            if (sscsCaseData.isLanguagePreferenceWelshAsBoolean()) {
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 sscsCaseData.setTranslationWorkOutstanding(YES);
                 log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", sscsCaseData.getCcdCaseId());
             }
@@ -329,7 +329,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             .documentDateAdded(scannedDate)
             .controlNumber(scannedDocument.getValue().getControlNumber())
             .evidenceIssued("No")
-            .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelshAsBoolean() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
+            .documentTranslationStatus(sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null)
             .build()).build();
     }
 

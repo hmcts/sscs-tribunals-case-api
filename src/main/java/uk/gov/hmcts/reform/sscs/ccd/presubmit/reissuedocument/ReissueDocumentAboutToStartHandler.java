@@ -60,11 +60,11 @@ public class ReissueDocumentAboutToStartHandler implements PreSubmitCallbackHand
             List<? extends AbstractDocument> filteredSscsDocuments = Stream.of(sscsCaseData.getSscsDocument(), sscsCaseData.getSscsWelshDocuments()).flatMap(x -> x == null ? null : x.stream()).filter(doc -> StringUtils.isNotBlank(doc.getValue().getDocumentType())).collect(Collectors.toList());
             if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(DECISION_NOTICE.getValue()))) {
-                listCostOptions.add(new DynamicListItem(sscsCaseData.isLanguagePreferenceWelshAsBoolean() ? EventType.DECISION_ISSUED_WELSH.getCcdType() : EventType.DECISION_ISSUED.getCcdType(), DECISION_NOTICE.getValue()));
+                listCostOptions.add(new DynamicListItem(sscsCaseData.isLanguagePreferenceWelsh() ? EventType.DECISION_ISSUED_WELSH.getCcdType() : EventType.DECISION_ISSUED.getCcdType(), DECISION_NOTICE.getValue()));
             }
             if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(DIRECTION_NOTICE.getValue()))) {
-                listCostOptions.add(new DynamicListItem(sscsCaseData.isLanguagePreferenceWelshAsBoolean() ? EventType.DIRECTION_ISSUED_WELSH.getCcdType() : EventType.DIRECTION_ISSUED.getCcdType(), DIRECTION_NOTICE.getLabel()));
+                listCostOptions.add(new DynamicListItem(sscsCaseData.isLanguagePreferenceWelsh() ? EventType.DIRECTION_ISSUED_WELSH.getCcdType() : EventType.DIRECTION_ISSUED.getCcdType(), DIRECTION_NOTICE.getLabel()));
             }
             if (filteredSscsDocuments.stream()
                     .anyMatch(doc -> doc.getValue().getDocumentType().equals(FINAL_DECISION_NOTICE.getValue()))) {

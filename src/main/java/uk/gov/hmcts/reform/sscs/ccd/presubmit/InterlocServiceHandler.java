@@ -38,7 +38,7 @@ public class InterlocServiceHandler extends EventToFieldPreSubmitCallbackHandler
     }
 
     protected SscsCaseData setField(SscsCaseData newSscsCaseData, String newValue, EventType eventType) {
-        if (newSscsCaseData.isLanguagePreferenceWelshAsBoolean()) {
+        if (newSscsCaseData.isLanguagePreferenceWelsh()) {
             log.info("Case({}): Setting Welsh next review field to {}", newSscsCaseData.getCcdCaseId(), newValue);
             newSscsCaseData.setWelshInterlocNextReviewState(newValue);
             newSscsCaseData.setInterlocReviewState(InterlocReviewState.WELSH_TRANSLATION.getId());

@@ -52,14 +52,14 @@ public class SscsPdfService {
         log.info("Case {} PDF successfully created for benefit type {}",
                 caseDetailsId,
                 sscsCaseData.getAppeal().getBenefitType().getCode());
-        SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelshAsBoolean() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        SscsDocumentTranslationStatus documentTranslationStatus = sscsCaseData.isLanguagePreferenceWelsh() ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         return ccdPdfService.updateDoc(fileName, pdf, caseDetailsId, sscsCaseData, documentType, documentTranslationStatus);
     }
 
     private byte[] generatePdf(SscsCaseData sscsCaseData, Long caseDetailsId) {
         byte[] template;
         try {
-            template = getTemplate(sscsCaseData.isLanguagePreferenceWelshAsBoolean());
+            template = getTemplate(sscsCaseData.isLanguagePreferenceWelsh());
         } catch (IOException e) {
             throw new PdfGenerationException("Error getting template", e);
         }
@@ -72,7 +72,7 @@ public class SscsPdfService {
 
         Map<String, Object> placeholders = new HashMap<>();
         placeholders.put("PdfWrapper", pdfWrapper);
-        if (sscsCaseData.isLanguagePreferenceWelshAsBoolean()) {
+        if (sscsCaseData.isLanguagePreferenceWelsh()) {
             placeholders.put("appellant_identity_dob",
                     LocalDateToWelshStringConverter.convert(sscsCaseData.getAppeal().getAppellant().getIdentity().getDob()));
             placeholders.put("appellant_appointee_identity_dob",

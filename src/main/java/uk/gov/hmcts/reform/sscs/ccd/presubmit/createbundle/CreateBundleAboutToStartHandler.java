@@ -77,7 +77,7 @@ public class CreateBundleAboutToStartHandler implements PreSubmitCallbackHandler
                     }
                 }
             }
-            if (sscsCaseData.isLanguagePreferenceWelshAsBoolean()) {
+            if (sscsCaseData.isLanguagePreferenceWelsh()) {
                 sscsCaseData.setBundleConfiguration(bundleWelshConfig);
                 log.info("Setting the bundleConfiguration on the case: " + bundleWelshConfig);
             }

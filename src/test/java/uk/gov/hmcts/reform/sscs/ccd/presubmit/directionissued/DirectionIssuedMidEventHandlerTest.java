@@ -137,7 +137,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
-                sscsCaseData.isLanguagePreferenceWelshAsBoolean());
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -148,7 +148,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
-                sscsCaseData.isLanguagePreferenceWelshAsBoolean());
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
                 documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.DIRECTION_ISSUED),
-                sscsCaseData.isLanguagePreferenceWelshAsBoolean());
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
@@ -183,7 +183,7 @@ public class DirectionIssuedMidEventHandlerTest {
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname",
                 documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.DIRECTION_ISSUED),
-                sscsCaseData.isLanguagePreferenceWelshAsBoolean());
+                sscsCaseData.isLanguagePreferenceWelsh());
     }
 
     @Test
