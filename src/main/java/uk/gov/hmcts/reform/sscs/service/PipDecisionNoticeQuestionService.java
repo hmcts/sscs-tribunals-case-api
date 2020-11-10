@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.service;
 
 import java.io.IOException;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ public class PipDecisionNoticeQuestionService extends DecisionNoticeQuestionServ
 
     @Autowired
     public PipDecisionNoticeQuestionService() throws IOException {
-        super("PIP", PipPointsCondition.class);
+        super("PIP", Arrays.asList(PipPointsCondition.class));
     }
 
     @Override

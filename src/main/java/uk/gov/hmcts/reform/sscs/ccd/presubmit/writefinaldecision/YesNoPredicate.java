@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.util.function.Predicate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
