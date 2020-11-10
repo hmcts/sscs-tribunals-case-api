@@ -88,7 +88,7 @@ public class WriteFinalDecisionTemplateBody {
     @JsonProperty("is_support_group_only")
     private boolean supportGroupOnly;
     @JsonProperty("is_regulation_29_applicable")
-    private boolean regulation29Applicable;
+    private Boolean regulation29Applicable;
     @JsonProperty("is_regulation_35_applicable")
-    private boolean regulation35Applicable;
+    private Boolean regulation35Applicable;
 }
