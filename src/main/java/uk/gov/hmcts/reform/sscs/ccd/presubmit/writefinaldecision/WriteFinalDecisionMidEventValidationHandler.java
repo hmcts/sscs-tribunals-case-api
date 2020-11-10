@@ -24,6 +24,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @Component
@@ -176,8 +177,7 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
     private void setEsaShowPageFlags(SscsCaseData sscsCaseData) {
 
-        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, Arrays.stream(EsaActivityQuestionKey.values())
-                .map(EsaActivityQuestionKey::getKey).collect(Collectors.toList()));
+        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
         if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
