@@ -183,7 +183,7 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
             if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
                 sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
-            } else {
+            } else if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
                 sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.NO);
             }
         } else {
