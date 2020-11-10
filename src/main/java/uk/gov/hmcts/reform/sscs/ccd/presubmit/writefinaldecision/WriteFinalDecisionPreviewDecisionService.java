@@ -329,8 +329,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             }
             builder.esaNumberOfPoints(numberOfPoints);
         }
-        builder.regulation29Applicable(caseData.getDoesRegulation29Apply().toBoolean());
-        builder.regulation35Applicable(caseData.getDoesRegulation35Apply().toBoolean());
+        builder.regulation29Applicable(caseData.getDoesRegulation29Apply() != null && caseData.getDoesRegulation29Apply().toBoolean());
+        builder.regulation35Applicable(caseData.getDoesRegulation35Apply() != null && caseData.getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
     }
 
