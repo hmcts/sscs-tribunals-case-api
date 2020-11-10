@@ -70,7 +70,7 @@ public class CancelTranslationIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertTrue(result.getData().isLanguagePreferenceWelsh());
+        assertTrue(result.getData().isLanguagePreferenceWelshAsBoolean());
     }
 
     @Test
