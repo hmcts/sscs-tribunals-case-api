@@ -31,7 +31,7 @@ public class CancelTranslationsAboutToStartHandler implements PreSubmitCallbackH
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
                 new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (!sscsCaseData.isLanguagePreferenceWelsh()) {
+        if (!sscsCaseData.isLanguagePreferenceWelshAsBoolean()) {
             preSubmitCallbackResponse.addError("Error: This action is only available for Welsh cases.");
         }
         return preSubmitCallbackResponse;

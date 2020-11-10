@@ -242,7 +242,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             return sscsCaseDataPreSubmitCallbackResponse;
         }
 
-        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelshAsBoolean() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
         log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {

@@ -64,7 +64,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
                                            String documentNamePrefix) {
         SscsCaseDetails caseDetails = data.getCaseDetails();
         PdfAppealDetails pdfAppealDetails = getPdfAppealDetails(caseId, caseDetails);
-        boolean isWelsh = caseDetails.getData().isLanguagePreferenceWelsh();
+        boolean isWelsh = caseDetails.getData().isLanguagePreferenceWelshAsBoolean();
 
         log.info("Storing pdf for [" + caseId + "]");
         byte[] pdfBytes = pdfService.createPdf(getPdfContent(data, onlineHearingId, pdfAppealDetails),
@@ -159,7 +159,7 @@ public abstract class StorePdfService<E, D extends PdfData> {
         String caseReference = caseDetails.getId().toString();
         String dateCreated = reformatDate(now());
 
-        if (caseDetails.getData().isLanguagePreferenceWelsh()) {
+        if (caseDetails.getData().isLanguagePreferenceWelshAsBoolean()) {
             return new PdfAppealDetails(appellantTitle, appellantFirstName, appellantLastName, nino, caseReference,
                     dateCreated, LocalDateToWelshStringConverter.convert(now()));
         }

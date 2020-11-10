@@ -43,7 +43,7 @@ public class CreateWelshNoticeAboutToStartHandler implements PreSubmitCallbackHa
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse =
                 new PreSubmitCallbackResponse<>(sscsCaseData);
 
-        if (!sscsCaseData.isLanguagePreferenceWelsh()) {
+        if (!sscsCaseData.isLanguagePreferenceWelshAsBoolean()) {
             preSubmitCallbackResponse.addError("Error: This action is only available for Welsh cases.");
         }
         setDocumentTypesAndOriginalNoticeDocumentsDropdown(sscsCaseData);
