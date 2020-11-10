@@ -26,7 +26,7 @@ public class EsaActivityQuestionKeyTest {
 
     @Test
     public void testGetMobilisingUnaidedQuestion() {
-        SscsCaseData sscsCaseData = SscsCaseData.builder().esaSscsCaseData(sscsEsaCaseData).build();
+        final SscsCaseData sscsCaseData = SscsCaseData.builder().esaSscsCaseData(sscsEsaCaseData).build();
         Mockito.when(sscsEsaCaseData.getEsaWriteFinalDecisionMobilisingUnaidedQuestion()).thenReturn("testAnswer");
         EsaActivityQuestionKey activityQuestion = EsaActivityQuestionKey.getByKey("mobilisingUnaided");
         Assert.assertNotNull(activityQuestion);
