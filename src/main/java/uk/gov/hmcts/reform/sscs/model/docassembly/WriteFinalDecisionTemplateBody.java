@@ -87,5 +87,7 @@ public class WriteFinalDecisionTemplateBody {
     private boolean isWcaAppeal;
     @JsonProperty("is_support_group_only")
     private boolean isSupportGroupOnly;
+    @JsonProperty("dwp_reassess_the_award")
+    private String dwpReassessTheAward;
 
 }

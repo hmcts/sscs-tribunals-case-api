@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
+import static java.util.Optional.empty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
@@ -99,6 +100,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
         writeFinalDecisionBuilder.isWcaAppeal(caseData.isWcaAppeal());
+        writeFinalDecisionBuilder.dwpReassessTheAward(caseData.getDwpReassessTheAward());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
@@ -249,29 +251,20 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
     private void setEsaEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        Optional<AwardType> esaAwardTypeOptional = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-                .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeService.getQuestionService("ESA"), caseData).getAwardType();
-
-        if (esaAwardTypeOptional.isEmpty()) {
-            builder.esaIsEntited(false);
-            builder.esaAwardRate(null);
-        } else {
-
+        builder.esaIsEntited(false);
+        builder.esaAwardRate(null);
+        Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
+                .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeService.getQuestionService("ESA"), caseData).getAwardType() : empty();
+        if (!esaAwardTypeOptional.isEmpty()) {
             String esaAwardType = esaAwardTypeOptional.get().getKey();
-
             if (esaAwardType != null) {
                 builder.esaAwardRate(join(
                         splitByCharacterTypeCamelCase(esaAwardType), ' ').toLowerCase());
-            } else {
-                builder.esaAwardRate(null);
             }
 
-            if (AwardType.LOWER_RATE.getKey().equals(esaAwardType)) {
+            if (AwardType.LOWER_RATE.getKey().equals(esaAwardType)
+                || AwardType.HIGHER_RATE.getKey().equals(esaAwardType)) {
                 builder.esaIsEntited(true);
-            } else if (AwardType.HIGHER_RATE.getKey().equals(esaAwardType)) {
-                builder.esaIsEntited(true);
-            } else {
-                builder.esaIsEntited(false);
             }
         }
     }

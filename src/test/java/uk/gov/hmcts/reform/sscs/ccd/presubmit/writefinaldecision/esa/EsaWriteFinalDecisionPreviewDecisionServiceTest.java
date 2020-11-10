@@ -41,6 +41,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
+        sscsCaseData.setDwpReassessTheAward("noRecommendation");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -62,6 +63,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         assertEquals("Judge Full Name", payload.getUserName());
         assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+        assertEquals("noRecommendation", payload.getDwpReassessTheAward());
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
 
