@@ -318,10 +318,12 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             allDescriptors.addAll(mentalAssessmentDescriptors);
 
         }
+
         if (allDescriptors.isEmpty()) {
             builder.esaSchedule2Descriptors(null);
             builder.esaNumberOfPoints(null);
         } else {
+            System.out.println("All descriptors not empty");
             builder.esaSchedule2Descriptors(allDescriptors);
             int numberOfPoints = allDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
             if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(numberOfPoints)) {

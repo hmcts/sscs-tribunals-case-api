@@ -41,7 +41,7 @@ public class EsaActivityTypeTest {
         Function<SscsCaseData, List<String>> answersExtractor = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor();
         Assert.assertNotNull(answersExtractor);
 
-        Mockito.when(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()).thenReturn(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"));
+        Mockito.when(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()).thenReturn(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"));
         List<String> answers = answersExtractor.apply(sscsCaseData);
         Assert.assertEquals(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"), answers);
     }
@@ -52,7 +52,7 @@ public class EsaActivityTypeTest {
         Function<SscsCaseData, List<String>> answersExtractor = EsaActivityType.MENTAL_ASSESSMENT.getAnswersExtractor();
         Assert.assertNotNull(answersExtractor);
 
-        Mockito.when(sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion()).thenReturn(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"));
+        Mockito.when(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()).thenReturn(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"));
         List<String> answers = answersExtractor.apply(sscsCaseData);
         Assert.assertEquals(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"), answers);
     }
