@@ -11,12 +11,13 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class EsaActivityQuestionKeyTest {
 
     @Mock
-    private SscsCaseData sscsCaseData;
+    private SscsEsaCaseData sscsEsaCaseData;
 
     @Before
     public void setUp() {
@@ -25,7 +26,8 @@ public class EsaActivityQuestionKeyTest {
 
     @Test
     public void testGetMobilisingUnaidedQuestion() {
-        Mockito.when(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMobilisingUnaidedQuestion()).thenReturn("testAnswer");
+        SscsCaseData sscsCaseData = SscsCaseData.builder().esaSscsCaseData(sscsEsaCaseData).build();
+        Mockito.when(sscsEsaCaseData.getEsaWriteFinalDecisionMobilisingUnaidedQuestion()).thenReturn("testAnswer");
         EsaActivityQuestionKey activityQuestion = EsaActivityQuestionKey.getByKey("mobilisingUnaided");
         Assert.assertNotNull(activityQuestion);
         Assert.assertNotNull(activityQuestion.getActivityType());

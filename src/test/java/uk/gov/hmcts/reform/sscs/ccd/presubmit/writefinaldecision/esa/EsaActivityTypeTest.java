@@ -10,15 +10,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 
 @RunWith(JUnitParamsRunner.class)
 public class EsaActivityTypeTest {
 
     @Mock
-    private SscsCaseData sscsCaseData;
+    private SscsEsaCaseData sscsEsaCaseData;
 
     @Before
     public void setUp() {
@@ -40,8 +42,8 @@ public class EsaActivityTypeTest {
 
         Function<SscsCaseData, List<String>> answersExtractor = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor();
         Assert.assertNotNull(answersExtractor);
-
-        Mockito.when(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()).thenReturn(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"));
+        Mockito.when(sscsEsaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()).thenReturn(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"));
+        SscsCaseData sscsCaseData = SscsCaseData.builder().esaSscsCaseData(sscsEsaCaseData).build();
         List<String> answers = answersExtractor.apply(sscsCaseData);
         Assert.assertEquals(Arrays.asList("physicalDisabilitiesAnswer1", "physicalDisabilitiesAnswer2"), answers);
     }
@@ -51,8 +53,8 @@ public class EsaActivityTypeTest {
 
         Function<SscsCaseData, List<String>> answersExtractor = EsaActivityType.MENTAL_ASSESSMENT.getAnswersExtractor();
         Assert.assertNotNull(answersExtractor);
-
-        Mockito.when(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()).thenReturn(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"));
+        SscsCaseData sscsCaseData = SscsCaseData.builder().esaSscsCaseData(sscsEsaCaseData).build();
+        Mockito.when(sscsEsaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion()).thenReturn(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"));
         List<String> answers = answersExtractor.apply(sscsCaseData);
         Assert.assertEquals(Arrays.asList("mentalAssessmentAnswer1", "mentalAssessmentAnswer2"), answers);
     }
