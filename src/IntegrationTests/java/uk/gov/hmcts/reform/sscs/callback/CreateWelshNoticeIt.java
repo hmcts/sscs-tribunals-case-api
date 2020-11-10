@@ -107,7 +107,7 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
                 Collections.singletonList(new DynamicListItem("Direction Notice", "Direction Notice"))
         );
 
-        assertTrue(result.getData().isLanguagePreferenceWelshAsBoolean());
+        assertTrue(result.getData().isLanguagePreferenceWelsh());
         assertEquals(expectedNoticeType, result.getData().getOriginalNoticeDocuments());
         assertEquals(expectedDocumentType, result.getData().getDocumentTypes());
     }
@@ -129,7 +129,7 @@ public class CreateWelshNoticeIt extends AbstractEventIt {
                 Collections.singletonList(new DynamicListItem("Decision Notice", "Decision Notice"))
         );
 
-        assertTrue(result.getData().isLanguagePreferenceWelshAsBoolean());
+        assertTrue(result.getData().isLanguagePreferenceWelsh());
         assertEquals(expectedNoticeType, result.getData().getOriginalNoticeDocuments());
         assertEquals(expectedDocumentType, result.getData().getDocumentTypes());
     }

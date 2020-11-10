@@ -29,7 +29,7 @@ public class UpdateWelshPreferenceIt extends AbstractEventIt {
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdAboutToSubmit"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-        assertTrue(result.getData().isLanguagePreferenceWelshAsBoolean());
+        assertTrue(result.getData().isLanguagePreferenceWelsh());
     }
 }
 

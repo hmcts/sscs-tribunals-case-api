@@ -44,7 +44,7 @@ public class MarkDocumentsForTranslationIt extends AbstractEventIt {
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
-        assertTrue(result.getData().isLanguagePreferenceWelshAsBoolean());
+        assertTrue(result.getData().isLanguagePreferenceWelsh());
     }
 
     @Test
