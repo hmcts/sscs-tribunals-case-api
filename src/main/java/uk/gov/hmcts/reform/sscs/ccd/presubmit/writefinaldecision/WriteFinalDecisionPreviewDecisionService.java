@@ -330,7 +330,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             builder.esaNumberOfPoints(numberOfPoints);
         }
 
-        builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSchedule3Selections()));
+        if (caseData.getSchedule3Selections() != null && !caseData.getSchedule3Selections().isEmpty()) {
+            builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSchedule3Selections()));
+        }
 
         builder.regulation29Applicable(caseData.getDoesRegulation29Apply() == null ? null :  caseData.getDoesRegulation29Apply().toBoolean());
         builder.regulation35Applicable(caseData.getDoesRegulation35Apply() == null ? null :  caseData.getDoesRegulation35Apply().toBoolean());
