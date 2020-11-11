@@ -50,6 +50,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
     private final DecisionNoticeService decisionNoticeService;
 
+    private static final String ESA_BENEFIT_TYPE = "ESA";
+    private static final String PIP_BENEFIT_TYPE = "PIP";
+
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
         DecisionNoticeService decisionNoticeService,  DocumentConfiguration documentConfiguration) {
@@ -137,11 +140,11 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
 
-        if ("PIP".equals(benefitType)) {
+        if (PIP_BENEFIT_TYPE.equals(benefitType)) {
             setPipEntitlements(writeFinalDecisionBuilder, caseData);
             setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
         }
-        if ("ESA".equals(benefitType)) {
+        if (ESA_BENEFIT_TYPE.equals(benefitType)) {
             setEsaDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
             setEsaEntitlements(writeFinalDecisionBuilder, caseData);
         }
@@ -250,7 +253,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     private void setEsaEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
         Optional<AwardType> esaAwardTypeOptional = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-                .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeService.getQuestionService("ESA"), caseData).getAwardType();
+                .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeService.getQuestionService(ESA_BENEFIT_TYPE), caseData).getAwardType();
 
         if (esaAwardTypeOptional.isEmpty()) {
             builder.esaIsEntited(false);
@@ -340,17 +343,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getQuestionAndAnswerDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
+        return getQuestionAndAnswerDescriptorsFromQuestionKeys(PIP_BENEFIT_TYPE, PipActivityQuestion::getByKey, caseData, questionKeys);
     }
 
     protected List<Descriptor> getEsaSchedule2DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService("ESA");
-        return getQuestionAndAnswerDescriptorsFromQuestionKeys("ESA", key -> questionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
+        EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService(ESA_BENEFIT_TYPE);
+        return getQuestionAndAnswerDescriptorsFromQuestionKeys(ESA_BENEFIT_TYPE, key -> questionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
     protected List<Descriptor> getEsaSchedule3DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService("ESA");
-        return getQuestionOnlyDescriptorsFromQuestionKeys("ESA", key -> questionService.extractQuestionFromKey(EsaSchedule3QuestionKey.getByKey(key)), caseData, questionKeys);
+        EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService(ESA_BENEFIT_TYPE);
+        return getQuestionOnlyDescriptorsFromQuestionKeys(ESA_BENEFIT_TYPE, key -> questionService.extractQuestionFromKey(EsaSchedule3QuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
     protected List<Descriptor> getQuestionAndAnswerDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
