@@ -28,6 +28,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivity
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaSchedule3QuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -174,7 +175,6 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         builder.writeFinalDecisionTemplateBody(payload);
 
         return builder.build();
-
     }
 
     private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
@@ -305,45 +305,53 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
     protected void setEsaDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        List<Descriptor> allDescriptors = new ArrayList<>();
+        List<Descriptor> allSchedule2Descriptors = new ArrayList<>();
         List<String> physicalDisabilityAnswers = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
         if (physicalDisabilityAnswers != null) {
-            List<Descriptor> physicalDisablityDescriptors = getEsaDescriptorsFromQuestionKeys(caseData, physicalDisabilityAnswers);
-            allDescriptors.addAll(physicalDisablityDescriptors);
+            List<Descriptor> physicalDisablityDescriptors = getEsaSchedule2DescriptorsFromQuestionKeys(caseData, physicalDisabilityAnswers);
+            allSchedule2Descriptors.addAll(physicalDisablityDescriptors);
         }
         List<String> mentalAssessmentAnswers = EsaActivityType.MENTAL_ASSESSMENT.getAnswersExtractor().apply(caseData);
         if (mentalAssessmentAnswers != null) {
 
-            List<Descriptor> mentalAssessmentDescriptors = getEsaDescriptorsFromQuestionKeys(caseData, mentalAssessmentAnswers);
-            allDescriptors.addAll(mentalAssessmentDescriptors);
+            List<Descriptor> mentalAssessmentDescriptors = getEsaSchedule2DescriptorsFromQuestionKeys(caseData, mentalAssessmentAnswers);
+            allSchedule2Descriptors.addAll(mentalAssessmentDescriptors);
 
         }
-        if (allDescriptors.isEmpty()) {
+        if (allSchedule2Descriptors.isEmpty()) {
             builder.esaSchedule2Descriptors(null);
             builder.esaNumberOfPoints(null);
         } else {
-            builder.esaSchedule2Descriptors(allDescriptors);
-            int numberOfPoints = allDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
+            builder.esaSchedule2Descriptors(allSchedule2Descriptors);
+            int numberOfPoints = allSchedule2Descriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
             if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(numberOfPoints)) {
                 caseData.setDoesRegulation29Apply(null);
             }
             builder.esaNumberOfPoints(numberOfPoints);
         }
+
+        builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSchedule3Selections()));
+
         builder.regulation29Applicable(caseData.getDoesRegulation29Apply() == null ? null :  caseData.getDoesRegulation29Apply().toBoolean());
         builder.regulation35Applicable(caseData.getDoesRegulation35Apply() == null ? null :  caseData.getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
     }
 
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
+        return getQuestionAndAnswerDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
     }
 
-    protected List<Descriptor> getEsaDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+    protected List<Descriptor> getEsaSchedule2DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
         EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService("ESA");
-        return getDescriptorsFromQuestionKeys("ESA", key -> questionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
+        return getQuestionAndAnswerDescriptorsFromQuestionKeys("ESA", key -> questionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
-    protected List<Descriptor> getDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
+    protected List<Descriptor> getEsaSchedule3DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+        EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService("ESA");
+        return getQuestionOnlyDescriptorsFromQuestionKeys("ESA", key -> questionService.extractQuestionFromKey(EsaSchedule3QuestionKey.getByKey(key)), caseData, questionKeys);
+    }
+
+    protected List<Descriptor> getQuestionAndAnswerDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
 
         DecisionNoticeQuestionService decisionNoticeQuestionService = decisionNoticeService.getQuestionService(benefitType);
 
@@ -358,6 +366,25 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         descriptors.sort(new DescriptorLexicographicalComparator());
 
         return descriptors;
+    }
+
+    protected List<Descriptor> getQuestionOnlyDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
+
+        DecisionNoticeQuestionService decisionNoticeQuestionService = decisionNoticeService.getQuestionService(benefitType);
+
+        List<Descriptor> descriptors = questionKeys
+            .stream().map(q ->
+                buildDescriptorFromActivityQuestion(activityQuestionlookup.getByKey(q))).collect(Collectors.toList());
+
+        descriptors.sort(new DescriptorLexicographicalComparator());
+
+        return descriptors;
+    }
+
+    protected Descriptor buildDescriptorFromActivityQuestion(ActivityQuestion activityQuestion) {
+        return Descriptor.builder()
+            .activityQuestionValue(activityQuestion.getValue())
+            .build();
     }
 
     protected Descriptor buildDescriptorFromActivityAnswer(ActivityQuestion activityQuestion, ActivityAnswer answer) {
