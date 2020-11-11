@@ -98,7 +98,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         builder.userName(buildSignedInJudgeName(userAuthorisation));
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
-        writeFinalDecisionBuilder.isWcaAppeal(caseData.isWcaAppeal());
+        writeFinalDecisionBuilder.wcaAppeal(caseData.isWcaAppeal());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
@@ -329,7 +329,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             }
             builder.esaNumberOfPoints(numberOfPoints);
         }
-        builder.isSupportGroupOnly(caseData.isSupportGroupOnlyAppeal());
+        builder.regulation29Applicable(caseData.getDoesRegulation29Apply() == null ? null :  caseData.getDoesRegulation29Apply().toBoolean());
+        builder.regulation35Applicable(caseData.getDoesRegulation35Apply() == null ? null :  caseData.getDoesRegulation35Apply().toBoolean());
+        builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
     }
 
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
