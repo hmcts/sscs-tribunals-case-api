@@ -13,6 +13,9 @@ import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionAboutToSubmitHandlerTestBase;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -20,6 +23,11 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
     public PipWriteFinalDecisionAboutToSubmitHandlerTest() throws IOException {
         super(new PipDecisionNoticeQuestionService());
+    }
+
+    @Override
+    protected DecisionNoticeOutcomeService createOutcomeService(DecisionNoticeQuestionService decisionNoticeQuestionService) {
+        return new PipDecisionNoticeOutcomeService();
     }
 
     @Override

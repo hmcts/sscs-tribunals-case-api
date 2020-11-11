@@ -22,6 +22,18 @@ public abstract class DecisionNoticeOutcomeService {
 
     public abstract Outcome determineOutcome(SscsCaseData sscsCaseData);
 
+    /**
+     * Due to a bug with CCD related to hidden fields, hidden fields are not being unset
+     * on the final submission from CCD, so we need to reset them here
+     * See https://tools.hmcts.net/jira/browse/RDM-8200
+     * This method provides a hook to temporarily workaround this issue, and allow
+     * hidden fields to be unset.
+     *
+     */
+    public abstract void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData);
+
+    public abstract Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData);
+
     protected Outcome useExplicitySetOutcome(SscsCaseData sscsCaseData) {
         if (sscsCaseData.getWriteFinalDecisionAllowedOrRefused() == null) {
             return null;
@@ -33,4 +45,5 @@ public abstract class DecisionNoticeOutcomeService {
             }
         }
     }
+
 }

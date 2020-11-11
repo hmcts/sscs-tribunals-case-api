@@ -1,10 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.FALSE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.SPECIFIED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.TRUE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.YesNoPredicate.UNSPECIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.SPECIFIED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,15 +12,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntPredicate;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListFieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
+/**
+ * Encapsulates the conditions satisfied by valid journeys through the decision notice flow,
+ * along with additional validation criteria and error message.  To be used as part of validation
+ * before preview.
+ */
 public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements PointsCondition<EsaPointsRegulationsAndSchedule3ActivitiesCondition> {
 
     LOW_POINTS_REGULATION_29_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
@@ -34,7 +45,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         Arrays.asList(isRegulation29(TRUE), isRegulation35(TRUE)), Optional.of(AwardType.HIGHER_RATE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_UNSPECIFIED(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isRegulation35(UNSPECIFIED, false), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
+        isRegulation35(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isRegulation35(FALSE), Optional.of(AwardType.LOWER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
@@ -49,6 +60,10 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     EsaPointsRegulationsAndSchedule3ActivitiesCondition(EsaPointsCondition pointsCondition, YesNoFieldCondition primaryCondition,
         Optional<AwardType> awardType, FieldCondition...validationConditions) {
         this(pointsCondition, Arrays.asList(primaryCondition), awardType, validationConditions);
+    }
+
+    public Optional<AwardType> getAwardType() {
+        return awardType;
     }
 
     EsaPointsRegulationsAndSchedule3ActivitiesCondition(EsaPointsCondition pointsCondition, List<YesNoFieldCondition> primaryConditions,
@@ -69,19 +84,19 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
                 SscsCaseData::getDoesRegulation29Apply, displaySatisifiedMessageOnError);
     }
 
-    static YesNoFieldCondition isRegulation35(YesNoPredicate predicate) {
+    static YesNoFieldCondition isRegulation35(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-                SscsCaseData::getDoesRegulation35Apply);
+                SscsCaseData::getRegulation35Selection);
     }
 
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate, boolean displaySatisifiedMessageOnError) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-                SscsCaseData::getDoesRegulation35Apply, displaySatisifiedMessageOnError);
+                SscsCaseData::getRegulation35Selection, displaySatisifiedMessageOnError);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
         return new StringListFieldCondition("Schedule 3 Activities", predicate,
-                SscsCaseData::getEsaWriteFinalDecisionSchedule3ActivitiesQuestion);
+            SscsCaseData::getSchedule3Selections);
     }
 
     @Override
@@ -103,6 +118,31 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     @Override
     public Function<SscsCaseData, List<String>> getAnswersExtractor() {
         return getAllAnswersExtractor();
+    }
+
+    public static EsaPointsRegulationsAndSchedule3ActivitiesCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+        for (EsaPointsRegulationsAndSchedule3ActivitiesCondition esaPointsAndActivitiesCondition : EsaPointsRegulationsAndSchedule3ActivitiesCondition.values()) {
+
+            if (esaPointsAndActivitiesCondition.isApplicable(questionService, caseData) && esaPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+                return esaPointsAndActivitiesCondition;
+            }
+        }
+        throw new IllegalStateException(
+            "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getSchedule3Selections() + ":" + caseData.getRegulation35Selection());
+    }
+
+    public static Optional<EsaAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+
+        EsaPointsRegulationsAndSchedule3ActivitiesCondition condition
+            = getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData);
+
+        if (condition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+            return Optional.of(EsaAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
