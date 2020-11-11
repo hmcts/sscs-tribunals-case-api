@@ -108,10 +108,10 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             return true;
         } else if (address.getLine2() != null && !address.getLine2().isEmpty() && !p.matcher(address.getLine2()).find()) {
             return true;
-        } else if (address.getTown() != null && !address.getLine2().isEmpty() && !p.matcher(address.getTown()).find()) {
+        } else if (address.getTown() != null && !address.getTown().isEmpty() && !p.matcher(address.getTown()).find()) {
             return true;
         } else {
-            return address.getCounty() != null && !address.getLine2().isEmpty() && !p.matcher(address.getCounty()).find();
+            return address.getCounty() != null && !address.getCounty().isEmpty() && !p.matcher(address.getCounty()).find();
         }
     }
 
