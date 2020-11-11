@@ -100,7 +100,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
         writeFinalDecisionBuilder.wcaAppeal(caseData.isWcaAppeal());
-        writeFinalDecisionBuilder.dwpReassessTheAward(caseData.getDwpReassessTheAward());
+        writeFinalDecisionBuilder.dwpReassessTheAward(caseData.getSscsEsaCaseData().getDwpReassessTheAward());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
@@ -311,6 +311,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             allDescriptors.addAll(mentalAssessmentDescriptors);
 
         }
+
         if (allDescriptors.isEmpty()) {
             builder.esaSchedule2Descriptors(null);
             builder.esaNumberOfPoints(null);

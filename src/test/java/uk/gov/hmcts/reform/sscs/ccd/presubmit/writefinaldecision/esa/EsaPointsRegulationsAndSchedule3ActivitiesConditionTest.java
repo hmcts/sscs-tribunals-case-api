@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
@@ -178,8 +179,8 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                         .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                         .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
                         .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply))
-                        .esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
-                        .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build();
+                        .esaSscsCaseData(SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
+                            .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
 
                     Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData), Mockito.any())).thenReturn(points);
 
