@@ -128,19 +128,22 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
     private void clearTransientFields(PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
         SscsCaseData sscsCaseData = preSubmitCallbackResponse.getData();
 
+        sscsCaseData.setWriteFinalDecisionGenerateNotice(null);
         sscsCaseData.setWriteFinalDecisionTypeOfHearing(null);
         sscsCaseData.setWriteFinalDecisionPresentingOfficerAttendedQuestion(null);
         sscsCaseData.setWriteFinalDecisionAppellantAttendedQuestion(null);
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName(null);
         sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName(null);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(null);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
         sscsCaseData.setWriteFinalDecisionStartDate(null);
         sscsCaseData.setWriteFinalDecisionEndDateType(null);
         sscsCaseData.setWriteFinalDecisionEndDate(null);
         sscsCaseData.setWriteFinalDecisionDateOfDecision(null);
+
+        //PIP
+        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(null);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(null);
+        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(null);
+        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(null);
         sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion(null);
@@ -162,6 +165,37 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow(null);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused(null);
         sscsCaseData.setWriteFinalDecisionAnythingElse(null);
+
+        //ESA
+        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionMentalAssessmentQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionStandingAndSittingQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionReachingQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionPickingUpQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionManualDexterityQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionMakingSelfUnderstoodQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionCommunicationQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionNavigationQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionLossOfControlQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionConsciousnessQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionLearningTasksQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionAwarenessOfHazardsQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionPersonalActionQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionCopingWithChangeQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionGettingAboutQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionSocialEngagementQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
+        sscsCaseData.setShowRegulation29Page(null);
+        sscsCaseData.setShowSchedule3ActivitiesPage(null);
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
+        sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
+        sscsCaseData.setWcaAppeal(null);
+        sscsCaseData.setSupportGroupOnlyAppeal(null);
+        sscsCaseData.setDoesRegulation29Apply(null);
+        sscsCaseData.setDoesRegulation35Apply(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
