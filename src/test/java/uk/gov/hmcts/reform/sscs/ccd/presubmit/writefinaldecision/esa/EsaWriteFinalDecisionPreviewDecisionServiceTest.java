@@ -39,8 +39,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -102,11 +102,11 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     @Override
     protected void setHigherRateScenarioFields(SscsCaseData caseData) {
-        caseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
-        caseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
         caseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        caseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        caseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         caseData.setDoesRegulation35Apply(YesNo.YES);
     }
 
