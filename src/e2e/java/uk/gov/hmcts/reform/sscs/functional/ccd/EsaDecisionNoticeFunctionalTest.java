@@ -19,16 +19,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.rules.SpringClassRule;
 import org.springframework.test.context.junit4.rules.SpringMethodRule;
 import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
 @RunWith(JUnitParamsRunner.class)
+@TestPropertySource(locations = "classpath:config/application_e2e.properties")
 public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
-
-    private static final String DM_URL_LOCAL = "http://dm-store:5005";
-    private static final String DM_URL_AAT = "http://dm-store-aat.service.core-compute-aat.internal";
-    private static final String DM_URL = System.getenv("TEST_URL") != null && System.getenv("TEST_URL").contains("aat") ? DM_URL_AAT : DM_URL_LOCAL;
 
     @ClassRule
     public static final SpringClassRule scr = new SpringClassRule();
@@ -59,17 +57,13 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
-        byte[] bytes = sscsMyaBackendRequests.toBytes(getDocumentUrl(ccdEventResponse));
+        byte[] bytes = sscsMyaBackendRequests.toBytes(ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = pdfText.replaceAll("[\\n\\t]", "");
             assertThat(pdfTextWithoutNewLines, containsString("7. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
             assertThat(pdfTextWithoutNewLines, containsString(expectedText));
         }
-    }
-
-    private String getDocumentUrl(CcdEventResponse ccdEventResponse) {
-        return ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl().replaceFirst(DM_URL_LOCAL, DM_URL);
     }
 
     private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {
