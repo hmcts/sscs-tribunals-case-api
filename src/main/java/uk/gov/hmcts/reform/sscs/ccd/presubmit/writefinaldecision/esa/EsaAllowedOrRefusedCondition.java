@@ -30,6 +30,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListField
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
@@ -107,6 +108,32 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected,
         FieldCondition...validationConditions) {
         this(allowedOrRefusedCondition, supportGroupOnlyCondition, primaryPointsCondition, schedule3ActivitiesSelected, isAnyPoints(), validationConditions);
+    }
+
+    public EsaScenario getEsaScenario(SscsCaseData caseData) {
+        if (REFUSED_NON_SUPPORT_GROUP_ONLY == this) {
+            return EsaScenario.SCENARIO_1;
+        } else if (REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS == this || REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS == this) {
+            return EsaScenario.SCENARIO_2;
+        } else if (ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(TRUE).isSatisified(caseData)) {
+            return EsaScenario.SCENARIO_3;
+        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
+            return EsaScenario.SCENARIO_4;
+        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
+            return EsaScenario.SCENARIO_4;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSchedule3Selections().isEmpty()) {
+            return EsaScenario.SCENARIO_5;
+        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSchedule3Selections().isEmpty()) {
+            return EsaScenario.SCENARIO_6;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSchedule3Selections().isEmpty() && isRegulation35(FALSE).isSatisified(caseData)) {
+            return EsaScenario.SCENARIO_7;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSchedule3Selections().isEmpty() && isRegulation35(TRUE).isSatisified(caseData)) {
+            return EsaScenario.SCENARIO_8;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSchedule3Selections().isEmpty()) {
+            return EsaScenario.SCENARIO_9;
+        } else {
+            throw new IllegalStateException("No scenario applicable");
+        }
     }
 
     EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected, Optional<EsaPointsCondition> validationPointsCondition,

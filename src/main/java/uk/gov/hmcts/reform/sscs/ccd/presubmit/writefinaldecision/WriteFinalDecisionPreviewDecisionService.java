@@ -26,8 +26,11 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -161,6 +164,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionAppellantAttendedQuestion()));
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
 
+
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
         validateRequiredProperties(payload);
@@ -172,6 +176,35 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
 
         builder.writeFinalDecisionTemplateBody(payload);
+
+        // This ESA-specific code will be moved into a subclass when this class is
+        // refactored.
+        if ("ESA".equals(benefitType)) {
+
+            // Currently the retrieval of the below condition is done on submission, rather than
+            // preview.
+            // At the moment, if the user's choices are invalid they will only find this out at submission time,
+            // and are still able to preview the document.
+            // We'll need to revisit this if we move to this new strategy,  as we will need a valid
+            // condition in order to determine the scenario.
+
+            Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
+                .getPassingAllowedOrRefusedCondition(decisionNoticeService.getQuestionService("ESA"), caseData);
+
+            // As discussed above, currently the condition may not be present
+            if (condition.isPresent()) {
+
+                EsaScenario scenario = condition.get().getEsaScenario(caseData);
+
+                // Once we have a scenario, we should always have template content,
+                // but only one scenario has been implemented - so for now, fail silently.
+                Optional<EsaTemplateContent> templateContent = scenario.getContent(payload);
+                if (templateContent.isPresent()) {
+                    // Add the template content to the builder
+                    builder.writeFinalDecisionTemplateContent(templateContent.get());
+                }
+            }
+        }
 
         return builder.build();
 

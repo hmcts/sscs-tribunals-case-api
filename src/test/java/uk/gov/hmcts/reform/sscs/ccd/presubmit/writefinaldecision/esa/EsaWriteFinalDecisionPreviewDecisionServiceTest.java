@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -88,6 +89,9 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+
+        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        Assert.assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Override

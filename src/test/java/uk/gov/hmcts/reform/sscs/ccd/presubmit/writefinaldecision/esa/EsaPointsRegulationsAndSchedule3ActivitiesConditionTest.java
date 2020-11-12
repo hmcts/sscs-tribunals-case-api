@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -234,15 +235,15 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             1, allowedOrRefusedConditionApplicableCount);
 
                         if (isValidAllowedOrRefusedCombinationExpected) {
-                            if (matchingAllowedOrRefusedCondition
-                                .getOptionalErrorMessage(questionService, caseData).isPresent()) {
-                                System.out.println(matchingAllowedOrRefusedCondition
-                                    .getOptionalErrorMessage(questionService, caseData).get());
-                            }
-                            System.out.println(matchingAllowedOrRefusedCondition);
                             Assert.assertTrue("Unexpected error for:" + points + ":" + doesRegulation29Apply
                                 + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingAllowedOrRefusedCondition
                                 .getOptionalErrorMessage(questionService, caseData).isEmpty());
+
+
+                            // Assert that for a valid allowed/refused condition, we can always retrieve a single scenario
+                            // which we will use to generate content
+                            EsaScenario scenario = matchingAllowedOrRefusedCondition.getEsaScenario(caseData);
+                            Assert.assertNotNull(scenario);
 
                         } else {
                             Assert.assertTrue("Expected an error for:" + points + ":" + doesRegulation29Apply
