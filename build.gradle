@@ -201,7 +201,7 @@ def versions = [
 ext["rest-assured.version"] = '4.2.0'
 
 ext {
-    springCloudVersion = 'Hoxton.SR8'
+    springCloudVersion = 'Hoxton.SR9'
 }
 
 dependencyManagement {
