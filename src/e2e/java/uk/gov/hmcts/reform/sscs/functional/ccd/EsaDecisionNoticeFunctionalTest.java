@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
-import static io.restassured.RestAssured.baseURI;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
@@ -36,10 +35,6 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
-
-    public EsaDecisionNoticeFunctionalTest() {
-        baseURI = baseUrl;
-    }
 
     @Test
     @Parameters({
