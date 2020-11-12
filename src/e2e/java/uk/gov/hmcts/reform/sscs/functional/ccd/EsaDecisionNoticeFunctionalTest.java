@@ -26,6 +26,10 @@ import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 @RunWith(JUnitParamsRunner.class)
 public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
+    private static final String DM_URL_LOCAL = "http://dm-store:5005";
+    private static final String DM_URL_AAT = "http://dm-store-aat.service.core-compute-aat.internal";
+    private static final String DM_URL = System.getenv("TEST_URL") != null && System.getenv("TEST_URL").contains("aat") ? DM_URL_AAT : DM_URL_LOCAL;
+
     @ClassRule
     public static final SpringClassRule scr = new SpringClassRule();
 
@@ -55,7 +59,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         CcdEventResponse ccdEventResponse = getCcdEventResponse(httpResponse);
         assertThat(httpResponse.getStatusLine().getStatusCode(), is(200));
         assertThat(ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument(), is(not(nullValue())));
-        byte[] bytes = sscsMyaBackendRequests.toBytes(ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl());
+        byte[] bytes = sscsMyaBackendRequests.toBytes(getDocumentUrl(ccdEventResponse));
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = pdfText.replaceAll("[\\n\\t]", "");
@@ -64,6 +68,9 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
+    private String getDocumentUrl(CcdEventResponse ccdEventResponse) {
+        return ccdEventResponse.getData().getWriteFinalDecisionPreviewDocument().getDocumentUrl().replaceFirst(DM_URL_LOCAL, DM_URL);
+    }
 
     private CcdEventResponse getCcdEventResponse(HttpResponse httpResponse) throws IOException {
         String response = EntityUtils.toString(httpResponse.getEntity());
