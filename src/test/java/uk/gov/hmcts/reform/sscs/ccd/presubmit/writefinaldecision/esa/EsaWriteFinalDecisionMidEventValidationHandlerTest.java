@@ -30,11 +30,11 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
                 Arrays.asList("mobilisingUnaided"));
 
         // < 15 points - correct for these fields
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
     }
 
     @Override
@@ -44,14 +44,14 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setEmptyActivitiesListScenario(SscsCaseData caseData) {
-        caseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Collections.emptyList());
-        caseData.setEsaWriteFinalDecisionMentalAssessmentQuestion(Collections.emptyList());
+        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Collections.emptyList());
+        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMentalAssessmentQuestion(Collections.emptyList());
     }
 
     @Override
     protected void setNullActivitiesListScenario(SscsCaseData caseData) {
-        caseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
-        caseData.setEsaWriteFinalDecisionMentalAssessmentQuestion(null);
+        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+        caseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMentalAssessmentQuestion(null);
     }
 
     @Test
@@ -59,11 +59,11 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply());
+        assertNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("Yes", sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply());
+        assertEquals("Yes", sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
     }
@@ -73,11 +73,11 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
 
-        assertEquals("No", sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply());
+        assertEquals("No", sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
     }

@@ -318,6 +318,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             allDescriptors.addAll(mentalAssessmentDescriptors);
 
         }
+
         if (allDescriptors.isEmpty()) {
             builder.esaSchedule2Descriptors(null);
             builder.esaNumberOfPoints(null);

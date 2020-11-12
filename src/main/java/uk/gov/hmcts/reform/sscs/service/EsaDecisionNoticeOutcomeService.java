@@ -39,12 +39,12 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
             // getSchedule3Selections methods peform this check,  and we use these methods
             // to set the final values of doesRegulation35Apply and esaWriteFinalDecisionSchedule3ActivitiesQuestion
             sscsCaseData.setDoesRegulation35Apply(sscsCaseData.getRegulation35Selection());
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(sscsCaseData.getSchedule3Selections());
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(sscsCaseData.getSchedule3Selections());
         } else if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
-                sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+                sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
                 sscsCaseData.setDoesRegulation35Apply(null);
-                sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
+                sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
             }
         }
 

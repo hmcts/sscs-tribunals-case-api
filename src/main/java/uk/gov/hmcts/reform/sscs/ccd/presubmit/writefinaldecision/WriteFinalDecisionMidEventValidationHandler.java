@@ -17,6 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
@@ -190,19 +191,20 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
     }
 
     private void setEsaDefaultFields(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
     }
 
     private void validateEsaAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() != null
-            || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() != null) {
+        SscsEsaCaseData esaCaseData = sscsCaseData.getSscsEsaCaseData();
+        if (esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() != null
+            || esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() != null) {
 
-            if ((sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
-                || sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
-                && (sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
-                || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())
+            if ((esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
+                || esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
+                && (esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
+                || esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())
                 && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())
                 && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
                 if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
