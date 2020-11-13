@@ -27,6 +27,6 @@ public class Scenario4Content extends EsaTemplateContent {
 
     @Override
     public EsaScenario getScenario() {
-        return EsaScenario.SCENARIO_4;
+        return EsaScenario.SCENARIO_3;
     }
 }
