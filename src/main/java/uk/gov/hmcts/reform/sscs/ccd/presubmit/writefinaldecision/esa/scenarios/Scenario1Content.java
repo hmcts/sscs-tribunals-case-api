@@ -23,10 +23,6 @@ public class Scenario1Content extends EsaTemplateContent {
         }
     }
 
-    public String getAllowedOrRefusedSentence(boolean allowed) {
-        return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
-    }
-
     @Override
     public EsaScenario getScenario() {
         return EsaScenario.SCENARIO_1;
