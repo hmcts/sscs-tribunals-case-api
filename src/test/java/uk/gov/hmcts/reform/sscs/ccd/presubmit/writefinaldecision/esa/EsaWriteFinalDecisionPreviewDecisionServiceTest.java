@@ -1,15 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
@@ -86,14 +82,14 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(9, body.getEsaNumberOfPoints().intValue());
 
 
-        assertEquals(false, body.isEsaIsEntited());
+        assertFalse(body.isEsaIsEntited());
         assertEquals("noRecommendation", body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
 
-        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
-        Assert.assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Override
