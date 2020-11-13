@@ -29,7 +29,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     public String getSchedule2InsufficientPointsSentence(Integer points, Boolean regulation29Applies) {
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "2 of the ESA Regulations 2008" + (regulation29Applies != null && regulation29Applies.booleanValue() ? "made up as follows:"
+            + "2 of the ESA Regulations 2008" + (regulation29Applies != null && regulation29Applies.booleanValue() ? " made up as follows:"
             : ". This is insufficient to meet the "
             + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }
@@ -49,7 +49,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     public String getHearingTypeSentence(String appellantName, String bundlePage) {
         // Placeholder for SSCS-8033 (Chris D)
         return "This has been an oral (face to face) hearing. "
-        + appellantName + "attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage
+        + appellantName + " attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage
         + ". A Presenting Officer attended on behalf of the Respondent.";
     }
 
@@ -57,7 +57,6 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         // Placeholder for SSCS-8308 (Ryan)
         return "";
     }
-
 
 
     public abstract EsaScenario getScenario();

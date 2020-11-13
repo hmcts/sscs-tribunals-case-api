@@ -36,7 +36,7 @@ public class EsaScenario1Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.\n"
             + "\n"
-            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008. This is insufficient to meet the threshold for the test.Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.\n"
+            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.\n"
             + "\n"
             + "Mobilising Unaided\t1.c\t9\n"
             + "\n"
