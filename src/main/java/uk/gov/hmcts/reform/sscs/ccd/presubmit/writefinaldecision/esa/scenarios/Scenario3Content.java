@@ -11,7 +11,7 @@ public class Scenario3Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getConfirmedOrSetAsideSentence(writeFinalDecisionTemplateBody.isSetAside(), writeFinalDecisionTemplateBody.getDateOfDecision())));
         addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_WORK_PARAGRAPH.name(), getDoesHaveLimitedCapabilityForWorkRelatedSentence(writeFinalDecisionTemplateBody.getAppellantName())));
         addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_WORK_RELATED_ACTIVITY_PARAGRAPH.name(), getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(writeFinalDecisionTemplateBody.getAppellantName())));
-        addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_WORK_RELATED_ACTIVITY_PARAGRAPH.name(), getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies()));
+        addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_REGULATION_35_APPLIED_PARAGRAPH.name(), getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies()));
         addComponent(new Paragraph(EsaTemplateComponentId.DISEASE_OR_DISABLEMENT_PARAGRAPH.name(), getRegulation35DiseaseOrDisablementSentenceWorkRelated(writeFinalDecisionTemplateBody.getAppellantName())));
 
         if (writeFinalDecisionTemplateBody.getReasonsForDecision() != null) {
