@@ -30,12 +30,8 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability " : "") + "for work-related activity." : ".");
     }
 
-    public String getToBeTreatedLimitedCapabilityForWorkRelatedSentence(String appellantName) {
-        return appellantName + " is to be treated as having limited capability for work-related activity.";
-    }
-
-    public String getHasLimitedCapabilityForWorkRelatedSentence(String appellantName) {
-        return appellantName + " has limited capability for work-related activity.";
+    public String getLimitedCapabilityForWorkRelatedSentence(String appellantName, boolean isTreatedLimitedCapability) {
+        return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work-related activity.";
     }
 
     public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivity(String appellantName) {
@@ -83,13 +79,6 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
             + "because it found that " + appellantName + " suffers from [insert disease or disablement] and, by reasons of such disease or disablement, "
             + "there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work"
             + (isRegulation35Applied ? " and for work-related activity." : ".");
-    }
-
-    public String getRegulation35DiseaseOrDisablementSentence(String appellantName) {
-        //FIXME: Replace disease or disablement as part of future ticket
-        return "The tribunal applied that regulation because it found that " + appellantName + " suffers from "
-                + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
-                + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.";
     }
 
     public String getRegulation35DiseaseOrDisablementSentenceWorkRelated(String appellantName) {
