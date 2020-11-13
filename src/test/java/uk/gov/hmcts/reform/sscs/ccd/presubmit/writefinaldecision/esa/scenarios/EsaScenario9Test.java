@@ -23,7 +23,7 @@ public class EsaScenario9Test {
                 Arrays.asList(Descriptor.builder()
                         .activityQuestionValue("My schedule 3 descriptor")
                         .activityAnswerValue("1")
-                        .activityAnswerLetter("c").activityAnswerPoints(9).build());
+                        .activityAnswerLetter("b").activityAnswerPoints(9).build());
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -56,7 +56,7 @@ public class EsaScenario9Test {
             + "\n"
             + "The following activity and descriptor from Schedule 3 applied:\n"
             + "\n"
-            + "My schedule 3 descriptor\n"
+            + "My schedule 3 descriptor\t1.b\n"
             + "\n"
             + "\n"
             + "My first reasons\n"

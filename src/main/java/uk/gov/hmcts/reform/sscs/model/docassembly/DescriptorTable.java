@@ -5,18 +5,22 @@ import java.util.List;
 
 public class DescriptorTable extends TemplateComponent<List<Descriptor>> {
 
-    private boolean showOnlyFirstColumn;
+    private boolean hidePointsColumn;
 
-    public DescriptorTable(String id, List<Descriptor> content, boolean showOnlyFirstColumn) {
+    public DescriptorTable(String id, List<Descriptor> content, boolean hidePointsColumn) {
         super(id, content);
-        this.showOnlyFirstColumn = showOnlyFirstColumn;
+        this.hidePointsColumn = hidePointsColumn;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Descriptor descriptor : content) {
-            if (showOnlyFirstColumn) {
+            if (hidePointsColumn) {
                 sb.append(descriptor.getActivityQuestionValue());
+                sb.append("\t");
+                sb.append(descriptor.getActivityAnswerValue());
+                sb.append(".");
+                sb.append(descriptor.getActivityAnswerLetter());
             } else {
                 sb.append(descriptor.getActivityQuestionValue());
                 sb.append("\t");
@@ -41,8 +45,8 @@ public class DescriptorTable extends TemplateComponent<List<Descriptor>> {
         return false;
     }
 
-    @JsonProperty("is_show_only_first_column")
-    public boolean isShowOnlyFirstColumn() {
-        return showOnlyFirstColumn;
+    @JsonProperty("is_hide_points_column")
+    public boolean isHidePointsColumn() {
+        return hidePointsColumn;
     }
 }
