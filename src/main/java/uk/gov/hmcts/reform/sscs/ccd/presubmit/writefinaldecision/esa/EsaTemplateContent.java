@@ -35,22 +35,22 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public String getInsufficientPointsSentenceRegulation29Applied(Integer points, Boolean regulation29Applies) {
-        return "This is because insufficient points were scored to meet the threshold for the work capability assessment, " +
-                "but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied.";
+        return "This is because insufficient points were scored to meet the threshold for the work capability assessment, "
+                + "but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied.";
     }
 
     public String getRegulation29DiseaseOrDisablementSentence(String appellantName) {
         //FIXME: Replace disease or disablement as part of future ticket
         return "The tribunal applied regulation 29 because it found that " + appellantName + " suffers from "
-        + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
-        + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.";
+                + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
+                + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.";
     }
 
     public String getHearingTypeSentence(String appellantName, String bundlePage) {
         // Placeholder for SSCS-8033 (Chris D)
         return "This has been an oral (face to face) hearing. "
-        + appellantName + " attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage
-        + ". A Presenting Officer attended on behalf of the Respondent.";
+                + appellantName + " attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage
+                + ". A Presenting Officer attended on behalf of the Respondent.";
     }
 
     public String getRecommendationSentence() {
