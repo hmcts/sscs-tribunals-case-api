@@ -17,7 +17,7 @@ public class EsaScenario3Test {
                         .dateOfDecision("20/09/2020")
                         .esaNumberOfPoints(15)
                         .appellantName("Felix Sydney")
-                        .regulation35Applicable(false)
+                        .regulation35Applicable(true)
                         .supportGroupOnly(true)
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else").build();

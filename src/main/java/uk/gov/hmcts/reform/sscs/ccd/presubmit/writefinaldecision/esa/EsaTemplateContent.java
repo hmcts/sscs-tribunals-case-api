@@ -34,6 +34,14 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + " is to be treated as having limited capability for work-related activity.";
     }
 
+    public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivity(String appellantName) {
+        return appellantName + " continues to have limited capability for work but does not have limited capability for "
+                + "work-related activity. This is because no descriptor from Schedule 3 of the Employment and "
+                + "Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply. The Secretary of State "
+                + "has accepted that Felix Sydney has limited capability for work. This was not in issue.";
+    }
+
+
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName) {
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
                 + "work related activity. This was not an issue.";
