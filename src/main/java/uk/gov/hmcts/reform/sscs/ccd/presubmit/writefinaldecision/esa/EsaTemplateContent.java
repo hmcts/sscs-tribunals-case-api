@@ -30,6 +30,20 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability " : "") + "for work-related activity." : ".");
     }
 
+    public String getDoesHaveLimitedCapabilityForWorkRelatedSentence(String appellantName) {
+        return appellantName + " is to be treated as having limited capability for work-related activity.";
+    }
+
+    public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName) {
+        return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
+                + "work related activity. This was not an issue.";
+    }
+
+    public String getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies() {
+        return "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.";
+    }
+
+
     public String getSchedule2PointsSentence(Integer points, Boolean isSufficient) {
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
@@ -58,6 +72,20 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
             + "because it found that " + appellantName + " suffers from [insert disease or disablement] and, by reasons of such disease or disablement, "
             + "there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work"
             + (isRegulation35Applied ? " and for work-related activity." : ".");
+    }
+
+    public String getRegulation35DiseaseOrDisablementSentence(String appellantName) {
+        //FIXME: Replace disease or disablement as part of future ticket
+        return "The tribunal applied that regulation because it found that " + appellantName + " suffers from "
+                + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
+                + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.";
+    }
+
+    public String getRegulation35DiseaseOrDisablementSentenceWorkRelated(String appellantName) {
+        //FIXME: Replace disease or disablement as part of future ticket
+        return "The tribunal applied that regulation because it found that " + appellantName + " suffers from "
+                + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
+                + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work-related activity.";
     }
 
     public String getSchedule3AppliesParagraph() {
