@@ -103,7 +103,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         final String firstSentence = "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State.";
         final String secondSentence;
         if ("noRecommendation".equals(code)) {
-            secondSentence = format("The Tribunal makes no recommendation as to when the Department should reassess %s ", appellantName);
+            secondSentence = format("The Tribunal makes no recommendation as to when the Department should reassess %s.", appellantName);
         } else if ("doNotReassess".equals(code)) {
             secondSentence = "In view of the degree of disability found by the Tribunal, and unless the regulations change, the Tribunal would recommend that the appellant is not re-assessed.";
         } else if (startsWith(code, "doNotReassess")) {
