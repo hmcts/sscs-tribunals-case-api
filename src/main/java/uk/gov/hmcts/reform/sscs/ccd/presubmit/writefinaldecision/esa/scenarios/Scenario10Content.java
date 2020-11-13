@@ -1,12 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
-import uk.gov.hmcts.reform.sscs.model.docassembly.DescriptorTable;
-import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
-import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 public class Scenario10Content extends EsaTemplateContent {
 

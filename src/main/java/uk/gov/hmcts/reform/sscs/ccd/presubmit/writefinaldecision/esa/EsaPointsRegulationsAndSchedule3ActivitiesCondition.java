@@ -98,12 +98,12 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Wca Appeal", predicate,
-                (SscsCaseData sscsCaseData) -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO);
+            (SscsCaseData sscsCaseData) -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Wca Appeal", predicate,
-                (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
+            (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
