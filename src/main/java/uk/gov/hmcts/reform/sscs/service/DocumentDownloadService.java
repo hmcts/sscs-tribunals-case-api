@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.exception.DocumentNotFoundException;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 
 @Service
@@ -54,7 +55,27 @@ public class DocumentDownloadService {
         return 0L;
     }
 
-    public UploadedEvidence downloadFile(String urlString) {
+    public ResponseEntity<Resource> downloadFile(String urlString) {
+        ResponseEntity<Resource> response = null;
+        try {
+            response = documentDownloadClientApi.downloadBinary(
+                    OAUTH2_TOKEN,
+                    authTokenGenerator.generate(),
+                    "",
+                    USER_ID,
+                    getDownloadUrl(urlString)
+            );
+        } catch (Exception e) {
+            log.error("Error when downloading the following Binary file from the Document Management: {} ", urlString, e);
+        } finally {
+            if (response != null && HttpStatus.OK.equals(response.getStatusCode())) {
+                return response;
+            }
+            throw new DocumentNotFoundException();
+        }
+    }
+
+    public UploadedEvidence getUploadedEvidence(String urlString) {
         ResponseEntity<Resource> response;
         try {
             response = documentDownloadClientApi.downloadBinary(
@@ -66,7 +87,7 @@ public class DocumentDownloadService {
             );
             if (HttpStatus.OK.equals(response.getStatusCode())) {
                 return new UploadedEvidence(response.getBody(), Objects.requireNonNull(response.getHeaders().get("originalfilename")).get(0), Objects
-                    .requireNonNull(response.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0));
+                        .requireNonNull(response.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0));
             } else {
                 throw new IllegalStateException("Cannot download document that is stored in CCD got "
                         + "[" + response.getStatusCode() + "] " + response.getBody());
