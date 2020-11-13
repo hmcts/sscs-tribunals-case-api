@@ -1,12 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
-import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
-
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.commons.lang3.StringUtils.startsWith;
+
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
 public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateContent {
 
