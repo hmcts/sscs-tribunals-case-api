@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.SPECIFIED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
@@ -49,8 +50,9 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     HIGH_POINTS_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isRegulation35(FALSE), Optional.of(AwardType.LOWER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isRegulation35(TRUE), Optional.of(AwardType.HIGHER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY));
-
+        isRegulation35(TRUE), Optional.of(AwardType.HIGHER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
+    NON_WCA_APPEAL(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
+            Arrays.asList(isWcaAppeal(FALSE), isDwpReassessTheAward(TRUE)), Optional.empty(), isDwpReassessTheAward(TRUE));
     List<YesNoFieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
@@ -92,6 +94,16 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate, boolean displaySatisifiedMessageOnError) {
         return new YesNoFieldCondition("Regulation 35", predicate,
                 SscsCaseData::getRegulation35Selection, displaySatisifiedMessageOnError);
+    }
+
+    static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
+        return new YesNoFieldCondition("Wca Appeal", predicate,
+                (SscsCaseData sscsCaseData) -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO);
+    }
+
+    static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
+        return new YesNoFieldCondition("Wca Appeal", predicate,
+                (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
