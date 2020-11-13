@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DescriptorTable;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
@@ -25,8 +27,9 @@ public class Scenario6Content extends EsaTemplateContent {
             addComponent(new Paragraph(EsaTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
         }
         addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber())));
-        addComponent(new Paragraph(EsaTemplateComponentId.RECOMMENDATION.name(), getRecommendationSentence()));
-
+        if (!writeFinalDecisionTemplateBody.isWcaAppeal() && isNotBlank(writeFinalDecisionTemplateBody.getDwpReassessTheAward())) {
+            addComponent(new Paragraph(EsaTemplateComponentId.RECOMMENDATION.name(), getRecommendationSentence(writeFinalDecisionTemplateBody.getDwpReassessTheAward(), writeFinalDecisionTemplateBody.getAppellantName())));
+        }
     }
 
     @Override

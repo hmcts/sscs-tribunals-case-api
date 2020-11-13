@@ -58,11 +58,9 @@ public class EsaScenario7Test {
             + "Something else\n"
             + "\n"
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
-            + "\n"
-            + "\n"
             + "\n";
 
-        Assert.assertEquals(13, content.getComponents().size());
+        Assert.assertEquals(12, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
