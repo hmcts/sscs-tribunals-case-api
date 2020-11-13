@@ -38,7 +38,7 @@ public class EsaScenario8Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney is to be treated as having limited capability for work and work-related activity.\n"
+            + "Felix Sydney is to be treated as having limited capability for work and for work-related activity.\n"
             + "\n"
             + "This is because insufficient points were scored to meet the threshold for the work capability assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008.\n"
             + "\n"

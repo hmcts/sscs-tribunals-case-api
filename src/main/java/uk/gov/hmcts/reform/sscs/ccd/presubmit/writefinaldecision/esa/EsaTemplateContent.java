@@ -26,14 +26,14 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.";
     }
 
-    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
-        return appellantName + " is to be treated as having limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability for " : "") + "work-related activity." : ".");
+    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
+        return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability " : "") + "for work-related activity." : ".");
     }
 
-    public String getSchedule2InsufficientPointsSentence(Integer points, Boolean regulation29Applies) {
+    public String getSchedule2PointsSentence(Integer points, Boolean isSufficient) {
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "2 of the ESA Regulations 2008" + (regulation29Applies != null && regulation29Applies.booleanValue() ? " made up as follows:"
+            + "2 of the ESA Regulations 2008" + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
             : ". This is insufficient to meet the "
             + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }
@@ -61,7 +61,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public String getSchedule3AppliesParagraph() {
-        return "The following activity and descriptor from Schedule 3 applied.";
+        return "The following activity and descriptor from Schedule 3 applied:";
     }
 
     public String getHearingTypeSentence(String appellantName, String bundlePage) {

@@ -8,10 +8,10 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplate
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class EsaScenario9Test {
+public class EsaScenario6Test {
 
     @Test
-    public void testScenario9() {
+    public void testScenario6() {
 
         List<Descriptor> schedule2Descriptors =
             Arrays.asList(Descriptor.builder()
@@ -39,20 +39,18 @@ public class EsaScenario9Test {
                 .esaSchedule2Descriptors(schedule2Descriptors)
                 .esaSchedule3Descriptors(schedule3Descriptors).build();
 
-        EsaTemplateContent content = EsaScenario.SCENARIO_9.getContent(body).get();
+        EsaTemplateContent content = EsaScenario.SCENARIO_6.getContent(body).get();
 
         String expectedContent = "The appeal is allowed.\n"
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney is to be treated as having limited capability for work and has limited capability for work-related activity.\n"
+            + "Felix Sydney has limited capability for work and for work-related activity.\n"
             + "\n"
-            + "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment, but the tribunal applied regulation 29.\n"
+            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
             + "\n"
             + "Mobilising Unaided\t1.c\t9\n"
             + "\n"
-            + "\n"
-            + "The tribunal applied regulation 29 because it found that Felix Sydney suffers from [insert disease or disablement] and, by reasons of such disease or disablement, there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.\n"
             + "\n"
             + "The following activity and descriptor from Schedule 3 applied:\n"
             + "\n"
@@ -70,7 +68,7 @@ public class EsaScenario9Test {
             + "\n"
             + "\n";
 
-        Assert.assertEquals(13, content.getComponents().size());
+        Assert.assertEquals(12, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
