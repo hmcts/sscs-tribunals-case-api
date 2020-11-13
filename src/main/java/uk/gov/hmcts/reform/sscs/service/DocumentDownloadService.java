@@ -67,12 +67,11 @@ public class DocumentDownloadService {
             );
         } catch (Exception e) {
             log.error("Error when downloading the following Binary file from the Document Management: {} ", urlString, e);
-        } finally {
-            if (response != null && HttpStatus.OK.equals(response.getStatusCode())) {
-                return response;
-            }
-            throw new DocumentNotFoundException();
         }
+        if (response != null && HttpStatus.OK.equals(response.getStatusCode())) {
+            return response;
+        }
+        throw new DocumentNotFoundException();
     }
 
     public UploadedEvidence getUploadedEvidence(String urlString) {

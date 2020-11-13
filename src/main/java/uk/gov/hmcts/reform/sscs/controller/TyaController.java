@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +46,7 @@ public class TyaController {
             notes = "Returns hearing outcome document given the document url",
             response = Resource.class)
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Document", response = Resource.class)})
-    @RequestMapping(value = "/document", method = GET, produces = APPLICATION_PDF_VALUE)
+    @GetMapping(value = "/document", produces = APPLICATION_PDF_VALUE)
     public ResponseEntity<Resource> getAppealDocument(@RequestParam(value = "url") String url) {
         return documentDownloadService.downloadFile(url);
     }
