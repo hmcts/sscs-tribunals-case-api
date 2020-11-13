@@ -22,8 +22,8 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.";
     }
 
-    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName) {
-        return appellantName + " is to be treated as having limited capability for work.";
+    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
+        return appellantName + " is to be treated as having limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability for " : "") + "work-related activity." : ".");
     }
 
     public String getSchedule2InsufficientPointsSentence(Integer points, Boolean regulation29Applies) {
@@ -34,16 +34,30 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
             + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }
 
-    public String getInsufficientPointsSentenceRegulation29Applied(Integer points, Boolean regulation29Applies) {
+    public String getInsufficientPointsSentenceRegulation29Applied() {
         return "This is because insufficient points were scored to meet the threshold for the work capability assessment, "
                 + "but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied.";
     }
 
-    public String getRegulation29DiseaseOrDisablementSentence(String appellantName) {
+    public String getInsufficientPointsSentenceRegulation29AndRegulation35Applied() {
+        return "This is because insufficient points were scored to meet the threshold for the work capability assessment "
+                + "and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008.";
+    }
+
+    public String getInsufficientPointsSentenceRegulation29AndSchedule3Applied() {
+        return "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment, but the tribunal applied regulation 29.";
+    }
+
+    public String getRegulation29And35DiseaseOrDisablementSentence(String appellantName, boolean isRegulation35Applied) {
         //FIXME: Replace disease or disablement as part of future ticket
-        return "The tribunal applied regulation 29 because it found that " + appellantName + " suffers from "
-                + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
-                + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.";
+        return "The tribunal applied regulation" + (isRegulation35Applied ? "s" : "") + " 29 " + (isRegulation35Applied ? "and 35 " : "")
+            + "because it found that " + appellantName + " suffers from [insert disease or disablement] and, by reasons of such disease or disablement, "
+            + "there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work"
+            + (isRegulation35Applied ? " and for work-related activity." : ".");
+    }
+
+    public String getSchedule3AppliesParagraph() {
+        return "The following activity and descriptor from Schedule 3 applied.";
     }
 
     public String getHearingTypeSentence(String appellantName, String bundlePage) {

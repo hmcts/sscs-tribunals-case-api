@@ -9,7 +9,7 @@ public enum EsaScenario {
 
     SCENARIO_1(Scenario1Content::new), SCENARIO_2(null), SCENARIO_3(null),
     SCENARIO_4(null), SCENARIO_5(null), SCENARIO_6(null),
-    SCENARIO_7(Scenario7Content::new), SCENARIO_8(null), SCENARIO_9(null);
+    SCENARIO_7(Scenario7Content::new), SCENARIO_8(Scenario8Content::new), SCENARIO_9(Scenario9Content::new);
 
     Function<WriteFinalDecisionTemplateBody, EsaTemplateContent> contentSupplier;
 
