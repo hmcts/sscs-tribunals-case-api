@@ -18,14 +18,47 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work.";
     }
 
-    public String getSchedule2InsuffientPointsSentence(Integer points, Boolean regulation29Applies) {
+    public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule3Sentence(String appellantName) {
+        return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.";
+    }
+
+    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName) {
+        return appellantName + " is to be treated as having limited capability for work.";
+    }
+
+    public String getSchedule2InsufficientPointsSentence(Integer points, Boolean regulation29Applies) {
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "2 of the ESA Regulations 2008. This is insufficient to meet the "
-            + "threshold for the test." + (regulation29Applies != null
-            && !regulation29Applies.booleanValue() ? ""
-            : "Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
+            + "2 of the ESA Regulations 2008" + (regulation29Applies != null && regulation29Applies.booleanValue() ? "made up as follows:"
+            : ". This is insufficient to meet the "
+            + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }
+
+    public String getInsufficientPointsSentenceRegulation29Applied(Integer points, Boolean regulation29Applies) {
+        return "This is because insufficient points were scored to meet the threshold for the work capability assessment, " +
+                "but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied.";
+    }
+
+    public String getRegulation29DiseaseOrDisablementSentence(String appellantName) {
+        //FIXME: Replace disease or disablement as part of future ticket
+        return "The tribunal applied regulation 29 because it found that " + appellantName + " suffers from "
+        + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
+        + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.";
+    }
+
+    public String getHearingTypeSentence(String appellantName, String bundlePage) {
+        // Placeholder for SSCS-8033 (Chris D)
+        return "This has been an oral (face to face) hearing. "
+        + appellantName + "attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage
+        + ". A Presenting Officer attended on behalf of the Respondent.";
+    }
+
+    public String getRecommendationSentence() {
+        // Placeholder for SSCS-8308 (Ryan)
+        return "";
+    }
+
+
 
     public abstract EsaScenario getScenario();
 }
