@@ -133,7 +133,7 @@ public class DocumentDownloadServiceTest {
     }
 
     @Test(expected = DocumentNotFoundException.class)
-    public void expectedExceptionForNullDownloadFile(){
+    public void expectedExceptionForNullDownloadFile() {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
                 .willReturn(null);
 
@@ -142,7 +142,7 @@ public class DocumentDownloadServiceTest {
     }
 
     @Test(expected = DocumentNotFoundException.class)
-    public void expectedExceptionForError(){
+    public void expectedExceptionForError() {
         given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
                 .willThrow();
 

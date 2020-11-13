@@ -26,8 +26,7 @@ public class ExceptionHandlerAdviceTest {
     }
 
     @Test
-    public void willHandleDocumentNotFound()
-    {
+    public void willHandleDocumentNotFound() {
         DocumentNotFoundException exception = new DocumentNotFoundException();
         ResponseEntity<Object> response = exceptionHandlerAdvice.handleDocumentNotFound(exception, webRequest);
         assertThat(response.getStatusCode().value(), equalTo(404));
