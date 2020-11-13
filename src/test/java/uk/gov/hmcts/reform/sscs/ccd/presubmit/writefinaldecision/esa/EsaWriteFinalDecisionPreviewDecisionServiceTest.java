@@ -89,7 +89,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
-        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Override

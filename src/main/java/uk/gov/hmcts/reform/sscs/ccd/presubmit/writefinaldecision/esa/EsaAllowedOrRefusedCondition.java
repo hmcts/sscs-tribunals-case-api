@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.EMPTY;
@@ -97,7 +98,21 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isAnyPoints(),
         isSchedule3(StringListPredicate.UNSPECIFIED),
         isRegulation29(TRUE.or(UNSPECIFIED)),
-    isRegulation35(TRUE));
+    isRegulation35(TRUE)),
+    NON_WCA_APPEAL_ALLOWED(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(FALSE),
+            isAnyPoints(),
+            isSchedule3(StringListPredicate.UNSPECIFIED),
+            isWcaAppeal(FALSE),
+            isDwpReassessTheAward(TRUE)),
+    NON_WCA_APPEAL_REFUSED(
+            isAllowedOrRefused(REFUSED),
+            isWcaAppeal(FALSE),
+            isAnyPoints(),
+            isSchedule3(StringListPredicate.UNSPECIFIED),
+            isWcaAppeal(FALSE),
+            isDwpReassessTheAward(TRUE));
 
     Optional<EsaPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule3ActivitiesSelected;
@@ -129,6 +144,8 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             return EsaScenario.SCENARIO_8;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSchedule3Selections().isEmpty()) {
             return EsaScenario.SCENARIO_9;
+        } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
+            return EsaScenario.SCENARIO_10;
         } else {
             throw new IllegalStateException("No scenario applicable");
         }
@@ -160,6 +177,16 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     static YesNoFieldCondition isSupportGroupOnly(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Support Group Only Appeal", predicate,
             s -> s.isSupportGroupOnlyAppeal() ? YesNo.YES : YesNo.NO);
+    }
+
+    static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
+        return new YesNoFieldCondition("Wca Appeal", predicate,
+                (SscsCaseData sscsCaseData) -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO);
+    }
+
+    static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
+        return new YesNoFieldCondition("Wca Appeal", predicate,
+                (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static Optional<EsaPointsCondition> isAnyPoints() {
