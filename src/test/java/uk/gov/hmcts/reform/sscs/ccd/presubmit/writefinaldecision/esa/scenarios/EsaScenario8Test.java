@@ -44,7 +44,7 @@ public class EsaScenario8Test {
             + "\n"
             + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
             + "\n"
-            + "Mobilising Unaided\t1.c\t9\n"
+            + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
             + "The tribunal applied regulations 29 and 35 because it found that Felix Sydney suffers from [insert disease or disablement] and, by reasons of such disease or disablement, there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity.\n"

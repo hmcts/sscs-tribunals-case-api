@@ -18,15 +18,15 @@ public class DescriptorTable extends TemplateComponent<List<Descriptor>> {
             if (hidePointsColumn) {
                 sb.append(descriptor.getActivityQuestionValue());
                 sb.append("\t");
-                sb.append(descriptor.getActivityAnswerValue());
-                sb.append(".");
                 sb.append(descriptor.getActivityAnswerLetter());
+                sb.append(".");
+                sb.append(descriptor.getActivityAnswerValue());
             } else {
                 sb.append(descriptor.getActivityQuestionValue());
                 sb.append("\t");
-                sb.append(descriptor.getActivityAnswerValue());
-                sb.append(".");
                 sb.append(descriptor.getActivityAnswerLetter());
+                sb.append(".");
+                sb.append(descriptor.getActivityAnswerValue());
                 sb.append("\t");
                 sb.append(descriptor.getActivityAnswerPoints());
             }

@@ -30,8 +30,12 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability " : "") + "for work-related activity." : ".");
     }
 
-    public String getDoesHaveLimitedCapabilityForWorkRelatedSentence(String appellantName) {
+    public String getToBeTreatedLimitedCapabilityForWorkRelatedSentence(String appellantName) {
         return appellantName + " is to be treated as having limited capability for work-related activity.";
+    }
+
+    public String getHasLimitedCapabilityForWorkRelatedSentence(String appellantName) {
+        return appellantName + " has limited capability for work-related activity.";
     }
 
     public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivity(String appellantName) {
@@ -41,10 +45,9 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
                 + "has accepted that Felix Sydney has limited capability for work. This was not in issue.";
     }
 
-
-    public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName) {
+    public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
-                + "work related activity. This was not an issue.";
+                + (work ? "work." : "work related activity.") + " This was not an issue.";
     }
 
     public String getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies() {

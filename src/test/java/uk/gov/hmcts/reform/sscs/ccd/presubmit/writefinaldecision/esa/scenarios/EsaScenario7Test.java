@@ -44,7 +44,7 @@ public class EsaScenario7Test {
             + "\n"
             + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
             + "\n"
-            + "Mobilising Unaided\t1.c\t9\n"
+            + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
             + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
