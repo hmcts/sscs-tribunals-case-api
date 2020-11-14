@@ -52,4 +52,11 @@
         ]]></notes>
         <cve>CVE-2020-13943</cve>
     </suppress>
+    <suppress until="2020-11-30">
+        <notes><![CDATA[
+         file name: junit-4.13.1.jar
+         Awaiting NVD reanalysis
+        ]]></notes>
+        <cve>CVE-2020-15250</cve>
+    </suppress>
 </suppressions>
