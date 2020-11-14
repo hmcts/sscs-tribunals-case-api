@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 
-
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;

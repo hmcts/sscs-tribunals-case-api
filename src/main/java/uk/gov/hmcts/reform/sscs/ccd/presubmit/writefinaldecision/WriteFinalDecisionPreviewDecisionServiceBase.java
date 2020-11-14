@@ -1,21 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static java.util.Optional.empty;
-import static org.apache.commons.lang3.StringUtils.join;
-import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
@@ -26,15 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityType;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAllowedOrRefusedCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -44,22 +29,22 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
-@Component
 @Slf4j
-public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler {
+public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends IssueNoticeHandler {
 
-    private final DecisionNoticeService decisionNoticeService;
+    protected final DecisionNoticeQuestionService decisionNoticeQuestionService;
+    protected final DecisionNoticeOutcomeService decisionNoticeOutcomeService;
 
-    @Autowired
-    public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
-        DecisionNoticeService decisionNoticeService,  DocumentConfiguration documentConfiguration) {
+    protected WriteFinalDecisionPreviewDecisionServiceBase(GenerateFile generateFile, IdamClient idamClient,
+        DecisionNoticeQuestionService decisionNoticeQuestionService,  DecisionNoticeOutcomeService decisionNoticeOutcomeService, DocumentConfiguration documentConfiguration) {
         super(generateFile, idamClient, languagePreferenceAndBenefit -> getTemplateId(documentConfiguration, languagePreferenceAndBenefit.getRight(), languagePreferenceAndBenefit.getLeft()));
-        this.decisionNoticeService = decisionNoticeService;
+        this.decisionNoticeQuestionService = decisionNoticeQuestionService;
+        this.decisionNoticeOutcomeService = decisionNoticeOutcomeService;
     }
+
+    public abstract String getBenefitType();
 
     private static String getTemplateId(final DocumentConfiguration documentConfiguration, final String benefitType, final LanguagePreference languagePreference) {
         if (benefitType == null) {
@@ -90,9 +75,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
             throw new IllegalStateException("Unable to determine benefit type");
         }
 
-        DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
-
-        outcomeService.performPreOutcomeIntegrityAdjustments(caseData);
+        decisionNoticeOutcomeService.performPreOutcomeIntegrityAdjustments(caseData);
 
         NoticeIssuedTemplateBody formPayload = super
             .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
@@ -110,7 +93,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
         setHearings(writeFinalDecisionBuilder, caseData);
 
-        Outcome outcome = outcomeService.determineOutcome(caseData);
+        Outcome outcome = decisionNoticeOutcomeService.determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
@@ -142,14 +125,8 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.startDate(caseData.getWriteFinalDecisionStartDate());
         writeFinalDecisionBuilder.isIndefinite(caseData.getWriteFinalDecisionEndDate() == null);
 
-        if ("PIP".equals(benefitType)) {
-            setPipEntitlements(writeFinalDecisionBuilder, caseData);
-            setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
-        }
-        if ("ESA".equals(benefitType)) {
-            setEsaDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
-            setEsaEntitlements(writeFinalDecisionBuilder, caseData);
-        }
+        setEntitlements(writeFinalDecisionBuilder, caseData);
+        setDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
 
         writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
         writeFinalDecisionBuilder.detailsOfDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
@@ -167,7 +144,6 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         writeFinalDecisionBuilder.attendedHearing("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionAppellantAttendedQuestion()));
         writeFinalDecisionBuilder.presentingOfficerAttended("yes".equalsIgnoreCase(caseData.getWriteFinalDecisionPresentingOfficerAttendedQuestion()));
 
-
         WriteFinalDecisionTemplateBody payload = writeFinalDecisionBuilder.build();
 
         validateRequiredProperties(payload);
@@ -180,33 +156,14 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
 
         builder.writeFinalDecisionTemplateBody(payload);
 
-        // This ESA-specific code will be moved into a subclass when this class is
-        // refactored.
-        if ("ESA".equals(benefitType)) {
-
-            // Validate here for ESA instead of only validating on submit.
-            // This ensures that we know we can obtain a valid allowed or refused condition below.
-            outcomeService.validate(response, caseData);
-
-            if (response.getErrors().isEmpty()) {
-
-                // If validation has produced no errors, we know that we can get an allowed/refused condition.
-                Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-                    .getPassingAllowedOrRefusedCondition(decisionNoticeService.getQuestionService("ESA"), caseData);
-                if (condition.isPresent()) {
-                    EsaScenario scenario = condition.get().getEsaScenario(caseData);
-                    EsaTemplateContent templateContent = scenario.getContent(payload);
-                    builder.writeFinalDecisionTemplateContent(templateContent);
-                } else {
-                    // Should never happen.
-                    response.addError("Unable to obtain a valid scenario - something has gone wrong");
-                }
-            }
-        }
+        setTemplateContent(decisionNoticeOutcomeService, response, builder, caseData, payload);
 
         return builder.build();
 
     }
+
+    protected abstract void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
+        NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData, WriteFinalDecisionTemplateBody payload);
 
     private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
         List<String> consideredComparissons = new ArrayList<>();
@@ -236,139 +193,17 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
-    private void setPipEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+    protected abstract void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
 
-        String dailyLivingAwardType = caseData.getPipWriteFinalDecisionDailyLivingQuestion();
-        String mobilityAwardType = caseData.getPipWriteFinalDecisionMobilityQuestion();
-
-        if (dailyLivingAwardType != null) {
-            builder.dailyLivingAwardRate(join(
-                splitByCharacterTypeCamelCase(dailyLivingAwardType), ' ').toLowerCase());
-        } else {
-            builder.dailyLivingAwardRate(null);
-        }
-
-        if (AwardType.ENHANCED_RATE.getKey().equals(dailyLivingAwardType)) {
-            builder.dailyLivingIsEntited(true);
-            builder.dailyLivingIsSeverelyLimited(true);
-        } else if (AwardType.STANDARD_RATE.getKey().equals(dailyLivingAwardType)) {
-            builder.dailyLivingIsEntited(true);
-            builder.dailyLivingIsSeverelyLimited(false);
-        } else {
-            builder.dailyLivingIsEntited(false);
-            builder.dailyLivingIsSeverelyLimited(false);
-        }
-
-        if (mobilityAwardType != null) {
-            builder.mobilityAwardRate(join(
-                splitByCharacterTypeCamelCase(mobilityAwardType), ' ').toLowerCase());
-        } else {
-            builder.mobilityAwardRate(null);
-        }
-
-        if (AwardType.ENHANCED_RATE.getKey().equals(mobilityAwardType)) {
-            builder.mobilityIsEntited(true);
-            builder.mobilityIsSeverelyLimited(true);
-        } else if (AwardType.STANDARD_RATE.getKey().equals(mobilityAwardType)) {
-            builder.mobilityIsEntited(true);
-            builder.mobilityIsSeverelyLimited(false);
-        } else {
-            builder.mobilityIsEntited(false);
-            builder.mobilityIsSeverelyLimited(false);
-        }
-    }
-
-    private void setEsaEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-
-        builder.esaIsEntited(false);
-        builder.esaAwardRate(null);
-        Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
-                .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeService.getQuestionService("ESA"), caseData).getAwardType() : empty();
-        if (!esaAwardTypeOptional.isEmpty()) {
-            String esaAwardType = esaAwardTypeOptional.get().getKey();
-            if (esaAwardType != null) {
-                builder.esaAwardRate(join(
-                        splitByCharacterTypeCamelCase(esaAwardType), ' ').toLowerCase());
-            }
-
-            if (AwardType.LOWER_RATE.getKey().equals(esaAwardType)
-                || AwardType.HIGHER_RATE.getKey().equals(esaAwardType)) {
-                builder.esaIsEntited(true);
-            }
-        }
-    }
-
-    protected void setPipDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-        List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
-        if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
-
-            List<Descriptor> dailyLivingDescriptors = getPipDescriptorsFromQuestionKeys(caseData, dailyLivingAnswers);
-
-            builder.dailyLivingNumberOfPoints(dailyLivingDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
-
-            builder.dailyLivingDescriptors(dailyLivingDescriptors);
-        } else {
-            builder.dailyLivingDescriptors(null);
-            builder.dailyLivingNumberOfPoints(null);
-        }
-
-        List<String> mobilityAnswers = PipActivityType.MOBILITY.getAnswersExtractor().apply(caseData);
-        if (mobilityAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
-            List<Descriptor> mobilityDescriptors = getPipDescriptorsFromQuestionKeys(caseData, mobilityAnswers);
-
-            builder.mobilityDescriptors(mobilityDescriptors);
-
-            builder.mobilityNumberOfPoints(mobilityDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum());
-        } else {
-            builder.mobilityDescriptors(null);
-            builder.mobilityNumberOfPoints(null);
-        }
-    }
-
-    protected void setEsaDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
-
-        List<Descriptor> allDescriptors = new ArrayList<>();
-        List<String> physicalDisabilityAnswers = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
-        if (physicalDisabilityAnswers != null) {
-            List<Descriptor> physicalDisablityDescriptors = getEsaDescriptorsFromQuestionKeys(caseData, physicalDisabilityAnswers);
-            allDescriptors.addAll(physicalDisablityDescriptors);
-        }
-        List<String> mentalAssessmentAnswers = EsaActivityType.MENTAL_ASSESSMENT.getAnswersExtractor().apply(caseData);
-        if (mentalAssessmentAnswers != null) {
-
-            List<Descriptor> mentalAssessmentDescriptors = getEsaDescriptorsFromQuestionKeys(caseData, mentalAssessmentAnswers);
-            allDescriptors.addAll(mentalAssessmentDescriptors);
-
-        }
-
-        if (allDescriptors.isEmpty()) {
-            builder.esaSchedule2Descriptors(null);
-            builder.esaNumberOfPoints(null);
-        } else {
-            builder.esaSchedule2Descriptors(allDescriptors);
-            int numberOfPoints = allDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
-            if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(numberOfPoints)) {
-                caseData.setDoesRegulation29Apply(null);
-            }
-            builder.esaNumberOfPoints(numberOfPoints);
-        }
-        builder.regulation29Applicable(caseData.getDoesRegulation29Apply() == null ? null :  caseData.getDoesRegulation29Apply().toBoolean());
-        builder.regulation35Applicable(caseData.getDoesRegulation35Apply() == null ? null :  caseData.getDoesRegulation35Apply().toBoolean());
-        builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
-    }
+    protected abstract void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
 
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
         return getDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
     }
 
-    protected List<Descriptor> getEsaDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService("ESA");
-        return getDescriptorsFromQuestionKeys("ESA", key -> questionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
-    }
+
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
-
-        DecisionNoticeQuestionService decisionNoticeQuestionService = decisionNoticeService.getQuestionService(benefitType);
 
         List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,

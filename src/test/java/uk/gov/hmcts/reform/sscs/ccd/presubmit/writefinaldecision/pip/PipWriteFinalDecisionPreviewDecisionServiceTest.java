@@ -11,13 +11,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import junitparams.Parameters;
 import org.junit.Test;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
@@ -25,6 +29,13 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     public PipWriteFinalDecisionPreviewDecisionServiceTest() {
         super("PIP");
+    }
+
+    @Override
+    protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+        DocumentConfiguration documentConfiguration) {
+        return new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, pipDecisionNoticeQuestionService,
+            pipDecisionNoticeOutcomeService, documentConfiguration);
     }
 
     @Override

@@ -36,21 +36,21 @@ import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements PointsCondition<EsaPointsRegulationsAndSchedule3ActivitiesCondition> {
 
     LOW_POINTS_REGULATION_29_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        isRegulation29(UNSPECIFIED, false), Optional.empty(), isRegulation29(SPECIFIED)),
+        isWcaAppeal(TRUE), isRegulation29(UNSPECIFIED, false), Optional.empty(), isRegulation29(SPECIFIED)),
     LOW_POINTS_REGULATION_29_DOES_NOT_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        isRegulation29(FALSE), Optional.of(AwardType.NO_AWARD), isRegulation35(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
+        isWcaAppeal(TRUE), isRegulation29(FALSE), Optional.of(AwardType.NO_AWARD), isRegulation35(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.UNSPECIFIED)),
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_UNSPECIFIED(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isRegulation29(TRUE), isRegulation35(UNSPECIFIED)), Optional.of(AwardType.HIGHER_RATE),  isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
+        Arrays.asList(isWcaAppeal(TRUE), isRegulation29(TRUE), isRegulation35(UNSPECIFIED)), Optional.of(AwardType.HIGHER_RATE),  isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isRegulation29(TRUE), isRegulation35(FALSE)), Optional.of(AwardType.LOWER_RATE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
+        Arrays.asList(isWcaAppeal(TRUE), isRegulation29(TRUE), isRegulation35(FALSE)), Optional.of(AwardType.LOWER_RATE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     LOW_POINTS_REGULATION_29_DOES_APPLY_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-        Arrays.asList(isRegulation29(TRUE), isRegulation35(TRUE)), Optional.of(AwardType.HIGHER_RATE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
+        Arrays.asList(isWcaAppeal(TRUE), isRegulation29(TRUE), isRegulation35(TRUE)), Optional.of(AwardType.HIGHER_RATE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_UNSPECIFIED(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isRegulation35(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
+        isWcaAppeal(TRUE), isRegulation35(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isRegulation35(FALSE), Optional.of(AwardType.LOWER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
+        isWcaAppeal(TRUE),isRegulation35(FALSE), Optional.of(AwardType.LOWER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     HIGH_POINTS_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
-        isRegulation35(TRUE), Optional.of(AwardType.HIGHER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
+        isWcaAppeal(TRUE), isRegulation35(TRUE), Optional.of(AwardType.HIGHER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     NON_WCA_APPEAL(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
             Arrays.asList(isWcaAppeal(FALSE), isDwpReassessTheAward(TRUE)), Optional.empty(), isDwpReassessTheAward(TRUE));
     List<YesNoFieldCondition> primaryConditions;
@@ -59,9 +59,9 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     EsaPointsCondition pointsCondition;
     Optional<AwardType> awardType;
 
-    EsaPointsRegulationsAndSchedule3ActivitiesCondition(EsaPointsCondition pointsCondition, YesNoFieldCondition primaryCondition,
+    EsaPointsRegulationsAndSchedule3ActivitiesCondition(EsaPointsCondition pointsCondition, YesNoFieldCondition primaryCondition1,YesNoFieldCondition primaryCondition2,
         Optional<AwardType> awardType, FieldCondition...validationConditions) {
-        this(pointsCondition, Arrays.asList(primaryCondition), awardType, validationConditions);
+        this(pointsCondition, Arrays.asList(primaryCondition1, primaryCondition2), awardType, validationConditions);
     }
 
     public Optional<AwardType> getAwardType() {
@@ -98,12 +98,12 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Wca Appeal", predicate,
-            (SscsCaseData sscsCaseData) -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO);
+            sscsCaseData -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
-        return new YesNoFieldCondition("Wca Appeal", predicate,
-            (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
+        return new YesNoFieldCondition("Dwp reassess the award", predicate,
+            (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getSscsEsaCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {

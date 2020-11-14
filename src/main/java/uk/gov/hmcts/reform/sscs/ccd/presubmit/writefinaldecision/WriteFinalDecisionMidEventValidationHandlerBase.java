@@ -1,0 +1,127 @@
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import lombok.extern.slf4j.Slf4j;
+import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
+import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+
+@Slf4j
+public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends IssueDocumentHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private final Validator validator;
+
+    protected final DecisionNoticeService decisionNoticeService;
+
+    protected WriteFinalDecisionMidEventValidationHandlerBase(Validator validator, DecisionNoticeService decisionNoticeService) {
+        this.validator = validator;
+        this.decisionNoticeService = decisionNoticeService;
+    }
+
+    protected abstract String getBenefitType();
+    
+    @Override
+    public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
+        return callbackType == CallbackType.MID_EVENT
+            && callback.getEvent() == EventType.WRITE_FINAL_DECISION
+            && Objects.nonNull(callback.getCaseDetails())
+            && Objects.nonNull(callback.getCaseDetails().getCaseData())
+            && getBenefitType().equals(getBenefitTypeFromCallback(callback));
+    }
+
+    private String getBenefitTypeFromCallback(Callback<SscsCaseData> callback) {
+        SscsCaseData caseData = callback.getCaseDetails().getCaseData();
+        if (caseData.getAppeal() != null) {
+            BenefitType benefitType = caseData.getAppeal().getBenefitType();
+            if (benefitType != null && benefitType.getCode() != null) {
+                return benefitType.getCode();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public PreSubmitCallbackResponse<SscsCaseData> handle(CallbackType callbackType, Callback<SscsCaseData> callback, String userAuthorisation) {
+        if (!canHandle(callbackType, callback)) {
+            throw new IllegalStateException("Cannot handle callback");
+        }
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+
+        Set<ConstraintViolation<SscsCaseData>> violations = validator.validate(sscsCaseData);
+        for (ConstraintViolation<SscsCaseData> violation : violations) {
+            preSubmitCallbackResponse.addError(violation.getMessage());
+        }
+
+        if (isDecisionNoticeDatesInvalid(sscsCaseData)) {
+            preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
+        }
+
+        setShowSummaryOfOutcomePage(sscsCaseData);
+
+        validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+        setShowPageFlags(sscsCaseData);
+        setDefaultFields(sscsCaseData);
+
+        return preSubmitCallbackResponse;
+    }
+
+    protected abstract void setDefaultFields(SscsCaseData sscsCaseData);
+
+    protected abstract void setShowPageFlags(SscsCaseData sscsCaseData);
+
+    protected abstract void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse);
+
+    protected abstract void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData);
+
+
+    private void setEsaShowPageFlags(SscsCaseData sscsCaseData) {
+
+        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
+
+        if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
+            sscsCaseData.setShowRegulation29Page(YesNo.YES);
+            if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+            } else if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.NO);
+            }
+        } else {
+            sscsCaseData.setShowRegulation29Page(YesNo.NO);
+            sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+        }
+    }
+
+    private void setEsaDefaultFields(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        }
+    }
+
+    private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
+        if (isNotBlank(sscsCaseData.getWriteFinalDecisionStartDate()) && isNotBlank(sscsCaseData.getWriteFinalDecisionEndDate())) {
+            LocalDate decisionNoticeStartDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionStartDate());
+            LocalDate decisionNoticeEndDate = LocalDate.parse(sscsCaseData.getWriteFinalDecisionEndDate());
+            return !decisionNoticeStartDate.isBefore(decisionNoticeEndDate);
+        }
+        return false;
+    }
+
+}

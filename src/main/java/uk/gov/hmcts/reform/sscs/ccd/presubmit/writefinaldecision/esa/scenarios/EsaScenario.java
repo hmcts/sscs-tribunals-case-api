@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
-import java.util.Optional;
 import java.util.function.Function;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
@@ -19,6 +18,6 @@ public enum EsaScenario {
     }
 
     public EsaTemplateContent getContent(WriteFinalDecisionTemplateBody body) {
-          return contentSupplier.apply(body);
+        return contentSupplier.apply(body);
     }
 }
