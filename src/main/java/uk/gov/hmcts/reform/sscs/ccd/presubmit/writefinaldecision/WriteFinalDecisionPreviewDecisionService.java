@@ -17,6 +17,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
@@ -80,7 +81,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     }
 
     @Override
-    protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
 
         String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
@@ -94,7 +95,7 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         outcomeService.performPreOutcomeIntegrityAdjustments(caseData);
 
         NoticeIssuedTemplateBody formPayload = super
-            .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
+            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -183,27 +184,22 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         // refactored.
         if ("ESA".equals(benefitType)) {
 
-            // Currently the retrieval of the below condition is done on submission, rather than
-            // preview.
-            // At the moment, if the user's choices are invalid they will only find this out at submission time,
-            // and are still able to preview the document.
-            // We'll need to revisit this if we move to this new strategy,  as we will need a valid
-            // condition in order to determine the scenario.
+            // Validate here for ESA instead of only validating on submit.
+            // This ensures that we know we can obtain a valid allowed or refused condition below.
+            outcomeService.validate(response, caseData);
 
-            Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-                .getPassingAllowedOrRefusedCondition(decisionNoticeService.getQuestionService("ESA"), caseData);
+            if (response.getErrors().isEmpty()) {
 
-            // As discussed above, currently the condition may not be present
-            if (condition.isPresent()) {
-
-                EsaScenario scenario = condition.get().getEsaScenario(caseData);
-
-                // Once we have a scenario, we should always have template content,
-                // but only one scenario has been implemented - so for now, fail silently.
-                Optional<EsaTemplateContent> templateContent = scenario.getContent(payload);
-                if (templateContent.isPresent()) {
-                    // Add the template content to the builder
-                    builder.writeFinalDecisionTemplateContent(templateContent.get());
+                // If validation has produced no errors, we know that we can get an allowed/refused condition.
+                Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
+                    .getPassingAllowedOrRefusedCondition(decisionNoticeService.getQuestionService("ESA"), caseData);
+                if (condition.isPresent()) {
+                    EsaScenario scenario = condition.get().getEsaScenario(caseData);
+                    EsaTemplateContent templateContent = scenario.getContent(payload);
+                    builder.writeFinalDecisionTemplateContent(templateContent);
+                } else {
+                    // Should never happen.
+                    response.addError("Unable to obtain a valid scenario - something has gone wrong");
                 }
             }
         }

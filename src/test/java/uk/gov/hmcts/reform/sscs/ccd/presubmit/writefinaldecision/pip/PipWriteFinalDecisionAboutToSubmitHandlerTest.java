@@ -19,15 +19,15 @@ import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDecisionAboutToSubmitHandlerTestBase {
+public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDecisionAboutToSubmitHandlerTestBase<PipDecisionNoticeQuestionService> {
 
     public PipWriteFinalDecisionAboutToSubmitHandlerTest() throws IOException {
         super(new PipDecisionNoticeQuestionService());
     }
 
     @Override
-    protected DecisionNoticeOutcomeService createOutcomeService(DecisionNoticeQuestionService decisionNoticeQuestionService) {
-        return new PipDecisionNoticeOutcomeService();
+    protected DecisionNoticeOutcomeService createOutcomeService(PipDecisionNoticeQuestionService decisionNoticeQuestionService) {
+        return new PipDecisionNoticeOutcomeService(decisionNoticeQuestionService);
     }
 
     @Override

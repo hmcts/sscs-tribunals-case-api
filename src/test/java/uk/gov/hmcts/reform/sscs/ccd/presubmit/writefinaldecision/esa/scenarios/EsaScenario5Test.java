@@ -32,7 +32,7 @@ public class EsaScenario5Test {
                 .regulation29Applicable(true)
                 .esaSchedule2Descriptors(schedule2Descriptors).build();
 
-        EsaTemplateContent content = EsaScenario.SCENARIO_5.getContent(body).get();
+        EsaTemplateContent content = EsaScenario.SCENARIO_5.getContent(body);
 
         String expectedContent = "The appeal is allowed.\n"
             + "\n"

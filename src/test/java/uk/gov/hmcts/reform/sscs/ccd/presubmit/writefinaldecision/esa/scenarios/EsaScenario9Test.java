@@ -39,7 +39,7 @@ public class EsaScenario9Test {
                 .esaSchedule2Descriptors(schedule2Descriptors)
                 .esaSchedule3Descriptors(schedule3Descriptors).build();
 
-        EsaTemplateContent content = EsaScenario.SCENARIO_9.getContent(body).get();
+        EsaTemplateContent content = EsaScenario.SCENARIO_9.getContent(body);
 
         String expectedContent = "The appeal is allowed.\n"
             + "\n"

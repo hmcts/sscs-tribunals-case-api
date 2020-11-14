@@ -31,7 +31,7 @@ public class EsaScenario4Test {
                         .anythingElse("Something else")
                         .esaSchedule3Descriptors(schedule3Descriptors).build();
 
-        EsaTemplateContent content = EsaScenario.SCENARIO_4.getContent(body).get();
+        EsaTemplateContent content = EsaScenario.SCENARIO_4.getContent(body);
 
         String expectedContent = "The appeal is allowed.\n"
                 + "\n"

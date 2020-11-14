@@ -18,11 +18,7 @@ public enum EsaScenario {
         this.contentSupplier = contentSupplier;
     }
 
-    public Optional<EsaTemplateContent> getContent(WriteFinalDecisionTemplateBody body) {
-        if (contentSupplier == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(contentSupplier.apply(body));
-        }
+    public EsaTemplateContent getContent(WriteFinalDecisionTemplateBody body) {
+          return contentSupplier.apply(body);
     }
 }

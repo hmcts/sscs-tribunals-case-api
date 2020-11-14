@@ -141,8 +141,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
 
-        this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
         this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+        this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(pipDecisionNoticeQuestionService);
 
         this.esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 

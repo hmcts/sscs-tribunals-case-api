@@ -13,15 +13,8 @@ public class Scenario1Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_WORK_PARAGRAPH.name(), getDoesNotHaveLimitedCapabilityForWorkSentence(writeFinalDecisionTemplateBody.getAppellantName())));
         addComponent(new Paragraph(EsaTemplateComponentId.INSUFFICIENT_POINTS_PARAGRAPH.name(), getSchedule2PointsSentence(writeFinalDecisionTemplateBody.getEsaNumberOfPoints(), false)));
         addComponent(new DescriptorTable(EsaTemplateComponentId.SCHEDULE_2_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getEsaSchedule2Descriptors(), false));
-        if (writeFinalDecisionTemplateBody.getReasonsForDecision() != null) {
-            for (String reason : writeFinalDecisionTemplateBody.getReasonsForDecision()) {
-                addComponent(new Paragraph(EsaTemplateComponentId.REASON.name(), reason));
-            }
-        }
-        if (writeFinalDecisionTemplateBody.getAnythingElse() != null) {
-            addComponent(new Paragraph(EsaTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
-        }
-
+        addReasonsIfPresent(writeFinalDecisionTemplateBody);
+        addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
         addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber())));
     }
 

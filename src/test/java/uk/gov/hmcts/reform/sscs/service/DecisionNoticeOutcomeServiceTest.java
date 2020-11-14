@@ -2,6 +2,8 @@ package uk.gov.hmcts.reform.sscs.service;
 
 import static org.junit.Assert.assertEquals;
 
+
+import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Assert;
@@ -17,8 +19,8 @@ public class DecisionNoticeOutcomeServiceTest {
     private DecisionNoticeOutcomeService service;
 
     @Before
-    public void setup() {
-        service = new PipDecisionNoticeOutcomeService();
+    public void setup() throws IOException {
+        service = new PipDecisionNoticeOutcomeService(new PipDecisionNoticeQuestionService());
     }
 
     @Test

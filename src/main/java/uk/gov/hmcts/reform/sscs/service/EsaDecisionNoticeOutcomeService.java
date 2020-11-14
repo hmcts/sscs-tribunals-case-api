@@ -1,12 +1,18 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
@@ -15,12 +21,9 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRe
 @Service
 public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
-    private EsaDecisionNoticeQuestionService questionService;
-
     @Autowired
     public EsaDecisionNoticeOutcomeService(EsaDecisionNoticeQuestionService questionService) {
-        super("ESA");
-        this.questionService = questionService;
+        super("ESA", questionService);
     }
     
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {

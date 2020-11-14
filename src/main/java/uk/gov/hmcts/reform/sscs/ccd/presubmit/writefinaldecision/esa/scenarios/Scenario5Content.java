@@ -16,15 +16,8 @@ public class Scenario5Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.INSUFFICIENT_POINTS_PARAGRAPH.name(), getSchedule2PointsSentence(writeFinalDecisionTemplateBody.getEsaNumberOfPoints(), true)));
         addComponent(new DescriptorTable(EsaTemplateComponentId.SCHEDULE_2_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getEsaSchedule2Descriptors(), false));
         addComponent(new Paragraph(EsaTemplateComponentId.SCHEDULE_3_PARAGRAPH.name(), getDoesNotHaveLimitedCapabilityForWorkNoSchedule3Sentence(writeFinalDecisionTemplateBody.getAppellantName())));
-
-        if (writeFinalDecisionTemplateBody.getReasonsForDecision() != null) {
-            for (String reason : writeFinalDecisionTemplateBody.getReasonsForDecision()) {
-                addComponent(new Paragraph(EsaTemplateComponentId.REASON.name(), reason));
-            }
-        }
-        if (writeFinalDecisionTemplateBody.getAnythingElse() != null) {
-            addComponent(new Paragraph(EsaTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
-        }
+        addReasonsIfPresent(writeFinalDecisionTemplateBody);
+        addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
         addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber())));
         if (!writeFinalDecisionTemplateBody.isWcaAppeal() && isNotBlank(writeFinalDecisionTemplateBody.getDwpReassessTheAward())) {
             addComponent(new Paragraph(EsaTemplateComponentId.RECOMMENDATION.name(), getRecommendationSentence(writeFinalDecisionTemplateBody.getDwpReassessTheAward(), writeFinalDecisionTemplateBody.getAppellantName())));
