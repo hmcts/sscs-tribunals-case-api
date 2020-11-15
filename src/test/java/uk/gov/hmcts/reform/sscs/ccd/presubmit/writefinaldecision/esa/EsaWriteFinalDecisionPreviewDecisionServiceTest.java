@@ -18,6 +18,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -99,6 +100,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
 
         assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
+        EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertEquals(EsaScenario.SCENARIO_1, templateContent.getScenario());
+
         assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 

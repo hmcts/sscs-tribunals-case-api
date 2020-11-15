@@ -44,7 +44,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     REFUSED_NON_SUPPORT_GROUP_ONLY(
         isAllowedOrRefused(REFUSED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.FALSE),
         isAnyPoints(),
         isAnySchedule3(),
@@ -54,7 +54,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(UNSPECIFIED)),
     REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(REFUSED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.TRUE),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule3(),
@@ -63,7 +63,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(FALSE)),
     REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(REFUSED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.TRUE),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule3(),
@@ -72,13 +72,13 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(FALSE)),
     ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(ALLOWED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.FALSE),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule3()),
     ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(ALLOWED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(FALSE),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule3(),
@@ -86,14 +86,14 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     ),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
         isAllowedOrRefused(ALLOWED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(NOT_EMPTY),
         isRegulation29(TRUE.or(UNSPECIFIED))),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(EMPTY),
@@ -101,27 +101,25 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(YesNoPredicate.TRUE)),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
-        isWcaAppeal(TRUE),
+        isWcaAppeal(TRUE,true),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(StringListPredicate.UNSPECIFIED),
         isRegulation29(TRUE.or(UNSPECIFIED)),
-    isRegulation35(TRUE)),
+        isRegulation35(TRUE)),
     NON_WCA_APPEAL_ALLOWED(
             isAllowedOrRefused(ALLOWED),
-            isWcaAppeal(FALSE),
+            isWcaAppeal(FALSE, true),
             isSupportGroupOnly(TRUE.or(FALSE)),
             isAnyPoints(),
-            isSchedule3(StringListPredicate.UNSPECIFIED),
-            isWcaAppeal(FALSE),
+            isAnySchedule3(),
             isDwpReassessTheAward(TRUE)),
     NON_WCA_APPEAL_REFUSED(
             isAllowedOrRefused(REFUSED),
-            isWcaAppeal(FALSE),
+            isWcaAppeal(FALSE, true),
             isSupportGroupOnly(TRUE.or(FALSE)),
             isAnyPoints(),
-            isSchedule3(StringListPredicate.UNSPECIFIED),
-            isWcaAppeal(FALSE),
+            isAnySchedule3(),
             isDwpReassessTheAward(TRUE));
 
     Optional<EsaPointsCondition> primaryPointsCondition;
@@ -130,6 +128,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     List<FieldCondition> validationConditions;
     Optional<EsaPointsCondition> validationPointsCondition;
 
+    
     EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, YesNoFieldCondition supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected,
         FieldCondition...validationConditions) {
         this(allowedOrRefusedCondition, wcaAppealCondition, supportGroupOnlyCondition, primaryPointsCondition, schedule3ActivitiesSelected, isAnyPoints(), validationConditions);
@@ -190,13 +189,13 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             s -> s.isSupportGroupOnlyAppeal() ? YesNo.YES : YesNo.NO);
     }
 
-    static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
+    static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
         return new YesNoFieldCondition("Wca Appeal", predicate,
-            (SscsCaseData sscsCaseData) -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO, false);
+            s -> s.isWcaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
-        return new YesNoFieldCondition("Dwp Reassess The Award", predicate,
+        return new YesNoFieldCondition("'When should DWP reassess the award?'", predicate,
             (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 

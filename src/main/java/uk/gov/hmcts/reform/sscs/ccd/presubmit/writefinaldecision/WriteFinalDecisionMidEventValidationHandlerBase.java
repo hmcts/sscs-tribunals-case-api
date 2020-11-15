@@ -14,11 +14,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @Slf4j
@@ -90,30 +87,6 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     protected abstract void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse);
 
     protected abstract void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData);
-
-
-    private void setEsaShowPageFlags(SscsCaseData sscsCaseData) {
-
-        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
-
-        if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-            sscsCaseData.setShowRegulation29Page(YesNo.YES);
-            if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
-                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
-            } else if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
-                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.NO);
-            }
-        } else {
-            sscsCaseData.setShowRegulation29Page(YesNo.NO);
-            sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
-        }
-    }
-
-    private void setEsaDefaultFields(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
-            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        }
-    }
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
         if (isNotBlank(sscsCaseData.getWriteFinalDecisionStartDate()) && isNotBlank(sscsCaseData.getWriteFinalDecisionEndDate())) {

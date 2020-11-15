@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -67,12 +66,6 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
                 // Should never happen.
                 response.addError("Unable to obtain a valid scenario - something has gone wrong");
             }
-        } else {
-            Iterator<String> iter = response.getErrors().iterator();
-            while (iter.hasNext()) {
-                System.out.println(iter.next());
-            }
-
         }
     }
 
@@ -98,7 +91,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     }
 
     protected List<Descriptor> getEsaDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getDescriptorsFromQuestionKeys("ESA", key -> esaDecisionNoticeQuestionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
+        return getDescriptorsFromQuestionKeys(key -> esaDecisionNoticeQuestionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
     @Override

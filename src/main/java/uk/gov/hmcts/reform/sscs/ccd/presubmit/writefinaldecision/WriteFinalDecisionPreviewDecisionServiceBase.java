@@ -19,7 +19,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -197,13 +196,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     protected abstract void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData);
 
-    protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
-    }
-
-
-
-    protected List<Descriptor> getDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
+    protected List<Descriptor> getDescriptorsFromQuestionKeys(ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
 
         List<Descriptor> descriptors = questionKeys
             .stream().map(questionKey -> new ImmutablePair<>(questionKey,

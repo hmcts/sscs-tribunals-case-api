@@ -52,7 +52,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     HIGH_POINTS_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isWcaAppeal(TRUE), isRegulation35(TRUE), Optional.of(AwardType.HIGHER_RATE),  isRegulation29(UNSPECIFIED), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     NON_WCA_APPEAL(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
-            Arrays.asList(isWcaAppeal(FALSE), isDwpReassessTheAward(TRUE)), Optional.empty(), isDwpReassessTheAward(TRUE));
+            Arrays.asList(isWcaAppeal(FALSE)), Optional.empty(), isDwpReassessTheAward(TRUE));
     List<YesNoFieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
@@ -102,7 +102,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
-        return new YesNoFieldCondition("Dwp reassess the award", predicate,
+        return new YesNoFieldCondition("'When should DWP reassess the award?'", predicate,
             (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getSscsEsaCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
