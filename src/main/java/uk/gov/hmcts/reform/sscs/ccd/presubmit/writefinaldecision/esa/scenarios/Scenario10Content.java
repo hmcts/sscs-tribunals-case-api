@@ -12,7 +12,7 @@ public class Scenario10Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.SUMMARY_OF_OUTCOME_DECISION.name(), writeFinalDecisionTemplateBody.getSummaryOfOutcomeDecision()));
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
-        addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber())));
+        addHearingType(writeFinalDecisionTemplateBody);
         addRecommendationIfPresent(writeFinalDecisionTemplateBody);
     }
 

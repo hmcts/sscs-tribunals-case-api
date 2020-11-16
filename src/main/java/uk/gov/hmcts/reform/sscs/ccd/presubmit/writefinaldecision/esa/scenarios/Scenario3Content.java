@@ -15,6 +15,7 @@ public class Scenario3Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.DISEASE_OR_DISABLEMENT_PARAGRAPH.name(), getRegulation35DiseaseOrDisablementSentenceWorkRelated(writeFinalDecisionTemplateBody.getAppellantName())));
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
+        addHearingType(writeFinalDecisionTemplateBody);
     }
 
     @Override

@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
+import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -106,10 +107,43 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public String getHearingTypeSentence(String appellantName, String bundlePage) {
-        // Placeholder for SSCS-8033 (Chris D)
-        return "This has been an oral (face to face) hearing. "
-                + appellantName + " attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage
-                + ". A Presenting Officer attended on behalf of the Respondent.";
+        return getHearingTypeSentence(appellantName, bundlePage, "oral", true, true);
+    }
+
+    public String getHearingTypeSentence(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
+        if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
+            return getFaceToFaceHearingTypeSentence(appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
+        } else if (StringUtils.equalsIgnoreCase("paper", hearingType)) {
+            return "No party has objected to the matter being decided without a hearing. Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.";
+        } else if (StringUtils.equalsIgnoreCase("telephone", hearingType) || StringUtils.equalsIgnoreCase("video", hearingType)) {
+            return getTelephoneOrVideoHearingTypeSentence(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
+        }
+        return "";
+    }
+
+    private String getTelephoneOrVideoHearingTypeSentence(String hearingType, String appellantName, String bundlePage, boolean appellantAttended, boolean presentingOfifficerAttened) {
+        if ((appellantAttended && presentingOfifficerAttened) || (appellantAttended && !presentingOfifficerAttened)) {
+            return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " attended the hearing today and gave oral evidence which was considered by the Tribunal together with the appeal bundle to page " + bundlePage + ".  " + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
+        } else if ((!appellantAttended && presentingOfifficerAttened) || (!appellantAttended && !presentingOfifficerAttened)) {
+            return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. " + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.\n"
+                    + "\n"
+                    + "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify " + appellantName + " of the hearing and that it is in the interests of justice to proceed today.  ";
+        }
+        return "";
+    }
+
+    public String getFaceToFaceHearingTypeSentence(String appellantName, String bundlePage, boolean appellantAttended, boolean presentingOfifficerAttened) {
+        if ((appellantAttended && presentingOfifficerAttened) || (appellantAttended && !presentingOfifficerAttened)) {
+            return "This has been an oral (face to face) hearing. "
+                    + appellantName + " attended the hearing today and the tribunal considered the appeal bundle to page " + bundlePage
+                    + ". " + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.";
+        } else if (!appellantAttended && presentingOfifficerAttened || !appellantAttended && !presentingOfifficerAttened) {
+            return appellantName + " requested an oral hearing but did not attend today. "
+                    + (presentingOfifficerAttened ? "A " : "No ")
+                    + "Presenting Officer attended on behalf of the Respondent. "
+                    + "\n" + "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. ";
+        }
+        return "";
     }
 
     public String getRecommendationSentence(String code, String appellantName) {
@@ -142,6 +176,11 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         if (writeFinalDecisionTemplateBody.getAnythingElse() != null) {
             addComponent(new Paragraph(EsaTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
         }
+    }
+
+    public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber(),
+                writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended())));
     }
 
     public void addRecommendationIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {

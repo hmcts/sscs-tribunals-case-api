@@ -18,6 +18,9 @@ public class EsaScenario4Test {
 
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
+                        .hearingType("faceToFace")
+                        .attendedHearing(true)
+                        .presentingOfficerAttended(true)
                         .isAllowed(true)
                         .isSetAside(true)
                         .dateOfDecision("2020-09-20")
@@ -50,7 +53,7 @@ public class EsaScenario4Test {
             + "Something else\n"
             + "\n";
 
-        Assert.assertEquals(9, content.getComponents().size());
+        Assert.assertEquals(10, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
