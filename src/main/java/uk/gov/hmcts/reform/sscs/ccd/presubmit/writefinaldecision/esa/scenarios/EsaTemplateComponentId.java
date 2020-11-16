@@ -15,6 +15,7 @@ public enum EsaTemplateComponentId {
     REASON,
     ANYTHING_ELSE,
     HEARING_TYPE,
+    SUMMARY_OF_OUTCOME_DECISION,
     RECOMMENDATION;
 
 }

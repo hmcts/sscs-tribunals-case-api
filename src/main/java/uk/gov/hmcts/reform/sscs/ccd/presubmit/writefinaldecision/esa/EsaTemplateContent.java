@@ -134,5 +134,11 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         }
     }
 
+    public void addRecommendationIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        if (writeFinalDecisionTemplateBody.getDwpReassessTheAward() != null) {
+            addComponent(new Paragraph(EsaTemplateComponentId.RECOMMENDATION.name(), getRecommendationSentence(writeFinalDecisionTemplateBody.getDwpReassessTheAward(), writeFinalDecisionTemplateBody.getAppellantName())));
+        }
+    }
+
     public abstract EsaScenario getScenario();
 }

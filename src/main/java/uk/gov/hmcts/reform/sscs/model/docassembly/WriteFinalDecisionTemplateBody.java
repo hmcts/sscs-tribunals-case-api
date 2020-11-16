@@ -93,4 +93,6 @@ public class WriteFinalDecisionTemplateBody {
     private Boolean regulation35Applicable;
     @JsonProperty("dwp_reassess_the_award")
     private String dwpReassessTheAward;
+    @JsonProperty("summary_of_outcome_decision")
+    private String summaryOfOutcomeDecision;
 }
