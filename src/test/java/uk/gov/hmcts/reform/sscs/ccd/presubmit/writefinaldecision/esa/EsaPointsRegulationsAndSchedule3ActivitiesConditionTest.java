@@ -221,6 +221,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
 
                         caseData = SscsCaseData.builder()
                             .wcaAppeal("Yes")
+                            .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
@@ -231,6 +232,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     } else {
                         caseData = SscsCaseData.builder()
                             .wcaAppeal("No")
+                            .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .esaSscsCaseData(

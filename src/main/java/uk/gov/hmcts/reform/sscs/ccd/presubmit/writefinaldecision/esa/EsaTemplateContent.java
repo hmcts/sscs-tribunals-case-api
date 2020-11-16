@@ -4,8 +4,10 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
+import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaTemplateComponentId;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
@@ -91,8 +93,12 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
                 + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work-related activity.";
     }
 
-    public String getSchedule3AppliesParagraph() {
-        return "The following activity and descriptor from Schedule 3 applied:";
+    public String getSchedule3AppliesParagraph(List<Descriptor> descriptors) {
+        if (descriptors != null && descriptors.size() == 1) {
+            return "The following activity and descriptor from Schedule 3 applied:";
+        } else {
+            return "The following activities and descriptors from Schedule 3 applied:";
+        }
     }
 
     public String getHearingTypeSentence(String appellantName, String bundlePage) {

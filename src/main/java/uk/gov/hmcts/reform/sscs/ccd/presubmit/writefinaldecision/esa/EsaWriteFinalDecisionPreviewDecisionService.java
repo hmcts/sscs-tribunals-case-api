@@ -17,7 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.DescriptorLexicographicalComparator;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -53,22 +52,26 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
 
-        // Validate here for ESA instead of only validating on submit.
-        // This ensures that we know we can obtain a valid allowed or refused condition below.
-        outcomeService.validate(response, caseData);
 
-        if (response.getErrors().isEmpty()) {
+        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
 
-            // If validation has produced no errors, we know that we can get an allowed/refused condition.
-            Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-                .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
-            if (condition.isPresent()) {
-                EsaScenario scenario = condition.get().getEsaScenario(caseData);
-                EsaTemplateContent templateContent = scenario.getContent(payload);
-                builder.writeFinalDecisionTemplateContent(templateContent);
-            } else {
-                // Should never happen.
-                response.addError("Unable to obtain a valid scenario - something has gone wrong");
+            // Validate here for ESA instead of only validating on submit.
+            // This ensures that we know we can obtain a valid allowed or refused condition below
+            outcomeService.validate(response, caseData);
+            if (response.getErrors().isEmpty()) {
+
+                // If validation has produced no errors, we know that we can get an allowed/refused condition.
+                Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
+                    .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
+                if (condition.isPresent()) {
+                    EsaScenario scenario = condition.get().getEsaScenario(caseData);
+                    EsaTemplateContent templateContent = scenario.getContent(payload);
+                    builder.writeFinalDecisionTemplateContent(templateContent);
+                } else {
+                    // Should never happen.
+                    log.error("Unable to obtain a valid scenario before preview - Something has gone wrong for caseId: ", caseData.getCcdCaseId());
+                    response.addError("Unable to obtain a valid scenario - something has gone wrong");
+                }
             }
         }
     }
@@ -76,20 +79,22 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     @Override
     protected void setEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
 
-        builder.esaIsEntited(false);
-        builder.esaAwardRate(null);
-        Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
-            .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
-        if (!esaAwardTypeOptional.isEmpty()) {
-            String esaAwardType = esaAwardTypeOptional.get().getKey();
-            if (esaAwardType != null) {
-                builder.esaAwardRate(join(
-                    splitByCharacterTypeCamelCase(esaAwardType), ' ').toLowerCase());
-            }
+        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+            builder.esaIsEntited(false);
+            builder.esaAwardRate(null);
+            Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
+                .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
+            if (!esaAwardTypeOptional.isEmpty()) {
+                String esaAwardType = esaAwardTypeOptional.get().getKey();
+                if (esaAwardType != null) {
+                    builder.esaAwardRate(join(
+                        splitByCharacterTypeCamelCase(esaAwardType), ' ').toLowerCase());
+                }
 
-            if (AwardType.LOWER_RATE.getKey().equals(esaAwardType)
-                || AwardType.HIGHER_RATE.getKey().equals(esaAwardType)) {
-                builder.esaIsEntited(true);
+                if (AwardType.LOWER_RATE.getKey().equals(esaAwardType)
+                    || AwardType.HIGHER_RATE.getKey().equals(esaAwardType)) {
+                    builder.esaIsEntited(true);
+                }
             }
         }
     }
@@ -141,7 +146,8 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             .stream().map(q ->
                 buildDescriptorFromActivityQuestion(activityQuestionlookup.getByKey(q))).collect(Collectors.toList());
 
-        descriptors.sort(new DescriptorLexicographicalComparator());
+        // FIXME Extract sort order from question text
+        //descriptors.sort(new DescriptorLexicographicalComparator());
 
         return descriptors;
     }
