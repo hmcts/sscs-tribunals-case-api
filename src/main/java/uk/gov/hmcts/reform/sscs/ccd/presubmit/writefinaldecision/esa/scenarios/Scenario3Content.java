@@ -13,15 +13,8 @@ public class Scenario3Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_WORK_RELATED_ACTIVITY_PARAGRAPH.name(), getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(writeFinalDecisionTemplateBody.getAppellantName(), false)));
         addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_REGULATION_35_APPLIED_PARAGRAPH.name(), getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies()));
         addComponent(new Paragraph(EsaTemplateComponentId.DISEASE_OR_DISABLEMENT_PARAGRAPH.name(), getRegulation35DiseaseOrDisablementSentenceWorkRelated(writeFinalDecisionTemplateBody.getAppellantName())));
-
-        if (writeFinalDecisionTemplateBody.getReasonsForDecision() != null) {
-            for (String reason : writeFinalDecisionTemplateBody.getReasonsForDecision()) {
-                addComponent(new Paragraph(EsaTemplateComponentId.REASON.name(), reason));
-            }
-        }
-        if (writeFinalDecisionTemplateBody.getAnythingElse() != null) {
-            addComponent(new Paragraph(EsaTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
-        }
+        addReasonsIfPresent(writeFinalDecisionTemplateBody);
+        addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
     }
 
     @Override

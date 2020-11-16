@@ -23,7 +23,7 @@ public class EsaScenario2Test {
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else").build();
 
-        EsaTemplateContent content = EsaScenario.SCENARIO_2.getContent(body).get();
+        EsaTemplateContent content = EsaScenario.SCENARIO_2.getContent(body);
 
         String expectedContent = "The appeal is refused.\n"
                 + "\n"

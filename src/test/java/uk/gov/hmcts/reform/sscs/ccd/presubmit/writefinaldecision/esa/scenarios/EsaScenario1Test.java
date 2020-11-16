@@ -29,7 +29,7 @@ public class EsaScenario1Test {
                 .anythingElse("Something else")
                 .esaSchedule2Descriptors(schedule2Descriptors).build();
 
-        EsaTemplateContent content = EsaScenario.SCENARIO_1.getContent(body).get();
+        EsaTemplateContent content = EsaScenario.SCENARIO_1.getContent(body);
 
         String expectedContent = "The appeal is refused.\n"
             + "\n"

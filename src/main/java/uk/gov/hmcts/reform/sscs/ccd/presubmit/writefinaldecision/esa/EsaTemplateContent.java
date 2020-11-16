@@ -5,6 +5,9 @@ import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaTemplateComponentId;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
 public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateContent {
@@ -117,6 +120,19 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return format("%s %s", firstSentence, secondSentence);
     }
 
+    public void addReasonsIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        if (writeFinalDecisionTemplateBody.getReasonsForDecision() != null) {
+            for (String reason : writeFinalDecisionTemplateBody.getReasonsForDecision()) {
+                addComponent(new Paragraph(EsaTemplateComponentId.REASON.name(), reason));
+            }
+        }
+    }
+
+    public void addAnythingElseIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        if (writeFinalDecisionTemplateBody.getAnythingElse() != null) {
+            addComponent(new Paragraph(EsaTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
+        }
+    }
 
     public abstract EsaScenario getScenario();
 }
