@@ -14,10 +14,7 @@ public class EsaScenario4Test {
     public void testScenario4() {
         List<Descriptor> schedule3Descriptors =
                 Arrays.asList(Descriptor.builder()
-                        .activityQuestionValue("2. Transferring from one seated position to another.")
-                        .activityAnswerValue(" Cannot move between one seated position and another "
-                                + "seated position located next to one another without receiving physical assistance from another person.")
-                        .activityAnswerLetter("2").activityAnswerPoints(9).build());
+                        .activityQuestionValue("2. Transferring from one seated position to another.").build());
 
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
@@ -34,24 +31,24 @@ public class EsaScenario4Test {
         EsaTemplateContent content = EsaScenario.SCENARIO_4.getContent(body);
 
         String expectedContent = "The appeal is allowed.\n"
-                + "\n"
-                + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
-                + "\n"
-                + "Felix Sydney has limited capability for work-related activity.\n"
-                + "\n"
-                + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not an issue.\n"
-                + "\n"
-                + "The following activity and descriptor from Schedule 3 applied:\n"
-                + "\n"
-                + "2. Transferring from one seated position to another.\t2. Cannot move between one seated position and another seated position located next to one another without receiving physical assistance from another person.\n"
-                + "\n"
-                + "\n"
-                + "My first reasons\n"
-                + "\n"
-                + "My second reasons\n"
-                + "\n"
-                + "Something else\n"
-                + "\n";
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
+            + "\n"
+            + "Felix Sydney has limited capability for work-related activity.\n"
+            + "\n"
+            + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not an issue.\n"
+            + "\n"
+            + "The following activity and descriptor from Schedule 3 applied:\n"
+            + "\n"
+            + "2. Transferring from one seated position to another.\n"
+            + "\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n";
 
         Assert.assertEquals(9, content.getComponents().size());
 

@@ -5,22 +5,18 @@ import java.util.List;
 
 public class DescriptorTable extends TemplateComponent<List<Descriptor>> {
 
-    private boolean hidePointsColumn;
+    private boolean hideAnswerColumns;
 
-    public DescriptorTable(String id, List<Descriptor> content, boolean hidePointsColumn) {
+    public DescriptorTable(String id, List<Descriptor> content, boolean hideAnswerColumns) {
         super(id, content);
-        this.hidePointsColumn = hidePointsColumn;
+        this.hideAnswerColumns = hideAnswerColumns;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (Descriptor descriptor : content) {
-            if (hidePointsColumn) {
+            if (hideAnswerColumns) {
                 sb.append(descriptor.getActivityQuestionValue());
-                sb.append("\t");
-                sb.append(descriptor.getActivityAnswerLetter());
-                sb.append(".");
-                sb.append(descriptor.getActivityAnswerValue());
             } else {
                 sb.append(descriptor.getActivityQuestionValue());
                 sb.append("\t");
@@ -45,8 +41,8 @@ public class DescriptorTable extends TemplateComponent<List<Descriptor>> {
         return false;
     }
 
-    @JsonProperty("is_hide_points_column")
-    public boolean isHidePointsColumn() {
-        return hidePointsColumn;
+    @JsonProperty("is_hide_answer_columns")
+    public boolean isHideAnswerColumns() {
+        return hideAnswerColumns;
     }
 }
