@@ -22,7 +22,6 @@ import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -888,22 +887,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
-    @Ignore
-    // FIXME
-    public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-        setDescriptorFlowIndicator("no", sscsCaseData);
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate();
 
     @Test
     public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
@@ -923,23 +907,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
-    @Ignore
-    // FIXME
-    public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-            false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate();
 
     @Test
     public void givenWelsh_GeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {

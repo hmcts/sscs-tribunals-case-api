@@ -59,7 +59,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
     @Override
     public Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData) {
         Outcome outcome = determineOutcome(sscsCaseData);
-        if (sscsCaseData.isWcaAppeal()) {
+        if ("Yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
             Optional<EsaAllowedOrRefusedCondition> passingAllowedOrRefusedCondition = EsaPointsRegulationsAndSchedule3ActivitiesCondition.getPassingAllowedOrRefusedCondition(questionService, sscsCaseData);
             if (passingAllowedOrRefusedCondition.isEmpty()) {
                 throw new IllegalStateException("No matching allowed or refused condition");

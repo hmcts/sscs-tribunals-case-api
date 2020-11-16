@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -107,10 +108,86 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
+    @Test
+    public void willSetPreviewFile_WhenApprovedAndLowerRate() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = true;
+
+        boolean setAsideExpectation = true;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertEquals("lower rate", body.getEsaAwardRate());
+
+        assertNotNull(body.getEsaSchedule2Descriptors());
+        assertEquals(1, body.getEsaSchedule2Descriptors().size());
+        assertNotNull(body.getEsaSchedule2Descriptors().get(0));
+        assertEquals(15, body.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("a", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
+        assertNotNull(body.getEsaNumberOfPoints());
+        assertEquals(15, body.getEsaNumberOfPoints().intValue());
+
+        assertTrue(body.isEsaIsEntited());
+        assertNull(body.getDwpReassessTheAward());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+
+        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
+        EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertEquals(EsaScenario.SCENARIO_5, templateContent.getScenario());
+        assertEquals(9, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+    }
+
     @Override
     protected void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData) {
         if ("no".equalsIgnoreCase(value)) {
-            sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("sometime");
+            sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("doNotReassess");
         }
         sscsCaseData.setWcaAppeal(value);
     }
@@ -128,6 +205,37 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         caseData.setDoesRegulation35Apply(YesNo.YES);
+    }
+
+    @Override
+    public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        setDescriptorFlowIndicator("no", sscsCaseData);
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
+    }
+
+    @Override
+    public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
+        setDescriptorFlowIndicator("no", sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
+            false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @Test
