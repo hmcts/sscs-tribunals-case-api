@@ -890,21 +890,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     public abstract void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate();
 
     @Test
-    public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, false, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate();
 
     @Test
     public abstract void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate();
