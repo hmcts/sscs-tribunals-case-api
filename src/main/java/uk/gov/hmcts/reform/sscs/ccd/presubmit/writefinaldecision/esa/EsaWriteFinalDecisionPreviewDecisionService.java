@@ -69,6 +69,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
                     builder.writeFinalDecisionTemplateContent(templateContent);
                 } else {
                     // Should never happen.
+                    log.error("Unable to obtain a valid scenario before preview - Something has gone wrong for caseId: ", caseData.getCcdCaseId());
                     response.addError("Unable to obtain a valid scenario - something has gone wrong");
                 }
             }
