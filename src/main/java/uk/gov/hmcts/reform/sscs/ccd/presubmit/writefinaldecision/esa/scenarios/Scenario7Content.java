@@ -19,7 +19,7 @@ public class Scenario7Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.DISEASE_OR_DISABLEMENT_PARAGRAPH.name(), getRegulation29And35DiseaseOrDisablementSentence(writeFinalDecisionTemplateBody.getAppellantName(), false)));
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
-        addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber())));
+        addHearingType(writeFinalDecisionTemplateBody);
         addRecommendationIfPresent(writeFinalDecisionTemplateBody);
 
     }

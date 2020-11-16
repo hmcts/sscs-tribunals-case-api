@@ -21,6 +21,9 @@ public class EsaScenario8Test {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
+                .hearingType("faceToFace")
+                .attendedHearing(true)
+                .presentingOfficerAttended(true)
                 .isAllowed(true)
                 .isSetAside(true)
                 .dateOfDecision("2020-09-20")
