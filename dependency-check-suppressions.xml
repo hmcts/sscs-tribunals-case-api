@@ -55,7 +55,7 @@
     <suppress until="2020-11-30">
         <notes><![CDATA[
          file name: junit-4.13.1.jar
-         Awaiting NVD reanalysis
+         Awaiting patch for Junit
         ]]></notes>
         <cve>CVE-2020-15250</cve>
     </suppress>
