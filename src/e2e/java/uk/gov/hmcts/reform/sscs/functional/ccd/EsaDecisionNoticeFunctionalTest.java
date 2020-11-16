@@ -56,7 +56,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = pdfText.replaceAll("[\\n\\t]", "");
-            assertThat(pdfTextWithoutNewLines, containsString("7. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Summary of outcome decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
             assertThat(pdfTextWithoutNewLines, containsString(expectedText));
         }
     }

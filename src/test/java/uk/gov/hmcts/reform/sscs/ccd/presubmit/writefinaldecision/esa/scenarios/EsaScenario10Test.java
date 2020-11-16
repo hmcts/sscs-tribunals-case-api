@@ -32,6 +32,7 @@ public class EsaScenario10Test {
                         .appellantName("Felix Sydney")
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else")
+                        .summaryOfOutcomeDecision("This is the summary of outcome decision")
                         .dwpReassessTheAward("noRecommendation")
                         .regulation29Applicable(true)
                         .esaSchedule2Descriptors(schedule2Descriptors).build();
@@ -41,6 +42,8 @@ public class EsaScenario10Test {
         String expectedContent = "The appeal is allowed.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
+                + "\n"
+                + "This is the summary of outcome decision\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -52,7 +55,7 @@ public class EsaScenario10Test {
                 + "\n"
                 + "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Felix Sydney.\n\n";
 
-        assertEquals(7, content.getComponents().size());
+        assertEquals(8, content.getComponents().size());
 
         assertThat(content.toString(), is(expectedContent));
 
