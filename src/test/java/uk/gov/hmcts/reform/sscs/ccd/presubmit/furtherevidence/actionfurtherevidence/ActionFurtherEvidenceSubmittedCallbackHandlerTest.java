@@ -159,18 +159,18 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
     @Test
     public void givenFurtherEvidenceActionSelectedOption_shouldTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
-        SscsDocument sscsDocument = SscsDocument.builder().value(
-                SscsDocumentDetails.builder()
-                        .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
-                        .documentFileName("bla.pdf")
-                        .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
-                        .documentDateAdded("2019-06-12T00:00:00.000")
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder()
+                        .type(DocumentType.URGENT_HEARING_REQUEST.getValue())
+                        .fileName("bla.pdf")
+                        .url(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .scannedDate("2019-06-12T00:00:00.000")
                         .controlNumber("123")
                         .build()).build();
 
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
 
-        callback.getCaseDetails().getCaseData().setSscsDocument(List.of(sscsDocument));
+        callback.getCaseDetails().getCaseData().setScannedDocuments(List.of(scannedDocument));
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
