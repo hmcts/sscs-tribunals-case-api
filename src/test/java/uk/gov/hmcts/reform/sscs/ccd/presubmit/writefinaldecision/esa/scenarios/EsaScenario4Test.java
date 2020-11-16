@@ -18,9 +18,13 @@ public class EsaScenario4Test {
 
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
+                        .hearingType("faceToFace")
+                        .attendedHearing(true)
+                        .presentingOfficerAttended(true)
                         .isAllowed(true)
                         .isSetAside(true)
                         .dateOfDecision("20/09/2020")
+                        .pageNumber("A1")
                         .esaNumberOfPoints(15)
                         .appellantName("Felix Sydney")
                         .supportGroupOnly(true)
@@ -48,9 +52,11 @@ public class EsaScenario4Test {
             + "My second reasons\n"
             + "\n"
             + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(9, content.getComponents().size());
+        Assert.assertEquals(10, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
