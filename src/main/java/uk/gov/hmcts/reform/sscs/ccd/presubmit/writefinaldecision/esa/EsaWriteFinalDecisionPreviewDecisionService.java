@@ -146,7 +146,8 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             .stream().map(q ->
                 buildDescriptorFromActivityQuestion(activityQuestionlookup.getByKey(q))).collect(Collectors.toList());
 
-        descriptors.sort(new DescriptorLexicographicalComparator());
+        // FIXME Extract sort order from question text
+        //descriptors.sort(new DescriptorLexicographicalComparator());
 
         return descriptors;
     }
