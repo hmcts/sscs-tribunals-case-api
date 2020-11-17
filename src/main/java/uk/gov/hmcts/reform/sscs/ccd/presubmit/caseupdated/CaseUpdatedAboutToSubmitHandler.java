@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
-import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -69,9 +68,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return checkFirstCharacterForEachAddressField(sscsCaseData, preSubmitCallbackResponse);
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {
@@ -79,44 +76,5 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             String isScottishCase = IsScottishHandler.isScottishCase(newRpc, caseData);
             caseData.setIsScottishCase(isScottishCase);
         }
-    }
-
-    private PreSubmitCallbackResponse<SscsCaseData> checkFirstCharacterForEachAddressField(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
-
-        Appeal appeal = sscsCaseData.getAppeal();
-
-        if (appeal.getAppellant() != null && appeal.getAppellant().getAddress() != null
-                && isInvalidAddress(appeal.getAppellant().getAddress())) {
-            return addAddressError(response);
-        }
-        if (appeal.getRep() != null && appeal.getRep().getAddress() != null && isInvalidAddress(appeal.getRep().getAddress())) {
-            return addAddressError(response);
-        }
-        if (appeal.getAppellant().getAppointee() != null && appeal.getAppellant().getAppointee().getAddress() != null
-                && isInvalidAddress(appeal.getAppellant().getAppointee().getAddress())) {
-            return addAddressError(response);
-        }
-        if (sscsCaseData.getJointPartyAddress() != null && isInvalidAddress(sscsCaseData.getJointPartyAddress())) {
-            return addAddressError(response);
-        }
-        return response;
-    }
-
-    private boolean isInvalidAddress(Address address) {
-        Pattern p = Pattern.compile("^[a-zA-ZÀ-ž0-9]{1}[a-zA-ZÀ-ž0-9 \\r\\n.“”\",’?![\\]()/£:\\\\_+\\-%&;]]{1,}$");
-        if (address.getLine1() != null && !address.getLine1().isEmpty() && !p.matcher(address.getLine1()).find()) {
-            return true;
-        } else if (address.getLine2() != null && !address.getLine2().isEmpty() && !p.matcher(address.getLine2()).find()) {
-            return true;
-        } else if (address.getTown() != null && !address.getTown().isEmpty() && !p.matcher(address.getTown()).find()) {
-            return true;
-        } else {
-            return address.getCounty() != null && !address.getCounty().isEmpty() && !p.matcher(address.getCounty()).find();
-        }
-    }
-
-    private PreSubmitCallbackResponse<SscsCaseData> addAddressError(PreSubmitCallbackResponse<SscsCaseData> response) {
-        response.addError("Invalid characters are being used at the beginning of address fields, please correct");
-        return response;
     }
 }
