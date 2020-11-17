@@ -7,15 +7,12 @@ import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestion;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.ActivityQuestionLookup;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
@@ -103,6 +100,10 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         return getDescriptorsFromQuestionKeys(key -> esaDecisionNoticeQuestionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
+    protected List<Descriptor> getEsaSchedule3DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+        return getDescriptorsFromQuestionKeys(key -> esaDecisionNoticeQuestionService.extractQuestionFromKey(EsaSchedule3QuestionKey.getByKey(key)), caseData, questionKeys);
+    }
+
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
         List<Descriptor> allSchedule2Descriptors = new ArrayList<>();
@@ -136,25 +137,5 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
     }
 
-    protected List<Descriptor> getEsaSchedule3DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getQuestionOnlyDescriptorsFromQuestionKeys(key -> esaDecisionNoticeQuestionService.extractQuestionFromKey(EsaSchedule3QuestionKey.getByKey(key)), caseData, questionKeys);
-    }
 
-    protected List<Descriptor> getQuestionOnlyDescriptorsFromQuestionKeys(ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
-        
-        List<Descriptor> descriptors = questionKeys
-            .stream().map(q ->
-                buildDescriptorFromActivityQuestion(activityQuestionlookup.getByKey(q))).collect(Collectors.toList());
-
-        // FIXME Extract sort order from question text
-        //descriptors.sort(new DescriptorLexicographicalComparator());
-
-        return descriptors;
-    }
-
-    protected Descriptor buildDescriptorFromActivityQuestion(ActivityQuestion activityQuestion) {
-        return Descriptor.builder()
-            .activityQuestionValue(activityQuestion.getValue())
-            .build();
-    }
 }
