@@ -21,7 +21,7 @@ public class EsaScenario1Test {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
-                .dateOfDecision("20/09/2020")
+                .dateOfDecision("2020-09-20")
                 .esaNumberOfPoints(9)
                 .pageNumber("A1")
                 .appellantName("Felix Sydney")
