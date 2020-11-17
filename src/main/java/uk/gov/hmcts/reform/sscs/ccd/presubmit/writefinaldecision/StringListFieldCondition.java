@@ -1,11 +1,10 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldConditionBase;
 
 public class StringListFieldCondition extends FieldConditionBase<List<String>> {
 

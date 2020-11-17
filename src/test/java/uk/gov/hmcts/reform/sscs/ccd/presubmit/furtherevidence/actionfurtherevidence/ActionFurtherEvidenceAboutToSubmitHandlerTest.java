@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.APPELLANT_EVIDENCE;
@@ -24,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -600,6 +605,29 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     @Test
+    @Parameters({"READY_TO_LIST,1", "RESPONSE_RECEIVED,1", "DORMANT_APPEAL_STATE,1", "HEARING,1", "VALID_APPEAL,0"})
+    public void shouldSetBundleAdditionBasedOnPreviousState(@Nullable State state, int occurrs) {
+
+        actionFurtherEvidenceAboutToSubmitHandler = new ActionFurtherEvidenceAboutToSubmitHandler(footerService, bundleAdditionFilenameBuilder);
+
+        sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(ISSUE_FURTHER_EVIDENCE.code, ISSUE_FURTHER_EVIDENCE.label));
+        when(caseDetails.getState()).thenReturn(state);
+        when(footerService.getNextBundleAddition(any())).thenReturn("A");
+
+        ScannedDocument scannedDocument = ScannedDocument.builder().value(
+                ScannedDocumentDetails.builder().fileName("filename.pdf").type(ScannedDocumentType.URGENT_HEARING_REQUEST.getValue())
+                        .url(DocumentLink.builder().documentUrl("test.com").build()).build()).build();
+        List<ScannedDocument> docs = new ArrayList<>();
+
+        docs.add(scannedDocument);
+        sscsCaseData.setScannedDocuments(docs);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(occurrs, response.getData().getSscsDocument().stream().filter(doc -> "A".equals(doc.getValue().getBundleAddition())).count());
+    }
+
+    @Test
     public void shouldNotUpdateInterlocReviewStateWhenActionManuallyAndHasNoReinstatementRequestDocument() {
         sscsCaseData.setPreviousState(null);
         sscsCaseData.getFurtherEvidenceAction().setValue(new DynamicListItem(OTHER_DOCUMENT_MANUAL.code, OTHER_DOCUMENT_MANUAL.label));
@@ -806,5 +834,56 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .requestOutcome(requestOutcome).build();
     }
 
-}
+    @Test
+    public void isThreadSafe() throws Exception {
 
+        DynamicList furtherEvidenceActionList =
+                buildFurtherEvidenceActionItemListForGivenOption("otherDocumentManual",
+                        "Other document type - action manually");
+
+        DynamicList originalSender = buildOriginalSenderItemListForGivenOption("appellant",
+                "Appellant (or Appointee)");
+
+        String evidenceHandle = null;
+
+        int numberOfTasks = 3;
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        AtomicBoolean noOverwrite = new AtomicBoolean(true);
+
+        try {
+            for (int i = 0; i < numberOfTasks; i++) {
+
+                String expectedId1 = String.valueOf(i);
+
+                SscsCaseData thisCaseData = SscsCaseData.builder()
+                        .ccdCaseId(expectedId1)
+                        .scannedDocuments(scannedDocumentList)
+                        .furtherEvidenceAction(furtherEvidenceActionList)
+                        .originalSender(originalSender)
+                        .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
+                        .build();
+
+                thisCaseData.setFurtherEvidenceAction(furtherEvidenceActionList);
+                thisCaseData.setOriginalSender(originalSender);
+                thisCaseData.setEvidenceHandled(evidenceHandle);
+
+                Callback<SscsCaseData> mockCallback = mock(Callback.class);
+                CaseDetails<SscsCaseData> mockCaseDetails = mock(CaseDetails.class);
+
+                when(mockCallback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
+                when(mockCallback.getCaseDetails()).thenReturn(mockCaseDetails);
+                when(mockCaseDetails.getCaseData()).thenReturn(thisCaseData);
+
+                executor.execute(new ThreadRunnable(i, actionFurtherEvidenceAboutToSubmitHandler, mockCallback, expectedId1, noOverwrite));
+            }
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
+
+        Thread.sleep(3000);
+        assertTrue(noOverwrite.get());
+        executor.shutdown();
+    }
+
+}

@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -22,6 +24,10 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityType;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityQuestion;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipActivityType;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
@@ -31,8 +37,10 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody.NoticeIssuedTemplateBodyBuilder;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody.WriteFinalDecisionTemplateBodyBuilder;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 @Component
@@ -44,17 +52,43 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
     @Autowired
     public WriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
         DecisionNoticeService decisionNoticeService,  DocumentConfiguration documentConfiguration) {
-        super(generateFile, idamClient, languagePreference -> getTemplateId(documentConfiguration, languagePreference));
+        super(generateFile, idamClient, languagePreferenceAndBenefit -> getTemplateId(documentConfiguration, languagePreferenceAndBenefit.getRight(), languagePreferenceAndBenefit.getLeft()));
         this.decisionNoticeService = decisionNoticeService;
     }
 
-    private static String getTemplateId(final DocumentConfiguration documentConfiguration, final LanguagePreference languagePreference) {
-        return documentConfiguration.getDocuments().get(languagePreference).get(EventType.ISSUE_FINAL_DECISION);
+    private static String getTemplateId(final DocumentConfiguration documentConfiguration, final String benefitType, final LanguagePreference languagePreference) {
+        if (benefitType == null) {
+            throw new IllegalStateException("Benefit type cannot be null");
+        }
+        Map<LanguagePreference, Map<EventType, String>> benefitSpecificDocuments = documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase());
+        if (benefitSpecificDocuments == null) {
+            throw new IllegalStateException("Unable to obtain benefit specific documents for benefit type:" + benefitType.toLowerCase() + " and language:" + languagePreference);
+        }
+        Map<EventType, String> eventTypeStringMap = benefitSpecificDocuments.get(languagePreference);
+        if (eventTypeStringMap == null) {
+            throw new IllegalStateException("Unable to obtain benefit specific documents for benefit type:" + benefitType.toLowerCase() + " and language:" + languagePreference);
+        }
+        String templateId = eventTypeStringMap.get(EventType.ISSUE_FINAL_DECISION);
+        if (templateId == null) {
+            throw new IllegalStateException("Unable to obtain template id for benefit type:" + benefitType + " and language:" + languagePreference);
+        }
+        return templateId;
     }
 
     @Override
     protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
+
+        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
+
+        if (benefitType == null) {
+            throw new IllegalStateException("Unable to determine benefit type");
+        }
+
+        DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
+
+        outcomeService.performPreOutcomeIntegrityAdjustments(caseData);
+
         NoticeIssuedTemplateBody formPayload = super
             .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getWriteFinalDecisionGeneratedDate(), DateTimeFormatter.ISO_DATE), isScottish, userAuthorisation);
         WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder = WriteFinalDecisionTemplateBody.builder();
@@ -64,18 +98,13 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         builder.userName(buildSignedInJudgeName(userAuthorisation));
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
+        writeFinalDecisionBuilder.wcaAppeal(caseData.isWcaAppeal());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
 
         setHearings(writeFinalDecisionBuilder, caseData);
-       
-        String benefitType = caseData.getAppeal().getBenefitType() == null ? null : caseData.getAppeal().getBenefitType().getCode();
 
-        if (benefitType == null) {
-            throw new IllegalStateException("Unable to determine benefit type");
-        }
-
-        Outcome outcome = decisionNoticeService.getOutcomeService(benefitType).determineOutcome(caseData);
+        Outcome outcome = outcomeService.determineOutcome(caseData);
         if (outcome == null) {
             throw new IllegalStateException("Outcome cannot be empty. Please check case data. If problem continues please contact support");
         } else {
@@ -110,6 +139,10 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         if ("PIP".equals(benefitType)) {
             setPipEntitlements(writeFinalDecisionBuilder, caseData);
             setPipDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+        }
+        if ("ESA".equals(benefitType)) {
+            setEsaDescriptorsAndPoints(writeFinalDecisionBuilder, caseData);
+            setEsaEntitlements(writeFinalDecisionBuilder, caseData);
         }
 
         writeFinalDecisionBuilder.pageNumber(caseData.getWriteFinalDecisionPageSectionReference());
@@ -214,6 +247,35 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
+    private void setEsaEntitlements(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+
+        Optional<AwardType> esaAwardTypeOptional = EsaPointsRegulationsAndSchedule3ActivitiesCondition
+                .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeService.getQuestionService("ESA"), caseData).getAwardType();
+
+        if (esaAwardTypeOptional.isEmpty()) {
+            builder.esaIsEntited(false);
+            builder.esaAwardRate(null);
+        } else {
+
+            String esaAwardType = esaAwardTypeOptional.get().getKey();
+
+            if (esaAwardType != null) {
+                builder.esaAwardRate(join(
+                        splitByCharacterTypeCamelCase(esaAwardType), ' ').toLowerCase());
+            } else {
+                builder.esaAwardRate(null);
+            }
+
+            if (AwardType.LOWER_RATE.getKey().equals(esaAwardType)) {
+                builder.esaIsEntited(true);
+            } else if (AwardType.HIGHER_RATE.getKey().equals(esaAwardType)) {
+                builder.esaIsEntited(true);
+            } else {
+                builder.esaIsEntited(false);
+            }
+        }
+    }
+
     protected void setPipDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
         List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
         if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
@@ -241,8 +303,45 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
     }
 
+    protected void setEsaDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+
+        List<Descriptor> allDescriptors = new ArrayList<>();
+        List<String> physicalDisabilityAnswers = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
+        if (physicalDisabilityAnswers != null) {
+            List<Descriptor> physicalDisablityDescriptors = getEsaDescriptorsFromQuestionKeys(caseData, physicalDisabilityAnswers);
+            allDescriptors.addAll(physicalDisablityDescriptors);
+        }
+        List<String> mentalAssessmentAnswers = EsaActivityType.MENTAL_ASSESSMENT.getAnswersExtractor().apply(caseData);
+        if (mentalAssessmentAnswers != null) {
+
+            List<Descriptor> mentalAssessmentDescriptors = getEsaDescriptorsFromQuestionKeys(caseData, mentalAssessmentAnswers);
+            allDescriptors.addAll(mentalAssessmentDescriptors);
+
+        }
+
+        if (allDescriptors.isEmpty()) {
+            builder.esaSchedule2Descriptors(null);
+            builder.esaNumberOfPoints(null);
+        } else {
+            builder.esaSchedule2Descriptors(allDescriptors);
+            int numberOfPoints = allDescriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
+            if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(numberOfPoints)) {
+                caseData.setDoesRegulation29Apply(null);
+            }
+            builder.esaNumberOfPoints(numberOfPoints);
+        }
+        builder.regulation29Applicable(caseData.getDoesRegulation29Apply() == null ? null :  caseData.getDoesRegulation29Apply().toBoolean());
+        builder.regulation35Applicable(caseData.getDoesRegulation35Apply() == null ? null :  caseData.getDoesRegulation35Apply().toBoolean());
+        builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
+    }
+
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
         return getDescriptorsFromQuestionKeys("PIP", PipActivityQuestion::getByKey, caseData, questionKeys);
+    }
+
+    protected List<Descriptor> getEsaDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+        EsaDecisionNoticeQuestionService questionService = (EsaDecisionNoticeQuestionService)decisionNoticeService.getQuestionService("ESA");
+        return getDescriptorsFromQuestionKeys("ESA", key -> questionService.extractQuestionFromKey(EsaActivityQuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
     protected List<Descriptor> getDescriptorsFromQuestionKeys(String benefitType, ActivityQuestionLookup activityQuestionlookup, SscsCaseData caseData, List<String> questionKeys) {
@@ -296,6 +395,9 @@ public class WriteFinalDecisionPreviewDecisionService extends IssueNoticeHandler
         }
         if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName())) {
             names.add(caseData.getWriteFinalDecisionMedicallyQualifiedPanelMemberName());
+        }
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(caseData.getWriteFinalDecisionOtherPanelMemberName())) {
+            names.add(caseData.getWriteFinalDecisionOtherPanelMemberName());
         }
         return StringUtils.getGramaticallyJoinedStrings(names);
     }

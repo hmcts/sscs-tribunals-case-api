@@ -4,10 +4,8 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +17,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @Component
@@ -67,12 +66,17 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
             preSubmitCallbackResponse.addError("Decision notice end date must be after decision notice start date");
         }
 
-        validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+        setShowSummaryOfOutcomePage(sscsCaseData);
 
-        if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
-            if (bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData) && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
-                && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
-                sscsCaseData.setWriteFinalDecisionEndDateType("na");
+        if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "PIP")) {
+
+            validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
+
+            if (sscsCaseData.getWriteFinalDecisionEndDateType() == null && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())) {
+                if (bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData) && isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+                        && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
+                    sscsCaseData.setWriteFinalDecisionEndDateType("na");
+                }
             }
         }
 
@@ -82,6 +86,7 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
             // reg 29 page should be shown based on a calculation
             setEsaShowPageFlags(sscsCaseData);
+            setEsaDefaultFields(sscsCaseData);
         }
 
         return preSubmitCallbackResponse;
@@ -102,6 +107,22 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
         return sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
             && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
             || "notConsidered".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion()));
+    }
+
+    private void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
+        if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "PIP")) {
+            if (sscsCaseData.getWriteFinalDecisionIsDescriptorFlow() != null && sscsCaseData.getWriteFinalDecisionIsDescriptorFlow().equalsIgnoreCase(YesNo.NO.getValue())
+                    && sscsCaseData.getWriteFinalDecisionGenerateNotice() != null && sscsCaseData.getWriteFinalDecisionGenerateNotice().equalsIgnoreCase(YesNo.YES.getValue())) {
+                sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
+                return;
+            }
+        } else if (StringUtils.equals(sscsCaseData.getAppeal().getBenefitType().getCode(), "ESA")) {
+            if (sscsCaseData.getWcaAppeal() != null && sscsCaseData.getWcaAppeal().equalsIgnoreCase(YesNo.NO.getValue())) {
+                sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
+                return;
+            }
+        }
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
     }
 
     private void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
@@ -154,35 +175,46 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
     private void setEsaShowPageFlags(SscsCaseData sscsCaseData) {
 
-        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, Arrays.stream(EsaActivityQuestionKey.values())
-                .map(EsaActivityQuestionKey::getKey).collect(Collectors.toList()));
+        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
         if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
+            if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+            } else if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.NO);
+            }
         } else {
             sscsCaseData.setShowRegulation29Page(YesNo.NO);
+            sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+        }
+    }
+
+    private void setEsaDefaultFields(SscsCaseData sscsCaseData) {
+        if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
     }
 
     private void validateEsaAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() != null
-            || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() != null) {
+        SscsEsaCaseData esaCaseData = sscsCaseData.getSscsEsaCaseData();
+        if (esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() != null
+            || esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() != null) {
 
-            if ((sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
-                || sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
-                && (sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
-                || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())) {
-                preSubmitCallbackResponse.addError("At least one activity must be selected.");
-                if ("yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()) && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
-                    if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
-                        && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
-                        if (sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
-                            preSubmitCallbackResponse.addError("End date is not applicable for this decision - please specify 'N/A - No Award'.");
-                        }
-                    } else {
-                        if ("na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
-                            preSubmitCallbackResponse.addError("An end date must be provided or set to Indefinite for this decision.");
-                        }
+            if ((esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
+                || esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
+                && (esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
+                || esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())
+                && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())
+                && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
+                if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)
+                    && isNoAwardOrNotConsideredForMobility(sscsCaseData)) {
+                    if (sscsCaseData.getWriteFinalDecisionEndDateType() != null && !"na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                        preSubmitCallbackResponse.addError("End date is not applicable for this decision - please specify 'N/A - No Award'.");
+                    }
+                } else {
+                    if ("na".equals(sscsCaseData.getWriteFinalDecisionEndDateType())) {
+                        preSubmitCallbackResponse.addError("An end date must be provided or set to Indefinite for this decision.");
                     }
                 }
             }

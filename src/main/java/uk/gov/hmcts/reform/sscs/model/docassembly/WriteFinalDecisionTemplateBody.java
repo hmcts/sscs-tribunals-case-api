@@ -73,5 +73,22 @@ public class WriteFinalDecisionTemplateBody {
     private List<String> reasonsForDecision;
     @JsonProperty("anything_else")
     private String anythingElse;
-
+    @JsonProperty("esa_is_entitled")
+    private boolean esaIsEntited;
+    @JsonProperty("esa_number_of_points")
+    private Integer esaNumberOfPoints;
+    @JsonProperty("esa_schedule_2_descriptors")
+    private List<Descriptor> esaSchedule2Descriptors;
+    @JsonProperty("esa_schedule_3_descriptors")
+    private List<Descriptor> esaSchedule3Descriptors;
+    @JsonProperty("esa_award_rate")
+    private String esaAwardRate;
+    @JsonProperty("is_wca_appeal")
+    private boolean wcaAppeal;
+    @JsonProperty("is_support_group_only")
+    private boolean supportGroupOnly;
+    @JsonProperty("is_regulation_29_applicable")
+    private Boolean regulation29Applicable;
+    @JsonProperty("is_regulation_35_applicable")
+    private Boolean regulation35Applicable;
 }
