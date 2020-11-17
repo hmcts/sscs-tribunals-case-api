@@ -4,11 +4,10 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
