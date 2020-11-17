@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.pip;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,13 +28,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class IssueFinalDecisionAboutToSubmitHandlerTest {
+public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToSubmitHandler handler;
@@ -109,27 +110,6 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .writeFinalDecisionPageSectionReference("")
             .writeFinalDecisionAnythingElse("something else")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
-            .esaWriteFinalDecisionPhysicalDisabilitiesQuestion(new ArrayList<>())
-            .esaWriteFinalDecisionMentalAssessmentQuestion(new ArrayList<>())
-            .esaWriteFinalDecisionMobilisingUnaidedQuestion("")
-            .esaWriteFinalDecisionStandingAndSittingQuestion("")
-            .esaWriteFinalDecisionReachingQuestion("")
-            .esaWriteFinalDecisionPickingUpQuestion("")
-            .esaWriteFinalDecisionManualDexterityQuestion("")
-            .esaWriteFinalDecisionMakingSelfUnderstoodQuestion("")
-            .esaWriteFinalDecisionCommunicationQuestion("")
-            .esaWriteFinalDecisionNavigationQuestion("")
-            .esaWriteFinalDecisionLossOfControlQuestion("")
-            .esaWriteFinalDecisionConsciousnessQuestion("")
-            .esaWriteFinalDecisionLearningTasksQuestion("")
-            .esaWriteFinalDecisionAwarenessOfHazardsQuestion("")
-            .esaWriteFinalDecisionPersonalActionQuestion("")
-            .esaWriteFinalDecisionCopingWithChangeQuestion("")
-            .esaWriteFinalDecisionGettingAboutQuestion("")
-            .esaWriteFinalDecisionSocialEngagementQuestion("")
-            .esaWriteFinalDecisionAppropriatenessOfBehaviourQuestion("")
-            .esaWriteFinalDecisionSchedule3ActivitiesApply("")
-            .esaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>())
             .showRegulation29Page(YesNo.YES)
             .showSchedule3ActivitiesPage(YesNo.YES)
             .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
@@ -202,36 +182,10 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
-
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionMobilisingUnaidedQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionStandingAndSittingQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionReachingQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionPickingUpQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionManualDexterityQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionMakingSelfUnderstoodQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionCommunicationQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionNavigationQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionLossOfControlQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionConsciousnessQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionLearningTasksQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionAwarenessOfHazardsQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionPersonalActionQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionCopingWithChangeQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionGettingAboutQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionSocialEngagementQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply());
-        assertNotNull(sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesQuestion());
         assertNotNull(sscsCaseData.getShowRegulation29Page());
         assertNotNull(sscsCaseData.getShowSchedule3ActivitiesPage());
         assertNotNull(sscsCaseData.getShowFinalDecisionNoticeSummaryOfOutcomePage());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDetailsOfDecision());
-        assertNotNull(sscsCaseData.getWcaAppeal());
-        assertNotNull(sscsCaseData.getSupportGroupOnlyAppeal());
-        assertNotNull(sscsCaseData.getDoesRegulation29Apply());
-        assertNotNull(sscsCaseData.getDoesRegulation35Apply());
     }
 
     @Test
@@ -516,36 +470,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
         assertNull(sscsCaseData.getWriteFinalDecisionAnythingElse());
-
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionMobilisingUnaidedQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionStandingAndSittingQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionReachingQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionPickingUpQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionManualDexterityQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionMakingSelfUnderstoodQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionCommunicationQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionNavigationQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionLossOfControlQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionConsciousnessQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionLearningTasksQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionAwarenessOfHazardsQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionPersonalActionQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionCopingWithChangeQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionGettingAboutQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionSocialEngagementQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply());
-        assertNull(sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesQuestion());
-        assertNull(sscsCaseData.getShowRegulation29Page());
-        assertNull(sscsCaseData.getShowSchedule3ActivitiesPage());
-        assertNull(sscsCaseData.getShowFinalDecisionNoticeSummaryOfOutcomePage());
         assertNull(sscsCaseData.getWriteFinalDecisionDetailsOfDecision());
-        assertNull(sscsCaseData.getWcaAppeal());
-        assertNull(sscsCaseData.getSupportGroupOnlyAppeal());
-        assertNull(sscsCaseData.getDoesRegulation29Apply());
-        assertNull(sscsCaseData.getDoesRegulation35Apply());
     }
 
     @Test
