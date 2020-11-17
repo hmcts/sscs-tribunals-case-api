@@ -84,8 +84,11 @@ public class WriteFinalDecisionTemplateBody {
     @JsonProperty("esa_award_rate")
     private String esaAwardRate;
     @JsonProperty("is_wca_appeal")
-    private boolean isWcaAppeal;
+    private boolean wcaAppeal;
     @JsonProperty("is_support_group_only")
-    private boolean isSupportGroupOnly;
-
+    private boolean supportGroupOnly;
+    @JsonProperty("is_regulation_29_applicable")
+    private Boolean regulation29Applicable;
+    @JsonProperty("is_regulation_35_applicable")
+    private Boolean regulation35Applicable;
 }

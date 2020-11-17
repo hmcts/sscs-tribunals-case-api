@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static io.restassured.RestAssured.baseURI;
+import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static uk.gov.hmcts.reform.sscs.functional.handlers.BaseHandler.getJsonCallbackForTest;
@@ -29,6 +30,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
 
     public CcdMidEventControllerFunctionalTest() {
         baseURI = baseUrl;
+        useRelaxedHTTPSValidation();
     }
 
     @Test
@@ -45,6 +47,7 @@ public class CcdMidEventControllerFunctionalTest extends BaseFunctionTest {
                 .header(new Header("ServiceAuthorization", "Invalid Value"))
                 .header(new Header("Authorization", idamService.getIdamOauth2Token()))
                 .body(getJsonCallbackForTest("handlers/writefinaldecision/writeFinalDecisionCallback.json"))
+                //.useRelaxedHttpsValidation()
                 .post("/ccdMidEvent")
                 .then()
                 .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);

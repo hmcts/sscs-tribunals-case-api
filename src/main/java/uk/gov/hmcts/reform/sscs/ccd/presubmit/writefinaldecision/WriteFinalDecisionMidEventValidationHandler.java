@@ -4,10 +4,8 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +17,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueDocumentHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaActivityQuestionKey;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @Component
@@ -87,7 +86,6 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
             // reg 29 page should be shown based on a calculation
             setEsaShowPageFlags(sscsCaseData);
-
             setEsaDefaultFields(sscsCaseData);
         }
 
@@ -177,13 +175,14 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
 
     private void setEsaShowPageFlags(SscsCaseData sscsCaseData) {
 
-        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, Arrays.stream(EsaActivityQuestionKey.values())
-                .map(EsaActivityQuestionKey::getKey).collect(Collectors.toList()));
+        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
         if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
             if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
                 sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
+            } else if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.NO);
             }
         } else {
             sscsCaseData.setShowRegulation29Page(YesNo.NO);
@@ -192,19 +191,20 @@ public class WriteFinalDecisionMidEventValidationHandler extends IssueDocumentHa
     }
 
     private void setEsaDefaultFields(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() == null) {
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         }
     }
 
     private void validateEsaAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        if (sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() != null
-            || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() != null) {
+        SscsEsaCaseData esaCaseData = sscsCaseData.getSscsEsaCaseData();
+        if (esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() != null
+            || esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() != null) {
 
-            if ((sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
-                || sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
-                && (sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
-                || sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())
+            if ((esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion() == null
+                || esaCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion().isEmpty())
+                && (esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion() == null
+                || esaCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion().isEmpty())
                 && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow())
                 && bothDailyLivingAndMobilityQuestionsAnswered(sscsCaseData)) {
                 if (isNoAwardOrNotConsideredForDailyLiving(sscsCaseData)

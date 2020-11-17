@@ -66,6 +66,14 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
             preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
         } else {
 
+            DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
+
+            // Due to a bug with CCD related to hidden fields, hidden fields are not being unset
+            // on the final submission from CCD, so we need to reset them here
+            // See https://tools.hmcts.net/jira/browse/RDM-8200
+            // This is a temporary workaround for this issue.
+            outcomeService.performPreOutcomeIntegrityAdjustments(sscsCaseData);
+
             DecisionNoticeQuestionService questionService = decisionNoticeService.getQuestionService(benefitType);
 
             List<String> validationErrorMessages = new ArrayList<>();
@@ -80,7 +88,6 @@ public class WriteFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
 
             if (validationErrorMessages.isEmpty()) {
 
-                DecisionNoticeOutcomeService outcomeService = decisionNoticeService.getOutcomeService(benefitType);
 
                 // Validate that we can determine an outcome
                 Outcome outcome = outcomeService.determineOutcomeWithValidation(preSubmitCallbackResponse.getData());

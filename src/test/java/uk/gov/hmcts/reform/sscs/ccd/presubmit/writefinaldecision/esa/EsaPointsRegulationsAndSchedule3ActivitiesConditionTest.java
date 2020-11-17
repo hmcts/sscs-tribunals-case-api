@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
@@ -68,21 +69,11 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
 
     private boolean isValidCombinationFromSelectSchedule3ActivitiesOnwards(Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply) {
-
         if (schedule3ActivitiesSelected == null) {
             return false;
         } else {
-            if (schedule3ActivitiesSelected.booleanValue()) {
-                if (doesRegulation35Apply != null) {
-                    return false;
-                }
-            } else {
-                if (doesRegulation35Apply == null) {
-                    return false;
-                }
-            }
+            return schedule3ActivitiesSelected.booleanValue() || doesRegulation35Apply != null;
         }
-        return true;
     }
 
     /**
@@ -128,7 +119,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                 return false;
             } else {
                 if (!doesRegulation29Apply.booleanValue()) {
-                    if (schedule3ActivitiesSelected != null || doesRegulation35Apply != null) {
+                    if (schedule3ActivitiesSelected != null) {
                         return false;
                     } else {
                         return true;
@@ -174,8 +165,12 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             doesRegulation35Apply);
 
                     List<String> schedule3Activities = null;
+                    String schedule3ActivitesApply = null;
                     if (schedule3ActivitiesSelected != null) {
                         schedule3Activities = schedule3ActivitiesSelected.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>();
+                        schedule3ActivitesApply = schedule3ActivitiesSelected.booleanValue() ? "Yes" : "No";
+                    } else {
+                        schedule3ActivitesApply = null;
                     }
 
                     SscsCaseData caseData = SscsCaseData.builder()
@@ -184,7 +179,8 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                         .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                         .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
                         .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply))
-                        .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build();
+                        .esaSscsCaseData(SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
+                            .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
 
                     Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData), Mockito.any())).thenReturn(points);
 
