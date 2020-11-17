@@ -100,8 +100,9 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 EventType.VALID_SEND_TO_INTERLOC, "Send a case to a judge for review");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)
-                && !CollectionUtils.isEmpty(caseData.getScannedDocuments())
-                && caseData.getScannedDocuments().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getType())).count() > 0) {
+                && (StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))
+                && !CollectionUtils.isEmpty(caseData.getSscsDocument())
+                && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0) {
             return setMakeCaseUrgentTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
