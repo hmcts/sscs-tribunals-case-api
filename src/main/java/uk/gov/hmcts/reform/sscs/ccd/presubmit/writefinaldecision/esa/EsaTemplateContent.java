@@ -107,10 +107,6 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         }
     }
 
-    public String getHearingTypeSentence(String appellantName, String bundlePage) {
-        return getHearingTypeSentence(appellantName, bundlePage, "oral", true, true);
-    }
-
     public String getHearingTypeSentence(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
             return getFaceToFaceHearingTypeSentence(appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
