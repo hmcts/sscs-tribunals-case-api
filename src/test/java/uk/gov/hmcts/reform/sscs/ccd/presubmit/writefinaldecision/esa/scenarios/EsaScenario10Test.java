@@ -26,7 +26,7 @@ public class EsaScenario10Test {
                 WriteFinalDecisionTemplateBody.builder()
                         .isAllowed(true)
                         .wcaAppeal(false)
-                        .dateOfDecision("20/09/2020")
+                        .dateOfDecision("2020-09-20")
                         .esaNumberOfPoints(0)
                         .pageNumber("A1")
                         .appellantName("Felix Sydney")

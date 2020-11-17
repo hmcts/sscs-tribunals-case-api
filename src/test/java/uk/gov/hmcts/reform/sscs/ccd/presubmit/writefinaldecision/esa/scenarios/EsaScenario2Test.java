@@ -15,7 +15,7 @@ public class EsaScenario2Test {
                 WriteFinalDecisionTemplateBody.builder()
                         .isAllowed(false)
                         .isSetAside(false)
-                        .dateOfDecision("20/09/2020")
+                        .dateOfDecision("2020-09-20")
                         .esaNumberOfPoints(9)
                         .appellantName("Felix Sydney")
                         .regulation35Applicable(false)

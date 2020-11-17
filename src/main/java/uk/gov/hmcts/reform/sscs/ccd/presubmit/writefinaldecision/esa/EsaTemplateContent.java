@@ -4,6 +4,8 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaTemplateComponentId;
@@ -14,12 +16,14 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateCont
 
 public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateContent {
 
+    protected static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     public String getAllowedOrRefusedSentence(boolean allowed) {
         return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
     }
 
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
-        return "The decision made by the Secretary of State on " + decisionDate + " is "
+        return "The decision made by the Secretary of State on " + DATE_FORMATTER.format(LocalDate.parse(decisionDate)) + " is "
             + (!setAside ? "confirmed." : "set aside.");
     }
 
@@ -142,7 +146,8 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
 
     public void addRecommendationIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
         if (writeFinalDecisionTemplateBody.getDwpReassessTheAward() != null) {
-            addComponent(new Paragraph(EsaTemplateComponentId.RECOMMENDATION.name(), getRecommendationSentence(writeFinalDecisionTemplateBody.getDwpReassessTheAward(), writeFinalDecisionTemplateBody.getAppellantName())));
+            addComponent(new Paragraph(EsaTemplateComponentId.RECOMMENDATION.name(),
+                getRecommendationSentence(writeFinalDecisionTemplateBody.getDwpReassessTheAward(), writeFinalDecisionTemplateBody.getAppellantName())));
         }
     }
 
