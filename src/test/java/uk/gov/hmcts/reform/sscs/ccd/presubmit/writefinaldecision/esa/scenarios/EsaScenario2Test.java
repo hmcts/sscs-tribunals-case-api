@@ -20,6 +20,7 @@ public class EsaScenario2Test {
                         .isSetAside(false)
                         .dateOfDecision("2020-09-20")
                         .esaNumberOfPoints(9)
+                        .pageNumber("A1")
                         .appellantName("Felix Sydney")
                         .regulation35Applicable(false)
                         .supportGroupOnly(true)

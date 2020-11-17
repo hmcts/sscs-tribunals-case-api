@@ -55,7 +55,7 @@ public class EsaScenarioHearingTypeTest {
                         .presentingOfficerAttended(presentingOfficerAttended)
                         .isAllowed(true)
                         .isSetAside(true)
-                        .dateOfDecision("20/09/2020")
+                        .dateOfDecision("2020-09-20")
                         .esaNumberOfPoints(15)
                         .pageNumber("A1")
                         .appellantName("Felix Sydney")
