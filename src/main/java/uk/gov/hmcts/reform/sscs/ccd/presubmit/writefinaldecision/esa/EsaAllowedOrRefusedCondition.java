@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.EMPTY;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListField
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
@@ -42,6 +44,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     REFUSED_NON_SUPPORT_GROUP_ONLY(
         isAllowedOrRefused(REFUSED),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.FALSE),
         isAnyPoints(),
         isAnySchedule3(),
@@ -51,6 +54,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(UNSPECIFIED)),
     REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(REFUSED),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.TRUE),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule3(),
@@ -59,6 +63,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(FALSE)),
     REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(REFUSED),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.TRUE),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule3(),
@@ -67,11 +72,13 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(FALSE)),
     ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS(
         isAllowedOrRefused(ALLOWED),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(YesNoPredicate.FALSE),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule3()),
     ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS(
         isAllowedOrRefused(ALLOWED),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(FALSE),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule3(),
@@ -79,12 +86,14 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     ),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
         isAllowedOrRefused(ALLOWED),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(NOT_EMPTY),
         isRegulation29(TRUE.or(UNSPECIFIED))),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
+        isWcaAppeal(TRUE, false),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(EMPTY),
@@ -92,11 +101,26 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         isRegulation35(YesNoPredicate.TRUE)),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
+        isWcaAppeal(TRUE,true),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule3(StringListPredicate.UNSPECIFIED),
         isRegulation29(TRUE.or(UNSPECIFIED)),
-    isRegulation35(TRUE));
+        isRegulation35(TRUE)),
+    NON_WCA_APPEAL_ALLOWED(
+            isAllowedOrRefused(ALLOWED),
+            isWcaAppeal(FALSE, true),
+            isSupportGroupOnly(TRUE.or(FALSE)),
+            isAnyPoints(),
+            isAnySchedule3(),
+            isDwpReassessTheAward(TRUE)),
+    NON_WCA_APPEAL_REFUSED(
+            isAllowedOrRefused(REFUSED),
+            isWcaAppeal(FALSE, true),
+            isSupportGroupOnly(TRUE.or(FALSE)),
+            isAnyPoints(),
+            isAnySchedule3(),
+            isDwpReassessTheAward(TRUE));
 
     Optional<EsaPointsCondition> primaryPointsCondition;
     Optional<FieldCondition> schedule3ActivitiesSelected;
@@ -104,12 +128,39 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     List<FieldCondition> validationConditions;
     Optional<EsaPointsCondition> validationPointsCondition;
 
-    EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected,
+    
+    EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, YesNoFieldCondition supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected,
         FieldCondition...validationConditions) {
-        this(allowedOrRefusedCondition, supportGroupOnlyCondition, primaryPointsCondition, schedule3ActivitiesSelected, isAnyPoints(), validationConditions);
+        this(allowedOrRefusedCondition, wcaAppealCondition, supportGroupOnlyCondition, primaryPointsCondition, schedule3ActivitiesSelected, isAnyPoints(), validationConditions);
     }
 
-    EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected, Optional<EsaPointsCondition> validationPointsCondition,
+    public EsaScenario getEsaScenario(SscsCaseData caseData) {
+        if (REFUSED_NON_SUPPORT_GROUP_ONLY == this) {
+            return EsaScenario.SCENARIO_1;
+        } else if (REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS == this || REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS == this) {
+            return EsaScenario.SCENARIO_2;
+        } else if (ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(TRUE).isSatisified(caseData)) {
+            return EsaScenario.SCENARIO_3;
+        } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
+            return EsaScenario.SCENARIO_4;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSchedule3Selections().isEmpty()) {
+            return EsaScenario.SCENARIO_5;
+        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSchedule3Selections().isEmpty()) {
+            return EsaScenario.SCENARIO_6;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSchedule3Selections().isEmpty() && isRegulation35(FALSE).isSatisified(caseData)) {
+            return EsaScenario.SCENARIO_7;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSchedule3Selections().isEmpty() && isRegulation35(TRUE).isSatisified(caseData)) {
+            return EsaScenario.SCENARIO_8;
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSchedule3Selections().isEmpty()) {
+            return EsaScenario.SCENARIO_9;
+        } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
+            return EsaScenario.SCENARIO_10;
+        } else {
+            throw new IllegalStateException("No scenario applicable");
+        }
+    }
+
+    EsaAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition wcaAppealCondition, YesNoFieldCondition supportGroupOnlyCondition, Optional<EsaPointsCondition> primaryPointsCondition, Optional<StringListPredicate> schedule3ActivitiesSelected, Optional<EsaPointsCondition> validationPointsCondition,
         FieldCondition...validationConditions) {
         if (schedule3ActivitiesSelected.isPresent()) {
             this.schedule3ActivitiesSelected = Optional.of(isSchedule3ActivitiesAnswer(schedule3ActivitiesSelected.get()));
@@ -119,6 +170,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
         this.primaryPointsCondition = primaryPointsCondition;
         this.primaryConditions = new ArrayList<>();
         primaryConditions.add(allowedOrRefusedCondition);
+        primaryConditions.add(wcaAppealCondition);
         primaryConditions.add(supportGroupOnlyCondition);
         if (this.schedule3ActivitiesSelected.isPresent()) {
             primaryConditions.add(this.schedule3ActivitiesSelected.get());
@@ -135,6 +187,16 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     static YesNoFieldCondition isSupportGroupOnly(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Support Group Only Appeal", predicate,
             s -> s.isSupportGroupOnlyAppeal() ? YesNo.YES : YesNo.NO);
+    }
+
+    static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
+        return new YesNoFieldCondition("Wca Appeal", predicate,
+            s -> s.isWcaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+    }
+
+    static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
+        return new YesNoFieldCondition("'When should DWP reassess the award?'", predicate,
+            (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static Optional<EsaPointsCondition> isAnyPoints() {
@@ -169,15 +231,19 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
-        int points = questionService.getTotalPoints(caseData, getAnswersExtractor().apply(caseData));
-        if (primaryPointsCondition.isPresent()) {
-            if (!primaryPointsCondition.get().getPointsRequirementCondition().test(points)) {
-                return false;
+        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
+            int points = questionService.getTotalPoints(caseData, getAnswersExtractor().apply(caseData));
+            if (primaryPointsCondition.isPresent()) {
+                if (!primaryPointsCondition.get().getPointsRequirementCondition().test(points)) {
+                    return false;
+                } else {
+                    return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
+                }
             } else {
                 return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
             }
         } else {
-            return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
+            return false;
         }
     }
 
@@ -250,7 +316,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
     }
 
     public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
-        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
-            emptyIfNull(sscsCaseData.getEsaWriteFinalDecisionMentalAssessmentQuestion()));
+        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
+            emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
     }
 }

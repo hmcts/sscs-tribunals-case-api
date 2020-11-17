@@ -31,6 +31,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public class IssueFinalDecisionAboutToSubmitHandlerTest {
@@ -60,9 +61,9 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
+        pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(new PipDecisionNoticeQuestionService());
 
-        decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService));
+        decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService), new ArrayList<>());
 
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator);
 

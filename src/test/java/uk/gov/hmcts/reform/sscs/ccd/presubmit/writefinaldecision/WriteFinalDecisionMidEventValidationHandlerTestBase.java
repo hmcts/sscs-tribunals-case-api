@@ -30,7 +30,7 @@ import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     protected static final String USER_AUTHORISATION = "Bearer token";
-    protected static WriteFinalDecisionMidEventValidationHandler handler;
+    protected static WriteFinalDecisionMidEventValidationHandlerBase handler;
 
     protected abstract String getBenefitType();
 
@@ -58,11 +58,13 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
     protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
+    protected abstract WriteFinalDecisionMidEventValidationHandlerBase createValidationHandler(Validator validator, DecisionNoticeService decisionNoticeService);
+
     @Before
     public void setUp() {
         openMocks(this);
 
-        handler = new WriteFinalDecisionMidEventValidationHandler(validator, decisionNoticeService);
+        handler = createValidationHandler(validator, decisionNoticeService);
 
         when(decisionNoticeService.getQuestionService(getBenefitType())).thenReturn(decisionNoticeQuestionService);
 
@@ -89,6 +91,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerTestBase {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
     }
+
 
     @Test
     public void givenANonWriteFinalDecisionEvent_thenReturnFalse() {

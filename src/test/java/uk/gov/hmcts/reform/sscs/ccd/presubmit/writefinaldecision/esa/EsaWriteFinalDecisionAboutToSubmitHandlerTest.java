@@ -3,10 +3,14 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
 import junitparams.Parameters;
@@ -15,6 +19,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionAboutToSubmitHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
@@ -59,24 +65,24 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule3ActivitiesNotPopulated(Boolean schedule3Activities, Boolean regulation35) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
 
         if (schedule3Activities != null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         } else {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         }
         if (regulation35 != null) {
             sscsCaseData.setDoesRegulation35Apply(regulation35.booleanValue() ? YesNo.YES : YesNo.NO);
         }
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
         // 15 points - too high for regulation 29 to apply
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -130,24 +136,24 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     public void givenRegulation29FieldIsPopulatedWithNoAndPointsAreTooHigh_thenOnlyDisplayAnErrorIfSchedule3ActivitiesNotPopulated(Boolean schedule3Activities, Boolean regulation35) {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
 
         if (schedule3Activities != null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         } else {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         }
         if (regulation35 != null) {
             sscsCaseData.setDoesRegulation35Apply(regulation35.booleanValue() ? YesNo.YES : YesNo.NO);
         }
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
         // 15 points - too high for regulation 29 to apply
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -204,16 +210,17 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setWcaAppeal("Yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         if (schedule3Activities != null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         }
         if (regulation35 != null) {
             sscsCaseData.setDoesRegulation35Apply(regulation35.booleanValue() ? YesNo.YES : YesNo.NO);
         }
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1w");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1w");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -234,13 +241,14 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.setWcaAppeal(YesNo.YES.getValue());
         if (schedule3Activities != null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         }
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -258,21 +266,22 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.setWcaAppeal(YesNo.YES.getValue());
         if (schedule3Activities != null) {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(schedule3Activities.booleanValue() ? "Yes" : "No");
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities.booleanValue() ? Arrays.asList("someActivity") : new ArrayList<>());
         } else {
-            sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         }
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
-        if (sscsCaseData.getEsaWriteFinalDecisionSchedule3ActivitiesApply() != null) {
+        if (sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply() != null) {
             Assert.assertEquals(1, response.getErrors().size());
 
             String error = response.getErrors().stream().findFirst().orElse("");
@@ -304,15 +313,15 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -323,18 +332,18 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToNo_thenDoNotDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -350,17 +359,18 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     public void givenRegulation29FieldIsPopulatedWithYesAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToYes_thenDoDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -380,16 +390,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -405,16 +415,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -426,16 +436,17 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -454,15 +465,15 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -473,16 +484,17 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     public void givenRegulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToNo_thenDoNotDisplayAnErrorButResetRegulation35OnSubmit() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -497,16 +509,17 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     public void givenRegulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndActivitiesSelectedAndRegulation35SetToYes_thenDisplayAnError() {
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("someQuestion"));
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -525,16 +538,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -552,16 +565,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -573,16 +586,17 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
+        sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -600,12 +614,29 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
             Arrays.asList("mobilisingUnaided"));
         sscsCaseData.setWcaAppeal(descriptorFlowValue);
 
         // < 15 points - correct for these fields
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1b");
+    }
+
+    @Override
+    public void givenDraftFinalDecisionAlreadyExistsOnCase_thenOverwriteExistingDraft() {
+        SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
+        List<SscsDocument> docs = new ArrayList<>();
+        docs.add(doc);
+        callback.getCaseDetails().getCaseData().setSscsDocument(docs);
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        // Why do we not need to set valid scenario ?
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getSscsDocument().size());
+        assertEquals((String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     // Refused scenario 1
@@ -621,10 +652,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -644,10 +675,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -672,10 +703,10 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -697,16 +728,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -724,16 +755,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -756,16 +787,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
         sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points - low, which means regulation 29 must apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1f");
+        // 0 points awarded for this question - low, which means regulation 29 must be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -788,16 +819,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to apply.
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -814,16 +845,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to apply.
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -845,16 +876,16 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
         sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
 
-        sscsCaseData.setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 15 points - high, which means regulation 29 must not apply.
-        sscsCaseData.setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+        // 15 points awarded for this question - high, which means regulation 29 does not need to apply.
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -864,5 +895,170 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Regulation 29 question, submitted an unexpected answer for the Schedule 3 Activities question and submitted an unexpected answer for the Regulation 35 question. Please review your previous selection.", error);
 
+    }
+
+    // Allowed scenario 1
+    @Test
+    public void givenNonSupportGroupAllowedScenario_Regulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndNoSchedule3ActivitesAndRegulation35False_WhenAllowed_thenDoNotDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertEquals(0, response.getErrors().size());
+    }
+
+    // Allowed scenario 1 - with error due to incorrect setting of refused
+    @Test
+    public void givenNonSupportGroupAllowedScenario_Regulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndNoSchedule3ActivitesAndRegulation35False_WhenRefused_thenDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertEquals(1, response.getErrors().size());
+
+        String error = response.getErrors().iterator().next();
+
+        Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Regulation 29 question, submitted an unexpected answer for the Schedule 3 Activities question and submitted an unexpected answer for the Regulation 35 question. Please review your previous selection.", error);
+    }
+
+    // Allowed scenario 1 - with error due to missing regulation 35
+    @Test
+    public void givenNonSupportGroupAllowedScenario_Regulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndNoSchedule3ActivitesAndRegulation35NotSpecified_WhenAllowed_thenDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertEquals(1, response.getErrors().size());
+
+        String error = response.getErrors().iterator().next();
+
+        Assert.assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+    }
+
+    // Allowed scenario 2
+    @Test
+    public void givenNonSupportGroupAllowedScenario_Regulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndSchedule3ActivitesAndRegulation35NotSet_WhenAllowed_thenDoNotDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided"));
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertEquals(0, response.getErrors().size());
+    }
+
+    // Allowed scenario 2 - with error due to incorrectly refused
+    @Test
+    public void givenNonSupportGroupAllowedScenario_Regulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndSchedule3ActivitesAndRegulation35NotSet_WhenRefused_thenDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided"));
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertEquals(1, response.getErrors().size());
+
+        String error = response.getErrors().iterator().next();
+
+        Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Regulation 29 question and submitted an unexpected answer for the Schedule 3 Activities question. Please review your previous selection.", error);
+    }
+
+    // Allowed scenario 2 - with error due to no schedule 3 answers
+    @Test
+    public void givenNonSupportGroupAllowedScenario_Regulation29FieldIsNotPopulatedAndPointsAreCorrectForRegulation29AndNoSchedule3ActivitesAndRegulation35NotSet_WhenAllowed_thenDisplayAnError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList(""));
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        Assert.assertEquals(1, response.getErrors().size());
+
+        String error = response.getErrors().iterator().next();
+
+        Assert.assertEquals("You have awarded 15 points or more and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
     }
 }
