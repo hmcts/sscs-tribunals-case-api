@@ -75,12 +75,19 @@ public class WriteFinalDecisionTemplateBody {
     private String anythingElse;
     @JsonProperty("esa_is_entitled")
     private boolean esaIsEntited;
+    @JsonProperty("uc_is_entitled")
+    private boolean ucIsEntited;
     @JsonProperty("esa_number_of_points")
     private Integer esaNumberOfPoints;
+    @JsonProperty("uc_number_of_points")
+    private Integer ucNumberOfPoints;
     @JsonProperty("esa_schedule_2_descriptors")
     private List<Descriptor> esaSchedule2Descriptors;
     @JsonProperty("esa_schedule_3_descriptors")
     private List<Descriptor> esaSchedule3Descriptors;
+    private List<Descriptor> ucSchedule6Descriptors;
+    @JsonProperty("uc_schedule_7_descriptors")
+    private List<Descriptor> ucSchedule7Descriptors;
     @JsonProperty("esa_award_rate")
     private String esaAwardRate;
     @JsonProperty("is_wca_appeal")
@@ -91,6 +98,10 @@ public class WriteFinalDecisionTemplateBody {
     private Boolean regulation29Applicable;
     @JsonProperty("is_regulation_35_applicable")
     private Boolean regulation35Applicable;
+    @JsonProperty("is_schedule_8_paragraph_4_applicable")
+    private Boolean schedule8Paragraph4Applicable;
+    @JsonProperty("is_schedule_9_paragraph_4_applicable")
+    private Boolean schedule9Paragraph4Applicable;
     @JsonProperty("dwp_reassess_the_award")
     private String dwpReassessTheAward;
     @JsonProperty("summary_of_outcome_decision")
