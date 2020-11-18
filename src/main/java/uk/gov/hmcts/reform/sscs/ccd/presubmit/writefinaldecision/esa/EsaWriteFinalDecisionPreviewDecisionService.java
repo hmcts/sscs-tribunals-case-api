@@ -45,6 +45,11 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     }
 
     @Override
+    protected String getDwpReassessTheAward(SscsCaseData caseData) {
+        return caseData.getSscsEsaCaseData().getDwpReassessTheAward();
+    }
+
+    @Override
     protected void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {

@@ -34,14 +34,19 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
 
     @Autowired
     public UcWriteFinalDecisionPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
-        UcDecisionNoticeQuestionService decisionNoticeQuestionService, UcDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration) {
-        super(generateFile, idamClient, decisionNoticeQuestionService, outcomeService, documentConfiguration);
+        UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService, UcDecisionNoticeOutcomeService outcomeService, DocumentConfiguration documentConfiguration) {
+        super(generateFile, idamClient, ucDecisionNoticeQuestionService, outcomeService, documentConfiguration);
         this.ucDecisionNoticeQuestionService = ucDecisionNoticeQuestionService;
     }
 
     @Override
     public String getBenefitType() {
         return "UC";
+    }
+
+    @Override
+    protected String getDwpReassessTheAward(SscsCaseData caseData) {
+        return caseData.getSscsUcCaseData().getDwpReassessTheAward();
     }
 
     @Override
@@ -52,7 +57,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
 
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
 
-            // Validate here for ESA instead of only validating on submit.
+            // Validate here for UC instead of only validating on submit.
             // This ensures that we know we can obtain a valid allowed or refused condition below
             outcomeService.validate(response, caseData);
             if (response.getErrors().isEmpty()) {
@@ -61,7 +66,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
                 Optional<UcAllowedOrRefusedCondition> condition = UcPointsRegulationsAndSchedule7ActivitiesCondition
                     .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
                 if (condition.isPresent()) {
-                    UcScenario scenario = condition.get().getEsaScenario(caseData);
+                    UcScenario scenario = condition.get().getUcScenario(caseData);
                     UcTemplateContent templateContent = scenario.getContent(payload);
                     builder.writeFinalDecisionTemplateContent(templateContent);
                 } else {
@@ -78,30 +83,30 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
 
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
             builder.ucIsEntited(false);
-            builder.esaAwardRate(null);
-            Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition
+            builder.ucAwardRate(null);
+            Optional<AwardType> ucAwardTypeOptional = caseData.isWcaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition
                 .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
-            if (!esaAwardTypeOptional.isEmpty()) {
-                String esaAwardType = esaAwardTypeOptional.get().getKey();
-                if (esaAwardType != null) {
-                    builder.esaAwardRate(join(
-                        splitByCharacterTypeCamelCase(esaAwardType), ' ').toLowerCase());
+            if (!ucAwardTypeOptional.isEmpty()) {
+                String ucAwardType = ucAwardTypeOptional.get().getKey();
+                if (ucAwardType != null) {
+                    builder.ucAwardRate(join(
+                        splitByCharacterTypeCamelCase(ucAwardType), ' ').toLowerCase());
                 }
 
-                if (AwardType.LOWER_RATE.getKey().equals(esaAwardType)
-                    || AwardType.HIGHER_RATE.getKey().equals(esaAwardType)) {
+                if (AwardType.LOWER_RATE.getKey().equals(ucAwardType)
+                    || AwardType.HIGHER_RATE.getKey().equals(ucAwardType)) {
                     builder.ucIsEntited(true);
                 }
             }
         }
     }
 
-    protected List<Descriptor> getEsaSchedule2DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+    protected List<Descriptor> getUcSchedule6DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
         return getDescriptorsFromQuestionKeys(key -> ucDecisionNoticeQuestionService.extractQuestionFromKey(UcActivityQuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
-    protected List<Descriptor> getEsaSchedule3DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
-        return getDescriptorsFromQuestionKeys(key -> ucDecisionNoticeQuestionService.extractQuestionFromKey(UcSchedule3QuestionKey.getByKey(key)), caseData, questionKeys);
+    protected List<Descriptor> getUcSchedule7DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
+        return getDescriptorsFromQuestionKeys(key -> ucDecisionNoticeQuestionService.extractQuestionFromKey(UcSchedule7QuestionKey.getByKey(key)), caseData, questionKeys);
     }
 
     @Override
@@ -109,12 +114,12 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         List<Descriptor> allSchedule6Descriptors = new ArrayList<>();
         List<String> physicalDisabilityAnswers = UcActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
         if (physicalDisabilityAnswers != null) {
-            List<Descriptor> physicalDisablityDescriptors = getEsaSchedule2DescriptorsFromQuestionKeys(caseData, physicalDisabilityAnswers);
+            List<Descriptor> physicalDisablityDescriptors = getUcSchedule6DescriptorsFromQuestionKeys(caseData, physicalDisabilityAnswers);
             allSchedule6Descriptors.addAll(physicalDisablityDescriptors);
         }
         List<String> mentalAssessmentAnswers = UcActivityType.MENTAL_ASSESSMENT.getAnswersExtractor().apply(caseData);
         if (mentalAssessmentAnswers != null) {
-            List<Descriptor> mentalAssessmentDescriptors = getEsaSchedule2DescriptorsFromQuestionKeys(caseData, mentalAssessmentAnswers);
+            List<Descriptor> mentalAssessmentDescriptors = getUcSchedule6DescriptorsFromQuestionKeys(caseData, mentalAssessmentAnswers);
             allSchedule6Descriptors.addAll(mentalAssessmentDescriptors);
         }
 
@@ -130,7 +135,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
             builder.ucNumberOfPoints(numberOfPoints);
         }
         if (caseData.getSchedule7Selections() != null && !caseData.getSchedule7Selections().isEmpty()) {
-            builder.ucSchedule7Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSchedule7Selections()));
+            builder.ucSchedule7Descriptors(getUcSchedule7DescriptorsFromQuestionKeys(caseData, caseData.getSchedule7Selections()));
         }
         builder.schedule8Paragraph4Applicable(caseData.getDoesSchedule8Paragraph4Apply() == null ? null :  caseData.getDoesSchedule8Paragraph4Apply().toBoolean());
         builder.schedule9Paragraph4Applicable(caseData.getDoesSchedule9Paragraph4Apply() == null ? null :  caseData.getDoesSchedule9Paragraph4Apply().toBoolean());

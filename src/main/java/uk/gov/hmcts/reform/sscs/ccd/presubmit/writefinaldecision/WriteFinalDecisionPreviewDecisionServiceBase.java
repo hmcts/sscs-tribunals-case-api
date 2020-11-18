@@ -86,7 +86,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
         writeFinalDecisionBuilder.wcaAppeal(caseData.isWcaAppeal());
-        writeFinalDecisionBuilder.dwpReassessTheAward(caseData.getSscsEsaCaseData().getDwpReassessTheAward());
+        writeFinalDecisionBuilder.dwpReassessTheAward(getDwpReassessTheAward(caseData));
         writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));
@@ -161,6 +161,8 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
         return builder.build();
 
     }
+
+    protected abstract String getDwpReassessTheAward(SscsCaseData caseData);
 
     protected abstract void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData, WriteFinalDecisionTemplateBody payload);

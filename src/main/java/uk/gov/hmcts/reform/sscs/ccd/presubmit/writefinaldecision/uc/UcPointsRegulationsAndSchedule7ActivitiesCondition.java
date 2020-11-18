@@ -107,7 +107,7 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
     }
 
     static FieldCondition isSchedule7ActivitiesAnswer(StringListPredicate predicate) {
-        return new StringListFieldCondition("Schedule 3 Activities", predicate,
+        return new StringListFieldCondition("Schedule 7 Activities", predicate,
             SscsCaseData::getSchedule7Selections);
     }
 

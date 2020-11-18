@@ -38,6 +38,12 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     }
 
     @Override
+    protected String getDwpReassessTheAward(SscsCaseData caseData) {
+        // N/A for PIP
+        return null;
+    }
+
+    @Override
     protected void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {

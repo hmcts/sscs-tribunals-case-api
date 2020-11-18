@@ -19,7 +19,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected String getBenefitType() {
-        return "ESA";
+        return "UC";
     }
 
     @Override
@@ -31,7 +31,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void setShowPageFlags(SscsCaseData sscsCaseData) {
-        int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, UcPointsRegulationsAndSchedule7ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
+        int totalPoints = decisionNoticeService.getQuestionService("UC").getTotalPoints(sscsCaseData, UcPointsRegulationsAndSchedule7ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
         if (UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowSchedule8Paragraph4Page(YesNo.YES);
@@ -48,7 +48,7 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse) {
-        // No-op for ESA
+        // No-op for UC
     }
 
     @Override

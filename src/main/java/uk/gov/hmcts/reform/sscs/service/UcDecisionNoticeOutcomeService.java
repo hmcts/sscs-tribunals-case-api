@@ -16,7 +16,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsRegu
 public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
     @Autowired
-    public UcDecisionNoticeOutcomeService(EsaDecisionNoticeQuestionService questionService) {
+    public UcDecisionNoticeOutcomeService(UcDecisionNoticeQuestionService questionService) {
         super("UC", questionService);
     }
     
@@ -37,7 +37,7 @@ public class UcDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService
                 if (UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
                     sscsCaseData.setDoesSchedule8Paragraph4Apply(null);
                     // Ensure that we set the following fields taking into account the radio button
-                    // for whether schedule 3 activities apply.   The getRegulation35Selection and
+                    // for whether schedule 7 activities apply.   The getRegulation35Selection and
                     // getSchedule3Selections methods peform this check,  and we use these methods
                     // to set the final values of doesRegulation35Apply and esaWriteFinalDecisionSchedule3ActivitiesQuestion
                     sscsCaseData.setDoesSchedule9Paragraph4Apply(sscsCaseData.getSchedule9Paragraph4Selection());

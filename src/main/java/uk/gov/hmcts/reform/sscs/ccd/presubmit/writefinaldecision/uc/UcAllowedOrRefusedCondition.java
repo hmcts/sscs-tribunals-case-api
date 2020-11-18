@@ -49,7 +49,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isAnyPoints(),
         isAnySchedule7(),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
-        isRegulation29(FALSE),
+        isSchedule8Paragraph4(FALSE),
         isSchedule7ActivitiesAnswer(StringListPredicate.UNSPECIFIED),
         isSchedule9Paragraph4(UNSPECIFIED)),
     REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS(
@@ -58,7 +58,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSupportGroupOnly(YesNoPredicate.TRUE),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule7(),
-        isRegulation29(TRUE),
+        isSchedule8Paragraph4(TRUE),
         isSchedule7ActivitiesAnswer(EMPTY),
         isSchedule9Paragraph4(FALSE)),
     REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS(
@@ -67,7 +67,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSupportGroupOnly(YesNoPredicate.TRUE),
         isPoints(POINTS_GREATER_OR_EQUAL_TO_FIFTEEN),
         isAnySchedule7(),
-        isRegulation29(UNSPECIFIED),
+        isSchedule8Paragraph4(UNSPECIFIED),
         isSchedule7ActivitiesAnswer(EMPTY),
         isSchedule9Paragraph4(FALSE)),
     ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS(
@@ -82,7 +82,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSupportGroupOnly(FALSE),
         isPoints(POINTS_LESS_THAN_FIFTEEN),
         isAnySchedule7(),
-        isRegulation29(YesNoPredicate.TRUE)
+        isSchedule8Paragraph4(YesNoPredicate.TRUE)
     ),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED(
         isAllowedOrRefused(ALLOWED),
@@ -90,14 +90,14 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule7(NOT_EMPTY),
-        isRegulation29(TRUE.or(UNSPECIFIED))),
+        isSchedule8Paragraph4(TRUE.or(UNSPECIFIED))),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED(
         isAllowedOrRefused(ALLOWED),
         isWcaAppeal(TRUE, false),
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule7(EMPTY),
-        isRegulation29(TRUE.or(UNSPECIFIED)),
+        isSchedule8Paragraph4(TRUE.or(UNSPECIFIED)),
         isSchedule9Paragraph4(YesNoPredicate.TRUE)),
     ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_UNSPECIFIED(
         isAllowedOrRefused(ALLOWED),
@@ -105,7 +105,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         isSupportGroupOnly(TRUE),
         isAnyPoints(),
         isSchedule7(StringListPredicate.UNSPECIFIED),
-        isRegulation29(TRUE.or(UNSPECIFIED)),
+        isSchedule8Paragraph4(TRUE.or(UNSPECIFIED)),
         isSchedule9Paragraph4(TRUE)),
     NON_WCA_APPEAL_ALLOWED(
             isAllowedOrRefused(ALLOWED),
@@ -134,7 +134,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         this(allowedOrRefusedCondition, wcaAppealCondition, supportGroupOnlyCondition, primaryPointsCondition, schedule7ActivitiesSelected, isAnyPoints(), validationConditions);
     }
 
-    public UcScenario getEsaScenario(SscsCaseData caseData) {
+    public UcScenario getUcScenario(SscsCaseData caseData) {
         if (REFUSED_NON_SUPPORT_GROUP_ONLY == this) {
             return UcScenario.SCENARIO_1;
         } else if (REFUSED_SUPPORT_GROUP_ONLY_LOW_POINTS == this || REFUSED_SUPPORT_GROUP_ONLY_HIGH_POINTS == this) {
@@ -179,7 +179,7 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         this.validationConditions = Arrays.asList(validationConditions);
     }
 
-    static YesNoFieldCondition isRegulation29(Predicate<YesNo> predicate) {
+    static YesNoFieldCondition isSchedule8Paragraph4(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Schedule 8 Paragraph 4", predicate,
                 SscsCaseData::getDoesSchedule8Paragraph4Apply);
     }
