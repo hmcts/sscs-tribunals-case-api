@@ -60,7 +60,7 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
 
     private boolean isValidUrgentDocument(SscsCaseData caseData) {
         return (!"Yes".equalsIgnoreCase(caseData.getUrgentCase())
-                && (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) && "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
+                && (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
                 && (!CollectionUtils.isEmpty(caseData.getSscsDocument()) && caseData.getSscsDocument().stream().anyMatch(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType()))
                 || (!CollectionUtils.isEmpty(caseData.getSscsWelshDocuments()) && caseData.getSscsWelshDocuments().stream().anyMatch(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())))));
     }
