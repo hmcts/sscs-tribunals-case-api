@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.pip;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,13 +28,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class IssueFinalDecisionAboutToSubmitHandlerTest {
+public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToSubmitHandler handler;
@@ -77,6 +78,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
             .sscsDocument(documentList)
+            .writeFinalDecisionGenerateNotice("")
             .writeFinalDecisionTypeOfHearing("")
             .writeFinalDecisionPresentingOfficerAttendedQuestion("")
             .writeFinalDecisionAppellantAttendedQuestion("")
@@ -108,6 +110,14 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .writeFinalDecisionPageSectionReference("")
             .writeFinalDecisionAnythingElse("something else")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+            .showRegulation29Page(YesNo.YES)
+            .showSchedule3ActivitiesPage(YesNo.YES)
+            .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
+            .writeFinalDecisionDetailsOfDecision("")
+            .wcaAppeal("")
+            .supportGroupOnlyAppeal("")
+            .doesRegulation29Apply(YesNo.YES)
+            .doesRegulation35Apply(YesNo.YES)
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -172,6 +182,10 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
+        assertNotNull(sscsCaseData.getShowRegulation29Page());
+        assertNotNull(sscsCaseData.getShowSchedule3ActivitiesPage());
+        assertNotNull(sscsCaseData.getShowFinalDecisionNoticeSummaryOfOutcomePage());
+        assertNotNull(sscsCaseData.getWriteFinalDecisionDetailsOfDecision());
     }
 
     @Test
@@ -456,6 +470,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
         assertNull(sscsCaseData.getWriteFinalDecisionAnythingElse());
+        assertNull(sscsCaseData.getWriteFinalDecisionDetailsOfDecision());
     }
 
     @Test
