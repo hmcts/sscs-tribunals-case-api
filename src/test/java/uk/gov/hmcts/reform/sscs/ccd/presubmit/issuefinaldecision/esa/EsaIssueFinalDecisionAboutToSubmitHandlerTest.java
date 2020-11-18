@@ -98,7 +98,7 @@ public class EsaIssueFinalDecisionAboutToSubmitHandlerTest {
             .writeFinalDecisionAppellantAttendedQuestion("")
             .writeFinalDecisionDisabilityQualifiedPanelMemberName("")
             .writeFinalDecisionMedicallyQualifiedPanelMemberName("")
-            .esaSscsCaseData(SscsEsaCaseData.builder()
+            .sscsEsaCaseData(SscsEsaCaseData.builder()
                 .esaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList())
                 .esaWriteFinalDecisionSchedule3ActivitiesApply("")
                 .esaWriteFinalDecisionAppropriatenessOfBehaviourQuestion("")
