@@ -32,7 +32,7 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificTime",
+      "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime": {
         "adjournCaseNextHearingFirstOnSession": [
@@ -761,7 +761,7 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificTime",
+      "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime" : {
         "adjournCaseNextHearingFirstOnSession" :  ["firstOnSession"],
