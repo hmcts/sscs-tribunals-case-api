@@ -34,7 +34,7 @@ public class EsaScenario3Test {
                 + "\n"
                 + "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.\n"
                 + "\n"
-                + "The tribunal applied that regulation because it found that Felix Sydney suffers from [insert disease or disablement] and, by reasons of such disease or disablement, there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work-related activity.\n"
+                + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
