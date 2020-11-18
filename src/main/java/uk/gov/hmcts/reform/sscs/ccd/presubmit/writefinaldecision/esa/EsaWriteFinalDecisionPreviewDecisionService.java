@@ -119,8 +119,13 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         }
 
         if (allSchedule2Descriptors.isEmpty()) {
-            builder.esaSchedule2Descriptors(null);
-            builder.esaNumberOfPoints(null);
+            if (caseData.isWcaAppeal()) {
+                builder.esaSchedule2Descriptors(new ArrayList<>());
+                builder.esaNumberOfPoints(caseData.isWcaAppeal() ? 0 : null);
+            } else {
+                builder.esaSchedule2Descriptors(null);
+                builder.esaNumberOfPoints(null);
+            }
         } else {
             builder.esaSchedule2Descriptors(allSchedule2Descriptors);
             int numberOfPoints = allSchedule2Descriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
