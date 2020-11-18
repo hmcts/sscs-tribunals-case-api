@@ -17,6 +17,7 @@ public class Scenario4Content extends EsaTemplateContent {
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
         addHearingType(writeFinalDecisionTemplateBody);
+        addRecommendationIfPresent(writeFinalDecisionTemplateBody);
     }
 
     @Override
