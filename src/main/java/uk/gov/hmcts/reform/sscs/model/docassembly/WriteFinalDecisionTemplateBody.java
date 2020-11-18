@@ -85,6 +85,7 @@ public class WriteFinalDecisionTemplateBody {
     private List<Descriptor> esaSchedule2Descriptors;
     @JsonProperty("esa_schedule_3_descriptors")
     private List<Descriptor> esaSchedule3Descriptors;
+    @JsonProperty("uc_schedule_6_descriptors")
     private List<Descriptor> ucSchedule6Descriptors;
     @JsonProperty("uc_schedule_7_descriptors")
     private List<Descriptor> ucSchedule7Descriptors;
