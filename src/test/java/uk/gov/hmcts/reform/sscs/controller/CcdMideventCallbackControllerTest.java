@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.INTERLOC_INFORMATION
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -34,6 +35,8 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
@@ -41,8 +44,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.State;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipWriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
@@ -71,7 +75,7 @@ public class CcdMideventCallbackControllerTest {
     private SscsCaseCallbackDeserializer deserializer;
 
     @MockBean
-    private WriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService;
+    private PipWriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService;
 
     @MockBean
     private AdjournCasePreviewService adjournCasePreviewService;
@@ -91,9 +95,14 @@ public class CcdMideventCallbackControllerTest {
 
         DynamicList dynamicList = new DynamicList(listItem, Arrays.asList(listItem));
 
+        when(writeFinalDecisionPreviewDecisionService.getBenefitType()).thenReturn("PIP");
+
         when(adjournCaseCcdService.getVenueDynamicListForRpcName(any())).thenReturn(dynamicList);
 
-        controller = new CcdMideventCallbackController(authorisationService, deserializer, writeFinalDecisionPreviewDecisionService,
+        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), new ArrayList<>(),
+            Arrays.asList(writeFinalDecisionPreviewDecisionService));
+
+        controller = new CcdMideventCallbackController(authorisationService, deserializer, decisionNoticeService,
             adjournCasePreviewService, adjournCaseCcdService, restoreCasesService);
         mockMvc = standaloneSetup(controller).build();
     }
@@ -103,7 +112,7 @@ public class CcdMideventCallbackControllerTest {
         String path = getClass().getClassLoader().getResource("sya/allDetailsForGeneratePdf.json").getFile();
         String content = FileUtils.readFileToString(new File(path), StandardCharsets.UTF_8.name());
 
-        SscsCaseData sscsCaseData = SscsCaseData.builder().build();
+        SscsCaseData sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build()).build();
         when(deserializer.deserialize(content)).thenReturn(new Callback<>(
                 new CaseDetails<>(ID, JURISDICTION, State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now()),
                 Optional.empty(), INTERLOC_INFORMATION_RECEIVED, false));
