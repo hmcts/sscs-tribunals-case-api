@@ -18,8 +18,9 @@ import uk.gov.hmcts.reform.sscs.ccd.deserialisation.SscsCaseCallbackDeserializer
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCaseCcdService;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.adjourncase.AdjournCasePreviewService;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.service.AuthorisationService;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesService;
 import uk.gov.hmcts.reform.sscs.service.admin.RestoreCasesStatus;
 
@@ -29,19 +30,19 @@ public class CcdMideventCallbackController {
 
     private final AuthorisationService authorisationService;
     private final SscsCaseCallbackDeserializer deserializer;
-    private final WriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService;
+    private final DecisionNoticeService decisionNoticeService;
     private final AdjournCasePreviewService adjournCasePreviewService;
     private final AdjournCaseCcdService adjournCaseCcdService;
     private final RestoreCasesService restoreCasesService;
 
     @Autowired
     public CcdMideventCallbackController(AuthorisationService authorisationService, SscsCaseCallbackDeserializer deserializer,
-                                         WriteFinalDecisionPreviewDecisionService writeFinalDecisionPreviewDecisionService,
+                                         DecisionNoticeService decisionNoticeService,
                                             AdjournCasePreviewService adjournCasePreviewService, AdjournCaseCcdService adjournCaseCcdService,
                                             RestoreCasesService restoreCasesService) {
         this.authorisationService = authorisationService;
         this.deserializer = deserializer;
-        this.writeFinalDecisionPreviewDecisionService = writeFinalDecisionPreviewDecisionService;
+        this.decisionNoticeService = decisionNoticeService;
         this.adjournCasePreviewService = adjournCasePreviewService;
         this.adjournCaseCcdService = adjournCaseCcdService;
         this.restoreCasesService = restoreCasesService;
@@ -78,6 +79,18 @@ public class CcdMideventCallbackController {
             callback.getCaseDetails().getId());
 
         authorisationService.authorise(serviceAuthHeader);
+
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+
+        String benefitType = sscsCaseData.getAppeal().getBenefitType() == null ? null : sscsCaseData.getAppeal().getBenefitType().getCode();
+
+        if (benefitType == null) {
+            PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
+            preSubmitCallbackResponse.addError("Unexpected error - benefit type is null");
+            return ok(preSubmitCallbackResponse);
+        }
+
+        WriteFinalDecisionPreviewDecisionServiceBase writeFinalDecisionPreviewDecisionService = decisionNoticeService.getPreviewService(benefitType);
 
         return ok(writeFinalDecisionPreviewDecisionService.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, userAuthorisation, false));
     }

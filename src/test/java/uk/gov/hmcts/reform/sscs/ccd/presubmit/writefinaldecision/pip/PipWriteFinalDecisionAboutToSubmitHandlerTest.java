@@ -3,31 +3,37 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import junitparams.JUnitParamsRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionAboutToSubmitHandlerTestBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDecisionAboutToSubmitHandlerTestBase {
+public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDecisionAboutToSubmitHandlerTestBase<PipDecisionNoticeQuestionService> {
 
     public PipWriteFinalDecisionAboutToSubmitHandlerTest() throws IOException {
         super(new PipDecisionNoticeQuestionService());
     }
 
     @Override
-    protected DecisionNoticeOutcomeService createOutcomeService(DecisionNoticeQuestionService decisionNoticeQuestionService) {
-        return new PipDecisionNoticeOutcomeService();
+    protected DecisionNoticeOutcomeService createOutcomeService(PipDecisionNoticeQuestionService decisionNoticeQuestionService) {
+        return new PipDecisionNoticeOutcomeService(decisionNoticeQuestionService);
     }
 
     @Override
@@ -50,6 +56,23 @@ public class PipWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         // 0 points - correct for mobility no award
         sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12a");
 
+    }
+
+    @Override
+    public void givenDraftFinalDecisionAlreadyExistsOnCase_thenOverwriteExistingDraft() {
+        SscsDocument doc = SscsDocument.builder().value(SscsDocumentDetails.builder().documentFileName("oldDraft.doc").documentType(DRAFT_DECISION_NOTICE.getValue()).build()).build();
+        List<SscsDocument> docs = new ArrayList<>();
+        docs.add(doc);
+        callback.getCaseDetails().getCaseData().setSscsDocument(docs);
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        // Why do we not need to set valid scenario ?
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getData().getSscsDocument().size());
+        assertEquals((String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))), response.getData().getSscsDocument().get(0).getValue().getDocumentFileName());
     }
 
     @Test
