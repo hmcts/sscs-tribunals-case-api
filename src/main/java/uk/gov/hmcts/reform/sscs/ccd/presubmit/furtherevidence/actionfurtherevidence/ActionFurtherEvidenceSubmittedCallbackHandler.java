@@ -107,6 +107,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
 
     private boolean isValidUrgentDocument(SscsCaseData caseData) {
         return ((StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))
+                && (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
                 && !CollectionUtils.isEmpty(caseData.getSscsDocument())
                 && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0);
     }
