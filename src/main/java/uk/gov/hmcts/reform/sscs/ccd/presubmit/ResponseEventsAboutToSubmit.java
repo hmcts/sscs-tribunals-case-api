@@ -17,7 +17,7 @@ public class ResponseEventsAboutToSubmit {
     }
 
     public void setCaseCode(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getAppeal().getBenefitType() != null && sscsCaseData.getAppeal().getBenefitType().getCode().equalsIgnoreCase("uc")) {
+        if (sscsCaseData.getAppeal().getBenefitType() != null && "uc".equalsIgnoreCase(scsCaseData.getAppeal().getBenefitType().getCode()) {
             setUcCaseCode(sscsCaseData);
         } else if (sscsCaseData.getBenefitCode() != null && sscsCaseData.getIssueCode() != null) {
             sscsCaseData.setCaseCode(buildCaseCode(sscsCaseData));
