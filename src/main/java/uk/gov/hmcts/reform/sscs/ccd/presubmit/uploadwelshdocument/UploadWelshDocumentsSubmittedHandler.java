@@ -47,15 +47,16 @@ public class UploadWelshDocumentsSubmittedHandler implements PreSubmitCallbackHa
         String nextEvent = callback.getCaseDetails().getCaseData().getSscsWelshPreviewNextEvent();
         log.info("Next event to submit  {}", nextEvent);
         callback.getCaseDetails().getCaseData().setSscsWelshPreviewNextEvent(null);
-        SscsCaseDetails sscsCaseDetails = ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
-                nextEvent, "Upload welsh document",
-                "Upload welsh document", idamService.getIdamTokens());
 
         if (isValidUrgentDocument(callback.getCaseDetails().getCaseData())) {
             setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
+        } else {
+            ccdService.updateCase(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
+                    nextEvent, "Upload welsh document",
+                    "Upload welsh document", idamService.getIdamTokens());
         }
-        return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 
     private boolean isValidUrgentDocument(SscsCaseData caseData) {

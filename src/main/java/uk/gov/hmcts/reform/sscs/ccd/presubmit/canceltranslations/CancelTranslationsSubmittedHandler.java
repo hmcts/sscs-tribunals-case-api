@@ -48,18 +48,17 @@ public class CancelTranslationsSubmittedHandler implements PreSubmitCallbackHand
         String sscsWelshPreviewNextEvent = caseData.getSscsWelshPreviewNextEvent();
         log.info("sscsWelshPreviewNextEvent is {}  for case id : {}", sscsWelshPreviewNextEvent, caseData.getCcdCaseId());
         caseData.setSscsWelshPreviewNextEvent(null);
-        SscsCaseDetails
-            sscsCaseDetails = ccdService
-            .updateCase(caseData, callback.getCaseDetails().getId(),
-                sscsWelshPreviewNextEvent, "Cancel welsh translations", "Cancel welsh translations",
-                idamService.getIdamTokens());
 
         if (isValidUrgentDocument(callback.getCaseDetails().getCaseData())) {
             setMakeCaseUrgentTriggerEvent(callback.getCaseDetails().getCaseData(), callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
+        } else {
+            ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                            sscsWelshPreviewNextEvent, "Cancel welsh translations", "Cancel welsh translations",
+                            idamService.getIdamTokens());
         }
 
-        return new PreSubmitCallbackResponse<>(sscsCaseDetails.getData());
+        return new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
     }
 
     private boolean isValidUrgentDocument(SscsCaseData caseData) {
