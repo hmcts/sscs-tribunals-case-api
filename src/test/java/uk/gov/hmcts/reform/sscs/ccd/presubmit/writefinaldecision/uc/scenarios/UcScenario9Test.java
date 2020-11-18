@@ -19,9 +19,9 @@ public class UcScenario9Test {
                 .activityAnswerValue("1")
                 .activityAnswerLetter("c").activityAnswerPoints(9).build());
 
-        List<Descriptor> schedule7Descriptors =
-                Arrays.asList(Descriptor.builder()
-                        .activityQuestionValue("My schedule 7 descriptor").build());
+        List<Descriptor> schedule3Descriptors =
+            Arrays.asList(Descriptor.builder()
+                .activityQuestionValue("My schedule 3 descriptor").build());
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -35,7 +35,7 @@ public class UcScenario9Test {
                 .anythingElse("Something else")
                 .regulation29Applicable(true)
                 .ucSchedule6Descriptors(schedule6Descriptors)
-                .ucSchedule7Descriptors(schedule7Descriptors).build();
+                .esaSchedule3Descriptors(schedule3Descriptors).build();
 
         UcTemplateContent content = UcScenario.SCENARIO_9.getContent(body);
 
@@ -50,11 +50,11 @@ public class UcScenario9Test {
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
-            + "The tribunal applied regulation 29 because it found that Felix Sydney suffers from [insert disease or disablement] and, by reasons of such disease or disablement, there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.\n"
+            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.\n"
             + "\n"
             + "The following activity and descriptor from Schedule 3 applied:\n"
             + "\n"
-            + "My schedule 7 descriptor\n"
+            + "My schedule 3 descriptor\n"
             + "\n"
             + "\n"
             + "My first reasons\n"

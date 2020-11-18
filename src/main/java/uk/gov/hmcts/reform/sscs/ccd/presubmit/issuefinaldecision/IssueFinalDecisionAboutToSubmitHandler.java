@@ -198,6 +198,38 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.setDoesRegulation29Apply(null);
         sscsCaseData.setDoesRegulation35Apply(null);
 
+        // UC
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMentalAssessmentQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionStandingAndSittingQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionReachingQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPickingUpQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionManualDexterityQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMakingSelfUnderstoodQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionCommunicationQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionNavigationQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionLossOfControlQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionConsciousnessQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionLearningTasksQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionAwarenessOfHazardsQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPersonalActionQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionCopingWithChangeQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionGettingAboutQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSocialEngagementQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setDwpReassessTheAward(null);
+        sscsCaseData.setShowSchedule8Paragraph4Page(null);
+        sscsCaseData.setShowSchedule7ActivitiesPage(null);
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
+        sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
+        sscsCaseData.setWcaAppeal(null);
+        sscsCaseData.setSupportGroupOnlyAppeal(null);
+        sscsCaseData.setDoesSchedule8Paragraph4Apply(null);
+        sscsCaseData.setDoesSchedule9Paragraph4Apply(null);
+
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
     }

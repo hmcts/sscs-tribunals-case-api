@@ -124,8 +124,13 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         }
 
         if (allSchedule6Descriptors.isEmpty()) {
-            builder.ucSchedule6Descriptors(null);
-            builder.ucNumberOfPoints(null);
+            if (caseData.isWcaAppeal()) {
+                builder.ucSchedule6Descriptors(new ArrayList<>());
+                builder.ucNumberOfPoints(caseData.isWcaAppeal() ? 0 : null);
+            } else {
+                builder.ucSchedule6Descriptors(null);
+                builder.ucNumberOfPoints(null);
+            }
         } else {
             builder.ucSchedule6Descriptors(allSchedule6Descriptors);
             int numberOfPoints = allSchedule6Descriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
