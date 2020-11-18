@@ -11,13 +11,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import junitparams.Parameters;
 import org.junit.Test;
+import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
+import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
+import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
@@ -25,6 +29,13 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
     public PipWriteFinalDecisionPreviewDecisionServiceTest() {
         super("PIP");
+    }
+
+    @Override
+    protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+        DocumentConfiguration documentConfiguration) {
+        return new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, pipDecisionNoticeQuestionService,
+            pipDecisionNoticeOutcomeService, documentConfiguration);
     }
 
     @Override
@@ -41,6 +52,56 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     protected void setHigherRateScenarioFields(SscsCaseData caseData) {
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+    }
+
+    @Override
+    public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+        setDescriptorFlowIndicator("no", sscsCaseData);
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
+    }
+
+    @Override
+    public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
+        setDescriptorFlowIndicator("yes", sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
+            true, false, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
+    }
+
+    @Override
+    public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
+        setDescriptorFlowIndicator("no", sscsCaseData);
+        setHigherRateScenarioFields(sscsCaseData);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
+
+        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
+            false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @Test
