@@ -1,8 +1,13 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.esa;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
@@ -28,20 +33,32 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToStartHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipWriteFinalDecisionPreviewDecisionService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaWriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class IssueFinalDecisionAboutToStartHandlerTest {
+public class EsaIssueFinalDecisionAboutToStartHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToStartHandler handler;
@@ -62,7 +79,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
+    private EsaDecisionNoticeOutcomeService esaDecisionNoticeOutcomeService;
 
     @Mock
     private WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService;
@@ -83,12 +100,12 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     public void setUp() throws IOException {
         openMocks(this);
 
-        Mockito.when(previewDecisionService.getBenefitType()).thenReturn("PIP");
-        Mockito.when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        Mockito.when(previewDecisionService.getBenefitType()).thenReturn("ESA");
+        Mockito.when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
         decisionNoticeService =
             new DecisionNoticeService(Arrays.asList(),
-                Arrays.asList(pipDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
+                Arrays.asList(esaDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
 
         handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService);
 
@@ -107,7 +124,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
             .writeFinalDecisionGeneratedDate("2018-01-01")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
             .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build())
+                .benefitType(BenefitType.builder().code("ESA").build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
                         .lastName("LastNamE")
@@ -156,7 +173,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
 
-        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
 
@@ -170,20 +187,25 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
-        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
-        PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
+        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+        when(esaDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -201,25 +223,28 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
         Assert.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
+        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
     }
 
     @Test
     public void givenAboutToStartRequestNonDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
-        PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+        EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
-        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
+        final EsaWriteFinalDecisionPreviewDecisionService previewDecisionService = new EsaWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
-
+        sscsCaseData.setWcaAppeal("No");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("doNotReassess");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+        when(esaDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -237,12 +262,13 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         // Check that the generated date has not been updated
         Assert.assertNotNull(payload.getGeneratedDate());
         Assert.assertEquals(LocalDate.parse("2018-01-01"), payload.getGeneratedDate());
+        Assert.assertNotNull(payload.getWriteFinalDecisionTemplateContent());
     }
 
     @Test
     public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
 
-        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -254,7 +280,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
 
-        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -264,7 +290,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         boolean isDescriptorFlow, boolean isGenerateFile) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
 
-        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("ESA");
 
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
@@ -281,7 +307,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         assertEquals(allowed, body.isAllowed());
         assertEquals(isSetAside, body.isSetAside());
         assertNull(body.getDetailsOfDecision());
-        assertEquals(isDescriptorFlow, body.isDescriptorFlow());
+        assertEquals(isDescriptorFlow, body.isWcaAppeal());
 
         return payload;
     }
