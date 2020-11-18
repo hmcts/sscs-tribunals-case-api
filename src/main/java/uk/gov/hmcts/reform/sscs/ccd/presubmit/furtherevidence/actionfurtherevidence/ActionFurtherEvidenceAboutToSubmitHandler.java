@@ -337,7 +337,8 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         if (caseState.equals(State.DORMANT_APPEAL_STATE)
                 || caseState.equals(State.RESPONSE_RECEIVED)
                 || caseState.equals(State.READY_TO_LIST)
-                || caseState.equals(State.HEARING)) {
+                || caseState.equals(State.HEARING)
+                || caseState.equals(State.WITH_DWP)) {
             return true;
         } else {
             return false;
