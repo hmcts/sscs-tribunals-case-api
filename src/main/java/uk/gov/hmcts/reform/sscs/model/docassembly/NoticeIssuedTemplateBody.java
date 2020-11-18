@@ -58,4 +58,6 @@ public class NoticeIssuedTemplateBody implements FormPayload {
     private String welshGeneratedDate;
     @JsonProperty("adjourn_case")
     private AdjournCaseTemplateBody adjournCaseTemplateBody;
+    @JsonProperty("write_final_decision_template_content")
+    private WriteFinalDecisionTemplateContent writeFinalDecisionTemplateContent;
 }

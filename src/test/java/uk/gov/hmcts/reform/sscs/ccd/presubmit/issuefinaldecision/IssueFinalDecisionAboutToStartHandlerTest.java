@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.idam.client.models.UserDetails;
@@ -28,14 +29,15 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.PipWriteFinalDecisionPreviewDecisionService;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -60,10 +62,10 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    private PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
 
     @Mock
-    private WriteFinalDecisionPreviewDecisionService previewDecisionService;
+    private WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService;
 
     @Spy
     private DocumentConfiguration documentConfiguration;
@@ -75,10 +77,20 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
 
     private ArgumentCaptor<GenerateFileParams> capture;
 
+    private DecisionNoticeService decisionNoticeService;
+
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        handler = new IssueFinalDecisionAboutToStartHandler(previewDecisionService);
+
+        Mockito.when(previewDecisionService.getBenefitType()).thenReturn("PIP");
+        Mockito.when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+
+        decisionNoticeService =
+            new DecisionNoticeService(Arrays.asList(),
+                Arrays.asList(pipDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
+
+        handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -144,7 +156,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
 
-        when(decisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
 
@@ -158,14 +170,12 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
-        when(decisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
         PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
 
-        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService), Arrays.asList(decisionNoticeOutcomeService));
-
-        final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            decisionNoticeService, documentConfiguration);
+        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -173,7 +183,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        when(decisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+        when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -198,12 +208,10 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
 
         PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
 
-        when(decisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
-        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService), Arrays.asList(decisionNoticeOutcomeService));
-
-        final WriteFinalDecisionPreviewDecisionService previewDecisionService = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            decisionNoticeService, documentConfiguration);
+        final PipWriteFinalDecisionPreviewDecisionService previewDecisionService = new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
+            pipDecisionNoticeQuestionService, pipDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
@@ -211,7 +219,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        when(decisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+        when(pipDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -234,7 +242,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
 
-        when(decisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -246,7 +254,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
 
-        when(decisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -256,7 +264,7 @@ public class IssueFinalDecisionAboutToStartHandlerTest {
         boolean isDescriptorFlow, boolean isGenerateFile) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
 
-        when(decisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
+        when(pipDecisionNoticeOutcomeService.getBenefitType()).thenReturn("PIP");
 
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
