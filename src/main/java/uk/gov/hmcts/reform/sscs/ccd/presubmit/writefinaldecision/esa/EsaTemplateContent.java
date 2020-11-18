@@ -82,19 +82,14 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment, but the tribunal applied regulation 29.";
     }
 
-    public String getRegulation29And35DiseaseOrDisablementSentence(String appellantName, boolean isRegulation35Applied) {
-        //FIXME: Replace disease or disablement as part of future ticket
-        return "The tribunal applied regulation" + (isRegulation35Applied ? "s" : "") + " 29 " + (isRegulation35Applied ? "and 35 " : "")
-            + "because it found that " + appellantName + " suffers from [insert disease or disablement] and, by reasons of such disease or disablement, "
-            + "there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work"
+    public String getRegulation29And35DiseaseOrDisablementSentence(boolean isRegulation29Applied, boolean isRegulation35Applied) {
+        return "The tribunal applied regulation" + (isRegulation29Applied && isRegulation35Applied ? "s" : "")
+                + (isRegulation29Applied ? " 29 " : "")
+                + (isRegulation29Applied && isRegulation35Applied ? "and" : "")
+                + (isRegulation35Applied ? " 35 " : "")
+            + "because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited "
+            + "capability for work"
             + (isRegulation35Applied ? " and for work-related activity." : ".");
-    }
-
-    public String getRegulation35DiseaseOrDisablementSentenceWorkRelated(String appellantName) {
-        //FIXME: Replace disease or disablement as part of future ticket
-        return "The tribunal applied that regulation because it found that " + appellantName + " suffers from "
-                + "[insert disease or disablement] and, by reasons of such disease or disablement, there would "
-                + "be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work-related activity.";
     }
 
     public String getSchedule3AppliesParagraph(List<Descriptor> descriptors) {
