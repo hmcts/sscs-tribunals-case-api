@@ -56,4 +56,45 @@ public class EsaScenario1Test {
         Assert.assertEquals(expectedContent, content.toString());
 
     }
+
+    @Test
+    public void testScenario1NoSchedule2() {
+
+        List<Descriptor> schedule2Descriptors =
+            Arrays.asList();
+
+        WriteFinalDecisionTemplateBody body =
+            WriteFinalDecisionTemplateBody.builder()
+                .dateOfDecision("2020-09-20")
+                .esaNumberOfPoints(9)
+                .pageNumber("A1")
+                .appellantName("Felix Sydney")
+                .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+                .anythingElse("Something else")
+                .esaSchedule2Descriptors(schedule2Descriptors).build();
+
+        EsaTemplateContent content = EsaScenario.SCENARIO_1.getContent(body);
+
+        String expectedContent = "The appeal is refused.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
+            + "\n"
+            + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.\n"
+            + "\n"
+            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "\n";
+
+        Assert.assertEquals(9, content.getComponents().size());
+
+        Assert.assertEquals(expectedContent, content.toString());
+
+    }
 }
