@@ -226,7 +226,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
                             .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply))
-                            .esaSscsCaseData(
+                            .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().dwpReassessTheAward(!wcaAppeal.booleanValue() ? "something" : null).esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
                     } else {
@@ -235,7 +235,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
-                            .esaSscsCaseData(
+                            .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().dwpReassessTheAward("something").esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
                     }

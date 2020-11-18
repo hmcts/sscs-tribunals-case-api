@@ -196,7 +196,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("'When should DWP reassess the award?'", predicate,
-            (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
+            (SscsCaseData sscsCaseData) -> isNotBlank(sscsCaseData.getSscsEsaCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static Optional<EsaPointsCondition> isAnyPoints() {
