@@ -87,7 +87,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. The Secretary of State has accepted that Joe Bloggs has limited capability for work related activity. This was not an issue."));
             assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied that regulation because it found that Joe Bloggs suffers from [insert disease or disablement] and, by reasons of such disease or disablement, there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
             assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
@@ -150,12 +150,35 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("5. In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because it found that Joe Bloggs suffers from [insert disease or disablement] and, by reasons of such disease or disablement, there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
             assertThat(pdfTextWithoutNewLines, containsString("9. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
+        }
+    }
+
+    @Test
+    public void scenario10_refused_nonWca() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaDwpReassessTheAwardCallback.json");
+        json = json.replaceAll("DWP_REASSESS_THE_AWARD", "noRecommendation");
+        json = json.replaceFirst("allowed", "refused");
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = PDDocument.load(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            System.out.println(pdfText);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 11/11/2020 is confirmed."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs does not have limited capability for work and cannot be treated as having limited capability for work."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Summary of outcome decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 1"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
 
@@ -168,17 +191,25 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             "doNotReassess3, The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date.",
             "doNotReassess18, The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today's date.",
     })
-    public void scenario11_dwpReassessTheAwardPreview_shouldGeneratePdfWithExpectedText(String code, String expectedText) throws IOException {
+    public void scenario11_allowed_nonWcaAppeal_shouldHaveExpectedText(String code, String expectedText) throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/esaDwpReassessTheAwardCallback.json");
         json = json.replaceAll("DWP_REASSESS_THE_AWARD", code);
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
+            System.out.println(pdfText);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
-            assertThat(pdfTextWithoutNewLines, containsString("3. Summary of outcome decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 11/11/2020 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Summary of outcome decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 1"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
             assertThat(pdfTextWithoutNewLines, containsString(expectedText));
-            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
+            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
 
