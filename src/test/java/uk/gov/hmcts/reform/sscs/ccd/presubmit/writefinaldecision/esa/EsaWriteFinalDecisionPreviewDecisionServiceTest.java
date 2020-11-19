@@ -371,7 +371,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(EsaScenario.SCENARIO_10, templateContent.getScenario());
 
-        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
@@ -431,7 +431,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(EsaScenario.SCENARIO_10, templateContent.getScenario());
 
-        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
