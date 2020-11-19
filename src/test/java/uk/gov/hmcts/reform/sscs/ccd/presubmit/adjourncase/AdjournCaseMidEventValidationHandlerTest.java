@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import javax.validation.Validation;
+import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -43,10 +44,12 @@ public class AdjournCaseMidEventValidationHandlerTest {
 
     private SscsCaseData sscsCaseData;
 
+    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        handler = new AdjournCaseMidEventValidationHandler(Validation.buildDefaultValidatorFactory().getValidator());
+        handler = new AdjournCaseMidEventValidationHandler(validator);
 
         when(callback.getEvent()).thenReturn(EventType.ADJOURN_CASE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -265,20 +268,6 @@ public class AdjournCaseMidEventValidationHandlerTest {
 
         String error = response.getErrors().stream().findFirst().orElse("");
         assertEquals("'First available date after' date must be provided", error);
-
-    }
-
-    @Test
-    public void givenNextHearingTimeNotSet_ThenDisplayAnError() {
-
-        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Must select a specific time option", error);
 
     }
 

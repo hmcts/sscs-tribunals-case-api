@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 @Service
 public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
-    public PipDecisionNoticeOutcomeService() {
-        super("PIP");
+    public PipDecisionNoticeOutcomeService(PipDecisionNoticeQuestionService questionService) {
+        super("PIP", questionService);
     }
 
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
@@ -40,6 +40,16 @@ public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
                 return useExplicitySetOutcome(sscsCaseData);
             }
         }
+    }
+
+    @Override
+    public void performPreOutcomeIntegrityAdjustments(SscsCaseData sscsCaseData) {
+        // N/A
+    }
+
+    @Override
+    public Outcome determineOutcomeWithValidation(SscsCaseData sscsCaseData) {
+        return determineOutcome(sscsCaseData);
     }
 
     private Outcome determineGenerateNoticeDailyLivingOrMobilityFlowOutcome(SscsCaseData sscsCaseData) {

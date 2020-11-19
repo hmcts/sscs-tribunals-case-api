@@ -27,4 +27,9 @@ public enum EsaPointsCondition  {
         return isSatisfiedMessage;
     }
 
+    public String getErrorMessage() {
+        return "not " + getIsSatisfiedMessage();
+    }
+
+
 }

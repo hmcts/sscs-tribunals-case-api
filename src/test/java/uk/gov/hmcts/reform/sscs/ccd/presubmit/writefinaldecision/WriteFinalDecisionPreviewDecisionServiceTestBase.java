@@ -1,17 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import junitparams.JUnitParamsRunner;
 import junitparams.NamedParameters;
-import junitparams.Parameters;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,78 +32,124 @@ import uk.gov.hmcts.reform.idam.client.models.UserDetails;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appeal;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appellant;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Appointee;
+import uk.gov.hmcts.reform.sscs.ccd.domain.BenefitType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.CollectionItem;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DirectionType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
+import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Hearing;
+import uk.gov.hmcts.reform.sscs.ccd.domain.HearingDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Identity;
+import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Name;
+import uk.gov.hmcts.reform.sscs.ccd.domain.RegionalProcessingCenter;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Venue;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class WriteFinalDecisionPreviewDecisionServiceTest {
+public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
-    private static final String USER_AUTHORISATION = "Bearer token";
-    private static final String URL = "http://dm-store/documents/123";
-    private WriteFinalDecisionPreviewDecisionService service;
+    protected static final String USER_AUTHORISATION = "Bearer token";
+    protected static final String URL = "http://dm-store/documents/123";
+    protected WriteFinalDecisionPreviewDecisionServiceBase service;
+    protected String benefitType;
 
-    @Mock
-    private Callback<SscsCaseData> callback;
-
-    @Mock
-    private GenerateFile generateFile;
-
-    @Mock
-    private CaseDetails<SscsCaseData> caseDetails;
+    protected WriteFinalDecisionPreviewDecisionServiceTestBase(String benefitType) {
+        this.benefitType = benefitType;
+    }
 
     @Mock
-    private IdamClient idamClient;
+    protected Callback<SscsCaseData> callback;
 
     @Mock
-    private UserDetails userDetails;
+    protected GenerateFile generateFile;
+
+    @Mock
+    protected CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    protected IdamClient idamClient;
+
+    @Mock
+    protected UserDetails userDetails;
 
     @Spy
-    private DocumentConfiguration documentConfiguration;
+    protected DocumentConfiguration documentConfiguration;
 
-    private ArgumentCaptor<GenerateFileParams> capture;
+    protected ArgumentCaptor<GenerateFileParams> capture;
 
-    private SscsCaseData sscsCaseData;
+    protected SscsCaseData sscsCaseData;
 
-    private DecisionNoticeOutcomeService decisionNoticeOutcomeService;
+    protected PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
 
-    private PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
+    protected PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
+
+    protected EsaDecisionNoticeOutcomeService esaDecisionNoticeOutcomeService;
+
+    protected EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
+
+    protected abstract WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+        DocumentConfiguration documentConfiguration);
 
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        final Map<EventType, String> englishEventTypePipDocs = new HashMap<>();
+        final Map<EventType, String> englishEventTypeEsaDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
         englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
-
+        englishEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
+        englishEventTypeEsaDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642.docx");
 
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        Map<EventType, String> welshEventTypePipDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
         welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
-        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
 
-        Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        welshEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
+
+        final Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
+        final Map<LanguagePreference, Map<EventType, String>> pipDocuments =  new HashMap<>();
+        final Map<LanguagePreference, Map<EventType, String>> esaDocuments =  new HashMap<>();
+
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
         documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
+        pipDocuments.put(LanguagePreference.ENGLISH, englishEventTypePipDocs);
+        pipDocuments.put(LanguagePreference.WELSH, welshEventTypePipDocs);
+        esaDocuments.put(LanguagePreference.ENGLISH, englishEventTypeEsaDocs);
 
         documentConfiguration.setDocuments(documents);
 
-        this.decisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
+        Map<String, Map<LanguagePreference, Map<EventType, String>>> benefitSpecificDocuments = new HashMap<>();
+        benefitSpecificDocuments.put("pip", pipDocuments);
+        benefitSpecificDocuments.put("esa", esaDocuments);
+
+        documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
+
         this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+        this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(pipDecisionNoticeQuestionService);
 
-        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService),
-            Arrays.asList(decisionNoticeOutcomeService));
+        this.esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
 
-        service = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            decisionNoticeService, documentConfiguration);
+        this.esaDecisionNoticeOutcomeService = new EsaDecisionNoticeOutcomeService(esaDecisionNoticeQuestionService);
+
+        service = createPreviewDecisionService(generateFile, idamClient,
+            documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -108,7 +163,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .directionTypeDl(new DynamicList(DirectionType.APPEAL_TO_PROCEED.toString()))
             .regionalProcessingCenter(RegionalProcessingCenter.builder().name("Birmingham").build())
             .appeal(Appeal.builder()
-                .benefitType(BenefitType.builder().code("PIP").build())
+                .benefitType(BenefitType.builder().code(benefitType).build())
                 .appellant(Appellant.builder()
                     .name(Name.builder().firstName("APPELLANT")
                         .lastName("LastNamE")
@@ -124,6 +179,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         when(generateFile.assemble(any())).thenReturn(URL);
     }
+
 
     @NamedParameters("previewEndDateAndRateCombinations")
     @SuppressWarnings("unused")
@@ -173,7 +229,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         };
     }
 
-    private void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
+    protected void setCommonPreviewParams(SscsCaseData sscsCaseData, String endDate) {
         sscsCaseData.setWriteFinalDecisionStartDate("2018-10-11");
         sscsCaseData.setWriteFinalDecisionEndDate(endDate);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -188,7 +244,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
     }
 
-    private void assertCommonPreviewParams(WriteFinalDecisionTemplateBody body, String endDate, boolean nullReasonsExpected) {
+    protected void assertCommonPreviewParams(WriteFinalDecisionTemplateBody body, String endDate, boolean nullReasonsExpected) {
         assertEquals("2018-10-11",body.getStartDate());
         assertEquals(endDate,body.getEndDate());
         assertEquals("2018-10-10", body.getDateOfDecision());
@@ -207,79 +263,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertFalse(body.isPresentingOfficerAttended());
     }
 
-    @Test
-    public void willSetPreviewFileWithNullReasons_WhenReasonsListIsEmpty() {
-
-        final String endDate = "10-10-2020";
-        final String rate = "standardRate";
-        final String descriptorsComparedToDwp = "higher";
-        final String nonDescriptorsComparedWithDwp = "higher";
-
-        setCommonPreviewParams(sscsCaseData, endDate);
-        sscsCaseData.setWriteFinalDecisionReasons(new ArrayList<>());
-
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
-
-        // Mobility specific parameters
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        boolean appealAllowedExpectation = "higher".equals(descriptorsComparedToDwp) && !"lower".equals(nonDescriptorsComparedWithDwp);
-
-        boolean setAsideExpectation = true;
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, endDate, true);
-
-        assertEquals("standard rate", body.getMobilityAwardRate());
-        assertEquals(false, body.isMobilityIsSeverelyLimited());
-        assertEquals(true, body.isMobilityIsEntited());
-
-        assertNotNull(body.getMobilityDescriptors());
-        assertEquals(1, body.getMobilityDescriptors().size());
-        assertNotNull(body.getMobilityDescriptors().get(0));
-        assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-        assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-        assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-        assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-        assertNotNull(body.getMobilityNumberOfPoints());
-        assertEquals(10, body.getMobilityNumberOfPoints().intValue());
-
-        // Daily living specific assertions
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-    }
-
-    private List<String> getConsideredComparissons(String rate, String nonDescriptorsRate, String descriptorsComparedToDwp,
+    protected List<String> getConsideredComparissons(String rate, String nonDescriptorsRate, String descriptorsComparedToDwp,
         String nonDescriptorsComparedWithDwp) {
         List<String> consideredComparissions = new ArrayList<>();
         if (!"notConsidered".equalsIgnoreCase(rate)) {
@@ -292,378 +276,11 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     }
 
     @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
-    public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
-
-        setCommonPreviewParams(sscsCaseData, endDate);
-
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
-
-        if ("noAward".equals(rate) || "notConsidered".equals(rate)) {
-            sscsCaseData.setWriteFinalDecisionEndDateType("na");
-        }
-
-        // Mobility specific parameters
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
-
-        boolean setAsideExpectation = getConsideredComparissons(rate, "notConsidered", descriptorsComparedToDwp, nonDescriptorsComparedWithDwp).stream().anyMatch(comparission ->
-            !"same".equalsIgnoreCase(comparission));
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
-
-        // Mobility specific assertions
-        if ("standardRate".equals(rate)) {
-            assertEquals("standard rate", body.getMobilityAwardRate());
-            assertEquals(false, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-        } else if ("enhancedRate".equals(rate)) {
-            assertEquals("enhanced rate", body.getMobilityAwardRate());
-            assertEquals(true, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-
-        } else {
-            assertEquals(false, body.isMobilityIsEntited());
-        }
-
-        if ("notConsidered".equals(rate)) {
-
-            assertNull(body.getMobilityDescriptors());
-            assertNull(body.getMobilityNumberOfPoints());
-
-        } else {
-
-            assertNotNull(body.getMobilityDescriptors());
-            assertEquals(1, body.getMobilityDescriptors().size());
-            assertNotNull(body.getMobilityDescriptors().get(0));
-            assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-            assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-            assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-            assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-            assertNotNull(body.getMobilityNumberOfPoints());
-            assertEquals(10, body.getMobilityNumberOfPoints().intValue());
-
-        }
-
-        // Daily living specific assertions
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
-    }
-
-    @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
-    public void willSetPreviewFile_whenDailyLivingDescriptorsOnly_ForEndDateAndRate(String endDate, String rate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
-
-        setCommonPreviewParams(sscsCaseData, endDate);
-
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(nonDescriptorsComparedWithDwp);
-
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-
-        // Daily living specific params
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion(rate);
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion("notConsidered");
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingActivitiesQuestion(Arrays.asList("preparingFood"));
-        sscsCaseData.setPipWriteFinalDecisionPreparingFoodQuestion("preparingFood1f");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
-
-        boolean setAsideExpectation = getConsideredComparissons(rate, "notConsidered", descriptorsComparedToDwp, nonDescriptorsComparedWithDwp).stream().anyMatch(comparission ->
-            !"same".equalsIgnoreCase(comparission));
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
-
-        // Daily living specific assertions
-        if ("standardRate".equals(rate)) {
-            assertEquals("standard rate", body.getDailyLivingAwardRate());
-            assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-            assertEquals(true, body.isDailyLivingIsEntited());
-
-        } else if ("enhancedRate".equals(rate)) {
-            assertEquals("enhanced rate", body.getDailyLivingAwardRate());
-            assertEquals(true, body.isDailyLivingIsSeverelyLimited());
-            assertEquals(true, body.isDailyLivingIsEntited());
-
-        } else {
-            assertEquals(false, body.isDailyLivingIsEntited());
-        }
-
-        if ("notConsidered".equals(rate)) {
-            assertNull(body.getDailyLivingDescriptors());
-            assertNull(body.getDailyLivingNumberOfPoints());
-        } else {
-            assertNotNull(body.getDailyLivingDescriptors());
-            assertEquals(1, body.getDailyLivingDescriptors().size());
-            assertNotNull(body.getDailyLivingDescriptors().get(0));
-            assertEquals(8, body.getDailyLivingDescriptors().get(0).getActivityAnswerPoints());
-            assertEquals("f", body.getDailyLivingDescriptors().get(0).getActivityAnswerLetter());
-            assertEquals("Cannot prepare and cook food.", body.getDailyLivingDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Preparing food", body.getDailyLivingDescriptors().get(0).getActivityQuestionValue());
-            assertEquals("1", body.getDailyLivingDescriptors().get(0).getActivityQuestionNumber());
-            assertNotNull(body.getDailyLivingNumberOfPoints());
-            assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
-
-        }
-
-
-        // Mobility specific assertions
-        assertEquals(false, body.isMobilityIsEntited());
-        assertEquals(false, body.isMobilityIsSeverelyLimited());
-        assertNull(body.getMobilityDescriptors());
-    }
-
-
-
-    @Test
-    public void willSetPreviewFileForDailyLivingMobility_whenNotGeneratingNotice() {
-
-        setCommonPreviewParams(sscsCaseData, null);
-
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        boolean appealAllowedExpectation = true;
-        boolean setAsideExpectation = appealAllowedExpectation;
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, null, false);
-
-        assertNull(body.getMobilityAwardRate());
-        assertFalse(body.isMobilityIsSeverelyLimited());
-        assertFalse(body.isMobilityIsEntited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertFalse(body.isDailyLivingIsSeverelyLimited());
-        assertFalse(body.isDailyLivingIsEntited());
-        assertNull(body.getMobilityDescriptors());
-        assertNull(body.getMobilityNumberOfPoints());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(body.getDailyLivingNumberOfPoints());
-
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-    }
-
-    @Test
-    public void willSetPreviewFileForNotDailyLivingMobility_whenNotGeneratingNotice() {
-
-        setCommonPreviewParams(sscsCaseData, null);
-
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        boolean appealAllowedExpectation = true;
-        boolean setAsideExpectation = appealAllowedExpectation;
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, true, false, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, null, false);
-
-        assertNull(body.getMobilityAwardRate());
-        assertFalse(body.isMobilityIsSeverelyLimited());
-        assertFalse(body.isMobilityIsEntited());
-        assertNull(body.getDailyLivingAwardRate());
-        assertFalse(body.isDailyLivingIsSeverelyLimited());
-        assertFalse(body.isDailyLivingIsEntited());
-        assertNull(body.getMobilityDescriptors());
-        assertNull(body.getMobilityNumberOfPoints());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(body.getDailyLivingNumberOfPoints());
-
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-    }
-
-    @Test
-    @Parameters(named = "previewEndDateAndRateCombinations")
-    public void willSetPreviewFile_whenMobilityDescriptorsOnly_ForEndDateAndRateForIssueDecision(String endDate, String rate, String descriptorsComparedToDwp,
-        String nonDescriptorsComparedWithDwp) {
-
-        setCommonPreviewParams(sscsCaseData, endDate);
-
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion(descriptorsComparedToDwp);
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion(nonDescriptorsComparedWithDwp);
-
-        // Mobility specific parameters
-        sscsCaseData.setPipWriteFinalDecisionMobilityQuestion(rate);
-        sscsCaseData.setPipWriteFinalDecisionDailyLivingQuestion("notConsidered");
-        sscsCaseData.setPipWriteFinalDecisionMobilityActivitiesQuestion(Arrays.asList("movingAround"));
-        sscsCaseData.setPipWriteFinalDecisionMovingAroundQuestion("movingAround12d");
-
-        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, false);
-
-        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
-        assertEquals(DocumentLink.builder()
-            .documentFilename(String.format("Final Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
-            .documentBinaryUrl(URL + "/binary")
-            .documentUrl(URL)
-            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
-
-        boolean appealAllowedExpectation = !"notConsidered".equalsIgnoreCase(rate) && "higher".equals(descriptorsComparedToDwp);
-
-        boolean setAsideExpectation = getConsideredComparissons(rate, "notConsidered", descriptorsComparedToDwp, nonDescriptorsComparedWithDwp).stream().anyMatch(comparission ->
-            !"same".equalsIgnoreCase(comparission));
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            appealAllowedExpectation, setAsideExpectation, false,
-            true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals("Judge Full Name", payload.getUserName());
-        assertEquals("DECISION NOTICE", payload.getNoticeType());
-
-        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
-
-        assertNotNull(body);
-
-        // Common assertions
-        assertCommonPreviewParams(body, endDate, false);
-
-        // Mobility specific assertions
-        if ("standardRate".equals(rate)) {
-            assertEquals("standard rate", body.getMobilityAwardRate());
-            assertEquals(false, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-        } else if ("enhancedRate".equals(rate)) {
-            assertEquals("enhanced rate", body.getMobilityAwardRate());
-            assertEquals(true, body.isMobilityIsSeverelyLimited());
-            assertEquals(true, body.isMobilityIsEntited());
-
-        } else {
-            assertEquals(false, body.isMobilityIsEntited());
-        }
-
-        if ("notConsidered".equals(rate)) {
-
-            assertNull(body.getMobilityDescriptors());
-            assertNull(body.getMobilityNumberOfPoints());
-
-        } else {
-
-            assertNotNull(body.getMobilityDescriptors());
-            assertEquals(1, body.getMobilityDescriptors().size());
-            assertNotNull(body.getMobilityDescriptors().get(0));
-            assertEquals(10, body.getMobilityDescriptors().get(0).getActivityAnswerPoints());
-            assertEquals("d", body.getMobilityDescriptors().get(0).getActivityAnswerLetter());
-            assertEquals("Can stand and then move using an aid or appliance more than 20 metres but no more than 50 metres.", body.getMobilityDescriptors().get(0).getActivityAnswerValue());
-            assertEquals("Moving around", body.getMobilityDescriptors().get(0).getActivityQuestionValue());
-            assertEquals("12", body.getMobilityDescriptors().get(0).getActivityQuestionNumber());
-            assertNotNull(body.getMobilityNumberOfPoints());
-            assertEquals(10, body.getMobilityNumberOfPoints().intValue());
-
-        }
-
-        // Daily living specific assertions
-        assertEquals(false, body.isDailyLivingIsEntited());
-        assertEquals(false, body.isDailyLivingIsSeverelyLimited());
-        assertNull(body.getDailyLivingDescriptors());
-        assertNull(payload.getDateIssued());
-        assertEquals(LocalDate.now(), payload.getGeneratedDate());
-    }
-
-    @Test
     public void givenDateOfDecisionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -680,10 +297,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenSignedInJudgeNameNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         when(userDetails.getFullName()).thenReturn(null);
 
@@ -701,10 +317,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenSignedInJudgeUserDetailsNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         when(idamClient.getUserDetails("Bearer token")).thenReturn(null);
 
@@ -722,7 +337,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpMobilityQuestionNotSet_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -741,7 +356,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpDailyLivingSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("someValue");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
@@ -762,7 +377,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenComparedToDwpMobilityQuestionSetIncorrectly_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
         sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("someValue");
@@ -790,10 +405,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithVenues_thenCorrectlySetHeldAtUsingTheFirstHearingInList() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -815,7 +429,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -827,10 +441,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -853,10 +466,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenue_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -879,10 +491,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayAnErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -903,10 +514,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDetails_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -928,10 +538,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithEmptyHearingsList_thenDefaultHearingData() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         List<Hearing> hearings = new ArrayList<>();
@@ -941,7 +550,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -955,10 +564,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithNullHearingsList_thenDefaultHearingData() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
@@ -966,7 +574,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
 
         assertTrue(response.getErrors().isEmpty());
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true,  true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,  true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -980,10 +588,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithHearingDates_thenCorrectlySetTheHeldOnUsingTheFirstHearingInList() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -1005,7 +612,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1017,10 +624,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoHearingDate_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -1043,10 +649,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstHearingInListNull_thenDisplayTwoErrorsAndDoNotGenerateDocument() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         Hearing hearing1 = Hearing.builder().value(HearingDetails.builder()
@@ -1070,16 +675,16 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     }
 
     @Test
-    public void givenCaseWithTwoPanelMembers_thenCorrectlySetTheHeldBefore() {
+    public void givenCaseWithMultiplePanelMembers_thenCorrectlySetTheHeldBefore() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
         sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName("Ms Panel Member 2");
+        sscsCaseData.setWriteFinalDecisionOtherPanelMemberName("Miss other");
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -1095,21 +700,20 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
-        assertEquals("Judge Full Name, Mr Panel Member 1 and Ms Panel Member 2", body.getHeldBefore());
+        assertEquals("Judge Full Name, Mr Panel Member 1, Ms Panel Member 2 and Miss other", body.getHeldBefore());
     }
 
     @Test
     public void givenCaseWithOnePanelMember_thenCorrectlySetTheHeldBefore() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName("Mr Panel Member 1");
@@ -1127,7 +731,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1140,11 +744,11 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithNoPanelMembersWithNullValues_thenCorrectlySetTheHeldBefore() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
+
 
         sscsCaseData.setHearings(Arrays.asList(Hearing.builder().value(HearingDetails.builder()
             .hearingDate("2019-01-01").venue(Venue.builder().name("Venue Name").build()).build()).build()));
@@ -1159,7 +763,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true,true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true,true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
@@ -1171,10 +775,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void givenCaseWithNoPanelMembersWithEmptyValues_thenCorrectlySetTheHeldBefore() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.setWriteFinalDecisionMedicallyQualifiedPanelMemberName("");
         sscsCaseData.setWriteFinalDecisionDisabilityQualifiedPanelMemberName("");
@@ -1193,7 +796,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
             .build(), response.getData().getWriteFinalDecisionPreviewDocument());
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
-            true,true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true,true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
         WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
         assertNotNull(body);
 
@@ -1204,10 +807,9 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
     @Test
     public void scottishRpcWillShowAScottishImage() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         sscsCaseData.setRegionalProcessingCenter(RegionalProcessingCenter.builder().name("Glasgow").build());
@@ -1218,16 +820,22 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.SCOTTISH_IMAGE, "Appellant Lastname", null,
-            "2018-10-10", true, true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            "2018-10-10", true, true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
+
+    protected abstract void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData);
+
+    protected abstract boolean getDescriptorFlowIndicator(WriteFinalDecisionTemplateBody body);
+
+    protected abstract void setHigherRateScenarioFields(SscsCaseData caseData);
 
     @Test
     public void givenCaseWithAppointee_thenCorrectlySetTheNoticeNameWithAppellantAndAppointeeAppendedAndAppointeeFullNameSet() {
 
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
+
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.getAppeal().getAppellant().setIsAppointee("Yes");
         sscsCaseData.getAppeal().getAppellant().setAppointee(Appointee.builder()
@@ -1244,93 +852,53 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appointee Surname, appointee for Appellant Lastname", "Appointee Surname", "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
     }
 
     @Test
     public void givenDateIssuedParameterIsTrue_thenShowIssuedDateOnDocument() {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true,
-            true, true, true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getDateIssued());
     }
 
     @Test
     public void givenGeneratedDateIsAlreadySetGeneratedDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
+        setDescriptorFlowIndicator("yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpDailyLivingQuestion("higher");
-        sscsCaseData.setPipWriteFinalDecisionComparedToDwpMobilityQuestion("higher");
+        setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
         sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
 
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+            true, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
     }
 
     @Test
-    public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate();
 
     @Test
-    public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("yes");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, false, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate();
 
     @Test
-    public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-            false, true, documentConfiguration.getDocuments().get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate();
 
     @Test
     public void givenWelsh_GeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
         sscsCaseData.setLanguagePreferenceWelsh("yes");
-        sscsCaseData.setWriteFinalDecisionIsDescriptorFlow("no");
+        setDescriptorFlowIndicator("no", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
@@ -1339,13 +907,13 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-                false, true, documentConfiguration.getDocuments().get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
+                false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }
 
-    private NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
-                                                        boolean isDescriptorFlow, boolean isGenerateFile, String templateId) {
+    protected NoticeIssuedTemplateBody verifyTemplateBody(String image, String expectedName, String expectedAppointeeName, String dateOfDecision, boolean allowed, boolean isSetAside, boolean isDraft,
+        boolean isDescriptorFlow, boolean isGenerateFile, String templateId) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
         GenerateFileParams generateFileParams = capture.getValue();
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) generateFileParams.getFormPayload();
@@ -1363,7 +931,7 @@ public class WriteFinalDecisionPreviewDecisionServiceTest {
         assertEquals(allowed, body.isAllowed());
         assertEquals(isSetAside, body.isSetAside());
         assertNull(body.getDetailsOfDecision());
-        assertEquals(isDescriptorFlow, body.isDescriptorFlow());
+        assertEquals(isDescriptorFlow, getDescriptorFlowIndicator(body));
         assertEquals(templateId, generateFileParams.getTemplateId());
 
         return payload;

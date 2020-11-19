@@ -59,13 +59,6 @@ public class AdjournCaseMidEventValidationHandler implements PreSubmitCallbackHa
                 preSubmitCallbackResponse.addError("'First available date after' date cannot be in the past");
             }
 
-            if (sscsCaseData.getAdjournCaseTime() != null
-                    && ((sscsCaseData.getAdjournCaseTime().getAdjournCaseNextHearingFirstOnSession() == null || sscsCaseData.getAdjournCaseTime().getAdjournCaseNextHearingFirstOnSession().size() == 0)
-                            && sscsCaseData.getAdjournCaseTime().getAdjournCaseNextHearingSpecificTime() == null)) {
-                preSubmitCallbackResponse.addError("Must select a specific time option");
-            }
-
-
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());
             preSubmitCallbackResponse.addError(e.getMessage());
