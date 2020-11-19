@@ -16,7 +16,7 @@
       "adjournCaseInterpreterLanguage": "spanish",
       "adjournCaseInterpreterRequired": "Yes",
       "adjournCaseMedicallyQualifiedPanelMemberName": "Wendy Rowe",
-      "adjournCaseNextHearingDateType": "specificTime",
+      "adjournCaseNextHearingDateType": "dateToBeFixed",
       "adjournCaseNextHearingListingDuration": "12",
       "adjournCaseNextHearingListingDurationType": "setTime",
       "adjournCaseNextHearingListingDurationUnits": "hours",
