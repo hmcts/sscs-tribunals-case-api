@@ -59,13 +59,13 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
     // SCENARIO_3
     LOW_POINTS_SCHEDULE2_AND_REG_29_SKIPPED_REGULATION_35_DOES_APPLY_SUPPORT_GROUP_ONLY(EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN,
         Arrays.asList(isWcaAppeal(TRUE), isSupportGroupOnly(TRUE),  isRegulation35(TRUE)), Optional.of(AwardType.HIGHER_RATE), false, isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY), isRegulation29(UNSPECIFIED)),
-    // SCENARIO_4, SCENARIO_6
+    // SCENARIO_6
     HIGH_POINTS_REGULATION_35_UNSPECIFIED(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isWcaAppeal(TRUE), isRegulation35(UNSPECIFIED), Optional.of(AwardType.HIGHER_RATE), true, isRegulation29(UNSPECIFIED), isSupportGroupOnly(FALSE), isSchedule3ActivitiesAnswer(StringListPredicate.NOT_EMPTY)),
-    // SCENARIO_2  SCENARIO_5
+    // SCENARIO_5
     HIGH_POINTS_REGULATION_35_DOES_NOT_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isWcaAppeal(TRUE),isRegulation35(FALSE), Optional.of(AwardType.LOWER_RATE),  true, isRegulation29(UNSPECIFIED), isSupportGroupOnly(FALSE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
-    // SCENARIO_3. SCENARIO_5
+    // SCENARIO_5
     HIGH_POINTS_REGULATION_35_DOES_APPLY(EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN,
         isWcaAppeal(TRUE), isRegulation35(TRUE), Optional.of(AwardType.HIGHER_RATE),  true, isRegulation29(UNSPECIFIED), isSupportGroupOnly(FALSE), isSchedule3ActivitiesAnswer(StringListPredicate.EMPTY)),
     // SCENARIO 10
