@@ -8,8 +8,9 @@ public enum YesNoPredicate implements Predicate<YesNo> {
     UNSPECIFIED(v -> v == null),
     SPECIFIED(v -> v != null),
     TRUE(v -> v != null && v.toBoolean()),
-    FALSE(v -> v != null && !v.toBoolean());
-
+    FALSE(v -> v != null && !v.toBoolean()),
+    NOT_TRUE(v -> v == null || !v.toBoolean()),
+    ANY(v -> true);
 
     Predicate<YesNo> predicate;
 

@@ -64,6 +64,8 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
             } else {
                 sscsCaseData.setDoesRegulation35Apply(null);
                 sscsCaseData.setDoesRegulation29Apply(null);
+                sscsCaseData.setSupportGroupOnlyAppeal(null);
+                sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward(null);
                 sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
                 sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
             }

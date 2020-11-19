@@ -240,7 +240,6 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWcaAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("doNotReassess");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
