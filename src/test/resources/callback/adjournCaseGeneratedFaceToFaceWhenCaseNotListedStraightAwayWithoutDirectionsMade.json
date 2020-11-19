@@ -30,7 +30,7 @@
       "adjournCaseAreDirectionsBeingMadeToParties" : "No",
       "adjournCaseTypeOfNextHearing" : "faceToFace",
       "adjournCasePanelMembersExcluded" : "yes",
-      "adjournCaseNextHearingDateType" : "specificTime",
+      "adjournCaseNextHearingDateType" : "dateToBeFixed",
       "adjournCaseNextHearingDateOrPeriod" : "provideDate",
       "adjournCaseTime": {
         "adjournCaseNextHearingFirstOnSession": [
@@ -757,7 +757,7 @@
       "adjournCaseGenerateNotice": "Yes",
       "adjournCaseInterpreterRequired": "No",
       "adjournCaseMedicallyQualifiedPanelMemberName": null,
-      "adjournCaseNextHearingDateType": "specificTime",
+      "adjournCaseNextHearingDateType": "dateToBeFixed",
       "adjournCaseNextHearingListingDurationType": "standardTimeSlot",
       "adjournCaseNextHearingVenue": "sameVenue",
       "adjournCaseOtherPanelMemberName": null,

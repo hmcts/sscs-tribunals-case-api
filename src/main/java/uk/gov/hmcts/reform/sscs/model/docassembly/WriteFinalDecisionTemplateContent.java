@@ -23,8 +23,11 @@ public class WriteFinalDecisionTemplateContent {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (TemplateComponent<?> component : components) {
-            sb.append(component.toString());
-            sb.append("\n\n");
+            if (!component.toString().isBlank()) {
+                sb.append(component.toString());
+                sb.append("\n\n");
+            }
+
         }
         return sb.toString();
     }
