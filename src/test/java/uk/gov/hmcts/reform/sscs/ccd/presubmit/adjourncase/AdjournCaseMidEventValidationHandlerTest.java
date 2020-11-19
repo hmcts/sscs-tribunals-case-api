@@ -271,20 +271,6 @@ public class AdjournCaseMidEventValidationHandlerTest {
 
     }
 
-    @Test
-    public void givenNextHearingTimeNotSet_ThenDisplayAnError() {
-
-        sscsCaseData.setAdjournCaseTime(AdjournCaseTime.builder().build());
-
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
-
-        String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("Must select a specific time option", error);
-
-    }
-
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheEvent() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
