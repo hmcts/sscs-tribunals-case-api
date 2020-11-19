@@ -16,8 +16,8 @@ import uk.gov.hmcts.reform.sscs.domain.wrapper.ComparedRate;
 @Service
 public class PipDecisionNoticeOutcomeService extends DecisionNoticeOutcomeService {
 
-    public PipDecisionNoticeOutcomeService() {
-        super("PIP");
+    public PipDecisionNoticeOutcomeService(PipDecisionNoticeQuestionService questionService) {
+        super("PIP", questionService);
     }
 
     public Outcome determineOutcome(SscsCaseData sscsCaseData) {
