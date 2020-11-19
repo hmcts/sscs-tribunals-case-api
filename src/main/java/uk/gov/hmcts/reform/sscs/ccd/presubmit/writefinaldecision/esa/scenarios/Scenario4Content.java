@@ -16,6 +16,8 @@ public class Scenario4Content extends EsaTemplateContent {
         addComponent(new DescriptorTable(EsaTemplateComponentId.SCHEDULE_3_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getEsaSchedule3Descriptors(), true));
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
+        addHearingType(writeFinalDecisionTemplateBody);
+        addRecommendationIfPresent(writeFinalDecisionTemplateBody);
     }
 
     @Override
