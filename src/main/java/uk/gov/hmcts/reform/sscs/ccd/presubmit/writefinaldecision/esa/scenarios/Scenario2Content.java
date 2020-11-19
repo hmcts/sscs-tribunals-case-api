@@ -12,6 +12,7 @@ public class Scenario2Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.DOES_NOT_HAVE_LIMITED_CAPABILITY_FOR_WORK_PARAGRAPH.name(), getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivity(writeFinalDecisionTemplateBody.getAppellantName())));
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
+        addHearingType(writeFinalDecisionTemplateBody);
     }
 
     @Override

@@ -1,20 +1,26 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
+@RunWith(JUnitParamsRunner.class)
 public class EsaScenario10Test {
 
     @Test
-    public void testScenario10() {
+    @Parameters({"true, allowed, has limited capability for work", "false, refused, does not have limited capability for work and cannot be treated as having limited capability for work"})
+    public void testScenario10(boolean isAllowed, String allowedText, String capabilityText) {
 
         List<Descriptor> schedule2Descriptors =
                 Arrays.asList(Descriptor.builder()
@@ -24,7 +30,10 @@ public class EsaScenario10Test {
 
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
-                        .isAllowed(true)
+                        .hearingType("faceToFace")
+                        .attendedHearing(true)
+                        .presentingOfficerAttended(true)
+                        .isAllowed(isAllowed)
                         .wcaAppeal(false)
                         .dateOfDecision("2020-09-20")
                         .esaNumberOfPoints(0)
@@ -39,9 +48,11 @@ public class EsaScenario10Test {
 
         EsaTemplateContent content = EsaScenario.SCENARIO_10.getContent(body);
 
-        String expectedContent = "The appeal is allowed.\n"
+        String expectedContent = format("The appeal is %s.\n"
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
+                + "\n"
+                + "Felix Sydney %s.\n"
                 + "\n"
                 + "This is the summary of outcome decision\n"
                 + "\n"
@@ -51,11 +62,12 @@ public class EsaScenario10Test {
                 + "\n"
                 + "Something else\n"
                 + "\n"
-                + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+                + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n"
-                + "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Felix Sydney.\n\n";
+                + "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Felix Sydney.\n\n",
+                allowedText, capabilityText);
 
-        assertEquals(8, content.getComponents().size());
+        assertEquals(9, content.getComponents().size());
 
         assertThat(content.toString(), is(expectedContent));
 
