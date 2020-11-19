@@ -18,7 +18,7 @@ public class EsaScenario3Test {
                         .isAllowed(true)
                         .isSetAside(true)
                         .dateOfDecision("2020-09-20")
-                        .esaNumberOfPoints(15)
+                        .esaNumberOfPoints(null)
                         .pageNumber("A1")
                         .appellantName("Felix Sydney")
                         .regulation35Applicable(true)
