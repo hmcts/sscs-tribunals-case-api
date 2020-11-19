@@ -16,7 +16,7 @@ public class Scenario5Content extends EsaTemplateContent {
         addComponent(new Paragraph(EsaTemplateComponentId.SCHEDULE_3_PARAGRAPH.name(), getDoesNotHaveLimitedCapabilityForWorkNoSchedule3Sentence(writeFinalDecisionTemplateBody.getAppellantName())));
         addReasonsIfPresent(writeFinalDecisionTemplateBody);
         addAnythingElseIfPresent(writeFinalDecisionTemplateBody);
-        addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber())));
+        addHearingType(writeFinalDecisionTemplateBody);
         addRecommendationIfPresent(writeFinalDecisionTemplateBody);
     }
 
