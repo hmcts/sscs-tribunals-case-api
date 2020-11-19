@@ -144,27 +144,42 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
         return false;
     }
 
-    private boolean isValidCombinationExpected(int points, Boolean wcaAppeal, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
-        Boolean doesRegulation35Apply) {
+    private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
+        Boolean doesRegulation35Apply, Boolean supportGroupOnly) {
 
+        // If it's not a wca appeal we don't do any points-based validation - always valid
         if (!wcaAppeal.booleanValue()) {
             return true;
         }
+        // For WCA appeals, if points < 15
         if (points < 15) {
             if (doesRegulation29Apply == null) {
-                return false;
-            } else {
-                if (!doesRegulation29Apply.booleanValue()) {
-                    if (schedule3ActivitiesSelected != null) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else {
+                if (supportGroupOnly) {
                     return isValidCombinationFromSelectSchedule3ActivitiesOnwards(schedule3ActivitiesSelected, doesRegulation35Apply);
+                } else {
+                    return false;
+                }
+            } else {
+                if (supportGroupOnly) {
+                    return false;
+                } else {
+                    if (!doesRegulation29Apply.booleanValue()) {
+                        if (schedule3ActivitiesSelected != null) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    } else {
+                        return isValidCombinationFromSelectSchedule3ActivitiesOnwards(schedule3ActivitiesSelected, doesRegulation35Apply);
+                    }
                 }
             }
         } else {
+            // For WCA appeals, if points >= 15
+            if (supportGroupOnly != null && supportGroupOnly.booleanValue()) {
+                // If points >= 15 there must have been an error, because we skip the points pages and we should be
+                return false;
+            }
             if (doesRegulation29Apply != null) {
                 return false;
             }
@@ -203,8 +218,8 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     int conditionApplicableCount = 0;
 
                     final boolean isValidCombinationExpected =
-                        isValidCombinationExpected(points, wcaAppeal, doesRegulation29Apply, schedule3ActivitiesSelected,
-                            doesRegulation35Apply);
+                        isValidPointsBasedCombinationExpected(points, wcaAppeal, doesRegulation29Apply, schedule3ActivitiesSelected,
+                            doesRegulation35Apply, supportGroupOnly);
 
                     List<String> schedule3Activities = null;
                     String schedule3ActivitesApply = null;
@@ -253,18 +268,18 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     }
 
                     Assert.assertEquals(
-                        "Expected 1 condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + " but "
+                        "Expected 1 condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly +  " but "
                             + conditionApplicableCount + " were satisfied",
                         1, conditionApplicableCount);
 
                     if (isValidCombinationExpected) {
 
                         Assert.assertTrue("Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
-                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly, matchingCondition
                             .getOptionalErrorMessage(questionService, caseData).isEmpty());
                     } else {
                         Assert.assertTrue("Expected an error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
-                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly, matchingCondition
                             .getOptionalErrorMessage(questionService, caseData).isPresent());
                     }
 

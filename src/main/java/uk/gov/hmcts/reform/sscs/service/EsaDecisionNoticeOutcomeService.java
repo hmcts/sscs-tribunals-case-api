@@ -31,22 +31,34 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
 
             if (sscsCaseData.isWcaAppeal()) {
 
-                int totalPoints = questionService.getTotalPoints(sscsCaseData,
-                    EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
-
-                if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
+                if (sscsCaseData.isSupportGroupOnlyAppeal()) {
                     sscsCaseData.setDoesRegulation29Apply(null);
+                    sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+                    sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMentalAssessmentQuestion(null);
                     // Ensure that we set the following fields taking into account the radio button
                     // for whether schedule 3 activities apply.   The getRegulation35Selection and
                     // getSchedule3Selections methods peform this check,  and we use these methods
                     // to set the final values of doesRegulation35Apply and esaWriteFinalDecisionSchedule3ActivitiesQuestion
                     sscsCaseData.setDoesRegulation35Apply(sscsCaseData.getRegulation35Selection());
                     sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(sscsCaseData.getSchedule3Selections());
-                } else if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-                    if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
-                        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
-                        sscsCaseData.setDoesRegulation35Apply(null);
-                        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
+                } else {
+                    int totalPoints = questionService.getTotalPoints(sscsCaseData,
+                        EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
+
+                    if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
+                        sscsCaseData.setDoesRegulation29Apply(null);
+                        // Ensure that we set the following fields taking into account the radio button
+                        // for whether schedule 3 activities apply.   The getRegulation35Selection and
+                        // getSchedule3Selections methods peform this check,  and we use these methods
+                        // to set the final values of doesRegulation35Apply and esaWriteFinalDecisionSchedule3ActivitiesQuestion
+                        sscsCaseData.setDoesRegulation35Apply(sscsCaseData.getRegulation35Selection());
+                        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(sscsCaseData.getSchedule3Selections());
+                    } else if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
+                        if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
+                            sscsCaseData.setDoesRegulation35Apply(null);
+                            sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
+                        }
                     }
                 }
             } else {
