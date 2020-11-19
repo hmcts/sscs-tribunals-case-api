@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
+import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.IssueNoticeHandler;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
@@ -47,10 +48,10 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     }
 
     @Override
-    protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish,
         String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = super
-            .createPayload(caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getAdjournCaseGeneratedDate()), isScottish, userAuthorisation);
+            .createPayload(response, caseData, documentTypeLabel, dateAdded, LocalDate.parse(caseData.getAdjournCaseGeneratedDate()), isScottish, userAuthorisation);
         AdjournCaseTemplateBodyBuilder adjournCaseBuilder = AdjournCaseTemplateBody.builder();
 
         final NoticeIssuedTemplateBodyBuilder builder = formPayload.toBuilder();
@@ -161,58 +162,68 @@ public class AdjournCasePreviewService extends IssueNoticeHandler {
     private void setNextHearingDateAndTime(AdjournCaseTemplateBodyBuilder adjournCaseBuilder, SscsCaseData caseData, LocalDate issueDate) {
         String hearingDateSentence;
         if ("firstAvailableDate".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            hearingDateSentence = "on the first available date";
+            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime(), false);
+
         } else if ("firstAvailableDateAfter".equals(caseData.getAdjournCaseNextHearingDateType())) {
+            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime(), false);
+
             if ("provideDate".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
                 if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterDate in case data");
                 }
-                hearingDateSentence = "on the first available date after " + LocalDate.parse(caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate())
-                    .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
+
+                hearingDateSentence = hearingDateSentence + " after " + LocalDate.parse(caseData.getAdjournCaseNextHearingFirstAvailableDateAfterDate())
+                        .format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             } else if ("providePeriod".equals(caseData.getAdjournCaseNextHearingDateOrPeriod())) {
                 if (caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod() == null) {
                     throw new IllegalStateException("No value set for adjournCaseNextHearingFirstAvailableDateAfterPeriod in case data");
                 }
-                hearingDateSentence = "on the first available date after " + getDateForPeriodAfterIssueDate(issueDate,
-                    caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
+                hearingDateSentence = hearingDateSentence + " after " + getDateForPeriodAfterIssueDate(issueDate,
+                        caseData.getAdjournCaseNextHearingFirstAvailableDateAfterPeriod()).format(DateTimeFormatter.ofPattern(DOCUMENT_DATE_PATTERN));
             } else {
                 throw new IllegalStateException("Date or period indicator not available in case data");
             }
-        } else if ("specificTime".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            if (caseData.getAdjournCaseTime() == null) {
-                throw new IllegalStateException("adjournCaseTime not available in case data");
-            }
-
-            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime());
 
         } else if ("dateToBeFixed".equals(caseData.getAdjournCaseNextHearingDateType())) {
-            hearingDateSentence = "on a date to be fixed";
+            hearingDateSentence = buildSpecificTimeText(caseData.getAdjournCaseTime(), true);
+
+
         } else {
             throw new IllegalStateException("Unknown next hearing date type for:" + caseData.getAdjournCaseNextHearingDateType());
         }
 
         adjournCaseBuilder.nextHearingDate(stripToEmpty(hearingDateSentence));
-
     }
 
-    private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime) {
-        StringBuilder stringBuilder = new StringBuilder("It will be ");
-        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
-                && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
-            stringBuilder.append("first ");
-        }
-        stringBuilder.append("in the ");
+    private String buildSpecificTimeText(AdjournCaseTime adjournCaseNextHearingSpecificTime, boolean fixDate) {
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (adjournCaseNextHearingSpecificTime != null) {
 
-        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
-                && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime().equalsIgnoreCase("am")) {
-            stringBuilder.append("morning ");
-        }
-        if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
-                && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime().equalsIgnoreCase("pm")) {
-            stringBuilder.append("afternoon ");
-        }
+            stringBuilder.append("It will be ");
 
-        stringBuilder.append("session on a date to be decided");
+            if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
+                    && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0) {
+                stringBuilder.append("first ");
+            }
+
+            if (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime() != null
+                || (adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession() != null
+                        && adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingFirstOnSession().size() > 0)) {
+                String session = "";
+                if ("am".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
+                    session = "morning ";
+                } else if ("pm".equalsIgnoreCase(adjournCaseNextHearingSpecificTime.getAdjournCaseNextHearingSpecificTime())) {
+                    session = "afternoon ";
+                }
+                stringBuilder.append("in the " + session + "session ");
+            }
+
+            if (fixDate) {
+                stringBuilder.append("on a date to be fixed");
+            } else {
+                stringBuilder.append("on the first available date");
+            }
+        }
 
         return stringBuilder.toString();
     }

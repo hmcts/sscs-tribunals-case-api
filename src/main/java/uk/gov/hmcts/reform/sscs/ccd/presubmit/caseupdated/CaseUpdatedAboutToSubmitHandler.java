@@ -68,9 +68,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
         }
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
-
-        return preSubmitCallbackResponse;
+        return new PreSubmitCallbackResponse<>(sscsCaseData);
     }
 
     public void maybeChangeIsScottish(RegionalProcessingCenter oldRpc, RegionalProcessingCenter newRpc, SscsCaseData caseData) {

@@ -204,7 +204,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals("It will be first in the morning session on a date to be decided", payload.getNextHearingDate());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("face to face hearing", payload.getNextHearingType());
         assertEquals("Chester Magistrate's Court", payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -255,7 +255,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals("It will be first in the afternoon session on a date to be decided", payload.getNextHearingDate());
+        assertEquals("It will be first in the afternoon session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("face to face hearing", payload.getNextHearingType());
         assertEquals("Chester Magistrate's Court", payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -331,7 +331,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals("It will be first in the morning session on a date to be decided", payload.getNextHearingDate());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("face to face hearing", payload.getNextHearingType());
         assertEquals("Chester Magistrate's Court", payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -382,7 +382,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals("It will be first in the morning session on a date to be decided", payload.getNextHearingDate());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("telephone hearing", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -432,7 +432,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals("It will be first in the session on a date to be decided", payload.getNextHearingDate());
+        assertEquals("It will be first in the session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("video hearing", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -482,7 +482,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals("It will be first in the morning session on a date to be decided", payload.getNextHearingDate());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("decision on the papers", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertNull(payload.getNextHearingTimeslot());
