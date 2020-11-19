@@ -39,7 +39,7 @@ public class AdjournCaseAboutToSubmitHandlerTest extends BaseHandler {
             .assertThat().body("adjournCaseInterpreterLanguage", equalTo("spanish"))
             .assertThat().body("adjournCaseInterpreterRequired", equalTo("Yes"))
             .assertThat().body("adjournCaseMedicallyQualifiedPanelMemberName", equalTo("Wendy Rowe"))
-            .assertThat().body("adjournCaseNextHearingDateType", equalTo("specificTime"))
+            .assertThat().body("adjournCaseNextHearingDateType", equalTo("dateToBeFixed"))
             .assertThat().body("adjournCaseNextHearingListingDuration", equalTo("12"))
             .assertThat().body("adjournCaseNextHearingListingDurationType", equalTo("setTime"))
             .assertThat().body("adjournCaseNextHearingListingDurationUnits", equalTo("hours"))
