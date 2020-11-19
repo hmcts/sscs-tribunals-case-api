@@ -93,10 +93,6 @@ public class CancelTranslationsSubmittedHandlerTest {
         SscsCaseData caseData = buildDataWithUrgentRequestDocument();
         IdamTokens idamTokens = IdamTokens.builder().build();
         when(idamService.getIdamTokens()).thenReturn(idamTokens);
-        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
-                "Cancel welsh translations",
-                "Cancel welsh translations", idamTokens))
-                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
                 EventType.MAKE_CASE_URGENT.getCcdType(), "Send a case to urgent hearing",
@@ -104,8 +100,7 @@ public class CancelTranslationsSubmittedHandlerTest {
                 .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
-        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
-                "Cancel welsh translations", "Cancel welsh translations", idamTokens);
+
         verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
                 "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
