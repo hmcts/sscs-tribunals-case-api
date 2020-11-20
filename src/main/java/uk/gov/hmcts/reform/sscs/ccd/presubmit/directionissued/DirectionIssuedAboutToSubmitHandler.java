@@ -197,7 +197,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterUrgentHearingGranted(SscsCaseData caseData) {
 
         caseData.setUrgentHearingOutcome(RequestOutcome.GRANTED.getValue());
-        updateStateIfInterLockReviewState(caseData);
+        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         log.info("Case ID {} urgent hearing granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
     }
@@ -205,6 +205,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterUrgentHearingRefused(SscsCaseData caseData) {
 
         caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
+        caseData.setInterlocReviewState(InterlocReviewState.NONE.getId());
         log.info("Case ID {} urgent hearing refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
     }
