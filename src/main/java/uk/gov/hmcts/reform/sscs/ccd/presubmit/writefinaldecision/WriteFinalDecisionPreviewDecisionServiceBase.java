@@ -100,16 +100,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
             writeFinalDecisionBuilder.isAllowed(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
         }
 
-        if ("yes".equalsIgnoreCase((caseData.getWriteFinalDecisionIsDescriptorFlow()))
-            && "yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
-
-            boolean isSetAside = getConsideredComparisonsWithDwp(caseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
-
-            writeFinalDecisionBuilder.isSetAside(isSetAside);
-
-        } else {
-            writeFinalDecisionBuilder.isSetAside(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome));
-        }
+        writeFinalDecisionBuilder.isSetAside(isSetAside(caseData, outcome));
 
         if (caseData.getWriteFinalDecisionDateOfDecision() != null) {
             writeFinalDecisionBuilder.dateOfDecision(caseData.getWriteFinalDecisionDateOfDecision());
@@ -162,19 +153,12 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
     }
 
+    protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
+        return Outcome.DECISION_IN_FAVOUR_OF_APPELLANT.equals(outcome);
+    }
+
     protected abstract void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData, WriteFinalDecisionTemplateBody payload);
-
-    private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
-        List<String> consideredComparissons = new ArrayList<>();
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
-            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
-        }
-        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
-            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
-        }
-        return consideredComparissons;
-    }
 
     private void setHearings(WriteFinalDecisionTemplateBodyBuilder writeFinalDecisionBuilder, SscsCaseData caseData) {
         if (CollectionUtils.isNotEmpty(caseData.getHearings())) {
