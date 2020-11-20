@@ -156,15 +156,15 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             return EsaScenario.SCENARIO_3;
         } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isRegulation35(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
             return EsaScenario.SCENARIO_4;
-        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSchedule3Selections().isEmpty()) {
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
             return EsaScenario.SCENARIO_5;
-        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSchedule3Selections().isEmpty()) {
+        } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
             return EsaScenario.SCENARIO_6;
-        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSchedule3Selections().isEmpty() && isRegulation35(FALSE).isSatisified(caseData)) {
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty() && isRegulation35(FALSE).isSatisified(caseData)) {
             return EsaScenario.SCENARIO_7;
-        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSchedule3Selections().isEmpty() && isRegulation35(TRUE).isSatisified(caseData)) {
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty() && isRegulation35(TRUE).isSatisified(caseData)) {
             return EsaScenario.SCENARIO_8;
-        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSchedule3Selections().isEmpty()) {
+        }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
             return EsaScenario.SCENARIO_9;
         } else if (NON_WCA_APPEAL_ALLOWED == this || NON_WCA_APPEAL_REFUSED == this) {
             return EsaScenario.SCENARIO_10;
@@ -196,7 +196,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isRegulation29(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Regulation 29", predicate,
-                SscsCaseData::getDoesRegulation29Apply);
+            caseData -> caseData.getSscsEsaCaseData().getDoesRegulation29Apply());
     }
 
     static Optional<YesNoFieldCondition> isSupportGroupOnly(Predicate<YesNo> predicate, boolean displayPointsSatisfiedMessageOnError) {
@@ -215,7 +215,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("'When should DWP reassess the award?'", predicate,
-            (SscsCaseData sscsCaseData) -> sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward() == null ? null : isNotBlank(sscsCaseData.getEsaSscsCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
+            (SscsCaseData sscsCaseData) -> sscsCaseData.getDwpReassessTheAward() == null ? null : isNotBlank(sscsCaseData.getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static Optional<EsaPointsCondition> isAnyPoints() {
@@ -240,12 +240,12 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
 
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-            SscsCaseData::getRegulation35Selection);
+            caseData -> caseData.getSscsEsaCaseData().getRegulation35Selection());
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
         return new StringListFieldCondition("Schedule 3 Activities", predicate,
-            SscsCaseData::getSchedule3Selections);
+            caseData -> caseData.getSscsEsaCaseData().getSchedule3Selections());
     }
 
     @Override
@@ -291,7 +291,7 @@ public enum EsaAllowedOrRefusedCondition implements PointsCondition<EsaAllowedOr
             }
         }
         throw new IllegalStateException(
-            "No allowed/refused condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getSchedule3Selections() + ":" + caseData.getRegulation35Selection());
+            "No allowed/refused condition found for " + caseData.getSscsEsaCaseData().getDoesRegulation29Apply() + ":" + caseData.getSscsEsaCaseData().getSchedule3Selections() + ":" + caseData.getSscsEsaCaseData().getRegulation35Selection());
     }
 
     @Override

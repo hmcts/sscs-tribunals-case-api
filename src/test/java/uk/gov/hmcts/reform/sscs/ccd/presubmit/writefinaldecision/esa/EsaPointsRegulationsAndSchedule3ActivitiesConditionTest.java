@@ -242,18 +242,19 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
-                            .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
-                            .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply))
-                            .esaSscsCaseData(
-                                SscsEsaCaseData.builder().dwpReassessTheAward(!wcaAppeal.booleanValue() ? "something" : null).esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
-                                    .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
+                            .dwpReassessTheAward(null)
+                            .sscsEsaCaseData(
+                                SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
+                                    .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities)
+                                    .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
+                                    .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build()).build();
                     } else {
                         caseData = SscsCaseData.builder()
                             .wcaAppeal("No")
                             .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
-                            .esaSscsCaseData(
+                            .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
                     }

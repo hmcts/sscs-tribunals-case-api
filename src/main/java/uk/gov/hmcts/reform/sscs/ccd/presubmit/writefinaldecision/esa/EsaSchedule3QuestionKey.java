@@ -57,7 +57,7 @@ public enum EsaSchedule3QuestionKey implements EsaQuestionKey<Boolean> {
     }
 
     private Boolean getBooleanAnswerToQuestion(SscsCaseData caseData) {
-        List<String> selected = caseData.getSchedule3Selections();
+        List<String> selected = caseData.getSscsEsaCaseData().getSchedule3Selections();
         if (selected != null && selected.contains(key)) {
             return true;
         } else {
