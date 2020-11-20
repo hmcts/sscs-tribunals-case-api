@@ -181,8 +181,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
 
@@ -210,9 +209,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
             assertThat(pdfTextWithoutNewLines, containsString(expectedText));
-            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
 
