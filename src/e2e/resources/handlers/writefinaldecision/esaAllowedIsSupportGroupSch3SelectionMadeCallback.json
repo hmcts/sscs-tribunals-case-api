@@ -35,31 +35,32 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "caseCode":"051DD",
-      "dwpReassessTheAward": "DWP_REASSESS_THE_AWARD",
-      "supportGroupOnlyAppeal":"No",
+      "supportGroupOnlyAppeal":"Yes",
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolitle",
+      "writeFinalDecisionAllowedOrRefused":"allowed",
+      "esaWriteFinalDecisionMentalAssessmentQuestion":[],
+      "dwpReassessTheAward":"doNotReassess",
+      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1a",
       "writeFinalDecisionGenerateNotice":"Yes",
-      "doesRegulation29Apply":"Yes",
       "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionPageSectionReference":"B7",
       "writeFinalDecisionTypeOfHearing":"triage",
       "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
         "mobilisingUnaided"
       ],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1b",
-      "doesRegulation35Apply":"Yes",
-      "wcaAppeal":"Yes",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
-      "esaWriteFinalDecisionMentalAssessmentQuestion":[],
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
-      "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
+      "esaWriteFinalDecisionSchedule3ActivitiesQuestion":[
+        "schedule3MobilisingUnaided"
+      ],
+      "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
       "writeFinalDecisionReasons":[
         {
-          "id":"ddfd2632-5ee2-4684-9b96-a90bea89bdc5",
+          "id":"c5d206c1-9630-4f05-b7e8-175b0617c2cc",
           "value":"Reasons for decision"
         }
       ],
-      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
       "writeFinalDecisionAnythingElse":"Anything else",
+      "esaWriteFinalDecisionSchedule3ActivitiesApply":"Yes",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
@@ -129,6 +130,7 @@
       "isScottishCase":"No",
       "createdInGapsFrom":"validAppeal",
       "issueCode":"DD",
+      "evidencePresent":"No",
       "appeal":{
         "mrnDetails":{
           "dwpIssuingOffice":"Coatbridge Benefit Centre",
@@ -201,21 +203,21 @@
                 "start":"2018-04-04",
                 "end":"2018-04-04"
               },
-              "id":"b9068b5c-0ea1-44e1-85f3-5fc2f318c977"
+              "id":"3597f228-d8f5-4af7-88d0-c5923ee7ae9b"
             },
             {
               "value":{
                 "start":"2018-04-05",
                 "end":"2018-04-05"
               },
-              "id":"5fd096af-d583-4793-b2a2-8ad0242be25d"
+              "id":"a2c13933-45e2-41ef-b52b-8f3f14857a76"
             },
             {
               "value":{
                 "start":"2018-04-06",
                 "end":"2018-04-06"
               },
-              "id":"6b4cfb5d-9b90-4bb3-921f-4f7c41c8751c"
+              "id":"04fb57a0-186c-488a-8252-0c84b52d70ae"
             }
           ],
           "other":"Yes, this..."
@@ -227,21 +229,21 @@
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               },
-              "id":"3d0413ce-3de4-4397-825e-ff5e6dfc4769"
+              "id":"158f6866-37c9-470e-811b-109bdcc1acf4"
             },
             {
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               },
-              "id":"546f5959-d85b-4425-8055-9707542e6283"
+              "id":"115a885a-73f9-4fce-bb7a-941ffa480ba0"
             },
             {
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
               },
-              "id":"ff51e565-9445-4cd8-87fd-2b05b05d9584"
+              "id":"ac9e6b08-e362-41d2-8d7a-54fc7e680f3a"
             }
           ],
           "otherReasons":"Another reason"
@@ -274,7 +276,6 @@
         },
         "receivedVia":"Online"
       },
-      "evidencePresent":"No",
       "sscsDocument":[
         {
           "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",

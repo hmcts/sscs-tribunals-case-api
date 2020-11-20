@@ -21,6 +21,9 @@ public class EsaScenario7Test {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
+                .hearingType("faceToFace")
+                .attendedHearing(true)
+                .presentingOfficerAttended(true)
                 .isAllowed(true)
                 .isSetAside(true)
                 .dateOfDecision("2020-09-20")
@@ -49,7 +52,7 @@ public class EsaScenario7Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
             + "\n"
-            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.\n"
+            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -57,7 +60,7 @@ public class EsaScenario7Test {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         Assert.assertEquals(12, content.getComponents().size());
@@ -74,6 +77,9 @@ public class EsaScenario7Test {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
+                .hearingType("faceToFace")
+                .attendedHearing(true)
+                .presentingOfficerAttended(true)
                 .isAllowed(true)
                 .isSetAside(true)
                 .dateOfDecision("2020-09-20")
@@ -99,7 +105,7 @@ public class EsaScenario7Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
             + "\n"
-            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.\n"
+            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -107,7 +113,7 @@ public class EsaScenario7Test {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         Assert.assertEquals(12, content.getComponents().size());

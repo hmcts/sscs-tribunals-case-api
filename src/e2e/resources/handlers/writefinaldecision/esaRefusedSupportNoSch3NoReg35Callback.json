@@ -35,31 +35,17 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "caseCode":"051DD",
-      "dwpReassessTheAward": "DWP_REASSESS_THE_AWARD",
-      "supportGroupOnlyAppeal":"No",
+      "benefitCode":"051",
+      "supportGroupOnlyAppeal":"Yes",
       "writeFinalDecisionGenerateNotice":"Yes",
-      "doesRegulation29Apply":"Yes",
-      "writeFinalDecisionDateOfDecision":"2020-11-17",
+      "esaWriteFinalDecisionStandingAndSittingQuestion":"standingAndSitting2a",
+      "writeFinalDecisionDateOfDecision":"2020-11-16",
       "writeFinalDecisionPageSectionReference":"B7",
-      "writeFinalDecisionTypeOfHearing":"triage",
+      "writeFinalDecisionTypeOfHearing":"paper",
       "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
-        "mobilisingUnaided"
+        "standingAndSitting"
       ],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1b",
-      "doesRegulation35Apply":"Yes",
-      "wcaAppeal":"Yes",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
-      "esaWriteFinalDecisionMentalAssessmentQuestion":[],
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
-      "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
-      "writeFinalDecisionReasons":[
-        {
-          "id":"ddfd2632-5ee2-4684-9b96-a90bea89bdc5",
-          "value":"Reasons for decision"
-        }
-      ],
-      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
-      "writeFinalDecisionAnythingElse":"Anything else",
+      "evidencePresent":"No",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
@@ -113,7 +99,6 @@
         }
       },
       "dwpRegionalCentre":"Coatbridge Benefit Centre",
-      "benefitCode":"051",
       "regionalProcessingCenter":{
         "city":"BRADFORD",
         "name":"BRADFORD",
@@ -201,21 +186,21 @@
                 "start":"2018-04-04",
                 "end":"2018-04-04"
               },
-              "id":"b9068b5c-0ea1-44e1-85f3-5fc2f318c977"
+              "id":"5e92051f-8170-4c29-a358-58e05b8d9016"
             },
             {
               "value":{
                 "start":"2018-04-05",
                 "end":"2018-04-05"
               },
-              "id":"5fd096af-d583-4793-b2a2-8ad0242be25d"
+              "id":"a159748e-29af-4241-88b3-2a43c202c748"
             },
             {
               "value":{
                 "start":"2018-04-06",
                 "end":"2018-04-06"
               },
-              "id":"6b4cfb5d-9b90-4bb3-921f-4f7c41c8751c"
+              "id":"41d09401-b887-42fe-9fcd-78a4bfaa9581"
             }
           ],
           "other":"Yes, this..."
@@ -227,21 +212,21 @@
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               },
-              "id":"3d0413ce-3de4-4397-825e-ff5e6dfc4769"
+              "id":"1c18e1ae-59c7-4d80-8a2b-d39a043d612d"
             },
             {
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               },
-              "id":"546f5959-d85b-4425-8055-9707542e6283"
+              "id":"eabd15f0-e28a-49dc-abd2-37186c5ae8ec"
             },
             {
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
               },
-              "id":"ff51e565-9445-4cd8-87fd-2b05b05d9584"
+              "id":"9d95ca60-914b-40ff-a213-34b0d0423572"
             }
           ],
           "otherReasons":"Another reason"
@@ -274,7 +259,7 @@
         },
         "receivedVia":"Online"
       },
-      "evidencePresent":"No",
+      "doesRegulation35Apply":"No",
       "sscsDocument":[
         {
           "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
@@ -290,8 +275,24 @@
           }
         }
       ],
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolittle",
+      "writeFinalDecisionAllowedOrRefused":"refused",
+      "esaWriteFinalDecisionMentalAssessmentQuestion":[
+
+      ],
+      "dwpReassessTheAward":"doNotReassess",
       "caseCreated":"2020-11-05",
-      "region":"BRADFORD"
+      "writeFinalDecisionOtherPanelMemberName":null,
+      "writeFinalDecisionReasons":[
+        {
+          "id":"94c55bf7-9e1b-4afc-9754-f7ab6ea1cee0",
+          "value":"Reasons for decision"
+        }
+      ],
+      "region":"BRADFORD",
+      "writeFinalDecisionAnythingElse":"Anything else",
+      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No"
     },
     "data_classification":{
       "caseCode":"PUBLIC",

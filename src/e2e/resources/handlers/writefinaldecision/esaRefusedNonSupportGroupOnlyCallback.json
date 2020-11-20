@@ -35,31 +35,19 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "caseCode":"051DD",
-      "dwpReassessTheAward": "DWP_REASSESS_THE_AWARD",
       "supportGroupOnlyAppeal":"No",
+      "doesRegulation29Apply":"No",
       "writeFinalDecisionGenerateNotice":"Yes",
-      "doesRegulation29Apply":"Yes",
-      "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionPageSectionReference":"B7",
-      "writeFinalDecisionTypeOfHearing":"triage",
+      "writeFinalDecisionTypeOfHearing":"video",
+      "evidencePresent":"No",
       "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
         "mobilisingUnaided"
       ],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1b",
-      "doesRegulation35Apply":"Yes",
-      "wcaAppeal":"Yes",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
-      "esaWriteFinalDecisionMentalAssessmentQuestion":[],
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
-      "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
-      "writeFinalDecisionReasons":[
-        {
-          "id":"ddfd2632-5ee2-4684-9b96-a90bea89bdc5",
-          "value":"Reasons for decision"
-        }
-      ],
-      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
-      "writeFinalDecisionAnythingElse":"Anything else",
+      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1d",
+      "esaWriteFinalDecisionCopingWithChangeQuestion":"copingWithChange14c",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion":"Yes",
+      "writeFinalDecisionDateOfDecision":"2020-11-16",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
@@ -109,7 +97,7 @@
           "subscribeSms":"No",
           "subscribeEmail":"No",
           "lastLoggedIntoMya":null,
-          "wantSmsNotifications":"No"
+          "wantSmsNotifications":"Yes"
         }
       },
       "dwpRegionalCentre":"Coatbridge Benefit Centre",
@@ -129,6 +117,7 @@
       "isScottishCase":"No",
       "createdInGapsFrom":"validAppeal",
       "issueCode":"DD",
+
       "appeal":{
         "mrnDetails":{
           "dwpIssuingOffice":"Coatbridge Benefit Centre",
@@ -201,21 +190,21 @@
                 "start":"2018-04-04",
                 "end":"2018-04-04"
               },
-              "id":"b9068b5c-0ea1-44e1-85f3-5fc2f318c977"
+              "id":"1cae884e-e65a-42f2-9736-4cb5af979d02"
             },
             {
               "value":{
                 "start":"2018-04-05",
                 "end":"2018-04-05"
               },
-              "id":"5fd096af-d583-4793-b2a2-8ad0242be25d"
+              "id":"496236fc-4027-4981-af81-a6a5cf01bfc4"
             },
             {
               "value":{
                 "start":"2018-04-06",
                 "end":"2018-04-06"
               },
-              "id":"6b4cfb5d-9b90-4bb3-921f-4f7c41c8751c"
+              "id":"0a02cbed-29f8-4c2f-9285-6a685f93217b"
             }
           ],
           "other":"Yes, this..."
@@ -227,21 +216,21 @@
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               },
-              "id":"3d0413ce-3de4-4397-825e-ff5e6dfc4769"
+              "id":"472fa1cd-8d99-4168-a9ff-7af9d4efd0ce"
             },
             {
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               },
-              "id":"546f5959-d85b-4425-8055-9707542e6283"
+              "id":"5f44fb99-99fa-4a9e-94c4-62bd120047a4"
             },
             {
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
               },
-              "id":"ff51e565-9445-4cd8-87fd-2b05b05d9584"
+              "id":"27f0aa92-1572-455e-ab9d-cda9e7a79a60"
             }
           ],
           "otherReasons":"Another reason"
@@ -274,7 +263,7 @@
         },
         "receivedVia":"Online"
       },
-      "evidencePresent":"No",
+      "writeFinalDecisionAppellantAttendedQuestion":"Yes",
       "sscsDocument":[
         {
           "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
@@ -290,8 +279,27 @@
           }
         }
       ],
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Topcat",
+      "writeFinalDecisionAllowedOrRefused":"refused",
+      "esaWriteFinalDecisionMentalAssessmentQuestion":[
+        "copingWithChange"
+      ],
+      "dwpReassessTheAward":"reassess3",
       "caseCreated":"2020-11-05",
-      "region":"BRADFORD"
+      "writeFinalDecisionOtherPanelMemberName":"Dr Penfold",
+      "writeFinalDecisionReasons":[
+        {
+          "id":"1a4c920b-8fa9-4655-b276-b80ba52d6f0e",
+          "value":"Reasons for decision 1"
+        },
+        {
+          "id":"6bfe0347-5283-4d50-8f39-1da5c40c6c80",
+          "value":"Reasons for decision 2"
+        }
+      ],
+      "region":"BRADFORD",
+      "writeFinalDecisionAnythingElse":"Anything else."
     },
     "data_classification":{
       "caseCode":"PUBLIC",

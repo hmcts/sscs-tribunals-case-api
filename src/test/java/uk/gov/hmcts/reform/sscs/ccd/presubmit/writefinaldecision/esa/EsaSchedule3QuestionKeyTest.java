@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -16,7 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 @RunWith(JUnitParamsRunner.class)
 public class EsaSchedule3QuestionKeyTest {
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SscsCaseData sscsCaseData;
 
     @Before
@@ -27,7 +28,7 @@ public class EsaSchedule3QuestionKeyTest {
 
     @Test
     public void testGetMobilisingUnaidedQuestion() {
-        Mockito.when(sscsCaseData.getSchedule3Selections()).thenReturn(
+        Mockito.when(sscsCaseData.getSscsEsaCaseData().getSchedule3Selections()).thenReturn(
             Arrays.asList("schedule3MobilisingUnaided"));
         EsaSchedule3QuestionKey activityQuestion = EsaSchedule3QuestionKey.getByKey("schedule3MobilisingUnaided");
         Assert.assertNotNull(activityQuestion);

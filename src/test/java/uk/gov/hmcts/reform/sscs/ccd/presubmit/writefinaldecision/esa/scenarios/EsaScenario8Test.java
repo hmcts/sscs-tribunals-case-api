@@ -21,6 +21,9 @@ public class EsaScenario8Test {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
+                .hearingType("faceToFace")
+                .attendedHearing(true)
+                .presentingOfficerAttended(true)
                 .isAllowed(true)
                 .isSetAside(true)
                 .dateOfDecision("2020-09-20")
@@ -47,7 +50,7 @@ public class EsaScenario8Test {
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
-            + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity.\n"
+            + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -55,7 +58,7 @@ public class EsaScenario8Test {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         Assert.assertEquals(11, content.getComponents().size());
@@ -72,6 +75,9 @@ public class EsaScenario8Test {
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
+                .hearingType("faceToFace")
+                .attendedHearing(true)
+                .presentingOfficerAttended(true)
                 .isAllowed(true)
                 .isSetAside(true)
                 .dateOfDecision("2020-09-20")
@@ -95,7 +101,7 @@ public class EsaScenario8Test {
             + "\n"
             + "In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
             + "\n"
-            + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity.\n"
+            + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -103,7 +109,7 @@ public class EsaScenario8Test {
             + "\n"
             + "Something else\n"
             + "\n"
-            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
         Assert.assertEquals(11, content.getComponents().size());

@@ -35,7 +35,7 @@ public class StringListFieldCondition extends FieldConditionBase<List<String>> {
     }
 
     @Override
-    public Optional<String> getOptionalIsSatisfiedMessage() {
+    public Optional<String> getOptionalIsSatisfiedMessage(SscsCaseData caseData) {
         if (StringListPredicate.EMPTY.equals(predicate)) {
             return Optional.of("made no selections for the " + fieldName + " question");
         } else if (StringListPredicate.NOT_EMPTY.equals(predicate)) {

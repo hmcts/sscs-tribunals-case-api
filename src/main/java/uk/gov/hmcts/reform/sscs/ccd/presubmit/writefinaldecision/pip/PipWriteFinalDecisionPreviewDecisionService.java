@@ -3,12 +3,14 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
@@ -117,5 +119,26 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     protected List<Descriptor> getPipDescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
         return getDescriptorsFromQuestionKeys(PipActivityQuestion::getByKey, caseData, questionKeys);
+    }
+
+    @Override
+    protected boolean isSetAside(SscsCaseData sscsCaseData, Outcome outcome) {
+        if ("yes".equalsIgnoreCase((sscsCaseData.getWriteFinalDecisionIsDescriptorFlow()))
+            && "yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
+            return getConsideredComparisonsWithDwp(sscsCaseData).stream().anyMatch(comparission -> !"same".equalsIgnoreCase(comparission));
+        } else {
+            return super.isSetAside(sscsCaseData, outcome);
+        }
+    }
+
+    private List<String> getConsideredComparisonsWithDwp(SscsCaseData caseData) {
+        List<String> consideredComparissons = new ArrayList<>();
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpDailyLivingQuestion());
+        }
+        if (!AwardType.NOT_CONSIDERED.getKey().equalsIgnoreCase(caseData.getPipWriteFinalDecisionMobilityQuestion())) {
+            consideredComparissons.add(caseData.getPipWriteFinalDecisionComparedToDwpMobilityQuestion());
+        }
+        return consideredComparissons;
     }
 }
