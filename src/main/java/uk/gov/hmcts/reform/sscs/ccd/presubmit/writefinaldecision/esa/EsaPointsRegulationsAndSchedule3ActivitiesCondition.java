@@ -100,12 +100,12 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isRegulation29(YesNoPredicate predicate) {
         return new YesNoFieldCondition("Regulation 29", predicate,
-                SscsCaseData::getDoesRegulation29Apply);
+            caseData -> caseData.getSscsEsaCaseData().getDoesRegulation29Apply());
     }
 
     static YesNoFieldCondition isRegulation29(YesNoPredicate predicate, boolean displaySatisifiedMessageOnError) {
         return new YesNoFieldCondition("Regulation 29", predicate,
-                SscsCaseData::getDoesRegulation29Apply, displaySatisifiedMessageOnError);
+            caseData -> caseData.getSscsEsaCaseData().getDoesRegulation29Apply(), displaySatisifiedMessageOnError);
     }
 
     static YesNoFieldCondition isSupportGroupOnly(Predicate<YesNo> predicate, boolean displayPointsSatisfiedMessageOnError) {
@@ -115,12 +115,12 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isRegulation35(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-                SscsCaseData::getRegulation35Selection);
+            caseData -> caseData.getSscsEsaCaseData().getRegulation35Selection());
     }
 
     static YesNoFieldCondition isRegulation35(YesNoPredicate predicate, boolean displaySatisifiedMessageOnError) {
         return new YesNoFieldCondition("Regulation 35", predicate,
-                SscsCaseData::getRegulation35Selection, displaySatisifiedMessageOnError);
+            caseData -> caseData.getSscsEsaCaseData().getRegulation35Selection(), displaySatisifiedMessageOnError);
     }
 
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
@@ -130,12 +130,12 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {
         return new YesNoFieldCondition("'When should DWP reassess the award?'", predicate,
-            (SscsCaseData sscsCaseData) -> sscsCaseData.getSscsEsaCaseData().getDwpReassessTheAward() == null ? null : isNotBlank(sscsCaseData.getSscsEsaCaseData().getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
+            (SscsCaseData sscsCaseData) -> sscsCaseData.getDwpReassessTheAward() == null ? null : isNotBlank(sscsCaseData.getDwpReassessTheAward()) ? YesNo.YES : YesNo.NO);
     }
 
     static FieldCondition isSchedule3ActivitiesAnswer(StringListPredicate predicate) {
         return new StringListFieldCondition("Schedule 3 Activities", predicate,
-            SscsCaseData::getSchedule3Selections);
+            caseData -> caseData.getSscsEsaCaseData().getSchedule3Selections());
     }
 
     @Override
@@ -168,7 +168,7 @@ public enum EsaPointsRegulationsAndSchedule3ActivitiesCondition implements Point
             }
         }
         throw new IllegalStateException(
-            "No points condition found for " + caseData.getDoesRegulation29Apply() + ":" + caseData.getSchedule3Selections() + ":" + caseData.getRegulation35Selection());
+            "No points condition found for " + caseData.getSscsEsaCaseData().getDoesRegulation29Apply() + ":" + caseData.getSscsEsaCaseData().getSchedule3Selections() + ":" + caseData.getSscsEsaCaseData().getRegulation35Selection());
     }
 
     public static Optional<EsaAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,

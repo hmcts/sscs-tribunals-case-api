@@ -48,7 +48,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -119,7 +119,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -182,7 +182,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonPreviewParams(sscsCaseData, endDate);
 
         sscsCaseData.setWcaAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -205,8 +205,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -269,8 +269,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -332,7 +332,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -393,8 +393,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -459,7 +459,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("noRecommendation");
+        sscsCaseData.setDwpReassessTheAward("noRecommendation");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -576,7 +576,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
@@ -653,7 +653,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -685,7 +685,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
@@ -762,7 +762,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -916,7 +916,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     @Override
     protected void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData) {
         if ("no".equalsIgnoreCase(value)) {
-            sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("doNotReassess");
+            sscsCaseData.setDwpReassessTheAward("doNotReassess");
         }
         sscsCaseData.setWcaAppeal(value);
     }
@@ -934,7 +934,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         caseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
-        caseData.setDoesRegulation35Apply(YesNo.YES);
+        caseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
     }
 
     @Override
@@ -993,7 +993,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1130,8 +1130,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1198,8 +1198,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1266,7 +1266,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1332,7 +1332,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1400,7 +1400,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1528,8 +1528,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1604,8 +1604,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1632,8 +1632,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1700,8 +1700,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1727,8 +1727,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1803,8 +1803,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1831,8 +1831,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1861,8 +1861,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1931,7 +1931,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -2007,7 +2007,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 

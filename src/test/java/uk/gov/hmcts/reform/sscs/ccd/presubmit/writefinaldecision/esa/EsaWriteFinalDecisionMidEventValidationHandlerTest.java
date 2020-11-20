@@ -32,7 +32,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Override
     protected void setValidPointsAndActivitiesScenario(SscsCaseData caseData, String descriptorFlowValue) {
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(
                 Arrays.asList("mobilisingUnaided"));
 

@@ -201,7 +201,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
