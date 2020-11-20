@@ -94,6 +94,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
                 }
             }
         }
+        builder.dwpReassessTheAward(caseData.getDwpReassessTheAward());
     }
 
     protected List<Descriptor> getEsaSchedule2DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
@@ -135,15 +136,15 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             builder.esaSchedule2Descriptors(allSchedule2Descriptors);
             int numberOfPoints = allSchedule2Descriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
             if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(numberOfPoints)) {
-                caseData.setDoesRegulation29Apply(null);
+                caseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
             }
             builder.esaNumberOfPoints(numberOfPoints);
         }
-        if (caseData.getSchedule3Selections() != null && !caseData.getSchedule3Selections().isEmpty()) {
-            builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSchedule3Selections()));
+        if (caseData.getSscsEsaCaseData().getSchedule3Selections() != null && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
+            builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSscsEsaCaseData().getSchedule3Selections()));
         }
-        builder.regulation29Applicable(caseData.getDoesRegulation29Apply() == null ? null :  caseData.getDoesRegulation29Apply().toBoolean());
-        builder.regulation35Applicable(caseData.getDoesRegulation35Apply() == null ? null :  caseData.getDoesRegulation35Apply().toBoolean());
+        builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
+        builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
     }
 
