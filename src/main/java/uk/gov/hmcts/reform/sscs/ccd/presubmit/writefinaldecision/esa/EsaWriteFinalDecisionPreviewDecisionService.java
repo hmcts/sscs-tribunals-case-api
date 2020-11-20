@@ -120,8 +120,13 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
         if (allSchedule2Descriptors.isEmpty()) {
             if (caseData.isWcaAppeal()) {
-                builder.esaSchedule2Descriptors(new ArrayList<>());
-                builder.esaNumberOfPoints(caseData.isWcaAppeal() ? 0 : null);
+                if (caseData.isSupportGroupOnlyAppeal()) {
+                    builder.esaSchedule2Descriptors(null);
+                    builder.esaNumberOfPoints(null);
+                } else {
+                    builder.esaSchedule2Descriptors(new ArrayList<>());
+                    builder.esaNumberOfPoints(0);
+                }
             } else {
                 builder.esaSchedule2Descriptors(null);
                 builder.esaNumberOfPoints(null);

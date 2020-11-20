@@ -228,7 +228,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         String error = response.getErrors().stream().findFirst().orElse("");
 
-        assertEquals("You have awarded less than 15 points, but have a missing answer for the Regulation 29 question. Please review your previous selection.", error);
+        assertEquals("You have awarded less than 15 points and specified that Support Group Only Appeal does not apply, but have a missing answer for the Regulation 29 question. Please review your previous selection.", error);
     }
 
     @Test
@@ -453,9 +453,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
         Assert.assertEquals(1, response.getErrors().size());
 
         String error = response.getErrors().stream().findFirst().orElse("");
-        assertEquals("You have awarded less than 15 points, specified that Regulation 29 applies "
-                + "and not provided an answer to the Regulation 35 question, but have made "
-                + "no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
+        assertEquals("You have awarded less than 15 points, specified that Support Group Only Appeal does not apply, specified that Regulation 29 applies and not provided an answer to the Regulation 35 question, but have made no selections for the Schedule 3 Activities question. Please review your previous selection.", error);
     }
 
     @Test
@@ -714,7 +712,7 @@ public class EsaWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDec
 
         String error = response.getErrors().iterator().next();
 
-        Assert.assertEquals("You have awarded less than 15 points, specified that the appeal is refused and specified that Support Group Only Appeal applies, but have answered No for the Regulation 29 question, have a missing answer for the Schedule 3 Activities question and a missing answer for the Regulation 35 question. Please review your previous selection.", error);
+        Assert.assertEquals("You have specified that Support Group Only Appeal applies and not provided an answer to the Regulation 35 question, but have have a missing answer for the Schedule 3 Activities question. Please review your previous selection.", error);
     }
 
     // Refused scenario 2
