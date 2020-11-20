@@ -88,7 +88,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
                 + (isRegulation29Applied ? " 29 " : "")
                 + (isRegulation29Applied && isRegulation35Applied ? "and" : "")
                 + (isRegulation35Applied ? " 35 " : "")
-            + "because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited "
+            + "because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited "
             + "capability for work"
             + (isRegulation35Applied ? " and for work-related activity." : ".");
     }

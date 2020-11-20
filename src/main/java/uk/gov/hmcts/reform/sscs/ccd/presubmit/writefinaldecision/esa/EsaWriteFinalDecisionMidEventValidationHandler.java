@@ -33,7 +33,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
     protected void setShowPageFlags(SscsCaseData sscsCaseData) {
         int totalPoints = decisionNoticeService.getQuestionService("ESA").getTotalPoints(sscsCaseData, EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
-        if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
+        if (isWcaNotSupportGroupOnly(sscsCaseData) && EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
             sscsCaseData.setShowRegulation29Page(YesNo.YES);
             if (YesNo.YES.equals(sscsCaseData.getDoesRegulation29Apply())) {
                 sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
@@ -44,6 +44,10 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
             sscsCaseData.setShowRegulation29Page(YesNo.NO);
             sscsCaseData.setShowSchedule3ActivitiesPage(YesNo.YES);
         }
+    }
+
+    private boolean isWcaNotSupportGroupOnly(SscsCaseData sscsCaseData) {
+        return sscsCaseData.isWcaAppeal() && !sscsCaseData.isSupportGroupOnlyAppeal();
     }
 
     @Override
