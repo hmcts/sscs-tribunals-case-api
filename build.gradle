@@ -131,21 +131,21 @@ dependencyCheck {
 
 repositories {
 
+    mavenLocal()
+    mavenCentral()
     maven {
         url "https://dl.bintray.com/hmcts/hmcts-maven"
     }
 
-    maven {
-        url 'https://repo.spring.io/libs-milestone'
-    }
-
     jcenter()
-    mavenCentral()
 
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
     maven { url 'https://jitpack.io' }
-    mavenLocal()
+    // Requires authentication, if it gets here the library cannot be found!
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
 }
 
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
