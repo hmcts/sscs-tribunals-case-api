@@ -1,0 +1,101 @@
+{
+  "caseId" : "1",
+  "caseReference": "SC333/33/33333",
+  "appeal": {
+    "appellant": {
+      "name": {
+        "title": "Mr.",
+        "lastName": "Charlie",
+        "firstName": "C"
+      }
+    },
+    "benefitType": {
+      "code": "PIP"
+    },
+    "hearingOptions": {
+      "wantsToAttend": "Yes"
+    }
+  },
+  "hearings": [{
+    "value": {
+      "venue": {
+        "name": "Chester Magistrate's Court",
+        "address": {
+          "line1": "Grosvenor Street",
+          "line2": "Chester",
+          "postcode": "CH1 2XA"
+        },
+        "googleMapLink": "https://www.google.com/maps/place/Chester+Magistrate%27s+Court+Grosvenor+Street+Chester+Cheshire+CH1+2XA/@53.187454,-2.893632"
+      },
+      "hearingDate": "2017-07-17",
+      "time": "23:00",
+      "eventDate": "2017-03-02T18:11:34.013",
+      "adjourned": "Yes"
+    }
+  }],
+  "sscsDocument": [
+    {
+      "id": "da136874-a982-4400-b30a-516a771b32b3",
+      "value": {
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/dac800d4-1cf2-47c1-a1ef-db91c6ab3412",
+          "document_filename": "Adjournment Notice issued on 21-11-2019.pdf",
+          "document_binary_url": "http://dm-store:5005/documents/dac800d4-1cf2-47c1-a1ef-db91c6ab3412/binary"
+        },
+        "documentType": "adjournmentNotice",
+        "bundleAddition": "C",
+        "documentFileName": "Addition C - Adjournment Notice issued on 21-11-2019.pdf",
+        "documentDateAdded": "2019-11-21"
+      }
+    },
+    {
+      "id": "d2ba0acc-d604-4d22-a382-34ad36e5454d",
+      "value": {
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/dbed7988-4ed5-4965-b1b4-50e5582770f3",
+          "document_filename": "Adjournment Notice issued on 20-11-2019.pdf",
+          "document_binary_url": "http://dm-store:5005/documents/dbed7988-4ed5-4965-b1b4-50e5582770f3/binary"
+        },
+        "documentType": "adjournmentNotice",
+        "bundleAddition": "B",
+        "documentFileName": "Addition B - Adjournment Notice issued on 20-11-2019.pdf",
+        "documentDateAdded": "2019-11-20"
+      }
+    },
+    {
+      "id": "9d287290-f8a3-45ce-afdc-0bc51f930e61",
+      "value": {
+        "documentLink": {
+          "document_url": "http://dm-store:5005/documents/b502f219-ef46-4778-9aef-4e47d3176e32",
+          "document_filename": "Decision Notice issued on 19-11-2019.pdf",
+          "document_binary_url": "http://dm-store:5005/documents/b502f219-ef46-4778-9aef-4e47d3176e32/binary"
+        },
+        "documentType": "Joint party evidence",
+        "bundleAddition": "A",
+        "documentFileName": "Addition A - Joint party evidence issued on 19-11-2019",
+        "documentDateAdded": "2019-11-19"
+      }
+    }
+  ],
+  "events": [
+    {
+      "value": {
+        "date": "2017-06-24T17:27:50.297",
+        "type": "hearingAdjourned",
+        "description": "Hearing adjourned"
+      }
+    },
+    {
+      "value": {
+        "date": "2017-03-02T14:11:34.013",
+        "type": "hearingBooked",
+        "description": "Hearing booked"
+      }
+    }
+  ],
+  "subscriptions": {
+    "appellantSubscription": {
+      "tya": "abcde12345"
+    }
+  }
+}

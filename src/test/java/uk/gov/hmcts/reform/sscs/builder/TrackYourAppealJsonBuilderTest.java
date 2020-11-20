@@ -66,6 +66,22 @@ public class TrackYourAppealJsonBuilderTest {
         assertJsonEquals(ADJOURNED_HEARING_MYA.getSerializedMessage(), objectNode);
     }
 
+    @Test
+    public void shouldReturnAdjournmentHearingOutcomeDocumentData() {
+        SscsCaseData caseData = ADJOURNMENT_NOTICE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "responseReceived");
+        assertJsonEquals(ADJOURNMENT_NOTICE_MYA.getSerializedMessage(), objectNode);
+    }
+
+    @Test
+    public void shouldReturnAdjournmentHearingAndFinalDecisionOutcomeDocumentDataInDateOrder() {
+        SscsCaseData caseData = FINAL_DECISION_NOTICE_CCD.getDeserializeMessage();
+        ObjectNode objectNode = trackYourAppealJsonBuilder.build(caseData,
+                populateRegionalProcessingCenter(), 1L, true, "responseReceived");
+        assertJsonEquals(FINAL_DECISION_NOTICE_MYA.getSerializedMessage(), objectNode);
+    }
+
     private RegionalProcessingCenter populateRegionalProcessingCenter() {
         return RegionalProcessingCenter.builder()
             .name("LIVERPOOL")
