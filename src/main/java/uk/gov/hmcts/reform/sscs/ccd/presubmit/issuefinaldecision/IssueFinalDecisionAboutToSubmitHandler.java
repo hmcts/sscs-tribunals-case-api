@@ -188,15 +188,15 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward(null);
-        sscsCaseData.setShowRegulation29Page(null);
-        sscsCaseData.setShowSchedule3ActivitiesPage(null);
+        sscsCaseData.setDwpReassessTheAward(null);
+        sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(null);
+        sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
         sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
         sscsCaseData.setWcaAppeal(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
-        sscsCaseData.setDoesRegulation29Apply(null);
-        sscsCaseData.setDoesRegulation35Apply(null);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));
