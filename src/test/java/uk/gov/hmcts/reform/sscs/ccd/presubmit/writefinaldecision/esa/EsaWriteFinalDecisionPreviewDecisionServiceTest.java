@@ -519,8 +519,6 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
-        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("noRecommendation");
-
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
         assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());

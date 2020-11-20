@@ -239,7 +239,6 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         when(generateFile.assemble(any())).thenReturn(URL);
         sscsCaseData.setWcaAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
-        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 

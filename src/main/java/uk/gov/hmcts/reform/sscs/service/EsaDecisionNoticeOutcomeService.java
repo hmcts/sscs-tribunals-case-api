@@ -61,6 +61,9 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
                         }
                     }
                 }
+                if ("refused".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                    sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward(null);
+                }
             } else {
                 sscsCaseData.setDoesRegulation35Apply(null);
                 sscsCaseData.setDoesRegulation29Apply(null);

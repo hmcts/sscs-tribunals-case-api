@@ -86,7 +86,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceBase extends Issue
 
         writeFinalDecisionBuilder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
         writeFinalDecisionBuilder.wcaAppeal(caseData.isWcaAppeal());
-        writeFinalDecisionBuilder.dwpReassessTheAward(caseData.getSscsEsaCaseData().getDwpReassessTheAward());
         writeFinalDecisionBuilder.summaryOfOutcomeDecision(caseData.getWriteFinalDecisionDetailsOfDecision());
 
         writeFinalDecisionBuilder.heldBefore(buildHeldBefore(caseData, userAuthorisation));

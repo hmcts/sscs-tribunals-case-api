@@ -94,6 +94,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
                 }
             }
         }
+        builder.dwpReassessTheAward(caseData.getSscsEsaCaseData().getDwpReassessTheAward());
     }
 
     protected List<Descriptor> getEsaSchedule2DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
