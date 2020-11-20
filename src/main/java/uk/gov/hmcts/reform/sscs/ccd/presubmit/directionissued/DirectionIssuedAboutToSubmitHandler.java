@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
 import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 import static uk.gov.hmcts.reform.sscs.util.DocumentUtil.isFileAPdf;
 
@@ -192,7 +193,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterUrgentHearingGranted(SscsCaseData caseData) {
 
         caseData.setUrgentHearingOutcome(RequestOutcome.GRANTED.getValue());
-        updateStateIfInterLockReviewState(caseData);
+        caseData.setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         log.info("Case ID {} urgent hearing granted on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
     }
@@ -200,6 +201,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterUrgentHearingRefused(SscsCaseData caseData) {
 
         caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
+        caseData.setInterlocReviewState(NONE.getId());
         log.info("Case ID {} urgent hearing refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
     }
