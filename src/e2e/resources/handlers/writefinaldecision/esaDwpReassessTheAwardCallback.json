@@ -35,7 +35,7 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "caseCode":"051DD",
-      "dwpReassessTheAward":"DWP_REASSESS_THE_AWARD",
+      "dwpReassessTheAward": "DWP_REASSESS_THE_AWARD",
       "supportGroupOnlyAppeal":"No",
       "writeFinalDecisionGenerateNotice":"Yes",
       "doesRegulation29Apply":"Yes",
@@ -50,7 +50,6 @@
       "wcaAppeal":"Yes",
       "writeFinalDecisionAllowedOrRefused":"allowed",
       "esaWriteFinalDecisionMentalAssessmentQuestion":[],
-      "dwpReassessTheAward":"reassess3",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
       "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
       "writeFinalDecisionReasons":[
