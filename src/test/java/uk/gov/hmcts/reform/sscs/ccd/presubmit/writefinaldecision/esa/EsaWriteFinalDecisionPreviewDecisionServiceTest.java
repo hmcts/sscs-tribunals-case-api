@@ -1,12 +1,15 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -44,7 +47,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonPreviewParams(sscsCaseData, endDate);
 
         sscsCaseData.setWcaAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -114,7 +118,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         setCommonPreviewParams(sscsCaseData, endDate);
 
         sscsCaseData.setWcaAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -171,6 +176,28 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
+    public void willNotSetPreviewFile_WhenRefusedAndNoAward_WhenZeroPointsAndNoSchedule2Apply_WhenSupportGroupNotSet() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have specified that the appeal is refused, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+
+    }
+
+    @Test
     public void willSetPreviewFile_WhenRefusedSupportGroupOnlyAppealAndLowerRateAward_WhenLowPoints() {
 
         String endDate = "2018-11-10";
@@ -178,8 +205,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -242,8 +269,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -305,7 +332,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -366,8 +393,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
@@ -432,7 +459,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
-        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("noRecommendation");
+        sscsCaseData.setDwpReassessTheAward("noRecommendation");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -469,7 +496,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getEsaNumberOfPoints());
 
         assertFalse(body.isEsaIsEntited());
-        assertEquals("noRecommendation", body.getDwpReassessTheAward());
+        assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
@@ -479,7 +506,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(EsaScenario.SCENARIO_10, templateContent.getScenario());
 
-        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
@@ -491,8 +518,6 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.setWcaAppeal("No");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-
-        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("noRecommendation");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -529,7 +554,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNull(body.getEsaNumberOfPoints());
 
         assertFalse(body.isEsaIsEntited());
-        assertEquals("noRecommendation", body.getDwpReassessTheAward());
+        assertNull(body.getDwpReassessTheAward());
         assertNull(payload.getDateIssued());
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
         assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
@@ -539,7 +564,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(EsaScenario.SCENARIO_10, templateContent.getScenario());
 
-        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
@@ -551,9 +576,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
 
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -619,6 +645,38 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
+    public void willNotSetPreviewFile_WhenAllowedAndLowerRateNoSchedule3_WhenSupportGroupNotSet() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
+
+    }
+
+    @Test
     public void willSetPreviewFile_WhenAllowedAndHigherRateNoSchedule3() {
 
         String endDate = "2018-11-10";
@@ -627,9 +685,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
 
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -695,6 +754,35 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
+    public void willNotSetPreviewFile_WhenAllowedAndHigherRateNoSchedule3_WhenSupportGroupNotSet() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+    }
+
+    @Test
     public void willSetPreviewFile_WhenAllowedAndHigherRateSchedule3() {
 
         String endDate = "2018-11-10";
@@ -706,6 +794,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
 
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -794,12 +883,40 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(10, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
+    @Test
+    public void willNotSetPreviewFile_WhenAllowedAndHigherRateSchedule3_WhenSupportGroupNotSet() {
 
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
+
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 15 points awarded for this question - high, which means regulation 29 is not applicable
+        // and does not need to be populated
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have awarded 15 points or more and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+    }
 
     @Override
     protected void setDescriptorFlowIndicator(String value, SscsCaseData sscsCaseData) {
         if ("no".equalsIgnoreCase(value)) {
-            sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward("doNotReassess");
+            sscsCaseData.setDwpReassessTheAward("doNotReassess");
         }
         sscsCaseData.setWcaAppeal(value);
     }
@@ -814,9 +931,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1a");
         caseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+        caseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
-        caseData.setDoesRegulation35Apply(YesNo.YES);
+        caseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
     }
 
     @Override
@@ -875,7 +993,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1012,8 +1130,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1080,8 +1198,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1148,7 +1266,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1214,7 +1332,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1282,7 +1400,7 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
@@ -1410,9 +1528,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1477,6 +1596,34 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
+    public void willNotSetPreviewFile_WhenAllowedNotSupportGroupOnlyNoSchedule3NoReg35_WhenLowPoints_WhenSupportGroupNotSet() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 0 points awarded for this question - low, which means regulation 29 must apply
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+    }
+
+    @Test
     public void willSetPreviewFile_WhenAllowedNotSupportGroupOnlyNoSchedule3NoReg35_WhenZeroPointsAndNoSchedule2() {
 
         String endDate = "2018-11-10";
@@ -1485,9 +1632,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1544,6 +1692,33 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
+    public void willNotSetPreviewFile_WhenAllowedNotSupportGroupOnlyNoSchedule3NoReg35_WhenZeroPointsAndNoSchedule2_WhenSupportGroupNotSet() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.NO);
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
+
+        // 0 points awarded as no schedule 2 apply - low, which means regulation 29 must apply
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+    }
+
+    @Test
     public void willSetPreviewFile_WhenAllowedNotSupportGroupOnlyNoSchedule3WithReg35_WhenLowPoints() {
 
         String endDate = "2018-11-10";
@@ -1552,9 +1727,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1619,6 +1795,64 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
     }
 
     @Test
+    public void willNotSetPreviewFile_WhenAllowedNotSupportGroupOnlyNoSchedule3WithReg35_WhenLowPoints_WhenSupportGroupNotSet() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 0 points awarded for this question - low, which means regulation 29 must apply
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void willNotSetPreviewFile_WhenAllowedNotSupportGroupOnlyNoSchedule3WithReg35_WhenZeroPointsAndNoSchedule2_WhenMissingSupportGroupOnly() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList());
+
+        // 0 points awarded as no schedule 2- low, which means regulation 29 must apply
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        Assert.assertEquals(1, response.getErrors().size());
+
+        Assert.assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.", response.getErrors().iterator().next());
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+
+    }
+
+    @Test
     public void willSetPreviewFile_WhenAllowedNotSupportGroupOnlyNoSchedule3WithReg35_WhenZeroPointsAndNoSchedule2() {
 
         String endDate = "2018-11-10";
@@ -1627,9 +1861,10 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("No");
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
-        sscsCaseData.setDoesRegulation35Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1696,8 +1931,9 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
-        sscsCaseData.setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
         sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1759,6 +1995,36 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(EsaScenario.SCENARIO_9, templateContent.getScenario());
         assertEquals(11, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+    }
+
+    @Test
+    public void willNotSetPreviewFile_WhenAllowedNotSupportGroupOnlyWithSchedule3_WhenLowPoints_WhenSupportGroupNotSet() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided", "schedule3AppropriatenessOfBehaviour"));
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.YES);
+        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+
+        // 0 points awarded for this question - low, which means regulation 29 must apply
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(1, response.getErrors().size());
+        assertEquals("You have awarded less than 15 points and specified that the appeal is allowed, but have a missing answer for the Support Group Only Appeal question. Please review your previous selection.",
+            response.getErrors().iterator().next());
+
     }
 
     @Test

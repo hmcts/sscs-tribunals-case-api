@@ -39,12 +39,19 @@ public class YesNoFieldCondition extends FieldConditionBase<YesNo> {
     }
 
     @Override
-    public Optional<String> getOptionalIsSatisfiedMessage() {
+    public Optional<String> getOptionalIsSatisfiedMessage(SscsCaseData caseData) {
         if (displayIsSatisfiedMessage) {
             if (YesNoPredicate.TRUE.equals(predicate)) {
                 return Optional.of("specified that " + fieldName + " applies");
             } else if (YesNoPredicate.FALSE.equals(predicate)) {
                 return Optional.of("specified that " + fieldName + " does not apply");
+            } else if (YesNoPredicate.NOT_TRUE.equals(predicate)) {
+                YesNo value = fieldExtractor.apply(caseData);
+                if (value != null) {
+                    return Optional.of("specified that " + fieldName + " does not apply");
+                } else {
+                    return Optional.empty();
+                }
             } else if (YesNoPredicate.UNSPECIFIED.equals(predicate)) {
                 return Optional.of("not provided an answer to the " + fieldName + " question");
             } else {
