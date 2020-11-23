@@ -122,6 +122,12 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
             allSchedule6Descriptors.addAll(mentalAssessmentDescriptors);
         }
 
+        // Don't add descriptors to the template if the total points in schedule 6 are zero
+        int totalPoints = allSchedule6Descriptors.stream().mapToInt(d -> d.getActivityAnswerPoints()).sum();
+        if (totalPoints == 0) {
+            allSchedule6Descriptors.clear();
+        }
+
         if (allSchedule6Descriptors.isEmpty()) {
             if (caseData.getSscsUcCaseData().isLcwaAppeal()) {
                 if (caseData.isSupportGroupOnlyAppeal()) {
