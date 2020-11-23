@@ -106,7 +106,7 @@ public class WriteFinalDecisionTemplateBody {
     @JsonProperty("uc_award_rate")
     private String ucAwardRate;
     @JsonProperty("is_schedule_8_paragraph_4_applicable")
-    private Boolean isSchedule8Paragraph4Applicable;
+    private Boolean schedule8Paragraph4Applicable;
     @JsonProperty("is_schedule_9_paragraph_4_applicable")
-    private Boolean isSchedule9Paragraph4Applicable;
+    private Boolean schedule9Paragraph4Applicable;
 }
