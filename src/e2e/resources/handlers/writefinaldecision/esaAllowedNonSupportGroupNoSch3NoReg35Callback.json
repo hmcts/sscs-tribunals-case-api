@@ -35,31 +35,20 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "caseCode":"051DD",
-      "dwpReassessTheAward": "DWP_REASSESS_THE_AWARD",
       "supportGroupOnlyAppeal":"No",
+      "doesRegulation35Apply":"No",
+      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1a",
       "writeFinalDecisionGenerateNotice":"Yes",
-      "doesRegulation29Apply":"Yes",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion":"No",
+      "esaWriteFinalDecisionStandingAndSittingQuestion":"standingAndSitting2a",
       "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionPageSectionReference":"B7",
-      "writeFinalDecisionTypeOfHearing":"triage",
+      "writeFinalDecisionTypeOfHearing":"telephone",
       "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
+        "standingAndSitting",
         "mobilisingUnaided"
       ],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1b",
-      "doesRegulation35Apply":"Yes",
-      "wcaAppeal":"Yes",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
-      "esaWriteFinalDecisionMentalAssessmentQuestion":[],
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
-      "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
-      "writeFinalDecisionReasons":[
-        {
-          "id":"ddfd2632-5ee2-4684-9b96-a90bea89bdc5",
-          "value":"Reasons for decision"
-        }
-      ],
-      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
-      "writeFinalDecisionAnythingElse":"Anything else",
+      "writeFinalDecisionAppellantAttendedQuestion":"Yes",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
@@ -129,6 +118,7 @@
       "isScottishCase":"No",
       "createdInGapsFrom":"validAppeal",
       "issueCode":"DD",
+      "evidencePresent":"No",
       "appeal":{
         "mrnDetails":{
           "dwpIssuingOffice":"Coatbridge Benefit Centre",
@@ -201,21 +191,21 @@
                 "start":"2018-04-04",
                 "end":"2018-04-04"
               },
-              "id":"b9068b5c-0ea1-44e1-85f3-5fc2f318c977"
+              "id":"0142ae99-e29b-446e-ad45-fa628633e4fe"
             },
             {
               "value":{
                 "start":"2018-04-05",
                 "end":"2018-04-05"
               },
-              "id":"5fd096af-d583-4793-b2a2-8ad0242be25d"
+              "id":"1df42bc0-f727-4369-9810-503501cb6180"
             },
             {
               "value":{
                 "start":"2018-04-06",
                 "end":"2018-04-06"
               },
-              "id":"6b4cfb5d-9b90-4bb3-921f-4f7c41c8751c"
+              "id":"6bd8e393-af2b-4fa8-b3aa-595e07232c91"
             }
           ],
           "other":"Yes, this..."
@@ -227,21 +217,21 @@
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               },
-              "id":"3d0413ce-3de4-4397-825e-ff5e6dfc4769"
+              "id":"4cbd4a16-e22f-4e1d-8c8f-b7ec5658e19a"
             },
             {
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               },
-              "id":"546f5959-d85b-4425-8055-9707542e6283"
+              "id":"e0d9feb4-3789-4884-9936-216da10744dc"
             },
             {
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
               },
-              "id":"ff51e565-9445-4cd8-87fd-2b05b05d9584"
+              "id":"d1d2efad-7d66-4046-8add-21fee2904133"
             }
           ],
           "otherReasons":"Another reason"
@@ -274,7 +264,6 @@
         },
         "receivedVia":"Online"
       },
-      "evidencePresent":"No",
       "sscsDocument":[
         {
           "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
@@ -290,6 +279,20 @@
           }
         }
       ],
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolittle",
+      "writeFinalDecisionAllowedOrRefused":"allowed",
+      "esaWriteFinalDecisionMentalAssessmentQuestion":[],
+      "dwpReassessTheAward":"noRecommendation",
+      "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
+      "writeFinalDecisionReasons":[
+        {
+          "id":"9829383f-2e0f-4c7c-9cd2-f68adad7c821",
+          "value":"Reasons for decision"
+        }
+      ],
+      "writeFinalDecisionAnythingElse":"Anything else",
+      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
       "caseCreated":"2020-11-05",
       "region":"BRADFORD"
     },

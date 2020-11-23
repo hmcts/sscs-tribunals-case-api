@@ -35,31 +35,33 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "caseCode":"051DD",
-      "dwpReassessTheAward": "DWP_REASSESS_THE_AWARD",
-      "supportGroupOnlyAppeal":"No",
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Doolitle",
+      "writeFinalDecisionAllowedOrRefused":"allowed",
+      "writeFinalDecisionAnythingElse":"Anything else",
+      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
+      "doesRegulation35Apply":"Yes",
+      "supportGroupOnlyAppeal":"Yes",
+      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1a",
       "writeFinalDecisionGenerateNotice":"Yes",
-      "doesRegulation29Apply":"Yes",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion":"No",
+      "writeFinalDecisionAppellantAttendedQuestion":"Yes",
       "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionPageSectionReference":"B7",
-      "writeFinalDecisionTypeOfHearing":"triage",
+      "writeFinalDecisionTypeOfHearing":"faceToFace",
       "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
         "mobilisingUnaided"
       ],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1b",
-      "doesRegulation35Apply":"Yes",
-      "wcaAppeal":"Yes",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
       "esaWriteFinalDecisionMentalAssessmentQuestion":[],
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
-      "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
+      "dwpReassessTheAward":"doNotReassess3",
+      "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
       "writeFinalDecisionReasons":[
         {
-          "id":"ddfd2632-5ee2-4684-9b96-a90bea89bdc5",
+          "id":"73bed519-4e80-4bd9-a6e4-546d07385df1",
           "value":"Reasons for decision"
         }
       ],
-      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
-      "writeFinalDecisionAnythingElse":"Anything else",
+      "evidencePresent":"No",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
@@ -112,8 +114,8 @@
           "wantSmsNotifications":"No"
         }
       },
-      "dwpRegionalCentre":"Coatbridge Benefit Centre",
       "benefitCode":"051",
+      "dwpRegionalCentre":"Coatbridge Benefit Centre",
       "regionalProcessingCenter":{
         "city":"BRADFORD",
         "name":"BRADFORD",
@@ -201,21 +203,21 @@
                 "start":"2018-04-04",
                 "end":"2018-04-04"
               },
-              "id":"b9068b5c-0ea1-44e1-85f3-5fc2f318c977"
+              "id":"a3a0356d-2bbd-4586-804a-b1ccafd3e7b7"
             },
             {
               "value":{
                 "start":"2018-04-05",
                 "end":"2018-04-05"
               },
-              "id":"5fd096af-d583-4793-b2a2-8ad0242be25d"
+              "id":"de5e8ba3-4c9b-43c3-8c00-2f416d3faa72"
             },
             {
               "value":{
                 "start":"2018-04-06",
                 "end":"2018-04-06"
               },
-              "id":"6b4cfb5d-9b90-4bb3-921f-4f7c41c8751c"
+              "id":"696a762c-d1df-46cb-a938-95c3b28bb56d"
             }
           ],
           "other":"Yes, this..."
@@ -227,21 +229,21 @@
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               },
-              "id":"3d0413ce-3de4-4397-825e-ff5e6dfc4769"
+              "id":"46b84008-13ab-40e2-83ae-e00cdf2025f3"
             },
             {
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               },
-              "id":"546f5959-d85b-4425-8055-9707542e6283"
+              "id":"7cad48e8-8a8e-49d7-b182-8358680ab5a6"
             },
             {
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
               },
-              "id":"ff51e565-9445-4cd8-87fd-2b05b05d9584"
+              "id":"f415a58e-3d75-448a-977b-3261a49be7ad"
             }
           ],
           "otherReasons":"Another reason"
@@ -274,7 +276,6 @@
         },
         "receivedVia":"Online"
       },
-      "evidencePresent":"No",
       "sscsDocument":[
         {
           "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",

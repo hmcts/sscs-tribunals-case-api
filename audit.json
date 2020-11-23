@@ -305,5 +305,8 @@
   "90022_Application Error Disclosure_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/id/subscriptions/subscriptionId_DELETE" : "ignore",
   "100000_A Server Error response code was returned by the server_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/id/subscriptions/subscriptionId_DELETE" : "ignore",
   "10023_Information Disclosure - Debug Error Messages_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/id/subscriptions/subscriptionId_DELETE" : "ignore",
-  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/id/subscriptions/subscriptionId_DELETE" : "ignore"
+  "10010_Cookie No HttpOnly Flag_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/appeals/id/subscriptions/subscriptionId_DELETE" : "ignore",
+  "100000_A Client Error response code was returned by the server_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/document?url=https://www.example.com_GET" : "ignore",
+  "10054_Cookie Without SameSite Attribute_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/document?url=https://www.example.com_GET" : "ignore",
+  "100001_Unexpected Content-Type was returned_http://sscs-tribunals-api-aat.service.core-compute-aat.internal/document?url=https://www.example.com_GET" : "ignore"
 }

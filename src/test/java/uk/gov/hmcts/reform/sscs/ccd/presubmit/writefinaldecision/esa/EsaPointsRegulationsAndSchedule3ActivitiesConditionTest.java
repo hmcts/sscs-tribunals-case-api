@@ -116,9 +116,12 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
      *
      */
     private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean wcaAppeal, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
-        Boolean doesRegulation35Apply, boolean allowed, boolean supportGroupOnly) {
+        Boolean doesRegulation35Apply, boolean allowed, Boolean supportGroupOnly) {
         if (!wcaAppeal.booleanValue()) {
             return true;
+        }
+        if (supportGroupOnly == null) {
+            return false;
         }
         if (allowed && !supportGroupOnly) {
             if (points >= 15) {
@@ -144,27 +147,42 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
         return false;
     }
 
-    private boolean isValidCombinationExpected(int points, Boolean wcaAppeal, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
-        Boolean doesRegulation35Apply) {
+    private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
+        Boolean doesRegulation35Apply, Boolean supportGroupOnly) {
 
+        // If it's not a wca appeal we don't do any points-based validation - always valid
         if (!wcaAppeal.booleanValue()) {
             return true;
         }
+        // For WCA appeals, if points < 15
         if (points < 15) {
             if (doesRegulation29Apply == null) {
-                return false;
-            } else {
-                if (!doesRegulation29Apply.booleanValue()) {
-                    if (schedule3ActivitiesSelected != null) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else {
+                if (supportGroupOnly != null && supportGroupOnly) {
                     return isValidCombinationFromSelectSchedule3ActivitiesOnwards(schedule3ActivitiesSelected, doesRegulation35Apply);
+                } else {
+                    return false;
+                }
+            } else {
+                if (supportGroupOnly != null && supportGroupOnly) {
+                    return false;
+                } else {
+                    if (!doesRegulation29Apply.booleanValue()) {
+                        if (schedule3ActivitiesSelected != null) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    } else {
+                        return isValidCombinationFromSelectSchedule3ActivitiesOnwards(schedule3ActivitiesSelected, doesRegulation35Apply);
+                    }
                 }
             }
         } else {
+            // For WCA appeals, if points >= 15
+            if (supportGroupOnly != null && supportGroupOnly.booleanValue()) {
+                // If points >= 15 there must have been an error, because we skip the points pages and we should be
+                return false;
+            }
             if (doesRegulation29Apply != null) {
                 return false;
             }
@@ -194,7 +212,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
             maxPointsValue = 15;
         }
 
-        for (boolean supportGroupOnly : Arrays.asList(false, true)) {
+        for (Boolean supportGroupOnly : Arrays.asList(null, false, true)) {
 
             for (boolean allowed : Arrays.asList(false, true)) {
 
@@ -203,8 +221,8 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     int conditionApplicableCount = 0;
 
                     final boolean isValidCombinationExpected =
-                        isValidCombinationExpected(points, wcaAppeal, doesRegulation29Apply, schedule3ActivitiesSelected,
-                            doesRegulation35Apply);
+                        isValidPointsBasedCombinationExpected(points, wcaAppeal, doesRegulation29Apply, schedule3ActivitiesSelected,
+                            doesRegulation35Apply, supportGroupOnly);
 
                     List<String> schedule3Activities = null;
                     String schedule3ActivitesApply = null;
@@ -222,21 +240,22 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                         caseData = SscsCaseData.builder()
                             .wcaAppeal("Yes")
                             .writeFinalDecisionGenerateNotice("Yes")
-                            .supportGroupOnlyAppeal(supportGroupOnly ? "Yes" : "No")
+                            .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
-                            .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
-                            .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply))
-                            .esaSscsCaseData(
-                                SscsEsaCaseData.builder().dwpReassessTheAward(!wcaAppeal.booleanValue() ? "something" : null).esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
-                                    .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
+                            .dwpReassessTheAward(null)
+                            .sscsEsaCaseData(
+                                SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
+                                    .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities)
+                                    .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
+                                    .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build()).build();
                     } else {
                         caseData = SscsCaseData.builder()
                             .wcaAppeal("No")
                             .writeFinalDecisionGenerateNotice("Yes")
-                            .supportGroupOnlyAppeal(supportGroupOnly ? "Yes" : "No")
+                            .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
-                            .esaSscsCaseData(
-                                SscsEsaCaseData.builder().dwpReassessTheAward("something").esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
+                            .sscsEsaCaseData(
+                                SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
                     }
 
@@ -253,18 +272,18 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     }
 
                     Assert.assertEquals(
-                        "Expected 1 condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + " but "
+                        "Expected 1 condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly +  " but "
                             + conditionApplicableCount + " were satisfied",
                         1, conditionApplicableCount);
 
                     if (isValidCombinationExpected) {
 
                         Assert.assertTrue("Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
-                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly, matchingCondition
                             .getOptionalErrorMessage(questionService, caseData).isEmpty());
                     } else {
                         Assert.assertTrue("Expected an error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
-                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly, matchingCondition
                             .getOptionalErrorMessage(questionService, caseData).isPresent());
                     }
 
