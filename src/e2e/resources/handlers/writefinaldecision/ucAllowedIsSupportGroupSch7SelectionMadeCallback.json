@@ -49,7 +49,7 @@
       "ucWriteFinalDecisionPhysicalDisabilitiesQuestion":[
         "mobilisingUnaided"
       ],
-      "ucWriteFinalDecisionSchedule3ActivitiesQuestion":[
+      "ucWriteFinalDecisionSchedule7ActivitiesQuestion":[
         "schedule3MobilisingUnaided"
       ],
       "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
@@ -60,7 +60,7 @@
         }
       ],
       "writeFinalDecisionAnythingElse":"Anything else",
-      "ucWriteFinalDecisionSchedule3ActivitiesApply":"Yes",
+      "ucWriteFinalDecisionSchedule7ActivitiesApply":"Yes",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
