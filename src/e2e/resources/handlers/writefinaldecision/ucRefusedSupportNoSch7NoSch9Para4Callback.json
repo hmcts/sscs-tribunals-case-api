@@ -166,7 +166,7 @@
           "isAddressSameAsAppointee":"No"
         },
         "benefitType":{
-          "code":"ESA",
+          "code":"UC",
           "description":"Personal Independence Payment"
         },
         "hearingOptions":{
