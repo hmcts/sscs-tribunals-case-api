@@ -45,9 +45,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsUcCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
+import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.FooterService;
 
 @RunWith(JUnitParamsRunner.class)
 public class UcIssueFinalDecisionAboutToSubmitHandlerTest {

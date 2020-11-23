@@ -25,7 +25,7 @@ import uk.gov.hmcts.reform.sscs.functional.mya.BaseFunctionTest;
 
 @RunWith(JUnitParamsRunner.class)
 @TestPropertySource(locations = "classpath:config/application_e2e.properties")
-public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
+public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @ClassRule
     public static final SpringClassRule scr = new SpringClassRule();
