@@ -39,7 +39,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
     public void scenario1_refused_non_support_group_less_than_15pts_sch2_reg29NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaRefusedNonSupportGroupOnlyCallback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucRefusedNonSupportGroupOnlyCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -61,7 +61,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void scenario2_refused_isSupportGroup_noSch3_Reg29NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaRefusedSupportNoSch3NoReg35Callback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucRefusedSupportNoSch7NoSch9Para4Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -78,7 +78,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void scenario3_allowed_isSupportGroup_noSch3_Reg35Applies() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedSupportNoSch3NoReg35Callback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedSupportNoSch7NoSch9Para4Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -99,7 +99,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void scenario4_allowed_isSupportGroup_selectionMadeForSch3() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedIsSupportGroupSch3SelectionMadeCallback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedIsSupportGroupSch7SelectionMadeCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -120,7 +120,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void scenario5_allowed_notSupportGroup_moreThan15Points_noSch3_NoReg35() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonSupportGroupNoSch3NoReg35Callback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonSupportGroupNoSchNoSch9Para4Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -143,7 +143,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void scenario8_allowed_notSupportGroup_LessThan15PointsSch2_Reg29Applies_Reg35Applies() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNoSupportGroupLessThan15PointsReg29AndReg35AppliesCallback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupLessThan15PointsSch8Para4AndSch9Para4AppliesCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -174,7 +174,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         "doNotReassess18, The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today's date.",
     })
     public void scenario8_allowed_notSupportGroup_LessThan15PointsSch2_Reg29Applies_Reg35Applies_shouldHaveExpectedText(String code, String expectedText) throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaDwpReassessTheAwardCallback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucDwpReassessTheAwardCallback.json");
         json = json.replaceAll("DWP_REASSESS_THE_AWARD", code);
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -199,7 +199,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void scenario10_refused_nonWca() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonWcaCallback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonWcaCallback.json");
         json = json.replaceFirst("allowed", "refused");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -219,7 +219,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void scenario11_allowed_nonWcaAppeal() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonWcaCallback.json");
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonWcaCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);

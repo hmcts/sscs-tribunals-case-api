@@ -126,9 +126,9 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForEsa() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUc() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESA.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorUC.json", "START_DATE_PLACEHOLDER", "2018-10-10");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -165,17 +165,17 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
-        assertEquals(true, payload.isEsaIsEntited());
-        assertEquals("lower rate", payload.getEsaAwardRate());
-        Assert.assertNotNull(payload.getEsaSchedule2Descriptors());
-        assertEquals(1, payload.getEsaSchedule2Descriptors().size());
-        assertEquals(15, payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
-        assertEquals("a", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
-        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
-        assertEquals("1", payload.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
-        Assert.assertNotNull(payload.getEsaNumberOfPoints());
-        assertEquals(15, payload.getEsaNumberOfPoints().intValue());
+        assertEquals(true, payload.isUcIsEntited());
+        assertEquals("lower rate", payload.getUcAwardRate());
+        Assert.assertNotNull(payload.getUcSchedule6Descriptors());
+        assertEquals(1, payload.getUcSchedule6Descriptors().size());
+        assertEquals(15, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("a", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
+        assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
+        Assert.assertNotNull(payload.getUcNumberOfPoints());
+        assertEquals(15, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
@@ -346,9 +346,9 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     }
 
     @Test
-    public void callToMidEventCallback_willValidateTheDateEsa() throws Exception {
+    public void callToMidEventCallback_willValidateTheDateUc() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorESA.json", "START_DATE_PLACEHOLDER", "2019-10-10");
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorUC.json", "START_DATE_PLACEHOLDER", "2019-10-10");
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
         assertHttpStatus(response, HttpStatus.OK);

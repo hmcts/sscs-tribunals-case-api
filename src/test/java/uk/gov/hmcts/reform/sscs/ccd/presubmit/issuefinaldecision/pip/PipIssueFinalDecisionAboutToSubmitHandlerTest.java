@@ -110,9 +110,9 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
             .writeFinalDecisionPageSectionReference("")
             .writeFinalDecisionAnythingElse("something else")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
-            .sscsEsaCaseData(SscsEsaCaseData.builder().showRegulation29Page(YesNo.YES)
-                .showSchedule3ActivitiesPage(YesNo.YES).doesRegulation29Apply(YesNo.YES)
-                .doesRegulation35Apply(YesNo.YES).build())
+            .sscsUcCaseData(SscsUcCaseData.builder().showSchedule8Paragraph4Page(YesNo.YES)
+                .showSchedule7ActivitiesPage(YesNo.YES).doesSchedule8Paragraph4Apply(YesNo.YES)
+                .doesSchedule9Paragraph4Apply(YesNo.YES).build())
             .dwpReassessTheAward("")
             .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
             .writeFinalDecisionDetailsOfDecision("")
@@ -184,8 +184,8 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
-        assertNotNull(sscsCaseData.getSscsEsaCaseData().getShowRegulation29Page());
-        assertNotNull(sscsCaseData.getSscsEsaCaseData().getShowSchedule3ActivitiesPage());
+        assertNotNull(sscsCaseData.getSscsUcCaseData().getShowSchedule8Paragraph4Page());
+        assertNotNull(sscsCaseData.getSscsUcCaseData().getShowSchedule7ActivitiesPage());
         assertNotNull(sscsCaseData.getShowFinalDecisionNoticeSummaryOfOutcomePage());
         assertNotNull(sscsCaseData.getWriteFinalDecisionDetailsOfDecision());
     }
