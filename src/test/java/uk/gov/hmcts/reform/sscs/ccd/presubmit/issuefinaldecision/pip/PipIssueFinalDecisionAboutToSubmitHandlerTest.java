@@ -112,11 +112,11 @@ public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
             .sscsEsaCaseData(SscsEsaCaseData.builder().showRegulation29Page(YesNo.YES)
                 .showSchedule3ActivitiesPage(YesNo.YES).doesRegulation29Apply(YesNo.YES)
+                .wcaAppeal("")
                 .doesRegulation35Apply(YesNo.YES).build())
             .dwpReassessTheAward("")
             .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
             .writeFinalDecisionDetailsOfDecision("")
-            .wcaAppeal("")
             .supportGroupOnlyAppeal("")
 
 

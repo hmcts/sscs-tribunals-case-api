@@ -5,10 +5,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import junitparams.Parameters;
 import org.junit.Test;
 import uk.gov.hmcts.reform.idam.client.IdamClient;
@@ -24,11 +27,18 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
-    public PipWriteFinalDecisionPreviewDecisionServiceTest() {
+    protected PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
+    protected PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
+
+    public PipWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
         super("PIP");
+        this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
+        this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(pipDecisionNoticeQuestionService);
     }
 
     @Override
@@ -36,6 +46,18 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         DocumentConfiguration documentConfiguration) {
         return new PipWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, pipDecisionNoticeQuestionService,
             pipDecisionNoticeOutcomeService, documentConfiguration);
+    }
+
+    @Override
+    protected Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments() {
+        final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        final Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00485");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00483.docx");
+        Map<LanguagePreference, Map<EventType, String>> docs = new HashMap<>();
+        docs.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        docs.put(LanguagePreference.WELSH, welshEventTypeDocs);
+        return docs;
     }
 
     @Override

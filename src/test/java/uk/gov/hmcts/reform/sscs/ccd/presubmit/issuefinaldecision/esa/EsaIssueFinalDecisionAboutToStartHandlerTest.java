@@ -199,7 +199,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
-        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.getSscsEsaCaseData().setWcaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -237,7 +237,7 @@ public class EsaIssueFinalDecisionAboutToStartHandlerTest {
             esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
-        sscsCaseData.setWcaAppeal("No");
+        sscsCaseData.getSscsEsaCaseData().setWcaAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");

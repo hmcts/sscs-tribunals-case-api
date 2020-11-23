@@ -79,7 +79,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
             builder.esaIsEntited(false);
             builder.esaAwardRate(null);
-            Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
+            Optional<AwardType> esaAwardTypeOptional = caseData.getSscsEsaCaseData().isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
                 .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
             if (!esaAwardTypeOptional.isEmpty()) {
                 String esaAwardType = esaAwardTypeOptional.get().getKey();
@@ -107,6 +107,9 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+
+        builder.wcaAppeal(caseData.getSscsEsaCaseData().isWcaAppeal());
+
         List<Descriptor> allSchedule2Descriptors = new ArrayList<>();
         List<String> physicalDisabilityAnswers = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
         if (physicalDisabilityAnswers != null) {
@@ -120,7 +123,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         }
 
         if (allSchedule2Descriptors.isEmpty()) {
-            if (caseData.isWcaAppeal()) {
+            if (caseData.getSscsEsaCaseData().isWcaAppeal()) {
                 if (caseData.isSupportGroupOnlyAppeal()) {
                     builder.esaSchedule2Descriptors(null);
                     builder.esaNumberOfPoints(null);
