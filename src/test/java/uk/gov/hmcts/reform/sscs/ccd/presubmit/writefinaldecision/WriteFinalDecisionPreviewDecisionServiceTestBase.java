@@ -55,10 +55,6 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
@@ -94,59 +90,30 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected SscsCaseData sscsCaseData;
 
-    protected PipDecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
-
-    protected PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
-
-    protected EsaDecisionNoticeOutcomeService esaDecisionNoticeOutcomeService;
-
-    protected EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
 
     protected abstract WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
         DocumentConfiguration documentConfiguration);
+
+    protected abstract Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments();
 
     @Before
     public void setUp() throws IOException {
         openMocks(this);
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        final Map<EventType, String> englishEventTypePipDocs = new HashMap<>();
-        final Map<EventType, String> englishEventTypeEsaDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
         englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
-        englishEventTypeEsaDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642.docx");
-
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
-        Map<EventType, String> welshEventTypePipDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
         welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
-
-        welshEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
-
         final Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
-        final Map<LanguagePreference, Map<EventType, String>> pipDocuments =  new HashMap<>();
-        final Map<LanguagePreference, Map<EventType, String>> esaDocuments =  new HashMap<>();
-
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
         documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
-        pipDocuments.put(LanguagePreference.ENGLISH, englishEventTypePipDocs);
-        pipDocuments.put(LanguagePreference.WELSH, welshEventTypePipDocs);
-        esaDocuments.put(LanguagePreference.ENGLISH, englishEventTypeEsaDocs);
 
         documentConfiguration.setDocuments(documents);
 
         Map<String, Map<LanguagePreference, Map<EventType, String>>> benefitSpecificDocuments = new HashMap<>();
-        benefitSpecificDocuments.put("pip", pipDocuments);
-        benefitSpecificDocuments.put("esa", esaDocuments);
-
+        benefitSpecificDocuments.put(benefitType.toLowerCase(), getBenefitSpecificDocuments());
         documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
-
-        this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
-        this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(pipDecisionNoticeQuestionService);
-
-        this.esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
-
-        this.esaDecisionNoticeOutcomeService = new EsaDecisionNoticeOutcomeService(esaDecisionNoticeQuestionService);
 
         service = createPreviewDecisionService(generateFile, idamClient,
             documentConfiguration);
@@ -225,7 +192,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             new String[]{null, "notConsidered", "lower", "same"},
             new String[]{null, "notConsidered", "same", "same"},
             new String[]{null, "notConsidered", "higher", "same"},
-
         };
     }
 

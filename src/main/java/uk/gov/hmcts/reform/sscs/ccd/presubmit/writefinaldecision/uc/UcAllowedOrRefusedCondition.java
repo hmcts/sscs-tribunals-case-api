@@ -13,7 +13,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPre
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcPointsCondition.POINTS_LESS_THAN_FIFTEEN;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

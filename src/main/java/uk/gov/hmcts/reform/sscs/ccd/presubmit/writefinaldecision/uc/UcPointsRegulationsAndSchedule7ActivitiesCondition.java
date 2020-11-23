@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPre
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

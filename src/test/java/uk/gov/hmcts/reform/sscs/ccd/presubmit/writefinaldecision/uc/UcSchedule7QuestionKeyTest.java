@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
 import static org.mockito.MockitoAnnotations.openMocks;
 
-
 import java.util.Arrays;
 import java.util.function.Function;
 import junitparams.JUnitParamsRunner;

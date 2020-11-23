@@ -7,11 +7,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,17 +32,36 @@ import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
+import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
 
 public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDecisionPreviewDecisionServiceTestBase {
 
-    public UcWriteFinalDecisionPreviewDecisionServiceTest() {
+    protected UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService;
+    protected UcDecisionNoticeQuestionService ucDecisionNoticeQuestionService;
+
+    public UcWriteFinalDecisionPreviewDecisionServiceTest() throws IOException {
         super("UC");
+        this.ucDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
+        this.ucDecisionNoticeOutcomeService = new UcDecisionNoticeOutcomeService(ucDecisionNoticeQuestionService);
     }
 
     @Override
     protected WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
         DocumentConfiguration documentConfiguration) {
         return new UcWriteFinalDecisionPreviewDecisionService(generateFile, idamClient, ucDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
+    }
+
+    @Override
+    protected Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments() {
+        final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
+        final Map<EventType, String> welshEventTypeDocs = new HashMap<>();
+        welshEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642");
+        englishEventTypeDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642.docx");
+        Map<LanguagePreference, Map<EventType, String>> docs = new HashMap<>();
+        docs.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
+        docs.put(LanguagePreference.WELSH, welshEventTypeDocs);
+        return docs;
     }
 
     @Test
