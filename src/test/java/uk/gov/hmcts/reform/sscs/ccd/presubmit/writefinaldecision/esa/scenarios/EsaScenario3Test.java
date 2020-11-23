@@ -18,7 +18,7 @@ public class EsaScenario3Test {
                         .isAllowed(true)
                         .isSetAside(true)
                         .dateOfDecision("2020-09-20")
-                        .esaNumberOfPoints(15)
+                        .esaNumberOfPoints(null)
                         .pageNumber("A1")
                         .appellantName("Felix Sydney")
                         .regulation35Applicable(true)
@@ -38,7 +38,7 @@ public class EsaScenario3Test {
                 + "\n"
                 + "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.\n"
                 + "\n"
-                + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work and for work-related activity.\n"
+                + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
