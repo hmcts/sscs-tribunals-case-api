@@ -79,7 +79,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     private CaseDetails<SscsCaseData> caseDetails;
 
     @Mock
-    private UcDecisionNoticeOutcomeService esaDecisionNoticeOutcomeService;
+    private UcDecisionNoticeOutcomeService ucDecisionNoticeOutcomeService;
 
     @Mock
     private WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService;
@@ -101,11 +101,11 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         openMocks(this);
 
         Mockito.when(previewDecisionService.getBenefitType()).thenReturn("UC");
-        Mockito.when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
+        Mockito.when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         decisionNoticeService =
             new DecisionNoticeService(Arrays.asList(),
-                Arrays.asList(esaDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
+                Arrays.asList(ucDecisionNoticeOutcomeService), Arrays.asList(previewDecisionService));
 
         handler = new IssueFinalDecisionAboutToStartHandler(decisionNoticeService);
 
@@ -173,7 +173,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequest_willGeneratePreviewFile() {
 
-        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
+        when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         PreSubmitCallbackResponse response = new PreSubmitCallbackResponse(sscsCaseData);
 
@@ -187,25 +187,25 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenAboutToStartRequestDescriptorFlow_willGeneratePreviewFileWithoutUpdatingGeneratedDate() throws IOException {
 
-        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
+        when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         UcDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
 
         final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
+            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
 
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
-        sscsCaseData.setWcaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        when(esaDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+        when(ucDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -231,18 +231,18 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
 
         UcDecisionNoticeQuestionService esaDecisionNoticeQuestionService = new UcDecisionNoticeQuestionService();
 
-        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
+        when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         final UcWriteFinalDecisionPreviewDecisionService previewDecisionService = new UcWriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            esaDecisionNoticeQuestionService, esaDecisionNoticeOutcomeService, documentConfiguration);
+            esaDecisionNoticeQuestionService, ucDecisionNoticeOutcomeService, documentConfiguration);
 
         when(generateFile.assemble(any())).thenReturn(URL);
-        sscsCaseData.setWcaAppeal("No");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
 
-        when(esaDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
+        when(ucDecisionNoticeOutcomeService.determineOutcome(sscsCaseData)).thenReturn(Outcome.DECISION_IN_FAVOUR_OF_APPELLANT);
 
         final PreSubmitCallbackResponse<SscsCaseData> previewResponse = previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, USER_AUTHORISATION, true);
 
@@ -266,7 +266,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     @Test
     public void givenNoPreviewDecisionFoundOnCase_thenShowError() {
 
-        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
+        when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         sscsCaseData.setWriteFinalDecisionPreviewDocument(null);
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -278,7 +278,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
     @Test(expected = IllegalStateException.class)
     public void throwsExceptionIfItCannotHandleTheAppeal() {
 
-        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
+        when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
         handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -288,7 +288,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         boolean isDescriptorFlow, boolean isGenerateFile) {
         verify(generateFile, atLeastOnce()).assemble(capture.capture());
 
-        when(esaDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
+        when(ucDecisionNoticeOutcomeService.getBenefitType()).thenReturn("UC");
 
         NoticeIssuedTemplateBody payload = (NoticeIssuedTemplateBody) capture.getValue().getFormPayload();
         assertEquals(image, payload.getImage());
@@ -305,7 +305,7 @@ public class UcIssueFinalDecisionAboutToStartHandlerTest {
         assertEquals(allowed, body.isAllowed());
         assertEquals(isSetAside, body.isSetAside());
         assertNull(body.getDetailsOfDecision());
-        assertEquals(isDescriptorFlow, body.isWcaAppeal());
+        assertEquals(isDescriptorFlow, body.isLcwaAppeal());
 
         return payload;
     }

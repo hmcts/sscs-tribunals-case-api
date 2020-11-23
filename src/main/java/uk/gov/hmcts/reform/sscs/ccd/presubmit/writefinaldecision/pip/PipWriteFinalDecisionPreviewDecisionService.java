@@ -91,6 +91,8 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+        builder.isDescriptorFlow(caseData.isDailyLivingAndOrMobilityDecision());
+
         List<String> dailyLivingAnswers = PipActivityType.DAILY_LIVING.getAnswersExtractor().apply(caseData);
         if (dailyLivingAnswers != null && !AwardType.NOT_CONSIDERED.getKey().equals(caseData.getPipWriteFinalDecisionDailyLivingQuestion())) {
 

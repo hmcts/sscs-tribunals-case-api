@@ -99,7 +99,7 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     public void givenUcCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
             @Nullable String wcaFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.setWcaAppeal(wcaFlow);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(wcaFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 

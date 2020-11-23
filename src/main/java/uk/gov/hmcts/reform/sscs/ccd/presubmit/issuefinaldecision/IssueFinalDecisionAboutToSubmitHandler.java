@@ -193,7 +193,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
         sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
-        sscsCaseData.setWcaAppeal(null);
+        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
         sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(null);
@@ -225,7 +225,7 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
         sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
-        sscsCaseData.setWcaAppeal(null);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(null);
         sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(null);

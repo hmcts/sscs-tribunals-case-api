@@ -238,7 +238,6 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                     if (wcaAppeal.booleanValue()) {
 
                         caseData = SscsCaseData.builder()
-                            .wcaAppeal("Yes")
                             .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
@@ -246,16 +245,17 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                             .sscsUcCaseData(
                                 SscsUcCaseData.builder().ucWriteFinalDecisionSchedule7ActivitiesApply(schedule7ActivitesApply)
                                     .ucWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities)
+                                    .lcwaAppeal("Yes")
                                     .doesSchedule8Paragraph4Apply(getYesNoFieldValue(doesSchedule8Paragraph4Apply))
                                     .doesSchedule9Paragraph4Apply(getYesNoFieldValue(doesSchedule9Paragraph4Apply)).build()).build();
                     } else {
                         caseData = SscsCaseData.builder()
-                            .wcaAppeal("No")
                             .writeFinalDecisionGenerateNotice("Yes")
                             .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .sscsUcCaseData(
                                 SscsUcCaseData.builder().ucWriteFinalDecisionSchedule7ActivitiesApply(schedule7ActivitesApply)
+                                    .lcwaAppeal("No")
                                     .ucWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities).build()).build();
                     }
 

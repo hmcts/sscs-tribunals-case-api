@@ -132,8 +132,8 @@ public enum UcPointsRegulationsAndSchedule7ActivitiesCondition implements Points
     }
 
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate) {
-        return new YesNoFieldCondition("Wca Appeal", predicate,
-            sscsCaseData -> sscsCaseData.isWcaAppeal() ? YesNo.YES : YesNo.NO, false);
+        return new YesNoFieldCondition("Lcwa Appeal", predicate,
+            sscsCaseData -> sscsCaseData.getSscsUcCaseData().isLcwaAppeal() ? YesNo.YES : YesNo.NO, false);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {

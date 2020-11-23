@@ -211,8 +211,8 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
     }
 
     static YesNoFieldCondition isWcaAppeal(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
-        return new YesNoFieldCondition("Wca Appeal", predicate,
-            s -> s.isWcaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
+        return new YesNoFieldCondition("Lcwa Appeal", predicate,
+            s -> s.getSscsUcCaseData().isLcwaAppeal() ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
     }
 
     static YesNoFieldCondition isDwpReassessTheAward(Predicate<YesNo> predicate) {

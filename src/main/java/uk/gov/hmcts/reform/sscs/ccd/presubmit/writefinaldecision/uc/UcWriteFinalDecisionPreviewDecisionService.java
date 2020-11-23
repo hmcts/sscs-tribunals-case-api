@@ -79,7 +79,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
             builder.ucIsEntited(false);
             builder.ucAwardRate(null);
-            Optional<AwardType> ucAwardTypeOptional = caseData.isWcaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition
+            Optional<AwardType> ucAwardTypeOptional = caseData.getSscsUcCaseData().isLcwaAppeal() ? UcPointsRegulationsAndSchedule7ActivitiesCondition
                 .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
             if (!ucAwardTypeOptional.isEmpty()) {
                 String ucAwardType = ucAwardTypeOptional.get().getKey();
@@ -107,6 +107,9 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+        
+        builder.lcwaAppeal(caseData.getSscsUcCaseData().isLcwaAppeal());
+        
         List<Descriptor> allSchedule6Descriptors = new ArrayList<>();
         List<String> physicalDisabilityAnswers = UcActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
         if (physicalDisabilityAnswers != null) {
@@ -120,7 +123,7 @@ public class UcWriteFinalDecisionPreviewDecisionService extends WriteFinalDecisi
         }
 
         if (allSchedule6Descriptors.isEmpty()) {
-            if (caseData.isWcaAppeal()) {
+            if (caseData.getSscsUcCaseData().isLcwaAppeal()) {
                 if (caseData.isSupportGroupOnlyAppeal()) {
                     builder.ucSchedule6Descriptors(null);
                     builder.ucNumberOfPoints(null);
