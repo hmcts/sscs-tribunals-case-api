@@ -72,7 +72,7 @@ public class EsaScenario1Test {
                 .attendedHearing(true)
                 .presentingOfficerAttended(true)
                 .dateOfDecision("2020-09-20")
-                .esaNumberOfPoints(9)
+                .esaNumberOfPoints(0)
                 .pageNumber("A1")
                 .appellantName("Felix Sydney")
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
@@ -87,7 +87,7 @@ public class EsaScenario1Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work.\n"
             + "\n"
-            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.\n"
+            + "In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
