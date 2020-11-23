@@ -99,7 +99,7 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
             @Nullable String wcaFlow, YesNo expectedShowResult) {
 
-        sscsCaseData.setWcaAppeal(wcaFlow);
+        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(wcaFlow);
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
