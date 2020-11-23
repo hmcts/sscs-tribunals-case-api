@@ -24,9 +24,8 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "wcaAppeal" : "Yes",
+      "lcwaAppeal" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "wcaAppeal" : "Yes",
       "supportGroupOnlyAppeal" : "No",
       "writeFinalDecisionAllowedOrRefused" : "allowed",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",

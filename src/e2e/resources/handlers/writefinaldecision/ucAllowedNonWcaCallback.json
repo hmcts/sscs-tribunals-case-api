@@ -35,7 +35,7 @@
     "security_classification":"PUBLIC",
     "case_data":{
       "supportGroupOnlyAppeal":"No",
-      "wcaAppeal":"No",
+      "lcwaAppeal":"No",
       "writeFinalDecisionAllowedOrRefused":"allowed",
       "writeFinalDecisionGenerateNotice":"Yes",
       "writeFinalDecisionPresentingOfficerAttendedQuestion":"Yes",
