@@ -55,10 +55,10 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
+import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.UcDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
