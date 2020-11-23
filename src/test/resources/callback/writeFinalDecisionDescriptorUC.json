@@ -33,7 +33,7 @@
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "ucWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
       "ucWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "ucWriteFinalDecisionSchedule3ActivitiesApply" : "No",
+      "ucWriteFinalDecisionSchedule7ActivitiesApply" : "No",
       "doesSchedule9Paragraph4Apply" : "No",
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
@@ -182,7 +182,7 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
+          "code": "UC",
           "description": "Employment Support Allowance"
         },
         "receivedVia": "PAPER",
@@ -769,7 +769,7 @@
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "ucWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
       "ucWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "ucWriteFinalDecisionSchedule3ActivitiesApply" : "No",
+      "ucWriteFinalDecisionSchedule7ActivitiesApply" : "No",
       "doesSchedule9Paragraph4Apply" : "No",
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
@@ -914,7 +914,7 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
+          "code": "UC",
           "description": "Employment Support Allowance"
         },
         "receivedVia": "PAPER",
