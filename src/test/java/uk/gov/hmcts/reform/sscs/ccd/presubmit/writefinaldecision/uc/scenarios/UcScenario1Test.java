@@ -17,7 +17,7 @@ public class UcScenario1Test {
             Arrays.asList(Descriptor.builder()
                 .activityQuestionValue("Mobilising Unaided")
                 .activityAnswerValue("1")
-                .activityAnswerLetter("e").activityAnswerPoints(9).build());
+                .activityAnswerLetter("c").activityAnswerPoints(9).build());
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
