@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -24,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
+import uk.gov.hmcts.reform.sscs.exception.DocumentNotFoundException;
 import uk.gov.hmcts.reform.sscs.service.pdf.data.UploadedEvidence;
 
 @RunWith(JUnitParamsRunner.class)
@@ -88,6 +91,26 @@ public class DocumentDownloadServiceTest {
     }
 
     @Test
+    public void canGetUploadedEvidence() {
+        Resource expectedResource = mock(Resource.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        String filename = "filename";
+        headers.add("originalfilename", filename);
+        String contentType = "application/pdf";
+        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
+        ResponseEntity<Resource> expectedResponse = new ResponseEntity<>(expectedResource, headers, HttpStatus.OK);
+
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willReturn(expectedResponse);
+
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        UploadedEvidence downloadFile = documentDownloadService.getUploadedEvidence(urlString);
+
+        assertThat(downloadFile, is(new UploadedEvidence(expectedResource, filename, contentType)));
+    }
+
+    @Test
     public void canDownloadFile() {
         Resource expectedResource = mock(Resource.class);
 
@@ -102,9 +125,29 @@ public class DocumentDownloadServiceTest {
                 .willReturn(expectedResponse);
 
         String urlString = "http://somedomain/documents/someDocId/binary";
-        UploadedEvidence downloadFile = documentDownloadService.downloadFile(urlString);
+        ResponseEntity<Resource> downloadFile = documentDownloadService.downloadFile(urlString);
 
-        assertThat(downloadFile, is(new UploadedEvidence(expectedResource, filename, contentType)));
+        assertThat(downloadFile.getStatusCode(), is(HttpStatus.OK));
+        assertThat(downloadFile.getBody(), equalTo(expectedResource));
+        assertTrue(downloadFile.getHeaders().get(HttpHeaders.CONTENT_TYPE).contains(contentType));
+    }
+
+    @Test(expected = DocumentNotFoundException.class)
+    public void expectedExceptionForNullDownloadFile() {
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willReturn(null);
+
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        documentDownloadService.downloadFile(urlString);
+    }
+
+    @Test(expected = DocumentNotFoundException.class)
+    public void expectedExceptionForError() {
+        given(documentDownloadClientApi.downloadBinary(any(), any(), any(), any(), any()))
+                .willThrow();
+
+        String urlString = "http://somedomain/documents/someDocId/binary";
+        documentDownloadService.downloadFile(urlString);
     }
 
     @SuppressWarnings("unused")
