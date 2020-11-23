@@ -34,7 +34,7 @@ public class UcScenario10Test {
                 .attendedHearing(true)
                 .presentingOfficerAttended(true)
                 .isAllowed(isAllowed)
-                .wcaAppeal(false)
+                .lcwaAppeal(false)
                 .dateOfDecision("2020-09-20")
                 .ucNumberOfPoints(0)
                 .pageNumber("A1")
