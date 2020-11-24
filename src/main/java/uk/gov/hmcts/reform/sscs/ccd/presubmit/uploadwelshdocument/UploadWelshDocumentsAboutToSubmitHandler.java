@@ -141,11 +141,6 @@ public class UploadWelshDocumentsAboutToSubmitHandler implements PreSubmitCallba
     }
 
     private String getNextEvent(SscsCaseData caseData, String documentType) {
-        if (DocumentType.URGENT_HEARING_REQUEST.getValue().equalsIgnoreCase(documentType) && "Yes".equalsIgnoreCase(caseData.getUrgentCase())) {
-            return null;
-        } else {
-            return nextEventMap.get(documentType);
-        }
+        return nextEventMap.get(documentType);
     }
-
 }
