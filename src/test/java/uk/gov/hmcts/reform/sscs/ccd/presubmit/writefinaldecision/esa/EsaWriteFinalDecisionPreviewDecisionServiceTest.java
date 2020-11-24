@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,9 +27,12 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
+import uk.gov.hmcts.reform.sscs.model.docassembly.DescriptorTable;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
+import uk.gov.hmcts.reform.sscs.model.docassembly.TemplateComponent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
 import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
@@ -131,6 +135,80 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertEquals(EsaScenario.SCENARIO_1, templateContent.getScenario());
 
         assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        Optional<TemplateComponent<?>> schedule2DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> EsaTemplateComponentId.SCHEDULE_2_DESCRIPTORS.name().equals(c.getId())).findFirst();
+        Assert.assertNotNull(schedule2DescriptorTable);
+        Assert.assertTrue(schedule2DescriptorTable.isPresent());
+        DescriptorTable table = (DescriptorTable)schedule2DescriptorTable.get();
+        Assert.assertEquals(1, table.getContent().size());
+    }
+
+    @Test
+    public void willSetPreviewFile_WhenRefusedAndNoAwardWhenZeroPoints() {
+
+        String endDate = "2018-11-10";
+        setCommonPreviewParams(sscsCaseData, endDate);
+
+        sscsCaseData.getSscsEsaCaseData().setWcaAppeal("Yes");
+        sscsCaseData.setSupportGroupOnlyAppeal("No");
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(YesNo.NO);
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+
+        final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
+
+        assertNotNull(response.getData().getWriteFinalDecisionPreviewDocument());
+        assertEquals(DocumentLink.builder()
+            .documentFilename(String.format("Draft Decision Notice generated on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY"))))
+            .documentBinaryUrl(URL + "/binary")
+            .documentUrl(URL)
+            .build(), response.getData().getWriteFinalDecisionPreviewDocument());
+
+        boolean appealAllowedExpectation = false;
+
+        boolean setAsideExpectation = false;
+
+        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",
+            appealAllowedExpectation, setAsideExpectation, true, true, true, documentConfiguration.getBenefitSpecificDocuments().get("esa").get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
+
+        assertTrue(payload.getWriteFinalDecisionTemplateBody().isWcaAppeal());
+
+        assertEquals("Judge Full Name", payload.getUserName());
+        assertEquals("DRAFT DECISION NOTICE", payload.getNoticeType());
+
+        WriteFinalDecisionTemplateBody body = payload.getWriteFinalDecisionTemplateBody();
+
+        assertNotNull(body);
+
+        // Common assertions
+        assertCommonPreviewParams(body, endDate, false);
+
+        assertEquals("no award", body.getEsaAwardRate());
+
+        assertNotNull(body.getEsaSchedule2Descriptors());
+        assertNull(body.getEsaSchedule3Descriptors());
+        assertEquals(0, body.getEsaSchedule2Descriptors().size());
+        assertNotNull(body.getEsaNumberOfPoints());
+        assertEquals(0, body.getEsaNumberOfPoints().intValue());
+
+        assertFalse(body.isEsaIsEntited());
+        assertNull(payload.getDateIssued());
+        assertEquals(LocalDate.now(), payload.getGeneratedDate());
+        assertNull(sscsCaseData.getWriteFinalDecisionEndDateType());
+
+        assertNotNull(payload.getWriteFinalDecisionTemplateContent());
+        assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof EsaTemplateContent);
+        EsaTemplateContent templateContent = (EsaTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertEquals(EsaScenario.SCENARIO_1, templateContent.getScenario());
+
+        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        Optional<TemplateComponent<?>> schedule2DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> EsaTemplateComponentId.SCHEDULE_2_DESCRIPTORS.name().equals(c.getId())).findFirst();
+        Assert.assertNotNull(schedule2DescriptorTable);
+        Assert.assertTrue(schedule2DescriptorTable.isPresent());
+        DescriptorTable table = (DescriptorTable)schedule2DescriptorTable.get();
+        Assert.assertEquals(0, table.getContent().size());
     }
 
     @Test
@@ -1560,8 +1638,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points awarded for this question - low, which means regulation 29 must apply
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+        // 9 points awarded for this question - low, which means regulation 29 must apply
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -1596,13 +1674,13 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNotNull(body.getEsaSchedule2Descriptors());
         assertEquals(1, body.getEsaSchedule2Descriptors().size());
         assertNotNull(body.getEsaSchedule2Descriptors().get(0));
-        assertEquals(0, body.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
-        assertEquals("e", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
-        assertEquals("None of the above applies.", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
+        assertEquals(9, body.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
         assertNotNull(body.getEsaNumberOfPoints());
-        assertEquals(0, body.getEsaNumberOfPoints().intValue());
+        assertEquals(9, body.getEsaNumberOfPoints().intValue());
 
         assertTrue(body.isEsaIsEntited());
         assertNull(body.getDwpReassessTheAward());
@@ -1759,8 +1837,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points awarded for this question - low, which means regulation 29 must apply
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+        // 9 points awarded for this question - low, which means regulation 29 must apply
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -1795,13 +1873,13 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNotNull(body.getEsaSchedule2Descriptors());
         assertEquals(1, body.getEsaSchedule2Descriptors().size());
         assertNotNull(body.getEsaSchedule2Descriptors().get(0));
-        assertEquals(0, body.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
-        assertEquals("e", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
-        assertEquals("None of the above applies.", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
+        assertEquals(9, body.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
         assertNotNull(body.getEsaNumberOfPoints());
-        assertEquals(0, body.getEsaNumberOfPoints().intValue());
+        assertEquals(9, body.getEsaNumberOfPoints().intValue());
 
         assertTrue(body.isEsaIsEntited());
         assertNull(body.getDwpReassessTheAward());
@@ -1962,8 +2040,8 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
 
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(Arrays.asList("mobilisingUnaided"));
 
-        // 0 points awarded for this question - low, which means regulation 29 must apply
-        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1e");
+        // 9 points awarded for this question - low, which means regulation 29 must apply
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMobilisingUnaidedQuestion("mobilisingUnaided1c");
 
         final PreSubmitCallbackResponse<SscsCaseData> response = service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, false);
 
@@ -1998,13 +2076,13 @@ public class EsaWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
         assertNotNull(body.getEsaSchedule2Descriptors());
         assertEquals(1, body.getEsaSchedule2Descriptors().size());
         assertNotNull(body.getEsaSchedule2Descriptors().get(0));
-        assertEquals(0, body.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
-        assertEquals("e", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
-        assertEquals("None of the above applies.", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
+        assertEquals(9, body.getEsaSchedule2Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", body.getEsaSchedule2Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", body.getEsaSchedule2Descriptors().get(0).getActivityQuestionNumber());
         assertNotNull(body.getEsaNumberOfPoints());
-        assertEquals(0, body.getEsaNumberOfPoints().intValue());
+        assertEquals(9, body.getEsaNumberOfPoints().intValue());
 
         assertTrue(body.isEsaIsEntited());
         assertNull(body.getDwpReassessTheAward());

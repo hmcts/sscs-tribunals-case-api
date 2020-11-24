@@ -122,6 +122,12 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             allSchedule2Descriptors.addAll(mentalAssessmentDescriptors);
         }
 
+        // Don't add descriptors to the template if the total points in schedule 2 are zero
+        int totalPoints = allSchedule2Descriptors.stream().mapToInt(d -> d.getActivityAnswerPoints()).sum();
+        if (totalPoints == 0) {
+            allSchedule2Descriptors.clear();
+        }
+
         if (allSchedule2Descriptors.isEmpty()) {
             if (caseData.getSscsEsaCaseData().isWcaAppeal()) {
                 if (caseData.isSupportGroupOnlyAppeal()) {
