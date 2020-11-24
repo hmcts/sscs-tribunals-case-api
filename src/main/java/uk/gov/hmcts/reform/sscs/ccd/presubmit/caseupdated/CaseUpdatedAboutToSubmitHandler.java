@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.caseupdated;
 
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Optional;
@@ -82,20 +83,21 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
     private PreSubmitCallbackResponse<SscsCaseData> checkFirstCharacterForEachAddressField(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> response) {
 
         Appeal appeal = sscsCaseData.getAppeal();
+        String caseId = sscsCaseData.getCcdCaseId();
 
         if (appeal.getAppellant() != null && appeal.getAppellant().getAddress() != null
                 && isInvalidAddress(appeal.getAppellant().getAddress())) {
-            return addAddressError(response);
+            return addAddressError("appellant", caseId, response);
         }
         if (appeal.getRep() != null && appeal.getRep().getAddress() != null && isInvalidAddress(appeal.getRep().getAddress())) {
-            return addAddressError(response);
+            return addAddressError("representative", caseId, response);
         }
         if (appeal.getAppellant().getAppointee() != null && appeal.getAppellant().getAppointee().getAddress() != null
                 && isInvalidAddress(appeal.getAppellant().getAppointee().getAddress())) {
-            return addAddressError(response);
+            return addAddressError("appointee", caseId, response);
         }
         if (sscsCaseData.getJointPartyAddress() != null && isInvalidAddress(sscsCaseData.getJointPartyAddress())) {
-            return addAddressError(response);
+            return addAddressError("joint party", caseId, response);
         }
         return response;
     }
@@ -113,7 +115,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private PreSubmitCallbackResponse<SscsCaseData> addAddressError(PreSubmitCallbackResponse<SscsCaseData> response) {
+    private PreSubmitCallbackResponse<SscsCaseData> addAddressError(String party, String caseId, PreSubmitCallbackResponse<SscsCaseData> response) {
+        log.error(format("caseUpdated event failed for case id %s: Invalid characters are being used at the beginning of %s address fields", caseId, party));
         response.addError("Invalid characters are being used at the beginning of address fields, please correct");
         return response;
     }
