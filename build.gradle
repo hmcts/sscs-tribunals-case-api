@@ -131,21 +131,21 @@ dependencyCheck {
 
 repositories {
 
+    mavenLocal()
     maven {
         url "https://dl.bintray.com/hmcts/hmcts-maven"
     }
-
-    maven {
-        url 'https://repo.spring.io/libs-milestone'
-    }
+    mavenCentral()
 
     jcenter()
-    mavenCentral()
 
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
     maven { url 'https://jitpack.io' }
-    mavenLocal()
+    // Requires authentication, if it gets here the library cannot be found!
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
 }
 
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
@@ -207,7 +207,7 @@ ext {
 dependencyManagement {
     dependencies {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
+        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.0'
         // resolves: CVE-2020-9489
         dependency group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
@@ -281,8 +281,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.6'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.0'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.15'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.6'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.16'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 

@@ -13,6 +13,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.DIRECTION_ACTION_REQUIRED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_INFORMATION;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
 
 import com.google.common.collect.ImmutableSet;
 import java.time.LocalDate;
@@ -403,32 +404,12 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenDirectionTypeOfGrantUrgentHearingAndNotInterlocReview_setState() {
-
-        handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false, dwpAddressLookupService);
-
-        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
-        callback.getCaseDetails().getCaseData().setPreviousState(State.APPEAL_CREATED);
-        callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
-        callback.getCaseDetails().getCaseData().setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
-        callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
-
-        callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.GRANT_URGENT_HEARING.getCode()));
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertTrue(response.getData().getState().equals(State.APPEAL_CREATED));
-        assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.GRANTED.getValue()));
-        assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
-        assertNull(response.getData().getInterlocReviewState());
-    }
-
-    @Test
     public void givenDirectionTypeOfGrantUrgentHearingAndInterlocReview_setState() {
 
         handler = new DirectionIssuedAboutToSubmitHandler(footerService, serviceRequestExecutor, "https://sscs-bulk-scan.net", "/validate", false, dwpAddressLookupService);
 
-        callback.getCaseDetails().getCaseData().setState(State.DORMANT_APPEAL_STATE);
-        callback.getCaseDetails().getCaseData().setPreviousState(State.INTERLOCUTORY_REVIEW_STATE);
+        callback.getCaseDetails().getCaseData().setState(State.INTERLOCUTORY_REVIEW_STATE);
+        callback.getCaseDetails().getCaseData().setPreviousState(State.DORMANT_APPEAL_STATE);
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
         callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
@@ -458,7 +439,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
 
         assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
         assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.REFUSED.getValue()));
-        assertNull(response.getData().getInterlocReviewState());
+        assertTrue(response.getData().getInterlocReviewState().equals(NONE.getId()));
         assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
     }
 

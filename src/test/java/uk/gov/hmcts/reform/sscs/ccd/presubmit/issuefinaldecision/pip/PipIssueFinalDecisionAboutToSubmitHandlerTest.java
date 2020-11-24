@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.pip;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,12 +28,14 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
 import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
+import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
-public class IssueFinalDecisionAboutToSubmitHandlerTest {
+public class PipIssueFinalDecisionAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
     private IssueFinalDecisionAboutToSubmitHandler handler;
@@ -60,9 +62,9 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
+        pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService(new PipDecisionNoticeQuestionService());
 
-        decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService));
+        decisionNoticeService = new DecisionNoticeService(new ArrayList<>(), Arrays.asList(pipDecisionNoticeOutcomeService), new ArrayList<>());
 
         handler = new IssueFinalDecisionAboutToSubmitHandler(footerService, decisionNoticeService, validator);
 
@@ -76,6 +78,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
             .appeal(Appeal.builder().benefitType(BenefitType.builder().code("PIP").build()).build())
             .sscsDocument(documentList)
+            .writeFinalDecisionGenerateNotice("")
             .writeFinalDecisionTypeOfHearing("")
             .writeFinalDecisionPresentingOfficerAttendedQuestion("")
             .writeFinalDecisionAppellantAttendedQuestion("")
@@ -107,6 +110,16 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
             .writeFinalDecisionPageSectionReference("")
             .writeFinalDecisionAnythingElse("something else")
             .writeFinalDecisionPreviewDocument(DocumentLink.builder().build())
+            .sscsEsaCaseData(SscsEsaCaseData.builder().showRegulation29Page(YesNo.YES)
+                .showSchedule3ActivitiesPage(YesNo.YES).doesRegulation29Apply(YesNo.YES)
+                .wcaAppeal("")
+                .doesRegulation35Apply(YesNo.YES).build())
+            .dwpReassessTheAward("")
+            .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
+            .writeFinalDecisionDetailsOfDecision("")
+            .supportGroupOnlyAppeal("")
+
+
             .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -171,6 +184,10 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionGeneratedDate());
         assertNotNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
+        assertNotNull(sscsCaseData.getSscsEsaCaseData().getShowRegulation29Page());
+        assertNotNull(sscsCaseData.getSscsEsaCaseData().getShowSchedule3ActivitiesPage());
+        assertNotNull(sscsCaseData.getShowFinalDecisionNoticeSummaryOfOutcomePage());
+        assertNotNull(sscsCaseData.getWriteFinalDecisionDetailsOfDecision());
     }
 
     @Test
@@ -455,6 +472,7 @@ public class IssueFinalDecisionAboutToSubmitHandlerTest {
         assertNull(sscsCaseData.getWriteFinalDecisionIsDescriptorFlow());
         assertNull(sscsCaseData.getWriteFinalDecisionAllowedOrRefused());
         assertNull(sscsCaseData.getWriteFinalDecisionAnythingElse());
+        assertNull(sscsCaseData.getWriteFinalDecisionDetailsOfDecision());
     }
 
     @Test

@@ -55,19 +55,13 @@ import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.GenerateFileParams;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.EsaDecisionNoticeQuestionService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeOutcomeService;
-import uk.gov.hmcts.reform.sscs.service.PipDecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
 public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected static final String USER_AUTHORISATION = "Bearer token";
     protected static final String URL = "http://dm-store/documents/123";
-    protected WriteFinalDecisionPreviewDecisionService service;
+    protected WriteFinalDecisionPreviewDecisionServiceBase service;
     protected String benefitType;
 
     protected WriteFinalDecisionPreviewDecisionServiceTestBase(String benefitType) {
@@ -96,63 +90,33 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
     protected SscsCaseData sscsCaseData;
 
-    protected DecisionNoticeOutcomeService pipDecisionNoticeOutcomeService;
 
-    protected PipDecisionNoticeQuestionService pipDecisionNoticeQuestionService;
+    protected abstract WriteFinalDecisionPreviewDecisionServiceBase createPreviewDecisionService(GenerateFile generateFile, IdamClient idamClient,
+        DocumentConfiguration documentConfiguration);
 
-    protected DecisionNoticeOutcomeService esaDecisionNoticeOutcomeService;
-
-    protected EsaDecisionNoticeQuestionService esaDecisionNoticeQuestionService;
-    
+    protected abstract Map<LanguagePreference, Map<EventType, String>> getBenefitSpecificDocuments();
 
     @Before
     public void setUp() throws IOException {
         openMocks(this);
         final Map<EventType, String> englishEventTypeDocs = new HashMap<>();
-        final Map<EventType, String> englishEventTypePipDocs = new HashMap<>();
-        final Map<EventType, String> englishEventTypeEsaDocs = new HashMap<>();
         englishEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
         englishEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-ENG-00091.docx");
-        englishEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00453.docx");
-        englishEventTypeEsaDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-ENG-00642.docx");
-
         Map<EventType, String> welshEventTypeDocs = new HashMap<>();
-        Map<EventType, String> welshEventTypePipDocs = new HashMap<>();
         welshEventTypeDocs.put(EventType.DIRECTION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
         welshEventTypeDocs.put(EventType.DECISION_ISSUED, "TB-SCS-GNO-WEL-00485.docx");
-
-        welshEventTypePipDocs.put(EventType.ISSUE_FINAL_DECISION, "TB-SCS-GNO-WEL-00485.docx");
-
         final Map<LanguagePreference, Map<EventType, String>> documents =  new HashMap<>();
-        final Map<LanguagePreference, Map<EventType, String>> pipDocuments =  new HashMap<>();
-        final Map<LanguagePreference, Map<EventType, String>> esaDocuments =  new HashMap<>();
-
         documents.put(LanguagePreference.ENGLISH, englishEventTypeDocs);
         documents.put(LanguagePreference.WELSH, welshEventTypeDocs);
-        pipDocuments.put(LanguagePreference.ENGLISH, englishEventTypePipDocs);
-        pipDocuments.put(LanguagePreference.WELSH, welshEventTypePipDocs);
-        esaDocuments.put(LanguagePreference.ENGLISH, englishEventTypeEsaDocs);
 
         documentConfiguration.setDocuments(documents);
 
         Map<String, Map<LanguagePreference, Map<EventType, String>>> benefitSpecificDocuments = new HashMap<>();
-        benefitSpecificDocuments.put("pip", pipDocuments);
-        benefitSpecificDocuments.put("esa", esaDocuments);
-
+        benefitSpecificDocuments.put(benefitType.toLowerCase(), getBenefitSpecificDocuments());
         documentConfiguration.setBenefitSpecificDocuments(benefitSpecificDocuments);
 
-        this.pipDecisionNoticeOutcomeService = new PipDecisionNoticeOutcomeService();
-        this.pipDecisionNoticeQuestionService = new PipDecisionNoticeQuestionService();
-
-        this.esaDecisionNoticeQuestionService = new EsaDecisionNoticeQuestionService();
-
-        this.esaDecisionNoticeOutcomeService = new EsaDecisionNoticeOutcomeService(esaDecisionNoticeQuestionService);
-
-        DecisionNoticeService decisionNoticeService = new DecisionNoticeService(Arrays.asList(pipDecisionNoticeQuestionService, esaDecisionNoticeQuestionService),
-            Arrays.asList(pipDecisionNoticeOutcomeService, esaDecisionNoticeOutcomeService));
-
-        service = new WriteFinalDecisionPreviewDecisionService(generateFile, idamClient,
-            decisionNoticeService, documentConfiguration);
+        service = createPreviewDecisionService(generateFile, idamClient,
+            documentConfiguration);
 
         when(callback.getEvent()).thenReturn(EventType.WRITE_FINAL_DECISION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -182,6 +146,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
 
         when(generateFile.assemble(any())).thenReturn(URL);
     }
+
 
     @NamedParameters("previewEndDateAndRateCombinations")
     @SuppressWarnings("unused")
@@ -227,7 +192,6 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
             new String[]{null, "notConsidered", "lower", "same"},
             new String[]{null, "notConsidered", "same", "same"},
             new String[]{null, "notConsidered", "higher", "same"},
-
         };
     }
 
@@ -889,54 +853,13 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     }
 
     @Test
-    public void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true, false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetGeneratedNonDescriptorFlow_thenSetNewGeneratedDate();
 
     @Test
-    public void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("yes", sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10", true, true, true,
-            true, false, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetNonGeneratedDescriptorFlow_thenDoSetNewGeneratedDate();
 
     @Test
-    public void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate() {
-        setDescriptorFlowIndicator("no", sscsCaseData);
-        setHigherRateScenarioFields(sscsCaseData);
-        sscsCaseData.setWriteFinalDecisionGenerateNotice("no");
-        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
-        sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");
-        sscsCaseData.setWriteFinalDecisionGeneratedDate("2018-10-10");
-
-        service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
-
-        NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-            false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.ENGLISH).get(EventType.ISSUE_FINAL_DECISION));
-
-        assertEquals(LocalDate.now().toString(), payload.getGeneratedDate().toString());
-    }
+    public abstract void givenGeneratedDateIsAlreadySetNonGeneratedNonDescriptorFlow_thenDoSetNewGeneratedDate();
 
     @Test
     public void givenWelsh_GeneratedDateIsAlreadySet_thenDoNotSetNewGeneratedDate() {
@@ -950,7 +873,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
         service.preview(callback, DocumentType.DRAFT_DECISION_NOTICE, USER_AUTHORISATION, true);
 
         NoticeIssuedTemplateBody payload = verifyTemplateBody(NoticeIssuedTemplateBody.ENGLISH_IMAGE, "Appellant Lastname", null, "2018-10-10",  true, true, true,
-                false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
+            false, true, documentConfiguration.getBenefitSpecificDocuments().get(benefitType.toLowerCase()).get(LanguagePreference.WELSH).get(EventType.ISSUE_FINAL_DECISION));
 
         assertEquals(LocalDate.now(), payload.getGeneratedDate());
     }

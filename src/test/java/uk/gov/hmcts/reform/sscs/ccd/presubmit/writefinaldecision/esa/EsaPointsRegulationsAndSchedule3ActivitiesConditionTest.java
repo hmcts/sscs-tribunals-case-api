@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -33,37 +34,66 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
         openMocks(this);
     }
 
-    @NamedParameters("scheduleAndRegulationQuestionCombinations")
+    @NamedParameters("wcaAppealAndScheduleAndRegulationQuestionCombinations")
     @SuppressWarnings("unused")
-    private Object[] scheduleAndRegulationQuestionCombinations() {
+    private Object[] wcaAppealAndScheduleAndRegulationQuestionCombinations() {
         return new Object[] {
-            new Boolean[] {null, null, null},
-            new Boolean[] {null, null, false},
-            new Boolean[] {null, null, true},
-            new Boolean[] {null, false, null},
-            new Boolean[] {null, false, false},
-            new Boolean[] {null, false, true},
-            new Boolean[] {null, true, null},
-            new Boolean[] {null, true, false},
-            new Boolean[] {null, true, true},
-            new Boolean[] {false, null, null},
-            new Boolean[] {false, null, false},
-            new Boolean[] {false, null, true},
-            new Boolean[] {false, false, null},
-            new Boolean[] {false, false, false},
-            new Boolean[] {false, false, true},
-            new Boolean[] {false, true, null},
-            new Boolean[] {false, true, false},
-            new Boolean[] {false, true, true},
-            new Boolean[] {true, null, null},
-            new Boolean[] {true, null, false},
-            new Boolean[] {true, null, true},
-            new Boolean[] {true, false, null},
-            new Boolean[] {true, false, false},
-            new Boolean[] {true, false, true},
-            new Boolean[] {true, true, null},
-            new Boolean[] {true, true, false},
-            new Boolean[] {true, true, true},
+            new Boolean[] {false, null, null, null},
+            new Boolean[] {false, null, null, false},
+            new Boolean[] {false, null, null, true},
+            new Boolean[] {false, null, false, null},
+            new Boolean[] {false, null, false, false},
+            new Boolean[] {false, null, false, true},
+            new Boolean[] {false, null, true, null},
+            new Boolean[] {false, null, true, false},
+            new Boolean[] {false, null, true, true},
+            new Boolean[] {false, false, null, null},
+            new Boolean[] {false, false, null, false},
+            new Boolean[] {false, false, null, true},
+            new Boolean[] {false, false, false, null},
+            new Boolean[] {false, false, false, false},
+            new Boolean[] {false, false, false, true},
+            new Boolean[] {false, false, true, null},
+            new Boolean[] {false, false, true, false},
+            new Boolean[] {false, false, true, true},
+            new Boolean[] {false, true, null, null},
+            new Boolean[] {false, true, null, false},
+            new Boolean[] {false, true, null, true},
+            new Boolean[] {false, true, false, null},
+            new Boolean[] {false, true, false, false},
+            new Boolean[] {false, true, false, true},
+            new Boolean[] {false, true, true, null},
+            new Boolean[] {false, true, true, false},
+            new Boolean[] {false, true, true, true},
+
+            new Boolean[] {true, null, null, null},
+            new Boolean[] {true, null, null, false},
+            new Boolean[] {true, null, null, true},
+            new Boolean[] {true, null, false, null},
+            new Boolean[] {true, null, false, false},
+            new Boolean[] {true, null, false, true},
+            new Boolean[] {true, null, true, null},
+            new Boolean[] {true, null, true, false},
+            new Boolean[] {true, null, true, true},
+            new Boolean[] {true, false, null, null},
+            new Boolean[] {true, false, null, false},
+            new Boolean[] {true, false, null, true},
+            new Boolean[] {true, false, false, null},
+            new Boolean[] {true, false, false, false},
+            new Boolean[] {true, false, false, true},
+            new Boolean[] {true, false, true, null},
+            new Boolean[] {true, false, true, false},
+            new Boolean[] {true, false, true, true},
+            new Boolean[] {true, true, null, null},
+            new Boolean[] {true, true, null, false},
+            new Boolean[] {true, true, null, true},
+            new Boolean[] {true, true, false, null},
+            new Boolean[] {true, true, false, false},
+            new Boolean[] {true, true, false, true},
+            new Boolean[] {true, true, true, null},
+            new Boolean[] {true, true, true, false},
+            new Boolean[] {true, true, true, true},
+
         };
     }
 
@@ -85,8 +115,14 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
      * If refused no sch 3 activity and Reg 35 doesn’t apply.
      *
      */
-    private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
-        Boolean doesRegulation35Apply, boolean allowed, boolean supportGroupOnly) {
+    private boolean isValidAllowedOrRefusedCombinationExpected(int points, Boolean wcaAppeal, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
+        Boolean doesRegulation35Apply, boolean allowed, Boolean supportGroupOnly) {
+        if (!wcaAppeal.booleanValue()) {
+            return true;
+        }
+        if (supportGroupOnly == null) {
+            return false;
+        }
         if (allowed && !supportGroupOnly) {
             if (points >= 15) {
                 return true;
@@ -111,24 +147,42 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
         return false;
     }
 
-    private boolean isValidCombinationExpected(int points, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
-        Boolean doesRegulation35Apply) {
+    private boolean isValidPointsBasedCombinationExpected(int points, Boolean wcaAppeal, Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
+        Boolean doesRegulation35Apply, Boolean supportGroupOnly) {
 
+        // If it's not a wca appeal we don't do any points-based validation - always valid
+        if (!wcaAppeal.booleanValue()) {
+            return true;
+        }
+        // For WCA appeals, if points < 15
         if (points < 15) {
             if (doesRegulation29Apply == null) {
-                return false;
-            } else {
-                if (!doesRegulation29Apply.booleanValue()) {
-                    if (schedule3ActivitiesSelected != null) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } else {
+                if (supportGroupOnly != null && supportGroupOnly) {
                     return isValidCombinationFromSelectSchedule3ActivitiesOnwards(schedule3ActivitiesSelected, doesRegulation35Apply);
+                } else {
+                    return false;
+                }
+            } else {
+                if (supportGroupOnly != null && supportGroupOnly) {
+                    return false;
+                } else {
+                    if (!doesRegulation29Apply.booleanValue()) {
+                        if (schedule3ActivitiesSelected != null) {
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    } else {
+                        return isValidCombinationFromSelectSchedule3ActivitiesOnwards(schedule3ActivitiesSelected, doesRegulation35Apply);
+                    }
                 }
             }
         } else {
+            // For WCA appeals, if points >= 15
+            if (supportGroupOnly != null && supportGroupOnly.booleanValue()) {
+                // If points >= 15 there must have been an error, because we skip the points pages and we should be
+                return false;
+            }
             if (doesRegulation29Apply != null) {
                 return false;
             }
@@ -144,15 +198,21 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
      * Test the continuity of boundaries between point ranges and regulation and schedule answers. (ie. this test will fail if there are any gaps, or overlap between the boundaries)
      */
     @Test
-    @Parameters(named = "scheduleAndRegulationQuestionCombinations")
+    @Parameters(named = "wcaAppealAndScheduleAndRegulationQuestionCombinations")
     public void testThatAtExactlyOneConditionIsApplicableForAllPointsAndActivityCombinations(
+        Boolean wcaAppeal,
         Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
         Boolean doesRegulation35Apply) {
 
-        int minPointsValue = 14;
-        int maxPointsValue = 15;
+        int minPointsValue = 0;
+        int maxPointsValue = 0;
 
-        for (boolean supportGroupOnly : Arrays.asList(false, true)) {
+        if (wcaAppeal != null && wcaAppeal.booleanValue()) {
+            minPointsValue = 14;
+            maxPointsValue = 15;
+        }
+
+        for (Boolean supportGroupOnly : Arrays.asList(null, false, true)) {
 
             for (boolean allowed : Arrays.asList(false, true)) {
 
@@ -161,8 +221,8 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     int conditionApplicableCount = 0;
 
                     final boolean isValidCombinationExpected =
-                        isValidCombinationExpected(points, doesRegulation29Apply, schedule3ActivitiesSelected,
-                            doesRegulation35Apply);
+                        isValidPointsBasedCombinationExpected(points, wcaAppeal, doesRegulation29Apply, schedule3ActivitiesSelected,
+                            doesRegulation35Apply, supportGroupOnly);
 
                     List<String> schedule3Activities = null;
                     String schedule3ActivitesApply = null;
@@ -173,14 +233,31 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                         schedule3ActivitesApply = null;
                     }
 
-                    SscsCaseData caseData = SscsCaseData.builder()
-                        .wcaAppeal("Yes")
-                        .supportGroupOnlyAppeal(supportGroupOnly ? "Yes" : "No")
-                        .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
-                        .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
-                        .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply))
-                        .esaSscsCaseData(SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
-                            .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
+                    SscsCaseData caseData = null;
+
+                    if (wcaAppeal.booleanValue()) {
+
+                        caseData = SscsCaseData.builder()
+                            .writeFinalDecisionGenerateNotice("Yes")
+                            .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
+                            .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
+                            .dwpReassessTheAward(null)
+                            .sscsEsaCaseData(
+                                SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
+                                    .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities)
+                                    .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
+                                    .wcaAppeal("Yes")
+                                    .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build()).build();
+                    } else {
+                        caseData = SscsCaseData.builder()
+                            .writeFinalDecisionGenerateNotice("Yes")
+                            .supportGroupOnlyAppeal(supportGroupOnly == null ? null : supportGroupOnly ? "Yes" : "No")
+                            .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
+                            .sscsEsaCaseData(
+                                SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
+                                    .wcaAppeal("No")
+                                    .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
+                    }
 
                     Mockito.when(questionService.getTotalPoints(Mockito.eq(caseData), Mockito.any())).thenReturn(points);
 
@@ -195,17 +272,18 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                     }
 
                     Assert.assertEquals(
-                        "Expected 1 condition to be satisfied for points:" + points + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + " but "
+                        "Expected 1 condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly +  " but "
                             + conditionApplicableCount + " were satisfied",
                         1, conditionApplicableCount);
 
                     if (isValidCombinationExpected) {
-                        Assert.assertTrue("Unexpected error for:" + points + ":" + doesRegulation29Apply
-                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+
+                        Assert.assertTrue("Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
+                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly, matchingCondition
                             .getOptionalErrorMessage(questionService, caseData).isEmpty());
                     } else {
-                        Assert.assertTrue("Expected an error for:" + points + ":" + doesRegulation29Apply
-                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingCondition
+                        Assert.assertTrue("Expected an error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
+                            + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + supportGroupOnly, matchingCondition
                             .getOptionalErrorMessage(questionService, caseData).isPresent());
                     }
 
@@ -215,7 +293,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                         int allowedOrRefusedConditionApplicableCount = 0;
 
                         final boolean isValidAllowedOrRefusedCombinationExpected =
-                            isValidAllowedOrRefusedCombinationExpected(points, doesRegulation29Apply, schedule3ActivitiesSelected,
+                            isValidAllowedOrRefusedCombinationExpected(points, wcaAppeal, doesRegulation29Apply, schedule3ActivitiesSelected,
                                 doesRegulation35Apply, allowed, supportGroupOnly);
 
                         EsaAllowedOrRefusedCondition matchingAllowedOrRefusedCondition = null;
@@ -228,24 +306,26 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                         }
 
                         Assert.assertEquals(
-                            "Expected 1 condition to be satisfied for points:" + points + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + allowed
+                            "Expected 1 allowed or refused condition to be satisfied for points:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply + ":" + allowed
                                 + ":" + supportGroupOnly + " but "
                                 + allowedOrRefusedConditionApplicableCount + " were satisfied",
                             1, allowedOrRefusedConditionApplicableCount);
 
                         if (isValidAllowedOrRefusedCombinationExpected) {
-                            if (matchingAllowedOrRefusedCondition
-                                .getOptionalErrorMessage(questionService, caseData).isPresent()) {
-                                System.out.println(matchingAllowedOrRefusedCondition
-                                    .getOptionalErrorMessage(questionService, caseData).get());
-                            }
-                            System.out.println(matchingAllowedOrRefusedCondition);
-                            Assert.assertTrue("Unexpected error for:" + points + ":" + doesRegulation29Apply
+
+
+                            Assert.assertTrue("Unexpected error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
                                 + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingAllowedOrRefusedCondition
                                 .getOptionalErrorMessage(questionService, caseData).isEmpty());
 
+
+                            // Assert that for a valid allowed/refused condition, we can always retrieve a single scenario
+                            // which we will use to generate content
+                            EsaScenario scenario = matchingAllowedOrRefusedCondition.getEsaScenario(caseData);
+                            Assert.assertNotNull(scenario);
+
                         } else {
-                            Assert.assertTrue("Expected an error for:" + points + ":" + doesRegulation29Apply
+                            Assert.assertTrue("Expected an error for:" + points + ":" + wcaAppeal + ":" + doesRegulation29Apply
                                 + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply, matchingAllowedOrRefusedCondition
                                 .getOptionalErrorMessage(questionService, caseData).isPresent());
                         }
@@ -258,28 +338,6 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
         }
     }
 
-
-    /**
-     * We have separate tests above to ensure that only a single PointsCondition exists for all valid activity/points combinations - this method returns that condition, or throws an exception if no
-     * matching condition.
-     */
-    /*
-    private EsaPointsAndActivitiesCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(
-        Boolean doesRegulation29Apply, Boolean schedule3ActivitiesSelected,
-        Boolean doesRegulation35Apply, int points) {
-        for (EsaPointsAndActivitiesCondition esaPointsAndActivitiesCondition : EsaPointsAndActivitiesCondition.values()) {
-
-            if (esaPointsAndActivitiesCondition.isSatisfied(points, doesRegulation29Apply, schedule3ActivitiesSelected,
-                doesRegulation35Apply)) {
-                if (esaPointsAndActivitiesCondition.getPointsCondition().getPointsRequirementCondition().test(points)) {
-                    return esaPointsAndActivitiesCondition;
-                }
-            }
-        }
-        throw new IllegalStateException("No points condition found for points:" + points + " and " + doesRegulation29Apply + ":" + schedule3ActivitiesSelected + ":" + doesRegulation35Apply);
-    }
-
-     */
     @Test
     public void testAllPointsConditionAttributesAreNotNull() {
         for (EsaPointsRegulationsAndSchedule3ActivitiesCondition esaPointsCondition : EsaPointsRegulationsAndSchedule3ActivitiesCondition.values()) {
