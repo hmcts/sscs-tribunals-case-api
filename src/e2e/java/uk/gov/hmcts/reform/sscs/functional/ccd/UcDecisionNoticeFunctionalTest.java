@@ -41,7 +41,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
-    public void scenario1_refused_non_support_group_less_than_15pts_sch2_reg29NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
+    public void scenario1_refused_non_support_group_less_than_15pts_sch6_sch8Para4NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucRefusedNonSupportGroupOnlyCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -63,7 +63,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario2_refused_isSupportGroup_noSch3_Reg29NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
+    public void scenario2_refused_isSupportGroup_noSch7_Sch8Para4NotApplies_shouldGeneratePdfWithExpectedText() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucRefusedSupportNoSch7NoSch9Para4Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -80,7 +80,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario3_allowed_isSupportGroup_noSch3_Reg35Applies() throws IOException {
+    public void scenario3_allowed_isSupportGroup_noSch7_Sch9Para4Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedSupportNoSch7NoSch9Para4Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -101,7 +101,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario4_allowed_isSupportGroup_selectionMadeForSch3() throws IOException {
+    public void scenario4_allowed_isSupportGroup_selectionMadeForSch7() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedIsSupportGroupSch7SelectionMadeCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -122,7 +122,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario5_allowed_notSupportGroup_moreThan15Points_noSch3_NoReg35() throws IOException {
+    public void scenario5_allowed_notSupportGroup_moreThan15Points_noSch7_NoSch9Para4() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonSupportGroupNoSchNoSch9Para4Callback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -145,7 +145,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario8_allowed_notSupportGroup_LessThan15PointsSch2_Reg29Applies_Reg35Applies() throws IOException {
+    public void scenario8_allowed_notSupportGroup_LessThan15PointsSch6_Sch8Para4Applies_Sch9Para4Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupLessThan15PointsSch8Para4AndSch9Para4AppliesCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -176,7 +176,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
         "doNotReassess3, The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date.",
         "doNotReassess18, The Tribunal recommends that the Department does not reassess Joe Bloggs within 18 months from today's date.",
     })
-    public void scenario8_allowed_notSupportGroup_LessThan15PointsSch2_Reg29Applies_Reg35Applies_shouldHaveExpectedText(String code, String expectedText) throws IOException {
+    public void scenario8_allowed_notSupportGroup_LessThan15PointsSch6_Sch8Para4Applies_Sch9Para4Applies_shouldHaveExpectedText(String code, String expectedText) throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucDwpReassessTheAwardCallback.json");
         json = json.replaceAll("DWP_REASSESS_THE_AWARD", code);
         byte[] bytes = callPreviewFinalDecision(json);
@@ -202,8 +202,8 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario10_refused_nonWca() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonWcaCallback.json");
+    public void scenario10_refused_nonLcwa() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonLcwaCallback.json");
         json = json.replaceFirst("allowed", "refused");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
@@ -222,8 +222,8 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
-    public void scenario11_allowed_nonWcaAppeal() throws IOException {
-        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonWcaCallback.json");
+    public void scenario11_allowed_nonLcwaAppeal() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonLcwaCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
