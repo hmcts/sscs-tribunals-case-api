@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.MID_EVENT;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import javax.validation.Validator;
@@ -74,6 +75,47 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
         assertEquals("Yes", sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionSchedule3ActivitiesApply());
 
         assertTrue(response.getErrors().isEmpty());
+    }
+
+    @Test
+    public void givenSchedule3ActivitiesApplyFlagSetToYes_WhenActivitiesSpecified_thenDoNoDisplayError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(Arrays.asList("schedule3MobilisingUnaided"));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(0, response.getErrors().size());
+    }
+
+    @Test
+    public void givenSchedule3ActivitiesApplyFlagSetToYes_WhenNullActivities_thenDisplayError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Please select the Schedule 3 Activities that apply, or indicate that none apply", response.getErrors().iterator().next());
+    }
+
+    @Test
+    public void givenSchedule3ActivitiesApplyFlagSetToYes_WhenEmptyActivities_thenDisplayError() {
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply("Yes");
+        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(new ArrayList<>());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+        assertEquals("Please select the Schedule 3 Activities that apply, or indicate that none apply", response.getErrors().iterator().next());
     }
 
     @Test
