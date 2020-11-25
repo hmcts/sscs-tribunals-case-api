@@ -134,12 +134,12 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
 
     @Test
     @Parameters({
-            "Yes, NO",
-            "No,YES",
+            "YES, NO",
+            "NO,YES",
             "null, NO"
     })
     public void givenUcCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
-            @Nullable String wcaFlow, YesNo expectedShowResult) {
+            @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
 
         sscsCaseData.getSscsUcCaseData().setLcwaAppeal(wcaFlow);
 

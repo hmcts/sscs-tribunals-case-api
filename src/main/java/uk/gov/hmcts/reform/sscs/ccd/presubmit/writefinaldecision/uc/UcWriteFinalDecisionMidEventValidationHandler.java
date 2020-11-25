@@ -1,11 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+
 import javax.validation.Validator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
@@ -34,15 +35,15 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         int totalPoints = decisionNoticeService.getQuestionService("UC").getTotalPoints(sscsCaseData, UcPointsRegulationsAndSchedule7ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
         if (isWcaNotSupportGroupOnly(sscsCaseData) && UcPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-            sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(YesNo.YES);
-            if (YesNo.YES.equals(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
-                sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(YesNo.YES);
-            } else if (YesNo.NO.equals(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
-                sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(YesNo.NO);
+            sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(YES);
+            if (YES.equals(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
+                sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(YES);
+            } else if (NO.equals(sscsCaseData.getSscsUcCaseData().getDoesSchedule8Paragraph4Apply())) {
+                sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(NO);
             }
         } else {
-            sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(YesNo.NO);
-            sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(YesNo.YES);
+            sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(NO);
+            sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(YES);
         }
     }
 
@@ -62,10 +63,10 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
 
     @Override
     protected void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData) {
-        if (sscsCaseData.getSscsUcCaseData().getLcwaAppeal() != null && sscsCaseData.getSscsUcCaseData().getLcwaAppeal().equalsIgnoreCase(YesNo.NO.getValue())) {
-            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES);
+        if (sscsCaseData.getSscsUcCaseData().getLcwaAppeal() != null && NO.equals(sscsCaseData.getSscsUcCaseData().getLcwaAppeal())) {
+            sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YES);
             return;
         }
-        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(NO);
     }
 }
