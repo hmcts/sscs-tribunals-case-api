@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,7 +193,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
     }
 
     private YesNo getYesNoFieldValue(Boolean value) {
-        return value == null ? null : (value.booleanValue() ? YesNo.YES : YesNo.NO);
+        return value == null ? null : (value.booleanValue() ? YesNo.YES : NO);
     }
 
     /**
@@ -245,7 +247,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                             .sscsUcCaseData(
                                 SscsUcCaseData.builder().ucWriteFinalDecisionSchedule7ActivitiesApply(schedule7ActivitesApply)
                                     .ucWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities)
-                                    .lcwaAppeal("Yes")
+                                    .lcwaAppeal(YES)
                                     .doesSchedule8Paragraph4Apply(getYesNoFieldValue(doesSchedule8Paragraph4Apply))
                                     .doesSchedule9Paragraph4Apply(getYesNoFieldValue(doesSchedule9Paragraph4Apply)).build()).build();
                     } else {
@@ -255,7 +257,7 @@ public class UcPointsRegulationsAndSchedule7ActivitiesConditionTest {
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .sscsUcCaseData(
                                 SscsUcCaseData.builder().ucWriteFinalDecisionSchedule7ActivitiesApply(schedule7ActivitesApply)
-                                    .lcwaAppeal("No")
+                                    .lcwaAppeal(NO)
                                     .ucWriteFinalDecisionSchedule7ActivitiesQuestion(schedule7Activities).build()).build();
                     }
 

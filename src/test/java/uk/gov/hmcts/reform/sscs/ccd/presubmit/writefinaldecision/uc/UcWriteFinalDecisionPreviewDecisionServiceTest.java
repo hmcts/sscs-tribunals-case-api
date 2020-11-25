@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -25,7 +27,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.DocumentLink;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
@@ -74,9 +75,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -150,9 +151,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -219,9 +220,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -283,8 +284,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -305,10 +306,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
@@ -369,10 +370,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
@@ -432,9 +433,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
@@ -493,10 +494,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
@@ -557,7 +558,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("No");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("refused");
 
@@ -617,7 +618,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         String endDate = "2018-11-10";
         setCommonPreviewParams(sscsCaseData, endDate);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("No");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(NO);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -678,9 +679,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -755,9 +756,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -787,9 +788,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -864,9 +865,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -895,7 +896,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -996,7 +997,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1020,7 +1021,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         if ("no".equalsIgnoreCase(value)) {
             sscsCaseData.setDwpReassessTheAward("doNotReassess");
         }
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(value);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("no".equalsIgnoreCase(value) ? NO : YES);
     }
 
     @Override
@@ -1036,7 +1037,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         caseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(new ArrayList<>());
-        caseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
+        caseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
     }
 
     @Override
@@ -1096,8 +1097,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1166,7 +1167,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
 
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1233,9 +1234,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1301,9 +1302,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1369,8 +1370,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1435,8 +1436,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1503,8 +1504,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1570,7 +1571,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("Yes");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1631,9 +1632,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1707,9 +1708,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1735,9 +1736,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1803,9 +1804,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.NO);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(NO);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1830,9 +1831,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -1906,9 +1907,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1934,9 +1935,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
@@ -1964,9 +1965,9 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("No");
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -2034,8 +2035,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setSupportGroupOnlyAppeal("No");
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
@@ -2110,8 +2111,8 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply("Yes");
         sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(Arrays.asList("schedule7MobilisingUnaided", "schedule7AppropriatenessOfBehaviour"));
-        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YesNo.YES);
-        sscsCaseData.getSscsUcCaseData().setLcwaAppeal("Yes");
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(YES);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(YES);
         sscsCaseData.setWriteFinalDecisionAllowedOrRefused("allowed");
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
