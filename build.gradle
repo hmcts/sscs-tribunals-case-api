@@ -225,7 +225,16 @@ dependencyManagement {
           entry 'tomcat-embed-core'
           entry 'tomcat-embed-el'
           entry 'tomcat-embed-websocket'
-	}
+	    }
+
+        // CVE-2020-13954
+        dependencySet(group: 'org.apache.cxf', version: '3.4.1') {
+            entry 'cxf-core'
+            entry 'cxf-rt-frontend-jaxrs'
+            entry 'cxf-rt-rs-client'
+            entry 'cxf-rt-security'
+            entry 'cxf-rt-transports-http'
+        }
 
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
