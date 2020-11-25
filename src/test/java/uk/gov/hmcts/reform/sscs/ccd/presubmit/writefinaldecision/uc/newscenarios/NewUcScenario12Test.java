@@ -9,10 +9,10 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.Uc
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class NewUcScenario5Test {
+public class NewUcScenario12Test {
 
     @Test
-    public void testScenario5() {
+    public void testScenario12() {
 
         List<Descriptor> schedule6Descriptors =
             Arrays.asList(Descriptor.builder()
@@ -34,11 +34,11 @@ public class NewUcScenario5Test {
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                 .anythingElse("Something else")
                 .schedule8Paragraph4Applicable(true)
-                .schedule9Paragraph4Applicable(false)
+                .schedule9Paragraph4Applicable(true)
                 .dwpReassessTheAward("noRecommendation")
                 .ucSchedule6Descriptors(schedule6Descriptors).build();
 
-        UcTemplateContent content = UcScenario.SCENARIO_5.getContent(body);
+        UcTemplateContent content = UcScenario.SCENARIO_12.getContent(body);
 
         String expectedContent = "The appeal is allowed.\n"
             + "\n"
@@ -51,7 +51,7 @@ public class NewUcScenario5Test {
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
-            + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.\n"
+            + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"

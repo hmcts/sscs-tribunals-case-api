@@ -1,14 +1,15 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class UcScenario6Test {
+public class NewUcScenario6Test {
 
     @Test
     public void testScenario6() {
@@ -46,9 +47,9 @@ public class UcScenario6Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney has limited capability for work and for work-related activity.\n"
+            + "Felix Sydney has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.\n"
             + "\n"
-            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:\n"
             + "\n"
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"

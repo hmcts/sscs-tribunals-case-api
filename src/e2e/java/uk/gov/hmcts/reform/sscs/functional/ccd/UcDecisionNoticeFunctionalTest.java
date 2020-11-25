@@ -130,9 +130,32 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the work capability assessment 30 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs does not have limited capability for work-related activity because no descriptor from Schedule 3 applied. Regulation 35 did not apply."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
+            assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
+            assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
+            assertThat(pdfTextWithoutNewLines, containsString("15 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+        }
+    }
+
+    @Test
+    public void scenario12_allowed_notSupportGroup_moreThan15Points_noSch7_Sch9Para4() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNonSupportGroupNoSchSch9Para4Callback.json");
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = PDDocument.load(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));
