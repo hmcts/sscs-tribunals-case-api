@@ -11,7 +11,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.Uc
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
 public abstract class UcNewTemplateContent extends UcTemplateContent {
 

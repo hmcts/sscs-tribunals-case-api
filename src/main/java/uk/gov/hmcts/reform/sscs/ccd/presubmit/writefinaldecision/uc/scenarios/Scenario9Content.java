@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcOldTemplateContent;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DescriptorTable;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;

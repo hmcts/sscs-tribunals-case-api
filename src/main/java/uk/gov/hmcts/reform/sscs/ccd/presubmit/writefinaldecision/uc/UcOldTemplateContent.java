@@ -13,7 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.Uc
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
-import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
 
 public abstract class UcOldTemplateContent extends UcTemplateContent {
 
