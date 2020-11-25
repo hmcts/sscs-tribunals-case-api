@@ -68,4 +68,16 @@ public class EsaWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         }
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
     }
+
+    @Override
+    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
+
+        if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())
+                && sscsCaseData.getSscsEsaCaseData().isWcaAppeal()
+                && "allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
+            return;
+        }
+        sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+    }
 }

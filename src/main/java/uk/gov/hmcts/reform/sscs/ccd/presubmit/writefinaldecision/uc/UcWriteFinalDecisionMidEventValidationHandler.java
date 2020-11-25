@@ -68,4 +68,16 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
         }
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
     }
+
+    @Override
+    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
+
+        if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())
+                && sscsCaseData.getSscsUcCaseData().isLcwaAppeal()
+                && "allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
+            return;
+        }
+        sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+    }
 }

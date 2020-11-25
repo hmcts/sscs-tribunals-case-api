@@ -151,6 +151,30 @@ public class UcWriteFinalDecisionMidEventValidationHandlerTest extends WriteFina
     }
 
     @Test
+    @Parameters({
+            "Yes, allowed, YES",
+            "Yes, refused, NO",
+            "No, allowed, NO",
+            "No, refused, NO",
+            "null, allowed, NO",
+            "No, null, NO",
+            "null, null, NO",
+    })
+    public void givenUcCaseWithLcwaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
+            @Nullable String wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(wcaFlow);
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused(allowedFlow);
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(expectedShowResult, response.getData().getShowDwpReassessAwardPage());
+    }
+
+    @Test
     @Parameters({"STANDARD_RATE, STANDARD_RATE",})
     @Override
     public void shouldExhibitBenefitSpecificBehaviourWhenAnAnAwardIsGivenAndNoActivitiesSelected(AwardType dailyLiving, AwardType mobility) {
