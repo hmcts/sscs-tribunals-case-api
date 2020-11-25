@@ -125,6 +125,11 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
         }
         if (allowed && !supportGroupOnly) {
             if (points >= 15) {
+                if (schedule3ActivitiesSelected != null && !schedule3ActivitiesSelected.booleanValue()) {
+                    if (doesRegulation35Apply.booleanValue()) {
+                        return false;
+                    }
+                }
                 return true;
             } else {
                 return doesRegulation29Apply != null && doesRegulation29Apply.booleanValue();
