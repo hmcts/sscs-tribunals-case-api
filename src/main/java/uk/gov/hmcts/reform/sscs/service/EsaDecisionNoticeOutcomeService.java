@@ -32,7 +32,7 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
 
             SscsEsaCaseData esaCaseData = sscsCaseData.getSscsEsaCaseData();
 
-            if (sscsCaseData.isWcaAppeal()) {
+            if (sscsCaseData.getSscsEsaCaseData().isWcaAppeal()) {
 
                 if (sscsCaseData.isSupportGroupOnlyAppeal()) {
                     esaCaseData.setDoesRegulation29Apply(null);
