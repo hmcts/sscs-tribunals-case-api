@@ -1,14 +1,15 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class UcScenario5Test {
+public class NewUcScenario5Test {
 
     @Test
     public void testScenario5() {
@@ -33,6 +34,7 @@ public class UcScenario5Test {
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                 .anythingElse("Something else")
                 .schedule8Paragraph4Applicable(true)
+                .dwpReassessTheAward("noRecommendation")
                 .ucSchedule6Descriptors(schedule6Descriptors).build();
 
         UcTemplateContent content = UcScenario.SCENARIO_5.getContent(body);
@@ -41,14 +43,14 @@ public class UcScenario5Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney has limited capability for work.\n"
+            + "Felix Sydney has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.\n"
             + "\n"
-            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:\n"
             + "\n"
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
-            + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
+            + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -57,9 +59,11 @@ public class UcScenario5Test {
             + "Something else\n"
             + "\n"
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "\n"
+            + "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Felix Sydney.\n"
             + "\n";
 
-        Assert.assertEquals(10, content.getComponents().size());
+        Assert.assertEquals(11,  content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
