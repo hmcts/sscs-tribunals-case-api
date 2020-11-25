@@ -60,11 +60,11 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.";
     }
 
-
-    public String getSchedule2PointsSentence(Integer points, Boolean isSufficient) {
+    public String getSchedule2PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> esaSchedule2Descriptors) {
+        String madeUpAsFollowsSuffix = esaSchedule2Descriptors == null || esaSchedule2Descriptors.isEmpty() ? "." : " made up as follows:";
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "2 of the ESA Regulations 2008" + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
+            + "2 of the ESA Regulations 2008" + (isSufficient != null && isSufficient.booleanValue() ? madeUpAsFollowsSuffix
             : ". This is insufficient to meet the "
             + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }
