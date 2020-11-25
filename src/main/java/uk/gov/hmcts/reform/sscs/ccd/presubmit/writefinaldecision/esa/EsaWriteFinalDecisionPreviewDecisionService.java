@@ -79,7 +79,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
             builder.esaIsEntited(false);
             builder.esaAwardRate(null);
-            Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
+            Optional<AwardType> esaAwardTypeOptional = caseData.getSscsEsaCaseData().isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
                 .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
             if (!esaAwardTypeOptional.isEmpty()) {
                 String esaAwardType = esaAwardTypeOptional.get().getKey();
@@ -107,6 +107,9 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+
+        builder.wcaAppeal(caseData.getSscsEsaCaseData().isWcaAppeal());
+
         List<Descriptor> allSchedule2Descriptors = new ArrayList<>();
         List<String> physicalDisabilityAnswers = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
         if (physicalDisabilityAnswers != null) {
@@ -119,8 +122,14 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             allSchedule2Descriptors.addAll(mentalAssessmentDescriptors);
         }
 
+        // Don't add descriptors to the template if the total points in schedule 2 are zero
+        int totalPoints = allSchedule2Descriptors.stream().mapToInt(d -> d.getActivityAnswerPoints()).sum();
+        if (totalPoints == 0) {
+            allSchedule2Descriptors.clear();
+        }
+
         if (allSchedule2Descriptors.isEmpty()) {
-            if (caseData.isWcaAppeal()) {
+            if (caseData.getSscsEsaCaseData().isWcaAppeal()) {
                 if (caseData.isSupportGroupOnlyAppeal()) {
                     builder.esaSchedule2Descriptors(null);
                     builder.esaNumberOfPoints(null);

@@ -100,6 +100,11 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
             return setMakeCaseUrgentTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
+        if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)) {
+            return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                    EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Actioned manually",
+                    "Actioned manually", idamService.getIdamTokens());
+        }
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
             EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
             "Issue to all parties", idamService.getIdamTokens());
