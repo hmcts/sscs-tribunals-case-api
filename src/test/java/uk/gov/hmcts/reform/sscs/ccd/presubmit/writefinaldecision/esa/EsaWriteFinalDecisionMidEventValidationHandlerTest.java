@@ -152,16 +152,16 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-            "Yes, allowed, YES",
-            "Yes, refused, NO",
-            "No, allowed, NO",
-            "No, refused, NO",
+            "YES, allowed, YES",
+            "YES, refused, NO",
+            "NO, allowed, NO",
+            "NO, refused, NO",
             "null, allowed, NO",
-            "No, null, NO",
+            "NO, null, NO",
             "null, null, NO",
     })
     public void givenEsaCaseWithWcaAppealFlowAndAllowedFlow_thenSetShowDwpReassessAwardPage(
-            @Nullable String wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
+            @Nullable YesNo wcaFlow, @Nullable String allowedFlow, YesNo expectedShowResult) {
 
         sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
         sscsCaseData.getSscsEsaCaseData().setWcaAppeal(wcaFlow);
