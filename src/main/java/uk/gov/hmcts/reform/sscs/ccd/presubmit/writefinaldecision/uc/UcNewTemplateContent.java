@@ -1,7 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
+import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
+import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 public abstract class UcNewTemplateContent extends UcTemplateContent {
 
@@ -17,10 +22,49 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         }
     }
 
-    public String getSchedule6PointsSentence(Integer points, Boolean isSufficient) {
+    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
+        if (StringUtils.equalsIgnoreCase("paper", hearingType)) {
+            return Arrays.asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
+        } else  {
+            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
+        }
+    }
+
+    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
+        boolean appellantAttended, boolean presentingOfifficerAttened) {
+        if (appellantAttended) {
+            if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
+                return Arrays.asList("This has been an oral (face to face) hearing. "
+                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            } else {
+                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
+                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            }
+        } else {
+            if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
+                return Arrays.asList(appellantName + " requested an oral hearing but did not attend today. "
+                    + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
+                    getConsideredParagraph(bundlePage, appellantName));
+            } else {
+                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
+                    + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
+                    getConsideredParagraph(bundlePage, appellantName));
+            }
+        }
+    }
+
+    public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+        for (String hearingTypeSentence : getHearingTypeSentences(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber(),
+            writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended())) {
+            addComponent(new Paragraph(UcTemplateComponentId.HEARING_TYPE.name(), hearingTypeSentence));
+        }
+    }
+
+    public String getSchedule6PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> ucSchedule6Descriptors) {
+        String madeUpAsFollowsSuffix = ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:";
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "6 of the UC Regulations 2013 made up as follows:"; // + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
+            + "6 of the UC Regulations 2013" + madeUpAsFollowsSuffix; // + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
             // : ". This is insufficient to meet the "
             //   + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }

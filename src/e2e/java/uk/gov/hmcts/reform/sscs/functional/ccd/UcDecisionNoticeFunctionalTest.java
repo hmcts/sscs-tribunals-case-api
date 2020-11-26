@@ -168,6 +168,8 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
+    // FIXME. Once this scenario has been migrated over to the new UC content write a clone of this test, but with zero points
+    // (see corresponding test in ESA master branch) - this ensures no table is displayed for zero points.
     public void scenario8_allowed_notSupportGroup_LessThan15PointsSch6_Sch8Para4Applies_Sch9Para4Applies() throws IOException {
         String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupLessThan15PointsSch8Para4AndSch9Para4AppliesCallback.json");
         byte[] bytes = callPreviewFinalDecision(json);
