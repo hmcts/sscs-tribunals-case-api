@@ -72,6 +72,7 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
         }
 
         setShowSummaryOfOutcomePage(sscsCaseData);
+        setDwpReassessAwardPage(sscsCaseData);
 
         validateAwardTypes(sscsCaseData, preSubmitCallbackResponse);
         setShowPageFlags(sscsCaseData);
@@ -87,6 +88,8 @@ public abstract class WriteFinalDecisionMidEventValidationHandlerBase extends Is
     protected abstract void validateAwardTypes(SscsCaseData sscsCaseData, PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse);
 
     protected abstract void setShowSummaryOfOutcomePage(SscsCaseData sscsCaseData);
+
+    protected abstract void setDwpReassessAwardPage(SscsCaseData sscsCaseData);
 
     private boolean isDecisionNoticeDatesInvalid(SscsCaseData sscsCaseData) {
         if (isNotBlank(sscsCaseData.getWriteFinalDecisionStartDate()) && isNotBlank(sscsCaseData.getWriteFinalDecisionEndDate())) {

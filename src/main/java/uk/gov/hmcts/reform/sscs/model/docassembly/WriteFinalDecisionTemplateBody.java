@@ -85,6 +85,8 @@ public class WriteFinalDecisionTemplateBody {
     private String esaAwardRate;
     @JsonProperty("is_wca_appeal")
     private boolean wcaAppeal;
+    @JsonProperty("is_lcwa_appeal")
+    private boolean lcwaAppeal;
     @JsonProperty("is_support_group_only")
     private boolean supportGroupOnly;
     @JsonProperty("is_regulation_29_applicable")
@@ -95,4 +97,18 @@ public class WriteFinalDecisionTemplateBody {
     private String dwpReassessTheAward;
     @JsonProperty("summary_of_outcome_decision")
     private String summaryOfOutcomeDecision;
+    @JsonProperty("uc_is_entitled")
+    private boolean ucIsEntited;
+    @JsonProperty("uc_number_of_points")
+    private Integer ucNumberOfPoints;
+    @JsonProperty("uc_schedule_2_descriptors")
+    private List<Descriptor> ucSchedule6Descriptors;
+    @JsonProperty("uc_schedule_3_descriptors")
+    private List<Descriptor> ucSchedule7Descriptors;
+    @JsonProperty("uc_award_rate")
+    private String ucAwardRate;
+    @JsonProperty("is_schedule_8_paragraph_4_applicable")
+    private Boolean schedule8Paragraph4Applicable;
+    @JsonProperty("is_schedule_9_paragraph_4_applicable")
+    private Boolean schedule9Paragraph4Applicable;
 }

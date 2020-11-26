@@ -407,7 +407,7 @@ public abstract class WriteFinalDecisionPreviewDecisionServiceTestBase {
     @Test
     public void givenCaseWithMultipleHearingsWithFirstInListWithNoVenueName_thenDisplayErrorAndDoNotGenerateDocument() {
 
-        setDescriptorFlowIndicator("yes", sscsCaseData);
+        setDescriptorFlowIndicator("Yes", sscsCaseData);
         sscsCaseData.setWriteFinalDecisionGenerateNotice("yes");
         setHigherRateScenarioFields(sscsCaseData);
         sscsCaseData.setWriteFinalDecisionDateOfDecision("2018-10-10");

@@ -99,7 +99,7 @@ public class EsaScenario8Test {
             + "\n"
             + "This is because insufficient points were scored to meet the threshold for the work capability assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008.\n"
             + "\n"
-            + "In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
+            + "In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008.\n"
             + "\n"
             + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"
@@ -112,7 +112,7 @@ public class EsaScenario8Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(11, content.getComponents().size());
+        Assert.assertEquals(10, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
