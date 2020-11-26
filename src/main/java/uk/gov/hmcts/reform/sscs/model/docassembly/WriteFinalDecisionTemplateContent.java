@@ -32,6 +32,12 @@ public class WriteFinalDecisionTemplateContent {
         return sb.toString();
     }
 
+    public void addDescriptorTableIfPopulated(DescriptorTable desciptorTable) {
+        if (desciptorTable.getContent() != null && !desciptorTable.getContent().isEmpty()) {
+            this.components.add(desciptorTable);
+        }
+    }
+
     public void addComponent(TemplateComponent<?> component) {
         this.components.add(component);
     }
