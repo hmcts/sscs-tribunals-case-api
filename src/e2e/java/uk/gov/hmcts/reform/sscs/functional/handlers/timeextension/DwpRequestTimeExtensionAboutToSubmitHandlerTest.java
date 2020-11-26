@@ -1,7 +1,6 @@
 package uk.gov.hmcts.reform.sscs.functional.handlers.timeextension;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -35,7 +34,8 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest extends BaseHandler
             .assertThat().body("interlocReviewState", equalTo("reviewByTcw"))
             .assertThat().body("dwpState", equalTo("extensionRequested"))
             .assertThat().body("interlocReferralReason", equalTo("timeExtension"))
-            .assertThat().body("tl1Form.documentLink.document_url", notNullValue());
+            .assertThat().body("dwpDocuments", notNullValue())
+            .assertThat().body("tl1Form", nullValue());
     }
 
 }
