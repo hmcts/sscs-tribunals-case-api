@@ -64,4 +64,53 @@ public class EsaScenario5Test {
         Assert.assertEquals(expectedContent, content.toString());
 
     }
+
+    @Test
+    public void testScenario5_NoSchedule2Descriptors() {
+
+        List<Descriptor> schedule2Descriptors =
+            Arrays.asList();
+
+        WriteFinalDecisionTemplateBody body =
+            WriteFinalDecisionTemplateBody.builder()
+                .hearingType("faceToFace")
+                .attendedHearing(true)
+                .presentingOfficerAttended(true)
+                .isAllowed(true)
+                .isSetAside(true)
+                .dateOfDecision("2020-09-20")
+                .esaNumberOfPoints(0)
+                .pageNumber("A1")
+                .appellantName("Felix Sydney")
+                .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
+                .anythingElse("Something else")
+                .regulation29Applicable(true)
+                .esaSchedule2Descriptors(schedule2Descriptors).build();
+
+        EsaTemplateContent content = EsaScenario.SCENARIO_5.getContent(body);
+
+        String expectedContent = "The appeal is allowed.\n"
+            + "\n"
+            + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
+            + "\n"
+            + "Felix Sydney has limited capability for work.\n"
+            + "\n"
+            + "In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008.\n"
+            + "\n"
+            + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
+            + "\n"
+            + "My first reasons\n"
+            + "\n"
+            + "My second reasons\n"
+            + "\n"
+            + "Something else\n"
+            + "\n"
+            + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "\n";
+
+        Assert.assertEquals(9, content.getComponents().size());
+
+        Assert.assertEquals(expectedContent, content.toString());
+
+    }
 }

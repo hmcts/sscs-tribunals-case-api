@@ -6,6 +6,7 @@ import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
@@ -60,11 +61,11 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         return "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.";
     }
 
-
-    public String getSchedule2PointsSentence(Integer points, Boolean isSufficient) {
+    public String getSchedule2PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> esaSchedule2Descriptors) {
+        String madeUpAsFollowsSuffix = esaSchedule2Descriptors == null || esaSchedule2Descriptors.isEmpty() ? "." : " made up as follows:";
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "2 of the ESA Regulations 2008" + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
+            + "2 of the ESA Regulations 2008" + (isSufficient != null && isSufficient.booleanValue() ? madeUpAsFollowsSuffix
             : ". This is insufficient to meet the "
             + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }
@@ -101,35 +102,33 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
         }
     }
 
-    public String getHearingTypeSentence(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
+    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (StringUtils.equalsIgnoreCase("paper", hearingType)) {
-            return "No party has objected to the matter being decided without a hearing. Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.";
+            return Arrays.asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
         } else  {
-            return getFaceToFaceTelephoneVideoHearingTypeSentence(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
+            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
         }
     }
 
-    public String getFaceToFaceTelephoneVideoHearingTypeSentence(String hearingType, String appellantName, String bundlePage,
+    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
                                                                  boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (appellantAttended) {
             if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
-                return "This has been an oral (face to face) hearing. "
-                        + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage);
+                return Arrays.asList("This has been an oral (face to face) hearing. "
+                        + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             } else {
-                return "This has been a remote hearing in the form of a " + hearingType + " hearing. "
-                        + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage);
+                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
+                        + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             }
         } else {
             if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
-                return appellantName + " requested an oral hearing but did not attend today. "
-                        + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent. "
-                        + "\n"
-                        + getConsideredParagraph(bundlePage, appellantName);
+                return Arrays.asList(appellantName + " requested an oral hearing but did not attend today. "
+                        + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
+                        getConsideredParagraph(bundlePage, appellantName));
             } else {
-                return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
-                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.\n"
-                        + "\n"
-                        + getConsideredParagraph(bundlePage, appellantName);
+                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
+                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
+                        getConsideredParagraph(bundlePage, appellantName));
             }
         }
     }
@@ -182,8 +181,10 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
-        addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber(),
-                writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended())));
+        for (String hearingTypeSentence : getHearingTypeSentences(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber(),
+            writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended())) {
+            addComponent(new Paragraph(EsaTemplateComponentId.HEARING_TYPE.name(), hearingTypeSentence));
+        }
     }
 
     public void addRecommendationIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
