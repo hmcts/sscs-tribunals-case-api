@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionMidEventValidationHandlerBase;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
@@ -68,5 +69,17 @@ public class UcWriteFinalDecisionMidEventValidationHandler extends WriteFinalDec
             return;
         }
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(NO);
+    }
+
+    @Override
+    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
+
+        if (YesNo.YES.getValue().equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())
+                && sscsCaseData.getSscsUcCaseData().isLcwaAppeal()
+                && "allowed".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+            sscsCaseData.setShowDwpReassessAwardPage(YesNo.YES);
+            return;
+        }
+        sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
     }
 }

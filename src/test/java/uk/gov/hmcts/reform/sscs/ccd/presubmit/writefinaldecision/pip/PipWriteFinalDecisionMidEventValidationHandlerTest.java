@@ -719,6 +719,19 @@ public class PipWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
     }
 
     @Test
+    public void givenPipCase_thenDoNotShowDwpReassessAwardPage() {
+
+        sscsCaseData.setWriteFinalDecisionGenerateNotice("Yes");
+        sscsCaseData.setWriteFinalDecisionAllowedOrRefused("Yes");
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(MID_EVENT, callback, USER_AUTHORISATION);
+
+        assertEquals(YesNo.NO, response.getData().getShowDwpReassessAwardPage());
+    }
+
+    @Test
     @Parameters({
             "STANDARD_RATE, STANDARD_RATE",
             "ENHANCED_RATE, ENHANCED_RATE",

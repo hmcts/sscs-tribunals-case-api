@@ -99,6 +99,11 @@ public class PipWriteFinalDecisionMidEventValidationHandler extends WriteFinalDe
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(YesNo.NO);
     }
 
+    @Override
+    protected void setDwpReassessAwardPage(SscsCaseData sscsCaseData) {
+        sscsCaseData.setShowDwpReassessAwardPage(YesNo.NO);
+    }
+
     private boolean isNoAwardOrNotConsideredForMobility(SscsCaseData sscsCaseData) {
         return sscsCaseData.getPipWriteFinalDecisionMobilityQuestion() != null
             && ("noAward".equals(sscsCaseData.getPipWriteFinalDecisionMobilityQuestion())
