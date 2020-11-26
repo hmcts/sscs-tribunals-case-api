@@ -17,10 +17,11 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         }
     }
 
-    public String getSchedule6PointsSentence(Integer points, Boolean isSufficient) {
+    public String getSchedule6PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> ucSchedule6Descriptors) {
+        String madeUpAsFollowsSuffix = ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:";
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "6 of the UC Regulations 2013 made up as follows:"; // + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
+            + "6 of the UC Regulations 2013" + madeUpAsFollowsSuffix; // + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
             // : ". This is insufficient to meet the "
             //   + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
     }

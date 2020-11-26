@@ -191,6 +191,29 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
     }
 
     @Test
+    public void scenario8_allowed_notSupportGroup_LessThan15PointsSch6_Sch8Para4Applies_Sch9Para4Applies_When_ZeroPoints() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/ucAllowedNoSupportGroupLessThan15PointsSch8Para4AndSch9Para4AppliesCallbackZeroPoints.json");
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = PDDocument.load(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the work capability assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("1. Mobilising unaided by another")));
+            assertThat(pdfTextWithoutNewLines, not(containsString("0 points")));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
+        }
+    }
+
+    @Test
     @Parameters({
         "noRecommendation, The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs.",
         "doNotReassess, In view of the degree of disability found by the Tribunal\\, and unless the regulations change\\, the Tribunal would recommend that the appellant is not re-assessed.",

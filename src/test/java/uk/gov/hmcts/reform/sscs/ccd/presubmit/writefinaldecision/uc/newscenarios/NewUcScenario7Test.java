@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 public class NewUcScenario7Test {
 
     @Test
-    public void testScenario1() {
+    public void testScenario7() {
 
         List<Descriptor> schedule6Descriptors =
             Arrays.asList(Descriptor.builder()
@@ -64,7 +64,7 @@ public class NewUcScenario7Test {
     }
 
     @Test
-    public void testScenario1WhenNoSchedule6() {
+    public void testScenario7WhenNoSchedule6() {
 
         List<Descriptor> schedule6Descriptors =
             Arrays.asList();
@@ -77,7 +77,7 @@ public class NewUcScenario7Test {
                 .isAllowed(true)
                 .isSetAside(true)
                 .dateOfDecision("2020-09-20")
-                .ucNumberOfPoints(9)
+                .ucNumberOfPoints(0)
                 .pageNumber("A1")
                 .appellantName("Felix Sydney")
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
