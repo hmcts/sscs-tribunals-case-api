@@ -24,7 +24,7 @@ public class CancelTranslationsAboutToSubmitHandler implements PreSubmitCallback
 
     static {
         nextEventMap.put(DocumentType.SSCS1.getValue(), EventType.SEND_TO_DWP.getCcdType());
-        nextEventMap.put(DocumentType.URGENT_HEARING_REQUEST.getValue(), EventType.MAKE_CASE_URGENT.getCcdType());
+        nextEventMap.put(DocumentType.URGENT_HEARING_REQUEST.getValue(), EventType.UPDATE_CASE_ONLY.getCcdType());
         nextEventMap.put(DocumentType.DECISION_NOTICE.getValue(), EventType.DECISION_ISSUED_WELSH.getCcdType());
         nextEventMap.put(DocumentType.DIRECTION_NOTICE.getValue(), EventType.DIRECTION_ISSUED_WELSH.getCcdType());
     }
