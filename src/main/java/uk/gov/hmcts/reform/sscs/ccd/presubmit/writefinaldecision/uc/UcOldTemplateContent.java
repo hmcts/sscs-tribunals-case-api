@@ -1,30 +1,17 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 
+/**
+ * This is a temporary class to support the un-migrated scenarios, containing content that has initially been ported
+ * over from ESA.  As we migrate each scenario over, the new content should be added to UcNewTemplateContent.
+ * Once we have move over all the scenarios,  this class can be removed.
+ */
 public abstract class UcOldTemplateContent extends UcTemplateContent {
-
-    protected static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    public String getAllowedOrRefusedSentence(boolean allowed) {
-        return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
-    }
-
-    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
-        return "The decision made by the Secretary of State on " + DATE_FORMATTER.format(LocalDate.parse(decisionDate)) + " is "
-            + (!setAside ? "confirmed." : "set aside.");
-    }
 
     public String getDoesNotHaveLimitedCapabilityForWorkSentence(String appellantName) {
         return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work.";
-    }
-
-    public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule7Sentence(String appellantName) {
-        return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.";
     }
 
     public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
@@ -51,18 +38,12 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
         return "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.";
     }
 
-
     public String getSchedule6PointsSentence(Integer points, Boolean isSufficient) {
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
             + "2 of the ESA Regulations 2008" + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
             : ". This is insufficient to meet the "
             + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
-    }
-
-    public String getInsufficientPointsSentenceSchedule8Paragraph4Applied() {
-        return "This is because insufficient points were scored to meet the threshold for the work capability assessment, "
-                + "but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied.";
     }
 
     public String getInsufficientPointsSentenceSchedule8Paragraph4AndSchedule9Paragraph4Applied() {
@@ -91,6 +72,4 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
             return "The following activities and descriptors from Schedule 3 applied:";
         }
     }
-
-    public abstract UcScenario getScenario();
 }

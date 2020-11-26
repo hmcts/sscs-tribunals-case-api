@@ -1,25 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 
 public abstract class UcNewTemplateContent extends UcTemplateContent {
-
-    protected static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    public abstract UcScenario getScenario();
-
-    public String getAllowedOrRefusedSentence(boolean allowed) {
-        return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
-    }
-
-    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
-        return "The decision made by the Secretary of State on " + DATE_FORMATTER.format(LocalDate.parse(decisionDate)) + " is "
-            + (!setAside ? "confirmed." : "set aside.");
-    }
 
     public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName) {
         return appellantName + " has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.";

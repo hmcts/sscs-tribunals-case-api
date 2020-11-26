@@ -5,6 +5,9 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.startsWith;
 
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
@@ -14,6 +17,8 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateCont
 
 public abstract class UcTemplateContent extends WriteFinalDecisionTemplateContent {
 
+    protected static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     public abstract UcScenario getScenario();
 
     public void addReasonsIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
@@ -22,6 +27,15 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
                 addComponent(new Paragraph(UcTemplateComponentId.REASON.name(), reason));
             }
         }
+    }
+
+    public String getAllowedOrRefusedSentence(boolean allowed) {
+        return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
+    }
+
+    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
+        return "The decision made by the Secretary of State on " + DATE_FORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+            + (!setAside ? "confirmed." : "set aside.");
     }
 
     public void addAnythingElseIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
