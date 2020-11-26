@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwprequesttimeextension;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,15 +40,26 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
     @Parameters({
         "APPEAL_RECEIVED, ABOUT_TO_SUBMIT, false, true",
         "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_SUBMIT, true, true",
-        "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_START, false, false",
-        "DWP_REQUEST_TIME_EXTENSION, null, false, false",
-        "null, ABOUT_TO_SUBMIT, false, true",
+        "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_SUBMIT, false, false",
+        "DWP_REQUEST_TIME_EXTENSION, ABOUT_TO_START, false, true",
+        "DWP_REQUEST_TIME_EXTENSION, null, false, true"
     })
     public void canHandle(@Nullable EventType eventType, @Nullable CallbackType callbackType, boolean expected,
-                          boolean mockNeeded) {
-        if (mockNeeded) {
-            when(callback.getEvent()).thenReturn(eventType);
-        }
+                          boolean tl1Set) {
+
+        SscsDocument sscs1Doc = SscsDocument.builder()
+                .value(SscsDocumentDetails.builder()
+                        .documentLink(DocumentLink.builder()
+                                .documentUrl("/anotherUrl")
+                                .build())
+                        .documentType("sscs1")
+                        .build())
+                .build();
+
+        List<SscsDocument> docs = new ArrayList<SscsDocument>();
+        docs.add(sscs1Doc);
+
+        createTestData(docs, eventType, tl1Set);
 
         boolean actualResult = handler.canHandle(callbackType, callback);
 
@@ -66,30 +75,40 @@ public class DwpRequestTimeExtensionAboutToSubmitHandlerTest {
     @Test
     @Parameters(method = "generateSscsCaseDataWithDifferentSscsDocumentLength")
     public void handle(@Nullable List<SscsDocument> sscsDocuments) {
-        createTestData(sscsDocuments);
+        createTestData(sscsDocuments, EventType.DWP_REQUEST_TIME_EXTENSION, true);
 
         PreSubmitCallbackResponse<SscsCaseData> actualCallback = handler.handle(CallbackType.ABOUT_TO_SUBMIT,
             callback, "user token");
 
-        assertNotNull(actualCallback.getData().getTl1Form());
-        DwpResponseDocument tl1FormDoc = actualCallback.getData().getTl1Form();
-        assertEquals(expectedDocumentLink, tl1FormDoc.getDocumentLink());
-        assertEquals(expectedDocumentLink.getDocumentFilename(), tl1FormDoc.getDocumentLink().getDocumentFilename());
+
+        List<DwpDocument> dwpDocs = actualCallback.getData().getDwpDocuments();
+        assertEquals(1, dwpDocs.size());
+
+        DwpDocumentDetails dwpDoc = dwpDocs.get(0).getValue();
+        assertEquals(expectedDocumentLink, dwpDoc.getDocumentLink());
+        assertEquals(expectedDocumentLink.getDocumentFilename(), dwpDoc.getDocumentLink().getDocumentFilename());
+
+        assertEquals(null, actualCallback.getData().getTl1Form());
+
         assertEquals("extensionRequested", actualCallback.getData().getDwpState());
         assertEquals("timeExtension", actualCallback.getData().getInterlocReferralReason());
     }
 
-    private void createTestData(List<SscsDocument> sscsDocuments) {
+    private void createTestData(List<SscsDocument> sscsDocuments, EventType eventType, boolean tl1Form) {
         SscsCaseData caseData = SscsCaseData.builder()
-            .tl1Form(DwpResponseDocument.builder()
-                .documentLink(expectedDocumentLink)
-                .build())
             .sscsDocument(sscsDocuments)
             .dwpState(null)
             .build();
+
+        if (tl1Form) {
+            caseData.setTl1Form(DwpResponseDocument.builder()
+                    .documentLink(expectedDocumentLink)
+                    .build());
+        }
+
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(1L, "sscs", State.WITH_DWP, caseData,
             LocalDateTime.now());
-        callback = new Callback<>(caseDetails, Optional.empty(), EventType.DWP_REQUEST_TIME_EXTENSION, false);
+        callback = new Callback<>(caseDetails, Optional.empty(), eventType, false);
     }
 
     public Object[] generateSscsCaseDataWithDifferentSscsDocumentLength() {
