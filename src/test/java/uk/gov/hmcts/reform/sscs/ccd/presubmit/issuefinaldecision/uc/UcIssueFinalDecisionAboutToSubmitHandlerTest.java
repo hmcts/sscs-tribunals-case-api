@@ -14,6 +14,7 @@ import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DRAFT_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.FINAL_DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.FINAL_DECISION_ISSUED;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -42,7 +43,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocumentDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsUcCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.issuefinaldecision.IssueFinalDecisionAboutToSubmitHandler;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 import uk.gov.hmcts.reform.sscs.service.FooterService;
@@ -121,12 +121,12 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
                 .ucWriteFinalDecisionReachingQuestion("")
                 .ucWriteFinalDecisionSocialEngagementQuestion("")
                 .ucWriteFinalDecisionStandingAndSittingQuestion("")
-                .showSchedule8Paragraph4Page(YesNo.YES)
-                .showSchedule7ActivitiesPage(YesNo.YES)
-                .doesSchedule9Paragraph4Apply(YesNo.YES)
-                .doesSchedule8Paragraph4Apply(YesNo.YES)
+                .showSchedule8Paragraph4Page(YES)
+                .showSchedule7ActivitiesPage(YES)
+                .doesSchedule9Paragraph4Apply(YES)
+                .doesSchedule8Paragraph4Apply(YES)
                 .build())
-            .showFinalDecisionNoticeSummaryOfOutcomePage(YesNo.YES)
+            .showFinalDecisionNoticeSummaryOfOutcomePage(YES)
             .writeFinalDecisionStartDate("")
             .writeFinalDecisionEndDateType("")
             .writeFinalDecisionEndDate("")
@@ -150,7 +150,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNull_ThenDisplayAnError() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsUcCaseData().setLcwaAppeal("Yes");
+        callback.getCaseDetails().getCaseData().getSscsUcCaseData().setLcwaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused(null);
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");
@@ -216,7 +216,7 @@ public class UcIssueFinalDecisionAboutToSubmitHandlerTest {
     public void givenAnIssueFinalDecisionEventForGenerateNoticeFlowWhenAllowedOrRefusedIsNotNull_ThenDoNotDisplayAnError() {
         DocumentLink docLink = DocumentLink.builder().documentUrl("bla.com").documentFilename(String.format("Decision Notice issued on %s.pdf", LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-YYYY")))).build();
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionPreviewDocument(docLink);
-        callback.getCaseDetails().getCaseData().getSscsUcCaseData().setLcwaAppeal("Yes");
+        callback.getCaseDetails().getCaseData().getSscsUcCaseData().setLcwaAppeal(YES);
         callback.getCaseDetails().getCaseData().setSupportGroupOnlyAppeal("Yes");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionAllowedOrRefused("allowed");
         callback.getCaseDetails().getCaseData().setWriteFinalDecisionGenerateNotice("yes");

@@ -134,12 +134,12 @@ public class EsaWriteFinalDecisionMidEventValidationHandlerTest extends WriteFin
 
     @Test
     @Parameters({
-            "Yes, NO",
-            "No,YES",
+            "YES, NO",
+            "NO,YES",
             "null, NO"
     })
     public void givenEsaCaseWithWcaAppealFlow_thenSetShowSummaryOfOutcomePage(
-            @Nullable String wcaFlow, YesNo expectedShowResult) {
+            @Nullable YesNo wcaFlow, YesNo expectedShowResult) {
 
         sscsCaseData.getSscsEsaCaseData().setWcaAppeal(wcaFlow);
 

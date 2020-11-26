@@ -1,6 +1,8 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
 import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,7 +193,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
     }
 
     private YesNo getYesNoFieldValue(Boolean value) {
-        return value == null ? null : (value.booleanValue() ? YesNo.YES : YesNo.NO);
+        return value == null ? null : (value.booleanValue() ? YES : YesNo.NO);
     }
 
     /**
@@ -246,7 +248,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                                 SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities)
                                     .doesRegulation29Apply(getYesNoFieldValue(doesRegulation29Apply))
-                                    .wcaAppeal("Yes")
+                                    .wcaAppeal(YES)
                                     .doesRegulation35Apply(getYesNoFieldValue(doesRegulation35Apply)).build()).build();
                     } else {
                         caseData = SscsCaseData.builder()
@@ -255,7 +257,7 @@ public class EsaPointsRegulationsAndSchedule3ActivitiesConditionTest {
                             .writeFinalDecisionAllowedOrRefused(allowed ? "allowed" : "refused")
                             .sscsEsaCaseData(
                                 SscsEsaCaseData.builder().esaWriteFinalDecisionSchedule3ActivitiesApply(schedule3ActivitesApply)
-                                    .wcaAppeal("No")
+                                    .wcaAppeal(NO)
                                     .esaWriteFinalDecisionSchedule3ActivitiesQuestion(schedule3Activities).build()).build();
                     }
 
