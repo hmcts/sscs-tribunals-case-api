@@ -180,7 +180,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. b. Cannot, unaided by another person, mount or descend two steps even with the support of a handrail."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("6. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
@@ -204,7 +204,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, not(containsString("1. Mobilising ")));
             assertThat(pdfTextWithoutNewLines, not(containsString("0 points")));
-            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("6. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
@@ -237,7 +237,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. b. Cannot, unaided by another person, mount or descend two steps even with the support of a handrail."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("6. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));

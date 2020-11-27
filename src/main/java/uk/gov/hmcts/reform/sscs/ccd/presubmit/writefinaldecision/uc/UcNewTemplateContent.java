@@ -102,7 +102,7 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         return "The tribunal applied Schedule" + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "s" : "")
             + (isSchedule8Paragraph4Applied ? " 8, paragraph 4 " : "")
             + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "and" : "")
-            + (isSchedule9Paragraph4Applied ? " 9, paragraph 4" : "")
+            + (isSchedule9Paragraph4Applied ? " 9, paragraph 4 " : "")
             + "because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited "
             + "capability for work"
             + (isSchedule9Paragraph4Applied ? " and for work-related activity." : ".");
