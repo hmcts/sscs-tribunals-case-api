@@ -87,7 +87,7 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         String madeUpAsFollowsSuffix = isSufficient != null && isSufficient
                 ? ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:"
                 : ". This is insufficient to meet the "
-                + "threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2008 did not apply.";
+                + "threshold for the test. Schedule 8, paragraph 4 of the UC Regulation 2013 did not apply.";
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
             + "6 of the UC Regulations 2013" + madeUpAsFollowsSuffix;
