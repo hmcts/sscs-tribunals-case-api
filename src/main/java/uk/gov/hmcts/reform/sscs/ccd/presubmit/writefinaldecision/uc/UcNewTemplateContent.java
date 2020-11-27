@@ -16,9 +16,9 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
 
     public String getSchedule7AppliesParagraph(List<Descriptor> descriptors) {
         if (descriptors != null && descriptors.size() == 1) {
-            return "The following activity and descriptor from Schedule 3 applied:";
+            return "The following activity and descriptor from Schedule 7 of the UC Regulations 2013 applied: ";
         } else {
-            return "The following activities and descriptors from Schedule 3 applied:";
+            return "The following activities and descriptors from Schedule 7 of the UC Regulations 2013 applied: ";
         }
     }
 

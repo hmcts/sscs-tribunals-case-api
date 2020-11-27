@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -8,10 +8,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class UcScenario8Test {
+public class NewUcScenario8Test {
 
     @Test
     public void testScenario8() {
@@ -120,4 +121,5 @@ public class UcScenario8Test {
         assertEquals(expectedContent, content.toString());
 
     }
+
 }
