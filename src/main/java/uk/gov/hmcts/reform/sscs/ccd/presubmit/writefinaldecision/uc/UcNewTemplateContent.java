@@ -1,16 +1,37 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 public abstract class UcNewTemplateContent extends UcTemplateContent {
+
+    protected static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    public abstract UcScenario getScenario();
+
+    public String getAllowedOrRefusedSentence(boolean allowed) {
+        return "The appeal is " + (allowed ? "allowed" : "refused") + ".";
+    }
+
+    public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
+        return "The decision made by the Secretary of State on " + DATE_FORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+            + (!setAside ? "confirmed." : "set aside.");
+    }
+
+    public String getDoesNotHaveLimitedCapabilityForWorkSentence(String appellantName) {
+        return appellantName + " does not have limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.";
+    }
 
     public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName) {
         return appellantName + " has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.";
@@ -63,7 +84,10 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
     }
 
     public String getSchedule6PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> ucSchedule6Descriptors) {
-        String madeUpAsFollowsSuffix = ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:";
+        String madeUpAsFollowsSuffix = isSufficient != null && isSufficient
+                ? ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:"
+                : ". This is insufficient to meet the "
+                + "threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2008 did not apply.";
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
             + "6 of the UC Regulations 2013" + madeUpAsFollowsSuffix;
