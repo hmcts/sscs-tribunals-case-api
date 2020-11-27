@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
@@ -15,10 +18,10 @@ public class NewUcScenario1Test {
     public void testScenario1() {
 
         List<Descriptor> schedule6Descriptors =
-            Arrays.asList(Descriptor.builder()
-                .activityQuestionValue("Mobilising Unaided")
-                .activityAnswerValue("1")
-                .activityAnswerLetter("c").activityAnswerPoints(9).build());
+                singletonList(Descriptor.builder()
+                        .activityQuestionValue("Mobilising Unaided")
+                        .activityAnswerValue("1")
+                        .activityAnswerLetter("c").activityAnswerPoints(9).build());
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -55,17 +58,16 @@ public class NewUcScenario1Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(9, content.getComponents().size());
+        assertEquals(9, content.getComponents().size());
 
-        Assert.assertEquals(expectedContent, content.toString());
+        assertEquals(expectedContent, content.toString());
 
     }
 
     @Test
     public void testScenario1NoSchedule6() {
 
-        List<Descriptor> schedule6Descriptors =
-            Arrays.asList();
+        List<Descriptor> schedule6Descriptors = emptyList();
 
         WriteFinalDecisionTemplateBody body =
             WriteFinalDecisionTemplateBody.builder()
@@ -99,9 +101,9 @@ public class NewUcScenario1Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(9, content.getComponents().size());
+        assertEquals(8, content.getComponents().size());
 
-        Assert.assertEquals(expectedContent, content.toString());
+        assertEquals(expectedContent, content.toString());
 
     }
 }
