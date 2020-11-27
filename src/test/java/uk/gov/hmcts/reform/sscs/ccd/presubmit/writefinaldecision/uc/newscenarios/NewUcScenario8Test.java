@@ -116,7 +116,7 @@ public class NewUcScenario8Test {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n";
 
-        assertEquals(11, content.getComponents().size());
+        assertEquals(10, content.getComponents().size());
 
         assertEquals(expectedContent, content.toString());
 
