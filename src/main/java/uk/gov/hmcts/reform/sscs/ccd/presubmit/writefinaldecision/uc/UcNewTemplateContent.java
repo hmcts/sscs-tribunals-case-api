@@ -92,4 +92,13 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         return "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.";
     }
 
+    public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivityOnly(String appellantName) {
+        return appellantName + " continues to have limited capability for work but does not have limited capability for "
+                + "work-related activity.";
+    }
+
+    public String getNoDescriptorFromSchedule7Schedule9NotApplied() {
+        return "This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
+    }
+
 }

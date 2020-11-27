@@ -39,10 +39,6 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
             + (!setAside ? "confirmed." : "set aside.");
     }
 
-    public String getDoesNotHaveLimitedCapabilityForWorkSentence(String appellantName) {
-        return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work.";
-    }
-
     public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule7Sentence(String appellantName) {
         return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.";
     }
@@ -60,19 +56,6 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
                 + "work-related activity. This is because no descriptor from Schedule 3 of the Employment and "
                 + "Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply. The Secretary of State "
                 + "has accepted that " + appellantName + " has limited capability for work. This was not in issue.";
-    }
-
-    public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivityOnly(String appellantName) {
-        return appellantName + " continues to have limited capability for work but does not have limited capability for "
-                + "work-related activity.";
-    }
-
-    public String getNoDescriptorFromSchedule7Schedule9NotApplied() {
-        return "This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
-    }
-
-    public String getNoDescriptorFromSchedule7Schedule9Applied() {
-        return "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.";
     }
 
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {

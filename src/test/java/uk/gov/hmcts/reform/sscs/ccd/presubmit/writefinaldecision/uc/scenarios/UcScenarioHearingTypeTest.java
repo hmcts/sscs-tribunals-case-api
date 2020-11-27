@@ -20,11 +20,15 @@ public class UcScenarioHearingTypeTest {
         return new Object[] {
             new Object[] {"faceToFace", true, true, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"faceToFace", true, false, "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
-            new Object[] {"faceToFace", false, true, "Felix Sydney requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent. "
-                    + "\n" + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"faceToFace", false, false, "Felix Sydney requested an oral hearing but did not attend today. No Presenting Officer attended on behalf of the Respondent. "
-                    + "\n" + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
-            new Object[] {"paper", false, false, "No party has objected to the matter being decided without a hearing. Having considered the appeal bundle to page A1 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.\n"},
+            new Object[] {"faceToFace", false, true, "Felix Sydney requested an oral hearing but did not attend today. A Presenting Officer attended on behalf of the Respondent.\n"
+                    + "\n"
+                    + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
+            new Object[] {"faceToFace", false, false, "Felix Sydney requested an oral hearing but did not attend today. No Presenting Officer attended on behalf of the Respondent.\n"
+                    + "\n"
+                    + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Felix Sydney of the hearing and that it is in the interests of justice to proceed today. \n"},
+            new Object[] {"paper", false, false, "No party has objected to the matter being decided without a hearing.\n"
+                    + "\n"
+                    + "Having considered the appeal bundle to page A1 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.\n"},
             new Object[] {"telephone", true, true, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney attended and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"telephone", true, false, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney attended and the Tribunal considered the appeal bundle to page A1. No Presenting Officer attended on behalf of the Respondent.\n"},
             new Object[] {"telephone", false, true, "This has been a remote hearing in the form of a telephone hearing. Felix Sydney did not attend the hearing today. A Presenting Officer attended on behalf of the Respondent.\n"
@@ -83,7 +87,11 @@ public class UcScenarioHearingTypeTest {
                 + expectedHearingType
                 + "\n";
 
-        Assert.assertEquals(8, content.getComponents().size());
+        if (appellantAttended) {
+            Assert.assertEquals(8, content.getComponents().size());
+        } else {
+            Assert.assertEquals(9, content.getComponents().size());
+        }
 
         Assert.assertEquals(expectedContent, content.toString());
     }
