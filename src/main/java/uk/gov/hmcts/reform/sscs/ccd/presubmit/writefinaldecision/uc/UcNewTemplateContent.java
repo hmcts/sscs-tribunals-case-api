@@ -1,8 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
@@ -79,8 +82,10 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
     }
 
     public String getSchedule6PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> ucSchedule6Descriptors) {
-        String madeUpAsFollowsSuffix = ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? ". This is insufficient to meet the "
-                + "threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2008 did not apply." : " made up as follows:";
+        String madeUpAsFollowsSuffix = isSufficient != null && isSufficient
+                ? ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:"
+                : ". This is insufficient to meet the "
+                + "threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2008 did not apply.";
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
             + "6 of the UC Regulations 2013" + madeUpAsFollowsSuffix; // + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
