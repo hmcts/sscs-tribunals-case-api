@@ -59,10 +59,10 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
         return "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment, but the tribunal applied regulation 29.";
     }
 
-    public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule8Paragraph4Applied, boolean isSchedule9Paragraph4Applied) {
-        return "The tribunal applied regulation" + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "s" : "")
-                + (isSchedule8Paragraph4Applied ? " 29 " : "")
-                + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "and" : "")
+    public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule9Paragraph4Applied) {
+        return "The tribunal applied regulation" + (isSchedule9Paragraph4Applied ? "s" : "")
+                + " 29 "
+                + (isSchedule9Paragraph4Applied ? "and" : "")
                 + (isSchedule9Paragraph4Applied ? " 35 " : "")
             + "because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited "
             + "capability for work"
