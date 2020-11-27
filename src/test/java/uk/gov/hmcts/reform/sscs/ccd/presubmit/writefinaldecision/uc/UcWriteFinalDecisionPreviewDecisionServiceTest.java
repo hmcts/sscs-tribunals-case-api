@@ -139,7 +139,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
 
         assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
         Optional<TemplateComponent<?>> schedule6DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> UcTemplateComponentId.SCHEDULE_6_DESCRIPTORS.name().equals(c.getId())).findFirst();
-        Assert.assertNotNull(schedule6DescriptorTable);
+        assertNotNull(schedule6DescriptorTable);
         Assert.assertTrue(schedule6DescriptorTable.isPresent());
         DescriptorTable table = (DescriptorTable)schedule6DescriptorTable.get();
         Assert.assertEquals(1, table.getContent().size());
@@ -206,12 +206,10 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         UcTemplateContent templateContent = (UcTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(UcScenario.SCENARIO_1, templateContent.getScenario());
 
-        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
         Optional<TemplateComponent<?>> schedule6DescriptorTable = payload.getWriteFinalDecisionTemplateContent().getComponents().stream().filter(c -> UcTemplateComponentId.SCHEDULE_6_DESCRIPTORS.name().equals(c.getId())).findFirst();
-        Assert.assertNotNull(schedule6DescriptorTable);
-        Assert.assertTrue(schedule6DescriptorTable.isPresent());
-        DescriptorTable table = (DescriptorTable)schedule6DescriptorTable.get();
-        Assert.assertEquals(0, table.getContent().size());
+        assertNotNull(schedule6DescriptorTable);
+        assertFalse(schedule6DescriptorTable.isPresent());
     }
 
     @Test
@@ -275,7 +273,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         UcTemplateContent templateContent = (UcTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(UcScenario.SCENARIO_1, templateContent.getScenario());
 
-        assertEquals(8, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
