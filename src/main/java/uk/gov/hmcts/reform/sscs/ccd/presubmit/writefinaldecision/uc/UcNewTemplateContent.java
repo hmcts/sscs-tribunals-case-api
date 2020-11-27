@@ -74,10 +74,10 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
             + "but Schedule 8, paragraph 4 of the UC Regulations 2013 applied.";
     }
 
-    public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule8Paragraph4Applied, boolean isSchedule9Paragraph4Applied) {
-        return "The tribunal applied Schedule" + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "s" : "")
-            + (isSchedule8Paragraph4Applied ? " 8, paragraph 4 " : "")
-            + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "and" : "")
+    public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule9Paragraph4Applied) {
+        return "The tribunal applied Schedule" + (isSchedule9Paragraph4Applied ? "s" : "")
+            + " 8, paragraph 4 "
+            + (isSchedule9Paragraph4Applied ? "and" : "")
             + (isSchedule9Paragraph4Applied ? " 9, paragraph 4" : "")
             + "because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited "
             + "capability for work"
