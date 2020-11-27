@@ -213,7 +213,7 @@ dependencyManagement {
         dependency group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.10') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.20') {
             entry 'kotlin-stdlib'
             entry 'kotlin-stdlib-common'
             entry 'kotlin-stdlib-jdk8'
@@ -301,7 +301,7 @@ dependencies {
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.28'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.21.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.21.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'
