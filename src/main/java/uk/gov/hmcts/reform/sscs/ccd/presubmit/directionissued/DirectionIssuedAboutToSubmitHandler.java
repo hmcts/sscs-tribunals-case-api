@@ -70,9 +70,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
         CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         SscsCaseData caseData = caseDetails.getCaseData();
 
+        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
+        log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
+
         return validateDirectionType(caseData)
                 .or(()        -> validateDirectionDueDate(caseData))
-                .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData));
+                .orElseGet(() -> validateForPdfAndCreateCallbackResponse(callback, caseDetails, caseData, documentTranslationStatus));
     }
 
     private void updateDwpRegionalCentre(SscsCaseData caseData) {
@@ -128,7 +131,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     }
 
     @NotNull
-    private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData) {
+    private SscsCaseData updateCaseForDirectionType(CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
 
         if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
 
@@ -156,10 +159,12 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                 && reinstatementFeatureFlag) {
             caseData = updateCaseAfterReinstatementRefused(caseData);
 
-        } else if (DirectionTypeItemList.GRANT_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+        } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
+            && DirectionTypeItemList.GRANT_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterUrgentHearingGranted(caseData);
 
-        } else if (DirectionTypeItemList.REFUSE_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
+        } else if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)
+            && DirectionTypeItemList.REFUSE_URGENT_HEARING.getCode().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
             caseData = updateCaseAfterUrgentHearingRefused(caseData);
 
         } else {
@@ -219,7 +224,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
 
     @NotNull
     private PreSubmitCallbackResponse<SscsCaseData> validateForPdfAndCreateCallbackResponse(
-            Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData) {
+            Callback<SscsCaseData> callback, CaseDetails<SscsCaseData> caseDetails, SscsCaseData caseData, SscsDocumentTranslationStatus documentTranslationStatus) {
 
         final PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse =
                 new PreSubmitCallbackResponse<>(caseData);
@@ -243,9 +248,6 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
             sscsCaseDataPreSubmitCallbackResponse.addError("You need to upload a PDF document");
             return sscsCaseDataPreSubmitCallbackResponse;
         }
-
-        SscsDocumentTranslationStatus documentTranslationStatus = caseData.isLanguagePreferenceWelsh() && callback.getEvent() == EventType.DIRECTION_ISSUED ? SscsDocumentTranslationStatus.TRANSLATION_REQUIRED : null;
-        log.info("DocumentTranslationStatus is {},  for case id : {}", documentTranslationStatus, caseData.getCcdCaseId());
 
         if (!SscsDocumentTranslationStatus.TRANSLATION_REQUIRED.equals(documentTranslationStatus)) {
             if (DirectionType.PROVIDE_INFORMATION.toString().equals(caseData.getDirectionTypeDl().getValue().getCode())) {
@@ -273,7 +275,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
                                                                   DocumentLink url,
                                                                   SscsDocumentTranslationStatus documentTranslationStatus) {
 
-        caseData = updateCaseForDirectionType(caseDetails, caseData);
+        caseData = updateCaseForDirectionType(caseDetails, caseData, documentTranslationStatus);
 
 
         if (callback.getEvent() == EventType.DIRECTION_ISSUED) {

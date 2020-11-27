@@ -12,11 +12,7 @@ import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicList;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DynamicListItem;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
@@ -100,9 +96,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
                 EventType.VALID_SEND_TO_INTERLOC, "Send a case to a judge for review");
         }
         if (isFurtherEvidenceActionOptionValid(caseData.getFurtherEvidenceAction(), OTHER_DOCUMENT_MANUAL)
-                && (StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))
-                && !CollectionUtils.isEmpty(caseData.getSscsDocument())
-                && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0) {
+                && isValidUrgentDocument(caseData)) {
             return setMakeCaseUrgentTriggerEvent(caseData, callback.getCaseDetails().getId(),
                     OTHER_DOCUMENT_MANUAL, EventType.MAKE_CASE_URGENT, "Send a case to urgent hearing");
         }
@@ -114,6 +108,13 @@ public class ActionFurtherEvidenceSubmittedCallbackHandler implements PreSubmitC
         return ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
             EventType.ISSUE_FURTHER_EVIDENCE.getCcdType(), "Issue to all parties",
             "Issue to all parties", idamService.getIdamTokens());
+    }
+
+    private boolean isValidUrgentDocument(SscsCaseData caseData) {
+        return ((StringUtils.isEmpty(caseData.getUrgentCase()) || "No".equalsIgnoreCase(caseData.getUrgentCase()))
+                && (StringUtils.isEmpty(caseData.getTranslationWorkOutstanding()) || "No".equalsIgnoreCase(caseData.getTranslationWorkOutstanding()))
+                && !CollectionUtils.isEmpty(caseData.getSscsDocument())
+                && caseData.getSscsDocument().stream().filter(d -> URGENT_HEARING_REQUEST.getValue().equals(d.getValue().getDocumentType())).count() > 0);
     }
 
     private void setSelectWhoReviewsCaseField(SscsCaseData caseData, InterlocReviewState reviewByWhom) {

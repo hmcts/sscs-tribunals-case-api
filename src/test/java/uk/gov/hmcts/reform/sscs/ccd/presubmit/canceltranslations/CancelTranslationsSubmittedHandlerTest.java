@@ -2,13 +2,15 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.canceltranslations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.SUBMITTED;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.CANCEL_TRANSLATIONS;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence.FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -19,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
@@ -79,6 +82,47 @@ public class CancelTranslationsSubmittedHandlerTest {
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
         verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
             "Cancel welsh translations", "Cancel welsh translations", idamTokens);
+        verify(ccdService, never()).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
+                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
+
+    }
+
+    @Test
+    public void shouldCallUpdateCaseWithUrgentCaseEvent() {
+        SscsCaseData caseData = buildDataWithUrgentRequestDocument();
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(),
+                EventType.MAKE_CASE_URGENT.getCcdType(), "Send a case to urgent hearing",
+                OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
+                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
+        assertNull(caseData.getSscsWelshPreviewNextEvent());
+
+    }
+
+    @Test
+    public void shouldCallUpdateButNotCallUpdateUrgentCaseEventWhenUrgentCaseIsYes() {
+        SscsCaseData caseData = buildDataWithUrgentRequestDocument();
+        caseData.setUrgentCase("Yes");
+        IdamTokens idamTokens = IdamTokens.builder().build();
+        when(idamService.getIdamTokens()).thenReturn(idamTokens);
+        when(ccdService.updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
+                "Cancel welsh translations",
+                "Cancel welsh translations", idamTokens))
+                .thenReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+        verify(ccdService).updateCase(caseData, callback.getCaseDetails().getId(), EventType.SEND_TO_DWP.getCcdType(),
+                "Cancel welsh translations", "Cancel welsh translations", idamTokens);
+        verify(ccdService, never()).updateCase(caseData, callback.getCaseDetails().getId(), EventType.MAKE_CASE_URGENT.getCcdType(),
+                "Send a case to urgent hearing", OTHER_DOCUMENT_MANUAL.getLabel(), idamTokens);
         assertNull(caseData.getSscsWelshPreviewNextEvent());
 
     }
@@ -100,6 +144,15 @@ public class CancelTranslationsSubmittedHandlerTest {
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
             state, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), CANCEL_TRANSLATIONS, false);
+    }
+
+    private SscsCaseData buildDataWithUrgentRequestDocument() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(SscsDocumentDetails.builder().documentType(DocumentType.URGENT_HEARING_REQUEST.getValue()).build()).build();
+        List<SscsDocument> sscsDocuments = new ArrayList<>();
+        sscsDocuments.add(sscsDocument);
+        SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
+        sscsCaseData.setSscsDocument(sscsDocuments);
+        return sscsCaseData;
     }
 
 }
