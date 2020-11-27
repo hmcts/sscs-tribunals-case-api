@@ -78,11 +78,7 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
     }
 
     public String getHearingTypeSentence(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
-        if (StringUtils.equalsIgnoreCase("paper", hearingType)) {
-            return "No party has objected to the matter being decided without a hearing. Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.";
-        } else  {
-            return getFaceToFaceTelephoneVideoHearingTypeSentence(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
-        }
+        return getFaceToFaceTelephoneVideoHearingTypeSentence(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
     }
 
     public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
@@ -101,17 +97,11 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage);
             }
         } else {
-            if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
-                return appellantName + " requested an oral hearing but did not attend today. "
-                    + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent. "
-                    + "\n"
-                    + getConsideredParagraph(bundlePage, appellantName);
-            } else {
-                return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
-                    + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.\n"
-                    + "\n"
-                    + getConsideredParagraph(bundlePage, appellantName);
-            }
+            return "This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
+                + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.\n"
+                + "\n"
+                + getConsideredParagraph(bundlePage, appellantName);
+
         }
     }
 }

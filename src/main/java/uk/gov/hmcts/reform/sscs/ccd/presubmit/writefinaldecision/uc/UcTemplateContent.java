@@ -39,34 +39,9 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
             + (!setAside ? "confirmed." : "set aside.");
     }
 
-    public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule7Sentence(String appellantName) {
-        return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.";
-    }
-
     public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
         return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability " : "") + "for work-related activity." : ".");
     }
-
-    public String getLimitedCapabilityForWorkRelatedSentence(String appellantName, boolean isTreatedLimitedCapability) {
-        return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work-related activity.";
-    }
-
-    public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivity(String appellantName) {
-        return appellantName + " continues to have limited capability for work but does not have limited capability for "
-                + "work-related activity. This is because no descriptor from Schedule 3 of the Employment and "
-                + "Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply. The Secretary of State "
-                + "has accepted that " + appellantName + " has limited capability for work. This was not in issue.";
-    }
-
-    public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
-        return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
-                + (work ? "work." : "work related activity.") + " This was not an issue.";
-    }
-
-    public String getHasLimitedCapabilityForWorkNoSchedule7SentenceSchedule9Paragraph4Applies() {
-        return "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.";
-    }
-
 
     public String getSchedule6PointsSentence(Integer points, Boolean isSufficient) {
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")

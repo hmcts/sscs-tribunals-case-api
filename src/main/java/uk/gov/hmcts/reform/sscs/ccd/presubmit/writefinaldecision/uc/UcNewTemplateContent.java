@@ -125,4 +125,8 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         return "This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
     }
 
+    public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
+        return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
+                + (work ? "work." : "work related activity.") + " This was not an issue.";
+    }
 }
