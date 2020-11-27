@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
+
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
@@ -22,31 +24,31 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         }
     }
 
-    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
-        if (StringUtils.equalsIgnoreCase("paper", hearingType)) {
-            return Arrays.asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
+    public List<String> getHearingTypeSentences(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfficerAttened) {
+        if (equalsIgnoreCase("paper", hearingType)) {
+            return asList("No party has objected to the matter being decided without a hearing.", "Having considered the appeal bundle to page " + bundlePage + " and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way.");
         } else  {
-            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
+            return getFaceToFaceTelephoneVideoHearingTypeSentences(hearingType, appellantName, bundlePage, appellantAttended, presentingOfficerAttened);
         }
     }
 
     public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
         boolean appellantAttended, boolean presentingOfifficerAttened) {
         if (appellantAttended) {
-            if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
-                return Arrays.asList("This has been an oral (face to face) hearing. "
-                    + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
+            if (equalsIgnoreCase("faceToFace", hearingType)) {
+                return singletonList("This has been an oral (face to face) hearing. "
+                        + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             } else {
-                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
+                return singletonList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
                     + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
             }
         } else {
-            if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
-                return Arrays.asList(appellantName + " requested an oral hearing but did not attend today. "
+            if (equalsIgnoreCase("faceToFace", hearingType)) {
+                return asList(appellantName + " requested an oral hearing but did not attend today. "
                     + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
                     getConsideredParagraph(bundlePage, appellantName));
             } else {
-                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
+                return asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
                     + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
                     getConsideredParagraph(bundlePage, appellantName));
             }
@@ -64,9 +66,7 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         String madeUpAsFollowsSuffix = ucSchedule6Descriptors == null || ucSchedule6Descriptors.isEmpty() ? "." : " made up as follows:";
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "6 of the UC Regulations 2013" + madeUpAsFollowsSuffix; // + (isSufficient != null && isSufficient.booleanValue() ? " made up as follows:"
-            // : ". This is insufficient to meet the "
-            //   + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
+            + "6 of the UC Regulations 2013" + madeUpAsFollowsSuffix;
     }
 
     public String getInsufficientPointsSentenceSchedule8Paragraph4Applied() {
