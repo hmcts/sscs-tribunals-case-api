@@ -48,6 +48,8 @@ public class NewUcScenario7Test {
             + "\n"
             + "The tribunal applied Schedule 8, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
+            + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.\n"
+            + "\n"
             + "My first reasons\n"
             + "\n"
             + "My second reasons\n"
@@ -57,7 +59,7 @@ public class NewUcScenario7Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(9, content.getComponents().size());
+        Assert.assertEquals(10, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
@@ -97,6 +99,8 @@ public class NewUcScenario7Test {
             + "\n"
             + "The tribunal applied Schedule 8, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
+            + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.\n"
+            + "\n"
             + "My first reasons\n"
             + "\n"
             + "My second reasons\n"
@@ -106,7 +110,7 @@ public class NewUcScenario7Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(9, content.getComponents().size());
+        Assert.assertEquals(10, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
