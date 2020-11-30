@@ -39,7 +39,7 @@ public class SubscriptionTest extends BaseFunctionTest {
         // Give ES time to index
         Thread.sleep(3000L);
 
-        sscsMyaBackendRequests.unsubscribeSubscription(appealNumber, appellantTya);
+        sscsMyaBackendRequests.unsubscribeSubscription(appellantTya, userEmail);
         SscsCaseDetails updatedCase = getCaseDetails(ccdCase.getCaseId());
         assertThat(updatedCase.getData().getSubscriptions().getAppellantSubscription().getTya(), is(appellantTya));
         assertThat(updatedCase.getData().getSubscriptions().getAppellantSubscription().getSubscribeEmail(), is(NO));
