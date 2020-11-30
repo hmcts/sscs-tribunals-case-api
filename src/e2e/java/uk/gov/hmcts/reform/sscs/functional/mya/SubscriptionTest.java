@@ -34,7 +34,6 @@ public class SubscriptionTest extends BaseFunctionTest {
         String userEmail = createRandomEmail();
         CreatedCcdCase ccdCase = createCcdCase(userEmail);
         String appellantTya = ccdCase.getAppellantTya();
-        String appealNumber = ccdCase.getCaseId();
 
         // Give ES time to index
         Thread.sleep(3000L);
