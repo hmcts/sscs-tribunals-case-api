@@ -49,7 +49,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         final Optional<CaseDetails<SscsCaseData>> caseDetailsBefore = callback.getCaseDetailsBefore();
         final SscsCaseData sscsCaseData = associatedCaseLinkHelper.linkCaseByNino(caseDetails.getCaseData(), caseDetailsBefore);
 
-        setCaseCode(sscsCaseData);
+        setCaseCode(sscsCaseData, callback.getEvent());
 
         if (sscsCaseData.getAppeal().getAppellant() != null
                 && sscsCaseData.getAppeal().getAppellant().getAddress() != null
