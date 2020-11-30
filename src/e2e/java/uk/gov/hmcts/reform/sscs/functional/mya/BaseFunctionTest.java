@@ -26,6 +26,7 @@ import uk.gov.hmcts.reform.sscs.TribunalsCaseApiApplication;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {TribunalsCaseApiApplication.class, CitizenIdamService.class})
@@ -44,6 +45,8 @@ public abstract class BaseFunctionTest {
     protected CitizenIdamService citizenIdamService;
     @Autowired
     protected CcdService ccdService;
+    @Autowired
+    protected EvidenceManagementService evidenceManagementService;
 
     @Value("${idam.url}")
     private String idamApiUrl;
@@ -53,7 +56,7 @@ public abstract class BaseFunctionTest {
     public void setUp() throws Exception {
         myaClient = buildClient("USE_MYA_PROXY");
         client = buildClient("USE_BACKEND_PROXY");
-        sscsMyaBackendRequests = new SscsMyaBackendRequests(idamService, citizenIdamService, baseUrl, client);
+        sscsMyaBackendRequests = new SscsMyaBackendRequests(idamService, citizenIdamService, baseUrl, client, evidenceManagementService);
         idamTestApiRequests = new IdamTestApiRequests(myaClient, idamApiUrl);
     }
 
