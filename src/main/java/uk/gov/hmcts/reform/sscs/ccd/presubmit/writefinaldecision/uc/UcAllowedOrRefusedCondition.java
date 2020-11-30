@@ -158,7 +158,11 @@ public enum UcAllowedOrRefusedCondition implements PointsCondition<UcAllowedOrRe
         } else if ((ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_NOT_SELECTED == this && isSchedule9Paragraph4(UNSPECIFIED).isSatisified(caseData)) || ALLOWED_SUPPORT_GROUP_ONLY_SCHEDULE_3_SELECTED == this) {
             return UcScenario.SCENARIO_4;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty()) {
-            return UcScenario.SCENARIO_5;
+            if (isSchedule9Paragraph4(TRUE).isSatisified(caseData)) {
+                return UcScenario.SCENARIO_12;
+            } else {
+                return UcScenario.SCENARIO_5;
+            }
         } else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_HIGH_POINTS == this && !caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty()) {
             return UcScenario.SCENARIO_6;
         }  else if (ALLOWED_NON_SUPPORT_GROUP_ONLY_LOW_POINTS == this && caseData.getSscsUcCaseData().getSchedule7Selections().isEmpty() && isSchedule9Paragraph4(FALSE).isSatisified(caseData)) {

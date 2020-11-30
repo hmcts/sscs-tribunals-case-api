@@ -1,13 +1,13 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
 
 import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-
-public class UcScenario2Test {
+public class NewUcScenario2Test {
 
     @Test
     public void testScenario2() {
@@ -33,7 +33,11 @@ public class UcScenario2Test {
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
                 + "\n"
-                + "Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity. This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply. The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
+                + "Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity.\n"
+                + "\n"
+                + "This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.\n"
+                + "\n"
+                + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -44,7 +48,7 @@ public class UcScenario2Test {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n";
 
-        Assert.assertEquals(7, content.getComponents().size());
+        Assert.assertEquals(9, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
