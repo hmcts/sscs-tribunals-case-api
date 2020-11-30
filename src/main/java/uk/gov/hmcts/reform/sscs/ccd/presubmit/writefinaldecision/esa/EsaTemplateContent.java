@@ -54,7 +54,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
 
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
-                + (work ? "work." : "work related activity.") + " This was not an issue.";
+                + (work ? "work." : "work related activity.") + " This was not in issue.";
     }
 
     public String getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies() {
