@@ -175,7 +175,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public void addAnythingElseIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
-        if (writeFinalDecisionTemplateBody.getAnythingElse() != null) {
+        if (StringUtils.isNotBlank(writeFinalDecisionTemplateBody.getAnythingElse())) {
             addComponent(new Paragraph(EsaTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
         }
     }

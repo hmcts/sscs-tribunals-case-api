@@ -38,7 +38,7 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
     }
 
     public void addAnythingElseIfPresent(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
-        if (writeFinalDecisionTemplateBody.getAnythingElse() != null) {
+        if (StringUtils.isNotBlank(writeFinalDecisionTemplateBody.getAnythingElse())) {
             addComponent(new Paragraph(UcTemplateComponentId.ANYTHING_ELSE.name(), writeFinalDecisionTemplateBody.getAnythingElse()));
         }
     }
