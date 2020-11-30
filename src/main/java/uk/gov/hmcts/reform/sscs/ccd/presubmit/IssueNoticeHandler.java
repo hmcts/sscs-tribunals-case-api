@@ -38,19 +38,19 @@ public abstract class IssueNoticeHandler extends IssueDocumentHandler {
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        String benefitType = sscsCaseData.getAppeal() == null ? null :
-            sscsCaseData.getAppeal().getBenefitType() == null ? null :
-                sscsCaseData.getAppeal().getBenefitType().getCode();
-
-        if (benefitType == null) {
-            throw new IllegalStateException("Unable to determine benefit type");
-        }
-
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         setGeneratedDateIfRequired(sscsCaseData, callback.getEvent());
 
         try {
+            String benefitType = sscsCaseData.getAppeal() == null ? null :
+                sscsCaseData.getAppeal().getBenefitType() == null ? null :
+                    sscsCaseData.getAppeal().getBenefitType().getCode();
+
+            if (benefitType == null) {
+                throw new IllegalStateException("Unable to determine benefit type");
+            }
+
             return issueDocument(callback, documentType, templateId.apply(new ImmutablePair<>(sscsCaseData.getLanguagePreference(), benefitType)), generateFile, userAuthorisation);
         } catch (IllegalStateException e) {
             log.error(e.getMessage() + ". Something has gone wrong for caseId: ", sscsCaseData.getCcdCaseId());

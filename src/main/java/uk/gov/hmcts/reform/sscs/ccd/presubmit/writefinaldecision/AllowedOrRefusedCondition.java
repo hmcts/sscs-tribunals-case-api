@@ -25,7 +25,7 @@ public class AllowedOrRefusedCondition extends FieldConditionBase<String> {
     }
 
     @Override
-    public Optional<String> getOptionalIsSatisfiedMessage() {
+    public Optional<String> getOptionalIsSatisfiedMessage(SscsCaseData sscsCaseData) {
         if (AllowedOrRefusedPredicate.ALLOWED.equals(predicate)) {
             return Optional.of("specified that the appeal is allowed");
         } else if (AllowedOrRefusedPredicate.REFUSED.equals(predicate)) {

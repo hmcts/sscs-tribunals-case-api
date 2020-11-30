@@ -158,7 +158,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
     }
 
     @Test
-    public void givenFurtherEvidenceActionSelectedOption_shouldTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
+    public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagNotSet_shouldTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
         SscsDocument sscsDocument = SscsDocument.builder().value(
                 SscsDocumentDetails.builder()
                         .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
@@ -171,6 +171,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
         Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
 
         callback.getCaseDetails().getCaseData().setSscsDocument(List.of(sscsDocument));
+        callback.getCaseDetails().getCaseData().setUrgentCase(null);
         given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
 
         ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
@@ -181,11 +182,59 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest {
 
         handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
 
-        //assertEquals(interlocReviewState, captor.getValue().getInterlocReviewState());
-
         then(ccdService).should(times(1))
                 .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(MAKE_CASE_URGENT.getCcdType()), anyString(),
                         anyString(), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenFurtherEvidenceActionSelectedOptionAndUrgentCaseFlagIsSet_shouldNotTriggerUrgentCaseEventAndUpdateCaseCorrectly() {
+        SscsDocument sscsDocument = SscsDocument.builder().value(
+                SscsDocumentDetails.builder()
+                        .documentType(DocumentType.URGENT_HEARING_REQUEST.getValue())
+                        .documentFileName("bla.pdf")
+                        .documentLink(DocumentLink.builder().documentUrl("www.test.com").build())
+                        .documentDateAdded("2019-06-12T00:00:00.000")
+                        .controlNumber("123")
+                        .build()).build();
+
+        Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
+
+        callback.getCaseDetails().getCaseData().setSscsDocument(List.of(sscsDocument));
+        callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(ISSUE_FURTHER_EVIDENCE.getCcdType()), anyString(), anyString(),
+                any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        then(ccdService).should(times(1))
+                .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(ISSUE_FURTHER_EVIDENCE.getCcdType()), anyString(),
+                        anyString(), any(IdamTokens.class));
+    }
+
+    @Test
+    public void givenFurtherEvidenceActionSelectedOptionWithManualDocument_shouldUpdateCaseCorrectly() {
+
+        Callback<SscsCaseData> callback = buildCallback(FurtherEvidenceActionDynamicListItems.OTHER_DOCUMENT_MANUAL.code, ACTION_FURTHER_EVIDENCE);
+
+        given(idamService.getIdamTokens()).willReturn(IdamTokens.builder().build());
+
+        ArgumentCaptor<SscsCaseData> captor = ArgumentCaptor.forClass(SscsCaseData.class);
+
+        given(ccdService.updateCase(captor.capture(), anyLong(), eq(ISSUE_FURTHER_EVIDENCE.getCcdType()), anyString(), anyString(),
+                any(IdamTokens.class)))
+                .willReturn(SscsCaseDetails.builder().data(SscsCaseData.builder().build()).build());
+
+        handler.handle(SUBMITTED, callback, USER_AUTHORISATION);
+
+        then(ccdService).should(times(1))
+                .updateCase(eq(callback.getCaseDetails().getCaseData()), eq(123L), eq(ISSUE_FURTHER_EVIDENCE.getCcdType()), eq("Actioned manually"),
+                        eq("Actioned manually"), any(IdamTokens.class));
     }
 
 }

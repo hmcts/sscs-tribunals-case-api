@@ -9,6 +9,6 @@ public interface FieldCondition {
 
     Optional<String> getOptionalErrorMessage(SscsCaseData sscsCaseData);
 
-    Optional<String> getOptionalIsSatisfiedMessage();
+    Optional<String> getOptionalIsSatisfiedMessage(SscsCaseData caseData);
 
 }

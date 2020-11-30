@@ -21,7 +21,7 @@
         <cve>CVE-2016-5394</cve>
         <cve>CVE-2016-6798</cve>
     </suppress>
-    <suppress until="2020-11-30">
+    <suppress until="2021-01-31">
         <notes><![CDATA[
          file name: kotlin-stdlib-common-1.4.0.jar
         ]]></notes>
@@ -51,5 +51,12 @@
          Awaiting patch for Tomcat
         ]]></notes>
         <cve>CVE-2020-13943</cve>
+    </suppress>
+    <suppress until="2020-11-30">
+        <notes><![CDATA[
+         file name: junit-4.13.1.jar
+         Awaiting patch for Junit
+        ]]></notes>
+        <cve>CVE-2020-15250</cve>
     </suppress>
 </suppressions>

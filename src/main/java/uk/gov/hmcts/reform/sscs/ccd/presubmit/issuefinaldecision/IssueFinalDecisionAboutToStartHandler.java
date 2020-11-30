@@ -12,16 +12,17 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionService;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
+import uk.gov.hmcts.reform.sscs.service.DecisionNoticeService;
 
 @Service
 public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
-    private final WriteFinalDecisionPreviewDecisionService previewDecisionService;
+    private final DecisionNoticeService decisionNoticeService;
 
     @Autowired
-    public IssueFinalDecisionAboutToStartHandler(WriteFinalDecisionPreviewDecisionService previewDecisionService) {
-        this.previewDecisionService = previewDecisionService;
+    public IssueFinalDecisionAboutToStartHandler(DecisionNoticeService decisionNoticeService) {
+        this.decisionNoticeService = decisionNoticeService;
     }
 
     @Override
@@ -45,6 +46,13 @@ public class IssueFinalDecisionAboutToStartHandler implements PreSubmitCallbackH
         PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         if (sscsCaseData.getWriteFinalDecisionPreviewDocument() != null) {
+
+            String benefitType = sscsCaseData.getAppeal().getBenefitType() == null ? null : sscsCaseData.getAppeal().getBenefitType().getCode();
+
+            if (benefitType == null) {
+                response.addError("Unexpected error - benefit type is null");
+            }
+            WriteFinalDecisionPreviewDecisionServiceBase previewDecisionService = decisionNoticeService.getPreviewService(benefitType);
             previewDecisionService.preview(callback, DocumentType.FINAL_DECISION_NOTICE, userAuthorisation, true);
         } else {
             response.addError("No draft final decision notice found on case. Please use 'Write final decision' event before trying to issue.");
