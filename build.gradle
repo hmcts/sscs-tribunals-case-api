@@ -19,7 +19,7 @@ plugins {
     id 'net.ltgt.apt' version '0.21'
     id "info.solidsoft.pitest" version '1.5.2'
     id 'org.owasp.dependencycheck' version '6.0.3'
-    id 'au.com.dius.pact' version '4.1.10'
+    id 'au.com.dius.pact' version '4.1.11'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -140,21 +140,21 @@ dependencyCheck {
 
 repositories {
 
+    mavenLocal()
     maven {
         url "https://dl.bintray.com/hmcts/hmcts-maven"
     }
-
-    maven {
-        url 'https://repo.spring.io/libs-milestone'
-    }
+    mavenCentral()
 
     jcenter()
-    mavenCentral()
 
     // jitpack should be last resort
     // see: https://github.com/jitpack/jitpack.io/issues/1939
     maven { url 'https://jitpack.io' }
-    mavenLocal()
+    // Requires authentication, if it gets here the library cannot be found!
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
 }
 
 project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
@@ -216,13 +216,13 @@ ext {
 dependencyManagement {
     dependencies {
         dependency group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
-        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.13.3'
+        dependency group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.0'
         dependency group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.14.0'
         // resolves: CVE-2020-9489
         dependency group: 'org.apache.tika', name: 'tika-core', version: '1.24.1'
 
         // resolves: CVE-2019-10101, CVE-2019-10102, CVE-2019-10103, CVE-2020-15824
-        dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.10') {
+        dependencySet(group: 'org.jetbrains.kotlin', version: '1.4.20') {
             entry 'kotlin-stdlib'
             entry 'kotlin-stdlib-common'
             entry 'kotlin-stdlib-jdk8'
@@ -234,7 +234,16 @@ dependencyManagement {
           entry 'tomcat-embed-core'
           entry 'tomcat-embed-el'
           entry 'tomcat-embed-websocket'
-	}
+	    }
+
+        // CVE-2020-13954
+        dependencySet(group: 'org.apache.cxf', version: '3.4.1') {
+            entry 'cxf-core'
+            entry 'cxf-rt-frontend-jaxrs'
+            entry 'cxf-rt-rs-client'
+            entry 'cxf-rt-security'
+            entry 'cxf-rt-transports-http'
+        }
 
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
@@ -290,8 +299,8 @@ dependencies {
     compile group: 'uk.gov.hmcts.reform', name: 'doc-assembly-client', version: '1.0.6'
     compile group: 'uk.gov.hmcts.reform', name: 'document-management-client', version: '7.0.0'
 
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.2'
-    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.15'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-common', version: '4.1.9'
+    compile group: 'uk.gov.hmcts.reform', name: 'sscs-pdf-email-common', version: '1.4.17'
 
     testCompile group: 'io.rest-assured', name: 'rest-assured'
 
@@ -299,9 +308,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.14'
 
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '2.3.5.RELEASE'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.0'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.6.28'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit', version: '2.21.0'
-    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.0'
+    testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.6.28'
     testCompile group: 'org.powermock', name: 'powermock-api-mockito2', version: '2.0.9'
     testCompile group: 'net.javacrumbs.json-unit', name: 'json-unit-fluent', version: '2.21.0'
     testCompile group: 'io.github.artsok', name: 'rerunner-jupiter', version: '2.1.6'

@@ -40,7 +40,7 @@ public class EsaScenario4Test {
             + "\n"
             + "Felix Sydney has limited capability for work-related activity.\n"
             + "\n"
-            + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not an issue.\n"
+            + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
             + "\n"
             + "The following activity and descriptor from Schedule 3 applied:\n"
             + "\n"

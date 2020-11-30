@@ -79,7 +79,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
             builder.esaIsEntited(false);
             builder.esaAwardRate(null);
-            Optional<AwardType> esaAwardTypeOptional = caseData.isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
+            Optional<AwardType> esaAwardTypeOptional = caseData.getSscsEsaCaseData().isWcaAppeal() ? EsaPointsRegulationsAndSchedule3ActivitiesCondition
                 .getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(decisionNoticeQuestionService, caseData).getAwardType() : empty();
             if (!esaAwardTypeOptional.isEmpty()) {
                 String esaAwardType = esaAwardTypeOptional.get().getKey();
@@ -94,6 +94,7 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
                 }
             }
         }
+        builder.dwpReassessTheAward(caseData.getDwpReassessTheAward());
     }
 
     protected List<Descriptor> getEsaSchedule2DescriptorsFromQuestionKeys(SscsCaseData caseData, List<String> questionKeys) {
@@ -106,6 +107,9 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
 
     @Override
     protected void setDescriptorsAndPoints(WriteFinalDecisionTemplateBodyBuilder builder, SscsCaseData caseData) {
+
+        builder.wcaAppeal(caseData.getSscsEsaCaseData().isWcaAppeal());
+
         List<Descriptor> allSchedule2Descriptors = new ArrayList<>();
         List<String> physicalDisabilityAnswers = EsaActivityType.PHYSICAL_DISABILITIES.getAnswersExtractor().apply(caseData);
         if (physicalDisabilityAnswers != null) {
@@ -118,8 +122,14 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             allSchedule2Descriptors.addAll(mentalAssessmentDescriptors);
         }
 
+        // Don't add descriptors to the template if the total points in schedule 2 are zero
+        int totalPoints = allSchedule2Descriptors.stream().mapToInt(d -> d.getActivityAnswerPoints()).sum();
+        if (totalPoints == 0) {
+            allSchedule2Descriptors.clear();
+        }
+
         if (allSchedule2Descriptors.isEmpty()) {
-            if (caseData.isWcaAppeal()) {
+            if (caseData.getSscsEsaCaseData().isWcaAppeal()) {
                 if (caseData.isSupportGroupOnlyAppeal()) {
                     builder.esaSchedule2Descriptors(null);
                     builder.esaNumberOfPoints(null);
@@ -135,15 +145,15 @@ public class EsaWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
             builder.esaSchedule2Descriptors(allSchedule2Descriptors);
             int numberOfPoints = allSchedule2Descriptors.stream().mapToInt(Descriptor::getActivityAnswerPoints).sum();
             if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(numberOfPoints)) {
-                caseData.setDoesRegulation29Apply(null);
+                caseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
             }
             builder.esaNumberOfPoints(numberOfPoints);
         }
-        if (caseData.getSchedule3Selections() != null && !caseData.getSchedule3Selections().isEmpty()) {
-            builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSchedule3Selections()));
+        if (caseData.getSscsEsaCaseData().getSchedule3Selections() != null && !caseData.getSscsEsaCaseData().getSchedule3Selections().isEmpty()) {
+            builder.esaSchedule3Descriptors(getEsaSchedule3DescriptorsFromQuestionKeys(caseData, caseData.getSscsEsaCaseData().getSchedule3Selections()));
         }
-        builder.regulation29Applicable(caseData.getDoesRegulation29Apply() == null ? null :  caseData.getDoesRegulation29Apply().toBoolean());
-        builder.regulation35Applicable(caseData.getDoesRegulation35Apply() == null ? null :  caseData.getDoesRegulation35Apply().toBoolean());
+        builder.regulation29Applicable(caseData.getSscsEsaCaseData().getDoesRegulation29Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation29Apply().toBoolean());
+        builder.regulation35Applicable(caseData.getSscsEsaCaseData().getDoesRegulation35Apply() == null ? null :  caseData.getSscsEsaCaseData().getDoesRegulation35Apply().toBoolean());
         builder.supportGroupOnly(caseData.isSupportGroupOnlyAppeal());
     }
 

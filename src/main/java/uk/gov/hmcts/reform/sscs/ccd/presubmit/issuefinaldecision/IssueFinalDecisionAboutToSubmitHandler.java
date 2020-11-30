@@ -188,15 +188,47 @@ public class IssueFinalDecisionAboutToSubmitHandler implements PreSubmitCallback
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
         sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
-        sscsCaseData.getSscsEsaCaseData().setDwpReassessTheAward(null);
-        sscsCaseData.setShowRegulation29Page(null);
-        sscsCaseData.setShowSchedule3ActivitiesPage(null);
+        sscsCaseData.setDwpReassessTheAward(null);
+        sscsCaseData.getSscsEsaCaseData().setShowRegulation29Page(null);
+        sscsCaseData.getSscsEsaCaseData().setShowSchedule3ActivitiesPage(null);
         sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
         sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
-        sscsCaseData.setWcaAppeal(null);
+        sscsCaseData.getSscsEsaCaseData().setWcaAppeal(null);
         sscsCaseData.setSupportGroupOnlyAppeal(null);
-        sscsCaseData.setDoesRegulation29Apply(null);
-        sscsCaseData.setDoesRegulation35Apply(null);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation29Apply(null);
+        sscsCaseData.getSscsEsaCaseData().setDoesRegulation35Apply(null);
+
+        //UC
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMentalAssessmentQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMobilisingUnaidedQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionStandingAndSittingQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionReachingQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPickingUpQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionManualDexterityQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionMakingSelfUnderstoodQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionCommunicationQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionNavigationQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionLossOfControlQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionConsciousnessQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionLearningTasksQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionAwarenessOfHazardsQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionPersonalActionQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionCopingWithChangeQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionGettingAboutQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSocialEngagementQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionAppropriatenessOfBehaviourQuestion(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesApply(null);
+        sscsCaseData.getSscsUcCaseData().setUcWriteFinalDecisionSchedule7ActivitiesQuestion(null);
+        sscsCaseData.setDwpReassessTheAward(null);
+        sscsCaseData.getSscsUcCaseData().setShowSchedule8Paragraph4Page(null);
+        sscsCaseData.getSscsUcCaseData().setShowSchedule7ActivitiesPage(null);
+        sscsCaseData.setShowFinalDecisionNoticeSummaryOfOutcomePage(null);
+        sscsCaseData.setWriteFinalDecisionDetailsOfDecision(null);
+        sscsCaseData.getSscsUcCaseData().setLcwaAppeal(null);
+        sscsCaseData.setSupportGroupOnlyAppeal(null);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule8Paragraph4Apply(null);
+        sscsCaseData.getSscsUcCaseData().setDoesSchedule9Paragraph4Apply(null);
 
         preSubmitCallbackResponse.getData().getSscsDocument()
                 .removeIf(doc -> doc.getValue().getDocumentType().equals(DRAFT_DECISION_NOTICE.getValue()));

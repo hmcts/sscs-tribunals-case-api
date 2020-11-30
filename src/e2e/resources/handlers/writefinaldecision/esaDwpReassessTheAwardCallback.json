@@ -1,6 +1,6 @@
 {
   "case_details":{
-    "id":1604586604346284,
+    "id":1604586669387645,
     "jurisdiction":"SSCS",
     "state":"validAppeal",
     "version":0,
@@ -10,9 +10,9 @@
       11,
       5,
       14,
-      30,
-      4,
-      388388000
+      31,
+      9,
+      391642000
     ],
     "last_modified":[
       2020,
@@ -21,53 +21,55 @@
       14,
       32,
       19,
-      967077000
+      966570000
     ],
     "last_state_modified_date":[
       2020,
       11,
       5,
       14,
-      30,
-      4,
-      388388000
+      31,
+      9,
+      391642000
     ],
     "security_classification":"PUBLIC",
     "case_data":{
-      "dwpReassessTheAward":"DWP_REASSESS_THE_AWARD",
+      "caseCode":"051DD",
+      "dwpReassessTheAward": "DWP_REASSESS_THE_AWARD",
       "supportGroupOnlyAppeal":"No",
-      "wcaAppeal":"No",
-      "writeFinalDecisionAllowedOrRefused":"allowed",
       "writeFinalDecisionGenerateNotice":"Yes",
-      "writeFinalDecisionPresentingOfficerAttendedQuestion":"Yes",
-      "writeFinalDecisionDetailsOfDecision":"Summary of outcome decision",
-      "writeFinalDecisionDateOfDecision":"2020-11-11",
+      "doesRegulation29Apply":"Yes",
+      "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionPageSectionReference":"B7",
-      "writeFinalDecisionTypeOfHearing":"telephone",
-      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Medicine",
-      "writeFinalDecisionOtherPanelMemberName":"Dr Other",
-      "writeFinalDecisionAnythingElse":"Anything else.",
+      "writeFinalDecisionTypeOfHearing":"triage",
+      "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
+        "mobilisingUnaided"
+      ],
+      "esaWriteFinalDecisionMobilisingUnaidedQuestion":"mobilisingUnaided1b",
+      "doesRegulation35Apply":"Yes",
+      "wcaAppeal":"Yes",
+      "writeFinalDecisionAllowedOrRefused":"allowed",
+      "esaWriteFinalDecisionMentalAssessmentQuestion":[],
+      "writeFinalDecisionMedicallyQualifiedPanelMemberName":"Dr Pepper",
+      "writeFinalDecisionOtherPanelMemberName":"Professor Orange",
       "writeFinalDecisionReasons":[
         {
-          "id":"43a7febc-c78e-48f9-86da-acb61673e879",
-          "value":"Reasons for decision 1"
-        },
-        {
-          "id":"8defe6e0-cae5-4790-8eb2-704a81be9c17",
-          "value":"Reasons for decision 2"
+          "id":"ddfd2632-5ee2-4684-9b96-a90bea89bdc5",
+          "value":"Reasons for decision"
         }
       ],
-      "caseCode":"051DD",
+      "esaWriteFinalDecisionSchedule3ActivitiesApply":"No",
+      "writeFinalDecisionAnythingElse":"Anything else",
       "subscriptions":{
         "appellantSubscription":{
-          "tya":"d7sLRFgPH5",
+          "tya":"0oGRulRKtA",
           "email":"sscstest+notify@greencroftconsulting.com",
           "mobile":"+447398785050",
           "reason":null,
           "subscribeSms":"No",
           "subscribeEmail":"No",
           "lastLoggedIntoMya":null,
-          "wantSmsNotifications":"Yes"
+          "wantSmsNotifications":"No"
         },
         "appointeeSubscription":{
           "tya":null,
@@ -100,7 +102,7 @@
           "wantSmsNotifications":null
         },
         "representativeSubscription":{
-          "tya":"Ihpc9Qm0gs",
+          "tya":"wN09eXpI3n",
           "email":"harry.potter@wizards.com",
           "mobile":"+447411999999",
           "reason":null,
@@ -110,7 +112,7 @@
           "wantSmsNotifications":"No"
         }
       },
-      "dwpRegionalCentre":"Inverness DRT",
+      "dwpRegionalCentre":"Coatbridge Benefit Centre",
       "benefitCode":"051",
       "regionalProcessingCenter":{
         "city":"BRADFORD",
@@ -127,13 +129,9 @@
       "isScottishCase":"No",
       "createdInGapsFrom":"validAppeal",
       "issueCode":"DD",
-      "evidencePresent":"No",
-      "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
-
-      ],
       "appeal":{
         "mrnDetails":{
-          "dwpIssuingOffice":"Inverness DRT",
+          "dwpIssuingOffice":"Coatbridge Benefit Centre",
           "mrnDate":"2020-11-05",
           "mrnLateReason":null,
           "mrnMissingReason":null
@@ -158,7 +156,7 @@
           },
           "identity":{
             "dob":"1990-02-26",
-            "nino":"SXUVQSJ6A"
+            "nino":"V8FIUN8Q6"
           },
           "isAppointee":"No",
           "appointee":{
@@ -203,21 +201,21 @@
                 "start":"2018-04-04",
                 "end":"2018-04-04"
               },
-              "id":"57db89fd-79e0-4f56-adbd-495188db03ce"
+              "id":"b9068b5c-0ea1-44e1-85f3-5fc2f318c977"
             },
             {
               "value":{
                 "start":"2018-04-05",
                 "end":"2018-04-05"
               },
-              "id":"5c1441fe-d108-4438-a3e1-0af594c51d9b"
+              "id":"5fd096af-d583-4793-b2a2-8ad0242be25d"
             },
             {
               "value":{
                 "start":"2018-04-06",
                 "end":"2018-04-06"
               },
-              "id":"51bf5eb4-2485-48f8-acc6-8b82f85cd217"
+              "id":"6b4cfb5d-9b90-4bb3-921f-4f7c41c8751c"
             }
           ],
           "other":"Yes, this..."
@@ -229,21 +227,21 @@
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               },
-              "id":"78bd9e75-603e-48a5-8194-c26be5c3eecf"
+              "id":"3d0413ce-3de4-4397-825e-ff5e6dfc4769"
             },
             {
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               },
-              "id":"55e3fc79-dbf7-4dc7-8060-a965c67a72a6"
+              "id":"546f5959-d85b-4425-8055-9707542e6283"
             },
             {
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
               },
-              "id":"2c6bea4e-0d13-43db-a963-23242cd7b672"
+              "id":"ff51e565-9445-4cd8-87fd-2b05b05d9584"
             }
           ],
           "otherReasons":"Another reason"
@@ -276,24 +274,21 @@
         },
         "receivedVia":"Online"
       },
-      "writeFinalDecisionAppellantAttendedQuestion":"Yes",
+      "evidencePresent":"No",
       "sscsDocument":[
         {
-          "id":"1ac3d4d1-3300-48b6-90f9-3c604a84d87f",
+          "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
           "value":{
             "documentLink":{
-              "document_url":"http://dm-store:5005/documents/5a091f64-d7d6-4a85-9dda-80062dbff8d4",
-              "document_filename":"Bloggs_J6A.pdf",
-              "document_binary_url":"http://dm-store:5005/documents/5a091f64-d7d6-4a85-9dda-80062dbff8d4/binary"
+              "document_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6",
+              "document_filename":"Bloggs_8Q6.pdf",
+              "document_binary_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6/binary"
             },
             "documentType":"sscs1",
-            "documentFileName":"Bloggs_J6A.pdf",
+            "documentFileName":"Bloggs_8Q6.pdf",
             "documentDateAdded":"2020-11-05"
           }
         }
-      ],
-      "esaWriteFinalDecisionMentalAssessmentQuestion":[
-
       ],
       "caseCreated":"2020-11-05",
       "region":"BRADFORD"
@@ -477,21 +472,21 @@
               "reasons":{
                 "value":[
                   {
-                    "id":"4c5a99aa-323b-4861-bd04-ab3262786177",
+                    "id":"4f157634-b310-407f-9601-f74fd49ae73f",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"7d5f0b20-dc59-4a23-9957-7a7e38f087aa",
+                    "id":"a015f279-6df8-471d-a5e1-70171448bdd1",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"948dffcf-25f6-47d3-8e6b-6b46d338dce2",
+                    "id":"84fa5dea-1466-4b05-8558-4da649004d7b",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
@@ -512,21 +507,21 @@
               "excludeDates":{
                 "value":[
                   {
-                    "id":"719c3215-6055-4721-a1fd-27fda3c6cd9a",
+                    "id":"488f412d-40f8-4f51-9c30-d1fae608f910",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"b6bd81be-89a9-45dd-95a2-6dc8c908a7b5",
+                    "id":"2c960b8c-d358-4251-af5f-4a24b1d53951",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"ce2fbf23-ae1e-4f51-bfd1-fa9ebe68e011",
+                    "id":"7d396ed7-0fe0-401f-904c-976c0075bf91",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
@@ -556,7 +551,7 @@
       "sscsDocument":{
         "value":[
           {
-            "id":"1ac3d4d1-3300-48b6-90f9-3c604a84d87f",
+            "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
             "value":{
               "documentLink":"PUBLIC",
               "documentType":"PUBLIC",
@@ -773,21 +768,21 @@
               "reasons":{
                 "value":[
                   {
-                    "id":"4c5a99aa-323b-4861-bd04-ab3262786177",
+                    "id":"4f157634-b310-407f-9601-f74fd49ae73f",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"7d5f0b20-dc59-4a23-9957-7a7e38f087aa",
+                    "id":"a015f279-6df8-471d-a5e1-70171448bdd1",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"948dffcf-25f6-47d3-8e6b-6b46d338dce2",
+                    "id":"84fa5dea-1466-4b05-8558-4da649004d7b",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
@@ -808,21 +803,21 @@
               "excludeDates":{
                 "value":[
                   {
-                    "id":"719c3215-6055-4721-a1fd-27fda3c6cd9a",
+                    "id":"488f412d-40f8-4f51-9c30-d1fae608f910",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"b6bd81be-89a9-45dd-95a2-6dc8c908a7b5",
+                    "id":"2c960b8c-d358-4251-af5f-4a24b1d53951",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"ce2fbf23-ae1e-4f51-bfd1-fa9ebe68e011",
+                    "id":"7d396ed7-0fe0-401f-904c-976c0075bf91",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
@@ -852,7 +847,7 @@
       "sscsDocument":{
         "value":[
           {
-            "id":"1ac3d4d1-3300-48b6-90f9-3c604a84d87f",
+            "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
             "value":{
               "documentLink":"PUBLIC",
               "documentType":"PUBLIC",
@@ -886,7 +881,7 @@
     }
   },
   "case_details_before":{
-    "id":1604586604346284,
+    "id":1604586669387645,
     "jurisdiction":"SSCS",
     "state":"validAppeal",
     "version":0,
@@ -896,9 +891,9 @@
       11,
       5,
       14,
-      30,
-      4,
-      388388000
+      31,
+      9,
+      391642000
     ],
     "last_modified":[
       2020,
@@ -907,16 +902,16 @@
       14,
       32,
       19,
-      967077000
+      966570000
     ],
     "last_state_modified_date":[
       2020,
       11,
       5,
       14,
-      30,
-      4,
-      388388000
+      31,
+      9,
+      391642000
     ],
     "security_classification":"PUBLIC",
     "case_data":{
@@ -924,7 +919,7 @@
       "evidencePresent":"No",
       "subscriptions":{
         "appellantSubscription":{
-          "tya":"d7sLRFgPH5",
+          "tya":"0oGRulRKtA",
           "email":"sscstest+notify@greencroftconsulting.com",
           "mobile":"+447398785050",
           "reason":null,
@@ -964,7 +959,7 @@
           "wantSmsNotifications":null
         },
         "representativeSubscription":{
-          "tya":"Ihpc9Qm0gs",
+          "tya":"wN09eXpI3n",
           "email":"harry.potter@wizards.com",
           "mobile":"+447411999999",
           "reason":null,
@@ -974,7 +969,7 @@
           "wantSmsNotifications":"Yes"
         }
       },
-      "dwpRegionalCentre":"Inverness DRT",
+      "dwpRegionalCentre":"Coatbridge Benefit Centre",
       "appeal":{
         "rep":{
           "name":{
@@ -1018,7 +1013,7 @@
           },
           "identity":{
             "dob":"1990-02-26",
-            "nino":"SXUVQSJ6A"
+            "nino":"V8FIUN8Q6"
           },
           "appointee":{
 
@@ -1029,7 +1024,7 @@
         "mrnDetails":{
           "mrnDate":"2020-11-05",
           "mrnLateReason":null,
-          "dwpIssuingOffice":"Inverness DRT",
+          "dwpIssuingOffice":"Coatbridge Benefit Centre",
           "mrnMissingReason":null
         },
         "benefitType":{
@@ -1041,21 +1036,21 @@
         "appealReasons":{
           "reasons":[
             {
-              "id":"4c5a99aa-323b-4861-bd04-ab3262786177",
+              "id":"4f157634-b310-407f-9601-f74fd49ae73f",
               "value":{
                 "reason":"aaaaaaaaaa",
                 "description":"aaaaaaaaaa"
               }
             },
             {
-              "id":"7d5f0b20-dc59-4a23-9957-7a7e38f087aa",
+              "id":"a015f279-6df8-471d-a5e1-70171448bdd1",
               "value":{
                 "reason":"bbbbbbbbbb",
                 "description":"bbbbbbbbbb"
               }
             },
             {
-              "id":"948dffcf-25f6-47d3-8e6b-6b46d338dce2",
+              "id":"84fa5dea-1466-4b05-8558-4da649004d7b",
               "value":{
                 "reason":"cccccccccc",
                 "description":"cccccccccc"
@@ -1073,21 +1068,21 @@
           ],
           "excludeDates":[
             {
-              "id":"719c3215-6055-4721-a1fd-27fda3c6cd9a",
+              "id":"488f412d-40f8-4f51-9c30-d1fae608f910",
               "value":{
                 "end":"2018-04-04",
                 "start":"2018-04-04"
               }
             },
             {
-              "id":"b6bd81be-89a9-45dd-95a2-6dc8c908a7b5",
+              "id":"2c960b8c-d358-4251-af5f-4a24b1d53951",
               "value":{
                 "end":"2018-04-05",
                 "start":"2018-04-05"
               }
             },
             {
-              "id":"ce2fbf23-ae1e-4f51-bfd1-fa9ebe68e011",
+              "id":"7d396ed7-0fe0-401f-904c-976c0075bf91",
               "value":{
                 "end":"2018-04-06",
                 "start":"2018-04-06"
@@ -1107,15 +1102,15 @@
       "benefitCode":"051",
       "sscsDocument":[
         {
-          "id":"1ac3d4d1-3300-48b6-90f9-3c604a84d87f",
+          "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
           "value":{
             "documentLink":{
-              "document_url":"http://dm-store:5005/documents/5a091f64-d7d6-4a85-9dda-80062dbff8d4",
-              "document_filename":"Bloggs_J6A.pdf",
-              "document_binary_url":"http://dm-store:5005/documents/5a091f64-d7d6-4a85-9dda-80062dbff8d4/binary"
+              "document_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6",
+              "document_filename":"Bloggs_8Q6.pdf",
+              "document_binary_url":"http://dm-store:5005/documents/deed8cc2-9d9e-4f5e-8c26-941010f4f9f6/binary"
             },
             "documentType":"sscs1",
-            "documentFileName":"Bloggs_J6A.pdf",
+            "documentFileName":"Bloggs_8Q6.pdf",
             "documentDateAdded":"2020-11-05"
           }
         }
@@ -1317,21 +1312,21 @@
               "reasons":{
                 "value":[
                   {
-                    "id":"4c5a99aa-323b-4861-bd04-ab3262786177",
+                    "id":"4f157634-b310-407f-9601-f74fd49ae73f",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"7d5f0b20-dc59-4a23-9957-7a7e38f087aa",
+                    "id":"a015f279-6df8-471d-a5e1-70171448bdd1",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"948dffcf-25f6-47d3-8e6b-6b46d338dce2",
+                    "id":"84fa5dea-1466-4b05-8558-4da649004d7b",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
@@ -1352,21 +1347,21 @@
               "excludeDates":{
                 "value":[
                   {
-                    "id":"719c3215-6055-4721-a1fd-27fda3c6cd9a",
+                    "id":"488f412d-40f8-4f51-9c30-d1fae608f910",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"b6bd81be-89a9-45dd-95a2-6dc8c908a7b5",
+                    "id":"2c960b8c-d358-4251-af5f-4a24b1d53951",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"ce2fbf23-ae1e-4f51-bfd1-fa9ebe68e011",
+                    "id":"7d396ed7-0fe0-401f-904c-976c0075bf91",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
@@ -1396,7 +1391,7 @@
       "sscsDocument":{
         "value":[
           {
-            "id":"1ac3d4d1-3300-48b6-90f9-3c604a84d87f",
+            "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
             "value":{
               "documentLink":"PUBLIC",
               "documentType":"PUBLIC",
@@ -1613,21 +1608,21 @@
               "reasons":{
                 "value":[
                   {
-                    "id":"4c5a99aa-323b-4861-bd04-ab3262786177",
+                    "id":"4f157634-b310-407f-9601-f74fd49ae73f",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"7d5f0b20-dc59-4a23-9957-7a7e38f087aa",
+                    "id":"a015f279-6df8-471d-a5e1-70171448bdd1",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
                     }
                   },
                   {
-                    "id":"948dffcf-25f6-47d3-8e6b-6b46d338dce2",
+                    "id":"84fa5dea-1466-4b05-8558-4da649004d7b",
                     "value":{
                       "reason":"PUBLIC",
                       "description":"PUBLIC"
@@ -1648,21 +1643,21 @@
               "excludeDates":{
                 "value":[
                   {
-                    "id":"719c3215-6055-4721-a1fd-27fda3c6cd9a",
+                    "id":"488f412d-40f8-4f51-9c30-d1fae608f910",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"b6bd81be-89a9-45dd-95a2-6dc8c908a7b5",
+                    "id":"2c960b8c-d358-4251-af5f-4a24b1d53951",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
                     }
                   },
                   {
-                    "id":"ce2fbf23-ae1e-4f51-bfd1-fa9ebe68e011",
+                    "id":"7d396ed7-0fe0-401f-904c-976c0075bf91",
                     "value":{
                       "end":"PUBLIC",
                       "start":"PUBLIC"
@@ -1692,7 +1687,7 @@
       "sscsDocument":{
         "value":[
           {
-            "id":"1ac3d4d1-3300-48b6-90f9-3c604a84d87f",
+            "id":"e0a86d4b-f0ab-4373-8b44-de6a670ac0b7",
             "value":{
               "documentLink":"PUBLIC",
               "documentType":"PUBLIC",

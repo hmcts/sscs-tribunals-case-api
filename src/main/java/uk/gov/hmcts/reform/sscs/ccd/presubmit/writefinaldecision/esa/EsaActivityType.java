@@ -22,7 +22,7 @@ public enum EsaActivityType implements ActivityType {
 
     EsaActivityType(String name, Function<SscsEsaCaseData, List<String>> answersExtractor) {
         this.name = name;
-        this.answersExtractor = c -> answersExtractor.apply(c.getEsaSscsCaseData());
+        this.answersExtractor = c -> answersExtractor.apply(c.getSscsEsaCaseData());
     }
 
     public Function<SscsCaseData, List<String>> getAnswersExtractor() {

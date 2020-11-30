@@ -52,7 +52,7 @@ public class EsaScenario7Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
             + "\n"
-            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.\n"
+            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -101,11 +101,11 @@ public class EsaScenario7Test {
             + "\n"
             + "This is because insufficient points were scored to meet the threshold for the work capability assessment, but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied.\n"
             + "\n"
-            + "In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
+            + "In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008.\n"
             + "\n"
             + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
             + "\n"
-            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if they were found not to have limited capability for work.\n"
+            + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -116,7 +116,7 @@ public class EsaScenario7Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(12, content.getComponents().size());
+        Assert.assertEquals(11, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 

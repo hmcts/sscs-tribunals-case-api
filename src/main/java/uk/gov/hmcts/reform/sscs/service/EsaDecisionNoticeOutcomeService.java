@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.SscsEsaCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.domain.YesNo;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAllowedOrRefusedCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
@@ -29,41 +30,48 @@ public class EsaDecisionNoticeOutcomeService extends DecisionNoticeOutcomeServic
 
         if ("Yes".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionGenerateNotice())) {
 
-            if (sscsCaseData.isWcaAppeal()) {
+            SscsEsaCaseData esaCaseData = sscsCaseData.getSscsEsaCaseData();
+
+            if (sscsCaseData.getSscsEsaCaseData().isWcaAppeal()) {
 
                 if (sscsCaseData.isSupportGroupOnlyAppeal()) {
-                    sscsCaseData.setDoesRegulation29Apply(null);
+                    esaCaseData.setDoesRegulation29Apply(null);
                     sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionPhysicalDisabilitiesQuestion(null);
                     sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionMentalAssessmentQuestion(null);
                     // Ensure that we set the following fields taking into account the radio button
                     // for whether schedule 3 activities apply.   The getRegulation35Selection and
                     // getSchedule3Selections methods peform this check,  and we use these methods
                     // to set the final values of doesRegulation35Apply and esaWriteFinalDecisionSchedule3ActivitiesQuestion
-                    sscsCaseData.setDoesRegulation35Apply(sscsCaseData.getRegulation35Selection());
-                    sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(sscsCaseData.getSchedule3Selections());
+                    esaCaseData.setDoesRegulation35Apply(esaCaseData.getRegulation35Selection());
+                    sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(esaCaseData.getSchedule3Selections());
                 } else {
                     int totalPoints = questionService.getTotalPoints(sscsCaseData,
                         EsaPointsRegulationsAndSchedule3ActivitiesCondition.getAllAnswersExtractor().apply(sscsCaseData));
 
                     if (EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-                        sscsCaseData.setDoesRegulation29Apply(null);
+                        esaCaseData.setDoesRegulation29Apply(null);
                         // Ensure that we set the following fields taking into account the radio button
                         // for whether schedule 3 activities apply.   The getRegulation35Selection and
                         // getSchedule3Selections methods peform this check,  and we use these methods
                         // to set the final values of doesRegulation35Apply and esaWriteFinalDecisionSchedule3ActivitiesQuestion
-                        sscsCaseData.setDoesRegulation35Apply(sscsCaseData.getRegulation35Selection());
-                        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(sscsCaseData.getSchedule3Selections());
+                        esaCaseData.setDoesRegulation35Apply(esaCaseData.getRegulation35Selection());
+                        sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(esaCaseData.getSchedule3Selections());
                     } else if (EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN.getPointsRequirementCondition().test(totalPoints)) {
-                        if (YesNo.NO.equals(sscsCaseData.getDoesRegulation29Apply())) {
+                        if (YesNo.NO.equals(esaCaseData.getDoesRegulation29Apply())) {
                             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
-                            sscsCaseData.setDoesRegulation35Apply(null);
+                            esaCaseData.setDoesRegulation35Apply(null);
                             sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
                         }
                     }
                 }
+                if ("refused".equalsIgnoreCase(sscsCaseData.getWriteFinalDecisionAllowedOrRefused())) {
+                    sscsCaseData.setDwpReassessTheAward(null);
+                }
             } else {
-                sscsCaseData.setDoesRegulation35Apply(null);
-                sscsCaseData.setDoesRegulation29Apply(null);
+                esaCaseData.setDoesRegulation35Apply(null);
+                esaCaseData.setDoesRegulation29Apply(null);
+                sscsCaseData.setSupportGroupOnlyAppeal(null);
+                sscsCaseData.setDwpReassessTheAward(null);
                 sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesApply(null);
                 sscsCaseData.getSscsEsaCaseData().setEsaWriteFinalDecisionSchedule3ActivitiesQuestion(null);
             }
