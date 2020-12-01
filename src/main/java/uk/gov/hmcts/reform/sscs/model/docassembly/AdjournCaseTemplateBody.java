@@ -42,9 +42,6 @@ public class AdjournCaseTemplateBody {
     @JsonProperty("next_hearing_date")
     private String nextHearingDate;
 
-    @JsonProperty("next_hearing_time")
-    private String nextHearingTime;
-
     @JsonProperty("next_hearing_timeslot")
     private String nextHearingTimeslot;
 
@@ -55,7 +52,7 @@ public class AdjournCaseTemplateBody {
     private List<String> reasonsForDecision;
 
     @JsonProperty("additional_directions")
-    private String additionalDirections;
+    private List<String> additionalDirections;
 
     @JsonProperty("interpreter_description")
     private String interpreterDescription;

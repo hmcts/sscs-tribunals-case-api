@@ -45,7 +45,7 @@ public class IssueDocumentHandler {
         caseData.setSscsInterlocDecisionDocument(null);
     }
 
-    protected NoticeIssuedTemplateBody createPayload(SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
+    protected NoticeIssuedTemplateBody createPayload(PreSubmitCallbackResponse<SscsCaseData> response, SscsCaseData caseData, String documentTypeLabel, LocalDate dateAdded, LocalDate generatedDate, boolean isScottish, String userAuthorisation) {
         NoticeIssuedTemplateBody formPayload = NoticeIssuedTemplateBody.builder()
                 .appellantFullName(buildFullName(caseData))
                 .appointeeFullName(buildAppointeeName(caseData).orElse(null))
@@ -90,7 +90,13 @@ public class IssueDocumentHandler {
 
         boolean isScottish = Optional.ofNullable(caseData.getRegionalProcessingCenter()).map(f -> equalsIgnoreCase(f.getName(), GLASGOW)).orElse(false);
 
-        FormPayload formPayload = createPayload(caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
+        PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(caseData);
+
+        FormPayload formPayload = createPayload(response, caseData, embeddedDocumentTypeLabel, dateAdded, LocalDate.now(), isScottish, userAuthorisation);
+
+        if (!response.getErrors().isEmpty()) {
+            return response;
+        }
 
         GenerateFileParams params = GenerateFileParams.builder()
                 .renditionOutputLocation(documentUrl)
@@ -115,7 +121,7 @@ public class IssueDocumentHandler {
 
         setDocumentOnCaseData(caseData, previewFile);
 
-        return new PreSubmitCallbackResponse<>(caseData);
+        return response;
     }
 
     /**

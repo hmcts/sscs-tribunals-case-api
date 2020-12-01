@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToC
 import feign.FeignException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -179,7 +178,11 @@ public class SubmitAppealService {
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {
         SscsCaseDetails caseDetails = null;
         try {
-            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(caseData, idamTokens);
+            caseDetails = ccdService.findCcdCaseByNinoAndBenefitTypeAndMrnDate(
+                    caseData.getAppeal().getAppellant().getIdentity().getNino(),
+                    caseData.getAppeal().getBenefitType().getCode(),
+                    caseData.getAppeal().getMrnDetails().getMrnDate(),
+                    idamTokens);
 
             if (caseDetails == null) {
 
@@ -196,10 +199,11 @@ public class SubmitAppealService {
                     }
                 }
 
-                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {}",
+                log.info("About to attempt creating case in CCD for benefit type {} and event {} and isScottish {} and languagePreference {}",
                         caseData.getAppeal().getBenefitType().getCode(),
                         eventType,
-                        caseData.getIsScottishCase());
+                        caseData.getIsScottishCase(),
+                        caseData.getLanguagePreference().getCode());
 
                 caseDetails = ccdService.createCase(caseData,
                     eventType.getCcdType(),
@@ -230,11 +234,7 @@ public class SubmitAppealService {
     }
 
     protected List<SscsCaseDetails> getMatchedCases(String nino, IdamTokens idamTokens) {
-        HashMap<String, String> map = new HashMap<String, String>();
-
-        map.put("case.appeal.appellant.identity.nino", nino);
-
-        return ccdService.findCaseBy(map, idamTokens);
+        return ccdService.findCaseBy("data.appeal.appellant.identity.nino", nino, idamTokens);
     }
 
     protected SscsCaseData addAssociatedCases(SscsCaseData caseData, List<SscsCaseDetails> matchedByNinoCases) {

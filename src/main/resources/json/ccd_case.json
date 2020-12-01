@@ -25,7 +25,31 @@
       "identity": {
         "dob": "1990-02-26",
         "nino": "AB877533C"
-      }
+      },
+      "appointee": {
+        "name": {
+          "title": "Mr",
+          "lastName": "Test",
+          "firstName": "Appointee"
+        },
+        "address": {
+          "line1": "124 Hairy Lane",
+          "line2": "Off Hairy Park",
+          "town": "Hairyfield",
+          "county": "Kent",
+          "postcode": "TS1 1ST"
+        },
+        "contact": {
+          "email": "appointee@test.com",
+          "mobile": "07411222223"
+        },
+        "identity": {
+          "dob": "1995-02-26",
+          "nino": "AB877533B"
+        }
+      },
+      "isAppointee": "Yes",
+      "isAddressSameAsAppointee": null
     },
     "benefitType": {
       "code": "PIP"
@@ -112,6 +136,30 @@
       "wantSmsNotifications": "Yes",
       "tya": "ew2OCHXOL5",
       "email": "joe@bloggs.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
+    },
+    "appointeeSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL7",
+      "email": "appointee@test.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
+    },
+    "representativeSubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL8",
+      "email": "rep@test.com",
+      "mobile": "07411333333",
+      "subscribeEmail": "Yes",
+      "subscribeSms": "Yes"
+    },
+    "jointPartySubscription": {
+      "wantSmsNotifications": "Yes",
+      "tya": "ew2OCHXOL6",
+      "email": "joint@bloggs.com",
       "mobile": "07411333333",
       "subscribeEmail": "Yes",
       "subscribeSms": "Yes"

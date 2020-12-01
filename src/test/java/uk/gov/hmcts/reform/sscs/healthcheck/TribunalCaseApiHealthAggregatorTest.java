@@ -1,14 +1,14 @@
 package uk.gov.hmcts.reform.sscs.healthcheck;
 
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
-import java.net.SocketTimeoutException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.*;
 
 public class TribunalCaseApiHealthAggregatorTest {
 
@@ -16,42 +16,47 @@ public class TribunalCaseApiHealthAggregatorTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         tribunalCaseApiHealthAggregator = new TribunalCaseApiHealthAggregator();
     }
 
-
     @Test
-    public void shouldReturnOverallHealthUpWithDetailMessageUp() {
+    public void shouldReturnOverallHealthUpWithWhenSoftCheckHealthIsDown() {
         //Given
-        Health mockCcdDataHealth = Health.up().build();
-        Health mockPdfServiceHealth = Health.up().build();
-        Map<String, Health> healths = new HashMap<>();
-        healths.put("mockCcdDataHealth", mockCcdDataHealth);
-        healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
+        HealthIndicator mockCoreCaseData = mock(HealthIndicator.class);
+        HealthIndicator mockDocumentManagement = mock(HealthIndicator.class);
+        when(mockCoreCaseData.health()).thenReturn(Health.up().build());
+        when(mockDocumentManagement.health()).thenReturn(Health.down().build());
+
+        List<NamedContributor<HealthContributor>> namedContributors = new ArrayList<>();
+        namedContributors.add(NamedContributor.of("coreCaseData", mockCoreCaseData));
+        namedContributors.add(NamedContributor.of("documentManagement", mockDocumentManagement));
+
         // when
-        Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
+        Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
 
         // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual.getStatus());
-        Assert.assertEquals("UP {}", actual.getDetails().values().iterator().next().toString());
+        Assert.assertEquals(Health.up().build().getStatus(), actual);
     }
 
     @Test
-    public void shouldReturnOverallHealthUpWithDetailMessageWithException() {
+    public void shouldReturnOverallHealthUpWhenHardCheckHealthIsDown() {
         //Given
-        Health mockCcdDataHealth = Health.down(new SocketTimeoutException()).build();
-        Health mockPdfServiceHealth = Health.up().build();
-        Map<String, Health> healths = new HashMap<>();
-        healths.put("mockCcdDataHealth", mockCcdDataHealth);
-        healths.put("mockPdfServiceHealth", mockPdfServiceHealth);
+        HealthIndicator mockCoreCaseData = mock(HealthIndicator.class);
+        HealthIndicator mockDocumentManagement = mock(HealthIndicator.class);
+
+        when(mockCoreCaseData.health()).thenReturn(Health.down().build());
+        when(mockDocumentManagement.health()).thenReturn(Health.up().build());
+
+        List<NamedContributor<HealthContributor>> namedContributors = new ArrayList<>();
+        namedContributors.add(NamedContributor.of("coreCaseData", mockCoreCaseData));
+        namedContributors.add(NamedContributor.of("documentManagement", mockDocumentManagement));
+
         // when
-        Health actual = tribunalCaseApiHealthAggregator.aggregate(healths);
+        Status actual = tribunalCaseApiHealthAggregator.getAggregateStatus();
 
         // then
-        Assert.assertEquals(Health.up().build().getStatus(), actual.getStatus());
-        Assert.assertEquals("{mockCcdDataHealth=DOWN {error=java.net.SocketTimeoutException: null}, mockPdfServiceHealth=UP {}}",
-                actual.getDetails().values().iterator().next().toString());
+        Assert.assertEquals(Health.up().build().getStatus(), actual);
     }
 
 }

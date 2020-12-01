@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.hmctsresponsereviewed;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 
 import java.util.Collections;
@@ -35,7 +35,7 @@ public class HmctsResponseReviewedAboutToStartTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
         dwpAddressLookupService = new DwpAddressLookupService();
         handler = new HmctsResponseReviewedAboutToStartHandler(dwpAddressLookupService);
 

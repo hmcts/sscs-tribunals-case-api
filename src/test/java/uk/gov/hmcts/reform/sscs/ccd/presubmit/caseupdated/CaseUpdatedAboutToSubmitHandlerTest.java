@@ -94,6 +94,18 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     }
 
     @Test
+    public void givenACaseUpdatedEventWithUcCase_thenSetCaseCode() {
+        List<String> elementList = new ArrayList<>();
+        elementList.add("testElement");
+        sscsCaseData.setElementsDisputedList(elementList);
+        sscsCaseData.getAppeal().setBenefitType(BenefitType.builder().code("uc").build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("002DD", response.getData().getCaseCode());
+    }
+
+    @Test
     public void givenACaseUpdatedEventWithEmptyBenefitCodeAndCaseCode_thenDoNotOverrideCaseCode() {
         callback.getCaseDetails().getCaseData().setBenefitCode(null);
         callback.getCaseDetails().getCaseData().setIssueCode(null);
@@ -128,7 +140,7 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
         matchedByNinoCases.add(matchingCase1);
         matchedByNinoCases.add(matchingCase2);
 
-        when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
+        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
         callback.getCaseDetails().getCaseData().setBenefitCode(null);
         callback.getCaseDetails().getCaseData().setIssueCode(null);
         callback.getCaseDetails().getCaseData().setCaseCode("002DD");

@@ -47,8 +47,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventCallback_whenPathIsYesNoYes_willValidateTheData_WhenDueDateInPast() throws Exception {
         setup();
-        setJsonAndReplace("callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json", Arrays.asList("DIRECTIONS_DUE_DATE_PLACEHOLDER", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER"),
-            Arrays.asList("2019-10-10", LocalDate.now().plus(1, ChronoUnit.DAYS).toString()));
+        setJsonAndReplace("callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json", Arrays.asList("DIRECTIONS_DUE_DATE_PLACEHOLDER"),
+            Arrays.asList("2019-10-10"));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
         assertHttpStatus(response, HttpStatus.OK);
@@ -61,43 +61,14 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventCallback_whenPathIsYesNoYes_willValidateTheData_WhenDueDateInFuture() throws Exception {
         setup();
-        setJsonAndReplace("callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json", Arrays.asList("DIRECTIONS_DUE_DATE_PLACEHOLDER",
-            "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER"), Arrays
-            .asList(LocalDate.now().plus(1, ChronoUnit.DAYS).toString(),
-            LocalDate.now().plus(1, ChronoUnit.DAYS).toString()));
+        setJsonAndReplace("callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithDirectionsMade.json", Arrays.asList("DIRECTIONS_DUE_DATE_PLACEHOLDER"), Arrays
+            .asList(LocalDate.now().plus(1, ChronoUnit.DAYS).toString()));
 
         MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
         assertHttpStatus(response, HttpStatus.OK);
         PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
 
         assertEquals(0, result.getErrors().size());
-    }
-
-    @Test
-    public void callToMidEventCallback_whenPathIsGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade_willValidateTheNextHearingDate_WhenDateInFuture() throws Exception {
-        setup();
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", LocalDate.now().plus(1, ChronoUnit.DAYS).toString());
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        assertEquals(0, result.getErrors().size());
-    }
-
-    @Test
-    public void callToMidEventCallback_whenPathIsGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade_willValidateTheNextHearingDate_WhenDateInPast() throws Exception {
-        setup();
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", LocalDate.now().plus(-1, ChronoUnit.DAYS).toString());
-
-        MockHttpServletResponse response = getResponse(getRequestWithAuthHeader(json, "/ccdMidEvent"));
-        assertHttpStatus(response, HttpStatus.OK);
-        PreSubmitCallbackResponse<SscsCaseData> result = deserialize(response.getContentAsString());
-
-        assertEquals(1, result.getErrors().size());
-        assertEquals("Specified date cannot be in the past", result.getErrors().toArray()[0]);
     }
 
     @Test
@@ -181,9 +152,6 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.now().toString(), result.getData().getAdjournCaseGeneratedDate());
     }
 
-
-
-
     @Test
     //FIXME: Might need to improve the data for this test once manual route has been fully implemented
     public void callToAboutToSubmitHandler_willWriteManuallyUploadedAdjournNoticeToCase() throws Exception {
@@ -205,12 +173,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForFaceToFace() throws Exception {
         setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+        json = getJson("callback/adjournCaseGeneratedFaceToFaceWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
 
-        
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
 
@@ -240,8 +204,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
-        assertEquals("am", payload.getNextHearingTime());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("face to face hearing", payload.getNextHearingType());
         assertEquals("Chester Magistrate's Court", payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -249,7 +212,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("faceToFace", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -260,10 +223,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForFaceToFace_WhenInterpreterRequiredAndLanguageSet() throws Exception {
         setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+        json =  getJson(
+            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageSet.json");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -294,8 +255,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
-        assertEquals("am", payload.getNextHearingTime());
+        assertEquals("It will be first in the afternoon session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("face to face hearing", payload.getNextHearingType());
         assertEquals("Chester Magistrate's Court", payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -303,7 +263,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("faceToFace", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -314,10 +274,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventPreviewAdjournCaseCallback_willNotPreviewTheDocumentForFaceToFace_WhenInterpreterRequiredAndLanguageNotSet() throws Exception {
         setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+        json =  getJson(
+            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterRequiredAndLanguageNotSet.json");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -341,10 +299,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForFaceToFace_WhenInterpreterNotRequiredAndLanguageSet() throws Exception {
         setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+        json = getJson(
+            "callback/adjournCaseGeneratedFaceToFaceWithInterpreterNotRequiredAndLanguageSet.json");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -375,8 +331,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
-        assertEquals("am", payload.getNextHearingTime());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("face to face hearing", payload.getNextHearingType());
         assertEquals("Chester Magistrate's Court", payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -384,7 +339,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("faceToFace", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -395,10 +350,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForTelephone() throws Exception {
         setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedTelephoneWhenCaseNotListedStraightAwayWithoutDirectionsMade.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+        json = getJson(
+            "callback/adjournCaseGeneratedTelephoneWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -429,8 +382,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
-        assertEquals("am", payload.getNextHearingTime());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("telephone hearing", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -438,7 +390,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("telephone", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -448,10 +400,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForVideo() throws Exception {
         setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+        json = getJson(
+            "callback/adjournCaseGeneratedVideoWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -482,8 +432,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
-        assertEquals("am", payload.getNextHearingTime());
+        assertEquals("It will be first in the session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("video hearing", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertEquals("a standard time slot", payload.getNextHearingTimeslot());
@@ -491,7 +440,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("video", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());
@@ -501,10 +450,8 @@ public class AdjournCaseIt extends AbstractEventIt {
     @Test
     public void callToMidEventPreviewAdjournCaseCallback_willPreviewTheDocumentForPaper() throws Exception {
         setup();
-        String nextHearingDateSpecificDate = "2020-07-01";
-        final String expectedNextHearingDateSpecificDateInDocument = "01/07/2020";
-        setJsonAndReplace(
-            "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json", "NEXT_HEARING_SPECIFIC_DATE_PLACEHOLDER", nextHearingDateSpecificDate);
+        json = getJson(
+            "callback/adjournCaseGeneratedPaperWhenCaseNotListedStraightAwayWithoutDirectionsMade.json");
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -535,8 +482,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name", payload.getHeldBefore());
-        assertEquals(expectedNextHearingDateSpecificDateInDocument, payload.getNextHearingDate());
-        assertEquals("am", payload.getNextHearingTime());
+        assertEquals("It will be first in the morning session on a date to be fixed", payload.getNextHearingDate());
         assertEquals("decision on the papers", payload.getNextHearingType());
         assertNull(payload.getNextHearingVenue());
         assertNull(payload.getNextHearingTimeslot());
@@ -544,7 +490,7 @@ public class AdjournCaseIt extends AbstractEventIt {
         assertEquals("Judge Full Name", payload.getHeldBefore());
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("paper", payload.getHearingType());
-        assertEquals("something else", payload.getAdditionalDirections());
+        assertEquals("something else", payload.getAdditionalDirections().get(0));
         assertEquals("Reasons 1", payload.getReasonsForDecision().get(0));
         assertEquals("yes", payload.getPanelMembersExcluded());
         assertEquals("An Test", payload.getAppellantName());

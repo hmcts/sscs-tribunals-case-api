@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.DirectionTypeItemList.*;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.directionissued.ExtensionNextEventItemList.*;
@@ -37,8 +37,8 @@ public class DirectionIssuedAboutToStartHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
-        handler = new DirectionIssuedAboutToStartHandler();
+        openMocks(this);
+        handler = new DirectionIssuedAboutToStartHandler(false, false);
 
         sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().mrnDetails(MrnDetails.builder().dwpIssuingOffice("3").build()).build()).build();
 
@@ -132,6 +132,70 @@ public class DirectionIssuedAboutToStartHandlerTest {
         DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
         assertEquals(expected, response.getData().getDirectionTypeDl());
         assertEquals(4, listOptions.size());
+    }
+
+    @Test
+    public void givenAppealWithReinstatementRequest_populateDirectionTypeDropdown() {
+
+        handler = new DirectionIssuedAboutToStartHandler(true, false);
+
+        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        sscsCaseData.setReinstatementOutcome(RequestOutcome.IN_PROGRESS);
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(GRANT_REINSTATEMENT.getCode(), GRANT_REINSTATEMENT.getLabel()));
+        listOptions.add(new DynamicListItem(REFUSE_REINSTATEMENT.getCode(), REFUSE_REINSTATEMENT.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(4, listOptions.size());
+    }
+
+    @Test
+    public void givenAppealWithUrgentHearingEnabledAndUrgentCaseYes_populateDirectionTypeDropdown() {
+
+        handler = new DirectionIssuedAboutToStartHandler(false, true);
+
+        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
+        listOptions.add(new DynamicListItem(GRANT_URGENT_HEARING.getCode(), GRANT_URGENT_HEARING.getLabel()));
+        listOptions.add(new DynamicListItem(REFUSE_URGENT_HEARING.getCode(), REFUSE_URGENT_HEARING.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(4, listOptions.size());
+    }
+
+    @Test
+    public void givenAppealWithUrgentHearingEnabledAndUrgentCaseNo_populateDirectionTypeDropdown() {
+
+        handler = new DirectionIssuedAboutToStartHandler(false, true);
+
+        when(callback.getEvent()).thenReturn(EventType.DIRECTION_ISSUED);
+        when(callback.getCaseDetails().getState()).thenReturn(State.WITH_DWP);
+        callback.getCaseDetails().getCaseData().setUrgentCase("No");
+
+        List<DynamicListItem> listOptions = new ArrayList<>();
+        listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
+        listOptions.add(new DynamicListItem(PROVIDE_INFORMATION.getCode(), PROVIDE_INFORMATION.getLabel()));
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        DynamicList expected = new DynamicList(new DynamicListItem("", ""), listOptions);
+        assertEquals(expected, response.getData().getDirectionTypeDl());
+        assertEquals(2, listOptions.size());
     }
 
     @Test

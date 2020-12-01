@@ -10,3 +10,5 @@ java:
     IDAM_API_URL: https://idam-api.aat.platform.hmcts.net
     IDAM_API_JWK_URL: https://idam-api.aat.platform.hmcts.net/jwks
     CREATE_CCD_ENDPOINT: true
+    UC_ENABLED: true
+    URGENT_HEARING_ENABLED: true

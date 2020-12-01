@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.validation.Validation;
+import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -49,10 +50,12 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
 
     private SscsDocument document;
 
+    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, Validation.buildDefaultValidatorFactory().getValidator());
+        handler = new IssueAdjournmentNoticeAboutToSubmitHandler(footerService, validator);
 
         when(callback.getEvent()).thenReturn(EventType.ISSUE_ADJOURNMENT_NOTICE);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -87,10 +90,8 @@ public class IssueAdjournmentNoticeAboutToSubmitHandlerTest {
             .adjournCaseNextHearingDateOrTime("")
             .adjournCaseNextHearingFirstAvailableDateAfterDate("")
             .adjournCaseNextHearingFirstAvailableDateAfterPeriod("")
-            .adjournCaseNextHearingSpecificDate("")
-            .adjournCaseNextHearingSpecificTime("")
             .adjournCaseReasons(Arrays.asList(new CollectionItem(null, "")))
-            .adjournCaseAdditionalDirections("")
+            .adjournCaseAdditionalDirections(Arrays.asList(new CollectionItem(null, "")))
         .build();
 
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);

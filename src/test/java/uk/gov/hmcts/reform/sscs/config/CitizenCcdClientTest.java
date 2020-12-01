@@ -5,7 +5,7 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class CitizenCcdClientTest {
 
     @Before
     public void setup() {
-        initMocks(this);
+        openMocks(this);
         citizenCcdClient = new CitizenCcdClient(ccdRequestDetails, coreCaseDataApi, caseAccessApi);
         when(idamTokens.getIdamOauth2Token()).thenReturn("token");
         when(idamTokens.getServiceAuthorization()).thenReturn("s2s");

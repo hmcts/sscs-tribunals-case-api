@@ -4,18 +4,25 @@
     "callback_response_status": null,
     "callback_response_status_code": null,
     "case_data": {
-      "adjournCaseAdditionalDirections": "Nothing else",
+      "adjournCaseAdditionalDirections": [
+        {
+          "id": "242ad032-05b5-4f3d-9851-e31d657240ee",
+          "value": "Nothing else"
+        }
+      ],
       "adjournCaseCanCaseBeListedRightAway": "Yes",
       "adjournCaseDisabilityQualifiedPanelMemberName": "Bob Smith",
       "adjournCaseGenerateNotice": "Yes",
       "adjournCaseInterpreterLanguage": "spanish",
       "adjournCaseInterpreterRequired": "Yes",
       "adjournCaseMedicallyQualifiedPanelMemberName": "Wendy Rowe",
-      "adjournCaseNextHearingDateType": "specificTime",
+      "adjournCaseNextHearingDateType": "dateToBeFixed",
       "adjournCaseNextHearingListingDuration": "12",
       "adjournCaseNextHearingListingDurationType": "setTime",
       "adjournCaseNextHearingListingDurationUnits": "hours",
-      "adjournCaseNextHearingSpecificTime": "pm",
+      "adjournCaseTime": {
+        "adjournCaseNextHearingSpecificTime": "am"
+      },
       "adjournCaseNextHearingVenue": "somewhereElse",
       "adjournCaseNextHearingVenueSelected": {
         "value": {
@@ -364,7 +371,15 @@
       768000000
     ],
     "data_classification": {
-      "adjournCaseAdditionalDirections": "PUBLIC",
+      "adjournCaseAdditionalDirections": {
+        "classification": "PUBLIC",
+        "value": [
+          {
+            "classification": "PUBLIC",
+            "id": "242ad032-05b5-4f3d-9851-e31d657240ee"
+          }
+        ]
+      },
       "adjournCaseCanCaseBeListedRightAway": "PUBLIC",
       "adjournCaseDisabilityQualifiedPanelMemberName": "PUBLIC",
       "adjournCaseGenerateNotice": "PUBLIC",

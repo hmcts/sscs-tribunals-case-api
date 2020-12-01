@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.markdocsfortranslation;
 import static java.util.Objects.requireNonNull;
 
 import java.util.function.Consumer;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -33,6 +32,7 @@ public class MarkDocumentsForTranslationAboutToSubmitHandler implements PreSubmi
                                                           String userAuthorisation) {
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         setTranslationRequiredStatus.accept(caseData);
+        log.info("Set the TranslationWorkOutstanding flag to YES,  for case id : {}", caseData.getCcdCaseId());
         caseData.setTranslationWorkOutstanding("Yes");
         return new PreSubmitCallbackResponse<>(caseData);
     }

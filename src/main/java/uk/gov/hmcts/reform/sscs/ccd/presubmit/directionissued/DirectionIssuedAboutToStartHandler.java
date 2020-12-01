@@ -7,6 +7,7 @@ import static uk.gov.hmcts.reform.sscs.helper.SscsHelper.getPreValidStates;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -16,6 +17,17 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+
+    private boolean reinstatementFeatureFlag;
+    private boolean urgentHearingEnabled;
+
+    public DirectionIssuedAboutToStartHandler(
+            @Value("#{new Boolean('${reinstatement_requests_feature_flag}')}") boolean reinstatement,
+            @Value("${feature.urgent-hearing.enabled}") boolean urgentHearingEnabled) {
+
+        this.reinstatementFeatureFlag = reinstatement;
+        this.urgentHearingEnabled = urgentHearingEnabled;
+    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -42,6 +54,7 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
     }
 
     private void setDirectionTypeDropDown(SscsCaseData sscsCaseData) {
+
         List<DynamicListItem> listOptions = new ArrayList<>();
 
         listOptions.add(new DynamicListItem(APPEAL_TO_PROCEED.getCode(), APPEAL_TO_PROCEED.getLabel()));
@@ -52,8 +65,20 @@ public class DirectionIssuedAboutToStartHandler implements PreSubmitCallbackHand
             listOptions.add(new DynamicListItem(REFUSE_EXTENSION.getCode(), REFUSE_EXTENSION.getLabel()));
         }
 
+        if (RequestOutcome.IN_PROGRESS.equals(sscsCaseData.getReinstatementOutcome()) && reinstatementFeatureFlag) {
+            listOptions.add(new DynamicListItem(GRANT_REINSTATEMENT.getCode(), GRANT_REINSTATEMENT.getLabel()));
+            listOptions.add(new DynamicListItem(REFUSE_REINSTATEMENT.getCode(), REFUSE_REINSTATEMENT.getLabel()));
+        }
+
+        if (urgentHearingEnabled && "Yes".equalsIgnoreCase(sscsCaseData.getUrgentCase())) {
+            listOptions.add(new DynamicListItem(GRANT_URGENT_HEARING.getCode(), GRANT_URGENT_HEARING.getLabel()));
+            listOptions.add(new DynamicListItem(REFUSE_URGENT_HEARING.getCode(), REFUSE_URGENT_HEARING.getLabel()));
+        }
+
         DynamicListItem selectedValue = null != sscsCaseData.getDirectionTypeDl() && sscsCaseData.getDirectionTypeDl().getValue() != null
                 ? sscsCaseData.getDirectionTypeDl().getValue() : new DynamicListItem("", "");
+
+
         sscsCaseData.setDirectionTypeDl(new DynamicList(selectedValue, listOptions));
     }
 

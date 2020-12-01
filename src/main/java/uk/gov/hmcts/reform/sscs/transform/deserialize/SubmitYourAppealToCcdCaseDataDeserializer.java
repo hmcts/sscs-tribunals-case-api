@@ -116,6 +116,8 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
 
         Representative representative = getRepresentative(syaCaseWrapper);
 
+        HearingSubtype hearingSubtype = getHearingSubType(syaCaseWrapper.getSyaHearingOptions());
+
         return Appeal.builder()
                 .mrnDetails(mrnDetails)
                 .appellant(appellant)
@@ -125,7 +127,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .rep(representative)
                 .signer(syaCaseWrapper.getSignAndSubmit() != null ? syaCaseWrapper.getSignAndSubmit().getSigner() : null)
                 .hearingType(getHearingType(hearingOptions))
-                .hearingSubtype(HearingSubtype.builder().build())
+                .hearingSubtype(hearingSubtype)
                 .receivedVia("Online")
                 .build();
     }
@@ -367,6 +369,22 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
                 .reasons(appealReasons)
                 .otherReasons(syaReasonsForAppealing.getOtherReasons())
                 .build();
+    }
+
+
+    private static HearingSubtype getHearingSubType(SyaHearingOptions syaHearingOptions) {
+        HearingSubtype.HearingSubtypeBuilder builder = HearingSubtype.builder();
+        if (syaHearingOptions != null && syaHearingOptions.getOptions() != null) {
+            SyaOptions options = syaHearingOptions.getOptions();
+            return HearingSubtype.builder()
+                    .wantsHearingTypeTelephone(options.getHearingTypeTelephone() ? YES : NO)
+                    .hearingTelephoneNumber(getPhoneNumberWithOutSpaces(options.getTelephone()))
+                    .wantsHearingTypeVideo(options.getHearingTypeVideo() ? YES : NO)
+                    .hearingVideoEmail(options.getEmail())
+                    .wantsHearingTypeFaceToFace(options.getHearingTypeFaceToFace() ? YES : NO)
+                    .build();
+        }
+        return builder.build();
     }
 
     private static HearingOptions getHearingOptions(SyaHearingOptions syaHearingOptions) {

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,7 +59,7 @@ public class AssociatedCaseLinkHelperTest {
         matchedByNinoCases.add(matchingCase2);
         SscsCaseData previousCaseData  = SscsCaseData.builder().appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).ccdCaseId("33333333").build();
         Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails = Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now()));
-        when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
+        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
@@ -88,7 +87,7 @@ public class AssociatedCaseLinkHelperTest {
         matchedByNinoCases.add(matchingCase2);
         SscsCaseData previousCaseData  = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         Optional<CaseDetails<SscsCaseData>> previousSscsCaseDataCaseDetails = Optional.of(new CaseDetails<SscsCaseData>(33333333L, "", State.APPEAL_CREATED, previousCaseData, LocalDateTime.now()));
-        when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
+        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).ccdCaseId("33333333").build();
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, previousSscsCaseDataCaseDetails);
@@ -111,7 +110,7 @@ public class AssociatedCaseLinkHelperTest {
         List<SscsCaseDetails> matchedByNinoCases = new ArrayList<>();
         matchedByNinoCases.add(matchingCase1);
         matchedByNinoCases.add(matchingCase2);
-        when(ccdService.findCaseBy(anyMap(),any())).thenReturn(matchedByNinoCases);
+        when(ccdService.findCaseBy(anyString(), anyString(), any())).thenReturn(matchedByNinoCases);
 
         SscsCaseData caseData = SscsCaseData.builder().appeal(Appeal.builder().appellant(appellant).build()).build();
         SscsCaseData result = associatedCaseLinkHelper.linkCaseByNino(caseData, Optional.empty());
@@ -167,7 +166,7 @@ public class AssociatedCaseLinkHelperTest {
 
     @Test
     public void getMatchedCases() {
-        given(ccdService.findCaseBy(any(), any())).willReturn(Collections.singletonList(
+        given(ccdService.findCaseBy(any(), any(), any())).willReturn(Collections.singletonList(
                 SscsCaseDetails.builder().id(12345678L).build()
         ));
         List<SscsCaseDetails> matchedCases = associatedCaseLinkHelper.getMatchedCases("ABCDEFG", idamService.getIdamTokens());

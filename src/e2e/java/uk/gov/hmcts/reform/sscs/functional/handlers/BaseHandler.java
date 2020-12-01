@@ -74,7 +74,7 @@ public class BaseHandler {
                 CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
-    protected SscsCaseDetails createCaseInWithDwpState() throws Exception {
+    public SscsCaseDetails createCaseInWithDwpState() throws Exception {
         SscsCaseDetails caseDetails = ccdService.createCase(buildSscsCaseDataForTesting("Lennon", "BB 22 55 66 B"),
                 EventType.VALID_APPEAL_CREATED.getCcdType(), CREATED_BY_FUNCTIONAL_TEST,
                 CREATED_BY_FUNCTIONAL_TEST, idamTokens);

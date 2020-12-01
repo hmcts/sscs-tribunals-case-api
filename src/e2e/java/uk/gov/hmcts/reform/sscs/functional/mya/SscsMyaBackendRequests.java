@@ -1,11 +1,15 @@
 package uk.gov.hmcts.reform.sscs.functional.mya;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.http.client.methods.RequestBuilder.*;
 import static org.apache.http.entity.ContentType.APPLICATION_JSON;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static uk.gov.hmcts.reform.sscs.service.evidence.EvidenceUploadService.DM_STORE_USER_ID;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.EvidenceManagementService;
 
 @Slf4j
 public class SscsMyaBackendRequests {
@@ -33,13 +38,15 @@ public class SscsMyaBackendRequests {
     private final CitizenIdamService citizenIdamService;
     private String baseUrl;
     private CloseableHttpClient client;
+    private EvidenceManagementService evidenceManagementService;
 
 
-    public SscsMyaBackendRequests(IdamService idamService, CitizenIdamService citizenIdamService, String baseUrl, CloseableHttpClient client) {
+    public SscsMyaBackendRequests(IdamService idamService, CitizenIdamService citizenIdamService, String baseUrl, CloseableHttpClient client, EvidenceManagementService evidenceManagementService) {
         this.idamTokens = idamService.getIdamTokens();
         this.citizenIdamService = citizenIdamService;
         this.baseUrl = baseUrl;
         this.client = client;
+        this.evidenceManagementService = evidenceManagementService;
     }
 
     public JSONArray getOnlineHearingForCitizen(String tya, String email) throws IOException {
@@ -64,6 +71,13 @@ public class SscsMyaBackendRequests {
         return new JSONObject(responseBody);
     }
 
+    public void logUserWithCase(Long caseId) throws IOException {
+        StringEntity entity = new StringEntity(EMPTY, APPLICATION_JSON);
+
+        HttpResponse response = putRequest("/api/citizen/cases/" + caseId + "/log", entity);
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
+    }
+
     public CreatedCcdCase createOralCase(String emailAddress) throws IOException {
         HttpResponse createCaseResponse = client.execute(post(baseUrl + "/api/case?hearingType=oral&email=" + emailAddress)
                 .setHeader("Content-Length", "0")
@@ -76,7 +90,8 @@ public class SscsMyaBackendRequests {
         System.out.println("Case id " + jsonObject.getString("id"));
         return new CreatedCcdCase(
                 jsonObject.getString("id"),
-                jsonObject.getString("appellant_tya")
+                jsonObject.getString("appellant_tya"),
+                jsonObject.getString("joint_party_tya")
         );
     }
 
@@ -91,6 +106,11 @@ public class SscsMyaBackendRequests {
 
         HttpResponse response = putRequest("/api/continuous-online-hearings/" + hearingId + "/evidence", data);
         assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+    }
+
+    public void deleteUploadEvidence(Long caseId, String evidenceId) throws IOException {
+        HttpResponse response = client.execute(addHeaders(delete(baseUrl + "/api/continuous-online-hearings/" + caseId + "/evidence/" + evidenceId)).build());
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.NO_CONTENT.value()));
     }
 
     public void submitHearingEvidence(String hearingId, String description) throws IOException {
@@ -129,6 +149,20 @@ public class SscsMyaBackendRequests {
         assertThat(getCoverSheetResponse.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
         Header fileNameHeader = getCoverSheetResponse.getFirstHeader("Content-Disposition");
         return ContentDisposition.parse(fileNameHeader.getValue()).getFilename();
+    }
+
+
+    public String updateSubscription(String appellantTya, String userEmail) throws IOException {
+        HttpResponse response = postRequest(format("/appeals/%s/subscriptions/%s", appellantTya, appellantTya),
+                new StringEntity(format("{ \"subscription\" : {\"email\" : \"%s\"}}", userEmail), APPLICATION_JSON));
+
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
+        return EntityUtils.toString(response.getEntity());
+    }
+
+    public void unsubscribeSubscription(String appellantTya, String userEmail) throws IOException {
+        HttpResponse response = client.execute(addHeaders(delete(format("%s/appeals/%s/subscriptions/%s", baseUrl, appellantTya, appellantTya))).build());
+        assertThat(response.getStatusLine().getStatusCode(), is(HttpStatus.OK.value()));
     }
 
     private RequestBuilder addHeaders(RequestBuilder requestBuilder) {
@@ -170,5 +204,16 @@ public class SscsMyaBackendRequests {
         return client.execute(addHeaders(post(baseUrl + url), email)
                 .setEntity(body)
                 .build());
+    }
+
+    public HttpResponse midEvent(HttpEntity body, String postfixUrl) throws IOException {
+        return client.execute(addHeaders(post(format("%s/ccdMidEvent%s", baseUrl, postfixUrl))).setEntity(body).build());
+    }
+
+    public byte[] toBytes(String documentUrl) {
+        return evidenceManagementService.download(
+                URI.create(documentUrl),
+                DM_STORE_USER_ID
+        );
     }
 }
