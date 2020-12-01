@@ -42,7 +42,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
             preSubmitCallbackResponse.addError("Further information to assist the tribunal cannot be empty.");
         }
 
-        setCaseCode(sscsCaseData);
+        setCaseCode(sscsCaseData, callback.getEvent());
 
         sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
 
