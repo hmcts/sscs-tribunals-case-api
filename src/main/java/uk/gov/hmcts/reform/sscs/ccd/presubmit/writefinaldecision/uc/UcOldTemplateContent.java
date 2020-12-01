@@ -2,10 +2,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc;
 
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
-import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
-import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
 /**
  * This is a temporary class to support the un-migrated scenarios, containing content that has initially been ported
@@ -26,20 +23,9 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
         return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work-related activity.";
     }
 
-    public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivity(String appellantName) {
-        return appellantName + " continues to have limited capability for work but does not have limited capability for "
-                + "work-related activity. This is because no descriptor from Schedule 3 of the Employment and "
-                + "Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply. The Secretary of State "
-                + "has accepted that " + appellantName + " has limited capability for work. This was not in issue.";
-    }
-
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
         return "The Secretary of State has accepted that " + appellantName + " has limited capability for "
                 + (work ? "work." : "work related activity.") + " This was not in issue.";
-    }
-
-    public String getHasLimitedCapabilityForWorkNoSchedule7SentenceSchedule9Paragraph4Applies() {
-        return "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.";
     }
 
     public String getSchedule6PointsSentence(Integer points, Boolean isSufficient) {
@@ -79,11 +65,6 @@ public abstract class UcOldTemplateContent extends UcTemplateContent {
 
     public String getHearingTypeSentence(String appellantName, String bundlePage, String hearingType, boolean appellantAttended, boolean presentingOfifficerAttened) {
         return getFaceToFaceTelephoneVideoHearingTypeSentence(hearingType, appellantName, bundlePage, appellantAttended, presentingOfifficerAttened);
-    }
-
-    public void addHearingType(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
-        addComponent(new Paragraph(UcTemplateComponentId.HEARING_TYPE.name(), getHearingTypeSentence(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getPageNumber(),
-            writeFinalDecisionTemplateBody.getHearingType(), writeFinalDecisionTemplateBody.isAttendedHearing(), writeFinalDecisionTemplateBody.isPresentingOfficerAttended())));
     }
 
     public String getFaceToFaceTelephoneVideoHearingTypeSentence(String hearingType, String appellantName, String bundlePage,
