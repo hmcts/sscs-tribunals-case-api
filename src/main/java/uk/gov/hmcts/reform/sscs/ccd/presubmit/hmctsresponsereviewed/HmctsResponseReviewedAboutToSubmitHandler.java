@@ -39,7 +39,7 @@ public class HmctsResponseReviewedAboutToSubmitHandler extends ResponseEventsAbo
         PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         checkMandatoryFields(preSubmitCallbackResponse, sscsCaseData);
-        setCaseCode(sscsCaseData);
+        setCaseCode(sscsCaseData, callback.getEvent());
 
         if (sscsCaseData.getDwpResponseDate() == null) {
             sscsCaseData.setDwpResponseDate(LocalDate.now().toString());
