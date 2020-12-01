@@ -19,7 +19,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecis
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class WriteFinalDecisionTemplateContent {
 
-    protected static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    protected static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @JsonProperty("template_content")
     private List<TemplateComponent<?>> components;
@@ -50,7 +50,7 @@ public class WriteFinalDecisionTemplateContent {
     }
 
     public String getConfirmedOrSetAsideSentence(boolean setAside, String decisionDate) {
-        return "The decision made by the Secretary of State on " + DATE_FORMATTER.format(LocalDate.parse(decisionDate)) + " is "
+        return "The decision made by the Secretary of State on " + DATEFORMATTER.format(LocalDate.parse(decisionDate)) + " is "
             + (!setAside ? "confirmed." : "set aside.");
     }
 

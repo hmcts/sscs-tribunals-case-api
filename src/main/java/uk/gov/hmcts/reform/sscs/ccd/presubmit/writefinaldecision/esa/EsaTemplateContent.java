@@ -1,8 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa;
 
-import java.util.Arrays;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
@@ -79,29 +77,6 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
             return "The following activity and descriptor from Schedule 3 applied:";
         } else {
             return "The following activities and descriptors from Schedule 3 applied:";
-        }
-    }
-
-    public List<String> getFaceToFaceTelephoneVideoHearingTypeSentences(String hearingType, String appellantName, String bundlePage,
-                                                                 boolean appellantAttended, boolean presentingOfifficerAttened) {
-        if (appellantAttended) {
-            if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
-                return Arrays.asList("This has been an oral (face to face) hearing. "
-                        + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
-            } else {
-                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. "
-                        + getAppellantAttended(hearingType, appellantName, presentingOfifficerAttened, bundlePage));
-            }
-        } else {
-            if (StringUtils.equalsIgnoreCase("faceToFace", hearingType)) {
-                return Arrays.asList(appellantName + " requested an oral hearing but did not attend today. "
-                        + (presentingOfifficerAttened ? "A " : "No ") + "Presenting Officer attended on behalf of the Respondent.",
-                        getConsideredParagraph(bundlePage, appellantName));
-            } else {
-                return Arrays.asList("This has been a remote hearing in the form of a " + hearingType + " hearing. " + appellantName + " did not attend the hearing today. "
-                        + (presentingOfifficerAttened ? "A" : "No") + " Presenting Officer attended on behalf of the Respondent.",
-                        getConsideredParagraph(bundlePage, appellantName));
-            }
         }
     }
 
