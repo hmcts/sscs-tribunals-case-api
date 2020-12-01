@@ -49,7 +49,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 16/11/2020 is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs does not have limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs does not have limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 12 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulation 2013 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
             assertThat(pdfTextWithoutNewLines, containsString("14. Coping with change."));
@@ -132,7 +132,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
@@ -155,7 +155,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
@@ -178,7 +178,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. b. Cannot, unaided by another person, mount or descend two steps even with the support of a handrail."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
@@ -202,7 +202,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, not(containsString("1. Mobilising ")));
             assertThat(pdfTextWithoutNewLines, not(containsString("0 points")));
@@ -235,7 +235,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. b. Cannot, unaided by another person, mount or descend two steps even with the support of a handrail."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
