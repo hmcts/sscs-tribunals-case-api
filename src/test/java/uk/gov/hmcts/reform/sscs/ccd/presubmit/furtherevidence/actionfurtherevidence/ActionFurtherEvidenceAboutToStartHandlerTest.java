@@ -34,7 +34,7 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new ActionFurtherEvidenceAboutToStartHandler(false);
+        handler = new ActionFurtherEvidenceAboutToStartHandler();
 
         when(callback.getEvent()).thenReturn(EventType.ACTION_FURTHER_EVIDENCE);
 
@@ -115,10 +115,11 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
 
+        assertEquals(4, response.getData().getOriginalSender().getListItems().size());
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
-        assertEquals("representative", response.getData().getOriginalSender().getListItems().get(2).getCode());
-        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
+        assertEquals("representative", response.getData().getOriginalSender().getListItems().get(3).getCode());
     }
 
     @Test
@@ -130,7 +131,8 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
-        assertEquals(2, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
+        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
     }
 
     @Test
@@ -142,21 +144,8 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
         assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
         assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
-        assertEquals(2, response.getData().getOriginalSender().getListItems().size());
-    }
-
-    @Test
-    public void populateOriginalSenderDropdownWithJointParty_whenUniversalCreditFeatureFlagOn() {
-        handler = new ActionFurtherEvidenceAboutToStartHandler(true);
-
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("No").build()).build()).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
-        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
         assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
         assertEquals(3, response.getData().getOriginalSender().getListItems().size());
     }
+
 }
