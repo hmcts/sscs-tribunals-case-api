@@ -36,7 +36,7 @@ public class NewUcScenario3Test {
                 + "\n"
                 + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
                 + "\n"
-                + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.\n"
+                + "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"

@@ -92,7 +92,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue. "));
-            assertThat(pdfTextWithoutNewLines, containsString("4. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied. "));
+            assertThat(pdfTextWithoutNewLines, containsString("4. No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied. "));
             assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Anything else"));
             assertThat(pdfTextWithoutNewLines, containsString("7. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
@@ -157,7 +157,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));

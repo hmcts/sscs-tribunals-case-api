@@ -57,7 +57,7 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
     }
 
     public String getNoSchedule7SentenceSchedule9Paragraph4Applies() {
-        return "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.";
+        return "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.";
     }
 
     public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivityOnly(String appellantName) {
