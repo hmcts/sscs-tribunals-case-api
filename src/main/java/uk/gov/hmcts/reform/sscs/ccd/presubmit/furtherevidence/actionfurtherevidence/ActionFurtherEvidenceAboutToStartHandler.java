@@ -71,7 +71,9 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
 
         listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
-        listOptions.add(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
+        if (sscsCaseData.isThereAJointParty()) {
+            listOptions.add(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
+        }
 
         if (sscsCaseData.getAppeal().getRep() != null
             && equalsIgnoreCase(sscsCaseData.getAppeal().getRep().getHasRepresentative(), "yes")) {

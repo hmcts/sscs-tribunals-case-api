@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_START;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -110,7 +112,45 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
 
     @Test
     public void populateOriginalSenderDropdown_whenCaseHasRep() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("Yes").build()).build()).build();
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES.getValue()).build()).build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
+        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
+        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
+        assertEquals("representative", response.getData().getOriginalSender().getListItems().get(2).getCode());
+    }
+
+    @Test
+    public void populateOriginalSenderDropdown_whenCaseHasNoRep() {
+        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(NO.getValue()).build()).build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
+        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
+        assertEquals(2, response.getData().getOriginalSender().getListItems().size());
+    }
+
+    @Test
+    public void populateOriginalSenderDropdown_whenCaseHasRepIsNullAndThereIsAJointParty() {
+        sscsCaseData = SscsCaseData.builder().jointParty(YES.getValue()).appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(null).build()).build()).build();
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
+
+        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
+        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
+        assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
+        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
+    }
+
+    @Test
+    public void populateOriginalSenderDropdown_whenCaseHasRepAndJointParty() {
+        sscsCaseData = SscsCaseData.builder().jointParty(YES.getValue()).appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(YES.getValue()).build()).build()).build();
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
@@ -121,31 +161,4 @@ public class ActionFurtherEvidenceAboutToStartHandlerTest {
         assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
         assertEquals("representative", response.getData().getOriginalSender().getListItems().get(3).getCode());
     }
-
-    @Test
-    public void populateOriginalSenderDropdown_whenCaseHasNoRep() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative("No").build()).build()).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
-        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
-        assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
-        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
-    }
-
-    @Test
-    public void populateOriginalSenderDropdown_whenCaseHasRepIsNull() {
-        sscsCaseData = SscsCaseData.builder().appeal(Appeal.builder().rep(Representative.builder().hasRepresentative(null).build()).build()).build();
-        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
-
-        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_START, callback, USER_AUTHORISATION);
-
-        assertEquals("appellant", response.getData().getOriginalSender().getListItems().get(0).getCode());
-        assertEquals("dwp", response.getData().getOriginalSender().getListItems().get(1).getCode());
-        assertEquals("jointParty", response.getData().getOriginalSender().getListItems().get(2).getCode());
-        assertEquals(3, response.getData().getOriginalSender().getListItems().size());
-    }
-
 }
