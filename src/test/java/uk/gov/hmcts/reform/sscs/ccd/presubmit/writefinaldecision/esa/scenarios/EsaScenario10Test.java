@@ -52,8 +52,6 @@ public class EsaScenario10Test {
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
                 + "\n"
-                + "Felix Sydney %s.\n"
-                + "\n"
                 + "This is the summary of outcome decision\n"
                 + "\n"
                 + "My first reasons\n"
@@ -65,7 +63,7 @@ public class EsaScenario10Test {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n\n",
             allowedText, capabilityText);
 
-        assertEquals(8, content.getComponents().size());
+        assertEquals(7, content.getComponents().size());
 
         assertThat(content.toString(), is(expectedContent));
 
