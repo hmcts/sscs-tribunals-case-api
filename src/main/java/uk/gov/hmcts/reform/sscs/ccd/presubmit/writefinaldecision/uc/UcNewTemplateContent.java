@@ -66,7 +66,7 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
     }
 
     public String getNoDescriptorFromSchedule7Schedule9NotApplied() {
-        return "This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
+        return "This is because no descriptor from Schedule 7 of the Universal Credit (UC) Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
     }
 
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
