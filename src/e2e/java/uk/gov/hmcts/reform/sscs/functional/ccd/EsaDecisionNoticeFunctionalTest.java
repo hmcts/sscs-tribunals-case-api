@@ -346,6 +346,29 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
         }
     }
 
+    @Test
+    public void scenario12_allowed_notSupportGroup_moreThan15Points_noSch3_Reg35Applies() throws IOException {
+        String json = getJsonCallbackForTest("handlers/writefinaldecision/esaAllowedNonSupportGroupNoSch3Reg35AppliesCallback.json");
+        byte[] bytes = callPreviewFinalDecision(json);
+        try (PDDocument document = PDDocument.load(bytes)) {
+            String pdfText = new PDFTextStripper().getText(document);
+            String pdfTextWithoutNewLines = replaceNewLines(pdfText);
+            assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the work capability assessment 30 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
+            assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
+            assertThat(pdfTextWithoutNewLines, containsString("15 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+        }
+    }
+
     private String replaceNewLines(String pdfText) {
         return pdfText.replaceAll("-\n", "-").replaceAll("[\\n\\t]", " ").replaceAll("\\s{2,}", " ");
     }
