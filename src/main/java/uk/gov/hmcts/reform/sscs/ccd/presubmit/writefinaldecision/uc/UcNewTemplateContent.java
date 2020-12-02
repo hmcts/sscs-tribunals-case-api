@@ -11,13 +11,22 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
 
     public abstract UcScenario getScenario();
 
+
     public String getDoesNotHaveLimitedCapabilityForWorkSentence(String appellantName) {
         return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
     }
 
+
+    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
+        return (appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (!isWorkRelatedActivitiesLimited ? "" : "is to be treated as having limited capability ") + "for work related activity." : "."))
+            + " The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
+    }
+
+    /*
     public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName) {
         return appellantName + " has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
     }
+     */
 
     public String getSchedule7AppliesParagraph(List<Descriptor> descriptors) {
         if (descriptors != null && descriptors.size() == 1) {
