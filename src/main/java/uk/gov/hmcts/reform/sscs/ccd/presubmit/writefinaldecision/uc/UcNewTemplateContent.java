@@ -16,9 +16,17 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
     }
 
+    public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule7Sentence(String appellantName) {
+        return appellantName + " does not have limited capability for work related activity because no descriptor from Schedule 7 of the UC Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
+    }
 
     public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
-        return (appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (!isWorkRelatedActivitiesLimited ? "" : "is to be treated as having limited capability ") + "for work related activity." : "."))
+        return (appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (!isWorkRelatedActivitiesLimited ? "" : "has limited capability ") + "for work related activity." : "."))
+            + " The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
+    }
+
+    public String getLimitedCapabilityForWorkRelatedSentence(String appellantName, boolean isTreatedLimitedCapability) {
+        return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work-related activity."
             + " The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
     }
 
@@ -51,6 +59,15 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
             + "but Schedule 8, paragraph 4 of the UC Regulations 2013 applied.";
     }
 
+    public String getInsufficientPointsSentenceNoSchedule8Paragraph4Sentence() {
+        return "This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment and none of the Schedule 7 activities or descriptors were satisfied.";
+    }
+
+    public String getInsufficientPointsSentenceNoSchedule8Paragraph4SentenceAndNoSchedule7Sentence() {
+        return "This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment.";
+    }
+
+    /*
     public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule8Paragraph4Applied, boolean isSchedule9Paragraph4Applied) {
         return "The tribunal applied Schedule" + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "s" : "")
             + (isSchedule8Paragraph4Applied ? " 8, paragraph 4 " : "")
@@ -60,7 +77,19 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
             + "capability for work"
             + (isSchedule9Paragraph4Applied ? " and for work-related activity." : ".");
     }
+    */
 
+    public String getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(boolean isSchedule8Paragraph4Applied, boolean isSchedule9Paragraph4Applied) {
+        return "The tribunal applied "
+            + (isSchedule8Paragraph4Applied ? "Schedule 8, paragraph 4 " : "")
+            + (isSchedule8Paragraph4Applied && isSchedule9Paragraph4Applied ? "and " : "")
+            + (isSchedule9Paragraph4Applied ? "Schedule 9, paragraph 4 " : "")
+            + "because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited "
+            + "capability for work"
+            + (isSchedule9Paragraph4Applied ? " and for work-related activity." : ".");
+    }
+
+    // FIXME - is this needed?
     public String getNoSchedule7Sentence() {
         return "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.";
     }
@@ -75,7 +104,7 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
     }
 
     public String getNoDescriptorFromSchedule7Schedule9NotApplied() {
-        return "This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
+        return "This is because no descriptor from Schedule 7 of the Universal Credit (UC) Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
     }
 
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {

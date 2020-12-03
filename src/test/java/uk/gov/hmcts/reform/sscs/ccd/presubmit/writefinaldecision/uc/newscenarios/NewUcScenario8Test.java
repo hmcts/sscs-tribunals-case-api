@@ -37,6 +37,7 @@ public class NewUcScenario8Test {
                         .reasonsForDecision(asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else")
                         .schedule8Paragraph4Applicable(true)
+                        .schedule9Paragraph4Applicable(true)
                         .ucSchedule6Descriptors(schedule6Descriptors).build();
 
         UcTemplateContent content = UcScenario.SCENARIO_8.getContent(body);
@@ -45,17 +46,14 @@ public class NewUcScenario8Test {
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
                 + "\n"
-                + "Felix Sydney has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+                + "Felix Sydney is to be treated as having limited capability for work and for work related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
                 + "\n"
-                + "This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied.\n"
+                + "This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment and none of the Schedule 7 activities or descriptors were satisfied.\n"
                 + "\n"
                 + "Mobilising Unaided\tc.1\t9\n"
                 + "\n"
                 + "\n"
-                + "The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."
-                + "\n"
-                + "\n"
-                + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.\n"
+                + "The tribunal applied Schedule 8, paragraph 4 and Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -66,7 +64,7 @@ public class NewUcScenario8Test {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n";
 
-        assertEquals(11, content.getComponents().size());
+        assertEquals(10, content.getComponents().size());
 
         assertEquals(expectedContent, content.toString());
 
@@ -91,7 +89,8 @@ public class NewUcScenario8Test {
                         .reasonsForDecision(asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else")
                         .schedule8Paragraph4Applicable(true)
-                        .ucSchedule6Descriptors(schedule6Descriptors).build();
+                        .schedule9Paragraph4Applicable(true)
+                    .ucSchedule6Descriptors(schedule6Descriptors).build();
 
         UcTemplateContent content = UcScenario.SCENARIO_8.getContent(body);
 
@@ -99,13 +98,11 @@ public class NewUcScenario8Test {
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
                 + "\n"
-                + "Felix Sydney has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+                + "Felix Sydney is to be treated as having limited capability for work and for work related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
                 + "\n"
-                + "This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied.\n"
+                + "This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment and none of the Schedule 7 activities or descriptors were satisfied.\n"
                 + "\n"
-                + "The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
-                + "\n"
-                + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.\n"
+                + "The tribunal applied Schedule 8, paragraph 4 and Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -116,7 +113,7 @@ public class NewUcScenario8Test {
                 + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
                 + "\n";
 
-        assertEquals(10, content.getComponents().size());
+        assertEquals(9, content.getComponents().size());
 
         assertEquals(expectedContent, content.toString());
 

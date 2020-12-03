@@ -74,9 +74,13 @@ public class UcScenarioHearingTypeTest {
                 + "\n"
                 + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
                 + "\n"
+                + "Felix Sydney is to be treated as having limited capability for work-related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+                + "\n"
                 + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
                 + "\n"
                 + "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.\n"
+                + "\n"
+                + "The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
                 + "\n"
                 + "My first reasons\n"
                 + "\n"
@@ -88,9 +92,9 @@ public class UcScenarioHearingTypeTest {
                 + "\n";
 
         if (appellantAttended) {
-            Assert.assertEquals(8, content.getComponents().size());
+            Assert.assertEquals(10, content.getComponents().size());
         } else {
-            Assert.assertEquals(9, content.getComponents().size());
+            Assert.assertEquals(11, content.getComponents().size());
         }
 
         Assert.assertEquals(expectedContent, content.toString());

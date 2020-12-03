@@ -44,7 +44,7 @@ public class NewUcScenario12Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney has limited capability for work and is to be treated as having limited capability for work related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+            + "Felix Sydney is to be treated as having limited capability for work and has limited capability for work related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:\n"
             + "\n"
@@ -52,6 +52,8 @@ public class NewUcScenario12Test {
             + "\n"
             + "\n"
             + "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.\n"
+            + "\n"
+            + "The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -64,7 +66,7 @@ public class NewUcScenario12Test {
             + "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Felix Sydney.\n"
             + "\n";
 
-        Assert.assertEquals(11,  content.getComponents().size());
+        Assert.assertEquals(12,  content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
@@ -100,11 +102,13 @@ public class NewUcScenario12Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney has limited capability for work and is to be treated as having limited capability for work related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+            + "Felix Sydney is to be treated as having limited capability for work and has limited capability for work related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013.\n"
             + "\n"
             + "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.\n"
+            + "\n"
+            + "The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -117,7 +121,7 @@ public class NewUcScenario12Test {
             + "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Felix Sydney.\n"
             + "\n";
 
-        Assert.assertEquals(10,  content.getComponents().size());
+        Assert.assertEquals(11,  content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
