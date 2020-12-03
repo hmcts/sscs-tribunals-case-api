@@ -13,7 +13,7 @@ public class NewUcScenario4Test {
 
     @Test
     public void testScenario4() {
-        List<Descriptor> schedule3Descriptors =
+        List<Descriptor> schedule7Descriptors =
                 Arrays.asList(Descriptor.builder()
                         .activityQuestionValue("12. Coping with change. Cannot cope with any change, due to cognitive impairment or mental disorder, to the extent that day to day life cannot be managed.").build());
 
@@ -31,7 +31,7 @@ public class NewUcScenario4Test {
                         .supportGroupOnly(true)
                         .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                         .anythingElse("Something else")
-                        .ucSchedule7Descriptors(schedule3Descriptors).build();
+                        .ucSchedule7Descriptors(schedule7Descriptors).build();
 
         UcTemplateContent content = UcScenario.SCENARIO_4.getContent(body);
 
