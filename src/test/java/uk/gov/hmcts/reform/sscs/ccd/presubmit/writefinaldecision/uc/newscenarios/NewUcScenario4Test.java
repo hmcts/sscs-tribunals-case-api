@@ -1,20 +1,21 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
 
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class UcScenario4Test {
+public class NewUcScenario4Test {
 
     @Test
     public void testScenario4() {
         List<Descriptor> schedule7Descriptors =
                 Arrays.asList(Descriptor.builder()
-                        .activityQuestionValue("2. Transferring from one seated position to another.").build());
+                        .activityQuestionValue("12. Coping with change. Cannot cope with any change, due to cognitive impairment or mental disorder, to the extent that day to day life cannot be managed.").build());
 
         WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
@@ -38,13 +39,14 @@ public class UcScenario4Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney has limited capability for work-related activity.\n"
+            + "Felix Sydney has limited capability for work-related activity. The matter is now remitted "
+                + "to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
             + "\n"
-            + "The following activity and descriptor from Schedule 3 applied:\n"
+            + "The following activity and descriptor from Schedule 7 of the UC Regulations 2013 applied: \n"
             + "\n"
-            + "2. Transferring from one seated position to another.\n"
+            + "12. Coping with change. Cannot cope with any change, due to cognitive impairment or mental disorder, to the extent that day to day life cannot be managed.\n"
             + "\n"
             + "\n"
             + "My first reasons\n"
