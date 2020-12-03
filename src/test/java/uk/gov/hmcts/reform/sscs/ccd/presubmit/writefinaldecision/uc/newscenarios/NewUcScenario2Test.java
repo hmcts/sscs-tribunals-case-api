@@ -35,7 +35,7 @@ public class NewUcScenario2Test {
                 + "\n"
                 + "Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity.\n"
                 + "\n"
-                + "This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.\n"
+                + "This is because no descriptor from Schedule 7 of the Universal Credit (UC) Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.\n"
                 + "\n"
                 + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
                 + "\n"

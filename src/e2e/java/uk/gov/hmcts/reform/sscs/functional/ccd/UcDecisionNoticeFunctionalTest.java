@@ -49,8 +49,8 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 16/11/2020 is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs does not have limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 12 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulation 2013 did not apply."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 12 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2013 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
             assertThat(pdfTextWithoutNewLines, containsString("14. Coping with change."));
             assertThat(pdfTextWithoutNewLines, containsString("6 points"));
@@ -72,7 +72,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 16/11/2020 is confirmed."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs continues to have limited capability for work but does not have limited capability for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because no descriptor from Schedule 7 of the Universal Credit Regulations 2013 applied. Schedule 9, paragraph 4 did not apply."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because no descriptor from Schedule 7 of the Universal Credit (UC) Regulations 2013 applied. Schedule 9, paragraph 4 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("5. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue. "));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
@@ -91,13 +91,15 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue. "));
-            assertThat(pdfTextWithoutNewLines, containsString("4. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied. "));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("6. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("7. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work-related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been an oral (face to face) hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department does not reassess Joe Bloggs within 3 months from today's date."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
 
@@ -132,9 +134,9 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations 2013 applied. Schedule 9, paragraph 4 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));
@@ -155,17 +157,19 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and has limited capability for work-related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
             assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("9. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
 
@@ -178,18 +182,17 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment and none of the Schedule 7 activities or descriptors were satisfied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. b. Cannot, unaided by another person, mount or descend two steps even with the support of a handrail."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedule 8, paragraph 4 and Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
 
@@ -202,18 +205,17 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment and none of the Schedule 7 activities or descriptors were satisfied."));
             assertThat(pdfTextWithoutNewLines, not(containsString("1. Mobilising ")));
             assertThat(pdfTextWithoutNewLines, not(containsString("0 points")));
-            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedule 8, paragraph 4 and Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
 
@@ -235,19 +237,18 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC)."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment and none of the Schedule 7 activities or descriptors were satisfied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used. b. Cannot, unaided by another person, mount or descend two steps even with the support of a handrail."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedules 8, paragraph 4 and 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied Schedule 8, paragraph 4 and Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
             assertThat(pdfTextWithoutNewLines, containsString(expectedText));
-            assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
 
