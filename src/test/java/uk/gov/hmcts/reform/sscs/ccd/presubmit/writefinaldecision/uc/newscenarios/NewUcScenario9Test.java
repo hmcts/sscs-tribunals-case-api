@@ -49,7 +49,7 @@ public class NewUcScenario9Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney is to be treated as having limited capability for work and has limited capability for work related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+            + "Felix Sydney is to be treated as having limited capability for work and has limited capability for work-related activity. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "This is because insufficient points were scored under Schedule 6 of the UC Regulations 2013 to meet the threshold for the Work Capability Assessment.\n"
             + "\n"
