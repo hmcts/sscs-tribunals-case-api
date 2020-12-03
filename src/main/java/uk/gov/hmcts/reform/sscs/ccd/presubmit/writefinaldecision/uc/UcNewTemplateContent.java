@@ -15,9 +15,10 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         return appellantName + " does not have limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.";
     }
 
-    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName) {
-        return appellantName + " has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.";
+    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
+        return appellantName + " has limited capability for " + (work ? "work." : "work related activity.") + " The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
     }
+
 
     public String getSchedule7AppliesParagraph(List<Descriptor> descriptors) {
         if (descriptors != null && descriptors.size() == 1) {

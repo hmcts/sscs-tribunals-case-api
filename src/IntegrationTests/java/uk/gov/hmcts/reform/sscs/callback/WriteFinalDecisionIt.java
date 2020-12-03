@@ -264,7 +264,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
             + "\n"
             + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
             + "\n"
-            + "An Test has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.\n"
+            + "An Test has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:\n"
             + "\n"
