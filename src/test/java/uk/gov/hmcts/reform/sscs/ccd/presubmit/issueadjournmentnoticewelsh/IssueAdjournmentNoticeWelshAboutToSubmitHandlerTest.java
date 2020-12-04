@@ -123,6 +123,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertThat(response.getErrors().size(), is(0));
         assertThat(response.getData().getInterlocReviewState(), is(NONE.getId()));
+        assertThat(response.getData().getTranslationWorkOutstanding(), is(NO.getValue()));
     }
 
 }

@@ -39,6 +39,7 @@ public class IssueAdjournmentNoticeWelshAboutToSubmitHandler implements PreSubmi
             preSubmitCallbackResponse.addError("Error: This action is only available for Welsh cases.");
         }
         sscsCaseData.setInterlocReviewState(NONE.getId());
+        sscsCaseData.updateTranslationWorkOutstandingFlag();
 
         return preSubmitCallbackResponse;
     }
