@@ -5,11 +5,13 @@ import static java.util.Objects.requireNonNull;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.model.AppConstants;
@@ -58,6 +60,28 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX,
                     todayDate,
                     sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
+        }
+        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
+            if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
+                preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
+            }
+            sscsCaseData.setDwpEditedEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink()));
+
+            if (!StringUtils.equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo(), "Yes")) {
+                DynamicListItem reviewByJudgeItem = new DynamicListItem("reviewByJudge", null);
+
+                if (sscsCaseData.getSelectWhoReviewsCase() == null) {
+                    sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));;
+                } else {
+                    sscsCaseData.getSelectWhoReviewsCase().getListItems().add(reviewByJudgeItem);
+                }
+                if (StringUtils.equalsIgnoreCase(sscsCaseData.getDwpEditedEvidenceReason(), "phme")) {
+                    sscsCaseData.setInterlocReferralReason(InterlocReferralReason.PHME_REQUEST.getId());
+                }
+            }
         }
         if (sscsCaseData.getDwpResponseDocument() != null) {
             sscsCaseData.setDwpResponseDocument(buildDwpResponseDocumentWithDate(

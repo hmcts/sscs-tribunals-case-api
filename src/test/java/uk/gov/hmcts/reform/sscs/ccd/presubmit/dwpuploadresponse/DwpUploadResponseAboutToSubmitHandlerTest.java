@@ -149,6 +149,15 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder()
                 .documentLink(
                         DocumentLink.builder()
@@ -168,6 +177,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentBinaryUrl()),
             () -> assertEquals(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename()),
+            () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentUrl()),
+            () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentBinaryUrl()),
+            () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentFilename()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()));
@@ -201,5 +213,62 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeNoFurtherInfo_thenSetReviewByJudge() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
+        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeYesFurtherInfo_thenDontReviewByJudge() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSelectWhoReviewsCase());
+        assertNull(response.getData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeYesFurtherInfo_thenMustHaveReason() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("If edited evidence is added a reason must be selected", error);
+        }
     }
 }
