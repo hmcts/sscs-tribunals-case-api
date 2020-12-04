@@ -12,10 +12,6 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
 
     public abstract UcScenario getScenario();
 
-    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
-        return appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (isWorkRelatedActivitiesLimited ? "has limited capability " : "") + "for work-related activity." : ".");
-    }
-
     public String getSchedule6PointsSentence(Integer points, Boolean isSufficient) {
         return "In applying the work capability assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "

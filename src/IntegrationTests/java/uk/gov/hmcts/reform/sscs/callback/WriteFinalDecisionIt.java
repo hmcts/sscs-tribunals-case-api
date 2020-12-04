@@ -259,19 +259,18 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertEquals("The appeal is allowed.\n"
             + "\n"
             + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
             + "\n"
-            + "An Test has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to UC.\n"
+            + "An Test has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
             + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:\n"
             + "\n"
             + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
             + "\n"
             + "\n"
-            + "No descriptor from Schedule 7 of the UC Regulations 2013 was satisfied.\n"
+            + "An Test does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.\n"
             + "\n"
             + "My reasons for decision\n"
             + "\n"
