@@ -35,7 +35,7 @@ public class AmendElementsIssuesAboutToSubmitHandler extends ResponseEventsAbout
 
         log.info("Setting case code for case id {}", callback.getCaseDetails().getId());
 
-        setCaseCode(caseData);
+        setCaseCode(caseData, callback.getEvent());
 
         PreSubmitCallbackResponse<SscsCaseData> sscsCaseDataPreSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
