@@ -607,7 +607,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         UcTemplateContent templateContent = (UcTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(UcScenario.SCENARIO_10, templateContent.getScenario());
 
-        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(6, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
@@ -665,7 +665,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         UcTemplateContent templateContent = (UcTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(UcScenario.SCENARIO_10, templateContent.getScenario());
 
-        assertEquals(7, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(6, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
