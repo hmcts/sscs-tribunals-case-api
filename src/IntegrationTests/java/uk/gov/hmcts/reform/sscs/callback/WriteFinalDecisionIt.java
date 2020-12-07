@@ -193,7 +193,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
             + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
             + "\n"
             + "\n"
-            + "An Test does not have limited capability for work-related activity because no descriptor from Schedule 3 applied.  Regulation 35 did not apply.\n"
+            + "An Test does not have limited capability for work-related activity because no descriptor from Schedule 3 applied. Regulation 35 did not apply.\n"
             + "\n"
             + "My reasons for decision\n"
             + "\n"
