@@ -6,8 +6,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
+import java.util.Optional;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
+import junitparams.converters.Nullable;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +30,12 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
     @Mock
     private CaseDetails<SscsCaseData> caseDetails;
+
+    @Mock
+    private CaseDetails<SscsCaseData> caseDetailsBefore;
+
     private SscsCaseData sscsCaseData;
+    private SscsCaseData sscsCaseDataBefore;
 
     @Before
     public void setUp() {
@@ -36,9 +43,13 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         handler = new DeathOfAppellantAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DEATH_OF_APPELLANT);
-        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().build()).dwpUcb("yes").build();
+        sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        when(callback.getCaseDetailsBefore()).thenReturn(Optional.of(caseDetailsBefore));
+        sscsCaseDataBefore = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
+        when(caseDetailsBefore.getCaseData()).thenReturn(sscsCaseDataBefore);
     }
 
     @Test
@@ -96,6 +107,73 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertNull(response.getData().getSubscriptions().getAppellantSubscription());
+    }
+
+    @Test
+    public void givenADeathOfAppellantEventThatHasNoAppointeeBeforeAndHasAppointeeAfter_thenSetInterlocReviewState() {
+
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(null);
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Tester").build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenADeathOfAppellantEventThatHasAppointeeBeforeAndItHasNowChanged_thenSetInterlocReviewState() {
+
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Tester").build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDwpState());
+    }
+
+    @Test
+        public void givenADeathOfAppellantEventThatHasNoAppointeeBeforeAndNoAppointeeAfter_thenSetInterlocReviewStateAndDwpState() {
+
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(null);
+        caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(null);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
+        assertEquals(DwpState.APPOINTEE_DETAILS_NEEDED.getId(), response.getData().getDwpState());
+    }
+
+    @Test
+    @Parameters({"null, null", "no, null", "null, no", "no, no"})
+    public void givenADeathOfAppellantEventThatHasWithAppointeeNoBeforeAndWithAppointeeNoAfter_thenSetInterlocReviewStateAndDwpState(@Nullable String isAppointeeBefore, @Nullable String isAppointeeAfter) {
+
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee(isAppointeeBefore);
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().build());
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee(isAppointeeAfter);
+        caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(DwpState.APPOINTEE_DETAILS_NEEDED.getId(), response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenADeathOfAppellantEventThatHasAppointeeBeforeAndAppointeeAfterWithNoChange_thenDoNotSetInterlocReviewStateOrDwpState() {
+
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetailsBefore.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
+        caseDetails.getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        caseDetails.getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().name(Name.builder().firstName("Fred").build()).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getInterlocReviewState());
+        assertNull(response.getData().getDwpState());
     }
 
     @Test(expected = IllegalStateException.class)

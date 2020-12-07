@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.deathofappellant;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEEDED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
 import lombok.extern.slf4j.Slf4j;
@@ -8,9 +9,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.CaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -38,7 +37,6 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
 
         log.info("Setting interloc review state on appeal after recording death of an appellant for case id: {}", callback.getCaseDetails().getId());
 
-        preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         preSubmitCallbackResponse.getData().setDwpUcb(null);
 
         if (null != preSubmitCallbackResponse.getData().getSubscriptions()
@@ -47,6 +45,27 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeSms("No");
         }
 
+        Appointee appointeeBefore = null;
+        if (callback.getCaseDetailsBefore().isPresent() && null != callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getAppointee()) {
+            appointeeBefore = callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getAppointee();
+        }
+        Appointee appointeeAfter = callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAppointee();
+
+        if (shouldSetInterlocReviewState(appointeeBefore, appointeeAfter)) {
+            preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
+        }
+
+        if ((appointeeBefore == null || "no".equalsIgnoreCase(callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getIsAppointee())
+                && appointeeAfter == null || "no".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIsAppointee()) {
+            preSubmitCallbackResponse.getData().setDwpState(APPOINTEE_DETAILS_NEEDED.getId());
+        }
+
         return preSubmitCallbackResponse;
     }
+
+    private boolean shouldSetInterlocReviewState(Appointee appointeeBefore, Appointee appointeeAfter) {
+
+        return !(null != appointeeBefore && null != appointeeAfter && appointeeBefore.equals(appointeeAfter));
+    }
+
 }
