@@ -69,11 +69,13 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 16/11/2020 is confirmed."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs continues to have limited capability for work but does not have limited capability for work-related activity. This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("6. No party has objected to the matter being decided without a hearing."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("8.")));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
 
@@ -179,18 +181,16 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 01/12/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work."));
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs does not have limited capability for work-related activity because no descriptor from Schedule 3 applied. Regulation 35 did not apply."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("10. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a telephone hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Joe Bloggs."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
 
@@ -206,16 +206,15 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
             assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal recommends that the Department reassesses Joe Bloggs within 3 months from today's date."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
 
@@ -273,13 +272,12 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
-            assertThat(pdfTextWithoutNewLines, containsString("11. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a triage hearing. Joe Bloggs did not attend the hearing today. No Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 31 of The Tribunal Procedure (First-tier Tribunal)(Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that reasonable steps were taken to notify Joe Bloggs of the hearing and that it is in the interests of justice to proceed today."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State."));
             assertThat(pdfTextWithoutNewLines, containsString(expectedText));
             assertThat(pdfTextWithoutNewLines, not(containsString("12.")));
         }
@@ -299,7 +297,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
             assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The following activity and descriptor from Schedule 3 applied:"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. The following activity and descriptor from Schedule 3 of the ESA Regulations 2008 applied:"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Transferring from one seated position to another. Cannot move between one seated position and another seated position located next to one another without receiving physical assistance from another person."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));

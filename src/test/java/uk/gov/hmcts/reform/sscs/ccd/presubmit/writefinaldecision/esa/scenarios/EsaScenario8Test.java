@@ -43,9 +43,7 @@ public class EsaScenario8Test {
             + "\n"
             + "Felix Sydney is to be treated as having limited capability for work and for work-related activity.\n"
             + "\n"
-            + "This is because insufficient points were scored to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008.\n"
-            + "\n"
-            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
+            + "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities or descriptors were satisfied.\n"
             + "\n"
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
@@ -61,7 +59,7 @@ public class EsaScenario8Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(11, content.getComponents().size());
+        Assert.assertEquals(10, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
@@ -97,9 +95,7 @@ public class EsaScenario8Test {
             + "\n"
             + "Felix Sydney is to be treated as having limited capability for work and for work-related activity.\n"
             + "\n"
-            + "This is because insufficient points were scored to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008.\n"
-            + "\n"
-            + "In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008.\n"
+            + "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities or descriptors were satisfied.\n"
             + "\n"
             + "The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"
@@ -112,7 +108,7 @@ public class EsaScenario8Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(10, content.getComponents().size());
+        Assert.assertEquals(9, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
