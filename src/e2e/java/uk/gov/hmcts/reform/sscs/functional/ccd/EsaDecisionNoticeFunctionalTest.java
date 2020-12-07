@@ -47,7 +47,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 16/11/2020 is confirmed."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs does not have limited capability for work and cannot be treated as having limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the work capability assessment 12 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 12 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008. This is insufficient to meet the threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
             assertThat(pdfTextWithoutNewLines, containsString("14. Coping with change."));
             assertThat(pdfTextWithoutNewLines, containsString("6 points"));
@@ -87,7 +87,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. The Secretary of State has accepted that Joe Bloggs has limited capability for work related activity. This was not in issue."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. The Secretary of State has accepted that Joe Bloggs has limited capability for work-related activity. This was not in issue."));
             assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
@@ -130,7 +130,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the work capability assessment 30 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs does not have limited capability for work-related activity because no descriptor from Schedule 3 applied. Regulation 35 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
@@ -153,7 +153,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 01/12/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the work capability assessment 24 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 24 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("15 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
@@ -180,8 +180,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 01/12/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the work capability assessment, but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs does not have limited capability for work-related activity because no descriptor from Schedule 3 applied. Regulation 35 did not apply."));
@@ -205,8 +205,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the work capability assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
@@ -238,8 +238,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the work capability assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("9 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
@@ -272,8 +272,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work and for work-related activity."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the work capability assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the work capability assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008."));
+            assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment and none of the Schedule 3 activities and descriptors were satisfied, but the tribunal applied regulations 29 and 35 of the Employment and Support Allowance Regulations (ESA) 2008."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008."));
             assertThat(pdfTextWithoutNewLines, containsString("6. The tribunal applied regulations 29 and 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
@@ -356,7 +356,7 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is allowed."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the work capability assessment 30 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. In applying the Work Capability Assessment 30 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:"));
             assertThat(pdfTextWithoutNewLines, containsString("5. No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Standing and sitting."));
