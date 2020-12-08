@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPOINTEE_DETAILS_NEEDED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.AWAITING_ADMIN_ACTION;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -47,9 +48,11 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
         }
 
         CaseDetails<SscsCaseData> caseDetailsBefore = null;
-        
-        if (callback.getCaseDetailsBefore().isPresent()) {
-            caseDetailsBefore = callback.getCaseDetailsBefore().get();
+
+        Optional<CaseDetails<SscsCaseData>> beforeOptional = callback.getCaseDetailsBefore();
+
+        if (beforeOptional.isPresent()) {
+            caseDetailsBefore = beforeOptional.get();
         }
 
         Appointee appointeeBefore = null;
