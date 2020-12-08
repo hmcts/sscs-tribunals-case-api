@@ -61,14 +61,23 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                     todayDate,
                     sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink()));
         }
-        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
+        if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null || sscsCaseData.getDwpEditedResponseDocument() != null) {
+            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedResponseDocument() == null) {
+                preSubmitCallbackResponse.addError("You must submit both an edited response document and an edited evidence bundle");
+            }
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
             }
+            sscsCaseData.setDwpEditedResponseDocument(buildDwpResponseDocumentWithDate(
+                    AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX,
+                    todayDate,
+                    sscsCaseData.getDwpEditedResponseDocument().getDocumentLink()));
+
             sscsCaseData.setDwpEditedEvidenceBundleDocument(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX,
                     todayDate,
                     sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink()));
+
 
             if (!StringUtils.equalsIgnoreCase(sscsCaseData.getDwpFurtherInfo(), "Yes")) {
                 DynamicListItem reviewByJudgeItem = new DynamicListItem("reviewByJudge", null);
