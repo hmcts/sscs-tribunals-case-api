@@ -206,6 +206,7 @@ public class DirectionIssuedAboutToSubmitHandler extends IssueDocumentHandler im
     private SscsCaseData updateCaseAfterUrgentHearingRefused(SscsCaseData caseData) {
 
         caseData.setUrgentHearingOutcome(RequestOutcome.REFUSED.getValue());
+        caseData.setUrgentCase("No");
         caseData.setInterlocReviewState(NONE.getId());
         log.info("Case ID {} urgent hearing refused on {}", caseData.getCcdCaseId(), LocalDate.now().toString());
         return caseData;
