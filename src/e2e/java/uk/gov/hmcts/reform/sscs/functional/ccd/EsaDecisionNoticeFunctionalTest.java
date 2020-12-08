@@ -71,12 +71,11 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs continues to have limited capability for work but does not have limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("5. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. No party has objected to the matter being decided without a hearing."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
+            assertThat(pdfTextWithoutNewLines, containsString("8. No party has objected to the matter being decided without a hearing."));
+            assertThat(pdfTextWithoutNewLines, containsString("9. Having considered the appeal bundle to page B7 and the requirements of rules 2 and 27 of the Tribunal Procedure (First-tier Tribunal) (Social Entitlement Chamber) Rules 2008 the Tribunal is satisfied that it is able to decide the case in this way."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
         }
     }
 
