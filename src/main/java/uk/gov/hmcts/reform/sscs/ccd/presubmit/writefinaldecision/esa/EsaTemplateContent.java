@@ -85,7 +85,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public String getNoDescriptorFromSchedule3Regulation35NotApplied() {
-        return "This is because no descriptor from Schedule 3 of the Employment Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply.";
+        return "This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply.";
     }
 
     public abstract EsaScenario getScenario();
