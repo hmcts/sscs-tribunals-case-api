@@ -114,7 +114,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs has limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. The following activity and descriptor from Schedule 3 applied:"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. The following activity and descriptor from Schedule 7 of the UC Regulations 2013 applied:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Anything else"));
