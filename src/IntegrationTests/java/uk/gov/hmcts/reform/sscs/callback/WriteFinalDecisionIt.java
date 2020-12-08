@@ -204,7 +204,7 @@ public class WriteFinalDecisionIt extends AbstractEventIt {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForEsaNonWCA_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForEsaNonWca_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESANonWCA.json", "START_DATE_PLACEHOLDER", "2018-10-10");
 
