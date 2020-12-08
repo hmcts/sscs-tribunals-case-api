@@ -46,17 +46,25 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setWantSmsNotifications("No");
         }
 
-        Appointee appointeeBefore = null;
-        if (callback.getCaseDetailsBefore().isPresent() && null != callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getAppointee()) {
-            appointeeBefore = callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getAppointee();
+        CaseDetails<SscsCaseData> caseDetailsBefore = null;
+        
+        if (callback.getCaseDetailsBefore().isPresent()) {
+            caseDetailsBefore = callback.getCaseDetailsBefore().get();
         }
+
+        Appointee appointeeBefore = null;
+
+        if (caseDetailsBefore != null && caseDetailsBefore.getCaseData().getAppeal().getAppellant().getAppointee() != null) {
+            appointeeBefore = caseDetailsBefore.getCaseData().getAppeal().getAppellant().getAppointee();
+        }
+
         Appointee appointeeAfter = callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAppointee();
 
         if (shouldSetInterlocReviewState(appointeeBefore, appointeeAfter)) {
             preSubmitCallbackResponse.getData().setInterlocReviewState(AWAITING_ADMIN_ACTION.getId());
         }
 
-        if ((appointeeBefore == null || "no".equalsIgnoreCase(callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == callback.getCaseDetailsBefore().get().getCaseData().getAppeal().getAppellant().getIsAppointee())
+        if ((appointeeBefore == null || "no".equalsIgnoreCase(caseDetailsBefore.getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == caseDetailsBefore.getCaseData().getAppeal().getAppellant().getIsAppointee())
                 && appointeeAfter == null || "no".equalsIgnoreCase(callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIsAppointee()) || null == callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getIsAppointee()) {
             preSubmitCallbackResponse.getData().setDwpState(APPOINTEE_DETAILS_NEEDED.getId());
         }
