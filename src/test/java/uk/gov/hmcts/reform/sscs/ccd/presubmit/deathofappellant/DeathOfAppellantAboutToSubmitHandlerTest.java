@@ -87,6 +87,7 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
         assertEquals(InterlocReviewState.AWAITING_ADMIN_ACTION.getId(), response.getData().getInterlocReviewState());
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeEmail());
         assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getSubscribeSms());
+        assertEquals("No", response.getData().getSubscriptions().getAppellantSubscription().getWantSmsNotifications());
     }
 
     @Test

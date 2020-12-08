@@ -43,6 +43,7 @@ public class DeathOfAppellantAboutToSubmitHandler implements PreSubmitCallbackHa
             && null != preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription()) {
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeEmail("No");
             preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setSubscribeSms("No");
+            preSubmitCallbackResponse.getData().getSubscriptions().getAppellantSubscription().setWantSmsNotifications("No");
         }
 
         Appointee appointeeBefore = null;
