@@ -195,7 +195,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
-            () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getEditedDwpResponseDocument().getDocumentLink().getDocumentFilename()));
+            () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEditedResponseDocumentDeathOfAppellantAboutToSubmitHandler().getDocumentLink().getDocumentFilename()));
 
     }
 
