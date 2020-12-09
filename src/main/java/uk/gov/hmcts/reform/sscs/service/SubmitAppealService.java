@@ -70,7 +70,7 @@ public class SubmitAppealService {
         IdamTokens idamTokens = idamService.getIdamTokens();
         SscsCaseDetails caseDetails = createCaseInCcd(caseData, event, idamTokens);
         postCreateCaseInCcdProcess(caseData, idamTokens, caseDetails, userToken);
-        if (appeal.getIsSaveAndReturn().equals("No")) {
+        if (appeal.getIsSaveAndReturn() != null && appeal.getIsSaveAndReturn().equals("No")) {
             log.info("Case {} created from cache, setting isSaveAndReturn to No", caseDetails.getData().getCcdCaseId());
         }
         // in case of duplicate case the caseDetails will be null
@@ -143,7 +143,8 @@ public class SubmitAppealService {
         if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
             Optional<SscsCaseDetails> draftDetails = citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
             citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
-            if(caseDetails.getData().getIsSaveAndReturn().equals("Yes") && draftDetails.isPresent()) {
+            if(caseDetails.getData() != null && caseDetails.getData().getIsSaveAndReturn() != null &&
+                    caseDetails.getData().getIsSaveAndReturn().equals("Yes") && draftDetails.isPresent()) {
                 log.info("Case {} created from draft {}, setting isSaveAndReturn to Yes", caseDetails.getId(), draftDetails.get().getId());
             }
         }
