@@ -143,8 +143,8 @@ public class SubmitAppealService {
         if (null != caseDetails && StringUtils.isNotEmpty(userToken)) {
             Optional<SscsCaseDetails> draftDetails = citizenCcdService.draftArchived(caseData, getUserTokens(userToken), idamTokens);
             citizenCcdService.associateCaseToCitizen(getUserTokens(userToken), caseDetails.getId(), idamTokens);
-            if(caseDetails.getData() != null && caseDetails.getData().getIsSaveAndReturn() != null &&
-                    caseDetails.getData().getIsSaveAndReturn().equals("Yes") && draftDetails.isPresent()) {
+            if (caseDetails.getData() != null && caseDetails.getData().getIsSaveAndReturn() != null
+                    && caseDetails.getData().getIsSaveAndReturn().equals("Yes") && draftDetails.isPresent()) {
                 log.info("Case {} created from draft {}, setting isSaveAndReturn to Yes", caseDetails.getId(), draftDetails.get().getId());
             }
         }
