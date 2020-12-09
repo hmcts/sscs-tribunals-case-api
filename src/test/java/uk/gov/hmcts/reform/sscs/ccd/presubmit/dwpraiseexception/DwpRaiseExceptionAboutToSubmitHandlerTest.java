@@ -34,7 +34,7 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
     @Before
     public void setUp() throws IOException {
         openMocks(this);
-        handler = new DwpRaiseExceptionAboutToSubmitHandler(true);
+        handler = new DwpRaiseExceptionAboutToSubmitHandler();
 
         when(callback.getEvent()).thenReturn(EventType.DWP_RAISE_EXCEPTION);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
@@ -49,14 +49,6 @@ public class DwpRaiseExceptionAboutToSubmitHandlerTest {
     @Test
     public void givenANonDwpRaiseExceptionEvent_thenReturnFalse() {
         when(callback.getEvent()).thenReturn(EventType.APPEAL_RECEIVED);
-        assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
-    }
-
-    @Test
-    public void givenADwpRaiseExceptionEventUcFalse_thenReturnFalse() {
-        handler = new DwpRaiseExceptionAboutToSubmitHandler(false);
-
-        when(callback.getEvent()).thenReturn(EventType.DWP_RAISE_EXCEPTION);
         assertFalse(handler.canHandle(ABOUT_TO_SUBMIT, callback));
     }
 
