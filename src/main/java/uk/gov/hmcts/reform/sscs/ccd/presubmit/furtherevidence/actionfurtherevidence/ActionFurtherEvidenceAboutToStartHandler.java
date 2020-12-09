@@ -8,7 +8,6 @@ import static uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurth
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -18,12 +17,6 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
 public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
-
-    private boolean ucEnabled;
-
-    public ActionFurtherEvidenceAboutToStartHandler(@Value("${feature.universal-credit.enabled}") boolean ucEnabled) {
-        this.ucEnabled = ucEnabled;
-    }
 
     @Override
     public boolean canHandle(CallbackType callbackType, Callback<SscsCaseData> callback) {
@@ -78,8 +71,7 @@ public class ActionFurtherEvidenceAboutToStartHandler implements PreSubmitCallba
 
         listOptions.add(new DynamicListItem(APPELLANT.getCode(), APPELLANT.getLabel()));
         listOptions.add(new DynamicListItem(DWP.getCode(), DWP.getLabel()));
-
-        if (ucEnabled) {
+        if (sscsCaseData.isThereAJointParty()) {
             listOptions.add(new DynamicListItem(JOINT_PARTY.getCode(), JOINT_PARTY.getLabel()));
         }
 

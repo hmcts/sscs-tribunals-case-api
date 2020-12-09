@@ -15,7 +15,7 @@ public class NewScenario8Content extends UcNewTemplateContent {
         addComponent(new Paragraph(
             UcTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getConfirmedOrSetAsideSentence(writeFinalDecisionTemplateBody.isSetAside(), writeFinalDecisionTemplateBody.getDateOfDecision())));
         addComponent(new Paragraph(
-            UcTemplateComponentId.DOES_HAVE_LIMITED_CAPABILITY_FOR_WORK_PARAGRAPH.name(), getDoesHaveLimitedCapabilityForWorkSentence(writeFinalDecisionTemplateBody.getAppellantName(), true, true, false)));
+            UcTemplateComponentId.DOES_HAVE_LIMITED_CAPABILITY_FOR_WORK_PARAGRAPH.name(), getDoesHaveLimitedCapabilityForWorkSentence(writeFinalDecisionTemplateBody.getAppellantName(), true, true, false, false)));
         addComponent(new Paragraph(UcTemplateComponentId.INSUFFICIENT_POINTS_PARAGRAPH_SCHEDULE_8_PARAGRAPH_4_APPLIED.name(), getInsufficientPointsSentenceNoSchedule8Paragraph4Sentence()));
         addDescriptorTableIfPopulated(new DescriptorTable(UcTemplateComponentId.SCHEDULE_6_DESCRIPTORS.name(), writeFinalDecisionTemplateBody.getUcSchedule6Descriptors(), false));
         addComponent(new Paragraph(UcTemplateComponentId.DISEASE_OR_DISABLEMENT_PARAGRAPH.name(), getSchedule8Paragraph4AndSchedule9Paragraph4DiseaseOrDisablementSentence(true, true)));
