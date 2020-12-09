@@ -149,6 +149,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
                 .documentLink(
                         DocumentLink.builder()
@@ -195,7 +196,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
-            () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEditedResponseDocumentDeathOfAppellantAboutToSubmitHandler().getDocumentLink().getDocumentFilename()));
+            () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentFilename()));
 
     }
 
@@ -239,6 +240,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .documentFilename("testEditedEvidenceBundleDocument.pdf")
                                 .build()
                 ).build());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedResponseDocument.pdf")
+                                .build()
+                ).build());
         callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -275,6 +284,14 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .documentFilename("testEditedEvidenceBundleDocument.pdf")
                                 .build()
                 ).build());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedResponseDocument.pdf")
+                                .build()
+                ).build());
 
         PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
@@ -286,7 +303,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     }
 
     @Test
-    public void givenUcCaseWithPhmeEvidence_thenMustResponseAsWell() {
+    public void givenUcCaseWithPhmeEvidence_thenMustHaveResponseAsWell() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
                 .documentLink(
@@ -302,7 +319,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(1, response.getErrors().size());
 
         for (String error : response.getErrors()) {
-            assertEquals("If edited evidence is added a reason must be selected", error);
+            assertEquals("You must submit both an edited response document and an edited evidence bundle", error);
         }
     }
 }

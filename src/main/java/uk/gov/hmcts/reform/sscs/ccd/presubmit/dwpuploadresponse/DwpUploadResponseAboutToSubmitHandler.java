@@ -64,9 +64,11 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
         if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null || sscsCaseData.getDwpEditedResponseDocument() != null) {
             if (sscsCaseData.getDwpEditedEvidenceBundleDocument() == null || sscsCaseData.getDwpEditedResponseDocument() == null) {
                 preSubmitCallbackResponse.addError("You must submit both an edited response document and an edited evidence bundle");
+                return preSubmitCallbackResponse;
             }
             if (sscsCaseData.getDwpEditedEvidenceReason() == null) {
                 preSubmitCallbackResponse.addError("If edited evidence is added a reason must be selected");
+                return preSubmitCallbackResponse;
             }
             sscsCaseData.setDwpEditedResponseDocument(buildDwpResponseDocumentWithDate(
                     AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX,
