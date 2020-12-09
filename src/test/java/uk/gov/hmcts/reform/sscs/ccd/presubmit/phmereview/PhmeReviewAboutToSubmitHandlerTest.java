@@ -1,5 +1,12 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.phmereview;
 
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
+
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Before;
@@ -10,16 +17,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.abatecase.AbateCaseAboutToSubmitHandler;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.openMocks;
-import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.APPEAL_ABATED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.Outcome.ABATED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
 
 @RunWith(JUnitParamsRunner.class)
 public class PhmeReviewAboutToSubmitHandlerTest {
@@ -63,7 +61,7 @@ public class PhmeReviewAboutToSubmitHandlerTest {
 
     @Test
     @Parameters({"YES, PHME_GRANTED", "NO, PHME_REFUSED"})
-    public void givenAReviewPHMEEvent_thenSetDwpStateAndResetInterloc(YesNo phmeGranted, DwpState dwpState) {
+    public void givenReviewPhmeEvent_thenSetDwpStateAndResetInterloc(YesNo phmeGranted, DwpState dwpState) {
         sscsCaseData.setPhmeGranted(phmeGranted);
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 

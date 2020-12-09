@@ -1,5 +1,9 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.phmereview;
 
+import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.*;
+import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -9,9 +13,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
-import static java.util.Objects.requireNonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.DwpState.*;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReviewState.NONE;
 
 @Service
 @Slf4j
