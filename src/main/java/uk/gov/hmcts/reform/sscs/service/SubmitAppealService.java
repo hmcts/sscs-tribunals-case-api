@@ -39,28 +39,28 @@ public class SubmitAppealService {
 
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
-    private final SscsPdfService sscsPdfService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final List<String> offices;
+    private final AirLookupService airLookupService;
 
     @SuppressWarnings("squid:S107")
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
-                        SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
+                        AirLookupService airLookupService,
                         @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
-        this.sscsPdfService = sscsPdfService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
+        this.airLookupService = airLookupService;
         this.offices = offices;
     }
 
@@ -145,8 +145,8 @@ public class SubmitAppealService {
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
 
-        String firstHalfOfPostcode = regionalProcessingCenterService
-            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
+        String postCode = appeal.getContactDetails().getPostCode();
+        String firstHalfOfPostcode = RegionalProcessingCenterService.getFirstHalfOfPostcode(postCode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData;
@@ -157,6 +157,7 @@ public class SubmitAppealService {
         }
 
         setCreatedInGapsFromField(sscsCaseData);
+        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
 
         return sscsCaseData;
     }
