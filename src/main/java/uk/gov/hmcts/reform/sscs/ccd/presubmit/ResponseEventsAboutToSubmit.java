@@ -1,5 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
+
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
@@ -14,6 +16,12 @@ public class ResponseEventsAboutToSubmit {
             preSubmitCallbackResponse.addError("Issue code cannot be empty");
         } else if (sscsCaseData.getIssueCode().equals("DD")) {
             preSubmitCallbackResponse.addError("Issue code cannot be set to the default value of DD");
+        }
+        if (isYes(sscsCaseData.getDwpUcb()) && sscsCaseData.getDwpUcbEvidenceDocument() == null) {
+            preSubmitCallbackResponse.addError("Please upload a UCB document");
+        } else if (!isYes(sscsCaseData.getDwpUcb()) && preSubmitCallbackResponse.getErrors().isEmpty()) {
+            sscsCaseData.setDwpUcb(null);
+            sscsCaseData.setDwpUcbEvidenceDocument(null);
         }
     }
 
