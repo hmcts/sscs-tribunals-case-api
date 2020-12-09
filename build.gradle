@@ -245,6 +245,13 @@ dependencyManagement {
             entry 'cxf-rt-transports-http'
         }
 
+        // CVE-2020-17521
+        dependencySet(group: 'org.codehaus.groovy', version: '2.5.14') {
+            entry 'groovy'
+            entry 'groovy-json'
+            entry 'groovy-xml'
+        }
+
         imports {
             mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         }
