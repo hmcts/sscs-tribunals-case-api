@@ -20,8 +20,8 @@ public abstract class UcNewTemplateContent extends UcTemplateContent {
         return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations 2013 applied. Schedule 9, paragraph 4 did not apply.";
     }
 
-    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
-        return (appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (!isWorkRelatedActivitiesLimited ? "" : "has limited capability ") + "for work-related activity." : "."))
+    public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited, boolean isWorkRelatedActivitiesToBeTreatedLimitedCapability) {
+        return (appellantName + (isTreatedLimitedCapability ? " is to be treated as having" : " has") + " limited capability for work" + (includeWorkRelatedActivities ? " and " + (!isWorkRelatedActivitiesLimited ? "" : (isWorkRelatedActivitiesToBeTreatedLimitedCapability ? "is to be treated as having limited capability " : "has limited capability ")) + "for work-related activity." : "."))
             + " The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).";
     }
 

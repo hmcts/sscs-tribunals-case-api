@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody
 public class EsaScenario12Test {
 
     @Test
-    public void testScenario5() {
+    public void testScenario12() {
 
         List<Descriptor> schedule2Descriptors =
             Arrays.asList(Descriptor.builder()
@@ -34,6 +34,7 @@ public class EsaScenario12Test {
                 .supportGroupOnly(false)
                 .reasonsForDecision(Arrays.asList("My first reasons", "My second reasons"))
                 .anythingElse("Something else")
+                .dwpReassessTheAward("noRecommendation")
                 .esaSchedule2Descriptors(schedule2Descriptors).build();
 
         EsaTemplateContent content = EsaScenario.SCENARIO_12.getContent(body);
@@ -42,14 +43,16 @@ public class EsaScenario12Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is set aside.\n"
             + "\n"
-            + "Felix Sydney has limited capability for work.\n"
+            + "Felix Sydney has limited capability for work and is to be treated as having limited capability for work-related activity.\n"
             + "\n"
-            + "In applying the work capability assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 2 of the ESA Regulations 2008 made up as follows:\n"
             + "\n"
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
-            + "No descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.\n"
+            + "No activity or descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.\n"
+            + "\n"
+            + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"
@@ -58,9 +61,11 @@ public class EsaScenario12Test {
             + "Something else\n"
             + "\n"
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
+            + "\n"
+            + "Any recommendation given below does not form part of the Tribunal's decision and is not binding on the Secretary of State. The Tribunal makes no recommendation as to when the Department should reassess Felix Sydney.\n"
             + "\n";
 
-        Assert.assertEquals(10, content.getComponents().size());
+        Assert.assertEquals(12, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 

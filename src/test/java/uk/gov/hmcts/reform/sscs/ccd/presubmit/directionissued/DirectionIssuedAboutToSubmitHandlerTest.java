@@ -433,6 +433,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         callback.getCaseDetails().getCaseData().setInterlocReviewState(null);
         callback.getCaseDetails().getCaseData().setUrgentHearingOutcome(RequestOutcome.IN_PROGRESS.getValue());
         callback.getCaseDetails().getCaseData().setDwpState(DwpState.LAPSED.getId());
+        callback.getCaseDetails().getCaseData().setUrgentCase("Yes");
 
         callback.getCaseDetails().getCaseData().setDirectionTypeDl(new DynamicList(DirectionTypeItemList.REFUSE_URGENT_HEARING.getCode()));
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -440,6 +441,7 @@ public class DirectionIssuedAboutToSubmitHandlerTest {
         assertTrue(response.getData().getState().equals(State.DORMANT_APPEAL_STATE));
         assertTrue(response.getData().getUrgentHearingOutcome().equals(RequestOutcome.REFUSED.getValue()));
         assertTrue(response.getData().getInterlocReviewState().equals(NONE.getId()));
+        assertTrue("No".equalsIgnoreCase(response.getData().getUrgentCase()));
         assertEquals(DIRECTION_ACTION_REQUIRED.getId(), response.getData().getDwpState());
     }
 
