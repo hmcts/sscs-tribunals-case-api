@@ -124,7 +124,7 @@
         "phoneNumber":"0300 123 1142"
       },
       "isScottishCase":"No",
-      "createdInGapsFrom":"validAppeal",
+      "createdInGapsFrom":"readyToList",
       "issueCode":"DD",
       "evidencePresent":"No",
       "esaWriteFinalDecisionPhysicalDisabilitiesQuestion":[
@@ -1134,7 +1134,7 @@
       },
       "region":"BRADFORD",
       "isScottishCase":"No",
-      "createdInGapsFrom":"validAppeal",
+      "createdInGapsFrom":"readyToList",
       "issueCode":"DD"
     },
     "data_classification":{

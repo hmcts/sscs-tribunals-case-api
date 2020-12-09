@@ -295,7 +295,7 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "events": [
         {
           "id": "5dd5e06e-e324-48a7-ae51-9d15ebc21ac0",
@@ -1257,7 +1257,7 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "events": [
         {
           "id": "5dd5e06e-e324-48a7-ae51-9d15ebc21ac0",
