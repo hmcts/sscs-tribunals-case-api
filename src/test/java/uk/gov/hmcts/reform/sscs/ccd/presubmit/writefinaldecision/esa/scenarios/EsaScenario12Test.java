@@ -50,7 +50,7 @@ public class EsaScenario12Test {
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
             + "\n"
-            + "No activity or descriptor from Schedule 3 of the ESA Regulations was satisfied but regulation 35 applied.\n"
+            + "No activity or descriptor from Schedule 3 of the ESA Regulations was satisfied but regulation 35 of the ESA Regulations applied.\n"
             + "\n"
             + "The tribunal applied regulation 35 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
             + "\n"

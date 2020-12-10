@@ -54,7 +54,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public String getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies() {
-        return "No activity or descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " was satisfied but regulation 35 applied.";
+        return "No activity or descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " was satisfied but regulation 35 of the " +  getUsageDependentBenefitTypeRegulationsString() + " applied.";
     }
 
     public String getSchedule2PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> esaSchedule2Descriptors) {
