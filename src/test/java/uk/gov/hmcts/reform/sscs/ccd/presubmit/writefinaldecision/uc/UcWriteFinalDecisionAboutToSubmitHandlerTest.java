@@ -974,7 +974,7 @@ public class UcWriteFinalDecisionAboutToSubmitHandlerTest extends WriteFinalDeci
         Assert.assertEquals("You have specified that the appeal is refused and specified that Support Group Only Appeal does not apply, but have not awarded less than 15 points, a missing answer for the Schedule 8 Paragraph 4 question, submitted an unexpected answer for the Schedule 7 Activities question and submitted an unexpected answer for the Schedule 9 Paragraph 4 question. Please review your previous selection.", error);
     }
 
-    // Allowed scenario 1 - with error due to missing regulation 35
+    // Allowed scenario 1 - with error due to missing schedule 9 paragraph 4
     @Test
     public void givenNonSupportGroupAllowedScenario_Schedule8Paragraph4FieldIsNotPopulatedAndPointsAreCorrectForSchedule8Paragraph4AndNoSchedule7ActivitesAndSchedule9Paragraph4NotSpecified_WhenAllowed_thenDisplayAnError() {
 
