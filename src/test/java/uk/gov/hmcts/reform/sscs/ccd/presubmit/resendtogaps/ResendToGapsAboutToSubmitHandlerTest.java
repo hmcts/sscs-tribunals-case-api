@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 
 import com.networknt.schema.ValidationMessage;
@@ -49,7 +49,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
     @Before
     public void setUp() {
-        initMocks(this);
+        openMocks(this);
 
         handler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator);
         when(callback.getEvent()).thenReturn(EventType.RESEND_CASE_TO_GAPS2);

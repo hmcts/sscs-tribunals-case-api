@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.sscs.functional.ccd;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.util.CaseDataUtils.YES;
 
 import java.time.LocalDate;
@@ -229,6 +230,7 @@ public class UpdateCaseInCcdTest {
                 .appeal(appeal)
                 .subscriptions(subscriptions)
                 .region("CARDIFF")
+                .createdInGapsFrom(READY_TO_LIST.getId())
                 .build();
     }
 }

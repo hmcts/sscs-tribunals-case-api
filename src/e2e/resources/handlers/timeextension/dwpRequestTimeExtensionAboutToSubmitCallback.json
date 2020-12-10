@@ -214,7 +214,7 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "issueCode": "DD"
     },
     "data_classification": {
@@ -962,7 +962,7 @@
         "phoneNumber": "0300 123 1142"
       },
       "region": "BIRMINGHAM",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "issueCode": "DD"
     },
     "data_classification": {
