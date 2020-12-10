@@ -55,7 +55,7 @@ public class EsaScenario9Test {
             + "\n"
             + "The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
-            + "The following activity and descriptor from Schedule 3 of the ESA Regulations 2008 applied:\n"
+            + "The following activity and descriptor from Schedule 3 of the ESA Regulations applied:\n"
             + "\n"
             + "My schedule 3 descriptor\n"
             + "\n"
