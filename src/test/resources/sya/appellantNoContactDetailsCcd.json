@@ -129,6 +129,7 @@
     "hearingType": "oral",
     "receivedVia": "Online"
   },
+  "dwpDocuments": [],
   "subscriptions": {
     "appellantSubscription": null,
     "supporterSubscription": null,

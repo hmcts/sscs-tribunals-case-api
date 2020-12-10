@@ -123,6 +123,7 @@
       "description": "Appeal received"
     }
   }],
+  "dwpDocuments": [],
   "subscriptions": {
     "appellantSubscription": {
       "wantSmsNotifications": "Yes",

@@ -165,6 +165,7 @@
         }
       }
     ],
+    "dwpDocuments": [],
     "subscriptions": {
       "appellantSubscription": {
         "wantSmsNotifications": null,
