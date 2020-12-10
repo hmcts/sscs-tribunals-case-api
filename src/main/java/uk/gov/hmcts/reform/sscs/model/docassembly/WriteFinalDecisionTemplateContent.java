@@ -17,12 +17,58 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionComponentId;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class WriteFinalDecisionTemplateContent {
+public abstract class WriteFinalDecisionTemplateContent {
 
     protected static DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @JsonProperty("template_content")
     private List<TemplateComponent<?>> components;
+
+    private boolean isBenefitTypeAlreadyMentioned;
+    private boolean isRegulationsAlreadyMentioned;
+
+    protected abstract String getBenefitTypeNameWithoutInitials();
+
+    protected abstract String getBenefitTypeInitials();
+
+    /**
+     * Please note, this method is not idempotent.
+     *
+     * The first time this method is called, the string returned should be the fully expanded
+     * benefit type with the initials in brackets.  eg ("Employment Support Allowance (ESA)")
+     *
+     * Subsequently, it should return just the initials eg ("ESA")
+     *
+     * @return
+     */
+    protected String getUsageDependentBenefitTypeString() {
+        String prefix = isBenefitTypeAlreadyMentioned ? "" : (getBenefitTypeNameWithoutInitials() + " ");
+        String suffix = isBenefitTypeAlreadyMentioned ? getBenefitTypeInitials() : ("(" + getBenefitTypeInitials() + ")");
+        isBenefitTypeAlreadyMentioned = true;
+        return prefix + suffix;
+    }
+
+    protected abstract String getRegulationsYear();
+
+    /**
+     * Please note, this method is not idempotent.
+     *
+     * The first time this method is called it should return the usage-dependent
+     * benefit type string (see getUsageDependentBenefitTypeString method) followed by:
+     *
+     * a) The word "Regulations" followed by the year of the regulations
+     * on first method call (eg. "ESA Regulations 2008", or "Employment and Support Allowance (ESA) Regulations 2008" ).
+     * or
+     * b) The word "Regulations" only ( without the year) for subsequent method calls
+     * eg. (eg. "ESA Regulations", or "Employment and Support Allowance (ESA) Regulations" )
+     *
+     * @return The usage dependent benefit type regulations string.
+     */
+    protected String getUsageDependentBenefitTypeRegulationsString() {
+        String value = isRegulationsAlreadyMentioned ? (getUsageDependentBenefitTypeString() + " Regulations") : (getUsageDependentBenefitTypeString() + " Regulations " + getRegulationsYear());
+        isRegulationsAlreadyMentioned = true;
+        return value;
+    }
 
     public WriteFinalDecisionTemplateContent() {
         this.components = new ArrayList<>();
