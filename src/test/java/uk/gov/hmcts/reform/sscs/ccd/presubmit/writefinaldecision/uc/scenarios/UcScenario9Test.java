@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -11,7 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.Uc
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class NewUcScenario9Test {
+public class UcScenario9Test {
 
     @Test
     public void testScenario9() {
@@ -58,7 +58,7 @@ public class NewUcScenario9Test {
             + "\n"
             + "The tribunal applied Schedule 8, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
-            + "The following activity and descriptor from Schedule 7 of the UC Regulations 2013 applied: \n"
+            + "The following activity and descriptor from Schedule 7 of the UC Regulations applied: \n"
             + "\n"
             + "My schedule 7 descriptor\n"
             + "\n"

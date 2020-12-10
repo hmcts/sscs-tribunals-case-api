@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +9,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.Uc
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class NewUcScenario4Test {
+public class UcScenario4Test {
 
     @Test
     public void testScenario4() {
