@@ -300,28 +300,6 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void testPostcodeSplit() {
-        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN32 6PL"));
-    }
-
-    @Test
-    public void testPostcodeSplitWithNoSpace() {
-        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN326PL"));
-    }
-
-    @Test
-    public void testInvalidPostCode() {
-        assertEquals("", submitAppealService.getFirstHalfOfPostcode(""));
-    }
-
-    @Test
-    public void testNullPostCode() {
-        appealData.getAppellant().getContactDetails().setPostCode(null);
-
-        assertEquals("", submitAppealService.getFirstHalfOfPostcode(null));
-    }
-
-    @Test
     @Parameters(method = "generateDifferentRpcScenarios")
     public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode)
         throws JsonProcessingException {
