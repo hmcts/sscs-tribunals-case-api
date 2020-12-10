@@ -79,7 +79,7 @@
         "faxNumber": "0126 434 7983",
         "phoneNumber": "0300 123 1142"
       },
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "issueCode": "DD",
       "evidencePresent": "No",
       "interlocReferralReason": "timeExtension",
