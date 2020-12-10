@@ -226,6 +226,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(nullValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(0));
     }
 
     @Test
@@ -236,6 +237,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
 
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
-        assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(not(nullValue())));
+        assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
     }
 }

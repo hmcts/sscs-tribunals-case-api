@@ -4,12 +4,11 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
-import uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType;
+import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.InterlocReferralReason;
@@ -59,7 +58,7 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
     public List<DwpDocument> addDocument(List<DwpDocument> existingDwpDocuments, DwpResponseDocument tl1Form) {
 
         DwpDocumentDetails docDetails = new DwpDocumentDetails(
-                DocumentType.TL1_FORM.getValue(),
+                DwpDocumentType.TL1_FORM.getValue(),
                 "TL1-Form",
                 LocalDate.now().toString(),
                 tl1Form.getDocumentLink(),
@@ -70,9 +69,6 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
 
         DwpDocument newDoc = new DwpDocument(docDetails);
 
-        if (isNull(existingDwpDocuments)) {
-            existingDwpDocuments = new ArrayList<DwpDocument>();
-        }
         existingDwpDocuments.add(newDoc);
 
         return existingDwpDocuments;
