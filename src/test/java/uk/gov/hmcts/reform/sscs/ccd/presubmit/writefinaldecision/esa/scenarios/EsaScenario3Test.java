@@ -34,7 +34,7 @@ public class EsaScenario3Test {
                 + "\n"
                 + "Felix Sydney is to be treated as having limited capability for work-related activity.\n"
                 + "\n"
-                + "The Secretary of State has accepted that Felix Sydney has limited capability for work-related activity. This was not in issue.\n"
+                + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
                 + "\n"
                 + "No activity or descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.\n"
                 + "\n"
