@@ -34,12 +34,11 @@ public abstract class WriteFinalDecisionTemplateContent {
     /**
      * Please note, this method is not idempotent.
      *
-     * The first time this method is called, the string returned should be the fully expanded
-     * benefit type with the initials in brackets.  eg ("Employment Support Allowance (ESA)")
+     * <p>The first time this method is called, the string returned should be the fully expanded
+     * benefit type with the initials in brackets.  eg ("Employment Support Allowance (ESA)")</p>
      *
-     * Subsequently, it should return just the initials eg ("ESA")
-     *
-     * @return
+     * <p>Subsequently, it should return just the initials eg ("ESA")</p>
+     * @return The usage dependent benefit type string.
      */
     protected String getUsageDependentBenefitTypeString() {
         String prefix = isBenefitTypeAlreadyMentioned ? "" : (getBenefitTypeNameWithoutInitials() + " ");
@@ -53,15 +52,14 @@ public abstract class WriteFinalDecisionTemplateContent {
     /**
      * Please note, this method is not idempotent.
      *
-     * The first time this method is called it should return the usage-dependent
-     * benefit type string (see getUsageDependentBenefitTypeString method) followed by:
+     * <p></p>The first time this method is called it should return the usage-dependent
+     * benefit type string (see getUsageDependentBenefitTypeString method) followed by:</p>
      *
-     * a) The word "Regulations" followed by the year of the regulations
-     * on first method call (eg. "ESA Regulations 2008", or "Employment and Support Allowance (ESA) Regulations 2008" ).
+     * <p></p>a) The word "Regulations" followed by the year of the regulations
+     * on first method call (eg. "ESA Regulations 2008", or "Employment and Support Allowance (ESA) Regulations 2008" ).</p>
      * or
      * b) The word "Regulations" only ( without the year) for subsequent method calls
      * eg. (eg. "ESA Regulations", or "Employment and Support Allowance (ESA) Regulations" )
-     *
      * @return The usage dependent benefit type regulations string.
      */
     protected String getUsageDependentBenefitTypeRegulationsString() {
