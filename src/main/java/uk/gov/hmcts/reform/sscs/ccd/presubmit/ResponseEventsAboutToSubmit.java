@@ -28,7 +28,7 @@ public class ResponseEventsAboutToSubmit {
         }
         if (isYes(sscsCaseData.getDwpUcb()) && dwpUcbEvidenceDocument != null && preSubmitCallbackResponse.getErrors().isEmpty()) {
             DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(DwpDocumentType.UCB.getValue(),
-                    format("ucb-%s", dwpUcbEvidenceDocument.getDocumentFilename()),
+                    "UCB document",
                     LocalDate.now().toString(),
                     dwpUcbEvidenceDocument, null, null, null);
             DwpDocument dwpDocument = new DwpDocument(dwpDocumentDetails);
