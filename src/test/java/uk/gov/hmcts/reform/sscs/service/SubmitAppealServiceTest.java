@@ -499,19 +499,29 @@ public class SubmitAppealServiceTest {
 
     @Test
     @Parameters({
-            "PIP, n1w1 wal, Birmingham",
-            "ESA, n1w1 wal, Birmingham",
-            "UC, n1w1 wal, Birmingham",
-            "PIP, NN85 1ss, Northampton",
-            "ESA, NN85 1ss, Northampton",
-            "UC, NN85 1ss, Northampton"
-
+            "PIP, n1w1 wal, Birmingham, appellant",
+            "ESA, n1w1 wal, Birmingham, appellant",
+            "UC, n1w1 wal, Birmingham, appellant",
+            "PIP, NN85 1ss, Northampton, appellant",
+            "ESA, NN85 1ss, Northampton, appellant",
+            "UC, NN85 1ss, Northampton, appellant",
+            "PIP, n1w1 wal, Birmingham, appointee",
+            "ESA, n1w1 wal, Birmingham, appointee",
+            "UC, n1w1 wal, Birmingham, appointee",
+            "PIP, NN85 1ss, Northampton, appointee",
+            "ESA, NN85 1ss, Northampton, appointee",
+            "UC, NN85 1ss, Northampton, appointee",
     })
-    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue) {
-        SyaCaseWrapper appealData = getSyaCaseWrapper();
+    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee) {
+        boolean isAppellant = appellantOrAppointee.equals("appellant");
+        SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
         SyaBenefitType syaBenefitType = new SyaBenefitType(benefitCode, benefitCode);
         appealData.setBenefitType(syaBenefitType);
-        appealData.getAppellant().getContactDetails().setPostCode(postcode);
+        if (isAppellant) {
+            appealData.getAppellant().getContactDetails().setPostCode(postcode);
+        } else {
+            appealData.getAppointee().getContactDetails().setPostCode(postcode);
+        }
 
         SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
         assertEquals(expectedVenue, caseData.getProcessingVenue());
