@@ -11,7 +11,6 @@
     "case_data": {
       "evidencePresent": "No",
       "hmctsDwpState": "sentToDwp",
-      "dwpDocuments": [],
       "subscriptions": {
         "appellantSubscription": {
           "tya": "NpmhpYaFLa",
@@ -789,7 +788,6 @@
     "case_data": {
       "evidencePresent": "No",
       "hmctsDwpState": "sentToDwp",
-      "dwpDocuments": [],
       "subscriptions": {
         "appellantSubscription": {
           "tya": "NpmhpYaFLa",
