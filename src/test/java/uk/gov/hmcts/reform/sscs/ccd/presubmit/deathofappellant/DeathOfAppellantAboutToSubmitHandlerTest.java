@@ -6,7 +6,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.APPEAL_RECEIVED;
 
+import java.time.LocalDate;
 import java.util.Optional;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import junitparams.converters.Nullable;
@@ -34,13 +37,15 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
     @Mock
     private CaseDetails<SscsCaseData> caseDetailsBefore;
 
+    protected static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     private SscsCaseData sscsCaseData;
     private SscsCaseData sscsCaseDataBefore;
 
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new DeathOfAppellantAboutToSubmitHandler();
+        handler = new DeathOfAppellantAboutToSubmitHandler(validator);
 
         when(callback.getEvent()).thenReturn(EventType.DEATH_OF_APPELLANT);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder().appellant(Appellant.builder().build()).build()).dwpUcb("yes").build();
@@ -175,6 +180,33 @@ public class DeathOfAppellantAboutToSubmitHandlerTest {
 
         assertNull(response.getData().getInterlocReviewState());
         assertNull(response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenADeathOfAppellantInFuture_thenDisplayAnError() {
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+        sscsCaseData.setDateOfAppellantDeath(tomorrow.toString());
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        String error = response.getErrors().stream().findFirst().orElse("");
+        assertEquals("Date of appellant death must not be in the future", error);
+    }
+
+    @Test
+    public void givenADeathOfAppellantInPast_thenDoNotDisplayAnError() {
+
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        sscsCaseData.setDateOfAppellantDeath(yesterday.toString());
+
+        when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertTrue(response.getErrors().isEmpty());
     }
 
     @Test(expected = IllegalStateException.class)
