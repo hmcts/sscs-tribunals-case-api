@@ -6,6 +6,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
+
 
 @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,10 +64,9 @@ public class SyaCaseWrapper {
         if (null == appellant && null == appointee) {
             return null;
         }
-        return (null != appellant && null != appellant.getIsAddressSameAsAppointee()
-            && appellant.getIsAddressSameAsAppointee())
-            ? appointee != null ? appointee.getContactDetails() : null
-            : appellant != null ? appellant.getContactDetails() : null;
+        return null != appellant && null != appointee && ofNullable(isAppointee).orElse(false)
+                ? appointee.getContactDetails()
+                : appellant != null ? appellant.getContactDetails() : null;
     }
 
 }
