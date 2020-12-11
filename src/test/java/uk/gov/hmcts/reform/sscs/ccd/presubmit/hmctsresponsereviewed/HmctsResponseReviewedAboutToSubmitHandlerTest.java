@@ -165,7 +165,7 @@ public class HmctsResponseReviewedAboutToSubmitHandlerTest {
         assertThat(response.getErrors().size(), is(0));
         assertThat(sscsCaseData.getDwpUcb(), is(nullValue()));
         assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
-        assertThat(sscsCaseData.getDwpDocuments().size(), is(0));
+        assertThat(sscsCaseData.getDwpDocuments(), is(nullValue()));
     }
 
     @Test

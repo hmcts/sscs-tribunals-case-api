@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
+import static java.util.Objects.isNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import uk.gov.hmcts.reform.sscs.ccd.callback.DwpDocumentType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
@@ -26,14 +28,21 @@ public class ResponseEventsAboutToSubmit {
             sscsCaseData.setDwpUcbEvidenceDocument(null);
         }
         if (isYes(sscsCaseData.getDwpUcb()) && dwpUcbEvidenceDocument != null && preSubmitCallbackResponse.getErrors().isEmpty()) {
-            DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(DwpDocumentType.UCB.getValue(),
-                    "UCB document",
-                    LocalDate.now().toString(),
-                    dwpUcbEvidenceDocument, null, null, null);
-            DwpDocument dwpDocument = new DwpDocument(dwpDocumentDetails);
-            sscsCaseData.getDwpDocuments().add(dwpDocument);
+            addToDwpDocuments(sscsCaseData, dwpUcbEvidenceDocument);
             sscsCaseData.setDwpUcbEvidenceDocument(null);
         }
+    }
+
+    private void addToDwpDocuments(SscsCaseData sscsCaseData, DocumentLink dwpUcbEvidenceDocument) {
+        DwpDocumentDetails dwpDocumentDetails = new DwpDocumentDetails(DwpDocumentType.UCB.getValue(),
+                "UCB document",
+                LocalDate.now().toString(),
+                dwpUcbEvidenceDocument, null, null, null);
+        DwpDocument dwpDocument = new DwpDocument(dwpDocumentDetails);
+        if (isNull(sscsCaseData.getDwpDocuments())) {
+            sscsCaseData.setDwpDocuments(new ArrayList<>());
+        }
+        sscsCaseData.getDwpDocuments().add(dwpDocument);
     }
 
     public void setCaseCode(SscsCaseData sscsCaseData, EventType event) {

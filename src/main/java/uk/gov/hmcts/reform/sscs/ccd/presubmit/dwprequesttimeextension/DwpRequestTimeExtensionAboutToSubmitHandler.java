@@ -4,6 +4,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
@@ -68,6 +69,10 @@ public class DwpRequestTimeExtensionAboutToSubmitHandler implements PreSubmitCal
         );
 
         DwpDocument newDoc = new DwpDocument(docDetails);
+
+        if (isNull(existingDwpDocuments)) {
+            existingDwpDocuments = new ArrayList<>();
+        }
 
         existingDwpDocuments.add(newDoc);
 
