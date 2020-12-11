@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
+import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
 import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 
@@ -38,5 +39,6 @@ public class ResponseEventsAboutToSubmit {
         sscsCaseData.setIssueCode(issueCode);
         sscsCaseData.setBenefitCode("001");
         sscsCaseData.setCaseCode("001" + issueCode);
+        sscsCaseData.setDwpState(DwpState.RESPONSE_SUBMITTED_DWP.getId());
     }
 }
