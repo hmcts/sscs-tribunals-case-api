@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -12,7 +12,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.Uc
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class NewUcScenario1Test {
+public class UcScenario1Test {
 
     @Test
     public void testScenario1() {
@@ -44,7 +44,7 @@ public class NewUcScenario1Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
-            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2013 did not apply.\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.\n"
             + "\n"
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
@@ -94,7 +94,7 @@ public class NewUcScenario1Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
-            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2013 did not apply.\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.\n"
             + "\n"
             + "Mobilising Unaided\tc.1\t9\n"
             + "\n"
@@ -138,7 +138,7 @@ public class NewUcScenario1Test {
             + "\n"
             + "Felix Sydney does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
-            + "In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations 2013 did not apply.\n"
+            + "In applying the Work Capability Assessment 0 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.\n"
             + "\n"
             + "My first reasons\n"
             + "\n"

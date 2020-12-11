@@ -18,7 +18,7 @@ public class SubscriptionTest extends BaseFunctionTest {
         String appellantTya = ccdCase.getAppellantTya();
 
         // Give ES time to index
-        Thread.sleep(2000L);
+        Thread.sleep(5000L);
 
         String benefitType = sscsMyaBackendRequests.updateSubscription(appellantTya, newUserEmail);
         assertThat(benefitType, is("{\"benefitType\":\"pip\"}"));

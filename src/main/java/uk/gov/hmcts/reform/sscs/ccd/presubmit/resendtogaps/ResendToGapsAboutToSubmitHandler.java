@@ -74,7 +74,7 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
         return preSubmitCallbackResponse;
     }
 
-    public PreSubmitCallbackResponse addErrors(PreSubmitCallbackResponse callbackResponse,
+    public PreSubmitCallbackResponse<SscsCaseData> addErrors(PreSubmitCallbackResponse callbackResponse,
                                                Set<ValidationMessage> validationErrors,
                                                String caseId,
                                                RoboticsValidationException roboticsValidationException) {
