@@ -161,7 +161,7 @@ public class SubmitAppealService {
         setCreatedInGapsFromField(sscsCaseData);
         sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
 
-        log.info("{} - setting venue name to {}", sscsCaseData.getCcdCaseId(), sscsCaseData.getProcessingVenue());
+        log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
     }
