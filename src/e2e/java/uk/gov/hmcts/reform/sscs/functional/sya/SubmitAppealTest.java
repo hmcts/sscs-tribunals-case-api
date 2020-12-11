@@ -174,7 +174,7 @@ public class SubmitAppealTest {
             .header("Content-Type", "application/json");
 
         // Give ES time to index
-        Thread.sleep(2000L);
+        Thread.sleep(3000L);
 
         response = httpRequest.post("/appeals");
 
@@ -183,6 +183,12 @@ public class SubmitAppealTest {
         final Long secondCaseId = getCcdIdFromLocationHeader(response.getHeader("Location"));
         log.info("Duplicate case " + secondCaseId);
         SscsCaseDetails secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+
+        if (secondCaseSscsCaseDetails.getData().getAssociatedCase() == null) {
+            //Give time for evidence share to create associated case link
+            Thread.sleep(5000L);
+            secondCaseSscsCaseDetails = submitHelper.findCaseInCcd(secondCaseId, idamTokens);
+        }
 
         log.info("Duplicate case " + secondCaseSscsCaseDetails.getId() + " has been found");
 

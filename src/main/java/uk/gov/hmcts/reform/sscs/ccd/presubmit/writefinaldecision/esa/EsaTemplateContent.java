@@ -7,12 +7,26 @@ import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateCont
 
 public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateContent {
 
+    @Override
+    protected String getBenefitTypeNameWithoutInitials() {
+        return "Employment and Support Allowance";
+    }
+
+    protected String getRegulationsYear() {
+        return "2008";
+    }
+
+    @Override
+    protected String getBenefitTypeInitials() {
+        return "ESA";
+    }
+
     public String getDoesNotHaveLimitedCapabilityForWorkSentence(String appellantName) {
         return appellantName + " does not have limited capability for work and cannot be treated as having limited capability for work.";
     }
 
     public String getDoesNotHaveLimitedCapabilityForWorkNoSchedule3Sentence(String appellantName) {
-        return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 applied. Regulation 35 did not apply.";
+        return appellantName + " does not have limited capability for work-related activity because no descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied. Regulation 35 did not apply.";
     }
 
     public String getDoesHaveLimitedCapabilityForWorkSentence(String appellantName, boolean isTreatedLimitedCapability, boolean includeWorkRelatedActivities, boolean isWorkRelatedActivitiesLimited) {
@@ -40,30 +54,30 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     public String getHasLimitedCapabilityForWorkNoSchedule3SentenceReg35Applies() {
-        return "No activity or descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 was satisfied but regulation 35 applied.";
+        return "No activity or descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " was satisfied but regulation 35 of the " +  getUsageDependentBenefitTypeRegulationsString() + " applied.";
     }
 
     public String getSchedule2PointsSentence(Integer points, Boolean isSufficient, List<Descriptor> esaSchedule2Descriptors) {
         String madeUpAsFollowsSuffix = esaSchedule2Descriptors == null || esaSchedule2Descriptors.isEmpty() ? "." : " made up as follows:";
         return "In applying the Work Capability Assessment " + points + (points == 1 ? " point was" : " points were")
             + " scored from the activities and descriptors in Schedule "
-            + "2 of the ESA Regulations 2008" + (isSufficient != null && isSufficient.booleanValue() ? madeUpAsFollowsSuffix
+            + "2 of the " + getUsageDependentBenefitTypeRegulationsString() + (isSufficient != null && isSufficient.booleanValue() ? madeUpAsFollowsSuffix
             : ". This is insufficient to meet the "
-            + "threshold for the test. Regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 did not apply.");
+            + "threshold for the test. Regulation 29 of the " + getUsageDependentBenefitTypeRegulationsString() + " did not apply.");
     }
 
     public String getInsufficientPointsSentenceRegulation29Applied() {
         return "This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, "
-                + "but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied.";
+                + "but regulation 29 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied.";
     }
 
     public String getInsufficientPointsSentenceRegulation29AndRegulation35Applied() {
-        return "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment "
+        return "This is because insufficient points were scored under Schedule 2 of the " + getUsageDependentBenefitTypeRegulationsString() +  " to meet the threshold for the Work Capability Assessment "
                 + "and none of the Schedule 3 activities or descriptors were satisfied.";
     }
 
     public String getInsufficientPointsSentence() {
-        return "This is because insufficient points were scored under Schedule 2 of the Employment and Support Allowance (ESA) Regulations 2008 to meet the threshold for the Work Capability Assessment.";
+        return "This is because insufficient points were scored under Schedule 2 of the " + getUsageDependentBenefitTypeRegulationsString() + " to meet the threshold for the Work Capability Assessment.";
     }
 
     public String getRegulation29And35DiseaseOrDisablementSentence(boolean isRegulation29Applied, boolean isRegulation35Applied) {
@@ -78,14 +92,14 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
 
     public String getSchedule3AppliesParagraph(List<Descriptor> descriptors) {
         if (descriptors != null && descriptors.size() == 1) {
-            return "The following activity and descriptor from Schedule 3 of the ESA Regulations 2008 applied:";
+            return "The following activity and descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied:";
         } else {
-            return "The following activities and descriptors from Schedule 3 of the ESA Regulations 2008 applied:";
+            return "The following activities and descriptors from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied:";
         }
     }
 
     public String getNoDescriptorFromSchedule3Regulation35NotApplied() {
-        return "This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply.";
+        return "This is because no descriptor from Schedule 3 of the " + getUsageDependentBenefitTypeRegulationsString() + " applied. Regulation 35 did not apply.";
     }
 
     public abstract EsaScenario getScenario();

@@ -1,15 +1,13 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcNewTemplateContent;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcTemplateComponentId;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateContent;
 import uk.gov.hmcts.reform.sscs.model.docassembly.DescriptorTable;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Paragraph;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class NewScenario1Content extends UcNewTemplateContent {
+public class Scenario1Content extends UcTemplateContent {
 
-    public NewScenario1Content(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
+    public Scenario1Content(WriteFinalDecisionTemplateBody writeFinalDecisionTemplateBody) {
         addComponent(new Paragraph(UcTemplateComponentId.ALLOWED_OR_REFUSED_PARAGRAPH.name(), getAllowedOrRefusedSentence(writeFinalDecisionTemplateBody.isAllowed())));
         addComponent(new Paragraph(
             UcTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(), getConfirmedOrSetAsideSentence(writeFinalDecisionTemplateBody.isSetAside(), writeFinalDecisionTemplateBody.getDateOfDecision())));
