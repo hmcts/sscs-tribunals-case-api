@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.functional.handlers.actionfurtherevidence;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
-import static uk.gov.hmcts.reform.sscs.functional.ccd.UpdateCaseInCcdTest.buildSscsCaseDataForTestingWithValidMobileNumbers;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -69,7 +68,7 @@ public class ActionFurtherEvidenceSubmittedCallbackHandlerTest extends BaseHandl
     }
 
     private SscsCaseDetails createCaseTriggeringGivenEvent(EventType eventType) {
-        return ccdService.createCase(buildSscsCaseDataForTestingWithValidMobileNumbers(),
+        return ccdService.createCase(buildSscsCaseDataForTesting("Bowie", "AB 44 88 12 Y"),
             eventType.getCcdType(), CREATED_BY_FUNCTIONAL_TEST, CREATED_BY_FUNCTIONAL_TEST, idamTokens);
     }
 
