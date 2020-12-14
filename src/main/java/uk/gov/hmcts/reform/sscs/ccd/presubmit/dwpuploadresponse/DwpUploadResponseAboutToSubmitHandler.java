@@ -86,7 +86,7 @@ public class DwpUploadResponseAboutToSubmitHandler extends ResponseEventsAboutTo
                 DynamicListItem reviewByJudgeItem = new DynamicListItem("reviewByJudge", null);
 
                 if (sscsCaseData.getSelectWhoReviewsCase() == null) {
-                    sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));;
+                    sscsCaseData.setSelectWhoReviewsCase(new DynamicList(reviewByJudgeItem, null));
                 } else {
                     sscsCaseData.getSelectWhoReviewsCase().getListItems().add(reviewByJudgeItem);
                 }

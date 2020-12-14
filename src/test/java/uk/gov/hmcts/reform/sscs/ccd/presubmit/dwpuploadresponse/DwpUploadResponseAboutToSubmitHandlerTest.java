@@ -235,6 +235,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
     }
 
+    @Test
     public void givenUcCaseWithPhmeNoFurtherInfo_thenSetReviewByJudge() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
@@ -311,6 +312,27 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
     public void givenUcCaseWithPhmeEvidence_thenMustHaveResponseAsWell() {
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
         callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You must submit both an edited response document and an edited evidence bundle", error);
+        }
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeResponse_thenMustHaveResponseAsWell() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
                 .documentLink(
                         DocumentLink.builder()
                                 .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
