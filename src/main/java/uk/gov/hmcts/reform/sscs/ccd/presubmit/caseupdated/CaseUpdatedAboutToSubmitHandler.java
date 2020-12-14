@@ -70,7 +70,7 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 sscsCaseData.setRegion(newRpc.getName());
             }
 
-            updateProcessingVenueIfRequired(sscsCaseData);
+            updateProcessingVenueIfRequired(caseDetails);
 
         }
 
@@ -84,7 +84,9 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
         }
     }
 
-    private void updateProcessingVenueIfRequired(SscsCaseData sscsCaseData) {
+    private void updateProcessingVenueIfRequired(CaseDetails<SscsCaseData> caseDetails) {
+
+        SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         String postCode = "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
             && null != sscsCaseData.getAppeal().getAppellant().getAppointee()
@@ -93,7 +95,13 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 ? sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
                 : sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
 
-        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
+        String venue = airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType());
+
+        if (venue != null && !venue.equalsIgnoreCase(sscsCaseData.getProcessingVenue())) {
+            log.info("Case id: {} - setting venue name to {} from {}", caseDetails.getId(), venue, sscsCaseData.getProcessingVenue());
+
+            sscsCaseData.setProcessingVenue(venue);
+        }
 
     }
 
