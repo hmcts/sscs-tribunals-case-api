@@ -14,6 +14,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.ResponseEventsAboutToSubmit;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.isscottish.IsScottishHandler;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @Component
@@ -22,12 +23,15 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
 
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final AssociatedCaseLinkHelper associatedCaseLinkHelper;
+    private final AirLookupService airLookupService;
 
     @Autowired
     CaseUpdatedAboutToSubmitHandler(RegionalProcessingCenterService regionalProcessingCenterService,
-                                    AssociatedCaseLinkHelper associatedCaseLinkHelper) {
+                                    AssociatedCaseLinkHelper associatedCaseLinkHelper,
+                                    AirLookupService airLookupService) {
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.associatedCaseLinkHelper = associatedCaseLinkHelper;
+        this.airLookupService = airLookupService;
     }
 
     @Override
@@ -66,6 +70,8 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
                 sscsCaseData.setRegion(newRpc.getName());
             }
 
+            updateProcessingVenueIfRequired(sscsCaseData);
+
         }
 
         return new PreSubmitCallbackResponse<>(sscsCaseData);
@@ -77,4 +83,18 @@ public class CaseUpdatedAboutToSubmitHandler extends ResponseEventsAboutToSubmit
             caseData.setIsScottishCase(isScottishCase);
         }
     }
+
+    private void updateProcessingVenueIfRequired(SscsCaseData sscsCaseData) {
+
+        String postCode = "yes".equalsIgnoreCase(sscsCaseData.getAppeal().getAppellant().getIsAppointee())
+            && null != sscsCaseData.getAppeal().getAppellant().getAppointee()
+            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress()
+            && null != sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
+                ? sscsCaseData.getAppeal().getAppellant().getAppointee().getAddress().getPostcode()
+                : sscsCaseData.getAppeal().getAppellant().getAddress().getPostcode();
+
+        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
+
+    }
+
 }
