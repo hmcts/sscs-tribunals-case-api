@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -186,6 +190,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("US", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001US", response.getData().getCaseCode());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
     }
 
     @Test
@@ -201,5 +206,40 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
+        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("Please upload a UCB document"));
+    }
+
+    @Test
+    public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
+        sscsCaseData.setDwpUcb(NO.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(sscsCaseData.getDwpUcb(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments(), is(nullValue()));
+    }
+
+    @Test
+    public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
+        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
+        assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
     }
 }
