@@ -42,7 +42,7 @@ public class EsaScenario4Test {
             + "\n"
             + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
             + "\n"
-            + "The following activity and descriptor from Schedule 3 of the ESA Regulations 2008 applied:\n"
+            + "The following activity and descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied:\n"
             + "\n"
             + "2. Transferring from one seated position to another.\n"
             + "\n"

@@ -199,7 +199,7 @@ public class TrackYourAppealJsonBuilder {
     }
 
     private boolean isHearingAdjourned(Map<Event, Hearing> eventHearingMap) {
-        List<Hearing> hearing = new ArrayList(eventHearingMap.values());
+        List<Hearing> hearing = new ArrayList<>(eventHearingMap.values());
         hearing.sort(Comparator.reverseOrder());
         return !hearing.isEmpty() && YES.equalsIgnoreCase(hearing.get(0).getValue().getAdjourned());
     }

@@ -224,7 +224,7 @@
       "interlocReviewState": "reviewByTcw",
       "region": "BIRMINGHAM",
       "generatedDOB": "1990-02-26",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "issueCode": "DD",
       "generatedMobile": "07411222222"
     },
@@ -1105,7 +1105,7 @@
       "interlocReviewState": "awaitingAdminAction",
       "region": "BIRMINGHAM",
       "generatedDOB": "1990-02-26",
-      "createdInGapsFrom": "validAppeal",
+      "createdInGapsFrom": "readyToList",
       "issueCode": "DD",
       "generatedMobile": "07411222222"
     },
