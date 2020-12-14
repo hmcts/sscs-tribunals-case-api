@@ -326,7 +326,9 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         for (String error : response.getErrors()) {
             assertEquals("You must submit both an edited response document and an edited evidence bundle", error);
         }
+    }
 
+    @Test
     public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
         sscsCaseData.setDwpUcb(YES.getValue());
         sscsCaseData.setDwpUcbEvidenceDocument(null);
