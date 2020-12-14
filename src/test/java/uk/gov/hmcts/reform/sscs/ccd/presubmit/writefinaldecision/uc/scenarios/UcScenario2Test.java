@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
 import java.util.Arrays;
 import org.junit.Assert;
@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateCo
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class NewUcScenario2Test {
+public class UcScenario2Test {
 
     @Test
     public void testScenario2() {

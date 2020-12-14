@@ -61,8 +61,8 @@ public class CreateCaseController {
     ) throws URISyntaxException {
         SscsCaseDetails caseDetails = ccdService.createCase(
                 createSscsCase(email, mobile, hearingType),
-                EventType.SYA_APPEAL_CREATED.getCcdType(),
-                "SSCS - appeal created event", "Created SSCS",
+                EventType.CREATE_TEST_CASE.getCcdType(),
+                "SSCS - create test case event", "Created SSCS",
                 idamService.getIdamTokens()
         );
 

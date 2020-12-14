@@ -1,4 +1,4 @@
-package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.newscenarios;
+package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios;
 
 import java.util.Arrays;
 import org.junit.Assert;
@@ -7,7 +7,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.UcTemplateCo
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.uc.scenarios.UcScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateBody;
 
-public class NewUcScenario3Test {
+public class UcScenario3Test {
 
     @Test
     public void testScenario3() {
@@ -38,7 +38,7 @@ public class NewUcScenario3Test {
                 + "\n"
                 + "The Secretary of State has accepted that Felix Sydney has limited capability for work. This was not in issue.\n"
                 + "\n"
-                + "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations 2013 applied.\n"
+                + "No activity or descriptor from Schedule 7 of the UC Regulations 2013 was satisfied but Schedule 9, paragraph 4 of the UC Regulations applied.\n"
                 + "\n"
                 + "The tribunal applied Schedule 9, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work and for work-related activity.\n"
                 + "\n"
