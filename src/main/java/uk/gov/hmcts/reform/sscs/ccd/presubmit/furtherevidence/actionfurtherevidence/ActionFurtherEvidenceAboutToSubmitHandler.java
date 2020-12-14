@@ -306,7 +306,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
         String bundleAddition = null;
 
         if (caseState != null
-            && isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction())
+            && (isIssueFurtherEvidenceToAllParties(sscsCaseData.getFurtherEvidenceAction()) || isOtherDocumentTypeActionManually(sscsCaseData.getFurtherEvidenceAction()))
             && isCaseStateAddtitionValid(caseState)) {
 
             log.info("adding footer appendix document link: {} and caseId {}", url, sscsCaseData.getCcdCaseId());
