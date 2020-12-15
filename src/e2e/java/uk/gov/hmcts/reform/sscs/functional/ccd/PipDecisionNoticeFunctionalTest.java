@@ -47,11 +47,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfText = new PDFTextStripper().getText(document);
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
-            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 16/11/2020 in respect of Personal Independence Payment is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 10/10/2020 for an indefinite period."));
+            assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
-            //assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
-            //assertThat(pdfTextWithoutNewLines, containsString("14. Coping with change."));
+            assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
             assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 10/10/2020 for an indefinite period."));
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is limited in their ability to mobilise. They score 0 points."));
@@ -59,7 +59,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
             assertThat(pdfTextWithoutNewLines, containsString("10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
+            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
     
