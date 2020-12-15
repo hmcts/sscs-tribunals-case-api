@@ -23,6 +23,9 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.LanguagePreference;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceTestBase;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaTemplateContent;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
+import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.NoticeIssuedTemplateBody;
@@ -394,12 +397,13 @@ public class PipWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalD
             assertEquals(8, body.getDailyLivingNumberOfPoints().intValue());
 
         }
-
-
+        
         // Mobility specific assertions
         assertEquals(false, body.isMobilityIsEntited());
         assertEquals(false, body.isMobilityIsSeverelyLimited());
         assertNull(body.getMobilityDescriptors());
+        PipTemplateContent templateContent = (PipTemplateContent)payload.getWriteFinalDecisionTemplateContent();
+        assertEquals(PipScenario.SCENARIO_1, templateContent.getScenario());
     }
 
     @Test
