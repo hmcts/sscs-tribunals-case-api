@@ -49,8 +49,10 @@
       "pipWriteFinalDecisionDailyLivingQuestion" : "standardRate",
       "pipWriteFinalDecisionMobilityQuestion" : "standardRate",
       "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
+      "pipWriteFinalDecisionMobilityActivitiesQuestion" : ["movingAround"],
       "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1e",
       "pipWriteFinalDecisionTakingNutritionQuestion" : "takingNutrition2d",
+      "pipWriteFinalDecisionMovingAroundQuestion" : "movingAround12a",
       "writeFinalDecisionReasons":[
         {
           "id":"c5d206c1-9630-4f05-b7e8-175b0617c2cc",
