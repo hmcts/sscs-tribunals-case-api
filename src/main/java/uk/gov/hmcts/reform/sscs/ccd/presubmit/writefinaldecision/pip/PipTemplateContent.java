@@ -2,7 +2,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import java.time.LocalDate;
 import java.util.List;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
 import uk.gov.hmcts.reform.sscs.model.docassembly.WriteFinalDecisionTemplateContent;
@@ -37,12 +36,16 @@ public abstract class PipTemplateContent extends WriteFinalDecisionTemplateConte
     }
 
     protected String getLimitedAbilityDailyLiving(String appellantName, Integer points, List<Descriptor> descriptors) {
-        if (points == null) points = 0;
+        if (points == null) {
+            points = 0;
+        }
         return appellantName + " has limited ability to carry out the activities of daily living set out below. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? " They satisfy the following descriptors:" : "");
     }
 
     protected String getLimitedAbilityMobility(String appellantName, Integer points, List<Descriptor> descriptors) {
-        if (points == null) points = 0;
+        if (points == null) {
+            points = 0;
+        }
         return appellantName + " is limited in their ability to mobilise. They score " + points + " point" + (points == 1 ? "." : "s.") + (descriptors != null && descriptors.size() > 0 ? " They satisfy the following descriptors:" : "");
     }
 
