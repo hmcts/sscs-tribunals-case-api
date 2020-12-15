@@ -1,9 +1,6 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.furtherevidence.actionfurtherevidence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
@@ -356,6 +353,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         assertEquals("Other document received on 13-06-2019", response.getData().getSscsDocument().get(1).getValue().getDocumentFileName());
         assertEquals("2019-06-13", response.getData().getSscsDocument().get(1).getValue().getDocumentDateAdded());
         assertEquals("exist.pdf", response.getData().getSscsDocument().get(2).getValue().getDocumentFileName());
+        assertNotNull(response.getData().getSscsDocument().get(0).getValue().getControlNumber());
         assertNull(response.getData().getScannedDocuments());
     }
 
