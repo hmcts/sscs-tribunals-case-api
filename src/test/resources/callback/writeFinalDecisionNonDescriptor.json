@@ -171,7 +171,7 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "PIP",
+          "code": "BENEFIT_TYPE",
           "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
@@ -896,7 +896,7 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "PIP",
+          "code": "BENEFIT_TYPE",
           "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
