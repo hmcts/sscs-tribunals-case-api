@@ -53,10 +53,15 @@
       "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1e",
       "pipWriteFinalDecisionTakingNutritionQuestion" : "takingNutrition2d",
       "pipWriteFinalDecisionMovingAroundQuestion" : "movingAround12a",
+      "writeFinalDecisionPageSectionReference":"B7",
       "writeFinalDecisionReasons":[
         {
           "id":"c5d206c1-9630-4f05-b7e8-175b0617c2cc",
-          "value":"Reasons for decision"
+          "value":"Reasons for decision 1"
+        },
+        {
+          "id":"5d206c1-9630-4f05-b7e8-175b0617c2cc",
+          "value":"Reasons for decision 2"
         }
       ],
       "writeFinalDecisionAnythingElse":"Anything else",
