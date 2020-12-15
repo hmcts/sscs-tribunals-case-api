@@ -99,7 +99,9 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
                 return preSubmitCallbackResponse;
             }
 
-            sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+            if(!"withDwp".equals(callback.getCaseDetails().getState().getId())) {
+                sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+            }
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(), preSubmitCallbackResponse);
