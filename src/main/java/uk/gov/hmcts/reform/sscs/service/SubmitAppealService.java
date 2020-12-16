@@ -1,8 +1,10 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.VALID_APPEAL;
+import static uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService.getFirstHalfOfPostcode;
 import static uk.gov.hmcts.reform.sscs.transform.deserialize.SubmitYourAppealToCcdCaseDataDeserializer.convertSyaToCcdCaseData;
 
 import feign.FeignException;
@@ -39,28 +41,28 @@ public class SubmitAppealService {
 
     private final CcdService ccdService;
     private final CitizenCcdService citizenCcdService;
-    private final SscsPdfService sscsPdfService;
     private final RegionalProcessingCenterService regionalProcessingCenterService;
     private final IdamService idamService;
     private final ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService;
     private final List<String> offices;
+    private final AirLookupService airLookupService;
 
     @SuppressWarnings("squid:S107")
     @Autowired
     SubmitAppealService(CcdService ccdService,
                         CitizenCcdService citizenCcdService,
-                        SscsPdfService sscsPdfService,
                         RegionalProcessingCenterService regionalProcessingCenterService,
                         IdamService idamService,
                         ConvertAIntoBService<SscsCaseData, SessionDraft> convertAIntoBService,
+                        AirLookupService airLookupService,
                         @Value("#{'${readyToList.offices}'.split(',')}") List<String> offices) {
 
         this.ccdService = ccdService;
         this.citizenCcdService = citizenCcdService;
-        this.sscsPdfService = sscsPdfService;
         this.regionalProcessingCenterService = regionalProcessingCenterService;
         this.idamService = idamService;
         this.convertAIntoBService = convertAIntoBService;
+        this.airLookupService = airLookupService;
         this.offices = offices;
     }
 
@@ -105,7 +107,7 @@ public class SubmitAppealService {
         }
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
 
-        if (CollectionUtils.isNotEmpty(caseDetailsList)) {
+        if (isNotEmpty(caseDetailsList)) {
             caseDetails = caseDetailsList.get(0);
             sessionDraft = convertAIntoBService.convert(caseDetails);
         }
@@ -129,7 +131,7 @@ public class SubmitAppealService {
     private boolean hasValidCitizenRole(IdamTokens idamTokens) {
         boolean hasRole = false;
         if (idamTokens != null && !CollectionUtils.isEmpty(idamTokens.getRoles())) {
-            hasRole = idamTokens.getRoles().stream().anyMatch(role -> CITIZEN_ROLE.equalsIgnoreCase(role));
+            hasRole = idamTokens.getRoles().stream().anyMatch(CITIZEN_ROLE::equalsIgnoreCase);
         }
         return hasRole;
     }
@@ -145,8 +147,8 @@ public class SubmitAppealService {
 
     SscsCaseData convertAppealToSscsCaseData(SyaCaseWrapper appeal) {
 
-        String firstHalfOfPostcode = regionalProcessingCenterService
-            .getFirstHalfOfPostcode(appeal.getContactDetails().getPostCode());
+        String postCode = appeal.getContactDetails().getPostCode();
+        String firstHalfOfPostcode = getFirstHalfOfPostcode(postCode);
         RegionalProcessingCenter rpc = regionalProcessingCenterService.getByPostcode(firstHalfOfPostcode);
 
         SscsCaseData sscsCaseData;
@@ -157,22 +159,17 @@ public class SubmitAppealService {
         }
 
         setCreatedInGapsFromField(sscsCaseData);
+        sscsCaseData.setProcessingVenue(airLookupService.lookupAirVenueNameByPostCode(postCode, sscsCaseData.getAppeal().getBenefitType()));
+
+        log.info("{} - setting venue name to {}", sscsCaseData.getAppeal().getAppellant().getIdentity().getNino(), sscsCaseData.getProcessingVenue());
 
         return sscsCaseData;
     }
 
-    private SscsCaseData setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
+    private void setCreatedInGapsFromField(SscsCaseData sscsCaseData) {
         String createdInGapsFrom = offices.contains(sscsCaseData.getAppeal().getMrnDetails().getDwpIssuingOffice())
             ? READY_TO_LIST.getId() : VALID_APPEAL.getId();
         sscsCaseData.setCreatedInGapsFrom(createdInGapsFrom);
-        return sscsCaseData;
-    }
-
-    String getFirstHalfOfPostcode(String postcode) {
-        if (postcode != null && postcode.length() > 3) {
-            return postcode.substring(0, postcode.length() - 3).trim();
-        }
-        return "";
     }
 
     private SscsCaseDetails createCaseInCcd(SscsCaseData caseData, EventType eventType, IdamTokens idamTokens) {

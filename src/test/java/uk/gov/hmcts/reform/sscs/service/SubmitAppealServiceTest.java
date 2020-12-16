@@ -94,10 +94,12 @@ public class SubmitAppealServiceTest {
 
     private static final RegionalProcessingCenterService regionalProcessingCenterService;
 
+    private static AirLookupService airLookupService;
+
     private SscsPdfService sscsPdfService;
 
     static {
-        AirLookupService airLookupService = new AirLookupService();
+        airLookupService = new AirLookupService();
         airLookupService.init();
         regionalProcessingCenterService = new RegionalProcessingCenterService(airLookupService);
         regionalProcessingCenterService.init();
@@ -152,11 +154,9 @@ public class SubmitAppealServiceTest {
         offices.add("Watford DRT");
         offices.add("Sheffield DRT");
 
-        sscsPdfService = new SscsPdfService(TEMPLATE_PATH, WELSH_TEMPLATE_PATH, pdfServiceClient, ccdPdfService, resourceManager, welshBenefitTypeTranslator);
-
         submitAppealService = new SubmitAppealService(
-            ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-            idamService, convertAIntoBService, offices);
+            ccdService, citizenCcdService, regionalProcessingCenterService,
+            idamService, convertAIntoBService, airLookupService, offices);
 
         given(ccdService.createCase(any(SscsCaseData.class), any(String.class), any(String.class), any(String.class), any(IdamTokens.class)))
             .willReturn(SscsCaseDetails.builder().id(123L).build());
@@ -171,8 +171,8 @@ public class SubmitAppealServiceTest {
     @Test
     public void givenCaseDoesNotExistInCcd_shouldCreateCaseWithAppealDetailsWithValidAppealCreatedEvent() {
         submitAppealService = new SubmitAppealService(
-                ccdService, citizenCcdService, sscsPdfService, regionalProcessingCenterService,
-                idamService, convertAIntoBService, offices);
+                ccdService, citizenCcdService, regionalProcessingCenterService,
+                idamService, convertAIntoBService, airLookupService, offices);
 
         byte[] expected = {};
         given(pdfServiceClient.generateFromHtml(any(byte[].class), any())).willReturn(expected);
@@ -297,28 +297,6 @@ public class SubmitAppealServiceTest {
     public void shouldThrowExceptionOnGetDraftWhenCitizenRoleNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
         Optional<SessionDraft> optionalSessionDraft = submitAppealService.getDraftAppeal("authorisation");
-    }
-
-    @Test
-    public void testPostcodeSplit() {
-        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN32 6PL"));
-    }
-
-    @Test
-    public void testPostcodeSplitWithNoSpace() {
-        assertEquals("TN32", submitAppealService.getFirstHalfOfPostcode("TN326PL"));
-    }
-
-    @Test
-    public void testInvalidPostCode() {
-        assertEquals("", submitAppealService.getFirstHalfOfPostcode(""));
-    }
-
-    @Test
-    public void testNullPostCode() {
-        appealData.getAppellant().getContactDetails().setPostCode(null);
-
-        assertEquals("", submitAppealService.getFirstHalfOfPostcode(null));
     }
 
     @Test
@@ -517,5 +495,35 @@ public class SubmitAppealServiceTest {
         List<SscsCaseDetails> matchedCases = submitAppealService.getMatchedCases("ABCDEFG", idamService.getIdamTokens());
 
         assertEquals(1, matchedCases.size());
+    }
+
+    @Test
+    @Parameters({
+            "PIP, n1w1 wal, Birmingham, appellant",
+            "ESA, n1w1 wal, Birmingham, appellant",
+            "UC, n1w1 wal, Birmingham, appellant",
+            "PIP, NN85 1ss, Northampton, appellant",
+            "ESA, NN85 1ss, Northampton, appellant",
+            "UC, NN85 1ss, Northampton, appellant",
+            "PIP, n1w1 wal, Birmingham, appointee",
+            "ESA, n1w1 wal, Birmingham, appointee",
+            "UC, n1w1 wal, Birmingham, appointee",
+            "PIP, NN85 1ss, Northampton, appointee",
+            "ESA, NN85 1ss, Northampton, appointee",
+            "UC, NN85 1ss, Northampton, appointee",
+    })
+    public void shouldSetProcessingVenueBasedOnBenefitTypeAndPostCode(String benefitCode, String postcode, String expectedVenue, String appellantOrAppointee) {
+        boolean isAppellant = appellantOrAppointee.equals("appellant");
+        SyaCaseWrapper appealData = getSyaCaseWrapper(isAppellant ? "json/sya.json" : "sya/allDetailsWithAppointeeWithDifferentAddress.json");
+        SyaBenefitType syaBenefitType = new SyaBenefitType(benefitCode, benefitCode);
+        appealData.setBenefitType(syaBenefitType);
+        if (isAppellant) {
+            appealData.getAppellant().getContactDetails().setPostCode(postcode);
+        } else {
+            appealData.getAppointee().getContactDetails().setPostCode(postcode);
+        }
+
+        SscsCaseData caseData = submitAppealService.convertAppealToSscsCaseData(appealData);
+        assertEquals(expectedVenue, caseData.getProcessingVenue());
     }
 }
