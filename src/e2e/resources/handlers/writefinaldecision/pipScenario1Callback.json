@@ -42,7 +42,9 @@
       "writeFinalDecisionDateOfDecision":"2020-11-17",
       "writeFinalDecisionStartDate": "2020-12-17",
       "writeFinalDecisionPageSectionReference":"B7",
-      "writeFinalDecisionTypeOfHearing":"triage",
+      "writeFinalDecisionPresentingOfficerAttendedQuestion":"No",
+      "writeFinalDecisionAppellantAttendedQuestion":"Yes",
+      "writeFinalDecisionTypeOfHearing":"video",
       "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
       "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "same",
       "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "same",
@@ -64,7 +66,7 @@
           "value":"Reasons for decision 2"
         }
       ],
-      "writeFinalDecisionAnythingElse":"Anything else",
+      "writeFinalDecisionAnythingElse":"Anything else.",
       "subscriptions":{
         "appellantSubscription":{
           "tya":"0oGRulRKtA",
