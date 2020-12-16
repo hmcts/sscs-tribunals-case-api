@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.sscs.service;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.EventType.*;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.State.READY_TO_LIST;
@@ -101,19 +102,43 @@ public class SubmitAppealService {
         SscsCaseData caseDetails = null;
         SessionDraft sessionDraft = null;
         IdamTokens idamTokens = getUserTokens(oauth2Token);
+
         if (!hasValidCitizenRole(idamTokens)) {
             throw new ApplicationErrorException(new Exception("User has a invalid role"));
         }
+
         List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
 
         if (isNotEmpty(caseDetailsList)) {
             caseDetails = caseDetailsList.get(0);
             sessionDraft = convertAIntoBService.convert(caseDetails);
         }
+
         log.info("GET Draft case with CCD Id {} , IDAM Id {} and roles {} ",
                 (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
             idamTokens.getRoles());
+
         return (sessionDraft != null) ? Optional.of(sessionDraft) : Optional.empty();
+    }
+
+    public List<SessionDraft> getDraftAppeals(String oauth2Token) {
+        SscsCaseData caseDetails = null;
+        IdamTokens idamTokens = getUserTokens(oauth2Token);
+
+        if (!hasValidCitizenRole(idamTokens)) {
+            throw new ApplicationErrorException(new Exception("User has a invalid role"));
+        }
+        List<SscsCaseData> caseDetailsList = citizenCcdService.findCase(idamTokens);
+
+        log.info("GET all Draft cases with IDAM Id {} and roles {}",
+                (caseDetails == null) ? null : caseDetails.getCcdCaseId(), idamTokens.getUserId(),
+                idamTokens.getRoles());
+
+        List<SessionDraft> drafts = caseDetailsList.stream()
+                .map(convertAIntoBService::convert)
+                .collect(toList());
+
+        return drafts;
     }
 
     private IdamTokens getUserTokens(String oauth2Token) {

@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -65,15 +66,36 @@ public class SyaController {
         return created(location).build();
     }
 
+    @ApiOperation(value = "getDraftAppeals", notes = "Get all draft appeals", response = Draft.class)
+    @ApiResponses(value =
+            {@ApiResponse(code = 200, message = "Returns all draft appeals data if it exists.", response = SessionDraft.class),
+                    @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
+                    @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
+    @GetMapping(value = "/drafts/all", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SessionDraft>> getDraftAppeals(@RequestHeader(AUTHORIZATION) String authorisation) {
+        Preconditions.checkNotNull(authorisation);
+
+        List<SessionDraft> draftAppeals = submitAppealService.getDraftAppeals(authorisation);
+
+        if (draftAppeals.isEmpty()) {
+            log.info("Did not find any draft appeals for the requested user.");
+            return ResponseEntity.noContent().build();
+        } else {
+            log.info("Found {} draft appeals", draftAppeals.size());
+            return ResponseEntity.ok().body(draftAppeals);
+        }
+    }
+
 
     @ApiOperation(value = "getDraftAppeal", notes = "Get a draft appeal", response = Draft.class)
     @ApiResponses(value =
         {@ApiResponse(code = 200, message = "Returns a draft appeal data if it exists.", response = SessionDraft.class),
-            @ApiResponse(code = 404, message = "The user does not have any draft appeal."),
+            @ApiResponse(code = 204, message = "The user does not have any draft appeal."),
             @ApiResponse(code = 500, message = "Most probably the user is unauthorised.")})
     @GetMapping(value = "/drafts", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<SessionDraft> getDraftAppeal(@RequestHeader(AUTHORIZATION) String authorisation) {
         Preconditions.checkNotNull(authorisation);
+
         Optional<SessionDraft> draftAppeal = submitAppealService.getDraftAppeal(authorisation);
         if (!draftAppeal.isPresent()) {
             log.info("Did not find any draft appeals for the requested user.");

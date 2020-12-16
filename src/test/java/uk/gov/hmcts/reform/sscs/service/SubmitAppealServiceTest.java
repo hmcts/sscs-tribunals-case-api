@@ -326,6 +326,30 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
+    public void shouldGetAllDraftsIfItExists() {
+
+        SscsCaseData caseData =  SscsCaseData.builder().build();
+
+        when(citizenCcdService.findCase(any())).thenReturn(List.of(caseData, caseData, caseData));
+        when(convertAIntoBService.convert(any(SscsCaseData.class))).thenReturn(SessionDraft.builder().build());
+        List<SessionDraft> sessionDrafts = submitAppealService.getDraftAppeals("authorisation");
+        assertEquals(3, sessionDrafts.size());
+    }
+
+    @Test
+    public void shouldGetEmptyListIfNoDraftsExists() {
+        when(citizenCcdService.findCase(any())).thenReturn(Collections.emptyList());
+        List<SessionDraft> sessionDrafts = submitAppealService.getDraftAppeals("authorisation");
+        assertEquals(0, sessionDrafts.size());
+    }
+
+    @Test(expected = ApplicationErrorException.class)
+    public void shouldThrowExceptionOnGetDraftsWhenCitizenRoleNotPresent() {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        List<SessionDraft> sessionDrafts = submitAppealService.getDraftAppeals("authorisation");
+    }
+
+    @Test
     @Parameters(method = "generateDifferentRpcScenarios")
     public void givenAppellantPostCode_shouldSetRegionAndRpcCorrectly(String expectedRpc, String appellantPostCode)
         throws JsonProcessingException {

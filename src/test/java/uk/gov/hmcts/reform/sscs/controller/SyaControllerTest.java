@@ -18,6 +18,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import junitparams.JUnitParamsRunner;
@@ -414,13 +415,63 @@ public class SyaControllerTest {
     }
 
     @Test
-    public void getDraftWillReturn404WhenNoneExistForTheUser() throws Exception {
+    public void getDraftWillReturn204WhenNoneExistForTheUser() throws Exception {
         when(submitAppealService.getDraftAppeal(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/drafts")
             .header("Authorization", "Bearer myToken")
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void givenGetDraftsIsCalled_shouldReturn200AndTheDraft() throws Exception {
+
+        SessionDraft sessionDraft = SessionDraft.builder()
+                .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+                .postcode(new SessionPostcodeChecker("AP1 4NT"))
+                .createAccount(new SessionCreateAccount("yes"))
+                .build();
+
+        SessionDraft sessionDraft2 = SessionDraft.builder()
+                .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+                .postcode(new SessionPostcodeChecker("DD1 8FH"))
+                .createAccount(new SessionCreateAccount("no"))
+                .build();
+
+        SessionDraft sessionDraft3 = SessionDraft.builder()
+                .benefitType(new SessionBenefitType("Personal Independence Payment (PIP)"))
+                .postcode(new SessionPostcodeChecker("LF4 9SH"))
+                .createAccount(new SessionCreateAccount("yes"))
+                .build();
+
+        when(submitAppealService.getDraftAppeals(any())).thenReturn(List.of(sessionDraft, sessionDraft2, sessionDraft3));
+
+        mockMvc.perform(
+                get("/drafts/all")
+                        .header("Authorization", "Bearer myToken")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].BenefitType.benefitType").value("Personal Independence Payment (PIP)"))
+                .andExpect(jsonPath("$[0].PostcodeChecker.postcode").value("AP1 4NT"))
+                .andExpect(jsonPath("$[0].CreateAccount.createAccount").value("yes"))
+                .andExpect(jsonPath("$[1].BenefitType.benefitType").value("Personal Independence Payment (PIP)"))
+                .andExpect(jsonPath("$[1].PostcodeChecker.postcode").value("DD1 8FH"))
+                .andExpect(jsonPath("$[1].CreateAccount.createAccount").value("no"))
+                .andExpect(jsonPath("$[2].BenefitType.benefitType").value("Personal Independence Payment (PIP)"))
+                .andExpect(jsonPath("$[2].PostcodeChecker.postcode").value("LF4 9SH"))
+                .andExpect(jsonPath("$[2].CreateAccount.createAccount").value("yes"))
+        ;
+    }
+
+    @Test
+    public void getDraftsWillReturn204WhenNoneExistForTheUser() throws Exception {
+        when(submitAppealService.getDraftAppeals(any())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/drafts/all")
+                .header("Authorization", "Bearer myToken")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 
     private String getSyaCaseWrapperJson(String resourcePath) throws IOException, URISyntaxException {
