@@ -58,7 +58,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, containsString("10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the Tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
             assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
         }
     }
