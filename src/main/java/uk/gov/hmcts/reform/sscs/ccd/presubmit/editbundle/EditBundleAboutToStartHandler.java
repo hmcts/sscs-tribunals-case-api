@@ -55,25 +55,34 @@ public class EditBundleAboutToStartHandler implements PreSubmitCallbackHandler<S
         final CaseDetails<SscsCaseData> caseDetails = callback.getCaseDetails();
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
         final String template = documentConfiguration.getCover().get(sscsCaseData.getLanguagePreference());
+
         log.info("EditBundleAboutToStartHandler getLanguagePreference  {}",sscsCaseData.getLanguagePreference());
         log.info("EditBundleAboutToStartHandler Coversheet Template {}",template);
+
         if (sscsCaseData.getCaseBundles() != null) {
             boolean eligibleForStitching = false;
             for (Bundle bundle : sscsCaseData.getCaseBundles()) {
                 if ("Yes".equals(bundle.getValue().getEligibleForStitching())) {
+
+                    final String bundleName = sscsCaseData.getCcdCaseId() + "-SscsBundle";
+
+                    log.info("EditBundleAboutToStartHandler Bundle File Name {}",bundleName);
+
                     eligibleForStitching = true;
-                    bundle.getValue().setFileName("SscsBundle.pdf");
+                    bundle.getValue().setFileName(bundleName);
                     bundle.getValue().setCoverpageTemplate(template);
                     bundle.getValue().setHasTableOfContents("Yes");
                     bundle.getValue().setHasCoversheets("Yes");
-                    bundle.getValue().setPaginationStyle("topCenter");
                     bundle.getValue().setPageNumberFormat("numberOfPages");
                     bundle.getValue().setStitchedDocument(null);
                 }
             }
+
             if (!eligibleForStitching && !callback.isIgnoreWarnings()) {
+
                 PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
                 preSubmitCallbackResponse.addWarning("No bundle selected to be amended. The stitched PDF will not be updated. Are you sure you want to continue?");
+
                 return preSubmitCallbackResponse;
             } else {
                 return serviceRequestExecutor.post(callback, bundleUrl + EDIT_BUNDLE_ENDPOINT);
