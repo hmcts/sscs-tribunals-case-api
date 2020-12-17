@@ -678,7 +678,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario4_WhenIncorrectlyRefused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario4_WhenIncorrectlyRefused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3"), Arrays.asList("2018-10-10", "refused", "Yes", "", "", "Yes"));
 
@@ -725,7 +725,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario5() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario5() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "No", "No", "1a"));
 
@@ -916,7 +916,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario6_WhenIncorrectlyRefused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario6_WhenIncorrectlyRefused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "\"doesRegulation35Apply\" : \"REGULATION_35\",", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "", "Yes", "1a"));
 
@@ -1074,7 +1074,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenIncorrectlyRefused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenIncorrectlyRefused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "No", "No", "1c"));
 
@@ -1122,7 +1122,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenSchedule3NotSet() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenSchedule3NotSet() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "\"esaWriteFinalDecisionSchedule3ActivitiesApply\" : \"SCHEDULE_3\",", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "", "1c"));
 
@@ -1147,7 +1147,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenRegulation29IncorrectlyDoesNotApply() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenRegulation29IncorrectlyDoesNotApply() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "No", "No", "No", "1c"));
 
@@ -1234,7 +1234,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario8_WhenIncorrectlyRefused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario8_WhenIncorrectlyRefused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "Yes", "No", "1c"));
 
@@ -1317,7 +1317,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario9_WhenIncorrectlyRefused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario9_WhenIncorrectlyRefused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "REGULATION_29", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "Yes", "No", "Yes", "1c"));
 
@@ -1597,7 +1597,7 @@ public class EsaWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario12_WhenIncorrectlyRefused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario12_WhenIncorrectlyRefused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorESAScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesRegulation29Apply\" : \"REGULATION_29\",", "REGULATION_35", "SCHEDULE_3", "ANSWER"), Arrays.asList("2018-10-10", "refused", "No", "", "Yes", "No", "1a"));
 
