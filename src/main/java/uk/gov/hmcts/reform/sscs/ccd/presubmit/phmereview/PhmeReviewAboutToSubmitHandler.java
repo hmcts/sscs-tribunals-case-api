@@ -36,10 +36,11 @@ public class PhmeReviewAboutToSubmitHandler implements PreSubmitCallbackHandler<
         SscsCaseData caseData = callback.getCaseDetails().getCaseData();
         log.info("Reviewing PHME request for case id: {}", callback.getCaseDetails().getId());
 
-        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
-
         caseData.setInterlocReviewState(NONE.getId());
+        caseData.setInterlocReferralReason(NONE.getId());
         caseData.setDwpState(caseData.getPhmeGranted().toBoolean() ? PHME_GRANTED.getId() : PHME_REFUSED.getId());
+
+        PreSubmitCallbackResponse<SscsCaseData> preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(caseData);
 
         return preSubmitCallbackResponse;
     }
