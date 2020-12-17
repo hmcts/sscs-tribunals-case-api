@@ -54,6 +54,9 @@ public class SyaCaseWrapper {
 
     private String evidenceProvide;
 
+    @JsonProperty("isSaveAndReturn")
+    private String isSaveAndReturn;
+
     @JsonProperty("languagePreferenceWelsh")
     private Boolean languagePreferenceWelsh;
 
