@@ -28,7 +28,7 @@
       "writeFinalDecisionGenerateNotice": "Yes",
       "supportGroupOnlyAppeal" : "No",
       "writeFinalDecisionDetailsOfDecision" : "This is my summary.",
-      "writeFinalDecisionAllowedOrRefused" : "allowed",
+      "writeFinalDecisionAllowedOrRefused" : "ALLOWED_OR_REFUSED",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
       "ucWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided", "standingAndSitting"],
