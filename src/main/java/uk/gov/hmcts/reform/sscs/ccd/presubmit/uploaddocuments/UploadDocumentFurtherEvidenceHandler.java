@@ -12,12 +12,7 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
-import uk.gov.hmcts.reform.sscs.ccd.domain.DwpState;
-import uk.gov.hmcts.reform.sscs.ccd.domain.EventType;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocument;
-import uk.gov.hmcts.reform.sscs.ccd.domain.ScannedDocumentDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsFurtherEvidenceDoc;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 
 @Service
@@ -59,7 +54,10 @@ public class UploadDocumentFurtherEvidenceHandler implements PreSubmitCallbackHa
         moveDraftsToSscsDocs(caseData);
         initDraftSscsFurtherEvidenceDocument(caseData);
         caseData.setEvidenceHandled("No");
-        caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+
+        if (!State.WITH_DWP.equals(callback.getCaseDetails().getState())) {
+            caseData.setDwpState(DwpState.FE_RECEIVED.getId());
+        }
 
         return new PreSubmitCallbackResponse<>(caseData);
     }
