@@ -24,18 +24,17 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "wcaAppeal" : "No",
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "supportGroupOnlyAppeal" : "No",
-      "writeFinalDecisionDetailsOfDecision" : "This is my summary.",
-      "writeFinalDecisionAllowedOrRefused" : "ALLOWED_OR_REFUSED",
+      "writeFinalDecisionGeneratedDate" : "GENERATED_DATE",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
-      "esaWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["ANSWERED_QUESTIONS"],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "esaWriteFinalDecisionStandingAndSittingQuestion" : "standingAndSitting2b",
-      "esaWriteFinalDecisionSchedule3ActivitiesApply" : "No",
-      "doesRegulation35Apply" : "No",
+      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
+      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "higher",
+      "pipWriteFinalDecisionDailyLivingQuestion" : "enhancedRate",
+      "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
+      "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1f",
+      "pipWriteFinalDecisionTakingNutritionQuestion" : "takingNutrition2f",
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
@@ -46,10 +45,6 @@
         "document_binary_url": "http://dm-store:5005/documents/7539160a-b124-4539-b7c1-f3dcfbcea94c/binary",
         "document_filename": "decisionIssued.pdf"
       },
-      "writeFinalDecisionPresentingOfficerAttendedQuestion": "Yes",
-      "writeFinalDecisionAppellantAttendedQuestion": "Yes",
-      "writeFinalDecisionPageSectionReference": "A1",
-      "writeFinalDecisionTypeOfHearing": "faceToFace",
       "dwpTimeExtension": [
       ],
       "generatedNino": "JT 12 34 56 D",
@@ -183,8 +178,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
@@ -761,20 +756,19 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "wcaAppeal" : "Yes",
+      "writeFinalDecisionIsDescriptorFlow" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "wcaAppeal" : "Yes",
-      "supportGroupOnlyAppeal" : "No",
-      "writeFinalDecisionAllowedOrRefused" : "allowed",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
-      "esaWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "esaWriteFinalDecisionSchedule3ActivitiesApply" : "No",
-      "doesRegulation35Apply" : "No",
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
+      "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "higher",
+      "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "higher",
+      "pipWriteFinalDecisionDailyLivingQuestion" : "enhancedRate",
+      "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
+      "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1f",
+      "pipWriteFinalDecisionTakingNutritionQuestion" : "takingNutrition2f",
       "writeFinalDecisionReasons" : [{"id" : null, "value" : "My reasons for decision"}],
       "writeFinalDecisionAnythingElse" : "Something else.",
       "writeFinalDecisionPreviewDocument": {
@@ -915,8 +909,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "PIP",
+          "description": "Personal Independence Payment"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {

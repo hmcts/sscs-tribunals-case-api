@@ -48,6 +48,7 @@ public final class SubmitYourAppealToCcdCaseDataDeserializer {
         List<SscsDocument> sscsDocuments = getEvidenceDocumentDetails(syaCaseWrapper);
         return SscsCaseData.builder()
                 .caseCreated(LocalDate.now().toString())
+                .isSaveAndReturn(syaCaseWrapper.getIsSaveAndReturn())
                 .appeal(appeal)
                 .subscriptions(getSubscriptions(syaCaseWrapper))
                 .sscsDocument(sscsDocuments.isEmpty() ? Collections.emptyList() : sscsDocuments)
