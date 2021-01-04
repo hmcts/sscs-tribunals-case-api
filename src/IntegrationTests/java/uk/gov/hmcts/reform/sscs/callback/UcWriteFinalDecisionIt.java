@@ -1481,7 +1481,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUCNonLcwaScenario10Refused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcLcwaScenario10Refused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "refused", ""));
 
@@ -1614,7 +1614,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUCNonLcwa_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcNonLcwa_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "allowed", "mobilisingUnaided\", \"standingAndSitting"));
 
