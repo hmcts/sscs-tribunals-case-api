@@ -972,7 +972,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario5_LowPoints() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario5_LowPoints() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesSchedule8Paragraph4Apply\" : \"SCHEDULE_8_PARA_4\",", "\"doesSchedule9Paragraph4Apply\" : \"SCHEDULE_9_PARA_4\",", "SCHEDULE_7", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1c"));
 
@@ -1238,7 +1238,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenSchedule9Para4NotSet() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenSchedule9Para4NotSet() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "SCHEDULE_8_PARA_4", "\"doesSchedule9Paragraph4Apply\" : \"SCHEDULE_9_PARA_4\",", "SCHEDULE_7", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "", "No", "1c"));
 
@@ -1263,7 +1263,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenSchedule7NotSet() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenSchedule7NotSet() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "SCHEDULE_8_PARA_4", "SCHEDULE_9_PARA_4", "\"ucWriteFinalDecisionSchedule7ActivitiesApply\" : \"SCHEDULE_7\",", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "", "1c"));
 
