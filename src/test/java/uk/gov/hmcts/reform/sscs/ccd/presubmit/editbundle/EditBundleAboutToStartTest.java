@@ -52,7 +52,10 @@ public class EditBundleAboutToStartTest {
 
         when(callback.getEvent()).thenReturn(EventType.EDIT_BUNDLE);
 
-        sscsCaseData = SscsCaseData.builder().build();
+        sscsCaseData = SscsCaseData
+                .builder()
+                .ccdCaseId("54321")
+                .build();
 
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
@@ -85,11 +88,11 @@ public class EditBundleAboutToStartTest {
         callback.getCaseDetails().getCaseData().setCaseBundles(bundles);
         BundleDetails bundleResult = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getData().getCaseBundles().get(0).getValue();
 
-        assertEquals("SscsBundle.pdf", bundleResult.getFileName());
+        assertEquals("54321-SscsBundle", bundleResult.getFileName());
         assertEquals("SSCS-cover-page.docx", bundleResult.getCoverpageTemplate());
         assertEquals("Yes", bundleResult.getHasTableOfContents());
         assertEquals("Yes", bundleResult.getHasCoversheets());
-        assertEquals("topCenter", bundleResult.getPaginationStyle());
+        assertEquals(null, bundleResult.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult.getPageNumberFormat());
         assertNull(bundleResult.getStitchStatus());
     }
@@ -105,11 +108,11 @@ public class EditBundleAboutToStartTest {
         caseData.setLanguagePreferenceWelsh("Yes");
         BundleDetails bundleResult = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION).getData().getCaseBundles().get(0).getValue();
 
-        assertEquals("SscsBundle.pdf", bundleResult.getFileName());
+        assertEquals("54321-SscsBundle", bundleResult.getFileName());
         assertEquals(coverPage.get(LanguagePreference.WELSH), bundleResult.getCoverpageTemplate());
         assertEquals("Yes", bundleResult.getHasTableOfContents());
         assertEquals("Yes", bundleResult.getHasCoversheets());
-        assertEquals("topCenter", bundleResult.getPaginationStyle());
+        assertEquals(null, bundleResult.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult.getPageNumberFormat());
         assertNull(bundleResult.getStitchStatus());
     }
@@ -126,11 +129,11 @@ public class EditBundleAboutToStartTest {
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         BundleDetails bundleResult1 = result.getData().getCaseBundles().get(0).getValue();
 
-        assertEquals("SscsBundle.pdf", bundleResult1.getFileName());
+        assertEquals("54321-SscsBundle", bundleResult1.getFileName());
         assertEquals("SSCS-cover-page.docx", bundleResult1.getCoverpageTemplate());
         assertEquals("Yes", bundleResult1.getHasTableOfContents());
         assertEquals("Yes", bundleResult1.getHasCoversheets());
-        assertEquals("topCenter", bundleResult1.getPaginationStyle());
+        assertEquals(null, bundleResult1.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult1.getPageNumberFormat());
         assertNull(bundleResult1.getStitchStatus());
 
@@ -158,11 +161,11 @@ public class EditBundleAboutToStartTest {
         PreSubmitCallbackResponse<SscsCaseData> result = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         BundleDetails bundleResult1 = result.getData().getCaseBundles().get(0).getValue();
 
-        assertEquals("SscsBundle.pdf", bundleResult1.getFileName());
+        assertEquals("54321-SscsBundle", bundleResult1.getFileName());
         assertEquals(coverPage.get(LanguagePreference.WELSH), bundleResult1.getCoverpageTemplate());
         assertEquals("Yes", bundleResult1.getHasTableOfContents());
         assertEquals("Yes", bundleResult1.getHasCoversheets());
-        assertEquals("topCenter", bundleResult1.getPaginationStyle());
+        assertEquals(null, bundleResult1.getPaginationStyle());
         assertEquals("numberOfPages", bundleResult1.getPageNumberFormat());
         assertNull(bundleResult1.getStitchStatus());
 
