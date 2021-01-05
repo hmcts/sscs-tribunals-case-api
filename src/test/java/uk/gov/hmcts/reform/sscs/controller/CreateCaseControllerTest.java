@@ -13,10 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseDetails;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscription;
-import uk.gov.hmcts.reform.sscs.ccd.domain.Subscriptions;
+import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
@@ -48,7 +45,7 @@ public class CreateCaseControllerTest {
                         .build())
                 .build()
         ).build();
-        when(ccdService.createCase(any(SscsCaseData.class), eq("appealCreated"), eq("SSCS - appeal created event"), eq("Created SSCS"), any(IdamTokens.class))).thenReturn(sscsCaseDetails);
+        when(ccdService.createCase(any(SscsCaseData.class), eq(EventType.CREATE_TEST_CASE.getCcdType()), eq("SSCS - create test case event"), eq("Created SSCS"), any(IdamTokens.class))).thenReturn(sscsCaseDetails);
         CreateCaseController createCaseController = new CreateCaseController(ccdService, idamService);
 
         ResponseEntity<Map<String, String>> createCaseResponse = createCaseController.createCase("someEmail", "someMobile", "oral");

@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.AssociatedCaseLinkHelper;
 import uk.gov.hmcts.reform.sscs.ccd.service.CcdService;
 import uk.gov.hmcts.reform.sscs.idam.IdamService;
 import uk.gov.hmcts.reform.sscs.idam.IdamTokens;
+import uk.gov.hmcts.reform.sscs.service.AirLookupService;
 import uk.gov.hmcts.reform.sscs.service.RegionalProcessingCenterService;
 
 @RunWith(JUnitParamsRunner.class)
@@ -44,17 +45,21 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
     @Mock
     private RegionalProcessingCenterService regionalProcessingCenterService;
 
+    @Mock
+    private AirLookupService airLookupService;
+
     private AssociatedCaseLinkHelper associatedCaseLinkHelper;
 
     @Before
     public void setUp() {
         openMocks(this);
         associatedCaseLinkHelper = new AssociatedCaseLinkHelper(ccdService, idamService);
-        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper);
+        handler = new CaseUpdatedAboutToSubmitHandler(regionalProcessingCenterService, associatedCaseLinkHelper, airLookupService);
 
         when(callback.getEvent()).thenReturn(EventType.CASE_UPDATED);
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId").appeal(Appeal.builder()
+                .benefitType(BenefitType.builder().code("PIP").build())
                 .appellant(Appellant.builder().address(Address.builder().postcode("CM120NS").build()).build()).build())
                 .benefitCode("002")
                 .issueCode("DD")
@@ -196,5 +201,41 @@ public class CaseUpdatedAboutToSubmitHandlerTest {
 
         assertEquals(newRpcName, response.getData().getRegionalProcessingCenter().getName());
         assertEquals(expectedIsScottish, response.getData().getIsScottishCase());
+    }
+
+    @Test
+    public void givenAnAppealWithNewAppellantPostcodeAndNoAppointee_thenUpdateProcessingVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
+
+        when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("VenueB", response.getData().getProcessingVenue());
+    }
+
+    @Test
+    public void givenAnAppealWithNewAppointeePostcode_thenUpdateProcessingVenueWithAppointeeVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode("AB1200B").build()).build());
+
+        when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("VenueB", response.getData().getProcessingVenue());
+    }
+
+    @Test
+    public void givenAnAppealWithNewAppointeeButEmptyPostcode_thenUpdateProcessingVenueWithAppellantVenue() {
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().getAddress().setPostcode("AB1200B");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setIsAppointee("Yes");
+        callback.getCaseDetails().getCaseData().getAppeal().getAppellant().setAppointee(Appointee.builder().address(Address.builder().postcode(null).build()).build());
+
+        when(airLookupService.lookupAirVenueNameByPostCode("AB1200B", sscsCaseData.getAppeal().getBenefitType())).thenReturn("VenueB");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("VenueB", response.getData().getProcessingVenue());
     }
 }

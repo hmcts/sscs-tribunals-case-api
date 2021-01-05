@@ -1,10 +1,14 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.dwpuploadresponse;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType.ABOUT_TO_SUBMIT;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.NO;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.YES;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -149,12 +153,32 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
                                 .build()
                 ).build());
 
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
         callback.getCaseDetails().getCaseData().setDwpResponseDocument(DwpResponseDocument.builder()
                 .documentLink(
                         DocumentLink.builder()
                                 .documentBinaryUrl("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary")
                                 .documentUrl("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw")
                                 .documentFilename("testResponseDocument.pdf")
+                                .build()
+                ).build());
+
+
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary")
+                                .documentUrl("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw")
+                                .documentFilename("testEditedResponseDocument.pdf")
                                 .build()
                 ).build());
 
@@ -168,9 +192,15 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
             () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/defg-5678-xyzabcmnop/binary", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentBinaryUrl()),
             () -> assertEquals(AppConstants.DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEvidenceBundleDocument().getDocumentLink().getDocumentFilename()),
+            () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentUrl()),
+            () -> assertEquals("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentBinaryUrl()),
+            () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEditedEvidenceBundleDocument().getDocumentLink().getDocumentFilename()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentUrl()),
             () -> assertEquals("http://dm-store:5005/documents/efgh-7890-mnopqrstuvw/binary", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
-            () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()));
+            () -> assertEquals(AppConstants.DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpResponseDocument().getDocumentLink().getDocumentFilename()),
+            () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentUrl()),
+            () -> assertEquals("http://dm-store:5005/documents/efgh-4567-mnopqrstuvw/binary", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentBinaryUrl()),
+            () -> assertEquals(AppConstants.DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX + " on " + todayDate + ".pdf", response.getData().getDwpEditedResponseDocument().getDocumentLink().getDocumentFilename()));
 
     }
 
@@ -186,6 +216,7 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("US", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001US", response.getData().getCaseCode());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
     }
 
     @Test
@@ -201,5 +232,155 @@ public class DwpUploadResponseAboutToSubmitHandlerTest {
         assertEquals("UM", response.getData().getIssueCode());
         assertEquals("001", response.getData().getBenefitCode());
         assertEquals("001UM", response.getData().getCaseCode());
+        assertEquals(DwpState.RESPONSE_SUBMITTED_DWP.getId(), response.getData().getDwpState());
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeNoFurtherInfo_thenSetReviewByJudge() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedResponseDocument.pdf")
+                                .build()
+                ).build());
+        callback.getCaseDetails().getCaseData().setDwpFurtherInfo("No");
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals("reviewByJudge", response.getData().getSelectWhoReviewsCase().getValue().getCode());
+        assertEquals("phmeRequest", response.getData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeYesFurtherInfo_thenDontReviewByJudge() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertNull(response.getData().getSelectWhoReviewsCase());
+        assertNull(response.getData().getInterlocReferralReason());
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeYesFurtherInfo_thenMustHaveReason() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedResponseDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("If edited evidence is added a reason must be selected", error);
+        }
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeEvidence_thenMustHaveResponseAsWell() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceBundleDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You must submit both an edited response document and an edited evidence bundle", error);
+        }
+    }
+
+    @Test
+    public void givenUcCaseWithPhmeResponse_thenMustHaveResponseAsWell() {
+        callback.getCaseDetails().getCaseData().setDwpEditedEvidenceReason("phme");
+        callback.getCaseDetails().getCaseData().setDwpEditedResponseDocument(DwpResponseDocument.builder()
+                .documentLink(
+                        DocumentLink.builder()
+                                .documentBinaryUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop/binary")
+                                .documentUrl("http://dm-store:5005/documents/defg-6545-xyzabcmnop")
+                                .documentFilename("testEditedEvidenceBundleDocument.pdf")
+                                .build()
+                ).build());
+
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertEquals(1, response.getErrors().size());
+
+        for (String error : response.getErrors()) {
+            assertEquals("You must submit both an edited response document and an edited evidence bundle", error);
+        }
+    }
+
+    @Test
+    public void givenUcbSelectedAndNoUcbDocument_displayAnError() {
+        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(null);
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(1));
+        assertThat(response.getErrors().iterator().next(), is("Please upload a UCB document"));
+    }
+
+    @Test
+    public void givenUcbSelectedIsNo_thenTheFieldsAreCleared() {
+        sscsCaseData.setDwpUcb(NO.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(sscsCaseData.getDwpUcb(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments(), is(nullValue()));
+    }
+
+    @Test
+    public void givenUcbSelectedAndUploadedUcbDoc_thenNoErrors() {
+        sscsCaseData.setDwpUcb(YES.getValue());
+        sscsCaseData.setDwpUcbEvidenceDocument(DocumentLink.builder().build());
+        PreSubmitCallbackResponse<SscsCaseData> response = dwpUploadResponseAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
+
+        assertThat(response.getErrors().size(), is(0));
+        assertThat(sscsCaseData.getDwpUcb(), is(YES.getValue()));
+        assertThat(sscsCaseData.getDwpUcbEvidenceDocument(), is(nullValue()));
+        assertThat(sscsCaseData.getDwpDocuments().size(), is(1));
     }
 }
