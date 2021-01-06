@@ -71,7 +71,7 @@ public class UcDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 16/11/2020 is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs continues to have limited capability for work but does not have limited capability for work-related activity."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs continues to have limited capability for work but does not have limited capability for work-related activity and cannot be treated as having limited capability for work-related activity."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because no descriptor from Schedule 7 of the Universal Credit (UC) Regulations 2013 applied. Schedule 9, paragraph 4 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("5. The Secretary of State has accepted that Joe Bloggs has limited capability for work. This was not in issue. "));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision"));
