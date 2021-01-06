@@ -1840,7 +1840,7 @@ public class UcWriteFinalDecisionPreviewDecisionServiceTest extends WriteFinalDe
         assertTrue(payload.getWriteFinalDecisionTemplateContent() instanceof UcTemplateContent);
         UcTemplateContent templateContent = (UcTemplateContent)payload.getWriteFinalDecisionTemplateContent();
         assertEquals(UcScenario.SCENARIO_7, templateContent.getScenario());
-        assertEquals(9, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
+        assertEquals(10, payload.getWriteFinalDecisionTemplateContent().getComponents().size());
     }
 
     @Test
