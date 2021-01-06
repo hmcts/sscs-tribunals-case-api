@@ -182,8 +182,8 @@ public class EsaDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 01/12/2020 is set aside."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is to be treated as having limited capability for work."));
             assertThat(pdfTextWithoutNewLines, containsString("4. This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but regulation 29 of the Employment and Support Allowance (ESA) Regulations 2008 applied."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.")));
-            assertThat(pdfTextWithoutNewLines, not(containsString("9 points")));
+            assertThat(pdfTextWithoutNewLines, containsString("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used."));
+            assertThat(pdfTextWithoutNewLines, containsString("9 points"));
             assertThat(pdfTextWithoutNewLines, containsString("5. The tribunal applied regulation 29 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work."));
             assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs does not have limited capability for work-related activity because no descriptor from Schedule 3 of the ESA Regulations applied. Regulation 35 did not apply."));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision"));
