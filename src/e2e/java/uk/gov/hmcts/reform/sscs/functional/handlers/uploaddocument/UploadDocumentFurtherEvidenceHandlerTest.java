@@ -35,7 +35,6 @@ public class UploadDocumentFurtherEvidenceHandlerTest extends BaseHandler {
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true)
-            .assertThat().body("data.dwpState", equalTo("feReceived"))
             .assertThat().body("data", not(hasKey("draftSscsFurtherEvidenceDocument")))
             .assertThat().body("data.sscsDocument", hasSize(2))
             .assertThat().body("data.scannedDocuments", hasSize(2))
