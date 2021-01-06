@@ -90,7 +90,7 @@ public abstract class UcTemplateContent extends WriteFinalDecisionTemplateConten
 
     public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivityOnly(String appellantName) {
         return appellantName + " continues to have limited capability for work but does not have limited capability for "
-                + "work-related activity.";
+                + "work-related activity and cannot be treated as having limited capability for work-related activity.";
     }
 
     public String getNoDescriptorFromSchedule7Schedule9NotApplied() {

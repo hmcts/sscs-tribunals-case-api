@@ -51,7 +51,7 @@ public class EsaScenario2Test {
             + "\n"
             + "The decision made by the Secretary of State on 20/09/2020 is confirmed.\n"
             + "\n"
-            + "Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity.\n"
+            + "Felix Sydney continues to have limited capability for work but does not have limited capability for work-related activity and cannot be treated as having limited capability for work-related activity.\n"
             + "\n"
             + "This is because no descriptor from Schedule 3 of the Employment and Support Allowance (ESA) Regulations 2008 applied. Regulation 35 did not apply.\n"
             + "\n"
