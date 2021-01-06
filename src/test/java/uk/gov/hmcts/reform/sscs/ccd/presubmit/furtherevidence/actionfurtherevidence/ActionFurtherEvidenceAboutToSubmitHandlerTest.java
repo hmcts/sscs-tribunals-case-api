@@ -422,10 +422,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
     }
 
     private Callback<SscsCaseData> buildCallback(String dynamicListItemCode) {
-        return buildCallbackWithState(dynamicListItemCode, State.INTERLOCUTORY_REVIEW_STATE);
-    }
-
-    private Callback<SscsCaseData> buildCallbackWithState(String dynamicListItemCode, State state) {
         DynamicList dynamicList = new DynamicList(new DynamicListItem(dynamicListItemCode, "label"),
             Collections.singletonList(new DynamicListItem(dynamicListItemCode, "label")));
         SscsCaseData sscsCaseData = SscsCaseData.builder()
@@ -435,7 +431,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
             .appeal(Appeal.builder().appellant(Appellant.builder().address(Address.builder().line1("My Road").postcode("TS1 2BA").build()).build()).build())
             .build();
         CaseDetails<SscsCaseData> caseDetails = new CaseDetails<>(123L, "sscs",
-            state, sscsCaseData, LocalDateTime.now());
+                State.INTERLOCUTORY_REVIEW_STATE, sscsCaseData, LocalDateTime.now());
         return new Callback<>(caseDetails, Optional.empty(), EventType.ACTION_FURTHER_EVIDENCE, false);
     }
 
@@ -446,15 +442,6 @@ public class ActionFurtherEvidenceAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertEquals("furtherEvidenceReceived", updated.getData().getDwpFurtherEvidenceStates());
-    }
-
-    @Test
-    public void givenIssueFurtherEvidence_shouldNotUpdateDwpFurtherEvidenceStatesIfStateIsWithDwp() {
-        Callback<SscsCaseData> callback = buildCallbackWithState(ISSUE_FURTHER_EVIDENCE.getCode(), State.WITH_DWP);
-
-        PreSubmitCallbackResponse<SscsCaseData> updated = actionFurtherEvidenceAboutToSubmitHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
-
-        assertNull(updated.getData().getDwpFurtherEvidenceStates());
     }
 
     @Test
