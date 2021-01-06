@@ -24,16 +24,18 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
+      "lcwaAppeal" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "wcaAppeal" : "Yes",
-      "supportGroupOnlyAppeal" : "No",
-      "writeFinalDecisionAllowedOrRefused" : "allowed",
+      "supportGroupOnlyAppeal" : "SUPPORT_GROUP_ONLY",
+      "writeFinalDecisionAllowedOrRefused" : "ALLOWED_OR_REFUSED",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
-      "esaWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "esaWriteFinalDecisionSchedule3ActivitiesApply" : "No",
-      "doesRegulation35Apply" : "No",
+      "ucWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
+      "ucWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaidedANSWER",
+      "ucWriteFinalDecisionSchedule7ActivitiesApply" : "SCHEDULE_7",
+      "doesSchedule8Paragraph4Apply" : "SCHEDULE_8_PARA_4",
+      "doesSchedule9Paragraph4Apply" : "SCHEDULE_9_PARA_4",
+      "ucWriteFinalDecisionSchedule7ActivitiesQuestion" : ["schedule7MobilisingUnaided"],
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
@@ -181,8 +183,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "UC",
+          "description": "Universal Credit"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
@@ -759,17 +761,18 @@
     ],
     "security_classification": "PUBLIC",
     "case_data": {
-      "wcaAppeal" : "Yes",
       "writeFinalDecisionGenerateNotice": "Yes",
-      "wcaAppeal" : "Yes",
-      "supportGroupOnlyAppeal" : "No",
-      "writeFinalDecisionAllowedOrRefused" : "allowed",
+      "lcwaAppeal" : "Yes",
+      "supportGroupOnlyAppeal" : "SUPPORT_GROUP_ONLY",
+      "writeFinalDecisionAllowedOrRefused" : "ALLOWED_OR_REFUSED",
       "writeFinalDecisionDisabilityQualifiedPanelMemberName": "Panel Member 1",
       "writeFinalDecisionMedicallyQualifiedPanelMemberName": "Panel Member 2",
-      "esaWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
-      "esaWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaided1a",
-      "esaWriteFinalDecisionSchedule3ActivitiesApply" : "No",
-      "doesRegulation35Apply" : "No",
+      "ucWriteFinalDecisionPhysicalDisabilitiesQuestion" : ["mobilisingUnaided"],
+      "ucWriteFinalDecisionMobilisingUnaidedQuestion" : "mobilisingUnaidedANSWER",
+      "ucWriteFinalDecisionSchedule7ActivitiesApply" : "SCHEDULE_7",
+      "doesSchedule8Paragraph4Apply" : "SCHEDULE_8_PARA_4",
+      "doesSchedule9Paragraph4Apply" : "SCHEDULE_9_PARA_4",
+      "ucWriteFinalDecisionSchedule7ActivitiesQuestion" : ["schedule7MobilisingUnaided"],
       "writeFinalDecisionDateOfDecision" : "2018-09-01",
       "writeFinalDecisionStartDate": "START_DATE_PLACEHOLDER",
       "writeFinalDecisionEndDate": "2018-11-10",
@@ -913,8 +916,8 @@
           "isAddressSameAsAppointee": null
         },
         "benefitType": {
-          "code": "ESA",
-          "description": "Employment Support Allowance"
+          "code": "UC",
+          "description": "Universal Credit"
         },
         "receivedVia": "PAPER",
         "hearingOptions": {
