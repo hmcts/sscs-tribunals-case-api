@@ -46,6 +46,9 @@ public class UcScenario7Test {
             + "\n"
             + "This is because insufficient points were scored to meet the threshold for the Work Capability Assessment, but Schedule 8, paragraph 4 of the UC Regulations 2013 applied.\n"
             + "\n"
+            + "Mobilising Unaided\tc.1\t9\n"
+            + "\n"
+            + "\n"
             + "The tribunal applied Schedule 8, paragraph 4 because there would be a substantial risk to the mental or physical health of any person if the appellant were found not to have limited capability for work.\n"
             + "\n"
             + "Felix Sydney does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.\n"
@@ -59,7 +62,7 @@ public class UcScenario7Test {
             + "This has been an oral (face to face) hearing. Felix Sydney attended the hearing today and the Tribunal considered the appeal bundle to page A1. A Presenting Officer attended on behalf of the Respondent.\n"
             + "\n";
 
-        Assert.assertEquals(10, content.getComponents().size());
+        Assert.assertEquals(11, content.getComponents().size());
 
         Assert.assertEquals(expectedContent, content.toString());
 
