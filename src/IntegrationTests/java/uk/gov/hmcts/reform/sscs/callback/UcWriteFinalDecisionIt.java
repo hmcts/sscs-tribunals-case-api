@@ -191,7 +191,8 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     @Test
     public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario1() throws Exception {
         setup();
-        setJsonAndReplace("callback/writeFinalDecisionDescriptorUC.json", "START_DATE_PLACEHOLDER", "2018-10-10");
+        setJsonAndReplace("callback/writeFinalDecisionDescriptorUCScenario.json", Arrays
+            .asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "ANSWER", "SCHEDULE_8_PARA_4", "\"doesSchedule9Paragraph4Apply\" : \"SCHEDULE_9_PARA_4\",", "\"ucWriteFinalDecisionSchedule7ActivitiesApply\" : \"SCHEDULE_7\","), Arrays.asList("2018-10-10", "refused",  "No", "1c", "No", "", ""));
 
         String documentUrl = "document.url";
         when(generateFile.assemble(any())).thenReturn(documentUrl);
@@ -221,42 +222,40 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
         assertEquals(LocalDate.parse("2017-07-17"), payload.getHeldOn());
         assertEquals("Chester Magistrate's Court", payload.getHeldAt());
         assertEquals("Judge Full Name, Panel Member 1 and Panel Member 2", payload.getHeldBefore());
-        assertEquals(true, payload.isAllowed());
-        assertEquals(true, payload.isSetAside());
+        assertEquals(false, payload.isAllowed());
+        assertEquals(false, payload.isSetAside());
         assertEquals("2018-09-01", payload.getDateOfDecision());
         assertEquals("An Test",payload.getAppellantName());
         assertEquals("2018-10-10",payload.getStartDate());
         assertEquals("2018-11-10",payload.getEndDate());
         assertEquals(false, payload.isIndefinite());
-        assertEquals(true, payload.isUcIsEntited());
-        assertEquals("lower rate", payload.getUcAwardRate());
+        assertEquals(false, payload.isUcIsEntited());
+        assertEquals("no award", payload.getUcAwardRate());
         Assert.assertNotNull(payload.getUcSchedule6Descriptors());
         assertEquals(1, payload.getUcSchedule6Descriptors().size());
-        assertEquals(15, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
-        assertEquals("a", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
-        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
+        assertEquals(9, payload.getUcSchedule6Descriptors().get(0).getActivityAnswerPoints());
+        assertEquals("c", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerLetter());
+        assertEquals("Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.", payload.getUcSchedule6Descriptors().get(0).getActivityAnswerValue());
         assertEquals("1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionValue());
         assertEquals("1", payload.getUcSchedule6Descriptors().get(0).getActivityQuestionNumber());
         Assert.assertNotNull(payload.getUcNumberOfPoints());
-        assertEquals(15, payload.getUcNumberOfPoints().intValue());
+        assertEquals(9, payload.getUcNumberOfPoints().intValue());
         assertNotNull(payload.getReasonsForDecision());
         assertEquals(1, payload.getReasonsForDecision().size());
         Assert.assertEquals("My reasons for decision", payload.getReasonsForDecision().get(0));
         assertEquals("Something else.", payload.getAnythingElse());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
         assertNotNull(parentPayload.getWriteFinalDecisionTemplateContent());
-        assertEquals("The appeal is allowed.\n"
+        assertEquals("The appeal is refused.\n"
             + "\n"
-            + "The decision made by the Secretary of State on 01/09/2018 is set aside.\n"
+            + "The decision made by the Secretary of State on 01/09/2018 is confirmed.\n"
             + "\n"
-            + "An Test has limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
+            + "An Test does not have limited capability for work and cannot be treated as having limited capability for work. The matter is now remitted to the Secretary of State to make a final decision upon entitlement to Universal Credit (UC).\n"
             + "\n"
-            + "In applying the Work Capability Assessment 15 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013 made up as follows:\n"
+            + "In applying the Work Capability Assessment 9 points were scored from the activities and descriptors in Schedule 6 of the UC Regulations 2013. This is insufficient to meet the threshold for the test. Schedule 8, paragraph 4 of the UC Regulations did not apply.\n"
             + "\n"
-            + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\ta.Cannot, unaided by another person, either: (i) mobilise more than 50 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 50 metres within a reasonable timescale because of significant discomfort or exhaustion.\t15\n"
+            + "1. Mobilising unaided by another person with or without a walking stick, manual wheelchair or other aid if such aid is normally or could reasonably be worn or used.\tc.Cannot, unaided by another person, either: (i) mobilise more than 100 metres on level ground without stopping in order to avoid significant discomfort or exhaustion; or (ii) repeatedly mobilise 100 metres within a reasonable timescale because of significant discomfort or exhaustion.\t9\n"
             + "\n"
-            + "\n"
-            + "An Test does not have limited capability for work-related activity because no descriptor from Schedule 7 of the UC Regulations applied. Schedule 9, paragraph 4 did not apply.\n"
             + "\n"
             + "My reasons for decision\n"
             + "\n"
@@ -973,7 +972,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario5_LowPoints() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario5_LowPoints() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "\"doesSchedule8Paragraph4Apply\" : \"SCHEDULE_8_PARA_4\",", "\"doesSchedule9Paragraph4Apply\" : \"SCHEDULE_9_PARA_4\",", "SCHEDULE_7", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "", "", "No", "1c"));
 
@@ -1239,7 +1238,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenSchedule9Para4NotSet() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenSchedule9Para4NotSet() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "SCHEDULE_8_PARA_4", "\"doesSchedule9Paragraph4Apply\" : \"SCHEDULE_9_PARA_4\",", "SCHEDULE_7", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "", "No", "1c"));
 
@@ -1264,7 +1263,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForScenario7_WhenSchedule7NotSet() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willNotPreviewTheDocumentForScenario7_WhenSchedule7NotSet() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCScenario.json", Arrays.asList("START_DATE_PLACEHOLDER","ALLOWED_OR_REFUSED", "SUPPORT_GROUP_ONLY", "SCHEDULE_8_PARA_4", "SCHEDULE_9_PARA_4", "\"ucWriteFinalDecisionSchedule7ActivitiesApply\" : \"SCHEDULE_7\",", "ANSWER"), Arrays.asList("2018-10-10", "allowed", "No", "Yes", "No", "", "1c"));
 
@@ -1482,7 +1481,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForEsaNonWcaScenario10Refused() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcLcwaScenario10Refused() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "refused", ""));
 
@@ -1548,7 +1547,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
     }
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForEsaNonWcaScenario10Allowed() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcNonLcwaScenario10Allowed() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "allowed", ""));
 
@@ -1615,7 +1614,7 @@ public class UcWriteFinalDecisionIt extends WriteFinalDecisionItBase {
 
 
     @Test
-    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForEsaNonWca_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
+    public void callToMidEventPreviewFinalDecisionCallback_willPreviewTheDocumentForUcNonLcwa_WhenPreviousQuestionsAnsweredAndOver15Points() throws Exception {
         setup();
         setJsonAndReplace("callback/writeFinalDecisionDescriptorUCNonLcwa.json", Arrays.asList("START_DATE_PLACEHOLDER", "ALLOWED_OR_REFUSED", "ANSWERED_QUESTIONS"), Arrays.asList("2018-10-10", "allowed", "mobilisingUnaided\", \"standingAndSitting"));
 
