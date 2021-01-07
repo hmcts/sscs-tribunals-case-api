@@ -42,7 +42,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
     public void scenario1_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER" ,"COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOVING_AROUND_ANSWER"), Arrays.asList("same", "standard", "preparingFood1e", "takingNutrition2d", "same", "standard", "movingAround12a"));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOVING_AROUND_ANSWER"), Arrays.asList("same", "standard", "preparingFood1e", "takingNutrition2d", "same", "standard", "movingAround12a"));
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
