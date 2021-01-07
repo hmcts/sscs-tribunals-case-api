@@ -3,7 +3,6 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 import java.util.Optional;
 import java.util.function.Function;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldConditionBase;
 
 public class ComparedToDwpCondition extends FieldConditionBase<String> {
@@ -35,7 +34,7 @@ public class ComparedToDwpCondition extends FieldConditionBase<String> {
         } else if (ComparedToDwpPredicate.LOWER.equals(predicate)) {
             return Optional.of("specified that the award for " + activityType + " is the lower than that awarded by DWP");
         } else if (ComparedToDwpPredicate.HIGHER.equals(predicate)) {
-        return Optional.of("specified that the award for " + activityType + " is the higher than that awarded by DWP");
+            return Optional.of("specified that the award for " + activityType + " is the higher than that awarded by DWP");
         } else {
             return Optional.empty();
         }

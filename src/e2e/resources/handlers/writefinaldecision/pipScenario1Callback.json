@@ -48,13 +48,13 @@
       "writeFinalDecisionOtherPanelMemberName":"Professor Plum",
       "pipWriteFinalDecisionComparedToDWPDailyLivingQuestion": "COMPARED_TO_DWP_DAILY_LIVING",
       "pipWriteFinalDecisionComparedToDWPMobilityQuestion": "COMPARED_TO_DWP_MOBILITY",
-      "pipWriteFinalDecisionDailyLivingQuestion" : "standardRate",
-      "pipWriteFinalDecisionMobilityQuestion" : "standardRate",
+      "pipWriteFinalDecisionDailyLivingQuestion" : "DAILY_LIVING_RATE",
+      "pipWriteFinalDecisionMobilityQuestion" : "MOBILITY_RATE",
       "pipWriteFinalDecisionDailyLivingActivitiesQuestion" : ["preparingFood", "takingNutrition"],
       "pipWriteFinalDecisionMobilityActivitiesQuestion" : ["movingAround"],
-      "pipWriteFinalDecisionPreparingFoodQuestion" : "preparingFood1e",
-      "pipWriteFinalDecisionTakingNutritionQuestion" : "takingNutrition2d",
-      "pipWriteFinalDecisionMovingAroundQuestion" : "movingAround12a",
+      "pipWriteFinalDecisionPreparingFoodQuestion" : "PREPARING_FOOD_ANSWER",
+      "pipWriteFinalDecisionTakingNutritionQuestion" : "TAKING_NUTRITION_ANSWER",
+      "pipWriteFinalDecisionMovingAroundQuestion" : "MOVING_AROUND_ANSWER",
       "writeFinalDecisionPageSectionReference":"B7",
       "writeFinalDecisionReasons":[
         {

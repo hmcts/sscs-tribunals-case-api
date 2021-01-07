@@ -1,22 +1,11 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.ALLOWED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.EMPTY;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate.NOT_EMPTY;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.FALSE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.NOT_TRUE;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.UNSPECIFIED;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_GREATER_OR_EQUAL_TO_FIFTEEN;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition.POINTS_LESS_THAN_FIFTEEN;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.ComparedToDwpPredicate.SAME;
 
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -30,22 +19,14 @@ import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefuse
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.FieldCondition;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.PointsCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListFieldCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.StringListPredicate;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoFieldCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaAllowedOrRefusedCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.EsaPointsRegulationsAndSchedule3ActivitiesCondition;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.esa.scenarios.EsaScenario;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.service.DecisionNoticeQuestionService;
 import uk.gov.hmcts.reform.sscs.utility.StringUtils;
 
 /**
- * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other
- * attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission),
- * but not on preview.
+ * Encapsulates the conditions satisfied by valid combinations of allowed/refused and other attributes of the Decision Notice journey - to be used on Outcome validation (eg. on submission), but not on
+ * preview.
  */
 public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOrRefusedCondition> {
 
@@ -60,7 +41,8 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
     List<FieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
-    PipAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition, MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition) {
+    PipAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
+        MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition) {
         this.primaryConditions = new ArrayList<>();
         this.validationConditions = new ArrayList<>();
         this.primaryConditions.add(allowedOrRefusedCondition);
@@ -82,15 +64,6 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         }
     }
 
-    public PipScenario getPipScenario(SscsCaseData caseData) {
-       if (REFUSED_SAME_SAME == this) {
-           return PipScenario.SCENARIO_1;
-       }
-       else {
-            throw new IllegalStateException("No scenario applicable");
-       }
-    }
-
     static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
         return new YesNoFieldCondition("Descriptor Flow", predicate,
             s -> "Yes".equals(s.getWriteFinalDecisionIsDescriptorFlow()) ? YesNo.YES : YesNo.NO, displayIsSatisfiedMessage);
@@ -108,10 +81,37 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         return new MobilityComparedToDwpCondition(predicate);
     }
 
+    protected static PipAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
+        SscsCaseData caseData) {
+
+        for (PipAllowedOrRefusedCondition esaPointsAndActivitiesCondition : PipAllowedOrRefusedCondition.values()) {
+
+            if (esaPointsAndActivitiesCondition.isApplicable(questionService, caseData) && esaPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
+                return esaPointsAndActivitiesCondition;
+            }
+        }
+        throw new IllegalStateException(
+            "No allowed/refused condition found for " + caseData.getSscsEsaCaseData().getDoesRegulation29Apply() + ":" + caseData.getSscsEsaCaseData().getSchedule3Selections() + ":" + caseData
+                .getSscsEsaCaseData().getRegulation35Selection());
+    }
+
+    public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
+        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
+            emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
+    }
+
+    public PipScenario getPipScenario(SscsCaseData caseData) {
+        if (REFUSED_SAME_SAME == this) {
+            return PipScenario.SCENARIO_1;
+        } else {
+            throw new IllegalStateException("No scenario applicable");
+        }
+    }
+
     @Override
     public boolean isApplicable(DecisionNoticeQuestionService questionService, SscsCaseData caseData) {
         if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
-                return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
+            return primaryConditions.stream().allMatch(c -> c.isSatisified(caseData));
         } else {
             return false;
         }
@@ -132,19 +132,6 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
         return getAllAnswersExtractor();
     }
 
-    protected static PipAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
-        SscsCaseData caseData) {
-
-        for (PipAllowedOrRefusedCondition esaPointsAndActivitiesCondition : PipAllowedOrRefusedCondition.values()) {
-
-            if (esaPointsAndActivitiesCondition.isApplicable(questionService, caseData) && esaPointsAndActivitiesCondition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
-                return esaPointsAndActivitiesCondition;
-            }
-        }
-        throw new IllegalStateException(
-            "No allowed/refused condition found for " + caseData.getSscsEsaCaseData().getDoesRegulation29Apply() + ":" + caseData.getSscsEsaCaseData().getSchedule3Selections() + ":" + caseData.getSscsEsaCaseData().getRegulation35Selection());
-    }
-
     @Override
     public Optional<String> getOptionalErrorMessage(DecisionNoticeQuestionService questionService, SscsCaseData sscsCaseData) {
 
@@ -156,7 +143,7 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
                 .collect(Collectors.toList());
 
         final List<String> validationErrorMessages =
-                validationConditions.stream()
+            validationConditions.stream()
                 .map(e -> e.getOptionalErrorMessage(sscsCaseData))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -183,14 +170,9 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
 
         if (!validationMessages.isEmpty()) {
             return Optional.of("You have " + StringUtils.getGramaticallyJoinedStrings(criteriaSatisfiedMessages)
-                    + (criteriaSatisfiedMessages.isEmpty() ? "" : ", but have ") + StringUtils.getGramaticallyJoinedStrings(validationMessages)
-               + ". Please review your previous selection.");
+                + (criteriaSatisfiedMessages.isEmpty() ? "" : ", but have ") + StringUtils.getGramaticallyJoinedStrings(validationMessages)
+                + ". Please review your previous selection.");
         }
         return Optional.empty();
-    }
-
-    public static Function<SscsCaseData, List<String>> getAllAnswersExtractor() {
-        return sscsCaseData -> CollectionUtils.collate(emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionPhysicalDisabilitiesQuestion()),
-            emptyIfNull(sscsCaseData.getSscsEsaCaseData().getEsaWriteFinalDecisionMentalAssessmentQuestion()));
     }
 }
