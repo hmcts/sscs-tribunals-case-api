@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AllowedOrRefusedPredicate.REFUSED;
 import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.YesNoPredicate.TRUE;
-import static uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.ComparedToDwpPredicate.SAME;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,35 +33,17 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
     // Scenario 1
     REFUSED_SAME_SAME(
         isAllowedOrRefused(REFUSED),
-        isDescriptorFlow(TRUE, false),
-        isDailyLivingComparedToDwp(SAME),
-        isMobilityComparedToDwp(SAME)
+        isDescriptorFlow(TRUE, false)
     );
 
     List<FieldCondition> primaryConditions;
     List<FieldCondition> validationConditions;
 
-    PipAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition, DailyLivingComparedToDwpCondition dailyLivingComparedToDwpCondition,
-        MobilityComparedToDwpCondition mobilityLivingComparedToDwpCondition) {
+    PipAllowedOrRefusedCondition(AllowedOrRefusedCondition allowedOrRefusedCondition, YesNoFieldCondition descriptorFlowCondition) {
         this.primaryConditions = new ArrayList<>();
         this.validationConditions = new ArrayList<>();
         this.primaryConditions.add(allowedOrRefusedCondition);
         this.primaryConditions.add(descriptorFlowCondition);
-        this.primaryConditions.add(dailyLivingComparedToDwpCondition);
-        this.primaryConditions.add(mobilityLivingComparedToDwpCondition);
-    }
-
-    public static Optional<PipAllowedOrRefusedCondition> getPassingAllowedOrRefusedCondition(DecisionNoticeQuestionService questionService,
-        SscsCaseData caseData) {
-
-        PipAllowedOrRefusedCondition condition
-            = getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData);
-
-        if (condition.getOptionalErrorMessage(questionService, caseData).isEmpty()) {
-            return Optional.of(PipAllowedOrRefusedCondition.getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(questionService, caseData));
-        } else {
-            return Optional.empty();
-        }
     }
 
     static YesNoFieldCondition isDescriptorFlow(Predicate<YesNo> predicate, boolean displayIsSatisfiedMessage) {
@@ -71,14 +53,6 @@ public enum PipAllowedOrRefusedCondition implements PointsCondition<PipAllowedOr
 
     static AllowedOrRefusedCondition isAllowedOrRefused(AllowedOrRefusedPredicate predicate) {
         return new AllowedOrRefusedCondition(predicate);
-    }
-
-    static DailyLivingComparedToDwpCondition isDailyLivingComparedToDwp(ComparedToDwpPredicate predicate) {
-        return new DailyLivingComparedToDwpCondition(predicate);
-    }
-
-    static MobilityComparedToDwpCondition isMobilityComparedToDwp(ComparedToDwpPredicate predicate) {
-        return new MobilityComparedToDwpCondition(predicate);
     }
 
     protected static PipAllowedOrRefusedCondition getTheSinglePassingPointsConditionForSubmittedActivitiesAndPoints(DecisionNoticeQuestionService questionService,
