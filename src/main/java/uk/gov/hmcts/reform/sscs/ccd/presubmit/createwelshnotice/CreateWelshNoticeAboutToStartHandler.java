@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.createwelshnotice;
 
 import static java.util.Objects.requireNonNull;
+import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.ADJOURNMENT_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DECISION_NOTICE;
 import static uk.gov.hmcts.reform.sscs.ccd.callback.DocumentType.DIRECTION_NOTICE;
 
@@ -62,6 +63,7 @@ public class CreateWelshNoticeAboutToStartHandler implements PreSubmitCallbackHa
                         && a.getValue().getDocumentTranslationStatus().equals(SscsDocumentTranslationStatus.TRANSLATION_REQUESTED))
                 .filter(a -> Objects.nonNull(a.getValue().getDocumentType())
                         && (a.getValue().getDocumentType().equals(DECISION_NOTICE.getValue())
+                        || a.getValue().getDocumentType().equals(ADJOURNMENT_NOTICE.getValue())
                         || a.getValue().getDocumentType().equals(DIRECTION_NOTICE.getValue())))
                 .collect(Collectors.toList());
 

@@ -45,7 +45,7 @@ public abstract class EsaTemplateContent extends WriteFinalDecisionTemplateConte
 
     public String getContinuesToHaveWorkRelatedSentenceButNotLimitedWorkRelatedActivity(String appellantName) {
         return appellantName + " continues to have limited capability for work but does not have limited capability for "
-                + "work-related activity.";
+                + "work-related activity and cannot be treated as having limited capability for work-related activity.";
     }
 
     public String getSecretaryOfStateAcceptsHasLimitedCapabilityForWorkSentence(String appellantName, boolean work) {
