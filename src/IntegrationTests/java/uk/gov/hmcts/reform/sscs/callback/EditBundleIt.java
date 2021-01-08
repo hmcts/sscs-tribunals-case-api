@@ -12,7 +12,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import junitparams.JUnitParamsRunner;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -66,7 +65,6 @@ public class EditBundleIt extends AbstractEventIt {
         when(idamService.getIdamTokens()).thenReturn(IdamTokens.builder().build());
     }
 
-    @Ignore
     @Test
     public void callToAboutToSubmitHandler_willCallExternalEditBundleService() throws Exception {
         SscsCaseData caseData = SscsCaseData.builder().build();
