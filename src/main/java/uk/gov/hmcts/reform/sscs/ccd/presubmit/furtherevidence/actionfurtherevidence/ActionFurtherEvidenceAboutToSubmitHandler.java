@@ -100,6 +100,7 @@ public class ActionFurtherEvidenceAboutToSubmitHandler implements PreSubmitCallb
             }
 
             sscsCaseData.setDwpFurtherEvidenceStates(FURTHER_EVIDENCE_RECEIVED);
+
         }
 
         buildSscsDocumentFromScan(sscsCaseData, caseDetails.getState(), callback.isIgnoreWarnings(), preSubmitCallbackResponse);
