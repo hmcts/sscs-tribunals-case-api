@@ -65,8 +65,8 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         final SscsCaseData sscsCaseData = caseDetails.getCaseData();
 
         if (checkMandatoryFilesMissing(sscsCaseData)) {
-            PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(
-                callback.getCaseDetails().getCaseData());
+            PreSubmitCallbackResponse<SscsCaseData> response;
+            response = new PreSubmitCallbackResponse<>(callback.getCaseDetails().getCaseData());
             response.addError("The bundle cannot be created as mandatory DWP documents are missing");
             return response;
         } else {
