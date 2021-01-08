@@ -17,33 +17,31 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.SscsDocument;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.PreSubmitCallbackHandler;
 import uk.gov.hmcts.reform.sscs.service.ServiceRequestExecutor;
 
+
 @Service
 @Slf4j
-public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandler<SscsCaseData> {
+public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackHandler<SscsCaseData> {
 
     private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
     private String bundleWelshConfig;
-    private String bundleUnEditedConfig;
-    private String bundleWelshUnEditedConfig;
+    private String bundleEditedConfig;
+    private String bundleWelshEditedConfig;
 
     private static String CREATE_BUNDLE_ENDPOINT = "/api/new-bundle";
 
     @Autowired
-    public CreateBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                           @Value("${bundle.url}") String bundleUrl,
-                                           @Value("${bundle.welsh.config}") String bundleWelshConfig,
-                                           @Value("${bundle.unedited.config}") String bundleUnEditedConfig,
-                                           @Value("${bundle.welsh.unedited.config}") String bundleWelshUnEditedConfig) {
-    public CreateBundleAboutToSubmitHandler(ServiceRequestExecutor serviceRequestExecutor,
-                                            @Value("${bundle.url}") String bundleUrl,
-                                            @Value("${bundle.welsh.config}") String bundleWelshConfig) {
+    public CreateEditedBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
+                                                 @Value("${bundle.url}") String bundleUrl,
+                                                 @Value("${bundle.welsh.config}") String bundleWelshConfig,
+                                                 @Value("${bundle.edited.config}") String bundleEditedConfig,
+                                                 @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
         this.bundleWelshConfig = bundleWelshConfig;
-        this.bundleUnEditedConfig = bundleUnEditedConfig;
-        this.bundleWelshUnEditedConfig = bundleWelshUnEditedConfig;
+        this.bundleEditedConfig = bundleEditedConfig;
+        this.bundleWelshEditedConfig = bundleWelshEditedConfig;
     }
 
     @Override
@@ -52,7 +50,7 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         requireNonNull(callbackType, "callbacktype must not be null");
 
         return callbackType.equals(CallbackType.ABOUT_TO_SUBMIT)
-            && callback.getEvent() == EventType.CREATE_BUNDLE;
+            && callback.getEvent() == EventType.CREATE_EDITED_BUNDLE;
     }
 
     @Override
@@ -67,16 +65,15 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
         if (checkMandatoryFilesMissing(sscsCaseData)) {
             PreSubmitCallbackResponse<SscsCaseData> response = new PreSubmitCallbackResponse<>(
                 callback.getCaseDetails().getCaseData());
-            response.addError("The bundle cannot be created as mandatory DWP documents are missing");
+            response.addError("The edited bundle cannot be created as mandatory edited DWP documents are missing");
             return response;
         } else {
-
-            if (sscsCaseData.getDwpResponseDocument() != null && sscsCaseData.getDwpResponseDocument().getDocumentFileName() == null) {
-                sscsCaseData.getDwpResponseDocument().setDocumentFileName(DWP_DOCUMENT_RESPONSE_FILENAME_PREFIX);
+            if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedResponseDocument().getDocumentFileName() == null) {
+                sscsCaseData.getDwpEditedResponseDocument().setDocumentFileName(DWP_DOCUMENT_EDITED_RESPONSE_FILENAME_PREFIX);
             }
 
-            if (sscsCaseData.getDwpEvidenceBundleDocument() != null && sscsCaseData.getDwpEvidenceBundleDocument().getDocumentFileName() == null) {
-                sscsCaseData.getDwpEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EVIDENCE_FILENAME_PREFIX);
+            if (sscsCaseData.getDwpEditedEvidenceBundleDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentFileName() == null) {
+                sscsCaseData.getDwpEditedEvidenceBundleDocument().setDocumentFileName(DWP_DOCUMENT_EDITED_EVIDENCE_FILENAME_PREFIX);
             }
 
             if (sscsCaseData.getSscsDocument() != null) {
@@ -88,16 +85,11 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
             }
 
             if (sscsCaseData.isLanguagePreferenceWelsh()) {
-                if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
-                    sscsCaseData.setBundleConfiguration(bundleWelshUnEditedConfig);
-                } else {
-                    sscsCaseData.setBundleConfiguration(bundleWelshConfig);
-                }
-                log.info("Setting the bundleConfiguration on the case: " + bundleWelshConfig);
-            }
-
-            if (sscsCaseData.getDwpEditedResponseDocument() != null && sscsCaseData.getDwpEditedEvidenceBundleDocument() != null) {
-                sscsCaseData.setBundleConfiguration(bundleUnEditedConfig);
+                sscsCaseData.setBundleConfiguration(bundleWelshEditedConfig);
+                log.info("Setting the editedBundleConfiguration {} on the case: {}",
+                        bundleWelshEditedConfig, sscsCaseData.getCcdCaseId());
+            } else {
+                sscsCaseData.setBundleConfiguration(bundleEditedConfig);
             }
 
             return serviceRequestExecutor.post(callback, bundleUrl + CREATE_BUNDLE_ENDPOINT);
@@ -105,9 +97,9 @@ public class CreateBundleAboutToSubmitHandler implements PreSubmitCallbackHandle
     }
 
     private boolean checkMandatoryFilesMissing(SscsCaseData sscsCaseData) {
-        return sscsCaseData.getDwpResponseDocument() == null
-            || sscsCaseData.getDwpResponseDocument().getDocumentLink() == null
-            || sscsCaseData.getDwpEvidenceBundleDocument() == null
-            || sscsCaseData.getDwpEvidenceBundleDocument().getDocumentLink() == null;
+        return sscsCaseData.getDwpEditedResponseDocument() == null
+            || sscsCaseData.getDwpEditedResponseDocument().getDocumentLink() == null
+            || sscsCaseData.getDwpEditedEvidenceBundleDocument() == null
+            || sscsCaseData.getDwpEditedEvidenceBundleDocument().getDocumentLink() == null;
     }
 }
