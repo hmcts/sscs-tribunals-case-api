@@ -25,7 +25,6 @@ public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackH
     private ServiceRequestExecutor serviceRequestExecutor;
 
     private String bundleUrl;
-    private String bundleWelshConfig;
     private String bundleEditedConfig;
     private String bundleWelshEditedConfig;
 
@@ -34,12 +33,10 @@ public class CreateEditedBundleAboutToStartHandler implements PreSubmitCallbackH
     @Autowired
     public CreateEditedBundleAboutToStartHandler(ServiceRequestExecutor serviceRequestExecutor,
                                                  @Value("${bundle.url}") String bundleUrl,
-                                                 @Value("${bundle.welsh.config}") String bundleWelshConfig,
                                                  @Value("${bundle.edited.config}") String bundleEditedConfig,
                                                  @Value("${bundle.welsh.edited.config}") String bundleWelshEditedConfig) {
         this.serviceRequestExecutor = serviceRequestExecutor;
         this.bundleUrl = bundleUrl;
-        this.bundleWelshConfig = bundleWelshConfig;
         this.bundleEditedConfig = bundleEditedConfig;
         this.bundleWelshEditedConfig = bundleWelshEditedConfig;
     }
