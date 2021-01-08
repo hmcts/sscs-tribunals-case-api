@@ -42,7 +42,7 @@ public class CreateEditedBundleAboutToStartHandlerTest {
     @Before
     public void setUp() {
         openMocks(this);
-        handler = new CreateEditedBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com", "bundleWelshConfig",
+        handler = new CreateEditedBundleAboutToStartHandler(serviceRequestExecutor, "bundleUrl.com",
                 "bundleEditedConfig", "bundleWelshEditedConfig");
 
         when(callback.getEvent()).thenReturn(EventType.CREATE_EDITED_BUNDLE);
