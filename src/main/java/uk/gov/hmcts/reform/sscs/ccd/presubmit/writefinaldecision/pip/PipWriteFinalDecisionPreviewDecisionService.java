@@ -14,7 +14,6 @@ import uk.gov.hmcts.reform.sscs.ccd.domain.Outcome;
 import uk.gov.hmcts.reform.sscs.ccd.domain.SscsCaseData;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.AwardType;
 import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.WriteFinalDecisionPreviewDecisionServiceBase;
-import uk.gov.hmcts.reform.sscs.ccd.presubmit.writefinaldecision.pip.scenarios.PipScenario;
 import uk.gov.hmcts.reform.sscs.config.DocumentConfiguration;
 import uk.gov.hmcts.reform.sscs.docassembly.GenerateFile;
 import uk.gov.hmcts.reform.sscs.model.docassembly.Descriptor;
@@ -44,27 +43,6 @@ public class PipWriteFinalDecisionPreviewDecisionService extends WriteFinalDecis
     protected void setTemplateContent(DecisionNoticeOutcomeService outcomeService, PreSubmitCallbackResponse<SscsCaseData> response,
         NoticeIssuedTemplateBodyBuilder builder, SscsCaseData caseData,
         WriteFinalDecisionTemplateBody payload) {
-
-
-        if ("Yes".equalsIgnoreCase(caseData.getWriteFinalDecisionGenerateNotice())) {
-
-            // Validate here for PIP instead of only validating on submit.
-            // This ensures that we know we can obtain a valid allowed or refused condition below
-            //outcomeService.validate(response, caseData)
-            // If validation has produced no errors, we know that we can get an allowed/refused condition.
-
-            // Optional<EsaAllowedOrRefusedCondition> condition = EsaPointsRegulationsAndSchedule3ActivitiesCondition
-            //   .getPassingAllowedOrRefusedCondition(decisionNoticeQuestionService, caseData);
-            //if (condition.isPresent()) {
-            PipScenario scenario = PipScenario.SCENARIO_1;
-            PipTemplateContent templateContent = scenario.getContent(payload);
-            builder.writeFinalDecisionTemplateContent(templateContent);
-            // } else {
-            // Should never happen.
-            //  log.error("Unable to obtain a valid scenario before preview - Something has gone wrong for caseId: ", caseData.getCcdCaseId());
-            //  response.addError("Unable to obtain a valid scenario - something has gone wrong");
-            //}
-        }
     }
 
     @Override
