@@ -42,7 +42,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
     public void scenario1_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOVING_AROUND_ANSWER"), Arrays.asList("same", "standardRate", "preparingFood1e", "takingNutrition2d", "same", "standardRate", "movingAround12a"));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("same", "standardRate", "preparingFood1e", "takingNutrition2d", "same", "standardRate", "\"movingAround\"", "movingAround12a"));
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -67,7 +67,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
     public void scenario10_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "\"pipWriteFinalDecisionMobilityQuestion\" : \"MOBILITY_RATE\",", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList("same", "standardRate", "preparingFood1e", "takingNutrition2d", "notConsidered", "", ""));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "\"pipWriteFinalDecisionMobilityQuestion\" : \"MOBILITY_RATE\",", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList("same", "standardRate", "preparingFood1e", "takingNutrition2d", "notConsidered", "", "", ""));
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -92,7 +92,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
     // The Scenarios are defined https://tools.hmcts.net/confluence/display/SSCS/ESA+DN+template+content+-+judges+input
     @Test
     public void scenario20_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "\"pipWriteFinalDecisionMobilityQuestion\" : \"MOBILITY_RATE\",", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList("same", "standardRate", "preparingFood1f", "takingNutrition2d", "notConsidered", "", ""));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("COMPARED_TO_DWP_DAILY_LIVING", "DAILY_LIVING_RATE", "PREPARING_FOOD_ANSWER", "TAKING_NUTRITION_ANSWER", "COMPARED_TO_DWP_MOBILITY", "\"pipWriteFinalDecisionMobilityQuestion\" : \"MOBILITY_RATE\",", "\"pipWriteFinalDecisionMobilityActivitiesQuestion\" : [\"MOBILITY_ACTIVITIES_ANSWER\"],", "\"pipWriteFinalDecisionMovingAroundQuestion\" : \"MOVING_AROUND_ANSWER\","), Arrays.asList("same", "standardRate", "preparingFood1f", "takingNutrition2d", "notConsidered", "", "", ""));
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
