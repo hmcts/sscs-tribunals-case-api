@@ -2,12 +2,12 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit.resendtogaps;
 
 import static java.util.Objects.requireNonNull;
 
-import com.networknt.schema.ValidationMessage;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
 import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
@@ -30,9 +30,6 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
     private RoboticsJsonMapper roboticsJsonMapper;
 
     private RoboticsJsonValidator roboticsJsonValidator;
-
-    private String missingFieldMessage = " is missing/not populated - please correct.";
-    private String malformedFieldMessage = " is invalid - please correct.";
 
     @Autowired
     public ResendToGapsAboutToSubmitHandler(RoboticsJsonMapper roboticsMapper, RoboticsJsonValidator jsonValidator) {
@@ -63,84 +60,18 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
         preSubmitCallbackResponse = new PreSubmitCallbackResponse<>(sscsCaseData);
 
         try {
-            isValid(sscsCaseData, caseDetails.getId(), caseDetails.getState());
+            Set<String> errorSet = isValid(sscsCaseData, caseDetails.getId(), caseDetails.getState());
+            if (!CollectionUtils.isEmpty(errorSet)) {
+                preSubmitCallbackResponse.addErrors(errorSet);
+            }
         } catch (RoboticsValidationException roboticsValidationException) {
-
-            Set<ValidationMessage> validationErrors = roboticsValidationException.getValidationErrors();
-            preSubmitCallbackResponse = addErrors(preSubmitCallbackResponse, validationErrors,
-                    sscsCaseData.getCcdCaseId(), roboticsValidationException);
+            preSubmitCallbackResponse.addError(roboticsValidationException.getMessage());
         }
 
         return preSubmitCallbackResponse;
     }
 
-    public PreSubmitCallbackResponse<SscsCaseData> addErrors(PreSubmitCallbackResponse callbackResponse,
-                                               Set<ValidationMessage> validationErrors,
-                                               String caseId,
-                                               RoboticsValidationException roboticsValidationException) {
-        if (validationErrors != null) {
-            for (ValidationMessage validationError : validationErrors) {
-
-                log.error("Unable to validate robotics json for case id" + caseId + " with error: "
-                        + validationError.getMessage() + " and type " + validationError.getType() + " and code "
-                        + validationError.getCode());
-                callbackResponse.addError(toCcdError(validationError));
-            }
-        } else {
-            callbackResponse.addError(roboticsValidationException.getMessage());
-        }
-        return  callbackResponse;
-    }
-
-    public String toCcdError(ValidationMessage error) {
-
-        String ccdError;
-
-        String errorType = error.getType();
-        String path = toPath(error.getPath());
-
-        if (errorType.equals("required")) {
-
-            ccdError = requiredErrorMessage(error, path);
-
-        } else if (errorType.equals("minLength")) {
-            ccdError = path + missingFieldMessage;
-
-        } else if (errorType.equals("pattern")) {
-            ccdError = path + malformedFieldMessage;
-        } else {
-            ccdError = "An unexpected error has occurred. Please raise a ServiceNow ticket"
-                    + " - the following field has caused the issue: " + path;
-        }
-
-        return ccdError;
-    }
-
-
-    private String requiredErrorMessage(ValidationMessage error, String path) {
-        String ccdError;
-        if (error.getArguments().length > 0) {
-            String field = error.getArguments()[0];
-            if (path.length() > 0) {
-                ccdError = path + "." + field + missingFieldMessage;
-            } else {
-                ccdError = field + missingFieldMessage;
-            }
-        } else {
-            ccdError = path + missingFieldMessage;
-        }
-        return ccdError;
-    }
-
-    public String toPath(String input) {
-        if (input != null && input.length() > 2) {
-            return input.substring(2);
-        } else {
-            return  "";
-        }
-    }
-
-    public void isValid(SscsCaseData caseData, Long caseId, State caseState) throws RoboticsValidationException {
+    public Set<String> isValid(SscsCaseData caseData, Long caseId, State caseState) throws RoboticsValidationException {
 
         RoboticsWrapper roboticsWrapper = RoboticsWrapper
                 .builder()
@@ -150,7 +81,8 @@ public class ResendToGapsAboutToSubmitHandler implements PreSubmitCallbackHandle
                 .state(caseState).build();
 
         JSONObject roboticsJson = toJsonObject(roboticsWrapper);
-        roboticsJsonValidator.validate(roboticsJson);
+        Set<String> errorSet = roboticsJsonValidator.validate(roboticsJson, String.valueOf(caseId));
+        return errorSet;
     }
 
     public JSONObject toJsonObject(RoboticsWrapper roboticsWrapper) throws RoboticsValidationException  {
