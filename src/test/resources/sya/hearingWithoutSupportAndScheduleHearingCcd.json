@@ -47,7 +47,9 @@
       },
       "isAppointee": "No",
       "isAddressSameAsAppointee": "No",
-      "appointee": null
+      "appointee": null,
+      "wantsReasonableAdjustment": null,
+      "reasonableAdjustmentRequirements": null
     },
     "benefitType": {
       "code": "PIP",
@@ -100,7 +102,9 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd"
+      "organisation": "HP Ltd",
+      "wantsReasonableAdjustment": null,
+      "reasonableAdjustmentRequirements": null
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},

@@ -45,6 +45,8 @@
         "dob": "1990-02-26",
         "nino": "AB877533C"
       },
+      "wantsReasonableAdjustment": null,
+      "reasonableAdjustmentRequirements": null,
       "isAppointee": "Yes",
       "isAddressSameAsAppointee": "No",
       "appointee": {
@@ -67,7 +69,9 @@
         "identity": {
           "dob": "1991-03-31",
           "nino": null
-        }
+        },
+        "wantsReasonableAdjustment": null,
+        "reasonableAdjustmentRequirements": null
       }
     },
     "benefitType": {
@@ -149,7 +153,9 @@
         "phone": null,
         "mobile": "07411999999"
       },
-      "organisation": "HP Ltd"
+      "organisation": "HP Ltd",
+      "wantsReasonableAdjustment": null,
+      "reasonableAdjustmentRequirements": null
     },
     "signer": "Joe Bloggs",
     "hearingSubtype": {},
