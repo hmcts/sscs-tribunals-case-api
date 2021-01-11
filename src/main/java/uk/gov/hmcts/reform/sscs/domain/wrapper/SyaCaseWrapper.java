@@ -60,6 +60,9 @@ public class SyaCaseWrapper {
     @JsonProperty("languagePreferenceWelsh")
     private Boolean languagePreferenceWelsh;
 
+    @JsonProperty("ccdCaseId")
+    private String ccdCaseId;
+
     public SyaContactDetails getContactDetails() {
         if (null == appellant && null == appointee) {
             return null;

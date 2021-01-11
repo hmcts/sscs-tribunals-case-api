@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -104,7 +105,7 @@ public class SyaControllerTest {
 
     @Test
     public void shouldReturnHttpStatusCode201ForTheSubmittedDraft() throws Exception {
-        when(submitAppealService.submitDraftAppeal(any(), any()))
+        when(submitAppealService.submitDraftAppeal(any(), any(), any()))
             .thenReturn(Optional.of(SaveCaseResult.builder()
                 .caseDetailsId(1L)
                 .saveCaseOperation(SaveCaseOperation.CREATE)
@@ -120,7 +121,141 @@ public class SyaControllerTest {
     }
 
     @Test
-    @Parameters(method = "generateInvalidScenarios")
+    public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateTrue() throws Exception {
+        when(submitAppealService.submitDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.CREATE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya.json");
+
+        mockMvc.perform(put("/drafts?forceCreate=true")
+                .header("Authorization", "Bearer myToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode201ForTheSubmittedDraftWhenForceCreateNotTrue() throws Exception {
+        when(submitAppealService.submitDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.CREATE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya.json");
+
+        mockMvc.perform(put("/drafts?forceCreate=notTrue")
+                .header("Authorization", "Bearer myToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode200ForTheUpdatedDraft() throws Exception {
+        when(submitAppealService.updateDraftAppeal(any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.UPDATE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
+
+        mockMvc.perform(post("/drafts")
+                .header("Authorization", "Bearer myToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode400ForInvalidAuthDraftUpdate() throws Exception {
+        when(submitAppealService.updateDraftAppeal(any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.UPDATE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
+
+        mockMvc.perform(post("/drafts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode204ForInvalidCcdIdDraftUpdate() throws Exception {
+        when(submitAppealService.updateDraftAppeal(any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.UPDATE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya.json");
+
+        mockMvc.perform(post("/drafts")
+                .header("Authorization", "Bearer myToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode200ForArchivedDraft() throws Exception {
+        when(submitAppealService.archiveDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.ARCHIVE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
+
+        mockMvc.perform(delete("/drafts/1234567890")
+                .header("Authorization", "Bearer myToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode400ForInvalidAuthArchivedDraft() throws Exception {
+        when(submitAppealService.archiveDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.ARCHIVE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
+
+        mockMvc.perform(delete("/drafts/1234567890")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void shouldReturnHttpStatusCode204ForInvalidDataArchivedDraft() throws Exception {
+        when(submitAppealService.archiveDraftAppeal(any(), any(), any()))
+                .thenReturn(Optional.of(SaveCaseResult.builder()
+                        .caseDetailsId(1L)
+                        .saveCaseOperation(SaveCaseOperation.ARCHIVE)
+                        .build()));
+
+        String json = getSyaCaseWrapperJson("json/sya.json");
+
+        mockMvc.perform(delete("/drafts/1234567890")
+                .header("Authorization", "Bearer myToken")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Parameters(method = "generateInvalidScenariosPut")
     public void givenParameterIsNotValid_whenPutDraftIsCalled_shouldReturn204Response(String payload, String token)
         throws Exception {
         mockMvc.perform(put("/drafts")
@@ -130,19 +265,79 @@ public class SyaControllerTest {
             .andExpect(status().isNoContent());
     }
 
-    private Object[] generateInvalidScenarios() throws Exception {
+    @Test
+    @Parameters(method = "generateInvalidScenariosPost")
+    public void givenParameterIsNotValid_whenPostDraftIsCalled_shouldReturn204Response(String payload, String token)
+            throws Exception {
+        mockMvc.perform(post("/drafts")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Parameters(method = "generateInvalidScenariosDelete")
+    public void givenParameterIsNotValid_whenArchiveDraftIsCalled_shouldReturn204Response(String payload, String token)
+            throws Exception {
+        mockMvc.perform(delete("/drafts/555")
+                .header("Authorization", token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload))
+                .andExpect(status().isNoContent());
+    }
+
+    private Object[] generateInvalidScenariosPut() throws Exception {
+
+        String validPayload = getSyaCaseWrapperJson("json/sya.json");
+
         String emptyPayload = "{}";
         String noBenefitCode = "{\n"
-            + "  \"benefitType\": {\n"
-            + "    \"description\": \"Personal Independence Payment\"\n"
-            + "  }\n"
-            + "}";
+                + "  \"benefitType\": {\n"
+                + "    \"description\": \"Personal Independence Payment\"\n"
+                + "  }\n"
+                + "}";
         String emptyBenefitCode = "{\n"
-            + "  \"benefitType\": {\n"
-            + "    \"code\": \"\"\n"
-            + "  }\n"
-            + "}";
-        String validPayload = getSyaCaseWrapperJson("json/sya.json");
+                + "  \"benefitType\": {\n"
+                + "    \"code\": \"\"\n"
+                + "  }\n"
+                + "}";
+
+        String validUserToken = "Bearer myToken";
+        String invalidUserToken = "";
+
+        return new Object[]{
+            new Object[]{emptyPayload, validUserToken},
+            new Object[]{noBenefitCode, validUserToken},
+            new Object[]{emptyBenefitCode, validUserToken},
+            new Object[]{validPayload, invalidUserToken}
+        };
+    }
+
+    private Object[] generateInvalidScenariosPost() throws Exception {
+
+        String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
+
+        String emptyPayload = "{}";
+        String noBenefitCode = "{\n"
+                + "  \"benefitType\": {\n"
+                + "    \"description\": \"Personal Independence Payment\"\n"
+                + "  },\n"
+                + "  \"ccdId\": 1234 \n"
+                + "}";
+        String emptyBenefitCode = "{\n"
+                + "  \"benefitType\": {\n"
+                + "    \"code\": \"\"\n"
+                + "  },\n"
+                + "  \"ccdId\": 1234 \n"
+                + "}";
+
+        String emptyCcdId = "{\n"
+                + "  \"benefitType\": {\n"
+                + "    \"code\": \"ESA\"\n"
+                + "  }\n"
+                + "}";
+
         String validUserToken = "Bearer myToken";
         String invalidUserToken = "";
 
@@ -151,6 +346,28 @@ public class SyaControllerTest {
             new Object[]{noBenefitCode, validUserToken},
             new Object[]{emptyBenefitCode, validUserToken},
             new Object[]{validPayload, invalidUserToken},
+            new Object[]{emptyCcdId, validUserToken}
+        };
+    }
+
+    private Object[] generateInvalidScenariosDelete() throws Exception {
+
+        String validPayload = getSyaCaseWrapperJson("json/sya_with_ccdId.json");
+
+        String emptyPayload = "{}";
+        String emptyCcdId = "{\n"
+                + "  \"benefitType\": {\n"
+                + "    \"code\": \"ESA\"\n"
+                + "  }\n"
+                + "}";
+
+        String validUserToken = "Bearer myToken";
+        String invalidUserToken = "";
+
+        return new Object[]{
+            new Object[]{emptyPayload, validUserToken},
+            new Object[]{validPayload, invalidUserToken},
+            new Object[]{emptyCcdId, validUserToken}
         };
     }
 

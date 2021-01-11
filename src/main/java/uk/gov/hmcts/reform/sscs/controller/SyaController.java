@@ -17,12 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.gov.hmcts.reform.sscs.domain.wrapper.SyaCaseWrapper;
 import uk.gov.hmcts.reform.sscs.model.SaveCaseOperation;
@@ -109,24 +104,72 @@ public class SyaController {
     @PutMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Draft> createDraftAppeal(
         @RequestHeader(AUTHORIZATION) String authorisation,
-        @RequestBody SyaCaseWrapper syaCaseWrapper) {
-        if (!isValid(syaCaseWrapper, authorisation)) {
-            log.info("Cannot proceed because the {} data is missing", getMissingDataInfo(syaCaseWrapper, authorisation));
+        @RequestBody SyaCaseWrapper syaCaseWrapper,
+        @RequestParam(required = false) String forceCreate) {
+
+        if (!isValidCreate(syaCaseWrapper, authorisation)) {
+            log.info("Cannot proceed with create draft because the {} data is missing", getMissingDataInfo(syaCaseWrapper, authorisation));
             return ResponseEntity.noContent().build();
         }
-        Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper);
-        return submitDraftResult.map(this::returnCreateOrUpdateDraftResponse).orElse(ResponseEntity.noContent().build());
+
+        Boolean forceCreateDraft;
+        if (forceCreate != null && forceCreate.equals("true")) {
+            forceCreateDraft = true;
+        } else {
+            forceCreateDraft = false;
+        }
+
+        Optional<SaveCaseResult> submitDraftResult = submitAppealService.submitDraftAppeal(authorisation, syaCaseWrapper, forceCreateDraft);
+        return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
     }
 
-    private ResponseEntity<Draft> returnCreateOrUpdateDraftResponse(SaveCaseResult submitDraftResult) {
+    @ApiOperation(value = "updateDraftAppeal", notes = "Updates a draft appeal", response = Draft.class)
+    @ApiResponses(value =
+            {@ApiResponse(code = 200, message = "Updated draft appeal successfully", response = Draft.class)})
+    @PostMapping(value = "/drafts", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Draft> updateDraftAppeal(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestBody SyaCaseWrapper syaCaseWrapper) {
+
+        if (!isValidUpdate(syaCaseWrapper, authorisation)) {
+            log.info("Cannot proceed with update draft because the {} data is missing", getMissingDataInfo(syaCaseWrapper, authorisation));
+            return ResponseEntity.noContent().build();
+        }
+
+        Optional<SaveCaseResult> submitDraftResult = submitAppealService.updateDraftAppeal(authorisation, syaCaseWrapper);
+        return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
+    }
+
+    @ApiOperation(value = "archiveDraftAppeal", notes = "Archives a draft appeal", response = Draft.class)
+    @ApiResponses(value =
+            {@ApiResponse(code = 200, message = "Updated draft appeal successfully", response = Draft.class)})
+    @DeleteMapping (value = "/drafts/{id}", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Draft> archiveDraftAppeal(
+            @RequestHeader(AUTHORIZATION) String authorisation,
+            @RequestBody SyaCaseWrapper syaCaseWrapper,
+            @PathVariable("id") long ccdCaseId) {
+
+        if (!isValidArchive(syaCaseWrapper, authorisation)) {
+            log.info("Cannot proceed with archive draft because the {} data is missing", getMissingDataInfo(syaCaseWrapper, authorisation));
+            return ResponseEntity.noContent().build();
+        }
+
+        Optional<SaveCaseResult> submitDraftResult = submitAppealService.archiveDraftAppeal(authorisation, syaCaseWrapper, ccdCaseId);
+        return submitDraftResult.map(this::returnCreateOrOkDraftResponse).orElse(ResponseEntity.noContent().build());
+    }
+
+    private ResponseEntity<Draft> returnCreateOrOkDraftResponse(SaveCaseResult submitDraftResult) {
+
         Draft draft = Draft.builder().id(submitDraftResult.getCaseDetailsId()).build();
-        log.info("{} {} successfully", draft, submitDraftResult.getSaveCaseOperation().name());
+        log.info("{} {} successfully draft", draft, submitDraftResult.getSaveCaseOperation().name());
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
             .buildAndExpand(draft.getId()).toUri();
+
         if (submitDraftResult.getSaveCaseOperation().equals(SaveCaseOperation.CREATE)) {
-            return created(location).build();
+            return created(location).body(draft);
         } else {
-            return status(HttpStatus.OK).location(location).build();
+            return status(HttpStatus.OK).location(location).body(draft);
         }
     }
 
@@ -138,13 +181,26 @@ public class SyaController {
             || StringUtils.isBlank(syaCaseWrapper.getBenefitType().getCode())) {
             return "benefit code";
         }
+
+        if (syaCaseWrapper.getCcdCaseId() == null) {
+            return "ccdCaseId";
+        }
         return null;
     }
 
-    private boolean isValid(SyaCaseWrapper syaCaseWrapper, String authorisation) {
+    private boolean isValidCreate(SyaCaseWrapper syaCaseWrapper, String authorisation) {
         return syaCaseWrapper != null && syaCaseWrapper.getBenefitType() != null
             && StringUtils.isNotBlank(syaCaseWrapper.getBenefitType().getCode())
             && StringUtils.isNotBlank(authorisation);
     }
 
+    private boolean isValidUpdate(SyaCaseWrapper syaCaseWrapper, String authorisation) {
+        return syaCaseWrapper != null && syaCaseWrapper.getBenefitType() != null && syaCaseWrapper.getCcdCaseId() != null
+                && StringUtils.isNotBlank(syaCaseWrapper.getBenefitType().getCode())
+                && StringUtils.isNotBlank(authorisation);
+    }
+
+    private boolean isValidArchive(SyaCaseWrapper syaCaseWrapper, String authorisation) {
+        return syaCaseWrapper.getCcdCaseId() != null && StringUtils.isNotBlank(authorisation);
+    }
 }

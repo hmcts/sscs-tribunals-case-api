@@ -29,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.pdf.service.client.PDFServiceClient;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.ccd.exception.CcdException;
@@ -256,16 +257,113 @@ public class SubmitAppealServiceTest {
     }
 
     @Test
-    public void shouldCreateDraftCaseWithAppealDetailsWithDraftEvent() {
+    public void shouldCreateDraftCaseWithAppealDetailsWithDraftEventNotForcedCreate() {
         given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
             .willReturn(SaveCaseResult.builder()
                 .caseDetailsId(123L)
                 .saveCaseOperation(SaveCaseOperation.CREATE)
                 .build());
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
+        assertTrue(result.isPresent());
+
+    }
+
+    @Test
+    public void shouldUpdateDraftCase() {
+
+        uk.gov.hmcts.reform.ccd.client.model.CaseDetails caseDetails =
+                uk.gov.hmcts.reform.ccd.client.model.CaseDetails.builder().id(12L).build();
+
+        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
+                .willReturn(caseDetails);
+
+        SyaCaseWrapper caseWrapper = getSyaCaseWrapper("json/sya_with_ccdId.json");
+        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", caseWrapper);
+
+        verify(citizenCcdService).updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any());
+        assertTrue(result.isPresent());
+    }
+
+    @Test(expected = FeignException.class)
+    public void shouldRaiseExceptionOnUpdateDraftEvent() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(404);
+        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
+                .willThrow(feignException);
+
+        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+
+        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void shouldSuppressExceptionIfIts409OnUpdateDraftCaseWithAppealDetailsWithDraftEvent() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(409);
+        given(citizenCcdService.updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any()))
+                .willThrow(feignException);
+
+        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+
+        verify(citizenCcdService).updateCase(any(SscsCaseData.class), any(), any(), any(), any(), any());
+        assertFalse(result.isPresent());
+    }
+
+    @Test(expected = ApplicationErrorException.class)
+    public void shouldRaisedExceptionOnUpdateDraftWhenCitizenRoleIsNotPresent() {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        Optional<SaveCaseResult> result = submitAppealService.updateDraftAppeal("authorisation", appealData);
+
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void shouldArchiveDraftCase() {
+        given(citizenCcdService.archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any()))
+                .willReturn(CaseDetails.builder().build());
+
+        Optional<SaveCaseResult> result = submitAppealService.archiveDraftAppeal("authorisation", appealData, 112L);
+
+        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+        assertTrue(result.isPresent());
+    }
+
+    @Test(expected = FeignException.class)
+    public void shouldRaiseExceptionOnArchiveDraftEvent() {
+        FeignException feignException = mock(FeignException.class);
+        given(feignException.status()).willReturn(404);
+        given(citizenCcdService.archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any()))
+                .willThrow(feignException);
+
+        Optional<SaveCaseResult> result = submitAppealService.archiveDraftAppeal("authorisation", appealData, 112L);
+
+        verify(citizenCcdService).archiveDraft(any(SscsCaseData.class), any(IdamTokens.class), any());
+        assertFalse(result.isPresent());
+    }
+
+    @Test(expected = ApplicationErrorException.class)
+    public void shouldRaisedExceptionOnArchiveDraftWhenCitizenRoleIsNotPresent() {
+        given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
+        Optional<SaveCaseResult> result = submitAppealService.archiveDraftAppeal("authorisation", appealData, 121L);
+
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    public void shouldCreateDraftCaseWithAppealDetailsWithDraftEventForcedCreate() {
+        given(citizenCcdService.createDraft(any(SscsCaseData.class), any(IdamTokens.class)))
+                .willReturn(SaveCaseResult.builder()
+                        .caseDetailsId(123L)
+                        .saveCaseOperation(SaveCaseOperation.CREATE)
+                        .build());
+
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, true);
+
+        verify(citizenCcdService).createDraft(any(SscsCaseData.class), any(IdamTokens.class));
         assertTrue(result.isPresent());
 
     }
@@ -277,7 +375,7 @@ public class SubmitAppealServiceTest {
         given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
             .willThrow(feignException);
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
         assertFalse(result.isPresent());
@@ -286,7 +384,7 @@ public class SubmitAppealServiceTest {
     @Test(expected = ApplicationErrorException.class)
     public void shouldRaisedExceptionOnCreateDraftWhenCitizenRoleIsNotPresent() {
         given(idamService.getUserDetails(anyString())).willReturn(UserDetails.builder().build()); // no citizen role
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
 
         assertFalse(result.isPresent());
     }
@@ -298,7 +396,7 @@ public class SubmitAppealServiceTest {
         given(citizenCcdService.saveCase(any(SscsCaseData.class), any(IdamTokens.class)))
             .willThrow(feignException);
 
-        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData);
+        Optional<SaveCaseResult> result = submitAppealService.submitDraftAppeal("authorisation", appealData, false);
 
         verify(citizenCcdService).saveCase(any(SscsCaseData.class), any(IdamTokens.class));
         assertFalse(result.isPresent());
@@ -488,7 +586,7 @@ public class SubmitAppealServiceTest {
 
 
         verify(ccdService).createCase(any(SscsCaseData.class), eq(VALID_APPEAL_CREATED.getCcdType()), any(String.class), any(String.class), any(IdamTokens.class));
-        verify(citizenCcdService).draftArchived(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
+        verify(citizenCcdService).draftArchivedFirst(any(SscsCaseData.class), any(IdamTokens.class), any(IdamTokens.class));
     }
 
     @Test
