@@ -79,8 +79,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Only the daily living component was in issue on this appeal and the mobility \n"
-                + "component was not considered. "));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Only the daily living component was in issue on this appeal and the mobility component was not considered. "));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
@@ -100,12 +99,11 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the enhanced rate from 17/12/2020 for an indefinite period."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has severely limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has severely limited ability to carry out the activities of daily living set out below. They score 12 points. They satisfy the following descriptors:"));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food f. Cannot prepare and cook food. 8 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Only the daily living component was in issue on this appeal and the mobility \n"
-                + "component was not considered. "));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Only the daily living component was in issue on this appeal and the mobility component was not considered. "));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 1"));
             assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
             assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
