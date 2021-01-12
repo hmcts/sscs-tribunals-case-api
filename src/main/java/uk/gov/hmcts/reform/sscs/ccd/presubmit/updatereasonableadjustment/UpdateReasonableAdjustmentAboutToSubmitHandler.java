@@ -1,7 +1,7 @@
 package uk.gov.hmcts.reform.sscs.ccd.presubmit.updatereasonableadjustment;
 
 import static java.util.Objects.nonNull;
-import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNo;
+import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isNoOrNull;
 import static uk.gov.hmcts.reform.sscs.ccd.domain.YesNo.isYes;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,24 +32,24 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (isNo(sscsCaseData.getAppeal().getAppellant().getWantsReasonableAdjustment())) {
+        if (isNoOrNull(sscsCaseData.getAppeal().getAppellant().getWantsReasonableAdjustment())) {
             sscsCaseData.getAppeal().getAppellant().setWantsReasonableAdjustment(null);
             sscsCaseData.getAppeal().getAppellant().setReasonableAdjustmentRequirements(null);
         }
 
         Appointee appointee = sscsCaseData.getAppeal().getAppellant().getAppointee();
-        if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) && nonNull(appointee) && isNo(appointee.getWantsReasonableAdjustment())) {
+        if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) && nonNull(appointee) && isNoOrNull(appointee.getWantsReasonableAdjustment())) {
             appointee.setWantsReasonableAdjustment(null);
             appointee.setReasonableAdjustmentRequirements(null);
         }
 
-        if (isYes(sscsCaseData.getJointParty()) && isNo(sscsCaseData.getJointPartyWantsReasonableAdjustment())) {
+        if (isYes(sscsCaseData.getJointParty()) && isNoOrNull(sscsCaseData.getJointPartyWantsReasonableAdjustment())) {
             sscsCaseData.setJointPartyWantsReasonableAdjustment(null);
             sscsCaseData.setJointPartyReasonableAdjustmentRequirements(null);
         }
 
         Representative representative = sscsCaseData.getAppeal().getRep();
-        if (nonNull(representative) && isYes(representative.getHasRepresentative()) && isNo(representative.getWantsReasonableAdjustment())) {
+        if (nonNull(representative) && isYes(representative.getHasRepresentative()) && isNoOrNull(representative.getWantsReasonableAdjustment())) {
             representative.setWantsReasonableAdjustment(null);
             representative.setReasonableAdjustmentRequirements(null);
         }
