@@ -87,7 +87,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void notConsideredStandardRate_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", "same", "noAward", "movingAround", "movingAround12c"));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", "same", "standardRate", "movingAround", "movingAround12c"));
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
@@ -109,7 +109,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
 
     @Test
     public void notConsideredEnhancedRate_shouldGeneratePdfWithExpectedText() throws IOException {
-        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", "same", "noAward", "movingAround", "movingAround12c"));
+        String json = getJsonCallbackForTestAndReplace("handlers/writefinaldecision/pipScenario1Callback.json", Arrays.asList("\"pipWriteFinalDecisionComparedToDWPDailyLivingQuestion\": \"COMPARED_TO_DWP_DAILY_LIVING\",", "DAILY_LIVING_RATE", "\"pipWriteFinalDecisionDailyLivingActivitiesQuestion\" : [\"preparingFood\", \"takingNutrition\"],", "COMPARED_TO_DWP_MOBILITY", "MOBILITY_RATE", "MOBILITY_ACTIVITIES_ANSWER", "MOVING_AROUND_ANSWER"), Arrays.asList("", "notConsidered", "", "same", "enhancedRate", "movingAround", "movingAround12c"));
         byte[] bytes = callPreviewFinalDecision(json);
         try (PDDocument document = PDDocument.load(bytes)) {
             String pdfText = new PDFTextStripper().getText(document);
