@@ -21,12 +21,12 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.*;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonMapper;
 import uk.gov.hmcts.reform.sscs.robotics.RoboticsJsonValidator;
-import uk.gov.hmcts.reform.sscs.robotics.RoboticsValidationException;
 
 @RunWith(JUnitParamsRunner.class)
 public class ResendToGapsAboutToSubmitHandlerTest {
 
     private static final String USER_AUTHORISATION = "Bearer token";
+    private static final String CASE_ID = "12345678";
 
     private ResendToGapsAboutToSubmitHandler handler;
 
@@ -92,7 +92,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
 
         PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
         assertEquals(0, response.getErrors().size());
-        verify(jsonValidator, atLeastOnce()).validate(any());
+        verify(jsonValidator, atLeastOnce()).validate(any(), any());
     }
 
     @Test
@@ -111,7 +111,9 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         Set<ValidationMessage> errors = new HashSet<ValidationMessage>();
         errors.add(validationMessage);
 
-        doThrow(new RoboticsValidationException("Effed it", errors)).when(jsonValidator).validate(any());
+        Set<String> errorSet = new HashSet<>();
+        errorSet.add(expectedError);
+        when(jsonValidator.validate(any(), any())).thenReturn(errorSet);
         when(caseDetails.getCaseData()).thenReturn(sscsCaseData);
         ResendToGapsAboutToSubmitHandler resendHandler = new ResendToGapsAboutToSubmitHandler(jsonMapper, jsonValidator);
         PreSubmitCallbackResponse<SscsCaseData> response = resendHandler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
@@ -120,7 +122,7 @@ public class ResendToGapsAboutToSubmitHandlerTest {
         String firstError = response.getErrors().iterator().next();
 
         assertTrue(firstError.contains(expectedError));
-        verify(jsonValidator, atLeastOnce()).validate(any());
+        verify(jsonValidator, atLeastOnce()).validate(any(), any());
     }
 
     @Test
