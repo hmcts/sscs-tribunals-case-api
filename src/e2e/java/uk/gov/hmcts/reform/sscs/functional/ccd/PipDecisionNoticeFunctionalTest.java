@@ -73,17 +73,16 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 6 points. This is insufficient to meet the threshold for the test."));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is not entitled to the daily living component from 17/12/2020. They score 6 points. This is insufficient to meet the threshold for the test."));
             assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food d. Needs prompting to be able to either prepare or cook a simple meal. 2 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Only the daily living component was in issue on this appeal and the mobility component was not considered. "));
-            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 1"));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 2"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("9. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("10.")));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Only the daily living component was in issue on this appeal and the mobility component was not considered. "));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 1"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
 
@@ -97,18 +96,17 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             String pdfTextWithoutNewLines = replaceNewLines(pdfText);
             assertThat(pdfTextWithoutNewLines, containsString("1. The appeal is refused."));
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
-            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is entitled to the daily living component at the standard rate from 17/12/2020 for an indefinite period."));
-            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs has limited ability to carry out the activities of daily living set out below. They score 8 points. They satisfy the following descriptors:"));
-            assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food e. Needs supervision or assistance to either prepare or cook a simple meal. 4 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("3. Joe Bloggs is not entitled to the daily living component from 17/12/2020. They score 6 points. They satisfy the following descriptors:"));
+            assertThat(pdfTextWithoutNewLines, containsString("1. Preparing food d. Needs prompting to be able to either prepare or cook a simple meal. 2 points"));
             assertThat(pdfTextWithoutNewLines, containsString("2. Taking nutrition d. Needs prompting to be able to take nutrition. 4 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("8 points"));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
-            assertThat(pdfTextWithoutNewLines, containsString("6. Joe Bloggs is limited in their ability to mobilise. They score 0 points."));
-            assertThat(pdfTextWithoutNewLines, containsString("7. Reasons for decision 1"));
-            assertThat(pdfTextWithoutNewLines, containsString("8. Reasons for decision 2"));
-            assertThat(pdfTextWithoutNewLines, containsString("9. Anything else."));
-            assertThat(pdfTextWithoutNewLines, containsString("10. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
-            assertThat(pdfTextWithoutNewLines, not(containsString("11.")));
+            assertThat(pdfTextWithoutNewLines, containsString("6 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs does not qualify for an award of the mobility component from 17/12/2020. They score 0 points. This is insufficient to meet the threshold for the test."));
+            assertThat(pdfTextWithoutNewLines, containsString("12. Moving around a. Can stand and then move more than 200 metres, either aided or unaided. 0 points"));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Reasons for decision 1"));
+            assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 2"));
+            assertThat(pdfTextWithoutNewLines, containsString("7. Anything else."));
+            assertThat(pdfTextWithoutNewLines, containsString("8. This has been a remote hearing in the form of a video hearing. Joe Bloggs attended the hearing today and the tribunal considered the appeal bundle to page B7. A Presenting Officer attended on behalf of the Respondent."));
+            assertThat(pdfTextWithoutNewLines, not(containsString("9.")));
         }
     }
 
