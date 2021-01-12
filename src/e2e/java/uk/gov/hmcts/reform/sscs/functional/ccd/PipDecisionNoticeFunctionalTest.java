@@ -96,7 +96,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the standard rate from 17/12/2020 for an indefinite period."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is limited in their ability to mobilise. They score 8 points. They satisfy the following descriptors."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is limited in their ability to mobilise. They score 8 points.They satisfy the following descriptors."));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around c."));
             assertThat(pdfTextWithoutNewLines, containsString("8 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 1"));
@@ -118,7 +118,7 @@ public class PipDecisionNoticeFunctionalTest extends BaseFunctionTest {
             assertThat(pdfTextWithoutNewLines, containsString("2. The decision made by the Secretary of State on 17/11/2020 in respect of Personal Independence Payment is confirmed."));
             assertThat(pdfTextWithoutNewLines, containsString("3. Only the mobility component was in issue on this appeal and the daily living component was not considered. "));
             assertThat(pdfTextWithoutNewLines, containsString("4. Joe Bloggs is entitled to the mobility component at the enhanced rate from 17/12/2020 for an indefinite period."));
-            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is severely limited in their ability to mobilise. They score 12 points. They satisfy the following descriptors."));
+            assertThat(pdfTextWithoutNewLines, containsString("5. Joe Bloggs is severely limited in their ability to mobilise. They score 12 points.They satisfy the following descriptors."));
             assertThat(pdfTextWithoutNewLines, containsString("12. Moving around e."));
             assertThat(pdfTextWithoutNewLines, containsString("12 points"));
             assertThat(pdfTextWithoutNewLines, containsString("6. Reasons for decision 1"));
