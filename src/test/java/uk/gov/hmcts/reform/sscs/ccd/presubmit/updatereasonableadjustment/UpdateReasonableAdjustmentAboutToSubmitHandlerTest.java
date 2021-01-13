@@ -44,7 +44,7 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         when(callback.getCaseDetails()).thenReturn(caseDetails);
         sscsCaseData = SscsCaseData.builder().ccdCaseId("ccdId")
                 .updateReasonableAdjustment("alternativeLetterFormat")
-                .reasonableAdjustment(ReasonableAdjustment.builder()
+                .reasonableAdjustments(ReasonableAdjustments.builder()
                         .appellant(ReasonableAdjustmentDetails.builder().reasonableAdjustmentRequirements(RED_FONT).wantsReasonableAdjustment(YES).build())
                         .appointee(ReasonableAdjustmentDetails.builder().reasonableAdjustmentRequirements(RED_FONT).wantsReasonableAdjustment(NO).build())
                         .representative(ReasonableAdjustmentDetails.builder().reasonableAdjustmentRequirements(RED_FONT).wantsReasonableAdjustment(NO).build())
@@ -72,11 +72,11 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getUpdateReasonableAdjustment());
-        assertNull(response.getData().getReasonableAdjustment().getRepresentative());
-        assertNull(response.getData().getReasonableAdjustment().getJointParty());
-        assertNull(response.getData().getReasonableAdjustment().getAppointee());
-        assertEquals(YES, response.getData().getReasonableAdjustment().getAppellant().getWantsReasonableAdjustment());
-        assertEquals(RED_FONT, response.getData().getReasonableAdjustment().getAppellant().getReasonableAdjustmentRequirements());
+        assertNull(response.getData().getReasonableAdjustments().getRepresentative());
+        assertNull(response.getData().getReasonableAdjustments().getJointParty());
+        assertNull(response.getData().getReasonableAdjustments().getAppointee());
+        assertEquals(YES, response.getData().getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment());
+        assertEquals(RED_FONT, response.getData().getReasonableAdjustments().getAppellant().getReasonableAdjustmentRequirements());
     }
 
     @Test
@@ -84,32 +84,32 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().isAppointee(YES.getValue()).appointee(
                 Appointee.builder().build()
         ).build());
-        sscsCaseData.getReasonableAdjustment().setAppointee(ReasonableAdjustmentDetails.builder().wantsReasonableAdjustment(YES).reasonableAdjustmentRequirements(RED_FONT).build());
+        sscsCaseData.getReasonableAdjustments().setAppointee(ReasonableAdjustmentDetails.builder().wantsReasonableAdjustment(YES).reasonableAdjustmentRequirements(RED_FONT).build());
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getUpdateReasonableAdjustment());
-        assertNull(response.getData().getReasonableAdjustment().getRepresentative());
-        assertNull(response.getData().getReasonableAdjustment().getJointParty());
-        assertNull(response.getData().getReasonableAdjustment().getAppellant());
-        assertEquals(YES, response.getData().getReasonableAdjustment().getAppointee().getWantsReasonableAdjustment());
-        assertEquals(RED_FONT, response.getData().getReasonableAdjustment().getAppointee().getReasonableAdjustmentRequirements());
+        assertNull(response.getData().getReasonableAdjustments().getRepresentative());
+        assertNull(response.getData().getReasonableAdjustments().getJointParty());
+        assertNull(response.getData().getReasonableAdjustments().getAppellant());
+        assertEquals(YES, response.getData().getReasonableAdjustments().getAppointee().getWantsReasonableAdjustment());
+        assertEquals(RED_FONT, response.getData().getReasonableAdjustments().getAppointee().getReasonableAdjustmentRequirements());
     }
 
     @Test
     public void givenRepresentativeUpdateReasonableAdjustment_thenClearAlternativeLetterFieldsSetToNo() {
 
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES.getValue()).build());
-        sscsCaseData.getReasonableAdjustment().getRepresentative().setWantsReasonableAdjustment(YES);
-        sscsCaseData.getReasonableAdjustment().getAppellant().setWantsReasonableAdjustment(NO);
+        sscsCaseData.getReasonableAdjustments().getRepresentative().setWantsReasonableAdjustment(YES);
+        sscsCaseData.getReasonableAdjustments().getAppellant().setWantsReasonableAdjustment(NO);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getUpdateReasonableAdjustment());
-        assertNull(response.getData().getReasonableAdjustment().getJointParty());
-        assertNull(response.getData().getReasonableAdjustment().getAppellant());
-        assertNull(response.getData().getReasonableAdjustment().getAppointee());
-        assertEquals(YES, response.getData().getReasonableAdjustment().getRepresentative().getWantsReasonableAdjustment());
-        assertEquals(RED_FONT, response.getData().getReasonableAdjustment().getRepresentative().getReasonableAdjustmentRequirements());
+        assertNull(response.getData().getReasonableAdjustments().getJointParty());
+        assertNull(response.getData().getReasonableAdjustments().getAppellant());
+        assertNull(response.getData().getReasonableAdjustments().getAppointee());
+        assertEquals(YES, response.getData().getReasonableAdjustments().getRepresentative().getWantsReasonableAdjustment());
+        assertEquals(RED_FONT, response.getData().getReasonableAdjustments().getRepresentative().getReasonableAdjustmentRequirements());
     }
 
     @Test
@@ -117,17 +117,17 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandlerTest {
         sscsCaseData.getAppeal().setAppellant(Appellant.builder().isAppointee(YES.getValue()).appointee(Appointee.builder().build()).build());
         sscsCaseData.getAppeal().setRep(Representative.builder().hasRepresentative(YES.getValue()).build());
         sscsCaseData.setJointParty(YES.getValue());
-        sscsCaseData.getReasonableAdjustment().getAppellant().setWantsReasonableAdjustment(NO);
-        sscsCaseData.getReasonableAdjustment().getJointParty().setWantsReasonableAdjustment(YES);
+        sscsCaseData.getReasonableAdjustments().getAppellant().setWantsReasonableAdjustment(NO);
+        sscsCaseData.getReasonableAdjustments().getJointParty().setWantsReasonableAdjustment(YES);
 
         PreSubmitCallbackResponse<SscsCaseData> response = handler.handle(ABOUT_TO_SUBMIT, callback, USER_AUTHORISATION);
 
         assertNull(response.getData().getUpdateReasonableAdjustment());
-        assertNull(response.getData().getReasonableAdjustment().getRepresentative());
-        assertNull(response.getData().getReasonableAdjustment().getAppellant());
-        assertNull(response.getData().getReasonableAdjustment().getAppointee());
-        assertEquals(YES, response.getData().getReasonableAdjustment().getJointParty().getWantsReasonableAdjustment());
-        assertEquals(RED_FONT, response.getData().getReasonableAdjustment().getJointParty().getReasonableAdjustmentRequirements());
+        assertNull(response.getData().getReasonableAdjustments().getRepresentative());
+        assertNull(response.getData().getReasonableAdjustments().getAppellant());
+        assertNull(response.getData().getReasonableAdjustments().getAppointee());
+        assertEquals(YES, response.getData().getReasonableAdjustments().getJointParty().getWantsReasonableAdjustment());
+        assertEquals(RED_FONT, response.getData().getReasonableAdjustments().getJointParty().getReasonableAdjustmentRequirements());
     }
 
     @Test

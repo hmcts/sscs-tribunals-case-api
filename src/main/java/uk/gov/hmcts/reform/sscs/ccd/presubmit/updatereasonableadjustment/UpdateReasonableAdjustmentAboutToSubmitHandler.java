@@ -33,21 +33,21 @@ public class UpdateReasonableAdjustmentAboutToSubmitHandler implements PreSubmit
 
         SscsCaseData sscsCaseData = callback.getCaseDetails().getCaseData();
 
-        if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(sscsCaseData.getReasonableAdjustment().getAppellant()) && isNoOrNull(sscsCaseData.getReasonableAdjustment().getAppellant().getWantsReasonableAdjustment())) {
-            sscsCaseData.getReasonableAdjustment().setAppellant(null);
+        if (isYes(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(sscsCaseData.getReasonableAdjustments().getAppellant()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getAppellant().getWantsReasonableAdjustment())) {
+            sscsCaseData.getReasonableAdjustments().setAppellant(null);
         }
 
-        if (isNoOrNull(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(sscsCaseData.getReasonableAdjustment().getAppointee()) && isNoOrNull(sscsCaseData.getReasonableAdjustment().getAppointee().getWantsReasonableAdjustment())) {
-            sscsCaseData.getReasonableAdjustment().setAppointee(null);
+        if (isNoOrNull(sscsCaseData.getAppeal().getAppellant().getIsAppointee()) || nonNull(sscsCaseData.getReasonableAdjustments().getAppointee()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getAppointee().getWantsReasonableAdjustment())) {
+            sscsCaseData.getReasonableAdjustments().setAppointee(null);
         }
 
-        if (isNoOrNull(sscsCaseData.getJointParty()) || nonNull(sscsCaseData.getReasonableAdjustment().getJointParty()) && isNoOrNull(sscsCaseData.getReasonableAdjustment().getJointParty().getWantsReasonableAdjustment())) {
-            sscsCaseData.getReasonableAdjustment().setJointParty(null);
+        if (isNoOrNull(sscsCaseData.getJointParty()) || nonNull(sscsCaseData.getReasonableAdjustments().getJointParty()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getJointParty().getWantsReasonableAdjustment())) {
+            sscsCaseData.getReasonableAdjustments().setJointParty(null);
         }
 
         Representative representative = sscsCaseData.getAppeal().getRep();
-        if (isNull(representative) || isNoOrNull(representative.getHasRepresentative()) || nonNull(sscsCaseData.getReasonableAdjustment().getRepresentative()) && isNoOrNull(sscsCaseData.getReasonableAdjustment().getRepresentative().getWantsReasonableAdjustment())) {
-            sscsCaseData.getReasonableAdjustment().setRepresentative(null);
+        if (isNull(representative) || isNoOrNull(representative.getHasRepresentative()) || nonNull(sscsCaseData.getReasonableAdjustments().getRepresentative()) && isNoOrNull(sscsCaseData.getReasonableAdjustments().getRepresentative().getWantsReasonableAdjustment())) {
+            sscsCaseData.getReasonableAdjustments().setRepresentative(null);
         }
         sscsCaseData.setUpdateReasonableAdjustment(null);
 
