@@ -23,7 +23,7 @@ public class PipScenarioDTest {
                         .activityAnswerValue("2")
                         .activityAnswerLetter("d").activityAnswerPoints(4).build());
 
-            WriteFinalDecisionTemplateBody body =
+        WriteFinalDecisionTemplateBody body =
                 WriteFinalDecisionTemplateBody.builder()
                         .hearingType("faceToFace")
                         .attendedHearing(true)
