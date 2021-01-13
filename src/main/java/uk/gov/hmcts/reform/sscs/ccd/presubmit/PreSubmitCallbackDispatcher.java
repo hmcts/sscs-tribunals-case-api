@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.sscs.ccd.presubmit;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.reform.sscs.ccd.callback.Callback;
 import uk.gov.hmcts.reform.sscs.ccd.callback.CallbackType;
@@ -10,6 +11,7 @@ import uk.gov.hmcts.reform.sscs.ccd.callback.PreSubmitCallbackResponse;
 import uk.gov.hmcts.reform.sscs.ccd.domain.CaseData;
 
 @Component
+@Slf4j
 public class PreSubmitCallbackDispatcher<T extends CaseData> {
 
     private final List<PreSubmitCallbackHandler<T>> callbackHandlers;
@@ -37,11 +39,14 @@ public class PreSubmitCallbackDispatcher<T extends CaseData> {
                                     String userAuthorisation
                                     ) {
 
+        log.info("before looping callback handlers");
+        int iterationCount = 0;
         for (PreSubmitCallbackHandler<T> callbackHandler : callbackHandlers) {
+                iterationCount ++;
             if (callbackHandler.canHandle(callbackType, callback)) {
-
+                log.info("callback successfully found, number of iterations: {}", iterationCount);
                 PreSubmitCallbackResponse<T> callbackResponseFromHandler = callbackHandler.handle(callbackType, callback, userAuthorisation);
-
+                log.info("callback response received from handler");
                 callbackResponse.setData(callbackResponseFromHandler.getData());
                 callbackResponse.addErrors(callbackResponseFromHandler.getErrors());
                 callbackResponse.addWarnings(callbackResponseFromHandler.getWarnings());

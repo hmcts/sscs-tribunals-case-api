@@ -42,6 +42,7 @@ public class CcdCallbackController {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
+        log.info("/ccdAboutToStart started");
 
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to start sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
@@ -57,6 +58,7 @@ public class CcdCallbackController {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
+        log.info("/ccdAboutToSubmit started");
 
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("About to submit sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
@@ -70,6 +72,7 @@ public class CcdCallbackController {
             @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
             @RequestHeader(AUTHORIZATION) String userAuthorisation,
             @RequestBody String message) {
+        log.info("/ccdMidEvent started");
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("Midevent sscs case callback `{}` received for Case ID `{}`", callback.getEvent(),
             callback.getCaseDetails().getId());
@@ -83,6 +86,7 @@ public class CcdCallbackController {
         @RequestHeader(SERVICE_AUTHORISATION_HEADER) String serviceAuthHeader,
         @RequestHeader(AUTHORIZATION) String userAuthorisation,
         @RequestBody String message) {
+        log.info("/ccdSubmittedEvent started");
         validateRequest(serviceAuthHeader, userAuthorisation, message);
         Callback<SscsCaseData> callback = deserializer.deserialize(message);
         log.info("Submitted event callback for`{}` event and Case ID `{}`", callback.getEvent(),
