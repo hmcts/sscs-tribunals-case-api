@@ -22,8 +22,11 @@ public class Scenario1Content extends PipTemplateContent {
                     getLimitedAbilityDailyLiving(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getDailyLivingNumberOfPoints(),
                         writeFinalDecisionTemplateBody.getDailyLivingDescriptors(), writeFinalDecisionTemplateBody.isDailyLivingIsSeverelyLimited())));
             } else {
-                addComponent(new Paragraph(PipTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(),
-                    getDailyLivingNoAward(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getStartDate(), writeFinalDecisionTemplateBody.getDailyLivingNumberOfPoints())));
+                if (writeFinalDecisionTemplateBody.getDailyLivingNumberOfPoints() != null) {
+                    addComponent(new Paragraph(PipTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(),
+                        getDailyLivingNoAward(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getStartDate(),
+                            writeFinalDecisionTemplateBody.getDailyLivingNumberOfPoints())));
+                }
             }
         }
 
@@ -40,8 +43,11 @@ public class Scenario1Content extends PipTemplateContent {
                     getLimitedAbilityMobility(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getMobilityNumberOfPoints(),
                         writeFinalDecisionTemplateBody.getMobilityDescriptors(), writeFinalDecisionTemplateBody.isMobilityIsSeverelyLimited())));
             } else {
-                addComponent(new Paragraph(PipTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(),
-                    getMobilityNoAward(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getStartDate(), writeFinalDecisionTemplateBody.getMobilityNumberOfPoints())));
+                if (writeFinalDecisionTemplateBody.getMobilityNumberOfPoints() != null) {
+                    addComponent(new Paragraph(PipTemplateComponentId.CONFIRMED_OR_SET_ASIDE_PARAGRAPH.name(),
+                        getMobilityNoAward(writeFinalDecisionTemplateBody.getAppellantName(), writeFinalDecisionTemplateBody.getStartDate(),
+                            writeFinalDecisionTemplateBody.getMobilityNumberOfPoints())));
+                }
             }
         }
 
